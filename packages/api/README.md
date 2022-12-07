@@ -36,6 +36,17 @@ orchestrator that the development API server knows about.
 
 ## Testing
 
-To run the unit tests in development, you can run `npm run test:local`. The full
-`npm run test` suite runs against every store and amalgamates the runs to ensure
-full test coverage.
+To run the unit tests in development, you can run:
+
+```
+yarn test:dev
+```
+
+To run a single unit test file:
+
+```
+yarn jest -i --watch --silent src/controllers/user.test.ts
+```
+
+The full `yarn test` suite runs against every store and amalgamates the runs to
+ensure full test coverage.

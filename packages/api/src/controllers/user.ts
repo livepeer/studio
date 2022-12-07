@@ -65,6 +65,11 @@ async function findUserByEmail(email: string, useReplica = true) {
   return users[0];
 }
 
+async function isEmailRegistered(email: string, useReplica = true) {
+  const [users] = await db.user.find({ email }, { useReplica });
+  return users?.length > 0;
+}
+
 const frontendUrl = (
   {
     headers: { "x-forwarded-proto": proto },
@@ -247,6 +252,14 @@ app.post("/", validatePost("user"), async (req, res) => {
     res.json({ errors: ["invalid email"] });
     return;
   }
+
+  const isEmailRegisteredAlready = await isEmailRegistered(email);
+  if (isEmailRegisteredAlready) {
+    res.status(409);
+    res.json({ errors: ["email already registered"] });
+    return;
+  }
+
   const [hashedPassword, salt] = await hash(password);
   const id = uuid();
   const emailValidToken = uuid();
