@@ -18,6 +18,7 @@ import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
+import { TooManyRequestsError } from "../store/errors";
 
 const app = Router();
 
@@ -236,9 +237,9 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     // this is an attempt to start executing the task for the first time. check concurrent tasks limit
     const numRunning = await db.task.countRunningTasks(req.user.id);
     if (numRunning >= req.config.vodMaxConcurrentTasksPerUser) {
-      return res.status(429).json({
-        errors: [`too many tasks running for user ${user.id} (${numRunning})`],
-      });
+      throw new TooManyRequestsError(
+        `too many tasks running for user ${user.id} (${numRunning})`
+      );
     }
   }
 

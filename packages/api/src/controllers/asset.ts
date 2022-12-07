@@ -27,6 +27,7 @@ import {
   InternalServerError,
   UnauthorizedError,
   NotImplementedError,
+  TooManyRequestsError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
@@ -44,6 +45,7 @@ import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
+import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -232,6 +234,15 @@ function assetWithIpfsUrls(
   });
 }
 
+async function ensureQueueCapacity(config: CliArgs, userId: string) {
+  const numScheduled = await db.task.countScheduledTasks(userId);
+  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
+    throw new TooManyRequestsError(
+      `user ${userId} has reached the maximum number of concurrent tasks`
+    );
+  }
+}
+
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {
   asset = await db.asset.create(asset);
   await queue.publishWebhook("events.asset.created", {
@@ -251,7 +262,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
 }
 
 async function reconcileAssetStorage(
-  { taskScheduler }: Request,
+  { taskScheduler, config }: Request,
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
   task?: WithID<Task>
@@ -267,6 +278,8 @@ async function reconcileAssetStorage(
       throw new BadRequestError("Cannot remove asset from IPFS");
     }
     if (!task) {
+      await ensureQueueCapacity(config, asset.userId);
+
       task = await taskScheduler.scheduleTask(
         "export",
         { export: { ipfs: newSpec } },
@@ -490,6 +503,7 @@ app.post(
     if (!asset) {
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
+
     if (asset.status.phase !== "ready") {
       res.status(412);
       return res.json({ errors: ["asset is not ready to be exported"] });
@@ -497,17 +511,22 @@ app.post(
     if (req.user.id !== asset.userId) {
       throw new ForbiddenError(`User can only export their own assets`);
     }
+
+    await ensureQueueCapacity(req.config, req.user.id);
+
     const params = req.body as ExportTaskParams;
     const task = await req.taskScheduler.scheduleTask(
       "export",
       { export: params },
       asset
     );
+
     if ("ipfs" in params && !params.ipfs?.pinata) {
       // TODO: Make this unsupported. PATCH should be the only way to change asset storage.
       console.warn(
         `Deprecated export to IPFS API used. userId=${req.user.id} assetId=${assetId}`
       );
+
       const storage = await reconcileAssetStorage(
         req,
         asset,
@@ -557,6 +576,8 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
       return;
     }
   }
+
+  await ensureQueueCapacity(req.config, req.user.id);
 
   asset = await createAsset(asset, req.queue);
   const taskType = useCatalyst ? "upload" : "import";
@@ -622,6 +643,9 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     { type: "transcode", inputAssetId: inputAsset.id }
   );
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
+
+  await ensureQueueCapacity(req.config, req.user.id);
+
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -689,7 +713,14 @@ app.post(
     const url = `${baseUrl}/api/asset/upload/direct?token=${uploadToken}`;
     const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
+    // we check for enqueued tasks when starting an upload, but uploads
+    // themselves don't count towards the limit. this should be relatvely fine
+    // as direct uploads will also need a lot of effort from callers to upload
+    // the files, so the risk is much smaller.
+    await ensureQueueCapacity(req.config, req.user.id);
+
     asset = await createAsset(asset, req.queue);
+
     const taskType = shouldUseCatalyst(req) ? "upload" : "import";
     const task = await req.taskScheduler.spawnTask(
       taskType,

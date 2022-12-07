@@ -19,14 +19,6 @@ export class BadRequestError extends APIError {
   }
 }
 
-export class UnprocessableEntityError extends APIError {
-  constructor(message) {
-    super(message);
-    this.type = "UnprocessableEntityError";
-    this.status = 422;
-  }
-}
-
 export class NotFoundError extends APIError {
   constructor(message) {
     super(message);
@@ -48,6 +40,22 @@ export class ForbiddenError extends APIError {
     super(message);
     this.type = "ForbiddenError";
     this.status = 403;
+  }
+}
+
+export class UnprocessableEntityError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "UnprocessableEntityError";
+    this.status = 422;
+  }
+}
+
+export class TooManyRequestsError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "TooManyRequestsError";
+    this.status = 429;
   }
 }
 
