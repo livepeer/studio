@@ -19,11 +19,18 @@ function joinOr(filters: SQLStatement[]): SQLStatement {
 }
 
 export default class TaskTable extends Table<WithID<Task>> {
-  async listPendingTasks(
+  async countRunningTasks(userId: string) {
+    return this.countPendingTasks(userId, true);
+  }
+
+  async countScheduledTasks(userId: string) {
+    return this.countPendingTasks(userId, false);
+  }
+
+  private async countPendingTasks(
     userId: string,
-    startedTasksOnly: boolean,
-    opts: FindOptions = { limit: 10 }
-  ): Promise<WithID<Task>[]> {
+    startedTasksOnly: boolean
+  ): Promise<number> {
     const activeTaskThreshold = Date.now() - ACTIVE_TASK_TIMEOUT;
     // tasks that are on a retry backoff will be in the `waiting` phase with a `retries` field
     const phaseConds = [
@@ -49,7 +56,10 @@ export default class TaskTable extends Table<WithID<Task>> {
       sql`task.data->>'userId' = ${userId}`,
       joinOr(phaseConds),
     ];
-    let [tasks] = await this.find(query, opts);
-    return tasks;
+    let [count] = await this.find(query, {
+      fields: "COUNT(*) as count",
+      process: (row: { count: number }) => row.count,
+    });
+    return count[0] ?? 0;
   }
 }

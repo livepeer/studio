@@ -234,12 +234,10 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   // allow test users to run as many tasks as necessary
   if (!user.isTestUser && phase === "waiting" && !retries) {
     // this is an attempt to start executing the task for the first time. check concurrent tasks limit
-    const tasks = await db.task.listPendingTasks(req.user.id, true);
-    if (tasks.length >= req.config.vodMaxConcurrentTasksPerUser) {
+    const numRunning = await db.task.countRunningTasks(req.user.id);
+    if (numRunning >= req.config.vodMaxConcurrentTasksPerUser) {
       return res.status(429).json({
-        errors: [
-          `too many tasks running for user ${user.id} (${tasks.length})`,
-        ],
+        errors: [`too many tasks running for user ${user.id} (${numRunning})`],
       });
     }
   }
