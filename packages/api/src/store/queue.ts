@@ -217,6 +217,7 @@ export class RabbitQueue implements Queue {
     );
     await this._channelPublish(this.exchanges[exchangeName], route, msg, {
       persistent: true,
+      mandatory: true,
     });
   }
 
