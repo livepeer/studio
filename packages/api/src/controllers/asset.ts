@@ -53,6 +53,11 @@ function shouldUseCatalyst({ query, user, config }: Request) {
   const { vodCatalystPipelineRolloutPercent: rollPct } = config;
   const { email = "", admin } = user ?? {};
   const { upload } = toStringValues(query);
+
+  // Special case for initial rollout
+  if (email.startsWith("sas")) {
+      return false
+  }
   if (email.endsWith("+e2e@livepeer.org") && rollPct < 100) {
     // force e2e tests to see 50% of each
     return 100 * Math.random() < 50;
