@@ -56,7 +56,7 @@ function shouldUseCatalyst({ query, user, config }: Request) {
 
   if (email.startsWith("sas")) {
     // Special case for initial rollout
-    return false;
+    return true;
   }
   if (email.endsWith("+e2e@livepeer.org") && rollPct < 100) {
     // force e2e tests to see 50% of each
