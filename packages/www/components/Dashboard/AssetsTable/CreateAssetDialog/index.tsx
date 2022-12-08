@@ -21,7 +21,7 @@ import AssetsUploadError from "./AssetsUploadError";
 
 const acceptedMimeTypes = isStaging()
   ? { "video/*": [] }
-  : { "video/mp4": [".mp4"] };
+  : { "video/mp4": [".mp4", ".mov"], "video/quicktime": [".mov"] };
 const maxFiles = 20;
 
 const activeStyle = {
