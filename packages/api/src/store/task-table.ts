@@ -71,8 +71,8 @@ export default class TaskTable extends Table<WithID<Task>> {
 
     const indexName = [this.name, "pendingTasks"].join("_");
     try {
-      await this.db.query(sql`
-          CREATE INDEX ${indexName} ON ${this.name}
+      await this.db.query(`
+          CREATE INDEX "${indexName}" ON "${this.name}"
           USING BTREE (
             (data->>'userId'),
             coalesce((task.data->'status'->>'updatedAt')::bigint, 0),
