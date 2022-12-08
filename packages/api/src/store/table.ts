@@ -84,10 +84,10 @@ export default class Table<T extends DBObject> {
   }
 
   // returns [docs, cursor]
-  async find(
+  async find<Q = T>(
     query: FindQuery | Array<SQLStatement> = {},
-    opts: FindOptions = {}
-  ): Promise<[Array<T>, string]> {
+    opts: FindOptions<Q> = {}
+  ): Promise<[Array<Q>, string]> {
     const {
       cursor = "",
       useReplica = true,
@@ -131,7 +131,9 @@ export default class Table<T extends DBObject> {
       q.append(" ");
     }
 
-    q.append(` ORDER BY ${order}`);
+    if (order) {
+      q.append(` ORDER BY ${order}`);
+    }
     if (limit) {
       q.append(sql` LIMIT ${limit}`);
     }
@@ -139,14 +141,14 @@ export default class Table<T extends DBObject> {
       q.append(sql` OFFSET ${cursor.replace("skip", "")}`);
     }
 
-    let res;
+    let res: QueryResult;
     if (useReplica) {
       res = await this.db.replicaQuery(q);
     } else {
       res = await this.db.query(q);
     }
 
-    const docs = res.rows.map(process ? process : ({ data }) => data);
+    const docs = res.rows.map(process ? process : ({ data }) => data as Q);
 
     if (docs.length < 1) {
       return [docs, null];

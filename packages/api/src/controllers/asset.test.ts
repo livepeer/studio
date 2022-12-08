@@ -167,6 +167,28 @@ describe("controllers/asset", () => {
     });
   });
 
+  it("should detect duplicate assets", async () => {
+    const spec = {
+      name: "test",
+      url: "https://example.com/test.mp4",
+    };
+    let res = await client.post(`/asset/upload/url`, spec);
+    expect(res.status).toBe(201);
+    let {
+      asset: { id: assetId },
+      task: { id: taskId },
+    } = await res.json();
+    expect(assetId).toMatch(/^[a-f0-9-]{36}$/);
+    expect(taskId).toMatch(/^[a-f0-9-]{36}$/);
+
+    res = await client.post(`/asset/upload/url`, spec);
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toMatchObject({
+      asset: { id: assetId },
+      task: { id: taskId },
+    });
+  });
+
   describe("asset inline storage", () => {
     let asset: WithID<Asset>;
 

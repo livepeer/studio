@@ -186,7 +186,7 @@ export class TaskScheduler {
     return true;
   }
 
-  private async failTask(
+  public async failTask(
     task: WithID<Task>,
     error: string,
     output?: Task["output"]
