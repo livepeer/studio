@@ -1,7 +1,8 @@
 import sql, { SQLStatement } from "sql-template-strings";
+import logger from "../logger";
 import { Task } from "../schema/types";
 import Table from "./table";
-import { FindOptions, WithID } from "./types";
+import { WithID } from "./types";
 
 // TODO: Clean-up these lost tasks, making them failed
 const ACTIVE_TASK_TIMEOUT = 5 * 60 * 1000; // 5 mins
@@ -63,5 +64,27 @@ export default class TaskTable extends Table<WithID<Task>> {
       process: (row: { count: number }) => row.count,
     });
     return count[0] ?? 0;
+  }
+
+  async ensureTable(): Promise<void> {
+    await super.ensureTable();
+
+    const indexName = [this.name, "pendingTasks"].join("_");
+    try {
+      await this.db.query(sql`
+          CREATE INDEX ${indexName} ON ${this.name}
+          USING BTREE (
+            (data->>'userId'),
+            coalesce((task.data->'status'->>'updatedAt')::bigint, 0),
+            (data->'status'->>'phase')
+          );
+        `);
+    } catch (e) {
+      if (!e.message.includes("already exists")) {
+        throw e;
+      }
+      return;
+    }
+    logger.info(`Created index ${indexName} on ${this.name}`);
   }
 }
