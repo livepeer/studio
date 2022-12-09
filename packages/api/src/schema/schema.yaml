@@ -1466,6 +1466,7 @@ components:
                     - background_external
                     - background_mist
                     - fallback_external
+                    - external
             import:
               $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:

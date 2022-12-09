@@ -548,7 +548,7 @@ app.post(
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   let { url, catalystPipelineStrategy } = req.body as NewAssetPayload;
-  if (!req.user.admin) {
+  if (!req.user.admin && !req.user.isTestUser) {
     catalystPipelineStrategy = undefined;
   }
   if (!url) {
