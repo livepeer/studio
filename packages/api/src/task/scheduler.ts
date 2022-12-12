@@ -258,10 +258,8 @@ export class TaskScheduler {
     const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
-      type: type,
-      outputAssetId: outputAsset?.id,
-      inputAssetId: inputAsset?.id,
-      userId: inputAsset?.userId || outputAsset?.userId,
+      type: "transcode-file",
+      userId: "659f5a74-5f56-442d-a3f5-c728ac546865",
       params,
       status: {
         phase: "pending",
