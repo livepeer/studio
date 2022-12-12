@@ -28,13 +28,13 @@ export interface QueryOptions {
   useReplica?: boolean;
 }
 
-export interface FindOptions extends QueryOptions {
+export interface FindOptions<T = never> extends QueryOptions {
   cursor?: string;
   limit?: number | string;
   order?: string;
   fields?: string;
   from?: string;
-  process?: Function;
+  process?: (row: any) => T;
 }
 
 export interface GetOptions {

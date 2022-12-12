@@ -524,6 +524,7 @@ export default class WebhookCannon {
       },
       this.queue
     );
+    // we can't rate limit this task because it's not a user action
     await taskScheduler.scheduleTask(
       "import",
       {

@@ -57,9 +57,10 @@ export default function OffsetPortableText({ title, portableTextRaw }) {
                 the optimal video viewing experience.
               </Text> */}
               {portableTextRaw && <PortableText value={portableTextRaw} />}
-              <Link href="/login">
+              <a
+                href="https://lvpr.link/dStorage"
+                style={{ textDecoration: "none" }}>
                 <Button
-                  as={A}
                   small
                   variant="blue"
                   css={{
@@ -82,7 +83,7 @@ export default function OffsetPortableText({ title, portableTextRaw }) {
                   }}>
                   Let's Go
                 </Button>
-              </Link>
+              </a>
             </Box>
           </Box>
         </Container>

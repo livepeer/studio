@@ -9,6 +9,7 @@ const withMDX = require("@next/mdx")({
 const isAnalyzeEnabled = process.env.ANALYZE === "true";
 
 const config = {
+  swcMinify: false,
   images: {
     domains: ["cdn.sanity.io"],
   },
@@ -235,10 +236,6 @@ module.exports = withPlugins(
           config.module.rules.push({
             test: /\.md$/,
             use: "raw-loader",
-          });
-          config.module.rules.push({
-            test: /\.svg$/,
-            use: ["@svgr/webpack"],
           });
           if (isAnalyzeEnabled) {
             const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");

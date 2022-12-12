@@ -186,7 +186,7 @@ export class TaskScheduler {
     return true;
   }
 
-  private async failTask(
+  public async failTask(
     task: WithID<Task>,
     error: string,
     output?: Task["output"]
@@ -287,13 +287,24 @@ export class TaskScheduler {
       updatedAt: Date.now(),
       retries: task.status.retries,
     };
-    await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
-      type: "task_trigger",
-      id: uuid(),
-      timestamp: status.updatedAt,
-      task: taskInfo(task),
-    });
     await this.updateTask(task, { status });
+    try {
+      await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
+        type: "task_trigger",
+        id: uuid(),
+        timestamp: status.updatedAt,
+        task: taskInfo(task),
+      });
+    } catch (err) {
+      console.error(`Failed to enqueue task: taskId=${task.id} err=`, err);
+      this.failTask(task, "Failed to enqueue task").catch((err) =>
+        console.error(
+          `Error failing task after enqueue error: taskId=${task.id} err=`,
+          err
+        )
+      );
+      throw new Error(`Failed to enqueue task: ${err}`);
+    }
   }
 
   async retryTask(task: WithID<Task>, errorMessage: string) {

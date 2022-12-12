@@ -15,6 +15,7 @@ import {
   toStringValues,
   pathJoin,
   getObjectStoreS3Config,
+  reqUseReplica,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -26,6 +27,7 @@ import {
   InternalServerError,
   UnauthorizedError,
   NotImplementedError,
+  TooManyRequestsError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
@@ -43,20 +45,34 @@ import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
+import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
+  const { vodCatalystPipelineRolloutPercent: rollPct } = config;
+  const { email = "", admin } = user ?? {};
   const { upload } = toStringValues(query);
-  if (
-    config.frontendDomain?.endsWith(".monster") &&
-    user.email?.endsWith("@livepeer.org")
-  ) {
+
+  if (email.startsWith("sas")) {
+    // Special case for initial rollout
     return true;
-  } else if (user.admin) {
-    return upload === "1";
   }
-  return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
+  if (email.endsWith("+e2e@livepeer.org") && rollPct < 100) {
+    // force e2e tests to see 50% of each
+    return 100 * Math.random() < 50;
+  } else if (admin && upload) {
+    // admin users can control what they see
+    return upload === "1";
+  } else if (
+    email.endsWith("@livepeer.org") &&
+    email !== "livepeerjs@livepeer.org"
+  ) {
+    // livepeer users only see catalyst
+    return true;
+  }
+  // everyone else will see as much as we decide to rollout the catalyst pipeline
+  return 100 * Math.random() < rollPct;
 }
 
 function defaultObjectStoreId(
@@ -223,6 +239,15 @@ function assetWithIpfsUrls(
   });
 }
 
+async function ensureQueueCapacity(config: CliArgs, userId: string) {
+  const numScheduled = await db.task.countScheduledTasks(userId);
+  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
+    throw new TooManyRequestsError(
+      `user ${userId} has reached the maximum number of pending tasks`
+    );
+  }
+}
+
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {
   asset = await db.asset.create(asset);
   await queue.publishWebhook("events.asset.created", {
@@ -242,7 +267,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
 }
 
 async function reconcileAssetStorage(
-  { taskScheduler }: Request,
+  { taskScheduler, config }: Request,
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
   task?: WithID<Task>
@@ -258,6 +283,8 @@ async function reconcileAssetStorage(
       throw new BadRequestError("Cannot remove asset from IPFS");
     }
     if (!task) {
+      await ensureQueueCapacity(config, asset.userId);
+
       task = await taskScheduler.scheduleTask(
         "export",
         { export: { ipfs: newSpec } },
@@ -455,7 +482,9 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const asset = await db.asset.get(req.params.id);
+  const asset = await db.asset.get(req.params.id, {
+    useReplica: reqUseReplica(req),
+  });
   if (!asset || asset.deleted) {
     throw new NotFoundError(`Asset not found`);
   }
@@ -479,6 +508,7 @@ app.post(
     if (!asset) {
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
+
     if (asset.status.phase !== "ready") {
       res.status(412);
       return res.json({ errors: ["asset is not ready to be exported"] });
@@ -486,17 +516,22 @@ app.post(
     if (req.user.id !== asset.userId) {
       throw new ForbiddenError(`User can only export their own assets`);
     }
+
+    await ensureQueueCapacity(req.config, req.user.id);
+
     const params = req.body as ExportTaskParams;
     const task = await req.taskScheduler.scheduleTask(
       "export",
       { export: params },
       asset
     );
+
     if ("ipfs" in params && !params.ipfs?.pinata) {
       // TODO: Make this unsupported. PATCH should be the only way to change asset storage.
       console.warn(
         `Deprecated export to IPFS API used. userId=${req.user.id} assetId=${assetId}`
       );
+
       const storage = await reconcileAssetStorage(
         req,
         asset,
@@ -512,10 +547,20 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
+  let { url, catalystPipelineStrategy } = req.body as NewAssetPayload;
+  if (!req.user.admin && !req.user.isTestUser) {
+    catalystPipelineStrategy = undefined;
+  }
+  if (!url) {
+    return res.status(422).json({
+      errors: [`Must provide a "url" field for the asset contents`],
+    });
+  }
+
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
   const useCatalyst = shouldUseCatalyst(req);
-  let asset = await validateAssetPayload(
+  const newAsset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
@@ -523,20 +568,28 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
-  if (!req.body.url) {
-    return res.status(422).json({
-      errors: [`Must provide a "url" field for the asset contents`],
-    });
+  const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
+  if (dupAsset) {
+    const [task] = await db.task.find({ outputAssetId: dupAsset.id });
+    if (!task.length) {
+      console.error("Found asset with no task", dupAsset);
+      // proceed as a regular new asset
+    } else {
+      // return the existing asset and task, as if created now, with a slightly
+      // different status code (200, not 201). Should be transparent to clients.
+      res.status(200).json({ asset: dupAsset, task: { id: task[0].id } });
+      return;
+    }
   }
 
-  asset = await createAsset(asset, req.queue);
+  await ensureQueueCapacity(req.config, req.user.id);
+
+  const asset = await createAsset(newAsset, req.queue);
   const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
-      [taskType]: {
-        url: req.body.url,
-      },
+      [taskType]: { url, catalystPipelineStrategy },
     },
     undefined,
     asset
@@ -595,6 +648,9 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     { type: "transcode", inputAssetId: inputAsset.id }
   );
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
+
+  await ensureQueueCapacity(req.config, req.user.id);
+
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -642,6 +698,10 @@ app.post(
       defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
+    const { catalystPipelineStrategy = undefined } = req.user.admin
+      ? (req.body as NewAssetPayload)
+      : {};
+
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
       vodObjectStoreId,
@@ -658,12 +718,19 @@ app.post(
     const url = `${baseUrl}/api/asset/upload/direct?token=${uploadToken}`;
     const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
+    // we check for enqueued tasks when starting an upload, but uploads
+    // themselves don't count towards the limit. this should be relatvely fine
+    // as direct uploads will also need a lot of effort from callers to upload
+    // the files, so the risk is much smaller.
+    await ensureQueueCapacity(req.config, req.user.id);
+
     asset = await createAsset(asset, req.queue);
+
     const taskType = shouldUseCatalyst(req) ? "upload" : "import";
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
-        [taskType]: { url: downloadUrl },
+        [taskType]: { url: downloadUrl, catalystPipelineStrategy },
       },
       null,
       asset
@@ -754,7 +821,7 @@ const getPendingAssetAndTask = async (playbackId: string) => {
     { outputAssetId: asset.id },
     { useReplica: false }
   );
-  if (!tasks?.length && !tasks[0]?.length) {
+  if (!tasks?.length || !tasks[0]?.length) {
     throw new NotFoundError(`task not found`);
   }
   const task = tasks[0][0];

@@ -17,8 +17,12 @@ import { useDropzone } from "react-dropzone";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
 import { isStaging } from "lib/utils";
+import AssetsUploadError from "./AssetsUploadError";
 
-const acceptedMimeTypes = isStaging() ? ["video/*"] : ["video/mp4"];
+const acceptedMimeTypes = isStaging()
+  ? { "*": [] }
+  : { "video/mp4": [".mp4", ".mov"], "video/quicktime": [".mov"] };
+const maxFiles = 20;
 
 const activeStyle = {
   borderColor: "white",
@@ -46,20 +50,24 @@ const CreateAssetDialog = ({
   onCreate: ({ videoFiles }: { videoFiles: File[] }) => Promise<void>;
 }) => {
   const [creating, setCreating] = useState(false);
-
   const [videoFiles, setVideoFiles] = useState<VideoFiles>({});
-  const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (acceptedFiles && acceptedFiles.length > 0) {
-      setVideoFiles((prev) => ({
+    if (!acceptedFiles || !acceptedFiles.length) return;
+
+    setVideoFiles((prev) => {
+      const newVideoFiles = {
         ...prev,
         ...acceptedFiles.reduce(
           (prev, curr) => ({ ...prev, [curr.name]: curr }),
           {}
         ),
-      }));
-    }
+      };
+      // Make sure there are never more than the max allowed files selected
+      return Object.keys(newVideoFiles).length <= maxFiles
+        ? newVideoFiles
+        : prev;
+    });
   }, []);
 
   const {
@@ -68,9 +76,10 @@ const CreateAssetDialog = ({
     isDragActive,
     isDragAccept,
     isDragReject,
+    fileRejections,
   } = useDropzone({
     accept: acceptedMimeTypes,
-    maxFiles: 20,
+    maxFiles,
     onDrop,
   });
 
@@ -155,38 +164,36 @@ const CreateAssetDialog = ({
                 </Text>
               </Box>
             </Box>
-            {videoFiles &&
-              Object.keys(videoFiles).map((key) => (
-                <Flex key={key} align="center">
-                  <IconButton
-                    onClick={() => setVideoFiles((prev) => omit(prev, key))}
-                    css={{ color: "$whiteA12", mr: "$1", cursor: "pointer" }}>
-                    <Cross2Icon />
-                  </IconButton>
 
-                  <Text
-                    as="p"
-                    css={{
-                      my: "$1",
-                      fontSize: "$1",
-                    }}>
-                    {key}
-                  </Text>
-                </Flex>
-              ))}
+            <AssetsUploadError fileRejections={fileRejections} />
 
-            {error && (
-              <Box>
-                <Text>{error}</Text>
-              </Box>
-            )}
+            <Box css={{ mt: "$1" }}>
+              {videoFiles &&
+                Object.keys(videoFiles).map((key) => (
+                  <Flex key={key} align="center">
+                    <IconButton
+                      onClick={() => setVideoFiles((prev) => omit(prev, key))}
+                      css={{ mr: "$1", cursor: "pointer" }}>
+                      <Cross2Icon />
+                    </IconButton>
+                    <Text
+                      as="p"
+                      css={{
+                        my: "$1",
+                        fontSize: "$1",
+                      }}>
+                      {key}
+                    </Text>
+                  </Flex>
+                ))}
+            </Box>
           </Box>
           <AlertDialogDescription asChild>
             <Text
               size="3"
               variant="gray"
               css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
-              Select up to 20 files at a time
+              Select up to {maxFiles} files at a time
             </Text>
           </AlertDialogDescription>
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>

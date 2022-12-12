@@ -23,6 +23,7 @@ import {
   ThemeConfig,
 } from "@livepeer/react";
 import "../css/hubspot.scss";
+import { isStaging } from "lib/utils";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,16 @@ Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
-const livepeerClient = createReactClient({ provider: studioProvider() });
+const livepeerClient = createReactClient({
+  provider: studioProvider({
+    // we intentionally provide no API key so any requests requiring auth will fail
+    // eventually should move to using JWT from user's login
+    apiKey: "",
+    baseUrl: isStaging()
+      ? "https://livepeer.monster"
+      : "https://livepeer.studio",
+  }),
+});
 
 const livepeerTheme: ThemeConfig = {
   colors: {

@@ -26,6 +26,7 @@ import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
 import { CdnUsageTable } from "./cdn-usage-table";
 import AssetTable from "./asset-table";
+import TaskTable from "./task-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -64,7 +65,7 @@ export class DB {
   objectStore: Table<ObjectStore>;
   multistreamTarget: MultistreamTargetTable;
   asset: AssetTable;
-  task: Table<Task>;
+  task: TaskTable;
   signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
@@ -151,7 +152,7 @@ export class DB {
       db: this,
       schema: schemas["asset"],
     });
-    this.task = makeTable<Task>({
+    this.task = new TaskTable({
       db: this,
       schema: schemas["task"],
     });

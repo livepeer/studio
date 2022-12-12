@@ -33,14 +33,16 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
               }}>
               {title}
             </LiveBox>
-            <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
-            {portableTextRaw && <PortableText value={portableTextRaw} />}
+            <Box sx={{ maxWidth: "640px", marginX: "auto" }}>
+              {portableTextRaw && <PortableText value={portableTextRaw} />}
+            </Box>
           </Box>
         )}
         <Box
           sx={{
             display: ["block", "flex"],
-            justifyContent: ["unset", "space-between"],
+            flexWrap: "wrap",
+            justifyContent: ["unset", "center"],
             width: "100%",
             borderTop: "1px solid #666774",
             borderBottom: "1px solid #666774",
@@ -54,10 +56,11 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
                 <Image
                   alt="Livepeer"
                   src={urlFor(icon).url()}
-                  width={100}
+                  width={200}
                   height={100}
                   placeholder="blur"
                   blurDataURL={urlFor(icon).width(24).height(24).blur(10).url()}
+                  style={{ objectFit: "contain" }}
                 />
               </Box>
             );

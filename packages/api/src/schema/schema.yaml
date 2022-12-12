@@ -1361,6 +1361,8 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
     transcode-asset-payload:
       additionalProperties: false
@@ -1446,12 +1448,25 @@ components:
                   type: string
                   description:
                     ID of the original recorded session to avoid re-transcoding
-                    of the same content.
+                    of the same content. Only used for import task.
                   example: 78df0075-b5f3-4683-a618-1086faca35dc
                 uploadedObjectKey:
                   type: string
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
+                catalystPipelineStrategy:
+                  type: string
+                  description:
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
             import:
               $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:

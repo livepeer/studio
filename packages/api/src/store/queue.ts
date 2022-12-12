@@ -143,8 +143,8 @@ export class RabbitQueue implements Queue {
             this.exchanges.task,
             "task.result.#"
           ),
-          channel.prefetch(2),
         ]);
+        await channel.prefetch(10);
       },
     });
     return new Promise<void>((resolve, reject) => {
@@ -217,6 +217,8 @@ export class RabbitQueue implements Queue {
     );
     await this._channelPublish(this.exchanges[exchangeName], route, msg, {
       persistent: true,
+      // TODO: Actually handle confirms and returns from the AMQP server. Needs to setup a `return` event handler in the channel.
+      // mandatory: true,
     });
   }
 
