@@ -19,10 +19,20 @@ import omit from "lodash.omit";
 import { isStaging } from "lib/utils";
 import AssetsUploadError from "./AssetsUploadError";
 
+// Note: commond mimetype list https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 const acceptedMimeTypes = isStaging()
   ? { "*": [] }
-  : { "video/mp4": [".mp4", ".mov"], "video/quicktime": [".mov"] };
-const maxFiles = 20;
+  : {
+      "video/mp4": [".mp4"],
+      "video/quicktime": [".mov"],
+      "video/x-msvideo": [".avi"],
+      "video/webm": [".webm"],
+      "video/x-ms-wmv": [".wmv"],
+      "video/x-matroska": [".mkv"],
+      "video/x-flv": [".flv"],
+    };
+
+const maxFiles = 100;
 
 const activeStyle = {
   borderColor: "white",
@@ -193,7 +203,7 @@ const CreateAssetDialog = ({
               size="3"
               variant="gray"
               css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
-              Select up to {maxFiles} files at a time
+              Select up to {maxFiles} files. Files are uploaded 5 at a time.
             </Text>
           </AlertDialogDescription>
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
