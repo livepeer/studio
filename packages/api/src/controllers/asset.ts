@@ -929,12 +929,17 @@ app.post(
             url: "https://storage.googleapis.com/thom-vod-testing/mustwork/Pexels%20Videos%203444.mp4",
           },
           storage: {
-            service: "s3",
+            type: "s3",
             endpoint: "https://gateway.storjshare.io",
             bucket: "testbucket12",
-            credentals: {
+            credentials: {
               accessKeyId: "<ACCESS_KEY_ID>",
               secretAccessKey: "<SECRET_ACCESS_KEY>",
+            },
+          },
+          outputs: {
+            hls: {
+              path: "/samplevideo/hls",
             },
           },
           catalystPipelineStrategy,
