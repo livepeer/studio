@@ -4,7 +4,7 @@ export const isDev = process.env.NODE_ENV === "development";
 
 // Be sure to include Vercel System Env Vars
 export const originURL = isDev
-  ? "http://localhost:3000"
+  ? `https://livepeer.monster`
   : `https://${
       process.env.VERCEL_URL ??
       process.env.NEXT_PUBLIC_VERCEL_URL ??

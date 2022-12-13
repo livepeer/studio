@@ -20,7 +20,7 @@ import * as versionEndpointsFunctions from "./endpoints/version";
 import * as webhookEndpointsFunctions from "./endpoints/webhook";
 
 const endpoint = isDevelopment()
-  ? `http://localhost:3004`
+  ? `https://livepeer.monster`
   : isStaging()
   ? `https://livepeer.monster`
   : ``;
