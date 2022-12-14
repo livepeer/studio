@@ -32,6 +32,10 @@ const acceptedMimeTypes = isStaging()
       "video/x-flv": [".flv"],
     };
 
+const acceptedFileTypesString = Object.keys(acceptedMimeTypes)
+  .flatMap((key) => acceptedMimeTypes[key])
+  .join(", ");
+
 const maxFiles = 100;
 
 const activeStyle = {
@@ -204,6 +208,8 @@ const CreateAssetDialog = ({
               variant="gray"
               css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
               Select up to {maxFiles} files. Files are uploaded 5 at a time.
+              <br />
+              {acceptedFileTypesString} supported.
             </Text>
           </AlertDialogDescription>
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
