@@ -919,10 +919,6 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
 
     asset = await createAsset(asset, req.queue);
-    const storageCredentials = {
-      accessKeyId: "<ACCESS_KEY_ID>",
-      secretAccessKey: "<SECRET_ACCESS_KEY>",
-    };
 
     const taskType = "transcode-file";
     const task = await req.taskScheduler.spawnTask(
@@ -935,7 +931,11 @@ app.post(
           storage: {
             type: "s3",
             endpoint: "https://gateway.storjshare.io",
-            bucket: "testbucket15",
+            bucket: "testbucket17",
+            credentials: {
+              accessKeyId: "<ACCESS_KEY_ID>",
+              secretAccessKey: "<SECRET_ACCESS_KEY>",
+            },
           },
           outputs: {
             hls: {
@@ -948,9 +948,6 @@ app.post(
       null,
       asset
     );
-
-    // Credentials added here, because they should be published to the queue, but not stored in DB
-    task.params["transcode-file"].storage.credentials = storageCredentials;
 
     await req.taskScheduler.enqueueTask(task);
 
