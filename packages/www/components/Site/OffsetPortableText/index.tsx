@@ -12,7 +12,7 @@ function CustomLinkResolver({ button }) {
     <Link
       style={{ textDecoration: "none" }}
       href={url.external ?? url.internal.slug.current ?? "/"}
-      target="_blank"
+      target={url.blank ? "_blank" : "_self"}
       passHref>
       <Button
         small
