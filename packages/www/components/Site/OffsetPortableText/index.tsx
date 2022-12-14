@@ -4,9 +4,50 @@ import Button from "../../../components/Site/Button";
 import { PortableText } from "@portabletext/react";
 import Link from "next/link";
 
-export default function OffsetPortableText({ title, portableTextRaw }) {
-  // console.log("args: ", title, portableTextRaw);
-  console.log(portableTextRaw);
+function CustomLinkResolver({ button }) {
+  const { url } = button;
+  // const isExternal = !!url.external;
+
+  return (
+    <Link
+      style={{ textDecoration: "none" }}
+      href={url.external ?? url.internal.slug.current ?? "/"}
+      target="_blank"
+      passHref>
+      <Button
+        small
+        variant="blue"
+        css={{
+          bc: "#0A5CD8",
+          fontSize: 20,
+          fontWeight: 500,
+          borderRadius: "$1",
+          px: "6px",
+          py: 0,
+          mt: 16,
+          textDecoration: "none",
+          "&:hover": {
+            textDecoration: "none",
+          },
+          "@bp2": {
+            fontSize: 34,
+            px: "4px",
+            py: "2px",
+          },
+        }}>
+        {button.buttonText}
+      </Button>
+    </Link>
+  );
+}
+
+export default function OffsetPortableText({
+  title,
+  portableTextRaw,
+  buttons,
+}) {
+  console.log("args: ", title, portableTextRaw, buttons);
+  // console.log(portableTextRaw);
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -57,34 +98,11 @@ export default function OffsetPortableText({ title, portableTextRaw }) {
                 the optimal video viewing experience.
               </Text> */}
               {portableTextRaw && <PortableText value={portableTextRaw} />}
-              <a
-                href="https://lvpr.link/dStorage"
-                style={{ textDecoration: "none" }}>
-                <Button
-                  small
-                  variant="blue"
-                  css={{
-                    bc: "#0A5CD8",
-                    fontSize: 20,
-                    fontWeight: 500,
-                    borderRadius: "$1",
-                    px: "6px",
-                    py: 0,
-                    mt: 16,
-                    textDecoration: "none",
-
-                    "&:hover": {
-                      textDecoration: "none",
-                    },
-                    "@bp2": {
-                      fontSize: 34,
-                      px: "4px",
-                      py: "2px",
-                    },
-                  }}>
-                  Let's Go
-                </Button>
-              </a>
+              {buttons &&
+                Array.isArray(buttons) &&
+                buttons.map((button) => (
+                  <CustomLinkResolver button={button} key={button._key} />
+                ))}
             </Box>
           </Box>
         </Container>

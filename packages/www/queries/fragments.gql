@@ -62,6 +62,21 @@ fragment offsetPortableText on OffsetPortableText {
   _type
   title
   portableTextRaw
+  buttons {
+    _key
+    buttonText
+    url {
+      external
+      internal {
+        _rev
+        _key
+        slug {
+          current
+        }
+      }
+      blank
+    }
+  }
 }
 fragment splitImage on SplitImage {
   _type
