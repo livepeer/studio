@@ -28,7 +28,8 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const { getAssets, uploadAssets, deleteAsset, getTasks } = useApi();
+  const { getAssets, uploadAssets, deleteAsset, getTasks, getFileUploads } =
+    useApi();
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
@@ -53,7 +54,13 @@ const AssetsTable = ({
       createDialogState.onOff();
     } catch (e) {
       openSnackbar(`Error with uploading videos, please try again.`);
+      return;
     }
+
+    // Show errors for any files that failed to request upload
+    getFileUploads()
+      .filter((fileUpload) => fileUpload.error !== undefined)
+      .forEach((fileUpload) => openSnackbar(fileUpload.error.message));
   };
 
   const fetcher: Fetcher<AssetsTableData> = useCallback(
