@@ -101,7 +101,7 @@ describe("controllers/user", () => {
 
     it("should create a user without authorization and not allow repeat user creation", async () => {
       client.jwtAuth = "";
-      let res = await client.post("/user/", { ...mockUser });
+      const res = await client.post("/user/", { ...mockUser });
       expect(res.status).toBe(201);
       const user = await res.json();
       expect(user.id).toBeDefined();
@@ -111,11 +111,20 @@ describe("controllers/user", () => {
       const resUser = await db.user.get(user.id);
       expect(resUser.email).toEqual(user.email);
 
-      // if same request is made, should return a 403
-      res = await client.post("/user", {
+      // Registering the same user again should fail
+      const resTwo = await client.post("/user", { ...mockUser });
+      let resTwoJson = await resTwo.json();
+      expect(resTwo.status).toBe(409);
+      expect(resTwoJson.errors[0]).toBe("email already registered");
+
+      // Registering a user with the same uppercased email should fail
+      const resThree = await client.post("/user", {
         ...mockUser,
+        email: mockUser.email.toUpperCase(),
       });
-      expect(res.status).toBe(400);
+      let resThreeJson = await resThree.json();
+      expect(resThree.status).toBe(409);
+      expect(resThreeJson.errors[0]).toBe("email already registered");
     });
 
     it("should make a user an admin with admin email", async () => {
@@ -298,7 +307,17 @@ describe("controllers/user", () => {
       res = await client.post("/user/token", {
         ...mockUser,
       });
+      expect(res.status).toBe(201);
+      tokenRes = await res.json();
+      expect(tokenRes.id).toBeDefined();
+      expect(tokenRes.email).toBe(mockUser.email);
+      expect(tokenRes.token).toBeDefined();
 
+      // token should be returned without error with an uppercase email
+      res = await client.post("/user/token", {
+        ...mockUser,
+        email: mockUser.email.toUpperCase(),
+      });
       expect(res.status).toBe(201);
       tokenRes = await res.json();
       expect(tokenRes.id).toBeDefined();

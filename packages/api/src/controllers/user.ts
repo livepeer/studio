@@ -56,6 +56,18 @@ function cleanUserFields(user: WithID<User>, isAdmin = false) {
 }
 
 async function findUserByEmail(email: string, useReplica = true) {
+  // Look for user by lowercase email
+  const [lowercaseUsers] = await db.user.find(
+    { email: email.toLowerCase() },
+    { useReplica }
+  );
+  if (lowercaseUsers?.length === 1) {
+    return lowercaseUsers[0];
+  } else if (lowercaseUsers.length > 1) {
+    throw new InternalServerError("multiple users found with same email");
+  }
+
+  // Look for user by original email
   const [users] = await db.user.find({ email }, { useReplica });
   if (!users?.length) {
     throw new NotFoundError("user not found");
@@ -63,6 +75,22 @@ async function findUserByEmail(email: string, useReplica = true) {
     throw new InternalServerError("multiple users found with same email");
   }
   return users[0];
+}
+
+async function isEmailRegistered(
+  email: string,
+  useReplica = true
+): Promise<boolean> {
+  // Check if lowercase email is already registered
+  const [lowercaseUsers] = await db.user.find(
+    { email: email.toLowerCase() },
+    { useReplica }
+  );
+  if (lowercaseUsers?.length > 0) return true;
+
+  // Check if original email is already registered
+  const [users] = await db.user.find({ email }, { useReplica });
+  return users?.length > 0;
 }
 
 const frontendUrl = (
@@ -247,6 +275,14 @@ app.post("/", validatePost("user"), async (req, res) => {
     res.json({ errors: ["invalid email"] });
     return;
   }
+
+  const isEmailRegisteredAlready = await isEmailRegistered(email);
+  if (isEmailRegisteredAlready) {
+    res.status(409);
+    res.json({ errors: ["email already registered"] });
+    return;
+  }
+
   const [hashedPassword, salt] = await hash(password);
   const id = uuid();
   const emailValidToken = uuid();
@@ -268,9 +304,11 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
+  const lowercaseEmail = email.toLowerCase();
+
   let stripeFields: Partial<User> = {};
   if (req.stripe) {
-    const customer = await getOrCreateCustomer(req.stripe, email);
+    const customer = await getOrCreateCustomer(req.stripe, lowercaseEmail);
     const subscription = await getOrCreateSubscription(
       req.stripe,
       defaultProductId,
@@ -287,7 +325,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     kind: "user",
     id: id,
     createdAt: Date.now(),
-    email: email,
+    email: lowercaseEmail,
     password: hashedPassword,
     salt: salt,
     admin: admin,
@@ -311,10 +349,10 @@ app.post("/", validatePost("user"), async (req, res) => {
     try {
       // This is a test of the Sendgrid email validation API. Remove this
       // if we decide not to use it and revert to more basic Sendgrid plan.
-      sendgridValidateEmail(email, sendgridValidationApiKey);
+      sendgridValidateEmail(lowercaseEmail, sendgridValidationApiKey);
       // send email verification message to user using SendGrid
       await sendgridEmail({
-        email,
+        email: lowercaseEmail,
         supportAddr,
         sendgridTemplateId,
         sendgridApiKey,
@@ -323,7 +361,11 @@ app.post("/", validatePost("user"), async (req, res) => {
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
-          `/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
+          `/verify?${qs.stringify({
+            email: lowercaseEmail,
+            emailValidToken,
+            selectedPlan,
+          })}`
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
