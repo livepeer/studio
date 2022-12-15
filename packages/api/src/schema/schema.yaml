@@ -1387,6 +1387,118 @@ components:
         profile:
           $ref: "#/components/schemas/ffmpeg-profile"
 
+    transcode-payload:
+      additionalProperties: false
+      required:
+        - input
+        - storage
+        - outputs
+      properties:
+        input:
+          type: object
+          additionalProperties: false
+          description: Input video file
+          properties:
+            url:
+              type: string
+              format: uri
+              pattern: ^(https?|ipfs|ar)://
+              description: URL of the video to transcode
+              example: https://s3.amazonaws.com/bucket/file.mp4
+            type:
+              type: string
+              enum:
+                - s3
+              description: Type of service used as the input instead of "url"
+            endpoint:
+              type: string
+              format: uri
+              pattern: ^http(s)?://
+              description: Service endpoint URL
+              example: https://gateway.storjshare.io
+            bucket:
+              type: string
+              description: Bucket with input file
+              example: inputbucket
+            path:
+              type: string
+              description: Path to the input file inside the bucket
+              example: /path/file.mp4
+            credentials:
+              type: object
+              additionalProperties: false
+              description: Credentials for the private input video storage
+              properties:
+                accessKeyId:
+                  type: string
+                  description: Access Key ID
+                  example: AKIAIOSFODNN7EXAMPLE
+                secretAccessKey:
+                  type: string
+                  description: Secret Access Key
+                  example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        storage:
+          type: object
+          additionalProperties: false
+          required:
+            - type
+            - endpoint
+            - bucket
+            - credentials
+          description: Storage for the output files
+          properties:
+            type:
+              type: string
+              enum:
+                - s3
+              description: Type of service used for output files
+            endpoint:
+              type: string
+              format: uri
+              pattern: ^http(s)?://
+              description: Service endpoint URL
+              example: https://gateway.storjshare.io
+            bucket:
+              type: string
+              description: Bucket with output files
+              example: outputbucket
+            credentials:
+              type: object
+              additionalProperties: false
+              required:
+                - accessKeyId
+                - secretAccessKey
+              description: Credentials for the output video storage
+              properties:
+                accessKeyId:
+                  type: string
+                  description: Access Key ID
+                  example: AKIAIOSFODNN7EXAMPLE
+                secretAccessKey:
+                  type: string
+                  description: Secret Access Key
+                  example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        outputs:
+          type: object
+          additionalProperties: false
+          required:
+            - hls
+          description: Output formats
+          properties:
+            hls:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+              description: HLS output format
+              properties:
+                path:
+                  type: string
+                  description: Path for the HLS output
+                  example: /samplevideo/hls
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+
     task:
       type: object
       table: task
@@ -1487,79 +1599,25 @@ components:
                 input:
                   type: object
                   additionalProperties: false
-                  description: Input video file
+                  description: Input video file to transcode
                   properties:
                     url:
                       type: string
-                      description: URL of the asset to "upload"
-                      example: https://s3.amazonaws.com/bucket/file.mp4
-                    type:
-                      type: string
-                      enum:
-                        - s3
                       description:
-                        Type of service used as the input instead of "url"
-                    endpoint:
-                      type: string
-                      description: Service endpoint URL
-                      example: https://gateway.storjshare.io
-                    bucket:
-                      type: string
-                      description: Bucket with input file
-                      example: inputbucket
-                    path:
-                      type: string
-                      description: Path to the input file inside the bucket
-                      example: /path/file.mp4
-                    credentials:
-                      type: object
-                      additionalProperties: false
-                      description:
-                        Credentials for the private input video storage
-                      properties:
-                        accessKeyId:
-                          type: string
-                          description: Access Key ID
-                          example: AKIAIOSFODNN7EXAMPLE
-                        secretAccessKey:
-                          type: string
-                          description: Secret Access Key
-                          example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+                        URL of a video to transcode, accepts object-store format
+                        "s3+https"
+                      example: https://cdn.livepeer.com/ABC123/filename.mp4
                 storage:
                   type: object
                   additionalProperties: false
                   description: Storage for the output files
                   properties:
-                    type:
+                    url:
                       type: string
-                      enum:
-                        - s3
-                      description: Type of service used for output files
-                    endpoint:
-                      type: string
-                      description: Service endpoint URL
-                      example: https://gateway.storjshare.io
-                    bucket:
-                      type: string
-                      description: Bucket with output files
-                      example: outputbucket
-                    path:
-                      type: string
-                      description: Path to store output files inside the bucket
-                      example: /outputpath/samplevideo
-                    credentials:
-                      type: object
-                      additionalProperties: false
-                      description: Credentials for the output video storage
-                      properties:
-                        accessKeyId:
-                          type: string
-                          description: Access Key ID
-                          example: AKIAIOSFODNN7EXAMPLE
-                        secretAccessKey:
-                          type: string
-                          description: Secret Access Key
-                          example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+                      description:
+                        URL of the output storage, accepts object-store format
+                        "s3+https"
+                      example: "s3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket"
                 outputs:
                   type: object
                   additionalProperties: false
