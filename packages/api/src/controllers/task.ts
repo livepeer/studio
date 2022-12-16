@@ -11,6 +11,7 @@ import {
   toStringValues,
   FieldsMap,
   reqUseReplica,
+  deleteCredentialsFromObjectStoreUrl,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -66,6 +67,20 @@ function taskWithIpfsUrls(
       },
     },
   });
+}
+
+function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
+  if (task?.type !== "transcode-file") {
+    return task;
+  }
+  task.params["transcode-file"].input.url = deleteCredentialsFromObjectStoreUrl(
+    task.params["transcode-file"].input.url
+  );
+  task.params["transcode-file"].storage.url =
+    deleteCredentialsFromObjectStoreUrl(
+      task.params["transcode-file"].storage.url
+    );
+  return task;
 }
 
 const fieldsMap: FieldsMap = {
@@ -196,7 +211,12 @@ app.get("/:id", authorizer({}), async (req, res) => {
     });
   }
 
-  res.json(taskWithIpfsUrls(req.config.ipfsGatewayUrl, task));
+  let resultTask = task;
+  if (req.user.admin !== true) {
+    resultTask = taskWithoutCredentials(task);
+  }
+
+  res.json((req.config.ipfsGatewayUrl, resultTask));
 });
 
 app.post(

@@ -156,9 +156,11 @@ export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
 }
 
 export function deleteCredentialsFromObjectStoreUrl(url: string): string {
-  const [_, accessKeyId, secretAccessKey] = [
-    ...url.matchAll(/s3\+https?:\/\/(.*):(.*)@.*\/.*$/g),
-  ][0];
+  const match = [...url.matchAll(/s3\+https?:\/\/(.*):(.*)@.*\/.*$/g)];
+  if (match.length == 0) {
+    return url;
+  }
+  const [_, accessKeyId, secretAccessKey] = match[0];
   return url.replace(accessKeyId, "***").replace(secretAccessKey, "***");
 }
 

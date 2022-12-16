@@ -92,12 +92,20 @@ describe("controllers/helpers", () => {
   });
 
   describe("delete credentials from object store URL", () => {
-    it("should delete credentials form a correct URL", () => {
+    it("should delete credentials form Object Store URL", () => {
       expect(
         deleteCredentialsFromObjectStoreUrl(
           "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
         )
       ).toBe("s3+https://***:***@gateway.storjshare.io/testbucket");
+    });
+
+    it("should not modify a standard URL", () => {
+      expect(
+        deleteCredentialsFromObjectStoreUrl(
+          "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
+        )
+      ).toBe("https://s3.amazonaws.com/my-bucket/path/filename.mp4");
     });
   });
 });
