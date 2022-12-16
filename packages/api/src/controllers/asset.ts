@@ -929,7 +929,8 @@ app.post(
         },
       },
       null,
-      null
+      null,
+      req.user.id
     );
     await req.taskScheduler.enqueueTask(task);
     res.json({ task: { id: task.id } });
