@@ -893,7 +893,7 @@ app.put("/upload/direct", async (req, res) => {
 
 app.post(
   "/transcode-file",
-  authorizer({}),
+  authorizer({ anyAdmin: true }),
   validatePost("transcode-payload"),
   async (req, res) => {
     const params = req.body as TranscodePayload;
