@@ -155,6 +155,13 @@ export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
   return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
 }
 
+export function deleteCredentialsFromObjectStoreUrl(url: string): string {
+  const [_, accessKeyId, secretAccessKey] = [
+    ...url.matchAll(/s3\+https?:\/\/(.*):(.*)@.*\/.*$/g),
+  ][0];
+  return url.replace(accessKeyId, "***").replace(secretAccessKey, "***");
+}
+
 export type OSS3Config = S3ClientConfig &
   Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
 

@@ -10,6 +10,7 @@ import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
 import sql, { SQLStatement } from "sql-template-strings";
+import { deleteCredentialsFromObjectStoreUrl } from "../controllers/helpers";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -321,9 +322,25 @@ export class TaskScheduler {
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output">,
+    updates: Pick<Task, "status" | "output" | "params">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
+    // TODO: Remove this at some point and do not store credentials at all
+    if (
+      task.type === "transcode-file" &&
+      (updates.status.phase === "completed" ||
+        updates.status.phase === "failed")
+    ) {
+      updates.params = task.params;
+      updates.params["transcode-file"].input.url =
+        deleteCredentialsFromObjectStoreUrl(
+          updates.params["transcode-file"].input.url
+        );
+      updates.params["transcode-file"].storage.url =
+        deleteCredentialsFromObjectStoreUrl(
+          updates.params["transcode-file"].storage.url
+        );
+    }
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
       query.push(

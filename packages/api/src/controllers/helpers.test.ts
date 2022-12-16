@@ -3,7 +3,11 @@ import { clearDatabase } from "../test-helpers";
 import { ObjectStore, User } from "../schema/types";
 import { db } from "../store";
 import { v4 as uuid } from "uuid";
-import { getS3PresignedUrl, toObjectStoreUrl } from "./helpers";
+import {
+  deleteCredentialsFromObjectStoreUrl,
+  getS3PresignedUrl,
+  toObjectStoreUrl,
+} from "./helpers";
 
 let server: TestServer;
 
@@ -73,7 +77,7 @@ describe("controllers/helpers", () => {
     it("should convert correct object", () => {
       const storageObj = {
         endpoint: "https://gateway.storjshare.io",
-        // bucket: "testbucket",
+        bucket: "testbucket",
         credentials: {
           accessKeyId: "AKIAIOSFODNN7EXAMPLE",
           secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -85,5 +89,15 @@ describe("controllers/helpers", () => {
       );
     });
     // TODO: Add more unit tests here
+  });
+
+  describe("delete credentials from object store URL", () => {
+    it("should delete credentials form a correct URL", () => {
+      expect(
+        deleteCredentialsFromObjectStoreUrl(
+          "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
+        )
+      ).toBe("s3+https://***:***@gateway.storjshare.io/testbucket");
+    });
   });
 });
