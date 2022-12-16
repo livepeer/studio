@@ -28,7 +28,6 @@ import {
   InternalServerError,
   UnauthorizedError,
   NotImplementedError,
-  TooManyRequestsError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
@@ -44,10 +43,9 @@ import {
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
-import taskScheduler from "../task/scheduler";
+import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
-import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -239,15 +237,6 @@ function assetWithIpfsUrls(
       },
     },
   });
-}
-
-async function ensureQueueCapacity(config: CliArgs, userId: string) {
-  const numScheduled = await db.task.countScheduledTasks(userId);
-  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
-    throw new TooManyRequestsError(
-      `user ${userId} has reached the maximum number of pending tasks`
-    );
-  }
 }
 
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {
@@ -890,52 +879,6 @@ app.put("/upload/direct", async (req, res) => {
     ignorePath: true,
   });
 });
-
-app.post(
-  "/transcode-file",
-  authorizer({ anyAdmin: true }),
-  validatePost("transcode-payload"),
-  async (req, res) => {
-    const params = req.body as TranscodePayload;
-    const { catalystPipelineStrategy = undefined } = req.user.admin
-      ? params
-      : {};
-
-    await ensureQueueCapacity(req.config, req.user.id);
-
-    const taskType = "transcode-file";
-
-    let inUrl = params.input.url;
-    if (!inUrl) {
-      if (!params.input.path) {
-        throw new Error("Undefined property 'path'");
-      }
-      inUrl = toObjectStoreUrl(params.input) + params.input.path;
-    }
-    const storageUrl = toObjectStoreUrl(params.storage);
-
-    const task = await req.taskScheduler.spawnTask(
-      taskType,
-      {
-        [taskType]: {
-          input: {
-            url: inUrl,
-          },
-          storage: {
-            url: storageUrl,
-          },
-          outputs: params.outputs,
-          catalystPipelineStrategy,
-        },
-      },
-      null,
-      null,
-      req.user.id
-    );
-    await req.taskScheduler.enqueueTask(task);
-    res.json({ task: { id: task.id } });
-  }
-);
 
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;

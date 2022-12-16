@@ -11,6 +11,8 @@ import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
 import sql, { SQLStatement } from "sql-template-strings";
 import { deleteCredentialsFromObjectStoreUrl } from "../controllers/helpers";
+import { TooManyRequestsError } from "../store/errors";
+import { CliArgs } from "../parse-cli";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -474,5 +476,13 @@ export class TaskScheduler {
   }
 }
 
-const taskScheduler = new TaskScheduler();
-export default taskScheduler;
+export async function ensureQueueCapacity(config: CliArgs, userId: string) {
+  const numScheduled = await db.task.countScheduledTasks(userId);
+  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
+    throw new TooManyRequestsError(
+      `user ${userId} has reached the maximum number of pending tasks`
+    );
+  }
+}
+
+export const taskScheduler = new TaskScheduler();
