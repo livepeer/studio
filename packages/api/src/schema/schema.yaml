@@ -1427,6 +1427,9 @@ components:
             credentials:
               type: object
               additionalProperties: false
+              required:
+                - accessKeyId
+                - secretAccessKey
               description: Credentials for the private input video storage
               properties:
                 accessKeyId:

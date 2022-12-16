@@ -16,6 +16,7 @@ import {
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
+  toObjectStoreUrl,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -39,6 +40,7 @@ import {
   NewAssetPayload,
   ObjectStore,
   Task,
+  TranscodePayload,
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
@@ -892,85 +894,44 @@ app.put("/upload/direct", async (req, res) => {
 app.post(
   "/transcode-file",
   authorizer({}),
-  // TODO: Update validate
-  // validatePost("new-asset-payload"),
+  validatePost("transcode-payload"),
   async (req, res) => {
-    const id = uuid();
-    let playbackId = await generateUniquePlaybackId(id);
-
-    const useCatalyst = shouldUseCatalyst(req);
-    const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
-    let asset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      defaultObjectStoreId(req, useCatalyst),
-      { name: `asset-upload-${id}`, ...req.body }
-    );
+    const params = req.body as TranscodePayload;
     const { catalystPipelineStrategy = undefined } = req.user.admin
-      ? (req.body as NewAssetPayload)
+      ? params
       : {};
 
-    // we check for enqueued tasks when starting an upload, but uploads
-    // themselves don't count towards the limit. this should be relatvely fine
-    // as direct uploads will also need a lot of effort from callers to upload
-    // the files, so the risk is much smaller.
     await ensureQueueCapacity(req.config, req.user.id);
 
-    asset = await createAsset(asset, req.queue);
-
     const taskType = "transcode-file";
+
+    let inUrl = params.input.url;
+    if (!inUrl) {
+      if (!params.input.path) {
+        throw new Error("Undefined property 'path'");
+      }
+      inUrl = toObjectStoreUrl(params.input) + params.input.path;
+    }
+    const storageUrl = toObjectStoreUrl(params.storage);
+
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
         [taskType]: {
           input: {
-            url: "https://storage.googleapis.com/thom-vod-testing/mustwork/Pexels%20Videos%203444.mp4",
+            url: inUrl,
           },
           storage: {
-            type: "s3",
-            endpoint: "https://gateway.storjshare.io",
-            bucket: "testbucket17",
-            credentials: {
-              accessKeyId: "<ACCESS_KEY_ID>",
-              secretAccessKey: "<SECRET_ACCESS_KEY>",
-            },
+            url: storageUrl,
           },
-          outputs: {
-            hls: {
-              path: "/samplevideo/hls",
-            },
-          },
+          outputs: params.outputs,
           catalystPipelineStrategy,
         },
       },
       null,
-      asset
+      null
     );
-
     await req.taskScheduler.enqueueTask(task);
-
-    // const uploadUrl = "http://fake-url.com";
-
-    // var proxy = httpProxy.createProxyServer({});
-    // proxy.on("end", async function (proxyReq, _, res) {
-    // if (res.statusCode == 200) {
-    //   // TODO: Find a way to return the task in the response
-    //   await req.taskScheduler.enqueueTask(task);
-    // } else {
-    //   console.log(
-    //     `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
-    //   );
-    // }
-    // });
-
-    // proxy.web(req, res, {
-    //   target: uploadUrl,
-    //   changeOrigin: true,
-    //   ignorePath: true,
-    // });
-
     res.json({ task: { id: task.id } });
   }
 );

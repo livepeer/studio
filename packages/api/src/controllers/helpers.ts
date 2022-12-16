@@ -127,6 +127,34 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
+interface ObjectStoreStorage {
+  endpoint?: string;
+  bucket?: string;
+  credentials?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
+}
+
+export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
+  if (storage.endpoint == undefined || !storage.endpoint) {
+    throw new Error("Undefined property 'endpoint'");
+  }
+  if (storage.bucket == undefined || !storage.bucket) {
+    throw new Error("Undefined property 'bucket'");
+  }
+  if (
+    storage.credentials == undefined ||
+    !storage.credentials ||
+    !storage.credentials.accessKeyId ||
+    !storage.credentials.secretAccessKey
+  ) {
+    throw new Error("Undefined property 'credentials'");
+  }
+  const endpointUrl = new URL(storage.endpoint);
+  return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
+}
+
 export type OSS3Config = S3ClientConfig &
   Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
 
