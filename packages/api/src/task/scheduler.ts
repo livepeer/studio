@@ -327,23 +327,10 @@ export class TaskScheduler {
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output" | "params">,
+    updates: Pick<Task, "status" | "output">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
-    // TODO: Remove this at some point and do not store credentials at all
-    if (
-      task.type === "transcode-file" &&
-      (updates.status.phase === "completed" ||
-        updates.status.phase === "failed")
-    ) {
-      updates.params = task.params;
-      updates.params["transcode-file"].input.url = deleteCredentials(
-        updates.params["transcode-file"].input.url
-      );
-      updates.params["transcode-file"].storage.url = deleteCredentials(
-        updates.params["transcode-file"].storage.url
-      );
-    }
+    updates = this.deleteCredentials(task, updates);
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
       query.push(
@@ -387,6 +374,27 @@ export class TaskScheduler {
       });
     }
     return task;
+  }
+
+  private deleteCredentials(
+    task: WithID<Task>,
+    updates: Pick<Task, "status" | "output" | "params">
+  ): Pick<Task, "status" | "output" | "params"> {
+    // We should remove this at some point and do not store credentials at all
+    const result = updates;
+    if (
+      task.type === "transcode-file" &&
+      (task.status.phase === "completed" || task.status.phase === "failed")
+    ) {
+      result.params = task.params;
+      result.params["transcode-file"].input.url = deleteCredentials(
+        updates.params["transcode-file"].input.url
+      );
+      result.params["transcode-file"].storage.url = deleteCredentials(
+        updates.params["transcode-file"].storage.url
+      );
+    }
+    return result;
   }
 
   async deleteAsset(asset: string | Asset) {

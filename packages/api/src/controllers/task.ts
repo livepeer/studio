@@ -215,7 +215,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     resultTask = taskWithoutCredentials(task);
   }
 
-  res.json((req.config.ipfsGatewayUrl, resultTask));
+  res.json(taskWithIpfsUrls(req.config.ipfsGatewayUrl, resultTask));
 });
 
 app.post(
