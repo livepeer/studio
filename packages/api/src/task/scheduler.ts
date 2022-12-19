@@ -384,7 +384,8 @@ export class TaskScheduler {
     const result = updates;
     if (
       task.type === "transcode-file" &&
-      (task.status.phase === "completed" || task.status.phase === "failed")
+      (updates?.status.phase === "completed" ||
+        updates?.status.phase === "failed")
     ) {
       result.params = task.params;
       result.params["transcode-file"].input.url = deleteCredentials(
