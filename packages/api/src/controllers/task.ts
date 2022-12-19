@@ -11,7 +11,7 @@ import {
   toStringValues,
   FieldsMap,
   reqUseReplica,
-  deleteCredentialsFromObjectStoreUrl,
+  deleteCredentials,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -73,13 +73,12 @@ function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
   if (task?.type !== "transcode-file") {
     return task;
   }
-  task.params["transcode-file"].input.url = deleteCredentialsFromObjectStoreUrl(
+  task.params["transcode-file"].input.url = deleteCredentials(
     task.params["transcode-file"].input.url
   );
-  task.params["transcode-file"].storage.url =
-    deleteCredentialsFromObjectStoreUrl(
-      task.params["transcode-file"].storage.url
-    );
+  task.params["transcode-file"].storage.url = deleteCredentials(
+    task.params["transcode-file"].storage.url
+  );
   return task;
 }
 

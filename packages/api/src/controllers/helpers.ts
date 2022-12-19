@@ -137,31 +137,34 @@ interface ObjectStoreStorage {
 }
 
 export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
-  if (storage.endpoint == undefined || !storage.endpoint) {
-    throw new Error("Undefined property 'endpoint'");
+  if (!storage.endpoint) {
+    throw new Error("undefined property 'endpoint'");
   }
-  if (storage.bucket == undefined || !storage.bucket) {
-    throw new Error("Undefined property 'bucket'");
+  if (!storage.bucket) {
+    throw new Error("undefined property 'bucket'");
   }
   if (
-    storage.credentials == undefined ||
     !storage.credentials ||
     !storage.credentials.accessKeyId ||
     !storage.credentials.secretAccessKey
   ) {
-    throw new Error("Undefined property 'credentials'");
+    throw new Error("undefined property 'credentials'");
   }
   const endpointUrl = new URL(storage.endpoint);
   return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
 }
 
-export function deleteCredentialsFromObjectStoreUrl(url: string): string {
-  const match = [...url.matchAll(/s3\+https?:\/\/(.*):(.*)@.*\/.*$/g)];
+export function deleteCredentials(objectStoreUrl: string): string {
+  const match = [
+    ...objectStoreUrl.matchAll(/s3\+https?:\/\/(.*):(.*)@.*\/.*$/g),
+  ];
   if (match.length == 0) {
-    return url;
+    return objectStoreUrl;
   }
   const [_, accessKeyId, secretAccessKey] = match[0];
-  return url.replace(accessKeyId, "***").replace(secretAccessKey, "***");
+  return objectStoreUrl
+    .replace(accessKeyId, "***")
+    .replace(secretAccessKey, "***");
 }
 
 export type OSS3Config = S3ClientConfig &

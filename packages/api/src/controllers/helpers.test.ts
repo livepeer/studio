@@ -4,7 +4,7 @@ import { ObjectStore, User } from "../schema/types";
 import { db } from "../store";
 import { v4 as uuid } from "uuid";
 import {
-  deleteCredentialsFromObjectStoreUrl,
+  deleteCredentials,
   getS3PresignedUrl,
   toObjectStoreUrl,
 } from "./helpers";
@@ -73,7 +73,7 @@ describe("controllers/helpers", () => {
     });
   });
 
-  describe("convert object to object store URL", () => {
+  describe("convert storage object to object store URL", () => {
     it("should convert correct object", () => {
       const storageObj = {
         endpoint: "https://gateway.storjshare.io",
@@ -82,19 +82,82 @@ describe("controllers/helpers", () => {
           accessKeyId: "AKIAIOSFODNN7EXAMPLE",
           secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
         },
-        additionalProperty: "someAdditionalProperty",
       };
       expect(toObjectStoreUrl(storageObj)).toBe(
         "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
       );
     });
-    // TODO: Add more unit tests here
+
+    it("should fail if endpoint is not defined", () => {
+      const storageObj = {
+        bucket: "testbucket",
+        credentials: {
+          accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+          secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        },
+      };
+      expect(() => toObjectStoreUrl(storageObj)).toThrow(
+        "undefined property 'endpoint'"
+      );
+    });
+
+    it("should fail if endpoint is empty", () => {
+      const storageObj = {
+        endpoint: "",
+        bucket: "testbucket",
+        credentials: {
+          accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+          secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        },
+      };
+      expect(() => toObjectStoreUrl(storageObj)).toThrow(
+        "undefined property 'endpoint'"
+      );
+    });
+
+    it("should fail if bucket is not defined", () => {
+      const storageObj = {
+        endpoint: "https://gateway.storjshare.io",
+        credentials: {
+          accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+          secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        },
+      };
+      expect(() => toObjectStoreUrl(storageObj)).toThrow(
+        "undefined property 'bucket'"
+      );
+    });
+
+    it("should fail if credentials are not defined", () => {
+      const storageObj = {
+        endpoint: "https://gateway.storjshare.io",
+        bucket: "testbucket",
+      };
+      expect(() => toObjectStoreUrl(storageObj)).toThrow(
+        "undefined property 'credentials'"
+      );
+    });
+
+    it("should fail if credentials are not defined", () => {
+      const storageObj = {
+        endpoint: "https://gateway.storjshare.io",
+        bucket: "testbucket",
+        credentials: {
+          accessKeyId: "",
+          secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        },
+        additionalProperty: "someAdditionalProperty",
+      };
+      expect(() => toObjectStoreUrl(storageObj)).toThrow(
+        "undefined property 'credentials'"
+      );
+    });
   });
 
   describe("delete credentials from object store URL", () => {
     it("should delete credentials form Object Store URL", () => {
       expect(
-        deleteCredentialsFromObjectStoreUrl(
+        deleteCredentials(
           "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
         )
       ).toBe("s3+https://***:***@gateway.storjshare.io/testbucket");
@@ -102,7 +165,7 @@ describe("controllers/helpers", () => {
 
     it("should not modify a standard URL", () => {
       expect(
-        deleteCredentialsFromObjectStoreUrl(
+        deleteCredentials(
           "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         )
       ).toBe("https://s3.amazonaws.com/my-bucket/path/filename.mp4");

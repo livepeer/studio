@@ -10,7 +10,7 @@ import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
 import sql, { SQLStatement } from "sql-template-strings";
-import { deleteCredentialsFromObjectStoreUrl } from "../controllers/helpers";
+import { deleteCredentials } from "../controllers/helpers";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
 
@@ -337,14 +337,12 @@ export class TaskScheduler {
         updates.status.phase === "failed")
     ) {
       updates.params = task.params;
-      updates.params["transcode-file"].input.url =
-        deleteCredentialsFromObjectStoreUrl(
-          updates.params["transcode-file"].input.url
-        );
-      updates.params["transcode-file"].storage.url =
-        deleteCredentialsFromObjectStoreUrl(
-          updates.params["transcode-file"].storage.url
-        );
+      updates.params["transcode-file"].input.url = deleteCredentials(
+        updates.params["transcode-file"].input.url
+      );
+      updates.params["transcode-file"].storage.url = deleteCredentials(
+        updates.params["transcode-file"].storage.url
+      );
     }
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
