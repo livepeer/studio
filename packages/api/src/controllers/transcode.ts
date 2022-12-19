@@ -1,6 +1,5 @@
-import { authorizer } from "../middleware";
-import { validatePost } from "../middleware";
-import { Request, RequestHandler, Router } from "express";
+import { authorizer, validatePost } from "../middleware";
+import { Router } from "express";
 import { TranscodePayload } from "../schema/types";
 import { toObjectStoreUrl } from "./helpers";
 import { ensureQueueCapacity } from "../task/scheduler";
@@ -20,11 +19,10 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
 
     const taskType = "transcode-file";
-
     let inUrl = params.input.url;
     if (!inUrl) {
       if (!params.input.path) {
-        throw new Error("Undefined property 'path'");
+        throw new Error("Undefined property 'input.path'");
       }
       inUrl = toObjectStoreUrl(params.input) + params.input.path;
     }
