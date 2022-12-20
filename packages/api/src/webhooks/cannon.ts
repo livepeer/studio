@@ -11,7 +11,7 @@ import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
-import taskScheduler from "../task/scheduler";
+import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";

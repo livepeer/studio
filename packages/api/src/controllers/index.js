@@ -12,6 +12,7 @@ import geolocate from "./geolocate";
 import webhook from "./webhook";
 import asset from "./asset";
 import task from "./task";
+import transcode from "./transcode";
 import stripe from "./stripe";
 import version from "./version";
 import admin from "./admin";
@@ -36,6 +37,7 @@ export default {
   webhook,
   asset,
   task,
+  transcode,
   "access-control": accessControl,
   region,
   stripe,

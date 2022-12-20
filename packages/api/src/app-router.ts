@@ -23,7 +23,7 @@ import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
-import taskScheduler from "./task/scheduler";
+import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
 
 enum OrchestratorSource {

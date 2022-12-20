@@ -16,6 +16,7 @@ import {
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
+  toObjectStoreUrl,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -27,7 +28,6 @@ import {
   InternalServerError,
   UnauthorizedError,
   NotImplementedError,
-  TooManyRequestsError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
@@ -39,13 +39,13 @@ import {
   NewAssetPayload,
   ObjectStore,
   Task,
+  TranscodePayload,
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
-import taskScheduler from "../task/scheduler";
+import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
-import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -237,15 +237,6 @@ function assetWithIpfsUrls(
       },
     },
   });
-}
-
-async function ensureQueueCapacity(config: CliArgs, userId: string) {
-  const numScheduled = await db.task.countScheduledTasks(userId);
-  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
-    throw new TooManyRequestsError(
-      `user ${userId} has reached the maximum number of pending tasks`
-    );
-  }
 }
 
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {

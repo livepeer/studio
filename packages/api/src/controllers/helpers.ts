@@ -127,6 +127,52 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
+export interface ObjectStoreStorage {
+  endpoint?: string;
+  bucket?: string;
+  credentials?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
+}
+
+export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
+  if (!storage.endpoint) {
+    throw new Error("undefined property 'endpoint'");
+  }
+  if (!storage.bucket) {
+    throw new Error("undefined property 'bucket'");
+  }
+  if (
+    !storage.credentials ||
+    !storage.credentials.accessKeyId ||
+    !storage.credentials.secretAccessKey
+  ) {
+    throw new Error("undefined property 'credentials'");
+  }
+  const endpointUrl = new URL(storage.endpoint);
+  return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
+}
+
+export function deleteCredentials(objectStoreUrl: string): string {
+  const match = [
+    ...objectStoreUrl.matchAll(/^s3\+https?:\/\/(.*):(.*)@.*\/.*$/g),
+  ];
+  if (match.length == 0) {
+    return objectStoreUrl;
+  }
+  if (match[0].length < 3) {
+    return objectStoreUrl;
+  }
+  const [_, accessKeyId, secretAccessKey] = match[0];
+  if (!accessKeyId || !secretAccessKey) {
+    return objectStoreUrl;
+  }
+  return objectStoreUrl
+    .replace(accessKeyId, "***")
+    .replace(secretAccessKey, "***");
+}
+
 export type OSS3Config = S3ClientConfig &
   Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
 
