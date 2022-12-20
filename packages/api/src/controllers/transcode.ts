@@ -44,7 +44,7 @@ app.post(
       null,
       req.user.id
     );
-    res.json({ task });
+    res.json(task);
   }
 );
 

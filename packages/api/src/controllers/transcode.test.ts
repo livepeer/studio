@@ -61,7 +61,7 @@ describe("controllers/transcode", () => {
         },
       });
       expect(res.status).toBe(200);
-      const { task } = await res.json();
+      const task = await res.json();
       const taskId = task.id;
 
       res = await client.get(`/task/${task.id}`);
@@ -137,7 +137,7 @@ describe("controllers/transcode", () => {
         },
       });
       expect(res.status).toBe(200);
-      const { task } = await res.json();
+      const task = await res.json();
       const taskId = task.id;
 
       client.apiKey = adminApiKey;
