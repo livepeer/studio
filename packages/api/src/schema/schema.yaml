@@ -1395,51 +1395,65 @@ components:
         - outputs
       properties:
         input:
-          type: object
-          additionalProperties: false
-          description: Input video file
-          properties:
-            url:
-              type: string
-              format: uri
-              pattern: ^(https?|ipfs|ar)://
-              description: URL of the video to transcode
-              example: https://s3.amazonaws.com/bucket/file.mp4
-            type:
-              type: string
-              enum:
-                - s3
-              description: Type of service used as the input instead of "url"
-            endpoint:
-              type: string
-              format: uri
-              pattern: ^http(s)?://
-              description: Service endpoint URL
-              example: https://gateway.storjshare.io
-            bucket:
-              type: string
-              description: Bucket with input file
-              example: inputbucket
-            path:
-              type: string
-              description: Path to the input file inside the bucket
-              example: /path/file.mp4
-            credentials:
-              type: object
+          oneOf:
+            - type: object
               additionalProperties: false
-              required:
-                - accessKeyId
-                - secretAccessKey
-              description: Credentials for the private input video storage
+              description: URL input video
+              required: [url]
               properties:
-                accessKeyId:
+                url:
                   type: string
-                  description: Access Key ID
-                  example: AKIAIOSFODNN7EXAMPLE
-                secretAccessKey:
+                  format: uri
+                  pattern: ^(https?|ipfs|ar)://
+                  description: URL of the video to transcode
+                  example: https://s3.amazonaws.com/bucket/file.mp4
+            - type: object
+              additionalProperties: false
+              description: S3-like storage input video
+              required:
+                - type
+                - endpoint
+                - bucket
+                - path
+                - credentials
+              properties:
+                type:
                   type: string
-                  description: Secret Access Key
-                  example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+                  enum:
+                    - s3
+                  description:
+                    Type of service. This is optional and defaults to `url` if
+                    ŚURL field is provided.
+                endpoint:
+                  type: string
+                  format: uri
+                  pattern: ^http(s)?://
+                  description: Service endpoint URL
+                  example: https://gateway.storjshare.io
+                bucket:
+                  type: string
+                  description: Bucket with input file
+                  example: inputbucket
+                path:
+                  type: string
+                  description: Path to the input file inside the bucket
+                  example: /path/file.mp4
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - accessKeyId
+                    - secretAccessKey
+                  description: Credentials for the private input video storage
+                  properties:
+                    accessKeyId:
+                      type: string
+                      description: Access Key ID
+                      example: AKIAIOSFODNN7EXAMPLE
+                    secretAccessKey:
+                      type: string
+                      description: Secret Access Key
+                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
         storage:
           type: object
           additionalProperties: false

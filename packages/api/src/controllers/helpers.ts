@@ -127,7 +127,7 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
-interface ObjectStoreStorage {
+export interface ObjectStoreStorage {
   endpoint?: string;
   bucket?: string;
   credentials?: {

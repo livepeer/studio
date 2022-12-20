@@ -1,7 +1,7 @@
 import { authorizer, validatePost } from "../middleware";
 import { Router } from "express";
 import { TranscodePayload } from "../schema/types";
-import { toObjectStoreUrl } from "./helpers";
+import { toObjectStoreUrl, ObjectStoreStorage } from "./helpers";
 import { ensureQueueCapacity } from "../task/scheduler";
 
 const app = Router();
@@ -18,20 +18,18 @@ app.post(
 
     await ensureQueueCapacity(req.config, req.user.id);
 
-    const taskType = "transcode-file";
-    let inUrl = params.input.url;
+    let inUrl = params.input["url"];
     if (!inUrl) {
-      if (!params.input.path) {
-        throw new Error("Undefined property 'input.path'");
-      }
-      inUrl = toObjectStoreUrl(params.input) + params.input.path;
+      inUrl =
+        toObjectStoreUrl(params.input as ObjectStoreStorage) +
+        params.input["path"];
     }
     const storageUrl = toObjectStoreUrl(params.storage);
 
-    const task = await req.taskScheduler.spawnTask(
-      taskType,
+    const task = await req.taskScheduler.scheduleTask(
+      "transcode-file",
       {
-        [taskType]: {
+        ["transcode-file"]: {
           input: {
             url: inUrl,
           },
@@ -46,8 +44,7 @@ app.post(
       null,
       req.user.id
     );
-    await req.taskScheduler.enqueueTask(task);
-    res.json({ task: { id: task.id } });
+    res.json({ task });
   }
 );
 

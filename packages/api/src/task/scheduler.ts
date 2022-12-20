@@ -245,9 +245,16 @@ export class TaskScheduler {
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    userId?: string
   ) {
-    const task = await this.spawnTask(type, params, inputAsset, outputAsset);
+    const task = await this.spawnTask(
+      type,
+      params,
+      inputAsset,
+      outputAsset,
+      userId
+    );
     await this.enqueueTask(task);
     return task;
   }
