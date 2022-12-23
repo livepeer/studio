@@ -121,10 +121,16 @@ export const uploadAssets = async (
   }
 };
 
+export const getFileUploads = (): FileUpload[] => {
+  return Object.keys(context.currentFileUploads ?? {}).map(
+    (key) => context.currentFileUploads?.[key]
+  );
+};
+
 export const getFilteredFileUploads = (): FileUpload[] => {
-  return Object.keys(context.currentFileUploads ?? {})
-    .map((key) => context.currentFileUploads?.[key])
-    .filter((file) => file && !file.error && file.file.name);
+  return getFileUploads().filter(
+    (file) => file && !file.error && file.file.name
+  );
 };
 
 export const clearFileUploads = async () => {

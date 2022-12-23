@@ -108,7 +108,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
             </>
           )}
 
-          {(asset?.videoSpec?.format ?? videoTrack?.bitrate) && (
+          {(asset?.videoSpec?.bitrate ?? videoTrack?.bitrate) && (
             <>
               <Cell css={{ color: "$hiContrast" }}>Bitrate</Cell>
               <Cell>

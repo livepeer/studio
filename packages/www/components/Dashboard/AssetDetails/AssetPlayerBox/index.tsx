@@ -9,7 +9,13 @@ import ProcessingProgress from "./ProcessingProgress";
 
 const AssetStatusBox = ({ asset }: { asset?: Asset }) => {
   if (asset?.status?.phase === "ready" && asset.playbackUrl) {
-    return <AppPlayer playbackUrl={asset.playbackUrl} autoPlay={false} />;
+    return (
+      <AppPlayer
+        playbackUrl={asset.playbackUrl}
+        autoPlay={false}
+        type="asset"
+      />
+    );
   }
   if (asset?.status?.phase === "failed") {
     return <FailedProcessing />;

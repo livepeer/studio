@@ -11,6 +11,12 @@ Install and run
 yarn && yarn dev
 ```
 
+## Developing against staging API
+
+```bash
+yarn dev:staging
+```
+
 ## Accessing the Dashboard Locally
 
 In order to access the Livepeer Studio Dashboard locally, you'll need to run the

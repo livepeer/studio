@@ -10,6 +10,9 @@ import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
 import sql, { SQLStatement } from "sql-template-strings";
+import { deleteCredentials } from "../controllers/helpers";
+import { TooManyRequestsError } from "../store/errors";
+import { CliArgs } from "../parse-cli";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -242,9 +245,16 @@ export class TaskScheduler {
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    userId?: string
   ) {
-    const task = await this.spawnTask(type, params, inputAsset, outputAsset);
+    const task = await this.spawnTask(
+      type,
+      params,
+      inputAsset,
+      outputAsset,
+      userId
+    );
     await this.enqueueTask(task);
     return task;
   }
@@ -253,7 +263,8 @@ export class TaskScheduler {
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    userId?: string
   ) {
     const task = await db.task.create({
       id: uuid(),
@@ -261,7 +272,7 @@ export class TaskScheduler {
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
-      userId: inputAsset?.userId || outputAsset?.userId,
+      userId: inputAsset?.userId || outputAsset?.userId || userId,
       params,
       status: {
         phase: "pending",
@@ -326,6 +337,7 @@ export class TaskScheduler {
     updates: Pick<Task, "status" | "output">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
+    updates = this.deleteCredentials(task, updates);
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
       query.push(
@@ -369,6 +381,28 @@ export class TaskScheduler {
       });
     }
     return task;
+  }
+
+  private deleteCredentials(
+    task: WithID<Task>,
+    updates: Pick<Task, "status" | "output" | "params">
+  ): Pick<Task, "status" | "output" | "params"> {
+    // We should remove this at some point and do not store credentials at all
+    const result = updates;
+    if (
+      task.type === "transcode-file" &&
+      (updates?.status.phase === "completed" ||
+        updates?.status.phase === "failed")
+    ) {
+      result.params = task.params;
+      result.params["transcode-file"].input.url = deleteCredentials(
+        updates.params["transcode-file"].input.url
+      );
+      result.params["transcode-file"].storage.url = deleteCredentials(
+        updates.params["transcode-file"].storage.url
+      );
+    }
+    return result;
   }
 
   async deleteAsset(asset: string | Asset) {
@@ -456,5 +490,13 @@ export class TaskScheduler {
   }
 }
 
-const taskScheduler = new TaskScheduler();
-export default taskScheduler;
+export async function ensureQueueCapacity(config: CliArgs, userId: string) {
+  const numScheduled = await db.task.countScheduledTasks(userId);
+  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
+    throw new TooManyRequestsError(
+      `user ${userId} has reached the maximum number of pending tasks`
+    );
+  }
+}
+
+export const taskScheduler = new TaskScheduler();

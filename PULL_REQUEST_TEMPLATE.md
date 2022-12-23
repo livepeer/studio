@@ -12,9 +12,7 @@
 
 <!--- List out all significant updates your code introduces -->
 
-## -
-
-- **How did you test each of these updates (required)**
+**How did you test each of these updates (required)**
 
 <!-- A detailed description of how you tested your code changes. Include details of your testing environment, and the tests you ran to see how your change affects other areas of the code, etc. -->
 
@@ -22,11 +20,11 @@
 
 <!-- Fixes # -->
 
-**Screenshots (optional):**
+**Screenshots (optional)**
 
 <!-- Drag some screenshots here, if applicable -->
 
-**Checklist:**
+**Checklist**
 
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
