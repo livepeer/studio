@@ -7,6 +7,8 @@ import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
 import { Team as PageContent } from "content";
+import { getClient } from "lib/sanity.server";
+import { groq } from "next-sanity";
 
 const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
@@ -43,19 +45,24 @@ const TeamPage = ({ content }) => {
 };
 
 export async function getStaticProps() {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
+  const client = getClient();
+  const query = groq`*[_type=="page" && slug.current == "team"][0]`;
+  const pageData = await client.fetch(query);
+  // console.log("pageData", pageData);
+  // const graphQLClient = new GraphQLClient(
+  //   "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+  // );
 
-  const data: any = await graphQLClient.request(print(allPages), {
-    where: {
-      slug: { current: { eq: "team" } },
-    },
-  });
+  // const data: any = await graphQLClient.request(print(allPages), {
+  //   where: {
+  //     slug: { current: { eq: "team" } },
+  //   },
+  // });
 
   return {
     props: {
-      ...data.allPage[0],
+      // ...data.allPage[0],
+      ...pageData,
       preview: false,
     },
     revalidate: 1,

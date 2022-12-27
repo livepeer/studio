@@ -6,11 +6,12 @@ import imageUrlBuilder from "@sanity/image-url";
 import client from "lib/client";
 import Image from "next/image";
 import TextTruncate from "react-text-truncate";
+import { urlFor } from "lib/sanity";
 
 export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
-  const text = blocksToText(post.contentRaw);
+  const text = blocksToText(post.content);
   const stats = readingTime(text);
-  const builder = imageUrlBuilder(client as any);
+  // const builder = imageUrlBuilder(client as any);
 
   return (
     <Link
@@ -50,7 +51,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               },
             }}>
             <Image
-              src={builder.image(post.mainImage).url()}
+              src={urlFor(post.mainImage).url()}
               alt={post.mainImage?.alt}
               fill
               style={{ objectFit: "cover" }}
@@ -90,7 +91,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                   mr: "$2",
                 }}>
                 <Image
-                  src={builder.image(post.author.image).url()}
+                  src={urlFor(post.author.image).url()}
                   alt={post.author.image?.alt}
                   fill
                   style={{ objectFit: "cover" }}

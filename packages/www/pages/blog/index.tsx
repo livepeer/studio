@@ -11,6 +11,8 @@ import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Link from "next/link";
 import { Blog as BlogContent } from "content";
+import { getClient } from "lib/sanity.server";
+import { groq } from "next-sanity";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -180,20 +182,22 @@ const BlogIndex = ({ categories, posts }) => {
 };
 
 export async function getStaticProps() {
-  const { allCategory: categories } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allCategories)
-  );
-  categories.push({ title: "All", slug: { current: "" } });
-  const { allPost: posts } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allPosts),
-    { where: { hide: { neq: true } } }
-  );
+  const client = getClient();
+
+  const postsQuery = groq`*[_type=="post"]{
+    ...,
+    author->{...},
+    category->{...},
+    mainImage{
+      asset->{...}
+  }}`;
+  const categoriesQuery = groq`*[_type=="category"]`;
+  const categories = await client.fetch(categoriesQuery);
+  const posts = await client.fetch(postsQuery);
 
   return {
     props: {
-      categories: categories.reverse(),
+      categories,
       posts,
     },
     revalidate: 1,
