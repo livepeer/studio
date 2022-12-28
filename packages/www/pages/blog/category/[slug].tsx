@@ -1,10 +1,8 @@
-import { getClient } from "lib/sanity.server";
-import { groq } from "next-sanity";
+import { client } from "lib/client";
 import BlogIndex from "../index";
 
 export async function getStaticPaths() {
-  const client = getClient();
-  const categoriesQuery = groq`*[_type=="category" && defined(slug.current)][].slug.current`;
+  const categoriesQuery = `*[_type=="category" && defined(slug.current)][].slug.current`;
   const categories = (await client.fetch(categoriesQuery)) ?? [];
   const paths = categories.map((category) => ({ params: { slug: category } }));
 
@@ -16,11 +14,11 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const { slug } = params;
-  const client = getClient();
+
   const queryParams = {
     slug,
   };
-  const postQuery = groq`*[_type == "post" && category._ref in (*[_type == "category" && slug.current == $slug]._id)]{
+  const postQuery = `*[_type == "post" && category._ref in (*[_type == "category" && slug.current == $slug]._id)]{
     ...,
     author->{...},
     category->{...},
@@ -30,7 +28,7 @@ export async function getStaticProps({ params }) {
     }`;
   const posts = (await client.fetch(postQuery, queryParams)) ?? [];
 
-  const categoriesQuery = groq`*[_type=="category"]`;
+  const categoriesQuery = `*[_type=="category"]`;
   const categories = await client.fetch(categoriesQuery);
 
   return {

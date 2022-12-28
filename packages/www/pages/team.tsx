@@ -1,14 +1,8 @@
-import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import { Container, Box, Heading, Text } from "@livepeer/design-system";
-import Prefooter from "components/Site/Prefooter";
 import TeamSection from "../components/Site/TeamSection";
-import { GraphQLClient } from "graphql-request";
-import { print } from "graphql/language/printer";
-import allPages from "../queries/allPages.gql";
 import { Team as PageContent } from "content";
-import { getClient } from "lib/sanity.server";
-import { groq } from "next-sanity";
+import { client } from "lib/client";
 
 const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
@@ -45,8 +39,7 @@ const TeamPage = ({ content }) => {
 };
 
 export async function getStaticProps() {
-  const client = getClient();
-  const query = groq`*[_type=="page" && slug.current == "team"][0]`;
+  const query = `*[_type=="page" && slug.current == "team"][0]`;
   const pageData = await client.fetch(query);
   // console.log("pageData", pageData);
   // const graphQLClient = new GraphQLClient(

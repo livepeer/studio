@@ -8,7 +8,7 @@ import {
 import { blocksToText } from "lib/utils";
 import { useRouter } from "next/router";
 import BlockContent from "@sanity/block-content-to-react";
-import client from "lib/client";
+import { client } from "lib/client";
 import Image from "next/image";
 import Layout from "layouts/main";
 import Link from "next/link";
@@ -16,8 +16,6 @@ import BlogPlayer from "components/Site/BlogPlayer";
 import React from "react";
 import readingTime from "reading-time";
 import BlogCTA from "components/Site/BlogCTA";
-import { getClient } from "lib/sanity.server";
-import { groq } from "next-sanity";
 import { urlFor } from "lib/sanity";
 
 const serializers = {
@@ -270,8 +268,7 @@ Post.theme = "dark-theme-blue";
 export default Post;
 
 export async function getStaticPaths() {
-  const client = getClient();
-  const query = groq`*[_type=="post" && defined(slug.current)][].slug.current`;
+  const query = `*[_type=="post" && defined(slug.current)][].slug.current`;
   const data = await client.fetch(query);
   const paths = data.map((path: string) => ({ params: { slug: path } }));
 
@@ -287,8 +284,8 @@ export async function getStaticProps({ params }) {
   const queryParams = {
     slug,
   };
-  const client = getClient();
-  const query = groq`*[_type=="post" && slug.current == $slug][0]{...,
+
+  const query = `*[_type=="post" && slug.current == $slug][0]{...,
     author->{...},
     category->{...},
     mainImage{
@@ -297,7 +294,7 @@ export async function getStaticProps({ params }) {
   }`;
   const pageData = (await client.fetch(query, queryParams)) ?? {};
 
-  const furtherQuery = groq`*[_type == "post" && slug.current !=$slug] | order(_createdAt desc) [0..1]{
+  const furtherQuery = `*[_type == "post" && slug.current !=$slug] | order(_createdAt desc) [0..1]{
     ...,
     author->{...},
     category->{...},

@@ -11,8 +11,7 @@ import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Link from "next/link";
 import { Blog as BlogContent } from "content";
-import { getClient } from "lib/sanity.server";
-import { groq } from "next-sanity";
+import { client } from "lib/client";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -182,16 +181,16 @@ const BlogIndex = ({ categories, posts }) => {
 };
 
 export async function getStaticProps() {
-  const client = getClient();
+  // const client = getClient();
 
-  const postsQuery = groq`*[_type=="post"]{
+  const postsQuery = `*[_type=="post"]{
     ...,
     author->{...},
     category->{...},
     mainImage{
       asset->{...}
   }}`;
-  const categoriesQuery = groq`*[_type=="category"]`;
+  const categoriesQuery = `*[_type=="category"]`;
   const categories = await client.fetch(categoriesQuery);
   const posts = await client.fetch(postsQuery);
 

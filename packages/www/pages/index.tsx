@@ -5,8 +5,7 @@ import ToolkitSection from "components/Site/ToolkitSection";
 import GuideSection from "components/Site/GuideSection";
 import FeaturedAppsSection from "components/Site/FeaturedAppsSection";
 import PrinciplesSection from "components/Site/PrinciplesSection";
-import { getClient } from "lib/sanity.server";
-import { groq } from "next-sanity";
+import { client } from "lib/client";
 
 const HomePage = (props) => {
   return (
@@ -21,9 +20,8 @@ const HomePage = (props) => {
 };
 
 export async function getStaticProps({ locale }) {
-  const client = getClient();
   const queryParams = {};
-  const query = groq`*[_type=="home" && __i18n_lang =='en-US'][0]`;
+  const query = `*[_type=="home" && __i18n_lang =='en-US'][0]`;
   const pageData = await client.fetch(query, queryParams);
   console.log("data: ", pageData);
   // const graphQLClient = new GraphQLClient(

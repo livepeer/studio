@@ -1,13 +1,11 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
-import client from "lib/client";
 import imageUrlBuilder from "@sanity/image-url";
 import DefaultError from "components/Site/DefaultError";
 import { getComponent } from "lib/utils";
 import { useRouter } from "next/router";
 import { Box } from "@livepeer/design-system";
-import { groq } from "next-sanity";
-import { getClient } from "lib/sanity.server";
+import { client } from "lib/client";
 
 const Page = ({
   title,
@@ -80,8 +78,8 @@ export async function getStaticPaths() {
   // paths = paths.filter(
   //   (p) => p.params.slug !== "jobs" && p.params.slug !== "team"
   // );
-  const client = getClient();
-  const queryForPaths = groq`*[_type=='page' && defined(slug.current)][].slug.current`;
+  // const client = getClient();
+  const queryForPaths = `*[_type=='page' && defined(slug.current)][].slug.current`;
   const data: string[] = (await client.fetch(queryForPaths)) ?? [];
   const paths = data
     .filter((path) => path !== "jobs" && path !== "team")
@@ -103,8 +101,8 @@ export async function getStaticProps({ params, locale }) {
   const queryParams = {
     slug,
   };
-  const client = getClient();
-  const query = groq`*[_type=="page" && slug.current == $slug][0]`;
+  // const client = getClient();
+  const query = `*[_type=="page" && slug.current == $slug][0]`;
   const pageData = (await client.fetch(query, queryParams)) ?? {};
   console.log("pageData: ", pageData);
   // const graphQLClient = new GraphQLClient(
