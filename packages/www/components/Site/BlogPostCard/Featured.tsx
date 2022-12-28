@@ -3,7 +3,7 @@ import { blocksToText } from "lib/utils";
 import Link from "next/link";
 import { Flex, Box, Text, Heading, Link as A } from "@livepeer/design-system";
 import imageUrlBuilder from "@sanity/image-url";
-import client from "lib/client";
+import { client } from "lib/client";
 import Image from "next/image";
 import TextTruncate from "react-text-truncate";
 import { urlFor } from "lib/sanity";
