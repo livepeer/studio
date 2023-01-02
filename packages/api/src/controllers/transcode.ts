@@ -1,7 +1,11 @@
 import { authorizer, validatePost } from "../middleware";
 import { Router } from "express";
 import { TranscodePayload } from "../schema/types";
-import { toObjectStoreUrl, ObjectStoreStorage } from "./helpers";
+import {
+  toObjectStoreUrl,
+  ObjectStoreStorage,
+  taskWithoutCredentials,
+} from "./helpers";
 import { ensureQueueCapacity } from "../task/scheduler";
 
 const app = Router();
@@ -44,7 +48,7 @@ app.post(
       null,
       req.user.id
     );
-    res.json(task);
+    res.json(taskWithoutCredentials(task));
   }
 );
 
