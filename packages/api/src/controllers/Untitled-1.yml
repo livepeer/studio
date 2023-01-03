@@ -1,0 +1,66 @@
+input:
+  oneOf:
+    - type: object
+      additionalProperties: false
+      description: URL input video
+      required: [url]
+      properties:
+        type:
+          type: string
+          enum:
+            - url
+          description:
+            Type of service. This is optional and defaults to `url` if a URL
+            field is provided.
+        url:
+          type: string
+          format: uri
+          pattern: ^(https?|ipfs|ar)://
+          description: URL of the video to transcode
+          example: https://s3.amazonaws.com/bucket/file.mp4
+    - type: object
+      additionalProperties: false
+      description: S3-like storage input video
+      required:
+        - type
+        - endpoint
+        - bucket
+        - path
+        - credentials
+      properties:
+        type:
+          type: string
+          enum:
+            - s3
+          description:
+            Type of storage service. Must be specified when not `url`.
+        endpoint:
+          type: string
+          format: uri
+          pattern: ^http(s)?://
+          description: Service endpoint URL
+          example: https://gateway.storjshare.io
+        bucket:
+          type: string
+          description: Bucket with input file
+          example: inputbucket
+        path:
+          type: string
+          description: Path to the input file inside the bucket
+          example: /path/file.mp4
+        credentials:
+          type: object
+          additionalProperties: false
+          required:
+            - accessKeyId
+            - secretAccessKey
+          description: Credentials for the private input video storage
+          properties:
+            accessKeyId:
+              type: string
+              description: Access Key ID
+              example: AKIAIOSFODNN7EXAMPLE
+            secretAccessKey:
+              type: string
+              description: Secret Access Key
+              example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
