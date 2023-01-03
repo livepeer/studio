@@ -740,15 +740,15 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 async function createTusServer(objectStoreId: string) {
   const os = await getActiveObjectStore(objectStoreId);
   const s3config = await getObjectStoreS3Config(os);
-  const opts: tus.S3StoreOptions & S3ClientConfig = {
-    ...s3config,
+  const tusServer = new tus.Server({
     path: "/upload/tus",
+    namingFunction,
+  });
+  tusServer.datastore = new tus.S3Store({
+    ...s3config,
     partSize: 8 * 1024 * 1024,
     tmpDirPrefix: "tus-tmp-files",
-    namingFunction,
-  };
-  const tusServer = new tus.Server();
-  tusServer.datastore = new tus.S3Store(opts);
+  });
   tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(false));
   return tusServer;
 }
@@ -758,12 +758,13 @@ export const setupTestTus = async (): Promise<void> => {
 };
 
 async function createTestTusServer() {
-  const tusTestServer = new tus.Server();
-  tusTestServer.datastore = new tus.FileStore({
+  const tusTestServer = new tus.Server({
     path: "/upload/tus",
-    directory: os.tmpdir(),
     namingFunction: (req: Request) =>
       req.res.getHeader("livepeer-playback-id").toString(),
+  });
+  tusTestServer.datastore = new tus.FileStore({
+    directory: os.tmpdir(),
   });
   tusTestServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(true));
   return tusTestServer;

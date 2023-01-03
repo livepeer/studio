@@ -174,7 +174,10 @@ export function deleteCredentials(objectStoreUrl: string): string {
 }
 
 export type OSS3Config = S3ClientConfig &
-  Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
+  Pick<TusS3Opts, "region" | "bucket"> & {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
 
 export async function getObjectStoreS3Config(
   os: ObjectStore
