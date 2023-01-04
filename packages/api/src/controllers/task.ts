@@ -11,7 +11,7 @@ import {
   toStringValues,
   FieldsMap,
   reqUseReplica,
-  deleteCredentials,
+  taskWithoutCredentials,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -67,19 +67,6 @@ function taskWithIpfsUrls(
       },
     },
   });
-}
-
-function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
-  if (task?.type !== "transcode-file") {
-    return task;
-  }
-  task.params["transcode-file"].input.url = deleteCredentials(
-    task.params["transcode-file"].input.url
-  );
-  task.params["transcode-file"].storage.url = deleteCredentials(
-    task.params["transcode-file"].storage.url
-  );
-  return task;
 }
 
 const fieldsMap: FieldsMap = {

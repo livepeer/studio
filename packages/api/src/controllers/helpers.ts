@@ -12,7 +12,8 @@ import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { db } from "../store";
-import { ObjectStore } from "../schema/types";
+import { WithID } from "../store/types";
+import { ObjectStore, Task } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -136,6 +137,19 @@ export interface ObjectStoreStorage {
   };
 }
 
+export function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
+  if (task?.type !== "transcode-file") {
+    return task;
+  }
+  task.params["transcode-file"].input.url = deleteCredentials(
+    task.params["transcode-file"].input.url
+  );
+  task.params["transcode-file"].storage.url = deleteCredentials(
+    task.params["transcode-file"].storage.url
+  );
+  return task;
+}
+
 export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
   if (!storage.endpoint) {
     throw new Error("undefined property 'endpoint'");
@@ -174,7 +188,10 @@ export function deleteCredentials(objectStoreUrl: string): string {
 }
 
 export type OSS3Config = S3ClientConfig &
-  Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
+  Pick<TusS3Opts, "region" | "bucket"> & {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
 
 export async function getObjectStoreS3Config(
   os: ObjectStore
