@@ -1,12 +1,8 @@
-import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import { Container, Box, Heading, Text } from "@livepeer/design-system";
-import Prefooter from "components/Site/Prefooter";
 import TeamSection from "../components/Site/TeamSection";
-import { GraphQLClient } from "graphql-request";
-import { print } from "graphql/language/printer";
-import allPages from "../queries/allPages.gql";
 import { Team as PageContent } from "content";
+import { client } from "lib/client";
 
 const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
@@ -43,19 +39,23 @@ const TeamPage = ({ content }) => {
 };
 
 export async function getStaticProps() {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
+  const query = `*[_type=="page" && slug.current == "team"][0]`;
+  const pageData = await client.fetch(query);
+  // console.log("pageData", pageData);
+  // const graphQLClient = new GraphQLClient(
+  //   "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+  // );
 
-  const data: any = await graphQLClient.request(print(allPages), {
-    where: {
-      slug: { current: { eq: "team" } },
-    },
-  });
+  // const data: any = await graphQLClient.request(print(allPages), {
+  //   where: {
+  //     slug: { current: { eq: "team" } },
+  //   },
+  // });
 
   return {
     props: {
-      ...data.allPage[0],
+      // ...data.allPage[0],
+      ...pageData,
       preview: false,
     },
     revalidate: 1,

@@ -12,7 +12,8 @@ import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { db } from "../store";
-import { ObjectStore } from "../schema/types";
+import { WithID } from "../store/types";
+import { ObjectStore, Task } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -127,8 +128,70 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
+export interface ObjectStoreStorage {
+  endpoint?: string;
+  bucket?: string;
+  credentials?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
+}
+
+export function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
+  if (task?.type !== "transcode-file") {
+    return task;
+  }
+  task.params["transcode-file"].input.url = deleteCredentials(
+    task.params["transcode-file"].input.url
+  );
+  task.params["transcode-file"].storage.url = deleteCredentials(
+    task.params["transcode-file"].storage.url
+  );
+  return task;
+}
+
+export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
+  if (!storage.endpoint) {
+    throw new Error("undefined property 'endpoint'");
+  }
+  if (!storage.bucket) {
+    throw new Error("undefined property 'bucket'");
+  }
+  if (
+    !storage.credentials ||
+    !storage.credentials.accessKeyId ||
+    !storage.credentials.secretAccessKey
+  ) {
+    throw new Error("undefined property 'credentials'");
+  }
+  const endpointUrl = new URL(storage.endpoint);
+  return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
+}
+
+export function deleteCredentials(objectStoreUrl: string): string {
+  const match = [
+    ...objectStoreUrl.matchAll(/^s3\+https?:\/\/(.*):(.*)@.*\/.*$/g),
+  ];
+  if (match.length == 0) {
+    return objectStoreUrl;
+  }
+  if (match[0].length < 3) {
+    return objectStoreUrl;
+  }
+  const [_, accessKeyId, secretAccessKey] = match[0];
+  if (!accessKeyId || !secretAccessKey) {
+    return objectStoreUrl;
+  }
+  return objectStoreUrl
+    .replace(accessKeyId, "***")
+    .replace(secretAccessKey, "***");
+}
+
 export type OSS3Config = S3ClientConfig &
-  Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
+  Pick<TusS3Opts, "region" | "bucket"> & {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
 
 export async function getObjectStoreS3Config(
   os: ObjectStore

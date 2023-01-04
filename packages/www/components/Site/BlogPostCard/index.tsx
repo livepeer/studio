@@ -3,15 +3,14 @@ import { blocksToText } from "lib/utils";
 import Link from "next/link";
 import { Flex, Box, Text, Heading, Link as A } from "@livepeer/design-system";
 import imageUrlBuilder from "@sanity/image-url";
-import client from "lib/client";
+import { client } from "lib/client";
 import Image from "next/image";
 import TextTruncate from "react-text-truncate";
+import { urlFor } from "lib/sanity";
 
 const BlogPostCard = ({ post, css = {} }) => {
-  const text = blocksToText(post.contentRaw);
+  const text = blocksToText(post.content);
   const stats = readingTime(text);
-  const builder = imageUrlBuilder(client as any);
-
   return (
     <Link
       href="/blog/[slug]"
@@ -50,7 +49,7 @@ const BlogPostCard = ({ post, css = {} }) => {
               },
             }}>
             <Image
-              src={builder.image(post.mainImage).url()}
+              src={urlFor(post.mainImage).url()}
               alt={post.mainImage?.alt}
               fill
               style={{ objectFit: "cover" }}
@@ -75,7 +74,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                 textTransform: "uppercase",
                 fontWeight: 500,
               }}>
-              {post.category.title}
+              {post.category?.title ?? ""}
             </Text>
             <Flex
               css={{
@@ -94,7 +93,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                 }}>
                 <Image
                   alt={post.author.image?.alt}
-                  src={builder.image(post.author.image).url()}
+                  src={urlFor(post.author.image).url()}
                   fill
                   style={{ objectFit: "cover" }}
                 />

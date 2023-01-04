@@ -18,7 +18,7 @@ const ActiveStream = ({ playbackUrl }: { playbackUrl: string }) => (
       </Box>
       Active
     </Badge>
-    <AppPlayer playbackUrl={playbackUrl} />
+    <AppPlayer playbackUrl={playbackUrl} type="stream" />
   </>
 );
 

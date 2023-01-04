@@ -5,9 +5,7 @@ import ToolkitSection from "components/Site/ToolkitSection";
 import GuideSection from "components/Site/GuideSection";
 import FeaturedAppsSection from "components/Site/FeaturedAppsSection";
 import PrinciplesSection from "components/Site/PrinciplesSection";
-import { GraphQLClient } from "graphql-request";
-import allHome from "../queries/allHome.gql";
-import { print } from "graphql/language/printer";
+import { client } from "lib/client";
 
 const HomePage = (props) => {
   return (
@@ -22,24 +20,29 @@ const HomePage = (props) => {
 };
 
 export async function getStaticProps({ locale }) {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
+  const queryParams = {};
+  const query = `*[_type=="home" && __i18n_lang =='en-US'][0]`;
+  const pageData = await client.fetch(query, queryParams);
+  console.log("data: ", pageData);
+  // const graphQLClient = new GraphQLClient(
+  //   "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+  // );
 
-  const id = {
-    en: "",
-    es: "i18n_es-ES",
-  };
+  // const id = {
+  //   en: "",
+  //   es: "i18n_es-ES",
+  // };
 
-  const variables = {
-    where: { _id: { matches: id[locale] } },
-  };
+  // const variables = {
+  //   where: { _id: { matches: id[locale] } },
+  // };
 
-  let data: any = await graphQLClient.request(print(allHome), variables);
-
+  // let data: any = await graphQLClient.request(print(allHome), variables);
+  // console.log("gql data: ", data);
   return {
     props: {
-      ...data.allHome[0],
+      // ...data.allHome[0],
+      ...pageData,
       preview: false,
     },
     revalidate: 1,

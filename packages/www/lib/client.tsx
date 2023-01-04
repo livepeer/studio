@@ -9,11 +9,9 @@ const options = {
   token: process.env.SANITY_API_TOKEN,
 };
 
-const client = sanityClient(options);
+export const client = sanityClient(options);
 
 export const urlFor = (source: SanityImageSource) =>
   sanityImage(options).image(source);
 
 export const imageBuilder = sanityImage(client);
-
-export default client;

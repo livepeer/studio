@@ -19,11 +19,12 @@ import * as userEndpointsFunctions from "./endpoints/user";
 import * as versionEndpointsFunctions from "./endpoints/version";
 import * as webhookEndpointsFunctions from "./endpoints/webhook";
 
-const endpoint = isDevelopment()
-  ? `http://localhost:3004`
-  : isStaging()
-  ? `https://livepeer.monster`
-  : ``;
+const endpoint =
+  process.env.NEXT_PUBLIC_USE_STAGING_ENDPOINT === "true" || isStaging()
+    ? `https://livepeer.monster`
+    : isDevelopment()
+    ? `http://localhost:3004`
+    : ``;
 
 const makeContext = (
   state: ApiState,

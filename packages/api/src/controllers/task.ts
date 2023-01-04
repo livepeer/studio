@@ -11,6 +11,7 @@ import {
   toStringValues,
   FieldsMap,
   reqUseReplica,
+  taskWithoutCredentials,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -81,15 +82,21 @@ const fieldsMap: FieldsMap = {
 };
 
 app.use(
-  mung.json(function cleanWriteOnlyResponses(data, req) {
-    if (req.user.admin) {
-      return data;
-    }
+  mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
+    const toExternalTask = async (t: WithID<Task>) => {
+      if (req.user.admin) {
+        return t;
+      }
+      t = taskWithoutCredentials(t);
+      t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
+      return db.task.cleanWriteOnlyResponse(t);
+    };
+
     if (Array.isArray(data)) {
-      return db.task.cleanWriteOnlyResponses(data);
+      return Promise.all(data.map(toExternalTask));
     }
     if ("id" in data) {
-      return db.task.cleanWriteOnlyResponse(data as WithID<Task>);
+      return toExternalTask(data as WithID<Task>);
     }
     return data;
   })
@@ -196,7 +203,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     });
   }
 
-  res.json(taskWithIpfsUrls(req.config.ipfsGatewayUrl, task));
+  res.json(task);
 });
 
 app.post(

@@ -6,7 +6,6 @@ import Link from "next/link";
 
 function CustomLinkResolver({ button }) {
   const { url } = button;
-  // const isExternal = !!url.external;
 
   return (
     <Link
@@ -46,8 +45,6 @@ export default function OffsetPortableText({
   portableTextRaw,
   buttons,
 }) {
-  console.log("args: ", title, portableTextRaw, buttons);
-  // console.log(portableTextRaw);
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -85,18 +82,6 @@ export default function OffsetPortableText({
                 }}>
                 {title}
               </LiveBox>
-              {/* <Text>
-                Why do video apps using decentralized storage have super high
-                churn rates? It’s because most of them do not use a service to
-                process video. This means that the end user experience is
-                generally a video buffering.
-              </Text>
-
-              <Text>
-                Decentralized storage is not optimized for video streaming.
-                Building with decentralized storage and Livepeer Studio creates
-                the optimal video viewing experience.
-              </Text> */}
               {portableTextRaw && <PortableText value={portableTextRaw} />}
               {buttons &&
                 Array.isArray(buttons) &&
