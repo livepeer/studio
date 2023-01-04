@@ -83,11 +83,15 @@ export default function OffsetPortableText({
                 {title}
               </LiveBox>
               {portableTextRaw && <PortableText value={portableTextRaw} />}
-              {buttons &&
-                Array.isArray(buttons) &&
-                buttons.map((button) => (
-                  <CustomLinkResolver button={button} key={button._key} />
-                ))}
+
+              {buttons && (
+                <Box sx={{ display: "grid", gap: "0.5em" }}>
+                  {Array.isArray(buttons) &&
+                    buttons.map((button) => (
+                      <CustomLinkResolver button={button} key={button._key} />
+                    ))}
+                </Box>
+              )}
             </Box>
           </Box>
         </Container>
