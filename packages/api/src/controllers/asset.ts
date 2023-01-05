@@ -145,18 +145,15 @@ function validateAssetPlaybackPolicy(playbackPolicy: Asset["playbackPolicy"]) {
         `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`
       );
     }
+    if (!playbackPolicy?.resourceId) {
+      // TODO: Generate resourceId if not present
+    }
   }
-
-  if (!playbackPolicy?.resourceId) {
-    // TODO: Generate resourceId if not present
-  }
-
   if (playbackPolicy?.type == "jwt") {
     throw new BadRequestError(
       `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
     );
   }
-
   return playbackPolicy;
 }
 
