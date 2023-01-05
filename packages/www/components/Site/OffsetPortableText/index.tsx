@@ -40,11 +40,7 @@ function CustomLinkResolver({ button }) {
   );
 }
 
-export default function OffsetPortableText({
-  title,
-  portableTextRaw,
-  buttons,
-}) {
+export default function OffsetPortableText({ title, portableText, buttons }) {
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -82,7 +78,7 @@ export default function OffsetPortableText({
                 }}>
                 {title}
               </LiveBox>
-              {portableTextRaw && <PortableText value={portableTextRaw} />}
+              {portableText && <PortableText value={portableText} />}
 
               {buttons && (
                 <Box sx={{ display: "grid", gap: "0.5em" }}>

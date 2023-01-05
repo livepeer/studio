@@ -8,7 +8,7 @@ export default function SplitImage({
   inverted,
   title,
   defaultImage,
-  portableTextRaw,
+  portableTex,
 }) {
   const { image } = defaultImage;
   return (
@@ -86,7 +86,7 @@ export default function SplitImage({
             }}>
             {title}
           </LiveBox>
-          {portableTextRaw && <PortableText value={portableTextRaw} />}
+          {portableTex && <PortableText value={portableTex} />}
         </Box>
       </Box>
     </Container>

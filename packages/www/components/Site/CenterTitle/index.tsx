@@ -4,7 +4,7 @@ import { Text, Container, Box } from "@theme-ui/components";
 
 import React from "react";
 
-export default function CenterTitle({ title, portableTextRaw }) {
+export default function CenterTitle({ title, portableText }) {
   return (
     <Box sx={{ paddingY: "64px", px: "16px" }}>
       <Container css={{ maxWidth: "800px", textAlign: "center" }}>
@@ -30,7 +30,7 @@ export default function CenterTitle({ title, portableTextRaw }) {
           }}>
           {title}
         </LiveBox>
-        {portableTextRaw && <PortableText value={portableTextRaw} />}
+        {portableText && <PortableText value={portableText} />}
       </Container>
     </Box>
   );
