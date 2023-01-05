@@ -115,6 +115,9 @@ async function validateAssetPayload(
     }
   }
 
+  // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
+  payload.playbackPolicy = validateAssetPlaybackPolicy(payload.playbackPolicy);
+
   return {
     id,
     playbackId,
@@ -133,6 +136,22 @@ async function validateAssetPayload(
     playbackPolicy: payload.playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
+}
+
+function validateAssetPlaybackPolicy(playbackPolicy: Asset["playbackPolicy"]) {
+  if (playbackPolicy?.type == "lit_signing_condition") {
+    if (!playbackPolicy.unifiedAccessControlConditions) {
+      throw new UnprocessableEntityError(
+        `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`
+      );
+    }
+  }
+
+  if (!playbackPolicy?.resourceId) {
+    // TODO: Generate resourceId if not present
+  }
+
+  return playbackPolicy;
 }
 
 async function getActiveObjectStore(id: string) {
@@ -650,7 +669,6 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
 
   await ensureQueueCapacity(req.config, req.user.id);
-
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -723,7 +741,6 @@ app.post(
     // as direct uploads will also need a lot of effort from callers to upload
     // the files, so the risk is much smaller.
     await ensureQueueCapacity(req.config, req.user.id);
-
     asset = await createAsset(asset, req.queue);
 
     const taskType = shouldUseCatalyst(req) ? "upload" : "import";
@@ -939,6 +956,8 @@ app.patch(
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
+
+    playbackPolicy = validateAssetPlaybackPolicy(playbackPolicy);
 
     await req.taskScheduler.updateAsset(asset, {
       name,
