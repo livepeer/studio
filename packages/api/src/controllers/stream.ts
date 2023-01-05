@@ -144,6 +144,20 @@ async function validateMultistreamOpts(
   return { targets };
 }
 
+function validateStreamPlaybackPolicy(
+  playbackPolicy: DBStream["playbackPolicy"]
+) {
+  if (
+    playbackPolicy?.type == "lit_signing_condition" ||
+    playbackPolicy?.resourceId ||
+    playbackPolicy?.unifiedAccessControlConditions
+  ) {
+    throw new BadRequestError(
+      `playbackPolicy type "lit_signing_condition" with a resourceId or unifiedAccessControlConditions is not supported for streams`
+    );
+  }
+}
+
 async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   return Promise.all(
     ids.map(async (id) => {
@@ -1086,6 +1100,7 @@ app.patch(
       );
       patch = { ...patch, multistream };
     }
+    validateStreamPlaybackPolicy(playbackPolicy);
     if (playbackPolicy) {
       patch = { ...patch, playbackPolicy };
     }

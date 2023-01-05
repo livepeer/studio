@@ -235,6 +235,15 @@ describe("controllers/asset", () => {
       });
     });
 
+    it("should disallow jwt playbackPolicy on assets", async () => {
+      let playbackPolicy = {
+        type: "jwt",
+      };
+      const res = await client.patch(`/asset/${asset.id}`, {
+        playbackPolicy,
+      });
+      expect(res.status).toBe(400);
+    });
     it("should start export task when adding IPFS storage", async () => {
       let res = await client.patch(`/asset/${asset.id}`, {
         storage: { ipfs: { spec: { nftMetadata: { a: "b" } } } },
