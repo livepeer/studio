@@ -236,6 +236,22 @@ export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
   return getSignedUrl(s3, putCommand, { expiresIn });
 }
 
+export function signGoogleCDNCookie(
+  urlPrefix: string,
+  expirationTs: number,
+  keyName: string,
+  key: string
+): string {
+  const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64");
+  const input = `URLPrefix=${encodedURLPrefix}:Expires=${expirationTs}:KeyName=${keyName}`;
+
+  const mac = createHmac("sha1", key);
+  mac.update(input);
+  const sig = mac.digest("base64");
+
+  return `${input}:Signature=${sig}`;
+}
+
 type EmailParams = {
   email: string;
   bcc?: string;
