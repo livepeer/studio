@@ -4,10 +4,15 @@ import Prefooter from "components/Site/Prefooter";
 import PricingCalculator from "components/Site/Pricing/pricingCalculator";
 import PricingCardsContainer from "components/Site/Pricing/pricingCardsContainer";
 import { Pricing as Content } from "content";
+import { CentralisedHero } from "components/PageSpecific/Pricing/CentralisedHero";
+import { SocialProof } from "components/PageSpecific/Pricing/SocialProof";
+import { FAQ } from "components/PageSpecific/Pricing/FAQs";
+import { IconCards } from "components/PageSpecific/Pricing/IconCards";
 
 const PricingPage = () => {
   return (
-    <Layout {...Content.metaData}>
+    <Layout {...Content.metaData} navBackgroundColor={"$hiContrast"}>
+      <CentralisedHero />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -44,11 +49,14 @@ const PricingPage = () => {
                   px: "$4",
                 },
               }}>
-              <PricingCalculator />
+              {/* <PricingCalculator /> */}
             </Container>
           </Box>
         </Box>
       </Box>
+      <SocialProof />
+      <IconCards />
+      <FAQ />
     </Layout>
   );
 };
