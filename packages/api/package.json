@@ -48,6 +48,7 @@
     "@cloudflare/kv-asset-handler": "^0.0.11",
     "@cloudflare/wrangler": "^1.8.4",
     "@kubernetes/client-node": "^0.10.2",
+    "@lit-protocol/sdk-nodejs": "^1.1.241",
     "@livepeer/sdk": "1.0.0-alpha.7",
     "@peculiar/webcrypto": "^1.2.3",
     "@sendgrid/client": "^7.6.0",

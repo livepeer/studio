@@ -11,6 +11,7 @@ import {
   BadRequestError,
 } from "../store/errors";
 import tracking from "../middleware/tracking";
+import LitJsSdk from "@lit-protocol/sdk-nodejs";
 
 const accessControl = Router();
 
@@ -18,6 +19,23 @@ const app = Router();
 
 accessControl.use("/signing-key", signingKeyApp);
 app.use("/access-control", accessControl);
+
+accessControl.post("/verify-lit-jwt", async (req, res) => {
+  const jwt = req.body.jwt;
+  const { verified, header, payload } = LitJsSdk.verifyJwt({
+    jwt,
+  });
+
+  // TODO check if verified and if cliams are valid against the playbackPolicy, then cookie
+
+  res.status(200);
+
+  return res.json({
+    verified,
+    header,
+    payload,
+  });
+});
 
 accessControl.post(
   "/gate",
