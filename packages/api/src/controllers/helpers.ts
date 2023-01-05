@@ -14,6 +14,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { db } from "../store";
 import { WithID } from "../store/types";
 import { ObjectStore, Task } from "../schema/types";
+import { CliArgs } from "../parse-cli";
 
 const ITERATIONS = 10000;
 
@@ -234,6 +235,25 @@ export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
   });
   const expiresIn = 12 * 60 * 60; // 12h in seconds
   return getSignedUrl(s3, putCommand, { expiresIn });
+}
+
+export function signGoogleCDNCookie(
+  config: CliArgs,
+  urlPrefix: string,
+  expirationTs: number
+): [string, string] {
+  const {
+    googleCloudUrlSigningKeyName: keyName,
+    googleCloudUrlSigningKey: key,
+  } = config;
+  const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64");
+  const input = `URLPrefix=${encodedURLPrefix}:Expires=${expirationTs}:KeyName=${keyName}`;
+
+  const mac = createHmac("sha1", key);
+  mac.update(input);
+  const sig = mac.digest("base64");
+
+  return ["Cloud-CDN-Cookie", `${input}:Signature=${sig}`];
 }
 
 type EmailParams = {

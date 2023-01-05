@@ -76,11 +76,14 @@ function shouldUseCatalyst({ query, user, config }: Request) {
 }
 
 function defaultObjectStoreId(
-  { config }: Request,
+  { config, body }: Request,
   useCatalyst: boolean
 ): string {
   if (!useCatalyst) {
     return config.vodObjectStoreId;
+  }
+  if (body.playbackPolicy?.type === "lit_signing_condition") {
+    return config.vodCatalystPrivateAssetsObjectStoreId;
   }
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
 }
@@ -107,6 +110,11 @@ async function validateAssetPayload(
   source?: Asset["source"]
 ): Promise<WithID<Asset>> {
   if (payload.objectStoreId) {
+    if (payload.playbackPolicy?.type === "lit_signing_condition") {
+      throw new ForbiddenError(
+        `lit-gated assets cannot use custom object store`
+      );
+    }
     const os = await getActiveObjectStore(payload.objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
@@ -213,7 +221,7 @@ function getDownloadUrl(
   return pathJoin(base, asset.playbackId, "video");
 }
 
-async function withPlaybackUrls(
+export async function withPlaybackUrls(
   { config }: Request,
   ingest: string,
   asset: WithID<Asset>,
