@@ -4,9 +4,7 @@ import Button from "../../../components/Site/Button";
 import { PortableText } from "@portabletext/react";
 import Link from "next/link";
 
-export default function OffsetPortableText({ title, portableTextRaw }) {
-  // console.log("args: ", title, portableTextRaw);
-  console.log(portableTextRaw);
+export default function OffsetPortableText({ title, portableText }) {
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -56,7 +54,7 @@ export default function OffsetPortableText({ title, portableTextRaw }) {
                 Building with decentralized storage and Livepeer Studio creates
                 the optimal video viewing experience.
               </Text> */}
-              {portableTextRaw && <PortableText value={portableTextRaw} />}
+              {portableText && <PortableText value={portableText} />}
               <a
                 href="https://lvpr.link/dStorage"
                 style={{ textDecoration: "none" }}>

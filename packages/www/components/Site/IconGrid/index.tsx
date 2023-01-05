@@ -4,8 +4,7 @@ import { PortableText } from "@portabletext/react";
 import { Text, Container, Box } from "@theme-ui/components";
 import Image from "next/image";
 
-export default function IconGrid({ title, richText, icons, portableTextRaw }) {
-  console.log("portable Text on icon grid: ", portableTextRaw);
+export default function IconGrid({ title, richText, icons, portableText }) {
   return (
     <Box sx={{ paddingY: "64px" }}>
       <Container css={{ maxWidth: "1200px", textAlign: "center" }}>
@@ -34,7 +33,7 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
               {title}
             </LiveBox>
             <Box sx={{ maxWidth: "640px", marginX: "auto" }}>
-              {portableTextRaw && <PortableText value={portableTextRaw} />}
+              {portableText && <PortableText value={portableText} />}
             </Box>
           </Box>
         )}
