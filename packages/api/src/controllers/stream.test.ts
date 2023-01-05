@@ -526,7 +526,14 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(204);
       });
-
+      it("should disallow lit playbackPolicy on streams", async () => {
+        const res = await client.patch(patchPath, {
+          playbackPolicy: {
+            type: "lit_signing_condition",
+          },
+        });
+        expect(res.status).toBe(400);
+      });
       it("should disallow additional fields", async () => {
         const res = await client.patch(patchPath, {
           name: "the stream name is immutable",
