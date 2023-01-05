@@ -213,7 +213,7 @@ function getDownloadUrl(
   return pathJoin(base, asset.playbackId, "video");
 }
 
-async function withPlaybackUrls(
+export async function withPlaybackUrls(
   { config }: Request,
   ingest: string,
   asset: WithID<Asset>,
