@@ -15,6 +15,7 @@ import {
 import Help from "../../../public/img/help.svg";
 import ReactTooltip from "react-tooltip";
 import { User, Stream } from "@livepeer.studio/api";
+import "regenerator-runtime/runtime";
 
 const loadingAnim = keyframes`
 0% {
