@@ -5,7 +5,7 @@ import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
 import { urlFor } from "../../../lib/client";
 
-export const CentralisedHero = () => {
+const CentralisedHero = ({ title, portableText, image }) => {
   return (
     <Container
       sx={{
@@ -61,24 +61,17 @@ export const CentralisedHero = () => {
                   fontSize: 72,
                 },
               }}>
-              {/* {title} */}
-              Creating video experiences is simple, affordable, and easy.
+              {title}
             </LiveBox>
             <Box sx={{ fontSize: "28px" }}>
-              Create a free account today and start building!
+              {portableText && <PortableText value={portableText} />}
             </Box>
-            {/* {portableTextRaw && <PortableText value={portableTextRaw} />} */}
           </Box>
           <Image
-            alt="Livepeer"
-            // src={urlFor(defaultImage).url()}
-            src="https://picsum.photos/1920/1080?grayscale"
-            // placeholder="blur"
-            // blurDataURL={urlFor(defaultImage)
-            //   .width(24)
-            //   .height(24)
-            //   .blur(10)
-            //   .url()}
+            src={urlFor(image).url()}
+            placeholder="blur"
+            blurDataURL={urlFor(image).width(24).height(24).blur(10).url()}
+            alt={title}
             layout="fill"
             objectFit="cover"
           />
@@ -87,3 +80,4 @@ export const CentralisedHero = () => {
     </Container>
   );
 };
+export default CentralisedHero;

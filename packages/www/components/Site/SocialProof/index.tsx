@@ -3,7 +3,7 @@ import { Container, Box } from "@theme-ui/components";
 import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
 
-export const SocialProof = () => {
+const SocialProof = () => {
   return (
     <Container
       sx={{
@@ -165,3 +165,4 @@ export const SocialProof = () => {
     </Container>
   );
 };
+export default SocialProof;

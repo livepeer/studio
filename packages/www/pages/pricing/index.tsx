@@ -1,18 +1,20 @@
 import Layout from "layouts/main";
 import { Box, Heading, Text, Container } from "@livepeer/design-system";
-import Prefooter from "components/Site/Prefooter";
-import PricingCalculator from "components/Site/Pricing/pricingCalculator";
+// import Prefooter from "components/Site/Prefooter";
+// import PricingCalculator from "components/Site/Pricing/pricingCalculator";
 import PricingCardsContainer from "components/Site/Pricing/pricingCardsContainer";
 import { Pricing as Content } from "content";
-import { CentralisedHero } from "components/PageSpecific/Pricing/CentralisedHero";
-import { SocialProof } from "components/PageSpecific/Pricing/SocialProof";
-import { FAQ } from "components/PageSpecific/Pricing/FAQs";
-import { IconCards } from "components/PageSpecific/Pricing/IconCards";
+import { client } from "lib/client";
+import Fade from "react-reveal/Fade";
+import { getComponent } from "lib/utils";
 
-const PricingPage = () => {
+const PricingPage = (pageData, { pageBuilder }) => {
+  console.log(pageData);
   return (
     <Layout {...Content.metaData} navBackgroundColor={"$hiContrast"}>
-      <CentralisedHero />
+      {pageData.pageBuilder.map((component, i) => (
+        <Fade key={i}>{getComponent(component)}</Fade>
+      ))}
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -54,12 +56,21 @@ const PricingPage = () => {
           </Box>
         </Box>
       </Box>
-      <SocialProof />
-      <IconCards />
-      <FAQ />
     </Layout>
   );
 };
 
-PricingPage.theme = "dark-theme-blue";
+export async function getStaticProps() {
+  const query = `*[_type=="pricingPage"][0]`;
+  const pageData = (await client.fetch(query)) ?? {};
+  console.log("pageData: ", pageData);
+
+  return {
+    props: {
+      ...pageData,
+    },
+    revalidate: 86400,
+  };
+}
+
 export default PricingPage;
