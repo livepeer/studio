@@ -71,11 +71,24 @@ app.post("/verify-lit-jwt", async (req, res) => {
     jwt,
   });
 
-  // TODO check if verified and if claims are valid against the playbackPolicy
-
-  setGoogleCloudCookie(res, asset);
-
-  res.status(200);
+  if (verified) {
+    res.status(200);
+    if (asset.playbackPolicy?.type == "lit_signing_condition") {
+      let resourceId = asset.playbackPolicy.resourceId;
+      if (resourceId.baseUrl != payload.baseUrl) {
+        throw new ForbiddenError("baseUrl does not match");
+      }
+      if (resourceId.path != payload.path) {
+        throw new ForbiddenError("path does not match");
+      }
+      if (resourceId.orgId != payload.orgId) {
+        throw new ForbiddenError("orgId does not match");
+      }
+    }
+    setGoogleCloudCookie(res, asset);
+  } else {
+    res.status(403);
+  }
 
   return res.json({
     verified,
