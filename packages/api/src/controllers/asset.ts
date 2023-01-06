@@ -124,7 +124,11 @@ async function validateAssetPayload(
   }
 
   // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
-  payload.playbackPolicy = validateAssetPlaybackPolicy(payload.playbackPolicy);
+  payload.playbackPolicy = validateAssetPlaybackPolicy(
+    payload.playbackPolicy,
+    playbackId,
+    createdAt
+  );
 
   return {
     id,
@@ -146,7 +150,11 @@ async function validateAssetPayload(
   };
 }
 
-function validateAssetPlaybackPolicy(playbackPolicy: Asset["playbackPolicy"]) {
+function validateAssetPlaybackPolicy(
+  playbackPolicy: Asset["playbackPolicy"],
+  playbackId?: string,
+  createdAt?: number
+) {
   if (playbackPolicy?.type == "lit_signing_condition") {
     if (!playbackPolicy.unifiedAccessControlConditions) {
       throw new UnprocessableEntityError(
@@ -154,7 +162,13 @@ function validateAssetPlaybackPolicy(playbackPolicy: Asset["playbackPolicy"]) {
       );
     }
     if (!playbackPolicy?.resourceId) {
-      // TODO: Generate resourceId if not present
+      playbackPolicy.resourceId = {
+        baseUrl: "playback.livepeer.studio",
+        path: `/gate/${playbackId}`,
+        orgId: "livepeer",
+        role: "",
+        extraData: `createdAt=${createdAt}`,
+      };
     }
   }
   if (playbackPolicy?.type == "jwt") {
@@ -968,7 +982,11 @@ app.patch(
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
-    playbackPolicy = validateAssetPlaybackPolicy(playbackPolicy);
+    playbackPolicy = validateAssetPlaybackPolicy(
+      playbackPolicy,
+      asset.playbackId,
+      asset.createdAt
+    );
 
     await req.taskScheduler.updateAsset(asset, {
       name,
