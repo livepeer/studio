@@ -144,7 +144,6 @@ export const getAssets = async (
     limit?: number | string;
     cursor?: string;
     order?: string;
-    active?: boolean;
     count?: boolean;
   }
 ): Promise<[Asset[], string, number]> => {
@@ -153,12 +152,11 @@ export const getAssets = async (
     `/asset?${qs.stringify({
       userId,
       filters,
-      active: opts?.active,
       order: opts?.order,
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
-      streamsonly: 1,
+      details: 1,
     })}`
   );
   if (res.status !== 200) {
@@ -171,7 +169,7 @@ export const getAssets = async (
 };
 
 export const getAsset = async (assetId): Promise<Asset> => {
-  const [res, asset] = await context.fetch(`/asset/${assetId}`);
+  const [res, asset] = await context.fetch(`/asset/${assetId}?details=1`);
   if (res.status !== 200) {
     throw asset && typeof asset === "object"
       ? { ...asset, status: res.status }

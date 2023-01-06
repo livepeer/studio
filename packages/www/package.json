@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@livepeer.studio/www",
-  "version": "0.11.3",
+  "version": "0.12.0",
   "scripts": {
     "prepare": "cd ../api && yarn run prepare",
     "dev": "next",
@@ -23,7 +23,7 @@
     "@emotion/core": "^10.0.17",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^10.0.23",
-    "@livepeer.studio/api": "^0.11.3",
+    "@livepeer.studio/api": "^0.12.0",
     "@livepeer/design-system": "^1.0.4",
     "@livepeer/react": "^2.0.0-next.9",
     "@mdx-js/loader": "^1.6.16",

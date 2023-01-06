@@ -1,6 +1,6 @@
 import { Box, Flex, Heading, Text, Link as A } from "@livepeer/design-system";
 import imageUrlBuilder from "@sanity/image-url";
-import client from "lib/client";
+import { client } from "lib/client";
 import { FaTwitter, FaMedium, FaGithub, FaLinkedin } from "react-icons/fa";
 import Image from "next/image";
 
