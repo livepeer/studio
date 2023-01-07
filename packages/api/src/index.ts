@@ -4,7 +4,7 @@ import { Server } from "http";
 import morgan from "morgan";
 import { AddressInfo } from "net";
 import "source-map-support/register";
-import { collectDefaultMetrics } from "prom-client";
+import { collectDefaultMetrics, Gauge } from "prom-client";
 
 import appRouter from "./app-router";
 import logger from "./logger";
@@ -13,7 +13,18 @@ import { UnboxPromise } from "./types/common";
 import tracking from "./middleware/tracking";
 
 export type AppServer = UnboxPromise<ReturnType<typeof makeApp>>;
-collectDefaultMetrics({ prefix: "livepeer_api_" });
+
+const prefix = "livepeer_api_";
+collectDefaultMetrics({ prefix });
+
+function getGitHash(): string {
+  return (
+    process.env.VERSION ||
+    process.env.GITHUB_SHA ||
+    require("child_process").execSync("git rev-parse HEAD").toString().trim() ||
+    "undefined"
+  );
+}
 
 export default async function makeApp(params: CliArgs) {
   const {
@@ -109,6 +120,20 @@ export default async function makeApp(params: CliArgs) {
   app.use(router);
 
   if (listen) {
+    let version = new Gauge({
+      name: "livepeer_api_versions",
+      help: "Versions used by livepeer api node",
+      labelNames: ["nodeversion", "apiversion", "os", "arch"],
+    });
+    version.set(
+      {
+        nodeversion: process.version,
+        arch: process.arch,
+        os: process.platform,
+        apiversion: getGitHash(),
+      },
+      1
+    );
     await new Promise<void>((resolve, reject) => {
       listener = app.listen(port, () => {
         const address = listener.address() as AddressInfo;
