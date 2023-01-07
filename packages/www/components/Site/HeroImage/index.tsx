@@ -4,7 +4,7 @@ import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
 import { urlFor } from "../../../lib/client";
 
-export default function HeroImage({ title, portableTextRaw, defaultImage }) {
+export default function HeroImage({ title, portableText, defaultImage }) {
   return (
     <Container
       sx={{
@@ -54,7 +54,7 @@ export default function HeroImage({ title, portableTextRaw, defaultImage }) {
               }}>
               {title}
             </LiveBox>
-            {portableTextRaw && <PortableText value={portableTextRaw} />}
+            {portableText && <PortableText value={portableText} />}
           </Box>
           <Image
             alt="Livepeer"
