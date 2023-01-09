@@ -8,12 +8,14 @@ import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import Table from "../store/table";
+import { Asset, Stream } from "../schema/types";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
   type: "live" | "vod" | "recording";
   meta: {
     live?: 0 | 1;
+    playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
     source: {
       // the only supported format is HLS for now
       hrn: "HLS (TS)";
@@ -26,11 +28,13 @@ type PlaybackInfo = {
 const newPlaybackInfo = (
   type: PlaybackInfo["type"],
   hlsUrl: string,
+  playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   live?: PlaybackInfo["meta"]["live"]
 ): PlaybackInfo => ({
   type,
   meta: {
     live,
+    playbackPolicy,
     source: [
       {
         hrn: "HLS (TS)",
@@ -58,7 +62,10 @@ const getAssetPlaybackUrl = async (
   if (!os || os.deleted || os.disabled) {
     return null;
   }
-  return assetPlaybackUrl(config, ingest, asset, os);
+  return {
+    playbackUrl: assetPlaybackUrl(config, ingest, asset, os),
+    playbackPolicy: asset.playbackPolicy,
+  };
 };
 
 const getRecordingPlaybackUrl = async (
@@ -84,12 +91,13 @@ async function getPlaybackInfo(
     return newPlaybackInfo(
       "live",
       streamPlaybackUrl(ingest, stream),
+      stream.playbackPolicy,
       stream.isActive ? 1 : 0
     );
   }
-  const assetUrl = await getAssetPlaybackUrl(config, ingest, id);
-  if (assetUrl) {
-    return newPlaybackInfo("vod", assetUrl);
+  const asset = await getAssetPlaybackUrl(config, ingest, id);
+  if (asset) {
+    return newPlaybackInfo("vod", asset.playbackUrl, asset.playbackPolicy);
   }
 
   const recordingUrl =
