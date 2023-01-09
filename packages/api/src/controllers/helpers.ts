@@ -245,14 +245,15 @@ export function signGoogleCDNCookie(
 ): [string, string] {
   const {
     googleCloudUrlSigningKeyName: keyName,
-    googleCloudUrlSigningKey: key,
+    googleCloudUrlSigningKey: keyb64,
   } = config;
-  if (!keyName || !key) {
+  if (!keyName || !keyb64) {
     throw new InternalServerError("Missing URL signing key config");
   }
   const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64");
   const input = `URLPrefix=${encodedURLPrefix}:Expires=${expirationTs}:KeyName=${keyName}`;
 
+  const key = Buffer.from(keyb64, "base64");
   const mac = createHmac("sha1", key);
   mac.update(input);
   const sig = mac.digest("base64");
