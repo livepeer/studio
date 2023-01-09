@@ -1,9 +1,9 @@
 import React from "react";
-import { PortableText } from "@portabletext/react";
 import { Container, Box } from "@theme-ui/components";
-import { Text, Box as LiveBox } from "@livepeer/design-system";
+import { Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
-import { urlFor } from "../../../lib/client";
+import Button from "../../../components/Site/Button";
+import Link from "next/link";
 
 function idealTextColor(bgColor) {
   var nThreshold = 105;
@@ -24,6 +24,33 @@ function getRGBComponents(color) {
     G: parseInt(g, 16),
     B: parseInt(b, 16),
   };
+}
+
+function CustomLinkResolver({ button }) {
+  const { url } = button;
+
+  return (
+    <Link
+      style={{ textDecoration: "none" }}
+      href={url.external ?? url?.internal?.slug?.current ?? "/"}
+      target={url.blank ? "_blank" : "_self"}
+      passHref>
+      <Box
+        as="a"
+        sx={{
+          background: "#fff",
+          borderRadius: "10px",
+          py: "16px",
+          px: "32px",
+          display: "block",
+          textAlign: "center",
+          color: "#000",
+          border: "1px solid rgba(0,0,0,0.2)",
+        }}>
+        {button.buttonText}
+      </Box>
+    </Link>
+  );
 }
 
 const PricingCards = ({ title, pricingCards }) => {
@@ -69,7 +96,7 @@ const PricingCards = ({ title, pricingCards }) => {
           gap: "20px",
         }}>
         {pricingCards.map((card, index) => {
-          const { color, title, description, price, features } = card;
+          const { color, title, description, price, features, button } = card;
           return (
             <Box
               sx={{
@@ -83,6 +110,7 @@ const PricingCards = ({ title, pricingCards }) => {
                 display: "grid",
                 gap: "20px",
                 borderRadius: "12px",
+                gridTemplateRows: "auto 1fr auto auto auto",
               }}
               key={index + title}>
               <LiveBox
@@ -152,7 +180,7 @@ const PricingCards = ({ title, pricingCards }) => {
                   />
                 </Box>
               )}
-
+              <CustomLinkResolver button={button} key={title} />
               <Box
                 sx={{
                   textAlign: "center",
