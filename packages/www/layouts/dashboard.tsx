@@ -7,7 +7,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
 import Router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
@@ -58,6 +58,8 @@ function DashboardLayout({
   canonical,
   requireLoggedIn = true,
 }: Props) {
+  const stripePromise = useMemo(() => getStripe(), []);
+
   useEffect(() => {
     if (window.location.hostname === "livepeer.studio") {
       ReactGA.pageview(window.location.pathname + window.location.search);
@@ -92,7 +94,7 @@ function DashboardLayout({
     <>
       {requireLoggedIn && <DashboardRedirect />}
       <Box className="dashboard">
-        <Elements stripe={getStripe()}>
+        <Elements stripe={stripePromise}>
           <Head>
             <meta name="viewport" content="width=1023" />
           </Head>
