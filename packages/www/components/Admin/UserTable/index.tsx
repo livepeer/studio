@@ -87,22 +87,21 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       { id: "email", placeholder: "user's email" },
       {
         id: "stripeProductId",
-        render: ({ value, setValue }) => {
-          return (
-            <Select
-              sx={{ ml: "1em", width: "8em" }}
-              onChange={(e) => setValue(e.target.value)}>
-              <option id="empty" value="">
-                —
+        render: ({ id, value, setValue }) => (
+          <Select
+            key={`select-${id}`}
+            sx={{ ml: "1em", width: "8em" }}
+            onChange={(e) => setValue(e.target.value)}>
+            <option id="empty" value="">
+              —
+            </option>
+            {Object.keys(products).map((id) => (
+              <option key={id} value={id}>
+                {products[id].name}
               </option>
-              {Object.keys(products).map((id) => (
-                <option key={id} value={id}>
-                  {products[id].name}
-                </option>
-              ))}
-            </Select>
-          );
-        },
+            ))}
+          </Select>
+        ),
       },
     ],
     []
