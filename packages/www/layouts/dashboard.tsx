@@ -7,7 +7,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
 import Router from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
@@ -58,7 +58,7 @@ function DashboardLayout({
   canonical,
   requireLoggedIn = true,
 }: Props) {
-  const [stripePromise] = useState(() => getStripe());
+  const stripePromise = useMemo(() => getStripe(), []);
 
   useEffect(() => {
     if (window.location.hostname === "livepeer.studio") {
