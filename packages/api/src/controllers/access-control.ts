@@ -37,6 +37,7 @@ function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
   res.cookie(name, value, {
     httpOnly: true,
     secure: true,
+    sameSite: "none",
     expires: new Date(expiration),
     domain: urlPrefix.hostname,
     path: urlPrefix.pathname,
