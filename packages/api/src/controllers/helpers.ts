@@ -15,6 +15,7 @@ import { db } from "../store";
 import { WithID } from "../store/types";
 import { ObjectStore, Task } from "../schema/types";
 import { CliArgs } from "../parse-cli";
+import { InternalServerError } from "../store/errors";
 
 const ITERATIONS = 10000;
 
@@ -246,6 +247,9 @@ export function signGoogleCDNCookie(
     googleCloudUrlSigningKeyName: keyName,
     googleCloudUrlSigningKey: key,
   } = config;
+  if (!keyName || !key) {
+    throw new InternalServerError("Missing URL signing key config");
+  }
   const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64");
   const input = `URLPrefix=${encodedURLPrefix}:Expires=${expirationTs}:KeyName=${keyName}`;
 
