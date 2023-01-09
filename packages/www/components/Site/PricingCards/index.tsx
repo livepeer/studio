@@ -110,7 +110,7 @@ const PricingCards = ({ title, pricingCards }) => {
                 display: "grid",
                 gap: "20px",
                 borderRadius: "12px",
-                gridTemplateRows: "auto 1fr auto auto auto",
+                gridTemplateRows: "auto auto 1fr auto 3fr",
               }}
               key={index + title}>
               <LiveBox
@@ -183,23 +183,31 @@ const PricingCards = ({ title, pricingCards }) => {
               <CustomLinkResolver button={button} key={title} />
               <Box
                 sx={{
-                  textAlign: "center",
-                  fontWeight: 600,
-                  fontSize: "18px",
+                  display: "grid",
+                  gap: "16px",
                   mt: "32px",
+                  alignItems: "flex-start",
+                  gridTemplateRows: "auto 1fr",
                 }}>
-                Plan includes
-              </Box>
-              <Box sx={{ display: "grid", gap: "8px" }}>
-                {features.map((feature, index) => {
-                  return (
-                    <Box
-                      key={index + feature}
-                      sx={{ textAlign: "center", margin: 0, padding: 0 }}>
-                      {feature}
-                    </Box>
-                  );
-                })}
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    fontWeight: 600,
+                    fontSize: "18px",
+                  }}>
+                  Plan includes
+                </Box>
+                <Box sx={{ display: "grid", gap: "8px" }}>
+                  {features.map((feature, index) => {
+                    return (
+                      <Box
+                        key={index + feature}
+                        sx={{ textAlign: "center", margin: 0, padding: 0 }}>
+                        {feature}
+                      </Box>
+                    );
+                  })}
+                </Box>
               </Box>
             </Box>
           );
