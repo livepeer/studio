@@ -25,7 +25,7 @@ function getPlaybackFolderPrefix(playbackUrl: string) {
 function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
   const urlPrefix = new URL(asset.playbackUrl);
   const lastSlashIndex = urlPrefix.pathname.lastIndexOf("/");
-  urlPrefix.pathname = urlPrefix.pathname.substring(0, lastSlashIndex + 1);
+  urlPrefix.pathname = urlPrefix.pathname.substring(0, lastSlashIndex);
 
   const expiration =
     Date.now() + 2 * Math.round(asset.videoSpec.duration * 1000);
