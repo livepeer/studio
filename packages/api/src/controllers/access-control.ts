@@ -18,17 +18,16 @@ import { Asset } from "../schema/types";
 
 function getPlaybackFolderPrefix(playbackUrl: string) {
   const url = new URL(playbackUrl);
-  url.pathname = url.pathname.substring(0, url.pathname.lastIndexOf("/") + 1);
+  url.pathname = url.pathname.substring(0, url.pathname.lastIndexOf("/"));
   return url;
 }
 
 function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
-  const urlPrefix = new URL(asset.playbackUrl);
-  const lastSlashIndex = urlPrefix.pathname.lastIndexOf("/");
-  urlPrefix.pathname = urlPrefix.pathname.substring(0, lastSlashIndex);
-
-  const expiration =
-    Date.now() + 2 * Math.round(asset.videoSpec.duration * 1000);
+  const urlPrefix = getPlaybackFolderPrefix(asset.playbackUrl);
+  const expiration = Math.max(
+    60 * 60 * 1000,
+    Date.now() + 2 * Math.round(asset.videoSpec.duration * 1000)
+  );
   const [name, value] = signGoogleCDNCookie(
     res.req.config,
     urlPrefix.toString(),
