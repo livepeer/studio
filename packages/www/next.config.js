@@ -22,7 +22,6 @@ const SentryWebpackPluginOptions = {
 };
 
 const config = {
-  swcMinify: false,
   images: {
     domains: ["cdn.sanity.io"],
   },
@@ -250,6 +249,10 @@ module.exports = withSentryConfig(
             config.module.rules.push({
               test: /\.md$/,
               use: "raw-loader",
+            });
+            config.module.rules.push({
+              test: /\.svg$/,
+              use: ["@svgr/webpack"],
             });
             if (isAnalyzeEnabled) {
               const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
