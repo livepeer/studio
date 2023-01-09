@@ -24,10 +24,11 @@ function getPlaybackFolderPrefix(playbackUrl: string) {
 
 function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
   const urlPrefix = getPlaybackFolderPrefix(asset.playbackUrl);
-  const expiration = Math.max(
+  const ttl = Math.max(
     60 * 60 * 1000,
-    Date.now() + 2 * Math.round(asset.videoSpec.duration * 1000)
+    2 * Math.round(asset.videoSpec.duration * 1000)
   );
+  const expiration = Date.now() + ttl;
   const [name, value] = signGoogleCDNCookie(
     res.req.config,
     urlPrefix.toString(),
