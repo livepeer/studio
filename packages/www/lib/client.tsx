@@ -6,7 +6,7 @@ const options = {
   dataset: "production",
   projectId: "dp4k3mpw",
   useCdn: process.env.NODE_ENV === "production",
-  token: process.env.SANITY_API_TOKEN,
+  // token: process.env.SANITY_API_TOKEN,
 };
 
 export const client = sanityClient(options);
