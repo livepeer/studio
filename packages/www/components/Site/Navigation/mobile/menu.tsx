@@ -8,16 +8,8 @@ import {
 import { User } from "@livepeer.studio/api";
 import Link from "next/link";
 import { BreadcrumbItem } from "../breadcrumb";
-import Button from "components/Site/Button";
-
-type Props = {
-  links: any;
-  breadcrumb?: BreadcrumbItem[];
-  mobileMenuIsOpen: boolean;
-  setMobileMenuIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  token: string | undefined;
-  user: User | undefined;
-};
+import { useEffect, useState } from "react";
+import AuthButtons from "./authButtons";
 
 const Menu = ({
   mobileMenuIsOpen,
@@ -25,7 +17,26 @@ const Menu = ({
   token,
   user,
   links,
-}: Props) => {
+}: {
+  links: any;
+  breadcrumb?: BreadcrumbItem[];
+  mobileMenuIsOpen: boolean;
+  setMobileMenuIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  token: string | undefined;
+  user: User | undefined;
+}) => {
+  const [authButtons, setAuthButtons] = useState<React.ReactNode>();
+
+  useEffect(() => {
+    setAuthButtons(
+      <AuthButtons
+        isTokenDefined={!!token}
+        isAdminUser={user && user.admin}
+        setMobileMenuIsOpen={setMobileMenuIsOpen}
+      />
+    );
+  }, [token, user, setMobileMenuIsOpen]);
+
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) setMobileMenuIsOpen(false);
   };
@@ -102,29 +113,7 @@ const Menu = ({
           css={{
             ai: "center",
           }}>
-          {!!token ? (
-            <>
-              <Link href="dashboard" passHref legacyBehavior>
-                <Button arrow>Dashboard</Button>
-              </Link>
-              {user && user.admin && (
-                <Link href="/app/admin" passHref legacyBehavior>
-                  <A css={{ ml: "$3" }}>Admin</A>
-                </Link>
-              )}
-            </>
-          ) : (
-            <>
-              <Link href="/login" passHref legacyBehavior>
-                <Button
-                  onClick={() => setMobileMenuIsOpen(false)}
-                  arrow
-                  css={{ mt: "$7", mr: "$3" }}>
-                  Let's Go
-                </Button>
-              </Link>
-            </>
-          )}
+          {authButtons}
         </Flex>
       </Container>
     </Box>

@@ -71,7 +71,9 @@ const Index = ({ id }: { id: string }, children) => {
           sx={{ mt: "1em" }}
           onChange={(e) => setSelectedUser(e.target.value)}>
           {users.map((user) => (
-            <option value={user.id}>{user.email}</option>
+            <option value={user.id} key={user.id}>
+              {user.email}
+            </option>
           ))}
         </Select>
         <Input

@@ -10,9 +10,7 @@ import {
   AlertDialog,
   AlertDialogTitle,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogCancel,
-  useSnackbar,
 } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -28,7 +26,6 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
   const { register, handleSubmit } = useForm();
   const elements = useElements();
   const [open, setOpen] = useState(false);
-  const [openSnackbar] = useSnackbar();
   const { resolvedTheme } = useTheme();
   const { handleSubmit: hubspotSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -135,7 +132,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
             </Heading>
           </AlertDialogTitle>
 
-          <AlertDialogDescription css={{ mt: "$4" }}>
+          <Box css={{ mt: "$4" }}>
             <Box css={{ color: "$hiContrast" }}>
               <Box>
                 <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
@@ -315,7 +312,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                 />
               </Box>
             </Box>
-          </AlertDialogDescription>
+          </Box>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
             <AlertDialogCancel asChild>
