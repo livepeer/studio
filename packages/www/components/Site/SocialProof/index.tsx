@@ -1,9 +1,10 @@
 import React from "react";
 import { Container, Box } from "@theme-ui/components";
 import { Text, Box as LiveBox } from "@livepeer/design-system";
+import { urlFor } from "lib/client";
 import Image from "next/image";
 
-const SocialProof = () => {
+const SocialProof = ({ icons, title }) => {
   return (
     <Container
       sx={{
@@ -28,8 +29,7 @@ const SocialProof = () => {
               fontSize: 48,
             },
           }}>
-          {/* {title} */}
-          Trusted by
+          {title}
         </LiveBox>
         <Box
           sx={{
@@ -40,126 +40,24 @@ const SocialProof = () => {
             paddingY: "64px",
             paddingX: "32px",
           }}>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
-          <Box sx={{ padding: "1em" }}>
-            <Image
-              alt="Livepeer"
-              // src={urlFor(defaultImage).url()}
-              src="https://picsum.photos/200/200?grayscale"
-              // placeholder="blur"
-              // blurDataURL={urlFor(defaultImage)
-              //   .width(24)
-              //   .height(24)
-              //   .blur(10)
-              //   .url()}
-              width={200}
-              height={200}
-            />
-          </Box>
+          {icons &&
+            Array.isArray(icons) &&
+            icons.map((icon) => (
+              <Box key={icon._key} sx={{ padding: "1em" }}>
+                <Image
+                  alt={icon.alt}
+                  src={urlFor(icon.asset).url()}
+                  placeholder="blur"
+                  blurDataURL={urlFor(icon.asset)
+                    .width(24)
+                    .height(24)
+                    .blur(10)
+                    .url()}
+                  width={100}
+                  height={50}
+                />
+              </Box>
+            ))}
         </Box>
       </Box>
     </Container>
