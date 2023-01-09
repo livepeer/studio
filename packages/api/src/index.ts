@@ -123,14 +123,15 @@ export default async function makeApp(params: CliArgs) {
     let version = new Gauge({
       name: "livepeer_api_versions",
       help: "Versions used by livepeer api node",
-      labelNames: ["nodeversion", "apiversion", "os", "arch"],
+      labelNames: ["nodeversion", "version", "app", "os", "arch"],
     });
     version.set(
       {
         nodeversion: process.version,
         arch: process.arch,
         os: process.platform,
-        apiversion: getGitHash(),
+        version: getGitHash(),
+        app: "studio-api",
       },
       1
     );
