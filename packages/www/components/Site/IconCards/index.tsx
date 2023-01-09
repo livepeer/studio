@@ -49,6 +49,8 @@ const IconCards = ({ title, cards }) => {
             marginTop: "64px",
             textAlign: "left",
             justifyContent: ["unset", "center"],
+            mx: "auto",
+            maxWidth: "1600px",
           }}>
           {cards.map((card) => {
             return (

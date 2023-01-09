@@ -8,7 +8,7 @@ const SocialProof = ({ icons, title }) => {
   return (
     <Container
       sx={{
-        paddingX: "15px",
+        pt: "64px",
       }}>
       <Box
         sx={{
@@ -39,6 +39,7 @@ const SocialProof = ({ icons, title }) => {
             width: "100%",
             paddingY: "64px",
             paddingX: "32px",
+            columnGap: "32px",
           }}>
           {icons &&
             Array.isArray(icons) &&
@@ -53,8 +54,9 @@ const SocialProof = ({ icons, title }) => {
                     .height(24)
                     .blur(10)
                     .url()}
-                  width={100}
-                  height={50}
+                  width={200}
+                  height={100}
+                  style={{ objectFit: "contain" }}
                 />
               </Box>
             ))}
