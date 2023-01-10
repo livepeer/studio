@@ -11,6 +11,7 @@
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
     "docs-positions": "node ./generate-docs-positions.js",
+    "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-master}) -f Dockerfile ../..",
     "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
     "pkg:local": "yarn run build && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')",
     "analyze-bundle": "ANALYZE=true yarn build"

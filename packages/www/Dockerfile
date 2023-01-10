@@ -4,9 +4,9 @@ WORKDIR	/app
 
 COPY	package.json yarn.lock lerna.json	./
 
-RUN	yarn install --frozen-lockfile
-
 COPY	.	.
+
+RUN	yarn install --frozen-lockfile
 
 WORKDIR /app/packages/www
 
