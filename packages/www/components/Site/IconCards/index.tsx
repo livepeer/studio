@@ -3,6 +3,7 @@ import { Container, Box } from "@theme-ui/components";
 import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
 import { urlFor } from "lib/client";
+import { PortableText } from "@portabletext/react";
 
 const IconCards = ({ title, cards }) => {
   return (
@@ -52,7 +53,7 @@ const IconCards = ({ title, cards }) => {
             mx: "auto",
             maxWidth: "1600px",
           }}>
-          {cards.map((card) => {
+          {cards.map((card, i) => {
             return (
               <Box
                 sx={{
@@ -61,7 +62,8 @@ const IconCards = ({ title, cards }) => {
                   padding: "16px",
                   boxSizing: "border-box",
                   maxWidth: ["100%", "240px", "240px", "calc(100%/5 - 13px)"],
-                }}>
+                }}
+                key={i + "iconCard"}>
                 <Box sx={{ pt: "64px" }}>
                   <Image
                     src={urlFor(card.image).url()}
@@ -75,10 +77,9 @@ const IconCards = ({ title, cards }) => {
                     width={48}
                     height={48}
                   />
-                  <p>
-                    Livepeer Studio is an easy-to-use video toolkit for building
-                    apps with video.
-                  </p>
+                  {card.portableText && (
+                    <PortableText value={card.portableText} />
+                  )}
                 </Box>
               </Box>
             );

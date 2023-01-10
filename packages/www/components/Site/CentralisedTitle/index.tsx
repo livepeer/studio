@@ -72,8 +72,9 @@ const CentralisedHero = ({ title, portableText, image }) => {
             placeholder="blur"
             blurDataURL={urlFor(image).width(24).height(24).blur(10).url()}
             alt={title}
-            layout="fill"
-            objectFit="cover"
+            sizes="100vw"
+            fill
+            style={{ objectFit: "cover" }}
           />
         </Box>
       </Box>

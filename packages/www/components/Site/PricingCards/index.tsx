@@ -30,26 +30,23 @@ function CustomLinkResolver({ button }) {
   const { url } = button;
 
   return (
-    <Link
+    <Box
+      as={Link}
+      sx={{
+        background: "#fff",
+        borderRadius: "10px",
+        py: "16px",
+        px: "32px",
+        display: "block",
+        textAlign: "center",
+        color: "#000",
+        border: "1px solid rgba(0,0,0,0.2)",
+      }}
       style={{ textDecoration: "none" }}
       href={url.external ?? url?.internal?.slug?.current ?? "/"}
-      target={url.blank ? "_blank" : "_self"}
-      passHref>
-      <Box
-        as="a"
-        sx={{
-          background: "#fff",
-          borderRadius: "10px",
-          py: "16px",
-          px: "32px",
-          display: "block",
-          textAlign: "center",
-          color: "#000",
-          border: "1px solid rgba(0,0,0,0.2)",
-        }}>
-        {button.buttonText}
-      </Box>
-    </Link>
+      target={url.blank ? "_blank" : "_self"}>
+      {button.buttonText}
+    </Box>
   );
 }
 
