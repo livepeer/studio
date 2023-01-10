@@ -54,7 +54,7 @@
     "eventsource": "^1.1.0",
     "filenamify": "^4.3.0",
     "fs": "^0.0.1-security",
-    "globby": "^11.0.3",
+    "globby": "^13.1.3",
     "graphql": "^14.6.0",
     "graphql-request": "^1.8.2",
     "hast-util-to-string": "^1.0.4",
