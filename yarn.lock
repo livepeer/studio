@@ -6727,19 +6727,12 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@types/amqp-connection-manager@2.0.10":
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/@types/amqp-connection-manager/-/amqp-connection-manager-2.0.10.tgz#9b78e8334c1ddd483ae50aa7dd5d01cc2c4d255a"
-  integrity sha512-TW97yNQ71pFKm4kUVXRmpeeM5OU9IpnFfuBF/+Ws2sFsVc8QxUeO4mHrP2gbWcKXBcpLODViGJNomo8WUU4/Rg==
+"@types/amqp-connection-manager@3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@types/amqp-connection-manager/-/amqp-connection-manager-3.4.1.tgz#f0f22aeaddbd5e0da5651748e7c9d34643685e10"
+  integrity sha512-IUKZjnE7V+aUbuHvNZAZiAo4ew7Zzgz1aDiZiN2QEms1EzCYegsT7/Kondgc3UuC2j+Xjz8Gj7jIxnnQ5dWtGQ==
   dependencies:
-    "@types/amqplib" "*"
-
-"@types/amqplib@*":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@types/amqplib/-/amqplib-0.10.1.tgz#d43d14027b969e82ceec71cc17bd28e5f5abbc7b"
-  integrity sha512-j6ANKT79ncUDnAs/+9r9eDujxbeJoTjoVu33gHHcaPfmLQaMhvfbH2GqSe8KUM444epAp1Vl3peVOQfZk3UIqA==
-  dependencies:
-    "@types/node" "*"
+    amqp-connection-manager "*"
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
   version "7.1.20"
@@ -7892,7 +7885,7 @@ alphanum-sort@^1.0.0:
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
   integrity sha512-0FcBfdcmaumGPQ0qPn7Q5qTgz/ooXgIyp1rf8ik5bGX8mpE2YHjC0P/eyQvxu1GURYQgq9ozf2mteQ5ZD9YiyQ==
 
-amqp-connection-manager@^4.1.6:
+amqp-connection-manager@*, amqp-connection-manager@^4.1.6:
   version "4.1.10"
   resolved "https://registry.yarnpkg.com/amqp-connection-manager/-/amqp-connection-manager-4.1.10.tgz#90343303ce7abaeaaf852a9de26bc9e4eee078a0"
   integrity sha512-0289u5PQ/0s8o9Gbq3YZw7euIDp2ETjvTwams/yletCcTJC+HyK2DiMe8gRK688tCufdou5avoFCWDlTN9QeRQ==

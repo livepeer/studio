@@ -50,7 +50,7 @@
     "@peculiar/webcrypto": "^1.2.3",
     "@sendgrid/client": "^7.6.0",
     "@sendgrid/mail": "^7.6.0",
-    "@types/amqp-connection-manager": "2.0.10",
+    "@types/amqp-connection-manager": "3.4.1",
     "@types/cors": "^2.8.12",
     "ajv": "^6.10.0",
     "ajv-cli": "^3.1.0",
