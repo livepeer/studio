@@ -250,14 +250,14 @@ export function signGoogleCDNCookie(
   if (!keyName || !keyb64) {
     throw new InternalServerError("Missing URL signing key config");
   }
-  const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64");
+  const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64url");
   const expires = Math.round(expirationMs / 1000);
   const input = `URLPrefix=${encodedURLPrefix}:Expires=${expires}:KeyName=${keyName}`;
 
-  const key = Buffer.from(keyb64, "base64");
+  const key = Buffer.from(keyb64, "base64url");
   const mac = createHmac("sha1", key);
   mac.update(input);
-  const sig = mac.digest("base64");
+  const sig = mac.digest("base64url");
 
   return ["Cloud-CDN-Cookie", `${input}:Signature=${sig}`];
 }
