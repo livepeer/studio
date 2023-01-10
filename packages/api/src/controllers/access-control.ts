@@ -40,6 +40,7 @@ function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
     sameSite: "none",
     expires: new Date(expiration),
     domain: urlPrefix.hostname,
+    encode: (v) => v,
   });
 }
 
