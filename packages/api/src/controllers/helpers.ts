@@ -251,7 +251,7 @@ export function signGoogleCDNCookie(
     throw new InternalServerError("Missing URL signing key config");
   }
   const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64");
-  const expires = expirationMs / 1000;
+  const expires = Math.round(expirationMs / 1000);
   const input = `URLPrefix=${encodedURLPrefix}:Expires=${expires}:KeyName=${keyName}`;
 
   const key = Buffer.from(keyb64, "base64");
