@@ -9,6 +9,7 @@ const SocialProof = ({ icons, title }) => {
     <Container
       sx={{
         pt: "64px",
+        background: "#11181c",
       }}>
       <Box
         sx={{
@@ -25,6 +26,7 @@ const SocialProof = ({ icons, title }) => {
             lineHeight: 0.8,
             letterSpacing: "-2px",
             mb: "8px",
+            color: "white",
             "@bp3": {
               fontSize: 48,
             },

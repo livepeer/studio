@@ -14,11 +14,11 @@ const CentralisedHero = ({ title, portableText, image }) => {
       <Box
         sx={{
           padding: "15px",
-          background: "#ECEDEE",
-          borderTopRightRadius: "12px",
+          background: "var(--colors-hiContrast)",
           maxWidth: "1600px",
           marginLeft: "auto",
           marginRight: "auto",
+          borderRadius: "0 12px 12px 12px",
         }}>
         <Box
           sx={{
@@ -40,7 +40,7 @@ const CentralisedHero = ({ title, portableText, image }) => {
               placeItems: "center",
               alignContent: "center",
               gap: 0,
-              color: "#000000",
+              color: "var(--colors-loContrast)",
             }}>
             <LiveBox
               css={{
