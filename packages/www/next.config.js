@@ -23,7 +23,7 @@ const SentryWebpackPluginOptions = {
 
 const config = {
   images: {
-    domains: ["cdn.sanity.io"],
+    domains: ["cdn.sanity.io", "picsum.photos"],
   },
   i18n: {
     locales: ["en", "es"],
