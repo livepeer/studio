@@ -400,7 +400,10 @@ const fieldsMap = {
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
-  const fieldFilters = _.pick(otherQs, "playbackId", "sourceUrl", "phase");
+  const fieldFilters = _(otherQs)
+    .pick("playbackId", "sourceUrl", "phase")
+    .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
+    .value();
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -410,10 +413,7 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = [
     ...parseFilters(fieldsMap, filters),
-    ...parseFilters(
-      fieldsMap,
-      JSON.stringify(_.map(fieldFilters, (v, k) => ({ id: k, value: v })))
-    ),
+    ...parseFilters(fieldsMap, JSON.stringify(fieldFilters)),
   ];
 
   if (cid) {
