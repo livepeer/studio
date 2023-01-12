@@ -565,16 +565,22 @@ describe("controllers/asset", () => {
     });
 
     it("should find asset by NFT metadata CID", async () => {
-      await expectFindAsset(`nftMetadataCid=somethingelse`, false);
       await expectFindAsset(
-        `nftMetadataCid=${asset.storage.ipfs.nftMetadata.cid}`,
+        `filters=[{"id":"nftMetadataCid","value":"somethingelse"}]`,
+        false
+      );
+      await expectFindAsset(
+        `filters=[{"id":"nftMetadataCid","value":"${asset.storage.ipfs.nftMetadata.cid}"}]`,
         true
       );
     });
 
     it("should not mix main and NFT metadata CIDs", async () => {
       await expectFindAsset(`cid=${asset.storage.ipfs.nftMetadata.cid}`, false);
-      await expectFindAsset(`nftMetadataCid=${asset.storage.ipfs.cid}`, false);
+      await expectFindAsset(
+        `filter=[{"id":"nftMetadataCid","value":"${asset.storage.ipfs.cid}"}]`,
+        false
+      );
     });
 
     it("should NOT allow finding by name through direct query string", async () => {
