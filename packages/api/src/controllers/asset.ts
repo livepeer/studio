@@ -400,7 +400,7 @@ const fieldsMap = {
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
-  const fieldFilters = _.pick(otherQs, "playbackId", "nftMetadataCid");
+  const fieldFilters = _.pick(otherQs, "playbackId", "nftMetadataCid", "sourceUrl");
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
