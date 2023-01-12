@@ -381,7 +381,7 @@ app.use(
   })
 );
 
-const fieldsMap: FieldsMap = {
+const fieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
@@ -394,12 +394,13 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
-};
+  sourceUrl: `asset.data->'source'->>'url'`,
+} as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, ...otherQs } =
+  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
-  const fieldFilters = _.pick(otherQs, "playbackId", "cid", "nftMetadataCid");
+  const fieldFilters = _.pick(otherQs, "playbackId", "nftMetadataCid");
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -414,6 +415,14 @@ app.get("/", authorizer({}), async (req, res) => {
       JSON.stringify(_.map(fieldFilters, (v, k) => ({ id: k, value: v })))
     ),
   ];
+
+  if (cid) {
+    const ipfsUrl = `ipfs://${cid}`;
+    query.push(
+      sql`(${fieldsMap.cid} = ${cid} OR ${fieldsMap.sourceUrl} = ${ipfsUrl})`
+    );
+  }
+
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
