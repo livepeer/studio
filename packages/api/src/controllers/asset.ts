@@ -400,7 +400,7 @@ const fieldsMap = {
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
-  const fieldFilters = _.pick(otherQs, "playbackId", "nftMetadataCid", "sourceUrl");
+  const fieldFilters = _.pick(otherQs, "playbackId", "sourceUrl", "phase");
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -419,7 +419,8 @@ app.get("/", authorizer({}), async (req, res) => {
   if (cid) {
     const ipfsUrl = `ipfs://${cid}`;
     query.push(
-      sql`(${fieldsMap.cid} = ${cid} OR ${fieldsMap.sourceUrl} = ${ipfsUrl})`
+      sql`(${fieldsMap.cid} = ${cid} OR ${fieldsMap.sourceUrl} = ${ipfsUrl})`,
+      sql`${fieldsMap.phase} = 'ready'`
     );
   }
 
