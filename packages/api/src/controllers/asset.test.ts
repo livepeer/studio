@@ -531,7 +531,7 @@ describe("controllers/asset", () => {
         createdAt: Date.now(),
         objectStoreId: "mock_vod_store",
         playbackId: await generateUniquePlaybackId(uuid()),
-        source: { type: "url", url: "ipfs://QmY321" },
+        source: { type: "url", url: "ipfs://QmW456" },
         status: {
           phase: "ready",
           updatedAt: Date.now(),
@@ -560,8 +560,8 @@ describe("controllers/asset", () => {
     it("should find asset by CID", async () => {
       await expectFindAsset(`cid=somethingelse`, false);
       await expectFindAsset(`cid=QmX123`, true);
-      await expectFindAsset(`cid=QmY321`, assetFromIpfs);
-      await expectFindAsset(`sourceUrl=ipfs://QmY321`, assetFromIpfs);
+      await expectFindAsset(`cid=QmW456`, assetFromIpfs);
+      await expectFindAsset(`sourceUrl=ipfs://QmW456`, assetFromIpfs);
     });
 
     it("should find asset by NFT metadata CID", async () => {

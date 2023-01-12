@@ -419,8 +419,7 @@ app.get("/", authorizer({}), async (req, res) => {
   if (cid) {
     const ipfsUrl = `ipfs://${cid}`;
     query.push(
-      sql`(${fieldsMap.cid} = ${cid} OR ${fieldsMap.sourceUrl} = ${ipfsUrl})`,
-      sql`${fieldsMap.phase} = 'ready'`
+      sql`(asset.data->'storage'->'ipfs'->>'cid' = ${cid} OR asset.data->'source'->>'url' = ${ipfsUrl})`
     );
   }
 
