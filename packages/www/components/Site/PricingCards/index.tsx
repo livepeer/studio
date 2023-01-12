@@ -73,6 +73,7 @@ const PricingCards = ({ title, pricingCards }) => {
             fontSize: "18px",
             py: "15px",
             px: "64px",
+            color: "#fff",
           }}>
           {title}
         </Box>
@@ -91,6 +92,7 @@ const PricingCards = ({ title, pricingCards }) => {
           maxWidth: "1600px",
           padding: "15px",
           gap: "20px",
+          borderRadius: "0 12px 12px 12px",
         }}>
         {pricingCards.map((card, index) => {
           const { color, title, description, price, features, button } = card;
