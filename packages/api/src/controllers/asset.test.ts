@@ -501,16 +501,38 @@ describe("controllers/asset", () => {
     let asset: WithID<Asset>;
     let assetFromIpfs: WithID<Asset>;
 
+    const createAsset = async (
+      payload: Omit<Asset, "id" | "playbackId" | "userId">
+    ) => {
+      const id = uuid();
+      const playbackId = await generateUniquePlaybackId(id);
+      return db.asset.cleanWriteOnlyResponse(
+        await db.asset.create({
+          id,
+          playbackId,
+          userId: nonAdminUser.id,
+          ...payload,
+        })
+      );
+    };
+
     beforeEach(async () => {
-      const createAsset = async (payload: WithID<Asset>) => {
-        return db.asset.cleanWriteOnlyResponse(await db.asset.create(payload));
-      };
+      // this dummy one is just to differentiate empty responses from "list all" responses
+      await createAsset({
+        name: "dummy",
+        source: { type: "directUpload" },
+        createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+      });
+
       asset = await createAsset({
-        id: uuid(),
         name: "test-storage",
         createdAt: Date.now(),
         objectStoreId: "mock_vod_store",
-        playbackId: await generateUniquePlaybackId(uuid()),
         source: { type: "directUpload" },
         storage: {
           ipfs: {
@@ -523,20 +545,16 @@ describe("controllers/asset", () => {
           phase: "ready",
           updatedAt: Date.now(),
         },
-        userId: nonAdminUser.id,
       });
       assetFromIpfs = await createAsset({
-        id: uuid(),
         name: "test-ipfs-source",
         createdAt: Date.now(),
         objectStoreId: "mock_vod_store",
-        playbackId: await generateUniquePlaybackId(uuid()),
         source: { type: "url", url: "ipfs://QmW456" },
         status: {
           phase: "ready",
           updatedAt: Date.now(),
         },
-        userId: nonAdminUser.id,
       });
     });
 
