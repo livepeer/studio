@@ -5,7 +5,7 @@ import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
 import express, { Request } from "express";
-import sql from "sql-template-strings";
+import sql, { SQLStatement } from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
@@ -372,12 +372,15 @@ export function parseOrder(fieldsMap: FieldsMap, val: string) {
   return prep.length ? prep.join(", ") : undefined;
 }
 
-export function parseFilters(fieldsMap: FieldsMap, val: string) {
+export function parseFilters(
+  fieldsMap: FieldsMap,
+  val: string
+): SQLStatement[] {
   const isObject = function (a) {
     return !!a && a.constructor === Object;
   };
 
-  const q = [];
+  const q: SQLStatement[] = [];
   if (!val) {
     return q;
   }

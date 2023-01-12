@@ -499,10 +499,26 @@ describe("controllers/asset", () => {
 
   describe("asset list", () => {
     let asset: WithID<Asset>;
+    let assetFromIpfs: WithID<Asset>;
+
+    const createAsset = async (
+      payload: Omit<Asset, "id" | "playbackId" | "userId">
+    ) => {
+      const id = uuid();
+      const playbackId = await generateUniquePlaybackId(id);
+      return db.asset.cleanWriteOnlyResponse(
+        await db.asset.create({
+          id,
+          playbackId,
+          userId: nonAdminUser.id,
+          ...payload,
+        })
+      );
+    };
 
     beforeEach(async () => {
-      await db.asset.create({
-        id: uuid(),
+      // this dummy one is just to differentiate empty responses from "list all" responses
+      await createAsset({
         name: "dummy",
         source: { type: "directUpload" },
         createdAt: Date.now(),
@@ -511,15 +527,12 @@ describe("controllers/asset", () => {
           phase: "ready",
           updatedAt: Date.now(),
         },
-        userId: nonAdminUser.id,
       });
-      const id = uuid();
-      asset = await db.asset.create({
-        id,
+
+      asset = await createAsset({
         name: "test-storage",
         createdAt: Date.now(),
         objectStoreId: "mock_vod_store",
-        playbackId: await generateUniquePlaybackId(id),
         source: { type: "directUpload" },
         storage: {
           ipfs: {
@@ -532,17 +545,26 @@ describe("controllers/asset", () => {
           phase: "ready",
           updatedAt: Date.now(),
         },
-        userId: nonAdminUser.id,
       });
-      asset = db.asset.cleanWriteOnlyResponse(asset);
+      assetFromIpfs = await createAsset({
+        name: "test-ipfs-source",
+        createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
+        source: { type: "url", url: "ipfs://QmW456" },
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+      });
     });
 
-    const expectFindAsset = async (qs: string, shouldFind: boolean) => {
+    const expectFindAsset = async (qs: string, shouldFind: boolean | Asset) => {
       const res = await client.get(`/asset?${qs}`);
       expect(res.status).toBe(200);
       const data = await res.json();
       if (shouldFind) {
-        expect(data).toMatchObject([asset]);
+        const expected = typeof shouldFind === "boolean" ? asset : shouldFind;
+        expect(data).toMatchObject([expected]);
       } else {
         expect(data.length).not.toEqual(1); // either empty or more than 1
       }
@@ -555,20 +577,28 @@ describe("controllers/asset", () => {
 
     it("should find asset by CID", async () => {
       await expectFindAsset(`cid=somethingelse`, false);
-      await expectFindAsset(`cid=${asset.storage.ipfs.cid}`, true);
+      await expectFindAsset(`cid=QmX123`, true);
+      await expectFindAsset(`cid=QmW456`, assetFromIpfs);
+      await expectFindAsset(`sourceUrl=ipfs://QmW456`, assetFromIpfs);
     });
 
     it("should find asset by NFT metadata CID", async () => {
-      await expectFindAsset(`nftMetadataCid=somethingelse`, false);
       await expectFindAsset(
-        `nftMetadataCid=${asset.storage.ipfs.nftMetadata.cid}`,
+        `filters=[{"id":"nftMetadataCid","value":"somethingelse"}]`,
+        false
+      );
+      await expectFindAsset(
+        `filters=[{"id":"nftMetadataCid","value":"${asset.storage.ipfs.nftMetadata.cid}"}]`,
         true
       );
     });
 
     it("should not mix main and NFT metadata CIDs", async () => {
       await expectFindAsset(`cid=${asset.storage.ipfs.nftMetadata.cid}`, false);
-      await expectFindAsset(`nftMetadataCid=${asset.storage.ipfs.cid}`, false);
+      await expectFindAsset(
+        `filter=[{"id":"nftMetadataCid","value":"${asset.storage.ipfs.cid}"}]`,
+        false
+      );
     });
 
     it("should NOT allow finding by name through direct query string", async () => {

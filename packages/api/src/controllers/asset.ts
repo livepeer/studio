@@ -381,7 +381,7 @@ app.use(
   })
 );
 
-const fieldsMap: FieldsMap = {
+const fieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
@@ -394,12 +394,16 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
-};
+  sourceUrl: `asset.data->'source'->>'url'`,
+} as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, ...otherQs } =
+  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
-  const fieldFilters = _.pick(otherQs, "playbackId", "cid", "nftMetadataCid");
+  const fieldFilters = _(otherQs)
+    .pick("playbackId", "sourceUrl", "phase")
+    .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
+    .value();
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -409,11 +413,16 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = [
     ...parseFilters(fieldsMap, filters),
-    ...parseFilters(
-      fieldsMap,
-      JSON.stringify(_.map(fieldFilters, (v, k) => ({ id: k, value: v })))
-    ),
+    ...parseFilters(fieldsMap, JSON.stringify(fieldFilters)),
   ];
+
+  if (cid) {
+    const ipfsUrl = `ipfs://${cid}`;
+    query.push(
+      sql`(asset.data->'storage'->'ipfs'->>'cid' = ${cid} OR asset.data->'source'->>'url' = ${ipfsUrl})`
+    );
+  }
+
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }

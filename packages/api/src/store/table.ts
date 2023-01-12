@@ -22,6 +22,16 @@ export interface TableOptions {
   schema: TableSchema;
 }
 
+function parseLimit({ limit }: FindOptions<any>) {
+  if (typeof limit === "string") {
+    limit = parseInt(limit);
+  }
+  if (typeof limit !== "number" || isNaN(limit) || limit < 1) {
+    limit = 20;
+  }
+  return Math.min(limit, 1000);
+}
+
 export default class Table<T extends DBObject> {
   db: DB;
   schema: TableSchema;
@@ -96,10 +106,7 @@ export default class Table<T extends DBObject> {
       from = this.name,
       process,
     } = opts;
-    let limit = opts.hasOwnProperty("limit") ? opts.limit : 100;
-    if (typeof limit === "string") {
-      limit = parseInt(limit);
-    }
+    const limit = parseLimit(opts);
 
     const q = sql`SELECT `.append(fields).append(` FROM `).append(from);
     let filters = [];
