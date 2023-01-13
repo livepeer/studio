@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
-import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import Table, {
+  DefaultSortBy,
+  Fetcher,
+  sortByToString,
+  useTableState,
+} from "components/Dashboard/Table";
 import { useToggleState } from "hooks/use-toggle-state";
 import {
   makeColumns,
@@ -25,6 +30,7 @@ const SigningKeysTable = ({
   const { state, stateSetter } = useTableState<SigningKeysTableData>({
     pageSize,
     tableId,
+    initialOrder: sortByToString(DefaultSortBy),
   });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
@@ -45,7 +51,7 @@ const SigningKeysTable = ({
         rowSelection="all"
         state={state}
         stateSetter={stateSetter}
-        initialSortBy={[{ id: "createdAt", desc: true }]}
+        initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(

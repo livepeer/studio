@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
-import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import Table, {
+  DefaultSortBy,
+  Fetcher,
+  sortByToString,
+  useTableState,
+} from "components/Dashboard/Table";
 import { Box } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateDialog, {
@@ -24,6 +29,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
     tableId: "webhooksTable",
+    initialOrder: sortByToString(DefaultSortBy),
   });
 
   const columns = useMemo(makeColumns, []);
@@ -57,6 +63,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         state={state}
         stateSetter={stateSetter}
         rowSelection="all"
+        initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
