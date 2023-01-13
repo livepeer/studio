@@ -47,15 +47,23 @@ export default class AssetTable extends Table<WithID<Asset>> {
       sql`asset.data->'storage'->'ipfs'->>'cid' = ${cid}`,
       sql`asset.data->>'deleted' IS NULL`,
     ];
+    let userQuery = [...query];
     if (user) {
-      query.push(sql`asset.data->>'userId' = ${user.id}`);
+      userQuery.push(sql`asset.data->>'userId' = ${user.id}`);
     }
-    const [assets] = await this.find(query, {
+    let order = "coalesce((asset.data->'createdAt')::bigint, 0) ASC";
+    var [assets] = await this.find(userQuery, {
       limit: 2,
-      order: "coalesce((asset.data->'createdAt')::bigint, 0) ASC",
+      order,
     });
     if (!assets || assets.length < 1) {
-      return null;
+      [assets] = await this.find(query, {
+        limit: 2,
+        order,
+      });
+      if (!assets || assets.length < 1) {
+        return null;
+      }
     }
     return assets[0];
   }
@@ -67,15 +75,23 @@ export default class AssetTable extends Table<WithID<Asset>> {
       sql`asset.data->>'deleted' IS NULL`,
       sql`asset.data->'status'->>'phase' = 'ready'`,
     ];
+    let userQuery = [...query];
     if (user) {
-      query.push(sql`asset.data->>'userId' = ${user.id}`);
+      userQuery.push(sql`asset.data->>'userId' = ${user.id}`);
     }
-    const [assets] = await this.find(query, {
+    let order = "coalesce((asset.data->'createdAt')::bigint, 0) ASC";
+    let [assets] = await this.find(userQuery, {
       limit: 2,
-      order: "coalesce((asset.data->'createdAt')::bigint, 0) ASC",
+      order,
     });
     if (!assets || assets.length < 1) {
-      return null;
+      [assets] = await this.find(query, {
+        limit: 2,
+        order,
+      });
+      if (!assets || assets.length < 1) {
+        return null;
+      }
     }
     return assets[0];
   }
