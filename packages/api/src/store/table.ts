@@ -373,12 +373,15 @@ export default class Table<T extends DBObject> {
     if (prop.unique) {
       unique = "unique";
     }
+    const indexType = prop.indexType || "btree";
     const indexName = `${this.name}_${[...parents, propName].join("_")}`;
+
     const parentsAcc = parents.map((p) => `->'${p}'`).join("");
-    const propAccessor = `data${parentsAcc}->>'${propName}'`;
+    const propAccessOp = indexType === "gin" ? "->" : "->>";
+    const propAccessor = `data${parentsAcc}${propAccessOp}'${propName}'`;
     try {
       await this.db.query(`
-          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((${propAccessor}));
+          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING ${indexType} ((${propAccessor}));
         `);
     } catch (e) {
       if (!e.message.includes("already exists")) {

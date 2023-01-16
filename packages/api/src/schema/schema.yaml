@@ -199,6 +199,8 @@ components:
           $ref: "#/components/schemas/webhook/properties/events/items"
         events:
           type: array
+          index: true
+          indexType: gin
           items:
             type: string
             enum:
@@ -2336,6 +2338,32 @@ components:
           type: object
           additionalProperties:
             type: boolean
+
+    experiment:
+      type: object
+      table: experiment
+      additionalProperties: false
+      required: [id, stream]
+      properties:
+        type:
+          type: string
+          enum: [experiment]
+        name:
+          type: string
+          index: true
+          unique: true
+          description: Name that identifies the experiment. Must be unique
+        userIds:
+          type: array
+          index: true
+          indexType: gin
+          description: List of user IDs in the experiment
+          items:
+            type: string
+        users:
+          type: object
+          readonly: true
+          description: Experiment name to gatekeep
 
     usage:
       type: object
