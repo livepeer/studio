@@ -38,7 +38,18 @@ import Spinner from "components/Dashboard/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import TableHeader from "./components/TableHeader";
 
-type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
+type Sort<T extends Record<string, unknown>> = {
+  id: keyof T;
+  desc: boolean;
+};
+
+export const DefaultSortBy: Sort<Record<string, unknown>> = {
+  id: "createdAt",
+  desc: true,
+};
+
+export const sortByToString = (sortBy: Sort<Record<string, unknown>>) =>
+  `${sortBy.id}-${sortBy.desc}`;
 
 type StateSetter<T extends Record<string, unknown>> = {
   setOrder: Dispatch<SetStateAction<string>>;
@@ -225,7 +236,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   }, [selectedFlatRows, stateSetter.setSelectedRows]);
 
   useEffect(() => {
-    const order = sortBy?.map((o) => `${o.id}-${o.desc}`).join(",") ?? "";
+    const order = sortBy?.map((o) => sortByToString(o)).join(",") ?? "";
     stateSetter.setOrder(order);
   }, [sortBy, stateSetter.setOrder]);
 
@@ -515,11 +526,13 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
 export const useTableState = <T extends Record<string, unknown>>({
   tableId,
   pageSize = 20,
+  initialOrder,
 }: {
   tableId: string;
   pageSize?: number;
+  initialOrder?: string;
 }) => {
-  const [order, setOrder] = useState("");
+  const [order, setOrder] = useState(initialOrder || "");
   const [cursor, setCursor] = useState("");
   const [prevCursors, setPrevCursors] = useState<string[]>([]);
   const [nextCursor, setNextCursor] = useState("default");
