@@ -761,6 +761,21 @@ components:
           type: string
           description: Base64 of Public key used for JWT verification
 
+    experiment-gatekeep-payload:
+      type: object
+      additionalProperties: false
+      required: [type, stream]
+      properties:
+        type:
+          type: string
+          enum: [experiment]
+        stream:
+          type: string
+          description: Stream ID to which this gate applies
+        experiments:
+          type: object
+          description: Experiment name to gatekeep
+
     playback-policy:
       type: object
       description:
@@ -2321,6 +2336,7 @@ components:
           type: object
           additionalProperties:
             type: boolean
+
     usage:
       type: object
       table: usage
