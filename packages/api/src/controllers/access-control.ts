@@ -1,5 +1,4 @@
 import signingKeyApp from "./signing-key";
-import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
 import _ from "lodash";
@@ -12,14 +11,11 @@ import {
 } from "../store/errors";
 import tracking from "../middleware/tracking";
 
-const accessControl = Router();
-
 const app = Router();
 
-accessControl.use("/signing-key", signingKeyApp);
-app.use("/access-control", accessControl);
+app.use("/signing-key", signingKeyApp);
 
-accessControl.post(
+app.post(
   "/gate",
   validatePost("access-control-gate-payload"),
   async (req, res) => {
@@ -123,4 +119,4 @@ accessControl.post(
   }
 );
 
-export default accessControl;
+export default app;

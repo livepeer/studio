@@ -1,6 +1,7 @@
 import apiToken from "./api-token";
 import auth from "./auth";
 import broadcaster from "./broadcaster";
+import experiment from "./experiment";
 import ingest from "./ingest";
 import objectStore from "./object-store";
 import accessControl from "./access-control";
@@ -27,6 +28,7 @@ export default {
   "api-token": apiToken,
   auth,
   broadcaster,
+  experiment,
   "object-store": objectStore,
   multistream,
   orchestrator,
