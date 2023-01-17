@@ -18,6 +18,8 @@ import { Experiment, ExperimentAudiencePayload, User } from "../schema/types";
 import { authorizer, validatePost } from "../middleware";
 import { WithID } from "../store/types";
 
+import experimentApis from "./experiment/index";
+
 async function toUserId(emailOrId: string) {
   let user: User;
   if (validateUuid(emailOrId)) {
@@ -36,6 +38,10 @@ const toUserIds = (emailsOrIds: string[]) =>
   Promise.all(emailsOrIds.map(toUserId));
 
 const app = Router();
+
+for (const [path, api] of Object.entries(experimentApis)) {
+  app.use(`/${path}`, api);
+}
 
 app.get("/check/:experiment", async (req, res) => {
   let user: User;
