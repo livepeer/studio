@@ -53,18 +53,11 @@ for (const [experiment, api] of Object.entries(experimentApis)) {
   app.use(`/api/${experiment}`, experimentSubjectsOnly(experiment), api);
 }
 
-app.get("/check/:experiment", async (req, res) => {
-  let user: User;
-  if (req.user) {
-    user = req.user;
-  } else {
+app.get("/check/:experiment", authorizer({}), async (req, res) => {
+  let user = req.user;
+  if (req.user.admin) {
     let { userId, playbackId } = toStringValues(req.query);
-    if (!userId) {
-      if (!playbackId) {
-        throw new BadRequestError(
-          "must be authenticated or provide userId or playbackId"
-        );
-      }
+    if (playbackId) {
       const content =
         (await db.asset.getByPlaybackId(playbackId)) ||
         (await db.stream.getByPlaybackId(playbackId));
@@ -73,9 +66,11 @@ app.get("/check/:experiment", async (req, res) => {
       }
       userId = content.userId;
     }
-    user = await db.user.get(userId);
-    if (!user || user.suspended) {
-      throw new NotFoundError("user not found or suspended");
+    if (userId) {
+      user = await db.user.get(userId);
+      if (!user) {
+        throw new NotFoundError("user not found");
+      }
     }
   }
 
