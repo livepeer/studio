@@ -373,11 +373,14 @@ export default class Table<T extends DBObject> {
     if (prop.unique) {
       unique = "unique";
     }
-    const indexType = prop.indexType || "btree";
+    const indexType = prop.indexType?.toUpperCase() || "BTREE";
+    if (!["GIN", "BTREE"].includes(indexType)) {
+      throw new Error(`unknown index type ${indexType} for ${propName}}`);
+    }
     const indexName = `${this.name}_${[...parents, propName].join("_")}`;
 
     const parentsAcc = parents.map((p) => `->'${p}'`).join("");
-    const propAccessOp = indexType === "gin" ? "->" : "->>";
+    const propAccessOp = indexType === "GIN" ? "->" : "->>";
     const propAccessor = `data${parentsAcc}${propAccessOp}'${propName}'`;
     try {
       await this.db.query(`

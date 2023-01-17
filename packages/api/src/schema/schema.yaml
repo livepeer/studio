@@ -2334,16 +2334,12 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
-        experiments:
-          type: object
-          additionalProperties:
-            type: boolean
 
     experiment:
       type: object
       table: experiment
       additionalProperties: false
-      required: [id, stream]
+      required: [name, userIds]
       properties:
         type:
           type: string

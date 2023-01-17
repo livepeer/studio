@@ -1,7 +1,7 @@
 export interface FieldSpec {
   [key: string]: any;
   index?: boolean;
-  indexType?: "btree" | "gin"; // defaults to btree
+  indexType?: string; // "btree" | "gin", defaults to "btree"
   unique?: boolean;
   writeOnly?: boolean;
   oneOf?: FieldSpec[];

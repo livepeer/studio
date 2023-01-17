@@ -38,9 +38,9 @@ app.get("/check/:experiment", async (req, res) => {
     }
   }
 
-  const { experiment } = req.params;
-  let userExperiments = user.experiments || {};
-  if (!userExperiments[experiment]) {
+  const { experiment: experimentQuery } = req.params;
+  const experiment = await db.experiment.getByNameOrId(experimentQuery);
+  if (!experiment.userIds?.includes(user.id)) {
     throw new ForbiddenError("user not in experiment");
   }
   res.status(204).end();
@@ -71,13 +71,6 @@ app.post("/gatekeep", authorizer({ anyAdmin: true }), async (req, res) => {
       throw new NotFoundError("user not found or suspended");
     }
   }
-
-  const { experiment } = req.params;
-  let userExperiments = user.experiments || {};
-  if (!userExperiments[experiment]) {
-    throw new ForbiddenError("user not in experiment");
-  }
-  res.status(204).end();
 });
 
 export default app;
