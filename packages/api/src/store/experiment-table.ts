@@ -1,9 +1,15 @@
 import sql from "sql-template-strings";
 
 import { Experiment } from "../schema/types";
+import db from "./db";
 import { NotFoundError } from "./errors";
 import Table from "./table";
 import { WithID } from "./types";
+
+export async function isExperimentSubject(experiment: string, userId: string) {
+  const { audienceUserIds } = await db.experiment.getByNameOrId(experiment);
+  return audienceUserIds.includes(userId);
+}
 
 export default class ExperimentTable extends Table<WithID<Experiment>> {
   async listUserExperiments(
@@ -33,10 +39,5 @@ export default class ExperimentTable extends Table<WithID<Experiment>> {
       throw new NotFoundError("experiment not found");
     }
     return experiments[0];
-  }
-
-  async isExperimentSubject(nameOrId: string, userId: string) {
-    const { audienceUserIds } = await this.getByNameOrId(nameOrId);
-    return audienceUserIds.includes(userId);
   }
 }

@@ -19,6 +19,7 @@ import { authorizer, validatePost } from "../middleware";
 import { WithID } from "../store/types";
 
 import experimentApis from "./experiment/index";
+import { isExperimentSubject } from "../store/experiment-table";
 
 async function toUserId(emailOrId: string) {
   let user: User;
@@ -41,10 +42,7 @@ const app = Router();
 
 const experimentSubjectsOnly =
   (experiment: string) => async (req, res, next) => {
-    const isSubject = await db.experiment.isExperimentSubject(
-      experiment,
-      req.user?.id
-    );
+    const isSubject = await isExperimentSubject(experiment, req.user?.id);
     if (!isSubject) {
       throw new ForbiddenError("user is not an experiment subject");
     }
@@ -82,10 +80,7 @@ app.get("/check/:experiment", async (req, res) => {
   }
 
   const { experiment: experimentQuery } = req.params;
-  const isSubject = await db.experiment.isExperimentSubject(
-    experimentQuery,
-    user.id
-  );
+  const isSubject = await isExperimentSubject(experimentQuery, user.id);
   if (!isSubject) {
     throw new ForbiddenError("user is not an experiment subject");
   }
