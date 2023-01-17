@@ -2352,14 +2352,21 @@ components:
           index: true
           unique: true
           description: Name that identifies the experiment. Must be unique
-        userIds:
+        userId:
+          type: string
+          index: true
+          description:
+            User ID of the creator of the experiment. Only used for auditing as
+            experiment APIs is only accessible to admins, which can all
+            experiments anyway.
+        audienceUserIds:
           type: array
           index: true
           indexType: gin
           description: List of user IDs in the experiment
           items:
             type: string
-        users:
+        audienceUsers:
           type: array
           description: User objects of users in the experiment for convenience
           readonly: true

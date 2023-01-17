@@ -57,7 +57,7 @@ app.get("/check/:experiment", async (req, res) => {
 
   const { experiment: experimentQuery } = req.params;
   const experiment = await db.experiment.getByNameOrId(experimentQuery);
-  if (!experiment.userIds?.includes(user.id)) {
+  if (!experiment.audienceUserIds?.includes(user.id)) {
     throw new ForbiddenError("user not in experiment");
   }
   res.status(204).end();
@@ -76,13 +76,13 @@ app.post(
       toUserIds(addUsers),
       toUserIds(removeUsers),
     ]);
-    const userIds = _(experiment.userIds ?? [])
+    const audienceUserIds = _(experiment.audienceUserIds ?? [])
       .concat(addUserIds)
       .difference(removeUserIds)
       .uniq()
       .value();
 
-    await db.experiment.update(experiment.id, { userIds });
+    await db.experiment.update(experiment.id, { audienceUserIds });
 
     res.status(204).end();
   }
@@ -95,13 +95,14 @@ app.post(
   authorizer({ anyAdmin: true }),
   validatePost("experiment"),
   async (req, res) => {
-    let { name, userIds } = req.body as Experiment;
-    userIds = await toUserIds(userIds);
+    let { name, audienceUserIds } = req.body as Experiment;
+    audienceUserIds = await toUserIds(audienceUserIds);
 
     const experiment = await db.experiment.create({
       id: uuid(),
       name,
-      userIds,
+      userId: req.user.id,
+      audienceUserIds,
     });
     res.status(201).json(experiment);
   }
@@ -109,15 +110,18 @@ app.post(
 
 app.patch("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
   const { experiment: experimentQuery } = req.params;
-  let { userIds } = req.body as { userIds: string[] };
-  if (!Array.isArray(userIds) || userIds.some((s) => typeof s !== "string")) {
+  let { audienceUserIds } = req.body as { audienceUserIds: string[] };
+  if (
+    !Array.isArray(audienceUserIds) ||
+    audienceUserIds.some((s) => typeof s !== "string")
+  ) {
     throw new BadRequestError("userIds must be an array of strings");
   }
 
   const experiment = await db.experiment.getByNameOrId(experimentQuery);
-  userIds = await toUserIds(userIds);
+  audienceUserIds = await toUserIds(audienceUserIds);
 
-  await db.experiment.update(experiment.id, { userIds });
+  await db.experiment.update(experiment.id, { audienceUserIds });
 
   res.status(204).end();
 });
@@ -127,8 +131,8 @@ app.get("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
 
   experiment = {
     ...experiment,
-    users: await Promise.all(
-      experiment.userIds.map(async (userId) => {
+    audienceUsers: await Promise.all(
+      experiment.audienceUserIds.map(async (userId) => {
         const user = await db.user.get(userId);
         return db.user.cleanWriteOnlyResponse(user);
       })
