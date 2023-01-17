@@ -12,7 +12,7 @@ export default class ExperimentTable extends Table<WithID<Experiment>> {
     cursor?: string,
     includeDeleted = false
   ) {
-    const query = [sql`data->'userIds' @> ${userId}`];
+    const query = [sql`data->'audienceUserIds' @> ${userId}`];
     if (!includeDeleted) {
       query.push(sql`data->>'deleted' IS NULL`);
     }

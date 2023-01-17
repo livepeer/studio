@@ -1,31 +1,39 @@
 import { Router } from "express";
 import _ from "lodash";
-import { v4 as uuid } from "uuid";
+import { v4 as uuid, validate as validateUuid } from "uuid";
 import { db } from "../store";
 import {
   NotFoundError,
   ForbiddenError,
   BadRequestError,
 } from "../store/errors";
-import { toStringValues } from "./helpers";
+import {
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  toStringValues,
+} from "./helpers";
+import sql from "sql-template-strings";
 import { Experiment, ExperimentAudiencePayload, User } from "../schema/types";
 import { authorizer, validatePost } from "../middleware";
+import { WithID } from "../store/types";
 
-async function toUserIds(emailOrIds: string[]) {
-  return Promise.all(
-    emailOrIds?.map(async (emailOrId) => {
-      let user = await db.user.get(emailOrId);
-      if (!user) {
-        const [users] = await db.user.find({ email: emailOrId });
-        if (users?.length === 0) {
-          throw new NotFoundError("user not found: " + emailOrId);
-        }
-        user = users[0];
-      }
-      return user.id;
-    })
-  );
+async function toUserId(emailOrId: string) {
+  let user: User;
+  if (validateUuid(emailOrId)) {
+    user = await db.user.get(emailOrId);
+  } else {
+    const [users] = await db.user.find({ email: emailOrId });
+    user = users?.[0];
+  }
+  if (!user) {
+    throw new NotFoundError(`user not found: ${emailOrId}`);
+  }
+  return user.id;
 }
+
+const toUserIds = (emailsOrIds: string[]) =>
+  Promise.all(emailsOrIds.map(toUserId));
 
 const app = Router();
 
@@ -150,16 +158,57 @@ app.get("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
   res.status(200).json(experiment);
 });
 
-app.get("/user/:id", authorizer({ anyAdmin: true }), async (req, res) => {
-  const user = await db.user.get(req.params.id);
-  if (!user) {
-    throw new NotFoundError("user not found");
+const fieldsMap = {
+  id: `experiment.ID`,
+  name: { val: `experiment.data->>'name'`, type: "full-text" },
+  createdAt: { val: `experiment.data->'createdAt'`, type: "int" },
+  updatedAt: { val: `experiment.data->'status'->'updatedAt'`, type: "int" },
+  userId: `experiment.data->>'userId'`,
+} as const;
+
+app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
+  let { limit, cursor, order, filters, count, subject } = toStringValues(
+    req.query
+  );
+  if (isNaN(parseInt(limit))) {
+    limit = undefined;
+  }
+  if (!order) {
+    order = "updatedAt-true,createdAt-true";
   }
 
-  const experiments = await db.experiment.listUserExperiments(user.id);
-  res.status(200).json({
-    experiments: experiments.data.map((x) => x.name),
+  // as this is an admin-only API, the query is always cross-user
+  const query = parseFilters(fieldsMap, filters);
+  if (subject) {
+    const subjectUserId = await toUserId(subject);
+    query.push(sql`experiment.data->>'audienceUserId' @> ${subjectUserId}`);
+  }
+
+  let output: WithID<Experiment>[];
+  let newCursor: string;
+
+  let fields = " experiment.id as id, experiment.data as data";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
+  [output, newCursor] = await db.experiment.find(query, {
+    limit,
+    cursor,
+    fields,
+    order: parseOrder(fieldsMap, order),
+    process: ({ data, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
+      return data;
+    },
   });
+
+  res.status(200);
+  if (output.length > 0 && newCursor) {
+    res.links({ next: makeNextHREF(req, newCursor) });
+  }
+  return res.json(output);
 });
 
 export default app;
