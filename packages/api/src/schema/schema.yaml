@@ -2359,6 +2359,18 @@ components:
             User ID of the creator of the experiment. Only used for auditing as
             experiment APIs is only accessible to admins, which can all
             experiments anyway.
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the signing-key was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which experiment was updated
+          example: 1587667174725
         audienceUserIds:
           type: array
           index: true

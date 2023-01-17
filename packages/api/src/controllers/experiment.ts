@@ -82,7 +82,10 @@ app.post(
       .uniq()
       .value();
 
-    await db.experiment.update(experiment.id, { audienceUserIds });
+    await db.experiment.update(experiment.id, {
+      updatedAt: Date.now(),
+      audienceUserIds,
+    });
 
     res.status(204).end();
   }
@@ -102,6 +105,8 @@ app.post(
       id: uuid(),
       name,
       userId: req.user.id,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       audienceUserIds,
     });
     res.status(201).json(experiment);
@@ -121,7 +126,10 @@ app.patch("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
   const experiment = await db.experiment.getByNameOrId(experimentQuery);
   audienceUserIds = await toUserIds(audienceUserIds);
 
-  await db.experiment.update(experiment.id, { audienceUserIds });
+  await db.experiment.update(experiment.id, {
+    updatedAt: Date.now(),
+    audienceUserIds,
+  });
 
   res.status(204).end();
 });
