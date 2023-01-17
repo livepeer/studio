@@ -145,7 +145,6 @@ app.get("/user/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   }
 
   const experiments = await db.experiment.listUserExperiments(user.id);
-
   res.status(200).json({
     experiments: experiments.data.map((x) => x.name),
   });
