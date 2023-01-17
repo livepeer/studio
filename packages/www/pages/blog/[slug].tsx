@@ -17,6 +17,7 @@ import React from "react";
 import readingTime from "reading-time";
 import BlogCTA from "components/Site/BlogCTA";
 import { urlFor } from "lib/sanity";
+import Code from "components/Site/Code";
 
 const serializers = {
   types: {
@@ -31,7 +32,19 @@ const serializers = {
           | React.ReactFragment
           | React.ReactPortal;
       };
-    }) => <code lang={props.node.language || "text"}>{props.node.code}</code>,
+    }) => {
+      return (
+        <Code
+          className={""}
+          language={props.node.language}
+          value={props.node.code}>
+          {props.node.code}
+        </Code>
+      );
+      // return (
+      //   <code lang={props.node.language || "text"}>{props.node.code}</code>
+      // );
+    },
     cta: (props: {
       node: {
         title: any;
@@ -79,6 +92,7 @@ const Post = ({
       </Layout>
     );
   }
+  console.log("content: ", content);
   const text = blocksToText(content);
   const stats = readingTime(text);
 
