@@ -34,4 +34,9 @@ export default class ExperimentTable extends Table<WithID<Experiment>> {
     }
     return experiments[0];
   }
+
+  async isExperimentSubject(nameOrId: string, userId: string) {
+    const { audienceUserIds } = await this.getByNameOrId(nameOrId);
+    return audienceUserIds.includes(userId);
+  }
 }

@@ -39,8 +39,20 @@ const toUserIds = (emailsOrIds: string[]) =>
 
 const app = Router();
 
-for (const [path, api] of Object.entries(experimentApis)) {
-  app.use(`/${path}`, api);
+const experimentSubjectsOnly =
+  (experiment: string) => async (req, res, next) => {
+    const isSubject = await db.experiment.isExperimentSubject(
+      experiment,
+      req.user?.id
+    );
+    if (!isSubject) {
+      throw new ForbiddenError("user is not an experiment subject");
+    }
+    next();
+  };
+
+for (const [experiment, api] of Object.entries(experimentApis)) {
+  app.use(`/api/${experiment}`, experimentSubjectsOnly(experiment), api);
 }
 
 app.get("/check/:experiment", async (req, res) => {
@@ -70,9 +82,12 @@ app.get("/check/:experiment", async (req, res) => {
   }
 
   const { experiment: experimentQuery } = req.params;
-  const experiment = await db.experiment.getByNameOrId(experimentQuery);
-  if (!experiment.audienceUserIds?.includes(user.id)) {
-    throw new ForbiddenError("user not in experiment");
+  const isSubject = await db.experiment.isExperimentSubject(
+    experimentQuery,
+    user.id
+  );
+  if (!isSubject) {
+    throw new ForbiddenError("user is not an experiment subject");
   }
   res.status(204).end();
 });
