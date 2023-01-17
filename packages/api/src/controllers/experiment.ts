@@ -1,5 +1,6 @@
 import { Router } from "express";
 import _ from "lodash";
+import { v4 as uuid } from "uuid";
 import { db } from "../store";
 import {
   NotFoundError,
@@ -7,7 +8,7 @@ import {
   BadRequestError,
 } from "../store/errors";
 import { toStringValues } from "./helpers";
-import { ExperimentAudiencePayload, User } from "../schema/types";
+import { Experiment, ExperimentAudiencePayload, User } from "../schema/types";
 import { authorizer, validatePost } from "../middleware";
 
 async function toUserIds(emailOrIds: string[]) {
@@ -86,5 +87,68 @@ app.post(
     res.status(204).end();
   }
 );
+
+// Experiment CRUD
+
+app.post(
+  "/",
+  authorizer({ anyAdmin: true }),
+  validatePost("experiment"),
+  async (req, res) => {
+    let { name, userIds } = req.body as Experiment;
+    userIds = await toUserIds(userIds);
+
+    const experiment = await db.experiment.create({
+      id: uuid(),
+      name,
+      userIds,
+    });
+    res.status(201).json(experiment);
+  }
+);
+
+app.patch("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { experiment: experimentQuery } = req.params;
+  let { userIds } = req.body as { userIds: string[] };
+  if (!Array.isArray(userIds) || userIds.some((s) => typeof s !== "string")) {
+    throw new BadRequestError("userIds must be an array of strings");
+  }
+
+  const experiment = await db.experiment.getByNameOrId(experimentQuery);
+  userIds = await toUserIds(userIds);
+
+  await db.experiment.update(experiment.id, { userIds });
+
+  res.status(204).end();
+});
+
+app.get("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
+  let experiment = await db.experiment.getByNameOrId(req.params.experiment);
+
+  experiment = {
+    ...experiment,
+    users: await Promise.all(
+      experiment.userIds.map(async (userId) => {
+        const user = await db.user.get(userId);
+        return db.user.cleanWriteOnlyResponse(user);
+      })
+    ),
+  };
+
+  res.status(200).json(experiment);
+});
+
+app.get("/user/:id", authorizer({ anyAdmin: true }), async (req, res) => {
+  const user = await db.user.get(req.params.id);
+  if (!user) {
+    throw new NotFoundError("user not found");
+  }
+
+  const experiments = await db.experiment.listUserExperiments(user.id);
+
+  res.status(200).json({
+    experiments: experiments.data.map((x) => x.name),
+  });
+});
 
 export default app;

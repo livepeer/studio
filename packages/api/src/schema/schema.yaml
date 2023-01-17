@@ -2360,9 +2360,11 @@ components:
           items:
             type: string
         users:
-          type: object
+          type: array
+          description: User objects of users in the experiment for convenience
           readonly: true
-          description: Experiment name to gatekeep
+          items:
+            type: object
 
     usage:
       type: object
