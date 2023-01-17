@@ -14,6 +14,7 @@ import { Blog as BlogContent } from "content";
 import { client } from "lib/client";
 
 const BlogIndex = ({ categories, posts }) => {
+  console.log("pros:", posts);
   const router = useRouter();
   const {
     query: { slug },
@@ -183,7 +184,7 @@ const BlogIndex = ({ categories, posts }) => {
 export async function getStaticProps() {
   // const client = getClient();
 
-  const postsQuery = `*[_type=="post"]{
+  const postsQuery = `*[_type=="post" && defined(hide) && hide ==false ]{
     ...,
     author->{...},
     category->{...},
