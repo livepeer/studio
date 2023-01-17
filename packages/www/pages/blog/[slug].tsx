@@ -92,7 +92,6 @@ const Post = ({
       </Layout>
     );
   }
-  console.log("content: ", content);
   const text = blocksToText(content);
   const stats = readingTime(text);
 
