@@ -763,20 +763,23 @@ components:
           type: string
           description: Base64 of Public key used for JWT verification
 
-    experiment-gatekeep-payload:
+    experiment-audience-payload:
       type: object
       additionalProperties: false
       required: [type, stream]
       properties:
-        type:
-          type: string
-          enum: [experiment]
-        stream:
-          type: string
-          description: Stream ID to which this gate applies
-        experiments:
-          type: object
-          description: Experiment name to gatekeep
+        addUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be added to the experiment
+        removeUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be removed from the experiment
 
     playback-policy:
       type: object
