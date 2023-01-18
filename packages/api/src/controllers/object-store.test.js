@@ -1,6 +1,6 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 
 // includes auth file tests
 
