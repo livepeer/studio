@@ -17,6 +17,7 @@ import React from "react";
 import readingTime from "reading-time";
 import BlogCTA from "components/Site/BlogCTA";
 import { urlFor } from "lib/sanity";
+import Code from "components/Site/Code";
 
 const serializers = {
   types: {
@@ -31,7 +32,16 @@ const serializers = {
           | React.ReactFragment
           | React.ReactPortal;
       };
-    }) => <code lang={props.node.language || "text"}>{props.node.code}</code>,
+    }) => {
+      return (
+        <Code
+          className={""}
+          language={props.node.language}
+          value={props.node.code}>
+          {props.node.code}
+        </Code>
+      );
+    },
     cta: (props: {
       node: {
         title: any;
@@ -268,7 +278,7 @@ Post.theme = "dark-theme-blue";
 export default Post;
 
 export async function getStaticPaths() {
-  const query = `*[_type=="post" && defined(slug.current)][].slug.current`;
+  const query = `*[_type=="post" && defined(hide) && hide ==false && defined(slug.current)][].slug.current`;
   const data = await client.fetch(query);
   const paths = data.map((path: string) => ({ params: { slug: path } }));
 
@@ -285,7 +295,7 @@ export async function getStaticProps({ params }) {
     slug,
   };
 
-  const query = `*[_type=="post" && slug.current == $slug][0]{...,
+  const query = `*[_type=="post" && defined(hide) && hide ==false && slug.current == $slug][0]{...,
     author->{...},
     category->{...},
     mainImage{
@@ -294,7 +304,7 @@ export async function getStaticProps({ params }) {
   }`;
   const pageData = (await client.fetch(query, queryParams)) ?? {};
 
-  const furtherQuery = `*[_type == "post" && slug.current !=$slug] | order(_createdAt desc) [0..1]{
+  const furtherQuery = `*[_type == "post" && defined(hide) && hide ==false  && slug.current !=$slug] | order(_createdAt desc) [0..1]{
     ...,
     author->{...},
     category->{...},

@@ -9,6 +9,10 @@ const options = {
   // token: process.env.SANITY_API_TOKEN,
 };
 
+if (process.env.NODE_ENV === "development") {
+  options["token"] = process.env.SANITY_API_TOKEN;
+}
+
 export const client = sanityClient(options);
 
 export const urlFor = (source: SanityImageSource) =>

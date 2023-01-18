@@ -18,7 +18,7 @@ export async function getStaticProps({ params }) {
   const queryParams = {
     slug,
   };
-  const postQuery = `*[_type == "post" && category._ref in (*[_type == "category" && slug.current == $slug]._id)]{
+  const postQuery = `*[_type == "post" && defined(hide) && hide ==false && category._ref in (*[_type == "category" && slug.current == $slug]._id)]{
     ...,
     author->{...},
     category->{...},
