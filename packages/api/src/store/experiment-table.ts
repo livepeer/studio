@@ -2,13 +2,24 @@ import sql from "sql-template-strings";
 
 import { Experiment } from "../schema/types";
 import db from "./db";
-import { NotFoundError } from "./errors";
+import { ForbiddenError, NotFoundError } from "./errors";
 import Table from "./table";
 import { WithID } from "./types";
 
 export async function isExperimentSubject(experiment: string, userId: string) {
   const { audienceUserIds } = await db.experiment.getByNameOrId(experiment);
   return audienceUserIds.includes(userId);
+}
+
+export async function ensureExperimentSubject(
+  experiment: string,
+  userId: string
+) {
+  if (!(await isExperimentSubject(experiment, userId))) {
+    throw new ForbiddenError(
+      `user is not a subject of experiment: ${experiment}`
+    );
+  }
 }
 
 export default class ExperimentTable extends Table<WithID<Experiment>> {

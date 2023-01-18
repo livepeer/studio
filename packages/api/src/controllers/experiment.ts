@@ -2,11 +2,7 @@ import { Router } from "express";
 import _ from "lodash";
 import { v4 as uuid, validate as validateUuid } from "uuid";
 import { db } from "../store";
-import {
-  NotFoundError,
-  ForbiddenError,
-  BadRequestError,
-} from "../store/errors";
+import { NotFoundError, BadRequestError } from "../store/errors";
 import {
   makeNextHREF,
   parseFilters,
@@ -19,7 +15,7 @@ import { authorizer, validatePost } from "../middleware";
 import { WithID } from "../store/types";
 
 import experimentApis from "./experiment/index";
-import { isExperimentSubject } from "../store/experiment-table";
+import { ensureExperimentSubject } from "../store/experiment-table";
 
 async function toUserId(emailOrId: string) {
   let user: User;
@@ -42,10 +38,7 @@ const app = Router();
 
 const experimentSubjectsOnly =
   (experiment: string) => async (req, res, next) => {
-    const isSubject = await isExperimentSubject(experiment, req.user?.id);
-    if (!isSubject) {
-      throw new ForbiddenError("user is not an experiment subject");
-    }
+    await ensureExperimentSubject(experiment, req.user?.id);
     return next();
   };
 
@@ -75,10 +68,7 @@ app.get("/check/:experiment", authorizer({}), async (req, res) => {
   }
 
   const { experiment: experimentQuery } = req.params;
-  const isSubject = await isExperimentSubject(experimentQuery, user.id);
-  if (!isSubject) {
-    throw new ForbiddenError("user is not an experiment subject");
-  }
+  await ensureExperimentSubject(experimentQuery, user.id);
   res.status(204).end();
 });
 
