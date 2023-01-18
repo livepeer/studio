@@ -9,6 +9,7 @@ import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import Table from "../store/table";
 import { Asset, Stream } from "../schema/types";
+import { isExperimentSubject } from "../store/experiment-table";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -58,13 +59,21 @@ const getAssetPlaybackUrl = async (
   if (!asset || asset.deleted) {
     return null;
   }
-  const { objectStoreId, playbackPolicy } = asset;
-  const os = await db.objectStore.get(objectStoreId);
+  const os = await db.objectStore.get(asset.objectStoreId);
   if (!os || os.deleted || os.disabled) {
     return null;
   }
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
-  return playbackUrl ? { playbackUrl, playbackPolicy } : null;
+  const inExperiment = await isExperimentSubject(
+    "lit-signing-condition",
+    asset.userId
+  );
+  return !playbackUrl
+    ? null
+    : {
+        playbackUrl,
+        playbackPolicy: inExperiment ? asset.playbackPolicy : null,
+      };
 };
 
 const getRecordingPlaybackUrl = async (

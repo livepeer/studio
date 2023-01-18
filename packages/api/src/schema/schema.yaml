@@ -789,7 +789,10 @@ components:
       properties:
         type:
           type: string
-          enum: [public, jwt, lit_signing_condition]
+          enum:
+            - public
+            - jwt
+            - lit_signing_condition # only for lit-signing-condition experiment
         unifiedAccessControlConditions:
           type: array
           description: LIT Unified Access Control Conditions
