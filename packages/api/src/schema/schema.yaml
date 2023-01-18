@@ -766,7 +766,6 @@ components:
     experiment-audience-payload:
       type: object
       additionalProperties: false
-      required: [type, stream]
       properties:
         addUsers:
           type: array
@@ -2342,7 +2341,7 @@ components:
       type: object
       table: experiment
       additionalProperties: false
-      required: [name, userIds]
+      required: [name]
       properties:
         type:
           type: string

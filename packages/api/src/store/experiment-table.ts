@@ -8,7 +8,7 @@ import { WithID } from "./types";
 
 export async function isExperimentSubject(experiment: string, userId: string) {
   const { audienceUserIds } = await db.experiment.getByNameOrId(experiment);
-  return audienceUserIds.includes(userId);
+  return audienceUserIds?.includes(userId) ?? false;
 }
 
 export async function ensureExperimentSubject(

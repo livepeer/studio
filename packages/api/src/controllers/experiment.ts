@@ -31,8 +31,8 @@ async function toUserId(emailOrId: string) {
   return user.id;
 }
 
-const toUserIds = (emailsOrIds: string[]) =>
-  Promise.all(emailsOrIds.map(toUserId));
+const toUserIds = (emailsOrIds?: string[]) =>
+  Promise.all(emailsOrIds?.map(toUserId) ?? []);
 
 const app = Router();
 
@@ -129,7 +129,7 @@ app.patch("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
     !Array.isArray(audienceUserIds) ||
     audienceUserIds.some((s) => typeof s !== "string")
   ) {
-    throw new BadRequestError("userIds must be an array of strings");
+    throw new BadRequestError("audienceUserIds must be an array of strings");
   }
 
   const experiment = await db.experiment.getByNameOrId(experimentQuery);
@@ -149,10 +149,10 @@ app.get("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
   experiment = {
     ...experiment,
     audienceUsers: await Promise.all(
-      experiment.audienceUserIds.map(async (userId) => {
+      experiment.audienceUserIds?.map(async (userId) => {
         const user = await db.user.get(userId);
         return db.user.cleanWriteOnlyResponse(user);
-      })
+      }) ?? []
     ),
   };
 
