@@ -11,11 +11,8 @@ import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import { db } from "../store";
 import { WithID } from "../store/types";
 import { ObjectStore, Task } from "../schema/types";
-import { CliArgs } from "../parse-cli";
-import { InternalServerError } from "../store/errors";
 
 const ITERATIONS = 10000;
 
@@ -236,30 +233,6 @@ export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
   });
   const expiresIn = 12 * 60 * 60; // 12h in seconds
   return getSignedUrl(s3, putCommand, { expiresIn });
-}
-
-export function signGoogleCDNCookie(
-  config: CliArgs,
-  urlPrefix: string,
-  expirationMs: number
-): [string, string] {
-  const {
-    googleCloudUrlSigningKeyName: keyName,
-    googleCloudUrlSigningKey: keyb64,
-  } = config;
-  if (!keyName || !keyb64) {
-    throw new InternalServerError("Missing URL signing key config");
-  }
-  const encodedURLPrefix = Buffer.from(urlPrefix).toString("base64url");
-  const expires = Math.round(expirationMs / 1000);
-  const input = `URLPrefix=${encodedURLPrefix}:Expires=${expires}:KeyName=${keyName}`;
-
-  const key = Buffer.from(keyb64, "base64url");
-  const mac = createHmac("sha1", key);
-  mac.update(input);
-  const sig = mac.digest("base64url");
-
-  return ["Cloud-CDN-Cookie", `${input}:Signature=${sig}`];
 }
 
 type EmailParams = {

@@ -1,6 +1,6 @@
 import signingKeyApp from "./signing-key";
 import { validatePost } from "../middleware";
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -10,94 +10,10 @@ import {
   BadRequestError,
 } from "../store/errors";
 import tracking from "../middleware/tracking";
-import LitJsSdk from "@lit-protocol/sdk-nodejs";
-import { signGoogleCDNCookie } from "./helpers";
-import { withPlaybackUrls } from "./asset";
-import { WithID } from "../store/types";
-import { Asset } from "../schema/types";
-
-function getPlaybackFolderPrefix(playbackUrl: string) {
-  const url = new URL(playbackUrl);
-  url.pathname = url.pathname.substring(0, url.pathname.lastIndexOf("/"));
-  return url;
-}
-
-function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
-  const urlPrefix = getPlaybackFolderPrefix(asset.playbackUrl);
-  const ttl = Math.max(
-    60 * 60 * 1000,
-    2 * Math.round(asset.videoSpec.duration * 1000)
-  );
-  const expiration = Date.now() + ttl;
-  const [name, value] = signGoogleCDNCookie(
-    res.req.config,
-    urlPrefix.toString(),
-    expiration
-  );
-  res.cookie(name, value, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    expires: new Date(expiration),
-    domain: urlPrefix.hostname,
-    path: urlPrefix.pathname,
-    encode: (v) => v,
-  });
-}
 
 const app = Router();
 
 app.use("/signing-key", signingKeyApp);
-
-app.post("/verify-lit-jwt", async (req, res) => {
-  // TODO: Create schema for this request payload
-  const { jwt, playbackId } = req.body as Record<string, string>;
-
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-  const ingest = ingests[0].base;
-
-  let asset = await db.asset.getByPlaybackId(playbackId);
-  if (!asset) {
-    throw new NotFoundError("asset not found");
-  }
-  asset = await withPlaybackUrls(req, ingest, asset);
-  if (!asset?.playbackUrl) {
-    throw new BadRequestError("asset is not playable");
-  }
-
-  const { verified, header, payload } = LitJsSdk.verifyJwt({
-    jwt,
-  });
-
-  if (verified) {
-    res.status(200);
-    if (asset.playbackPolicy?.type == "lit_signing_condition") {
-      let resourceId = asset.playbackPolicy.resourceId;
-      if (resourceId.baseUrl != payload.baseUrl) {
-        throw new ForbiddenError("baseUrl does not match");
-      }
-      if (resourceId.path != payload.path) {
-        throw new ForbiddenError("path does not match");
-      }
-      if (resourceId.orgId != payload.orgId) {
-        throw new ForbiddenError("orgId does not match");
-      }
-    }
-    setGoogleCloudCookie(res, asset);
-  } else {
-    res.status(403);
-  }
-
-  return res.json({
-    verified,
-    header,
-    payload,
-  });
-});
 
 app.post(
   "/gate",

@@ -11,12 +11,10 @@ import {
   parseFilters,
   parseOrder,
   getS3PresignedUrl,
-  FieldsMap,
   toStringValues,
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
-  toObjectStoreUrl,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -39,13 +37,12 @@ import {
   NewAssetPayload,
   ObjectStore,
   Task,
-  TranscodePayload,
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
 import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
-import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
+import { ensureExperimentSubject } from "../store/experiment-table";
 
 const app = Router();
 
@@ -109,12 +106,15 @@ async function validateAssetPayload(
   payload: NewAssetPayload,
   source?: Asset["source"]
 ): Promise<WithID<Asset>> {
-  if (payload.objectStoreId) {
-    if (payload.playbackPolicy?.type === "lit_signing_condition") {
+  if (payload.playbackPolicy?.type === "lit_signing_condition") {
+    if (payload.objectStoreId) {
       throw new ForbiddenError(
         `lit-gated assets cannot use custom object store`
       );
     }
+    await ensureExperimentSubject("lit-signing-condition", userId);
+  }
+  if (payload.objectStoreId) {
     const os = await getActiveObjectStore(payload.objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
