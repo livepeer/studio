@@ -46,7 +46,7 @@ const experimentSubjectsOnly =
     if (!isSubject) {
       throw new ForbiddenError("user is not an experiment subject");
     }
-    next();
+    return next();
   };
 
 for (const [experiment, api] of Object.entries(experimentApis)) {
