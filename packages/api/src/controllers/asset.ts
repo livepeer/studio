@@ -106,14 +106,6 @@ async function validateAssetPayload(
   payload: NewAssetPayload,
   source?: Asset["source"]
 ): Promise<WithID<Asset>> {
-  if (payload.playbackPolicy?.type === "lit_signing_condition") {
-    if (payload.objectStoreId) {
-      throw new ForbiddenError(
-        `lit-gated assets cannot use custom object store`
-      );
-    }
-    await ensureExperimentSubject("lit-signing-condition", userId);
-  }
   if (payload.objectStoreId) {
     const os = await getActiveObjectStore(payload.objectStoreId);
     if (os.userId !== userId) {
@@ -124,9 +116,10 @@ async function validateAssetPayload(
   }
 
   // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
-  payload.playbackPolicy = validateAssetPlaybackPolicy(
-    payload.playbackPolicy,
+  payload.playbackPolicy = await validateAssetPlaybackPolicy(
+    payload,
     playbackId,
+    userId,
     createdAt
   );
 
@@ -150,12 +143,19 @@ async function validateAssetPayload(
   };
 }
 
-function validateAssetPlaybackPolicy(
-  playbackPolicy: Asset["playbackPolicy"],
-  playbackId?: string,
-  createdAt?: number
+async function validateAssetPlaybackPolicy(
+  { playbackPolicy, objectStoreId }: Partial<NewAssetPayload>,
+  playbackId: string,
+  userId: string,
+  createdAt: number
 ) {
-  if (playbackPolicy?.type == "lit_signing_condition") {
+  if (playbackPolicy?.type === "lit_signing_condition") {
+    await ensureExperimentSubject("lit-signing-condition", userId);
+
+    if (objectStoreId) {
+      throw new ForbiddenError(`lit-gated assets cant use custom object store`);
+    }
+
     if (!playbackPolicy.unifiedAccessControlConditions) {
       throw new UnprocessableEntityError(
         `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`
@@ -982,9 +982,20 @@ app.patch(
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
-    playbackPolicy = validateAssetPlaybackPolicy(
-      playbackPolicy,
+    if (
+      asset.playbackPolicy?.type === "lit_signing_condition" &&
+      (playbackPolicy?.type !== "lit_signing_condition" ||
+        playbackPolicy?.resourceId)
+    ) {
+      throw new UnprocessableEntityError(
+        `cannot update playback policy from lit_signing_condition to ${playbackPolicy?.type} nor change the resource ID`
+      );
+    }
+
+    playbackPolicy = await validateAssetPlaybackPolicy(
+      { playbackPolicy },
       asset.playbackId,
+      asset.userId,
       asset.createdAt
     );
 
