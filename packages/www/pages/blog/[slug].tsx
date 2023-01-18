@@ -41,9 +41,6 @@ const serializers = {
           {props.node.code}
         </Code>
       );
-      // return (
-      //   <code lang={props.node.language || "text"}>{props.node.code}</code>
-      // );
     },
     cta: (props: {
       node: {
