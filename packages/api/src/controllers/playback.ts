@@ -58,14 +58,13 @@ const getAssetPlaybackUrl = async (
   if (!asset || asset.deleted) {
     return null;
   }
-  const os = await db.objectStore.get(asset.objectStoreId);
+  const { objectStoreId, playbackPolicy } = asset;
+  const os = await db.objectStore.get(objectStoreId);
   if (!os || os.deleted || os.disabled) {
     return null;
   }
-  return {
-    playbackUrl: assetPlaybackUrl(config, ingest, asset, os),
-    playbackPolicy: asset.playbackPolicy,
-  };
+  const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
+  return playbackUrl ? { playbackUrl, playbackPolicy } : null;
 };
 
 const getRecordingPlaybackUrl = async (
