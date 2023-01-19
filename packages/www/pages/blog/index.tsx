@@ -14,7 +14,6 @@ import { Blog as BlogContent } from "content";
 import { client } from "lib/client";
 
 const BlogIndex = ({ categories, posts }) => {
-  console.log("pros:", posts);
   const router = useRouter();
   const {
     query: { slug },
