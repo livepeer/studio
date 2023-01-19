@@ -41,6 +41,7 @@ app.post(
             url: storageUrl,
           },
           outputs: params.outputs,
+          profiles: params.profiles,
           catalystPipelineStrategy,
         },
       },
