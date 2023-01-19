@@ -23,7 +23,7 @@ const BlogIndex = ({ categories, posts }) => {
   if (router.isFallback) {
     return (
       <Layout>
-        <Box>Loading...</Box>
+        <Box>Loading....</Box>
       </Layout>
     );
   }
