@@ -1513,6 +1513,10 @@ components:
                   type: string
                   description: Path for the HLS output
                   example: /samplevideo/hls
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
@@ -1649,6 +1653,10 @@ components:
                           type: string
                           description: Path for the HLS output
                           example: /samplevideo/hls
+                profiles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ffmpeg-profile"
                 catalystPipelineStrategy:
                   type: string
                   description:
