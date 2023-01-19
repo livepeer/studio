@@ -278,7 +278,7 @@ Post.theme = "dark-theme-blue";
 export default Post;
 
 export async function getStaticPaths() {
-  const query = `*[_type=="post" && defined(hide) && hide ==false && defined(slug.current)][].slug.current`;
+  const query = `*[_type=="post" && defined(slug.current)][].slug.current`;
   const data = await client.fetch(query);
   const paths = data.map((path: string) => ({ params: { slug: path } }));
 
@@ -295,7 +295,7 @@ export async function getStaticProps({ params }) {
     slug,
   };
 
-  const query = `*[_type=="post" && defined(hide) && hide ==false && slug.current == $slug][0]{...,
+  const query = `*[_type=="post" && slug.current == $slug][0]{...,
     author->{...},
     category->{...},
     mainImage{
@@ -304,7 +304,7 @@ export async function getStaticProps({ params }) {
   }`;
   const pageData = (await client.fetch(query, queryParams)) ?? {};
 
-  const furtherQuery = `*[_type == "post" && defined(hide) && hide ==false  && slug.current !=$slug] | order(_createdAt desc) [0..1]{
+  const furtherQuery = `*[_type == "post" && slug.current !=$slug] | order(_createdAt desc) [0..1]{
     ...,
     author->{...},
     category->{...},
