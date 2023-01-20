@@ -391,10 +391,11 @@ export function parseFilters(
   try {
     json = JSON.parse(decodeURIComponent(val));
   } catch (e) {
-    console.log("error decoding filters", e);
+    console.error("parseFilters: error decoding filters", e);
     return q;
   }
   if (!Array.isArray(json)) {
+    console.error("parseFilters: filters are not an array");
     return q;
   }
   for (const filter of json) {
@@ -446,6 +447,8 @@ export function parseFilters(
           q.push(sql``.append(fv.val).append(sql` = ${filter.value}`));
         }
       }
+    } else {
+      console.error("parseFilters: unknown field: ", filter.id);
     }
   }
   return q;
