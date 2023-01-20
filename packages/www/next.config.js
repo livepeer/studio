@@ -1,5 +1,4 @@
 const { withSentryConfig } = require("@sentry/nextjs");
-const withPlugins = require("next-compose-plugins");
 const emoji = require("remark-emoji");
 const withMDX = require("@next/mdx")({
   options: {
@@ -9,19 +8,14 @@ const withMDX = require("@next/mdx")({
 
 const isAnalyzeEnabled = process.env.ANALYZE === "true";
 
-const SentryWebpackPluginOptions = {
-  // Additional config options for the Sentry Webpack plugin. Keep in mind that
-  // the following options are set automatically, and overriding them is not
-  // recommended:
-  //   release, url, org, project, authToken, configFile, stripPrefix,
-  //   urlPrefix, include, ignore
-
+const sentryWebpackPluginOptions = {
   silent: true, // Suppresses all logs
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-const config = {
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
   images: {
     domains: ["cdn.sanity.io", "picsum.photos"],
   },
@@ -32,6 +26,7 @@ const config = {
   sentry: {
     hideSourceMaps: false,
   },
+  pageExtensions: ["js", "jsx", "mdx", "ts", "tsx", "svg"],
   async redirects() {
     return [
       {
@@ -236,40 +231,52 @@ const config = {
   },
 };
 
-module.exports = withSentryConfig(
-  withPlugins(
-    [
-      [
-        withMDX,
-        {
-          pageExtensions: ["js", "jsx", "mdx", "ts", "tsx", "svg"],
-          webpack(config, _options) {
-            config.module.rules.push({
-              test: /\.(graphql|gql)$/,
-              exclude: /node_modules/,
-              loader: "graphql-tag/loader",
-            });
-            config.module.rules.push({
-              test: /\.md$/,
-              use: "raw-loader",
-            });
-            config.module.rules.push({
-              test: /\.svg$/,
-              use: ["@svgr/webpack"],
-            });
-            if (isAnalyzeEnabled) {
-              const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
-              config.plugins.push(new DuplicatePackageCheckerPlugin());
-            }
-            return config;
-          },
-        },
-      ],
-      ...(isAnalyzeEnabled
-        ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
-        : []),
-    ],
-    config
-  ),
-  SentryWebpackPluginOptions
-);
+/**
+ * @type {import('@next/mdx').NextMDXOptions}
+ */
+const mdxOptions = {
+  webpack(config, _options) {
+    config.module.rules.push({
+      test: /\.(graphql|gql)$/,
+      exclude: /node_modules/,
+      loader: "graphql-tag/loader",
+    });
+    config.module.rules.push({
+      test: /\.md$/,
+      use: "raw-loader",
+    });
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
+    if (isAnalyzeEnabled) {
+      const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+      config.plugins.push(new DuplicatePackageCheckerPlugin());
+    }
+    return config;
+  },
+};
+
+const bundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: isAnalyzeEnabled,
+});
+
+module.exports = (phase, defaultConfig) => {
+  const plugins = [
+    (config) => withSentryConfig(config, sentryWebpackPluginOptions),
+    (config) => withMDX({ ...config, ...mdxOptions }),
+    bundleAnalyzer,
+  ];
+
+  const config = plugins.reduce(
+    (acc, plugin) => {
+      const update = plugin(acc);
+      return typeof update === "function"
+        ? update(phase, defaultConfig)
+        : update;
+    },
+    { ...nextConfig }
+  );
+
+  return config;
+};
