@@ -29,6 +29,9 @@ const config = {
     locales: ["en", "es"],
     defaultLocale: "en",
   },
+  sentry: {
+    hideSourceMaps: false,
+  },
   async redirects() {
     return [
       {
