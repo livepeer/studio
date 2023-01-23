@@ -1,1 +1,2 @@
-*      @livepeer/studio-team
+/packages/api/      @livepeer/studio-team
+/packages/www/      @livepeer/ux-team
