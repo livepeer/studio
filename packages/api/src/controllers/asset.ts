@@ -983,13 +983,18 @@ app.patch(
     }
 
     if (
-      asset.playbackPolicy?.type === "lit_signing_condition" &&
-      (playbackPolicy?.type !== "lit_signing_condition" ||
-        playbackPolicy?.resourceId)
+      playbackPolicy &&
+      asset.playbackPolicy?.type === "lit_signing_condition"
     ) {
-      throw new UnprocessableEntityError(
-        `cannot update playback policy from lit_signing_condition to ${playbackPolicy?.type} nor change the resource ID`
+      const sameResourceId = _.isEqual(
+        playbackPolicy.resourceId,
+        asset.playbackPolicy.resourceId
       );
+      if (playbackPolicy.type !== "lit_signing_condition" || !sameResourceId) {
+        throw new UnprocessableEntityError(
+          `cannot update playback policy from lit_signing_condition nor change the resource ID`
+        );
+      }
     }
 
     playbackPolicy = await validateAssetPlaybackPolicy(
