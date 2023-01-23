@@ -237,6 +237,20 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "object store ID to use for Catalyst VOD",
         type: "string",
       },
+      vodCatalystPrivateAssetsObjectStoreId: {
+        describe: "object store ID to use for private assets in Catalyst VOD",
+        type: "string",
+      },
+      googleCloudUrlSigningKeyName: {
+        describe:
+          "name of the signing key to use for signing access cookies for private assets on Google Cloud CDN",
+        type: "string",
+      },
+      googleCloudUrlSigningKey: {
+        describe:
+          "value of the signing key to use for signing access cookies for private assets on Google Cloud CDN",
+        type: "string",
+      },
       vodCatalystPipelineRolloutPercent: {
         describe: "percentage of assets to test the new Catalyst VOD pipeline",
         default: 0,

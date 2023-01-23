@@ -11,7 +11,6 @@ import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import { db } from "../store";
 import { WithID } from "../store/types";
 import { ObjectStore, Task } from "../schema/types";
 

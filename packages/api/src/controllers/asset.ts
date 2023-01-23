@@ -11,12 +11,10 @@ import {
   parseFilters,
   parseOrder,
   getS3PresignedUrl,
-  FieldsMap,
   toStringValues,
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
-  toObjectStoreUrl,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -39,13 +37,12 @@ import {
   NewAssetPayload,
   ObjectStore,
   Task,
-  TranscodePayload,
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
 import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
-import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
+import { ensureExperimentSubject } from "../store/experiment-table";
 
 const app = Router();
 
@@ -76,11 +73,14 @@ function shouldUseCatalyst({ query, user, config }: Request) {
 }
 
 function defaultObjectStoreId(
-  { config }: Request,
+  { config, body }: Request,
   useCatalyst: boolean
 ): string {
   if (!useCatalyst) {
     return config.vodObjectStoreId;
+  }
+  if (body.playbackPolicy?.type === "lit_signing_condition") {
+    return config.vodCatalystPrivateAssetsObjectStoreId;
   }
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
 }
@@ -115,6 +115,14 @@ async function validateAssetPayload(
     }
   }
 
+  // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
+  payload.playbackPolicy = await validateAssetPlaybackPolicy(
+    payload,
+    playbackId,
+    userId,
+    createdAt
+  );
+
   return {
     id,
     playbackId,
@@ -133,6 +141,42 @@ async function validateAssetPayload(
     playbackPolicy: payload.playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
+}
+
+async function validateAssetPlaybackPolicy(
+  { playbackPolicy, objectStoreId }: Partial<NewAssetPayload>,
+  playbackId: string,
+  userId: string,
+  createdAt: number
+) {
+  if (playbackPolicy?.type === "lit_signing_condition") {
+    await ensureExperimentSubject("lit-signing-condition", userId);
+
+    if (objectStoreId) {
+      throw new ForbiddenError(`lit-gated assets cant use custom object store`);
+    }
+
+    if (!playbackPolicy.unifiedAccessControlConditions) {
+      throw new UnprocessableEntityError(
+        `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`
+      );
+    }
+    if (!playbackPolicy?.resourceId) {
+      playbackPolicy.resourceId = {
+        baseUrl: "playback.livepeer.studio",
+        path: `/gate/${playbackId}`,
+        orgId: "livepeer",
+        role: "",
+        extraData: `createdAt=${createdAt}`,
+      };
+    }
+  }
+  if (playbackPolicy?.type == "jwt") {
+    throw new BadRequestError(
+      `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
+    );
+  }
+  return playbackPolicy;
 }
 
 async function getActiveObjectStore(id: string) {
@@ -191,7 +235,7 @@ function getDownloadUrl(
   return pathJoin(base, asset.playbackId, "video");
 }
 
-async function withPlaybackUrls(
+export async function withPlaybackUrls(
   { config }: Request,
   ingest: string,
   asset: WithID<Asset>,
@@ -650,7 +694,6 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
 
   await ensureQueueCapacity(req.config, req.user.id);
-
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -723,7 +766,6 @@ app.post(
     // as direct uploads will also need a lot of effort from callers to upload
     // the files, so the risk is much smaller.
     await ensureQueueCapacity(req.config, req.user.id);
-
     asset = await createAsset(asset, req.queue);
 
     const taskType = shouldUseCatalyst(req) ? "upload" : "import";
@@ -939,6 +981,28 @@ app.patch(
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
+
+    if (
+      playbackPolicy &&
+      asset.playbackPolicy?.type === "lit_signing_condition"
+    ) {
+      const sameResourceId = _.isEqual(
+        playbackPolicy.resourceId,
+        asset.playbackPolicy.resourceId
+      );
+      if (playbackPolicy.type !== "lit_signing_condition" || !sameResourceId) {
+        throw new UnprocessableEntityError(
+          `cannot update playback policy from lit_signing_condition nor change the resource ID`
+        );
+      }
+    }
+
+    playbackPolicy = await validateAssetPlaybackPolicy(
+      { playbackPolicy },
+      asset.playbackId,
+      asset.userId,
+      asset.createdAt
+    );
 
     await req.taskScheduler.updateAsset(asset, {
       name,
