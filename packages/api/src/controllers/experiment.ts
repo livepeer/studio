@@ -43,7 +43,7 @@ const experimentSubjectsOnly =
   };
 
 for (const [experiment, api] of Object.entries(experimentApis)) {
-  app.use(`/api/${experiment}`, experimentSubjectsOnly(experiment), api);
+  app.use(`/-/${experiment}`, experimentSubjectsOnly(experiment), api);
 }
 
 app.get("/check/:experiment", authorizer({}), async (req, res) => {
