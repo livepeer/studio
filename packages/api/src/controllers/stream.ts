@@ -148,7 +148,7 @@ function validateStreamPlaybackPolicy(
   playbackPolicy: DBStream["playbackPolicy"]
 ) {
   if (
-    playbackPolicy?.type == "lit_signing_condition" ||
+    playbackPolicy?.type === "lit_signing_condition" ||
     playbackPolicy?.resourceId ||
     playbackPolicy?.unifiedAccessControlConditions
   ) {
@@ -849,6 +849,7 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
     isActive: false,
     lastSeen: 0,
   });
+  validateStreamPlaybackPolicy(doc.playbackPolicy);
 
   doc.profiles = hackMistSettings(req, doc.profiles);
   doc.multistream = await validateMultistreamOpts(
