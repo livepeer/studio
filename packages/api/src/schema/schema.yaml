@@ -2343,9 +2343,6 @@ components:
       additionalProperties: false
       required: [name]
       properties:
-        type:
-          type: string
-          enum: [experiment]
         name:
           type: string
           index: true
@@ -2362,7 +2359,7 @@ components:
           type: number
           readOnly: true
           description:
-            Timestamp (in milliseconds) at which the signing-key was created
+            Timestamp (in milliseconds) at which the experiment was created
           example: 1587667174725
         updatedAt:
           type: number
