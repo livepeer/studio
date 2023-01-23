@@ -199,6 +199,8 @@ components:
           $ref: "#/components/schemas/webhook/properties/events/items"
         events:
           type: array
+          index: true
+          indexType: gin
           items:
             type: string
             enum:
@@ -760,6 +762,23 @@ components:
         pub:
           type: string
           description: Base64 of Public key used for JWT verification
+
+    experiment-audience-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        addUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be added to the experiment
+        removeUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be removed from the experiment
 
     playback-policy:
       type: object
@@ -2317,6 +2336,51 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
+
+    experiment:
+      type: object
+      table: experiment
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          index: true
+          unique: true
+          description: Name that identifies the experiment. Must be unique
+        userId:
+          type: string
+          index: true
+          description:
+            User ID of the creator of the experiment. Only used for auditing as
+            experiment APIs is only accessible to admins, which can all
+            experiments anyway.
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the experiment was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which experiment was updated
+          example: 1587667174725
+        audienceUserIds:
+          type: array
+          index: true
+          indexType: gin
+          description: List of user IDs in the experiment
+          items:
+            type: string
+        audienceUsers:
+          type: array
+          description: User objects of users in the experiment for convenience
+          readonly: true
+          items:
+            $ref: "#/components/schemas/user"
+
     usage:
       type: object
       table: usage

@@ -10,7 +10,6 @@ import {
   ApiToken,
   User,
   PasswordResetToken,
-  Task,
   Usage,
   Region,
   WebhookResponse,
@@ -27,6 +26,7 @@ import WebhookTable from "./webhook-table";
 import { CdnUsageTable } from "./cdn-usage-table";
 import AssetTable from "./asset-table";
 import TaskTable from "./task-table";
+import ExperimentTable from "./experiment-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -69,6 +69,7 @@ export class DB {
   signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
+  experiment: ExperimentTable;
   usage: Table<Usage>;
   webhook: WebhookTable;
   webhookResponse: Table<WebhookResponse>;
@@ -161,6 +162,10 @@ export class DB {
       schema: schemas["signing-key"],
     });
     this.user = makeTable<User>({ db: this, schema: schemas["user"] });
+    this.experiment = new ExperimentTable({
+      db: this,
+      schema: schemas["experiment"],
+    });
     this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
     this.webhook = new WebhookTable({ db: this, schema: schemas["webhook"] });
     this.passwordResetToken = makeTable<PasswordResetToken>({
