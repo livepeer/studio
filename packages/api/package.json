@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@livepeer.studio/api",
-  "description": "Livepeer Studio API node for controlling streams",
+  "description": "Livepeer Studio API",
   "version": "0.12.0",
   "license": "MIT",
   "main": "dist/index.js",
