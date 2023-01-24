@@ -22,6 +22,7 @@ import region from "./region";
 import session from "./session";
 import cdnData from "./cdn-data";
 import playback from "./playback";
+import did from "./did";
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -49,4 +50,5 @@ export default {
   session,
   "cdn-data": cdnData,
   playback,
+  did,
 };
