@@ -7,8 +7,12 @@ import Table from "./table";
 import { WithID } from "./types";
 
 export async function isExperimentSubject(experiment: string, userId: string) {
-  const { audienceUserIds } = await db.experiment.getByNameOrId(experiment);
-  return audienceUserIds?.includes(userId) ?? false;
+  try {
+    const { audienceUserIds } = await db.experiment.getByNameOrId(experiment);
+    return audienceUserIds?.includes(userId) ?? false;
+  } catch (err) {
+    return false;
+  }
 }
 
 export async function ensureExperimentSubject(
