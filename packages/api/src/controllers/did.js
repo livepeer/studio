@@ -2,8 +2,14 @@ import Router from "express/lib/router";
 
 const app = Router();
 
-app.get("/", (_, res) => {
-  res.json({ did: process.env.UCAN_DID || "" });
+app.get("/", (req, res) => {
+  const did = req.config.did;
+  if (did) {
+    res.json({ did });
+  } else {
+    res.status(501);
+    res.json({ errors: ["DID key not configured"] });
+  }
 });
 
 export default app;
