@@ -352,6 +352,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "boolean",
         alias: "j",
       },
+      did: {
+        describe: "Livepeer DID key",
+        type: "string",
+      },
     })
     .usage(
       `
