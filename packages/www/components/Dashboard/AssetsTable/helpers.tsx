@@ -158,8 +158,8 @@ export const fileUploadProgressForAsset = (
 
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
-    title="Upload your first On Demand asset"
-    description="Livepeer Studio supports video on demand which allows you to import video assets, store them on decentralized storage, and easily mint a video NFT."
+    title="Upload your first video asset"
+    description="Upload video assets for optimized and cached on-demand playback."
     learnMoreUrl="https://docs.livepeer.studio/category/on-demand"
     actionTitle="Upload asset"
     actionToggleState={actionToggleState}
