@@ -901,16 +901,12 @@ app.put(
       return res.json({ errors: ["user is suspended"] });
     }
 
-    const ingest = ((await req.getIngest()) ?? [])[0]?.base;
-    sendSetActiveHooks(stream, req.body, req.queue, ingest).catch((err) => {
-      logger.error("Error sending /setactive hooks err=", err);
-    });
-
-    const sameFromStream =
-      stream.region === req.config.ownRegion && stream.mistHost === hostName;
-    if (stream.isActive && !active && !sameFromStream) {
-      // This likely means the user is doing multiple sessions with the same
-      // stream key. We only support 1 conc. session so ignore previous ones.
+    const isActiveChanged = stream.isActive != active;
+    const mediaServerChanged =
+      stream.region !== req.config.ownRegion || stream.mistHost !== hostName;
+    if (isActiveChanged && !active && mediaServerChanged) {
+      // This means the user is doing multiple sessions with the same stream
+      // key. We only support 1 conc. session so keep the last to have started.
       logger.info(
         `Ignoring /setactive false since another session had already started. ` +
           `stream=${id} currMist="${stream.region}-${stream.mistHost}" oldMist="${req.config.ownRegion}-${hostName}"`
@@ -925,10 +921,18 @@ app.put(
       region: req.config.ownRegion,
     };
     await db.stream.update(stream.id, patch);
+
+    if (isActiveChanged || mediaServerChanged) {
+      const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+      sendSetActiveHooks(stream, req.body, req.queue, ingest).catch((err) => {
+        logger.error("Error sending /setactive hooks err=", err);
+      });
+    }
+
     // update the other auxiliary info in the database in background.
     setImmediate(async () => {
       try {
-        if (active) {
+        if (isActiveChanged && active) {
           await db.user.update(stream.userId, {
             lastStreamedAt: Date.now(),
           });
