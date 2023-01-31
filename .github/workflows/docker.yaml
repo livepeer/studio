@@ -81,7 +81,7 @@ jobs:
             type=raw,value=${{ github.event.pull_request.head.ref }}
 
       - name: Build and push livepeer docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           build-args: |
             VERSION=${{ (github.ref_type == 'tag' && github.ref_name) || (github.event.pull_request.head.sha || github.sha) }}
