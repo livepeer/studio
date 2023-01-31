@@ -72,6 +72,14 @@ function shouldUseCatalyst({ query, user, config }: Request) {
   return 100 * Math.random() < rollPct;
 }
 
+function catalystPipelineStrategy(req: Request) {
+  let { catalystPipelineStrategy } = req.body as NewAssetPayload;
+  if (!req.user.admin || !req.user.isTestUser) {
+    catalystPipelineStrategy = undefined;
+  }
+  return catalystPipelineStrategy;
+}
+
 function defaultObjectStoreId(
   { config, body }: Request,
   useCatalyst: boolean
@@ -591,10 +599,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, catalystPipelineStrategy } = req.body as NewAssetPayload;
-  if (!req.user.admin && !req.user.isTestUser) {
-    catalystPipelineStrategy = undefined;
-  }
+  let { url } = req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -633,7 +638,10 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
-      [taskType]: { url, catalystPipelineStrategy },
+      [taskType]: {
+        url,
+        catalystPipelineStrategy: catalystPipelineStrategy(req),
+      },
     },
     undefined,
     asset
@@ -741,10 +749,6 @@ app.post(
       defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
-    let { catalystPipelineStrategy } = req.body as NewAssetPayload;
-    if (!req.user.admin && !req.user.isTestUser) {
-      catalystPipelineStrategy = undefined;
-    }
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
@@ -773,7 +777,10 @@ app.post(
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
-        [taskType]: { url: downloadUrl, catalystPipelineStrategy },
+        [taskType]: {
+          url: downloadUrl,
+          catalystPipelineStrategy: catalystPipelineStrategy(req),
+        },
       },
       null,
       asset
