@@ -75,8 +75,6 @@ describe("controllers/asset", () => {
 
   describe("experimental APIs", () => {
     it("should register APIs under a - path segment", async () => {
-      client.apiKey = nonAdminApiKey;
-
       // control case
       let res = await client.post(`/experiment/-/non-existing-experiment`, {});
       expect(res.status).toBe(404);
@@ -84,9 +82,9 @@ describe("controllers/asset", () => {
       res = await client.post(
         `/experiment/-/lit-signing-condition/verify-lit-jwt`
       );
-      expect(res.status).toBe(501);
+      expect(res.status).toBe(403);
       const { errors } = await res.json();
-      expect(errors[0]).toContain("not implemented");
+      expect(errors[0]).toContain("user is not a subject of experiment");
     });
   });
 
