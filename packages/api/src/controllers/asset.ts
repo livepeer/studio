@@ -741,9 +741,10 @@ app.post(
       defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const { catalystPipelineStrategy = undefined } = req.user.admin
-      ? (req.body as NewAssetPayload)
-      : {};
+    let { catalystPipelineStrategy } = req.body as NewAssetPayload;
+    if (!req.user.admin && !req.user.isTestUser) {
+      catalystPipelineStrategy = undefined;
+    }
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
