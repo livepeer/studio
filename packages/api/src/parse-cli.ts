@@ -251,11 +251,6 @@ export default function parseCli(argv?: string | readonly string[]) {
           "value of the signing key to use for signing access cookies for private assets on Google Cloud CDN",
         type: "string",
       },
-      vodCatalystPipelineRolloutPercent: {
-        describe: "percentage of assets to test the new Catalyst VOD pipeline",
-        default: 0,
-        type: "number",
-      },
       vodMaxConcurrentTasksPerUser: {
         describe:
           "maximum number of tasks that can be running for a given user",
