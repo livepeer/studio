@@ -169,6 +169,25 @@ async function getActiveObjectStore(id: string) {
   return os;
 }
 
+export function getStaticPlaybackUrls(
+  { vodCatalystObjectStoreId }: Request["config"],
+  asset: WithID<Asset>,
+  os: ObjectStore
+): string[] {
+  let files = asset.files;
+  if (files) {
+    files = files.filter((f) => f.type === "static_file");
+  } else {
+    return [];
+  }
+  return files?.map((f) => {
+    if (os.id !== vodCatalystObjectStoreId) {
+      return pathJoin(os.publicUrl, asset.playbackId, f.path);
+    }
+    return pathJoin(os.publicUrl, asset.playbackId, f.path);
+  });
+}
+
 export function getPlaybackUrl(
   { vodCatalystObjectStoreId }: Request["config"],
   ingest: string,

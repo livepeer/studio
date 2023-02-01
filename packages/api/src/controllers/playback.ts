@@ -4,7 +4,10 @@ import {
   getPlaybackUrl as streamPlaybackUrl,
   getRecordingFields,
 } from "./stream";
-import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
+import {
+  getPlaybackUrl as assetPlaybackUrl,
+  getStaticPlaybackUrls as staticPlaybackUrls,
+} from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import Table from "../store/table";
@@ -19,33 +22,56 @@ type PlaybackInfo = {
     playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
     source: {
       // the only supported format is HLS for now
-      hrn: "HLS (TS)";
-      type: "html5/application/vnd.apple.mpegurl";
+      hrn: "HLS (TS)" | "MP4";
+      type: "html5/application/vnd.apple.mpegurl" | "html5/video/mp4";
       url: string;
+      rendition?: string;
     }[];
   };
 };
 
-const newPlaybackInfo = (
+type AssetInfo = {
+  playbackUrl: string;
+  playbackPolicy?: Asset["playbackPolicy"];
+  files?: Asset["files"];
+  staticPlaybackUrl?: string;
+};
+
+function newPlaybackInfo(
   type: PlaybackInfo["type"],
   hlsUrl: string,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
+  staticFilesPlaybackUrls?: string[],
   live?: PlaybackInfo["meta"]["live"]
-): PlaybackInfo => ({
-  type,
-  meta: {
-    live,
-    playbackPolicy,
-    source: [
-      {
-        hrn: "HLS (TS)",
-        type: "html5/application/vnd.apple.mpegurl",
-        url: hlsUrl,
-      },
-    ],
-  },
-});
+): PlaybackInfo {
+  let playbackInfo: PlaybackInfo = {
+    type,
+    meta: {
+      live,
+      playbackPolicy,
+      source: [
+        {
+          hrn: "HLS (TS)",
+          type: "html5/application/vnd.apple.mpegurl",
+          url: hlsUrl,
+        },
+      ],
+    },
+  };
+  if (staticFilesPlaybackUrls && staticFilesPlaybackUrls.length > 0) {
+    for (let staticUrl of staticFilesPlaybackUrls) {
+      const rendition = staticUrl.split("/").pop().replace(".mp4", "");
+      playbackInfo.meta.source.push({
+        hrn: "MP4",
+        type: "html5/video/mp4",
+        url: staticUrl,
+        rendition,
+      });
+    }
+  }
 
+  return playbackInfo;
+}
 const getAssetPlaybackUrl = async (
   config: Request["config"],
   ingest: string,
@@ -64,6 +90,7 @@ const getAssetPlaybackUrl = async (
     return null;
   }
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
+  const staticFilesPlaybackUrls = staticPlaybackUrls(config, asset, os);
   const inExperiment = await isExperimentSubject(
     "lit-signing-condition",
     asset.userId
@@ -73,6 +100,7 @@ const getAssetPlaybackUrl = async (
     : {
         playbackUrl,
         playbackPolicy: inExperiment ? asset.playbackPolicy : null,
+        staticFilesPlaybackUrls,
       };
 };
 
@@ -100,12 +128,18 @@ async function getPlaybackInfo(
       "live",
       streamPlaybackUrl(ingest, stream),
       stream.playbackPolicy,
+      null,
       stream.isActive ? 1 : 0
     );
   }
   const asset = await getAssetPlaybackUrl(config, ingest, id);
   if (asset) {
-    return newPlaybackInfo("vod", asset.playbackUrl, asset.playbackPolicy);
+    return newPlaybackInfo(
+      "vod",
+      asset.playbackUrl,
+      asset.playbackPolicy,
+      asset.staticFilesPlaybackUrls
+    );
   }
 
   const recordingUrl =
