@@ -176,7 +176,7 @@ export function getStaticPlaybackUrls(
 ): string[] {
   let files = asset.files;
   if (files) {
-    files = files.filter((f) => f.type === "static_file");
+    files = files.filter((f) => f.type === "static_transcoded_mp4");
   } else {
     return [];
   }
