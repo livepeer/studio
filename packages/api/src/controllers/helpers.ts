@@ -136,6 +136,12 @@ export interface ObjectStoreStorage {
   };
 }
 
+export interface Web3StoreStorage {
+  credentials: {
+    proof: string;
+  };
+}
+
 export function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
   if (task?.type !== "transcode-file") {
     return task;
@@ -147,6 +153,16 @@ export function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
     task.params["transcode-file"].storage.url
   );
   return task;
+}
+
+export function toWeb3StorageUrl(
+  storage: Web3StoreStorage,
+  path: string
+): string {
+  if (!storage.credentials || !storage.credentials.proof) {
+    throw new Error("undefined property 'credentials'");
+  }
+  return `w3s://${storage.credentials.proof}@/${path}`;
 }
 
 export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
