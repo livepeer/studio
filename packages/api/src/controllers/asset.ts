@@ -170,19 +170,13 @@ async function getActiveObjectStore(id: string) {
 }
 
 export function getStaticPlaybackUrls(
-  { vodCatalystObjectStoreId }: Request["config"],
+  {}: Request["config"],
   asset: WithID<Asset>,
   os: ObjectStore
 ): string[] {
-  let files = asset.files;
-  if (files) {
-    files = files.filter((f) => f.type === "static_transcoded_mp4");
-  } else {
-    return [];
-  }
-  return files?.map((f) => {
-    return pathJoin(os.publicUrl, asset.playbackId, f.path);
-  });
+  return (asset.files ?? [])
+    .filter((f) => f.type === "static_transcoded_mp4")
+    .map((f) => pathJoin(os.publicUrl, asset.playbackId, f.path));
 }
 
 export function getPlaybackUrl(
