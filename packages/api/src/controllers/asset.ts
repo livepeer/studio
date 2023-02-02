@@ -181,9 +181,6 @@ export function getStaticPlaybackUrls(
     return [];
   }
   return files?.map((f) => {
-    if (os.id !== vodCatalystObjectStoreId) {
-      return pathJoin(os.publicUrl, asset.playbackId, f.path);
-    }
     return pathJoin(os.publicUrl, asset.playbackId, f.path);
   });
 }
