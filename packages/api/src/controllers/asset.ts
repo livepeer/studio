@@ -599,6 +599,9 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
       errors: [`Must provide a "url" field for the asset contents`],
     });
   }
+  if (encryption) {
+    await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+  }
 
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
@@ -735,6 +738,10 @@ app.post(
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     const { encryption } = req.body as NewAssetPayload;
+    if (encryption) {
+      await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+    }
+
     let asset = await validateAssetPayload(
       id,
       playbackId,
