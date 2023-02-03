@@ -6,7 +6,8 @@ import {
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
-  getStaticPlaybackUrls as staticPlaybackUrls,
+  getStaticPlaybackInfo,
+  StaticPlaybackInfo,
 } from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
@@ -25,23 +26,16 @@ type PlaybackInfo = {
       hrn: "HLS (TS)" | "MP4";
       type: "html5/application/vnd.apple.mpegurl" | "html5/video/mp4";
       url: string;
-      rendition?: string;
+      size?: number;
     }[];
   };
-};
-
-type AssetInfo = {
-  playbackUrl: string;
-  playbackPolicy?: Asset["playbackPolicy"];
-  files?: Asset["files"];
-  staticPlaybackUrl?: string;
 };
 
 function newPlaybackInfo(
   type: PlaybackInfo["type"],
   hlsUrl: string,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
-  staticFilesPlaybackUrls?: string[],
+  staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   live?: PlaybackInfo["meta"]["live"]
 ): PlaybackInfo {
   let playbackInfo: PlaybackInfo = {
@@ -58,14 +52,13 @@ function newPlaybackInfo(
       ],
     },
   };
-  if (staticFilesPlaybackUrls && staticFilesPlaybackUrls.length > 0) {
-    for (let staticUrl of staticFilesPlaybackUrls) {
-      const rendition = staticUrl.split("/").pop().replace(".mp4", "");
+  if (staticFilesPlaybackInfo && staticFilesPlaybackInfo.length > 0) {
+    for (let staticFile of staticFilesPlaybackInfo) {
       playbackInfo.meta.source.push({
         hrn: "MP4",
         type: "html5/video/mp4",
-        url: staticUrl,
-        rendition,
+        url: staticFile.playbackUrl,
+        size: staticFile.size,
       });
     }
   }
@@ -90,7 +83,7 @@ const getAssetPlaybackUrl = async (
     return null;
   }
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
-  const staticFilesPlaybackUrls = staticPlaybackUrls(config, asset, os);
+  const staticFilesPlaybackInfo = getStaticPlaybackInfo(config, asset, os);
   const inExperiment = await isExperimentSubject(
     "lit-signing-condition",
     asset.userId
@@ -100,7 +93,7 @@ const getAssetPlaybackUrl = async (
     : {
         playbackUrl,
         playbackPolicy: inExperiment ? asset.playbackPolicy : null,
-        staticFilesPlaybackUrls,
+        staticFilesPlaybackInfo,
       };
 };
 
@@ -138,7 +131,7 @@ async function getPlaybackInfo(
       "vod",
       asset.playbackUrl,
       asset.playbackPolicy,
-      asset.staticFilesPlaybackUrls
+      asset.staticFilesPlaybackInfo
     );
   }
 

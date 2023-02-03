@@ -169,14 +169,22 @@ async function getActiveObjectStore(id: string) {
   return os;
 }
 
-export function getStaticPlaybackUrls(
+export type StaticPlaybackInfo = {
+  playbackUrl: string;
+  size: number;
+};
+
+export function getStaticPlaybackInfo(
   {}: Request["config"],
   asset: WithID<Asset>,
   os: ObjectStore
-): string[] {
+): StaticPlaybackInfo[] {
   return (asset.files ?? [])
     .filter((f) => f.type === "static_transcoded_mp4")
-    .map((f) => pathJoin(os.publicUrl, asset.playbackId, f.path));
+    .map((f) => ({
+      playbackUrl: pathJoin(os.publicUrl, asset.playbackId, f.path),
+      size: asset.size,
+    }));
 }
 
 export function getPlaybackUrl(
