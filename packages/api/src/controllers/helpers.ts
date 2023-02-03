@@ -155,14 +155,11 @@ export function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
   return task;
 }
 
-export function toWeb3StorageUrl(
-  storage: Web3StoreStorage,
-  path: string
-): string {
+export function toWeb3StorageUrl(storage: Web3StoreStorage): string {
   if (!storage.credentials || !storage.credentials.proof) {
     throw new Error("undefined property 'credentials'");
   }
-  return `w3s://${storage.credentials.proof}@/${path}`;
+  return `w3s://${storage.credentials.proof}@/`;
 }
 
 export function toObjectStoreUrl(storage: ObjectStoreStorage): string {

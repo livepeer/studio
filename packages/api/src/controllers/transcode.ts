@@ -31,7 +31,7 @@ app.post(
     }
     const storageUrl =
       params.storage.type === "web3.storage"
-        ? toWeb3StorageUrl(params.storage, params.outputs.hls.path)
+        ? toWeb3StorageUrl(params.storage)
         : toObjectStoreUrl(params.storage);
 
     const task = await req.taskScheduler.scheduleTask(
