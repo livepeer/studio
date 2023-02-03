@@ -11,7 +11,7 @@ import {
   toStringValues,
   FieldsMap,
   reqUseReplica,
-  taskWithoutCredentials,
+  deleteCredentials,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -69,6 +69,19 @@ function taskWithIpfsUrls(
   });
 }
 
+function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
+  if (task?.type !== "transcode-file") {
+    return task;
+  }
+  task.params["transcode-file"].input.url = deleteCredentials(
+    task.params["transcode-file"].input.url
+  );
+  task.params["transcode-file"].storage.url = deleteCredentials(
+    task.params["transcode-file"].storage.url
+  );
+  return task;
+}
+
 const fieldsMap: FieldsMap = {
   id: `task.ID`,
   name: { val: `task.data->>'name'`, type: "full-text" },
@@ -81,14 +94,14 @@ const fieldsMap: FieldsMap = {
   outputAssetId: `task.data->>'outputAssetId'`,
 };
 
-app.use(
+export const cleanTaskResponses = () =>
   mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
     const toExternalTask = async (t: WithID<Task>) => {
+      t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
       if (req.user.admin) {
         return t;
       }
       t = taskWithoutCredentials(t);
-      t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
       return db.task.cleanWriteOnlyResponse(t);
     };
 
@@ -99,8 +112,9 @@ app.use(
       return toExternalTask(data as WithID<Task>);
     }
     return data;
-  })
-);
+  });
+
+app.use(cleanTaskResponses());
 
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
