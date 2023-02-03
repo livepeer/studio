@@ -1126,12 +1126,16 @@ components:
                   type: string
                   index: true
                   description: URL from which the asset was uploaded
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required: [type]
               properties:
                 type:
                   type: string
                   enum: [directUpload]
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required: [type, sessionId]
               properties:
@@ -1427,6 +1431,24 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+        encryption:
+          type: object
+          required: [key]
+          properties:
+            key:
+              type: string
+              writeOnly: true
+              description:
+                Encryption key used to encrypt the asset encoded in base16. Only
+                writable in the upload asset endpoints and cannot be retrieved
+                back.
+              example: 9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
+            algorithm:
+              type: string
+              description:
+                Encryption algorithm used to encrypt the asset, defaults to
+                AES-256 CBC mode.
+              default: aes-256-cbc
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
@@ -1670,6 +1692,8 @@ components:
                   type: string
                   description: URL of the asset to "upload"
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
                 recordedSessionId:
                   type: string
                   description:
