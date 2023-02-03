@@ -86,7 +86,7 @@ async function validateAssetPayload(
   createdAt: number,
   defaultObjectStoreId: string,
   payload: NewAssetPayload,
-  source?: Asset["source"]
+  source: Asset["source"]
 ): Promise<WithID<Asset>> {
   if (payload.objectStoreId) {
     const os = await getActiveObjectStore(payload.objectStoreId);
@@ -115,11 +115,7 @@ async function validateAssetPayload(
       updatedAt: createdAt,
     },
     name: payload.name,
-    source:
-      source ??
-      (payload.url
-        ? { type: "url", url: payload.url }
-        : { type: "directUpload" }),
+    source,
     playbackPolicy: payload.playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
@@ -597,7 +593,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url } = req.body as NewAssetPayload;
+  let { url, encryption } = req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -612,7 +608,8 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req),
-    req.body
+    req.body,
+    { type: "url", url, encryption }
   );
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
   if (dupAsset) {
@@ -637,6 +634,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
       upload: {
         url,
         catalystPipelineStrategy: catalystPipelineStrategy(req),
+        encryption,
       },
     },
     undefined,
@@ -736,13 +734,15 @@ app.post(
     let playbackId = await generateUniquePlaybackId(id);
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
+    const { encryption } = req.body as NewAssetPayload;
     let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
       defaultObjectStoreId(req),
-      { name: `asset-upload-${id}`, ...req.body }
+      req.body,
+      { type: "directUpload", encryption }
     );
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
@@ -774,6 +774,7 @@ app.post(
         upload: {
           url: downloadUrl,
           catalystPipelineStrategy: catalystPipelineStrategy(req),
+          encryption,
         },
       },
       null,

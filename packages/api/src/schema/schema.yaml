@@ -1433,6 +1433,7 @@ components:
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
         encryption:
           type: object
+          additionalProperties: false
           required: [key]
           properties:
             key:
