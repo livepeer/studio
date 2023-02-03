@@ -1543,8 +1543,6 @@ components:
               additionalProperties: false
               required:
                 - type
-                - endpoint
-                - bucket
                 - credentials
               description: Storage for the output files
               properties:
