@@ -1065,6 +1065,10 @@ components:
                   Path to the file in the asset subfolder in the object store.
                   This means that all these paths are relative to a folder in
                   the OS the asset playback ID as the name.
+              size:
+                type: number
+                example: 123456
+                description: Size of the file in bytes.
         playbackUrl:
           type: string
           readOnly: true
