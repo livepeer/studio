@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
-import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import Table, {
+  DefaultSortBy,
+  Fetcher,
+  sortByToString,
+  useTableState,
+} from "components/Dashboard/Table";
 import { useSnackbar } from "@livepeer/design-system";
 import {
   filterItems,
@@ -14,6 +19,7 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId } = useApi();
   const { state, stateSetter } = useTableState<StreamSessionsTableData>({
     tableId: "allSessionsTable",
+    initialOrder: sortByToString(DefaultSortBy),
   });
   const [openSnackbar] = useSnackbar();
   const columns = useMemo(makeColumns, []);
@@ -36,7 +42,7 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       stateSetter={stateSetter}
       columns={columns}
       fetcher={fetcher}
-      initialSortBy={[{ id: "createdAt", desc: true }]}
+      initialSortBy={[DefaultSortBy]}
       showOverflow={true}
       filterItems={filterItems}
       emptyState={makeEmptyState()}

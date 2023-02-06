@@ -11,12 +11,10 @@ import {
   parseFilters,
   parseOrder,
   getS3PresignedUrl,
-  FieldsMap,
   toStringValues,
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
-  toObjectStoreUrl,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -39,48 +37,32 @@ import {
   NewAssetPayload,
   ObjectStore,
   Task,
-  TranscodePayload,
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
 import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
-import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
+import { ensureExperimentSubject } from "../store/experiment-table";
 
 const app = Router();
 
-function shouldUseCatalyst({ query, user, config }: Request) {
-  const { vodCatalystPipelineRolloutPercent: rollPct } = config;
-  const { email = "", admin } = user ?? {};
-  const { upload } = toStringValues(query);
-
-  if (email.startsWith("sas")) {
-    // Special case for initial rollout
-    return true;
+function catalystPipelineStrategy(req: Request) {
+  let { catalystPipelineStrategy } = req.body as NewAssetPayload;
+  if (!req.user.admin && !req.user.isTestUser) {
+    catalystPipelineStrategy = undefined;
   }
-  if (email.endsWith("+e2e@livepeer.org") && rollPct < 100) {
-    // force e2e tests to see 50% of each
-    return 100 * Math.random() < 50;
-  } else if (admin && upload) {
-    // admin users can control what they see
-    return upload === "1";
-  } else if (
-    email.endsWith("@livepeer.org") &&
-    email !== "livepeerjs@livepeer.org"
-  ) {
-    // livepeer users only see catalyst
-    return true;
-  }
-  // everyone else will see as much as we decide to rollout the catalyst pipeline
-  return 100 * Math.random() < rollPct;
+  return catalystPipelineStrategy;
 }
 
 function defaultObjectStoreId(
-  { config }: Request,
-  useCatalyst: boolean
+  { config, body }: Request,
+  isOldPipeline?: boolean
 ): string {
-  if (!useCatalyst) {
+  if (isOldPipeline) {
     return config.vodObjectStoreId;
+  }
+  if (body.playbackPolicy?.type === "lit_signing_condition") {
+    return config.vodCatalystPrivateAssetsObjectStoreId;
   }
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
 }
@@ -115,6 +97,14 @@ async function validateAssetPayload(
     }
   }
 
+  // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
+  payload.playbackPolicy = await validateAssetPlaybackPolicy(
+    payload,
+    playbackId,
+    userId,
+    createdAt
+  );
+
   return {
     id,
     playbackId,
@@ -133,6 +123,42 @@ async function validateAssetPayload(
     playbackPolicy: payload.playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
+}
+
+async function validateAssetPlaybackPolicy(
+  { playbackPolicy, objectStoreId }: Partial<NewAssetPayload>,
+  playbackId: string,
+  userId: string,
+  createdAt: number
+) {
+  if (playbackPolicy?.type === "lit_signing_condition") {
+    await ensureExperimentSubject("lit-signing-condition", userId);
+
+    if (objectStoreId) {
+      throw new ForbiddenError(`lit-gated assets cant use custom object store`);
+    }
+
+    if (!playbackPolicy.unifiedAccessControlConditions) {
+      throw new UnprocessableEntityError(
+        `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`
+      );
+    }
+    if (!playbackPolicy?.resourceId) {
+      playbackPolicy.resourceId = {
+        baseUrl: "playback.livepeer.studio",
+        path: `/gate/${playbackId}`,
+        orgId: "livepeer",
+        role: "",
+        extraData: `createdAt=${createdAt}`,
+      };
+    }
+  }
+  if (playbackPolicy?.type == "jwt") {
+    throw new BadRequestError(
+      `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
+    );
+  }
+  return playbackPolicy;
 }
 
 async function getActiveObjectStore(id: string) {
@@ -191,7 +217,7 @@ function getDownloadUrl(
   return pathJoin(base, asset.playbackId, "video");
 }
 
-async function withPlaybackUrls(
+export async function withPlaybackUrls(
   { config }: Request,
   ingest: string,
   asset: WithID<Asset>,
@@ -381,7 +407,7 @@ app.use(
   })
 );
 
-const fieldsMap: FieldsMap = {
+const fieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
@@ -394,12 +420,16 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
-};
+  sourceUrl: `asset.data->'source'->>'url'`,
+} as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, ...otherQs } =
+  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
-  const fieldFilters = _.pick(otherQs, "playbackId", "cid", "nftMetadataCid");
+  const fieldFilters = _(otherQs)
+    .pick("playbackId", "sourceUrl", "phase")
+    .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
+    .value();
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -409,11 +439,16 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = [
     ...parseFilters(fieldsMap, filters),
-    ...parseFilters(
-      fieldsMap,
-      JSON.stringify(_.map(fieldFilters, (v, k) => ({ id: k, value: v })))
-    ),
+    ...parseFilters(fieldsMap, JSON.stringify(fieldFilters)),
   ];
+
+  if (cid) {
+    const ipfsUrl = `ipfs://${cid}`;
+    query.push(
+      sql`(asset.data->'storage'->'ipfs'->>'cid' = ${cid} OR asset.data->'source'->>'url' = ${ipfsUrl})`
+    );
+  }
+
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
@@ -538,10 +573,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, catalystPipelineStrategy } = req.body as NewAssetPayload;
-  if (!req.user.admin && !req.user.isTestUser) {
-    catalystPipelineStrategy = undefined;
-  }
+  let { url } = req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -550,13 +582,12 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
-  const useCatalyst = shouldUseCatalyst(req);
   const newAsset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
     Date.now(),
-    defaultObjectStoreId(req, useCatalyst),
+    defaultObjectStoreId(req),
     req.body
   );
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
@@ -576,11 +607,13 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
 
   const asset = await createAsset(newAsset, req.queue);
-  const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
-    taskType,
+    "upload",
     {
-      [taskType]: { url, catalystPipelineStrategy },
+      upload: {
+        url,
+        catalystPipelineStrategy: catalystPipelineStrategy(req),
+      },
     },
     undefined,
     asset
@@ -632,7 +665,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     playbackId,
     req.user.id,
     Date.now(),
-    defaultObjectStoreId(req, false), // transcode only in old pipeline for now
+    defaultObjectStoreId(req, true), // transcode only in old pipeline for now
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -641,7 +674,6 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
 
   await ensureQueueCapacity(req.config, req.user.id);
-
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -679,19 +711,15 @@ app.post(
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(id);
 
-    const useCatalyst = shouldUseCatalyst(req);
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
-      defaultObjectStoreId(req, useCatalyst),
+      defaultObjectStoreId(req),
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const { catalystPipelineStrategy = undefined } = req.user.admin
-      ? (req.body as NewAssetPayload)
-      : {};
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
@@ -714,14 +742,15 @@ app.post(
     // as direct uploads will also need a lot of effort from callers to upload
     // the files, so the risk is much smaller.
     await ensureQueueCapacity(req.config, req.user.id);
-
     asset = await createAsset(asset, req.queue);
 
-    const taskType = shouldUseCatalyst(req) ? "upload" : "import";
     const task = await req.taskScheduler.spawnTask(
-      taskType,
+      "upload",
       {
-        [taskType]: { url: downloadUrl, catalystPipelineStrategy },
+        upload: {
+          url: downloadUrl,
+          catalystPipelineStrategy: catalystPipelineStrategy(req),
+        },
       },
       null,
       asset
@@ -930,6 +959,28 @@ app.patch(
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
+
+    if (
+      playbackPolicy &&
+      asset.playbackPolicy?.type === "lit_signing_condition"
+    ) {
+      const sameResourceId = _.isEqual(
+        playbackPolicy.resourceId,
+        asset.playbackPolicy.resourceId
+      );
+      if (playbackPolicy.type !== "lit_signing_condition" || !sameResourceId) {
+        throw new UnprocessableEntityError(
+          `cannot update playback policy from lit_signing_condition nor change the resource ID`
+        );
+      }
+    }
+
+    playbackPolicy = await validateAssetPlaybackPolicy(
+      { playbackPolicy },
+      asset.playbackId,
+      asset.userId,
+      asset.createdAt
+    );
 
     await req.taskScheduler.updateAsset(asset, {
       name,

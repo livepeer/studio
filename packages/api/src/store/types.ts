@@ -1,5 +1,8 @@
 export interface FieldSpec {
   [key: string]: any;
+  index?: boolean;
+  indexType?: string; // "btree" | "gin", defaults to "btree"
+  unique?: boolean;
   writeOnly?: boolean;
   oneOf?: FieldSpec[];
   properties?: Record<string, FieldSpec>;

@@ -5,6 +5,7 @@ import {
   toObjectStoreUrl,
   ObjectStoreStorage,
   taskWithoutCredentials,
+  toWeb3StorageUrl,
 } from "./helpers";
 import { ensureQueueCapacity } from "../task/scheduler";
 
@@ -28,7 +29,10 @@ app.post(
         toObjectStoreUrl(params.input as ObjectStoreStorage) +
         params.input["path"];
     }
-    const storageUrl = toObjectStoreUrl(params.storage);
+    const storageUrl =
+      params.storage.type === "web3.storage"
+        ? toWeb3StorageUrl(params.storage)
+        : toObjectStoreUrl(params.storage);
 
     const task = await req.taskScheduler.scheduleTask(
       "transcode-file",
@@ -41,6 +45,7 @@ app.post(
             url: storageUrl,
           },
           outputs: params.outputs,
+          profiles: params.profiles,
           catalystPipelineStrategy,
         },
       },

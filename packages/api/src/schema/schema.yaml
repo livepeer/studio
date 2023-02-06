@@ -199,6 +199,8 @@ components:
           $ref: "#/components/schemas/webhook/properties/events/items"
         events:
           type: array
+          index: true
+          indexType: gin
           items:
             type: string
             enum:
@@ -761,6 +763,23 @@ components:
           type: string
           description: Base64 of Public key used for JWT verification
 
+    experiment-audience-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        addUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be added to the experiment
+        removeUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be removed from the experiment
+
     playback-policy:
       type: object
       description:
@@ -770,7 +789,31 @@ components:
       properties:
         type:
           type: string
-          enum: [public, jwt]
+          enum:
+            - public
+            - jwt
+            - lit_signing_condition # only for lit-signing-condition experiment
+        unifiedAccessControlConditions:
+          type: array
+          description: LIT Unified Access Control Conditions
+          items:
+            type: object
+        resourceId:
+          type: object
+          description: LIT Resource ID
+          additionalProperties: false
+          required: [baseUrl, path, orgId, role, extraData]
+          properties:
+            baseUrl:
+              type: string
+            path:
+              type: string
+            orgId:
+              type: string
+            role:
+              type: string
+            extraData:
+              type: string
 
     session:
       type: object
@@ -1455,46 +1498,72 @@ components:
                       description: Secret Access Key
                       example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
         storage:
-          type: object
-          additionalProperties: false
-          required:
-            - type
-            - endpoint
-            - bucket
-            - credentials
-          description: Storage for the output files
-          properties:
-            type:
-              type: string
-              enum:
-                - s3
-              description: Type of service used for output files
-            endpoint:
-              type: string
-              format: uri
-              pattern: ^http(s)?://
-              description: Service endpoint URL
-              example: https://gateway.storjshare.io
-            bucket:
-              type: string
-              description: Bucket with output files
-              example: outputbucket
-            credentials:
-              type: object
+          oneOf:
+            - type: object
               additionalProperties: false
               required:
-                - accessKeyId
-                - secretAccessKey
-              description: Credentials for the output video storage
+                - type
+                - endpoint
+                - bucket
+                - credentials
+              description: Storage for the output files
               properties:
-                accessKeyId:
+                type:
                   type: string
-                  description: Access Key ID
-                  example: AKIAIOSFODNN7EXAMPLE
-                secretAccessKey:
+                  enum:
+                    - s3
+                  description: Type of service used for output files
+                endpoint:
                   type: string
-                  description: Secret Access Key
-                  example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+                  format: uri
+                  pattern: ^http(s)?://
+                  description: Service endpoint URL
+                  example: https://gateway.storjshare.io
+                bucket:
+                  type: string
+                  description: Bucket with output files
+                  example: outputbucket
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - accessKeyId
+                    - secretAccessKey
+                  description: Credentials for the output video storage
+                  properties:
+                    accessKeyId:
+                      type: string
+                      description: Access Key ID
+                      example: AKIAIOSFODNN7EXAMPLE
+                    secretAccessKey:
+                      type: string
+                      description: Secret Access Key
+                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+            - type: object
+              additionalProperties: false
+              required:
+                - type
+                - credentials
+              description: Storage for the output files
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - web3.storage
+                  description: Type of service used for output files
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - proof
+                  description:
+                    Delegation proof for Livepeer to be able to upload to
+                    web3.storage
+                  properties:
+                    proof:
+                      type: string
+                      description: Base64 encoded UCAN delegation proof
+                      example: EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
         outputs:
           type: object
           additionalProperties: false
@@ -1513,6 +1582,10 @@ components:
                   type: string
                   description: Path for the HLS output
                   example: /samplevideo/hls
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
@@ -1649,6 +1722,10 @@ components:
                           type: string
                           description: Path for the HLS output
                           example: /samplevideo/hls
+                profiles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ffmpeg-profile"
                 catalystPipelineStrategy:
                   type: string
                   description:
@@ -2309,6 +2386,51 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
+
+    experiment:
+      type: object
+      table: experiment
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          index: true
+          unique: true
+          description: Name that identifies the experiment. Must be unique
+        userId:
+          type: string
+          index: true
+          description:
+            User ID of the creator of the experiment. Only used for auditing as
+            experiment APIs is only accessible to admins, which can all
+            experiments anyway.
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the experiment was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which experiment was updated
+          example: 1587667174725
+        audienceUserIds:
+          type: array
+          index: true
+          indexType: gin
+          description: List of user IDs in the experiment
+          items:
+            type: string
+        audienceUsers:
+          type: array
+          description: User objects of users in the experiment for convenience
+          readonly: true
+          items:
+            $ref: "#/components/schemas/user"
+
     usage:
       type: object
       table: usage

@@ -1,6 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
-import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import Table, {
+  DefaultSortBy,
+  Fetcher,
+  sortByToString,
+  useTableState,
+} from "components/Dashboard/Table";
 import CreateDialog from "./CreateDialog";
 import { useToggleState } from "hooks/use-toggle-state";
 import {
@@ -22,6 +27,7 @@ const ApiKeysTable = ({
   const { getApiTokens, deleteApiToken } = useApi();
   const { state, stateSetter } = useTableState<ApiKeysTableData>({
     tableId: "tokenTable",
+    initialOrder: sortByToString(DefaultSortBy),
   });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
@@ -41,6 +47,7 @@ const ApiKeysTable = ({
         columns={columns}
         fetcher={fetcher}
         rowSelection="all"
+        initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(

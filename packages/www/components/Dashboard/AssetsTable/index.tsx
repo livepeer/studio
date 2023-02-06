@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "hooks";
-import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
+import Table, {
+  useTableState,
+  Fetcher,
+  sortByToString,
+  DefaultSortBy,
+} from "components/Dashboard/Table";
 import { useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
@@ -35,6 +40,7 @@ const AssetsTable = ({
   const { state, stateSetter } = useTableState<AssetsTableData>({
     pageSize,
     tableId,
+    initialOrder: sortByToString(DefaultSortBy),
   });
   const columns = useMemo(makeColumns, []);
 
@@ -80,7 +86,7 @@ const AssetsTable = ({
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}
         viewAll={viewAll}
-        initialSortBy={[{ id: "createdAt", desc: true }]}
+        initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         createAction={makeCreateAction("Upload asset", createDialogState.onOn)}
       />

@@ -1,6 +1,6 @@
 import Script from "next/script";
 
-const gtmID = "GTM-PN27VN7";
+const gtmID = "GTM-PCZ4PWD";
 
 const GoogleTagManager = () => (
   <>

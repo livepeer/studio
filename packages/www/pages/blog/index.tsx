@@ -23,7 +23,7 @@ const BlogIndex = ({ categories, posts }) => {
   if (router.isFallback) {
     return (
       <Layout>
-        <Box>Loading...</Box>
+        <Box>Loading....</Box>
       </Layout>
     );
   }
@@ -183,7 +183,7 @@ const BlogIndex = ({ categories, posts }) => {
 export async function getStaticProps() {
   // const client = getClient();
 
-  const postsQuery = `*[_type=="post"]{
+  const postsQuery = `*[_type=="post" && defined(hide) && hide ==false ]{
     ...,
     author->{...},
     category->{...},

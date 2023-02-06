@@ -7,7 +7,9 @@ import {
   Stream,
   StreamPatchPayload,
   User,
+  StreamSetActivePayload,
 } from "../schema/types";
+import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import {
@@ -97,6 +99,8 @@ describe("controllers/stream", () => {
   let nonAdminApiKey: string;
 
   beforeEach(async () => {
+    await server.store.create(mockStore);
+
     ({
       client,
       adminUser,
@@ -192,6 +196,8 @@ describe("controllers/stream", () => {
     });
 
     it("should reject streams with object stores that do not exist", async () => {
+      await db.objectStore.delete(mockStore.id);
+
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(400);
     });
@@ -200,7 +206,6 @@ describe("controllers/stream", () => {
       let msTarget: MultistreamTarget;
 
       beforeEach(async () => {
-        await server.store.create(mockStore);
         msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
@@ -382,7 +387,6 @@ describe("controllers/stream", () => {
       let msTarget: MultistreamTarget;
 
       beforeEach(async () => {
-        await server.store.create(mockStore);
         msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
@@ -460,7 +464,6 @@ describe("controllers/stream", () => {
     });
 
     it("should create a stream, delete it, and error when attempting additional detele or replace", async () => {
-      await server.store.create(mockStore);
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
@@ -488,13 +491,132 @@ describe("controllers/stream", () => {
       }
     });
 
+    describe("set active", () => {
+      const callSetActive = async (
+        streamId: string,
+        payload: StreamSetActivePayload
+      ) => {
+        const res = await client.put(`/stream/${streamId}/setactive`, payload);
+        expect(res.status).toBe(204);
+        return server.db.stream.get(streamId);
+      };
+
+      const createAndActivateStream = async (startedAt?: number) => {
+        let res = await client.post("/stream", { ...postMockStream });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBeDefined();
+        expect(!!stream.active).toBe(false);
+
+        return callSetActive(stream.id, {
+          active: true,
+          startedAt: startedAt || Date.now(),
+          hostName: "jest-test-runner",
+        });
+      };
+
+      const expectError = async (streamId: string, msg: string) => {
+        const res = await client.put(`/stream/${streamId}/setactive`, {
+          active: true,
+        });
+        expect(res.status).toBe(403);
+        const response = await res.json();
+        expect(response).toMatchObject({
+          errors: [expect.stringContaining(msg)],
+        });
+      };
+
+      it("should be admin only", async () => {
+        client.jwtAuth = nonAdminToken;
+        await expectError("1234", "not have admin");
+      });
+
+      it("should disallow setting suspended streams or users", async () => {
+        client.jwtAuth = nonAdminToken;
+        let res = await client.post("/stream", {
+          ...postMockStream,
+          suspended: true,
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        client.jwtAuth = adminToken;
+
+        await expectError(stream.id, "stream is suspended");
+
+        await db.stream.update(stream.id, { suspended: false });
+        await db.user.update(stream.userId, { suspended: true });
+
+        await expectError(stream.id, "user is suspended");
+
+        await db.user.update(stream.userId, { suspended: false });
+
+        // make sure everything works if neither suspended
+        await callSetActive(stream.id, { active: true });
+      });
+
+      it("should set stream's active field", async () => {
+        const startedAt = Date.now();
+        const updatedStream = await createAndActivateStream(startedAt);
+
+        expect(updatedStream.isActive).toBe(true);
+        expect(updatedStream.lastSeen).toBeGreaterThan(startedAt);
+        expect(updatedStream.mistHost).toBe("jest-test-runner");
+      });
+
+      it("should disallow turning off active from other host", async () => {
+        const stream = await createAndActivateStream();
+
+        const setActivePayload = {
+          active: false,
+          startedAt: Date.now(),
+          hostName: "other-host",
+        };
+        const updatedStream = await callSetActive(stream.id, setActivePayload);
+
+        expect(updatedStream.isActive).toBe(true);
+        expect(updatedStream.lastSeen).toBeLessThan(setActivePayload.startedAt);
+        expect(updatedStream.mistHost).not.toEqual(setActivePayload.hostName);
+      });
+
+      it("should bump the last seen value", async () => {
+        const stream = await createAndActivateStream();
+        const timeBeforeBump = Date.now();
+        expect(stream.lastSeen).toBeLessThan(timeBeforeBump);
+
+        const setActivePayload = {
+          active: true,
+          startedAt: stream.lastSeen,
+          hostName: stream.mistHost,
+        };
+        const updatedStream = await callSetActive(stream.id, setActivePayload);
+
+        expect(updatedStream.isActive).toBe(true);
+        expect(updatedStream.lastSeen).toBeGreaterThan(timeBeforeBump);
+        expect(updatedStream.mistHost).toEqual(setActivePayload.hostName);
+      });
+
+      it("should allos changing the mist host as well", async () => {
+        const stream = await createAndActivateStream();
+
+        const setActivePayload = {
+          active: true,
+          startedAt: Date.now(),
+          hostName: "other-host",
+        };
+        const updatedStream = await callSetActive(stream.id, setActivePayload);
+
+        expect(updatedStream.isActive).toBe(true);
+        expect(updatedStream.lastSeen).toBeGreaterThan(stream.lastSeen);
+        expect(updatedStream.mistHost).toEqual(setActivePayload.hostName);
+      });
+    });
+
     describe("stream patch", () => {
       let msTarget: MultistreamTarget;
       let stream: Stream;
       let patchPath: string;
 
       beforeEach(async () => {
-        await server.store.create(mockStore);
         msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
@@ -526,7 +648,14 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(204);
       });
-
+      it("should disallow lit playbackPolicy on streams", async () => {
+        const res = await client.patch(patchPath, {
+          playbackPolicy: {
+            type: "lit_signing_condition",
+          },
+        });
+        expect(res.status).toBe(400);
+      });
       it("should disallow additional fields", async () => {
         const res = await client.patch(patchPath, {
           name: "the stream name is immutable",
@@ -753,7 +882,6 @@ describe("controllers/stream", () => {
     let res;
 
     beforeEach(async () => {
-      await server.store.create(mockStore);
       stream = {
         id: uuid(),
         kind: "stream",
@@ -997,7 +1125,6 @@ describe("controllers/stream", () => {
     beforeEach(async () => {
       client.jwtAuth = nonAdminToken;
 
-      await server.store.create(mockStore);
       stream = {
         kind: "stream",
         name: "test stream",
@@ -1128,7 +1255,6 @@ describe("controllers/stream", () => {
 
   describe("user sessions", () => {
     it("should join sessions", async () => {
-      await server.store.create(mockStore);
       // create parent stream
       let res = await client.post("/stream", smallStream);
       expect(res.status).toBe(201);

@@ -1,6 +1,7 @@
 import apiToken from "./api-token";
 import auth from "./auth";
 import broadcaster from "./broadcaster";
+import experiment from "./experiment";
 import ingest from "./ingest";
 import objectStore from "./object-store";
 import accessControl from "./access-control";
@@ -21,12 +22,14 @@ import region from "./region";
 import session from "./session";
 import cdnData from "./cdn-data";
 import playback from "./playback";
+import did from "./did";
 
 // Annoying but necessary to get the routing correct
 export default {
   "api-token": apiToken,
   auth,
   broadcaster,
+  experiment,
   "object-store": objectStore,
   multistream,
   orchestrator,
@@ -47,4 +50,5 @@ export default {
   session,
   "cdn-data": cdnData,
   playback,
+  did,
 };

@@ -103,7 +103,7 @@ export class RabbitQueue implements Queue {
     this.exchanges = getExchanges(tasksExchange);
   }
 
-  private init(url: string): Promise<void> {
+  private async init(url: string): Promise<void> {
     // Create a new connection manager
     this.connection = amqp.connect([url]);
     this.channel = this.connection.createChannel({
@@ -147,7 +147,7 @@ export class RabbitQueue implements Queue {
         await channel.prefetch(10);
       },
     });
-    return new Promise<void>((resolve, reject) => {
+    const connectPromise = new Promise<void>((resolve, reject) => {
       let resolveOnce = (err?: Error) => {
         if (!resolve) return;
         err ? reject(err) : resolve();
@@ -164,6 +164,7 @@ export class RabbitQueue implements Queue {
         );
       });
     });
+    await Promise.all([connectPromise, this.channel.waitForConnect()]);
   }
 
   public async close(): Promise<void> {
