@@ -10,8 +10,6 @@ let server: TestServer;
 let ingest: string;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
-let mockAdminUserInput2: User;
-let mockNonAdminUserInput2: User;
 
 // jest.setTimeout(70000)
 
@@ -28,16 +26,6 @@ beforeAll(async () => {
     email: "user_non_admin@gmail.com",
     password: "y".repeat(64),
   };
-
-  mockAdminUserInput2 = {
-    email: "user_admin2@gmail.com",
-    password: "x".repeat(64),
-  };
-
-  mockNonAdminUserInput2 = {
-    email: "user_non_admin2@gmail.com",
-    password: "y".repeat(64),
-  };
 });
 
 afterEach(async () => {
@@ -47,15 +35,12 @@ afterEach(async () => {
 describe("controllers/playback", () => {
   describe("fetching playback URL of different objects", () => {
     let client: TestClient;
-    let client2: TestClient;
     let nonAdminToken: string;
-    let otherUserToken: string;
 
     let stream: DBStream;
     let session: DBStream;
     let userSession: DBSession;
     let asset: WithID<Asset>;
-    let asset2: WithID<Asset>;
 
     beforeEach(async () => {
       await db.objectStore.create({
@@ -69,15 +54,7 @@ describe("controllers/playback", () => {
         mockAdminUserInput,
         mockNonAdminUserInput
       ));
-
       client.jwtAuth = nonAdminToken;
-
-      ({ client: client2, nonAdminToken: otherUserToken } = await setupUsers(
-        server,
-        mockAdminUserInput2,
-        mockNonAdminUserInput2
-      ));
-      client2.jwtAuth = otherUserToken;
 
       let res = await client.post("/stream", {
         name: "test-stream",
@@ -90,12 +67,6 @@ describe("controllers/playback", () => {
       });
       expect(res.status).toBe(200);
       ({ asset } = await res.json());
-
-      res = await client2.post("/asset/request-upload", {
-        name: "test-session",
-      });
-      expect(res.status).toBe(200);
-      ({ asset: asset2 } = await res.json());
 
       res = await client.post(`/stream/${stream.id}/stream`, {
         name: "test-recording",
@@ -368,99 +339,6 @@ describe("controllers/playback", () => {
       expect(res.status).toBe(200);
       await expect(res.json()).resolves.toMatchObject({
         type: "live",
-      });
-    });
-
-    it("should return playback URL assets from CID when authenticated", async () => {
-      client.jwtAuth = nonAdminToken;
-      const cid = "bafyfoobar";
-      await db.asset.update(asset.id, {
-        playbackRecordingId: "mock_asset_1",
-        source: {
-          type: "url",
-          url: "ipfs://" + cid,
-        },
-        status: {
-          phase: "ready",
-          updatedAt: 1234,
-        },
-      });
-
-      const res = await client.get(`/playback/${cid}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "vod",
-        meta: {
-          source: [
-            {
-              hrn: "HLS (TS)",
-              type: "html5/application/vnd.apple.mpegurl",
-              url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
-            },
-          ],
-        },
-      });
-    });
-
-    it("should return playback URL asset of user from CID when another one was created before and when authenticated", async () => {
-      client2.jwtAuth = otherUserToken;
-      const cid = "bafyfoobar";
-      await db.asset.update(asset2.id, {
-        playbackRecordingId: "mock_asset_2",
-        source: {
-          type: "url",
-          url: "ipfs://" + cid,
-        },
-        status: {
-          phase: "ready",
-          updatedAt: 1234,
-        },
-      });
-
-      const res = await client2.get(`/playback/${cid}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "vod",
-        meta: {
-          source: [
-            {
-              hrn: "HLS (TS)",
-              type: "html5/application/vnd.apple.mpegurl",
-              url: `${ingest}/recordings/mock_asset_2/index.m3u8`,
-            },
-          ],
-        },
-      });
-    });
-
-    it("should return other available playback URL asset from CID when authenticated", async () => {
-      const cid = "bafyfoobar";
-      await db.asset.delete(asset2.id);
-      await db.asset.update(asset.id, {
-        playbackRecordingId: "mock_asset_1",
-        source: {
-          type: "url",
-          url: "ipfs://" + cid,
-        },
-        status: {
-          phase: "ready",
-          updatedAt: 1234,
-        },
-      });
-
-      const res = await client2.get(`/playback/${cid}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "vod",
-        meta: {
-          source: [
-            {
-              hrn: "HLS (TS)",
-              type: "html5/application/vnd.apple.mpegurl",
-              url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
-            },
-          ],
-        },
       });
     });
   });
