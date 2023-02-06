@@ -10,6 +10,7 @@ import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import base64url from "base64url";
 
 import { WithID } from "../store/types";
 import { ObjectStore, Task } from "../schema/types";
@@ -159,7 +160,7 @@ export function toWeb3StorageUrl(storage: Web3StoreStorage): string {
   if (!storage.credentials || !storage.credentials.proof) {
     throw new Error("undefined property 'credentials.proof'");
   }
-  return `w3s://${storage.credentials.proof}@/`;
+  return `w3s://${base64url.fromBase64(storage.credentials.proof)}@/`;
 }
 
 export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
