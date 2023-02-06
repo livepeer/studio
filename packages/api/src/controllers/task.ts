@@ -109,10 +109,10 @@ export const cleanTaskResponses = () =>
   mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
     const toExternalTask = async (t: WithID<Task>) => {
       t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
-      t.params = taskParamsWithoutCredentials(t.type, t.params);
       if (req.user.admin) {
         return t;
       }
+      t.params = taskParamsWithoutCredentials(t.type, t.params);
       return db.task.cleanWriteOnlyResponse(t);
     };
 
