@@ -389,18 +389,36 @@ export class TaskScheduler {
   ): Pick<Task, "status" | "output" | "params"> {
     // We should remove this at some point and do not store credentials at all
     const result = updates;
-    if (
-      task.type === "transcode-file" &&
-      (updates?.status.phase === "completed" ||
-        updates?.status.phase === "failed")
-    ) {
-      result.params = task.params;
-      result.params["transcode-file"].input.url = deleteCredentials(
-        updates.params["transcode-file"].input.url
-      );
-      result.params["transcode-file"].storage.url = deleteCredentials(
-        updates.params["transcode-file"].storage.url
-      );
+    const isTerminal =
+      updates?.status.phase === "completed" ||
+      updates?.status.phase === "failed";
+    if (!isTerminal) {
+      return result;
+    }
+
+    switch (task.type) {
+      case "transcode-file":
+        result.params = task.params;
+        result.params["transcode-file"].input.url = deleteCredentials(
+          updates.params["transcode-file"].input.url
+        );
+        result.params["transcode-file"].storage.url = deleteCredentials(
+          updates.params["transcode-file"].storage.url
+        );
+        break;
+      case "upload":
+        const encryption = task.params.upload?.encryption;
+        if (!encryption) {
+          break;
+        }
+        result.params = {
+          ...task.params,
+          upload: {
+            ...task.params.upload,
+            encryption: { ...encryption, key: "***" },
+          },
+        };
+        break;
     }
     return result;
   }
