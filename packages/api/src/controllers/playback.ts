@@ -8,7 +8,7 @@ import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import Table from "../store/table";
-import { Asset, Stream } from "../schema/types";
+import { Asset, Stream, User } from "../schema/types";
 import { isExperimentSubject } from "../store/experiment-table";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
@@ -49,13 +49,14 @@ const newPlaybackInfo = (
 const getAssetPlaybackUrl = async (
   config: Request["config"],
   ingest: string,
-  id: string
+  id: string,
+  user?: User
 ) => {
   const asset =
     (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id)) ??
-    (await db.asset.getBySourceURL("ar://" + id));
+    (await db.asset.getByIpfsCid(id, user)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user));
   if (!asset || asset.deleted) {
     return null;
   }
@@ -90,7 +91,7 @@ const getRecordingPlaybackUrl = async (
 };
 
 async function getPlaybackInfo(
-  { config }: Request,
+  { config, user }: Request,
   ingest: string,
   id: string
 ): Promise<PlaybackInfo> {
