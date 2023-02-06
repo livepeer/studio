@@ -69,17 +69,28 @@ function taskWithIpfsUrls(
   });
 }
 
-function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
-  if (task?.type !== "transcode-file") {
-    return task;
+export function taskParamsWithoutCredentials(
+  type: Task["type"],
+  params: Task["params"]
+): Task["params"] {
+  const result = _.cloneDeep(params);
+  switch (type) {
+    case "transcode-file":
+      result["transcode-file"].input.url = deleteCredentials(
+        params["transcode-file"].input.url
+      );
+      result["transcode-file"].storage.url = deleteCredentials(
+        params["transcode-file"].storage.url
+      );
+      break;
+    case "upload":
+      const encryption = params.upload?.encryption;
+      if (encryption) {
+        result.upload.encryption = { ...encryption, key: "***" };
+      }
+      break;
   }
-  task.params["transcode-file"].input.url = deleteCredentials(
-    task.params["transcode-file"].input.url
-  );
-  task.params["transcode-file"].storage.url = deleteCredentials(
-    task.params["transcode-file"].storage.url
-  );
-  return task;
+  return result;
 }
 
 const fieldsMap: FieldsMap = {
@@ -98,10 +109,10 @@ export const cleanTaskResponses = () =>
   mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
     const toExternalTask = async (t: WithID<Task>) => {
       t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
+      t.params = taskParamsWithoutCredentials(t.type, t.params);
       if (req.user.admin) {
         return t;
       }
-      t = taskWithoutCredentials(t);
       return db.task.cleanWriteOnlyResponse(t);
     };
 
