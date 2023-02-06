@@ -1563,7 +1563,7 @@ components:
                     proof:
                       type: string
                       description: Base64 encoded UCAN delegation proof
-                      example: did:key:z6MkkwKy2C9sCgoWcCGgxVCCt1qFyLJzwkoWi9BF3zi5s5jw
+                      example: EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
         outputs:
           type: object
           additionalProperties: false
