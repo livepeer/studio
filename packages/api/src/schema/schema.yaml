@@ -1449,6 +1449,7 @@ components:
               description:
                 Encryption algorithm used to encrypt the asset, defaults to
                 AES-256 CBC mode.
+              enum: [aes-256-cbc]
               default: aes-256-cbc
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
