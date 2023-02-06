@@ -1498,46 +1498,72 @@ components:
                       description: Secret Access Key
                       example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
         storage:
-          type: object
-          additionalProperties: false
-          required:
-            - type
-            - endpoint
-            - bucket
-            - credentials
-          description: Storage for the output files
-          properties:
-            type:
-              type: string
-              enum:
-                - s3
-              description: Type of service used for output files
-            endpoint:
-              type: string
-              format: uri
-              pattern: ^http(s)?://
-              description: Service endpoint URL
-              example: https://gateway.storjshare.io
-            bucket:
-              type: string
-              description: Bucket with output files
-              example: outputbucket
-            credentials:
-              type: object
+          oneOf:
+            - type: object
               additionalProperties: false
               required:
-                - accessKeyId
-                - secretAccessKey
-              description: Credentials for the output video storage
+                - type
+                - endpoint
+                - bucket
+                - credentials
+              description: Storage for the output files
               properties:
-                accessKeyId:
+                type:
                   type: string
-                  description: Access Key ID
-                  example: AKIAIOSFODNN7EXAMPLE
-                secretAccessKey:
+                  enum:
+                    - s3
+                  description: Type of service used for output files
+                endpoint:
                   type: string
-                  description: Secret Access Key
-                  example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+                  format: uri
+                  pattern: ^http(s)?://
+                  description: Service endpoint URL
+                  example: https://gateway.storjshare.io
+                bucket:
+                  type: string
+                  description: Bucket with output files
+                  example: outputbucket
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - accessKeyId
+                    - secretAccessKey
+                  description: Credentials for the output video storage
+                  properties:
+                    accessKeyId:
+                      type: string
+                      description: Access Key ID
+                      example: AKIAIOSFODNN7EXAMPLE
+                    secretAccessKey:
+                      type: string
+                      description: Secret Access Key
+                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+            - type: object
+              additionalProperties: false
+              required:
+                - type
+                - credentials
+              description: Storage for the output files
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - web3.storage
+                  description: Type of service used for output files
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - proof
+                  description:
+                    Delegation proof for Livepeer to be able to upload to
+                    web3.storage
+                  properties:
+                    proof:
+                      type: string
+                      description: Base64 encoded UCAN delegation proof
+                      example: EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
         outputs:
           type: object
           additionalProperties: false

@@ -200,5 +200,72 @@ describe("controllers/transcode", () => {
         status: { phase: "completed" },
       });
     });
+
+    it("should transcode video with w3s storage", async () => {
+      let res = await client.post(`/transcode`, {
+        input: {
+          url: "https://directurl.com/video.mp4",
+        },
+        storage: {
+          type: "web3.storage",
+          credentials: {
+            proof:
+              "EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn",
+          },
+        },
+        outputs: {
+          hls: {
+            path: "/output/hls",
+          },
+        },
+      });
+      expect(res.status).toBe(200);
+      const task = await res.json();
+      const taskId = task.id;
+
+      res = await client.get(`/task/${task.id}`);
+      expect(res.status).toBe(200);
+      expect(res.json()).resolves.toMatchObject({
+        id: taskId,
+        type: "transcode-file",
+        params: {
+          "transcode-file": {
+            input: {
+              url: "https://directurl.com/video.mp4",
+            },
+            storage: {
+              url: "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn@/",
+            },
+            outputs: {
+              hls: {
+                path: "/output/hls",
+              },
+            },
+          },
+        },
+        status: { phase: "waiting" },
+      });
+
+      await server.taskScheduler.processTaskEvent({
+        id: uuid(),
+        type: "task_result",
+        timestamp: Date.now(),
+        task: {
+          id: taskId,
+          type: "transcode-file",
+          snapshot: await db.task.get(taskId),
+        },
+        error: null,
+        output: null,
+      });
+
+      res = await client.get(`/task/${task.id}`);
+      expect(res.status).toBe(200);
+      expect(res.json()).resolves.toMatchObject({
+        id: taskId,
+        type: "transcode-file",
+        status: { phase: "completed" },
+      });
+    });
   });
 });
