@@ -183,7 +183,7 @@ export function getStaticPlaybackInfo(
     .filter((f) => f.type === "static_transcoded_mp4")
     .map((f) => ({
       playbackUrl: pathJoin(os.publicUrl, asset.playbackId, f.path),
-      size: f.size ?? 0,
+      size: f.spec?.size ?? 0,
     }));
 }
 
