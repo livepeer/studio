@@ -27,6 +27,9 @@ type PlaybackInfo = {
       type: "html5/application/vnd.apple.mpegurl" | "html5/video/mp4";
       url: string;
       size?: number;
+      width?: number;
+      height?: number;
+      bitrate?: number;
     }[];
   };
 };
@@ -53,6 +56,9 @@ function newPlaybackInfo(
         type: "html5/video/mp4",
         url: staticFile.playbackUrl,
         size: staticFile.size,
+        width: staticFile.width,
+        height: staticFile.height,
+        bitrate: staticFile.bitrate,
       });
     }
   }
