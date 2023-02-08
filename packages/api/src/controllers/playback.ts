@@ -43,13 +43,7 @@ function newPlaybackInfo(
     meta: {
       live,
       playbackPolicy,
-      source: [
-        {
-          hrn: "HLS (TS)",
-          type: "html5/application/vnd.apple.mpegurl",
-          url: hlsUrl,
-        },
-      ],
+      source: [],
     },
   };
   if (staticFilesPlaybackInfo && staticFilesPlaybackInfo.length > 0) {
@@ -62,6 +56,11 @@ function newPlaybackInfo(
       });
     }
   }
+  playbackInfo.meta.source.push({
+    hrn: "HLS (TS)",
+    type: "html5/application/vnd.apple.mpegurl",
+    url: hlsUrl,
+  });
 
   return playbackInfo;
 }
@@ -91,9 +90,9 @@ const getAssetPlaybackUrl = async (
   return !playbackUrl
     ? null
     : {
+        staticFilesPlaybackInfo,
         playbackUrl,
         playbackPolicy: inExperiment ? asset.playbackPolicy : null,
-        staticFilesPlaybackInfo,
       };
 };
 
