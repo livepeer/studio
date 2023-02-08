@@ -17,7 +17,7 @@ app.post(
   validatePost("transcode-payload"),
   async (req, res) => {
     const params = req.body as TranscodePayload;
-    const { catalystPipelineStrategy = external } = req.user.admin
+    const { catalystPipelineStrategy = "external" } = req.user.admin
       ? params
       : {};
 
