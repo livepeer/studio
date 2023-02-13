@@ -1771,6 +1771,7 @@ components:
               description: Number of retries done on the task
             step:
               type: string
+              writeOnly: true
               description: Step of the task processing
         output:
           type: object
