@@ -416,11 +416,17 @@ export class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
-    const task = await this.scheduleTask("delete", {
-      delete: {
-        id: asset.id,
+
+    const task = await this.scheduleTask(
+      "delete",
+      {
+        delete: {
+          id: asset.id,
+        },
       },
-    });
+      asset
+    );
+
     this.enqueueTask(task);
     await this.queue.publishWebhook("events.asset.deleted", {
       type: "webhook_event",
