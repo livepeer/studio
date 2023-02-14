@@ -299,6 +299,15 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     }
   }
 
+  if (task.type == "delete" && task.status.phase == "completed") {
+    await req.taskScheduler.updateAsset(task.inputAssetId, {
+      status: {
+        phase: "deleted",
+        updatedAt: Date.now(),
+      },
+    });
+  }
+
   res.status(200);
   res.json({ id, status });
 });

@@ -410,6 +410,19 @@ export class TaskScheduler {
       asset = await db.asset.get(asset);
     }
     await db.asset.markDeleted(asset.id);
+    await db.asset.update(asset.id, {
+      status: {
+        phase: "deleting",
+        updatedAt: Date.now(),
+      },
+    });
+    const task = await this.scheduleTask("delete", {
+      delete: {
+        id: asset.id,
+        objectStoreId: asset.objectStoreId,
+      },
+    });
+    this.enqueueTask(task);
     await this.queue.publishWebhook("events.asset.deleted", {
       type: "webhook_event",
       id: uuid(),
