@@ -419,7 +419,6 @@ export class TaskScheduler {
     const task = await this.scheduleTask("delete", {
       delete: {
         id: asset.id,
-        objectStoreId: asset.objectStoreId,
       },
     });
     this.enqueueTask(task);

@@ -1685,9 +1685,6 @@ components:
                 id:
                   type: string
                   description: ID of the asset to delete
-                objectStoreId:
-                  type: string
-                  description: ID of the object store to delete the asset from
             transcode:
               type: object
               additionalProperties: false
