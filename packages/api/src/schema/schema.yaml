@@ -1443,7 +1443,7 @@ components:
                 Encryption key used to encrypt the asset encoded in base16. Only
                 writable in the upload asset endpoints and cannot be retrieved
                 back.
-              example: 9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
+              example: 74686973206d65616e73206e6f7468696e672120676f2061776179206672656e
             algorithm:
               type: string
               description:
