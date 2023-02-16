@@ -9,10 +9,10 @@ import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
-import sql, { SQLStatement } from "sql-template-strings";
-import { deleteCredentials } from "../controllers/helpers";
+import sql from "sql-template-strings";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
+import { taskParamsWithoutCredentials } from "../controllers/task";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -388,21 +388,17 @@ export class TaskScheduler {
     updates: Pick<Task, "status" | "output" | "params">
   ): Pick<Task, "status" | "output" | "params"> {
     // We should remove this at some point and do not store credentials at all
-    const result = updates;
-    if (
-      task.type === "transcode-file" &&
-      (updates?.status.phase === "completed" ||
-        updates?.status.phase === "failed")
-    ) {
-      result.params = task.params;
-      result.params["transcode-file"].input.url = deleteCredentials(
-        updates.params["transcode-file"].input.url
-      );
-      result.params["transcode-file"].storage.url = deleteCredentials(
-        updates.params["transcode-file"].storage.url
-      );
+    const isTerminal =
+      updates?.status.phase === "completed" ||
+      updates?.status.phase === "failed";
+    if (!isTerminal) {
+      return updates;
     }
-    return result;
+
+    return {
+      ...updates,
+      params: taskParamsWithoutCredentials(task.type, task.params),
+    };
   }
 
   async deleteAsset(asset: string | Asset) {

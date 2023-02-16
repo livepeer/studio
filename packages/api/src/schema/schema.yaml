@@ -1126,12 +1126,16 @@ components:
                   type: string
                   index: true
                   description: URL from which the asset was uploaded
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required: [type]
               properties:
                 type:
                   type: string
                   enum: [directUpload]
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required: [type, sessionId]
               properties:
@@ -1427,6 +1431,26 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+        encryption:
+          type: object
+          additionalProperties: false
+          required: [key]
+          properties:
+            key:
+              type: string
+              writeOnly: true
+              description:
+                Encryption key used to encrypt the asset encoded in base16. Only
+                writable in the upload asset endpoints and cannot be retrieved
+                back.
+              example: 74686973206d65616e73206e6f7468696e672120676f2061776179206672656e
+            algorithm:
+              type: string
+              description:
+                Encryption algorithm used to encrypt the asset, defaults to AES
+                in CBC block cipher mode.
+              enum: [aes-cbc]
+              default: aes-cbc
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
@@ -1670,6 +1694,8 @@ components:
                   type: string
                   description: URL of the asset to "upload"
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
                 recordedSessionId:
                   type: string
                   description:

@@ -4,12 +4,14 @@ import { TranscodePayload } from "../schema/types";
 import {
   toObjectStoreUrl,
   ObjectStoreStorage,
-  taskWithoutCredentials,
   toWeb3StorageUrl,
 } from "./helpers";
 import { ensureQueueCapacity } from "../task/scheduler";
+import { cleanTaskResponses } from "./task";
 
 const app = Router();
+
+app.use(cleanTaskResponses());
 
 app.post(
   "/",
@@ -53,7 +55,7 @@ app.post(
       null,
       req.user.id
     );
-    res.json(taskWithoutCredentials(task));
+    res.json(task);
   }
 );
 

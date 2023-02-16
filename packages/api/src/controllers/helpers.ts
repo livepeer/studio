@@ -143,19 +143,6 @@ export interface Web3StoreStorage {
   };
 }
 
-export function taskWithoutCredentials(task: WithID<Task>): WithID<Task> {
-  if (task?.type !== "transcode-file") {
-    return task;
-  }
-  task.params["transcode-file"].input.url = deleteCredentials(
-    task.params["transcode-file"].input.url
-  );
-  task.params["transcode-file"].storage.url = deleteCredentials(
-    task.params["transcode-file"].storage.url
-  );
-  return task;
-}
-
 export function toWeb3StorageUrl(storage: Web3StoreStorage): string {
   if (!storage.credentials || !storage.credentials.proof) {
     throw new Error("undefined property 'credentials.proof'");
