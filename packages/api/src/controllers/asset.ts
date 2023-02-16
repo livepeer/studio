@@ -178,7 +178,6 @@ export type StaticPlaybackInfo = {
 };
 
 export function getStaticPlaybackInfo(
-  {}: Request["config"],
   asset: WithID<Asset>,
   os: ObjectStore
 ): StaticPlaybackInfo[] {
@@ -186,11 +185,12 @@ export function getStaticPlaybackInfo(
     .filter((f) => f.type === "static_transcoded_mp4")
     .map((f) => ({
       playbackUrl: pathJoin(os.publicUrl, asset.playbackId, f.path),
-      size: f.spec?.size ?? null,
-      height: f.spec?.height ?? null,
-      width: f.spec?.width ?? null,
-      bitrate: f.spec?.bitrate ?? null,
-    }));
+      size: f.spec?.size,
+      height: f.spec?.height,
+      width: f.spec?.width,
+      bitrate: f.spec?.bitrate,
+    }))
+    .sort((a, b) => b.bitrate - a.bitrate);
 }
 
 export function getPlaybackUrl(

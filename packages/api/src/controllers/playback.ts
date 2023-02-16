@@ -22,7 +22,6 @@ type PlaybackInfo = {
     live?: 0 | 1;
     playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
     source: {
-      // the only supported format is HLS for now
       hrn: "HLS (TS)" | "MP4";
       type: "html5/application/vnd.apple.mpegurl" | "html5/video/mp4";
       url: string;
@@ -88,7 +87,7 @@ const getAssetPlaybackUrl = async (
     return null;
   }
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
-  const staticFilesPlaybackInfo = getStaticPlaybackInfo(config, asset, os);
+  const staticFilesPlaybackInfo = getStaticPlaybackInfo(asset, os);
   const inExperiment = await isExperimentSubject(
     "lit-signing-condition",
     asset.userId
