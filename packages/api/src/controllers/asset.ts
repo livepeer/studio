@@ -46,37 +46,19 @@ import { ensureExperimentSubject } from "../store/experiment-table";
 
 const app = Router();
 
-function shouldUseCatalyst({ query, user, config }: Request) {
-  const { vodCatalystPipelineRolloutPercent: rollPct } = config;
-  const { email = "", admin } = user ?? {};
-  const { upload } = toStringValues(query);
-
-  if (email.startsWith("sas")) {
-    // Special case for initial rollout
-    return true;
+function catalystPipelineStrategy(req: Request) {
+  let { catalystPipelineStrategy } = req.body as NewAssetPayload;
+  if (!req.user.admin && !req.user.isTestUser) {
+    catalystPipelineStrategy = undefined;
   }
-  if (email.endsWith("+e2e@livepeer.org") && rollPct < 100) {
-    // force e2e tests to see 50% of each
-    return 100 * Math.random() < 50;
-  } else if (admin && upload) {
-    // admin users can control what they see
-    return upload === "1";
-  } else if (
-    email.endsWith("@livepeer.org") &&
-    email !== "livepeerjs@livepeer.org"
-  ) {
-    // livepeer users only see catalyst
-    return true;
-  }
-  // everyone else will see as much as we decide to rollout the catalyst pipeline
-  return 100 * Math.random() < rollPct;
+  return catalystPipelineStrategy;
 }
 
 function defaultObjectStoreId(
   { config, body }: Request,
-  useCatalyst: boolean
+  isOldPipeline?: boolean
 ): string {
-  if (!useCatalyst) {
+  if (isOldPipeline) {
     return config.vodObjectStoreId;
   }
   if (body.playbackPolicy?.type === "lit_signing_condition") {
@@ -185,6 +167,30 @@ async function getActiveObjectStore(id: string) {
     throw new Error("Object store not found or disabled");
   }
   return os;
+}
+
+export type StaticPlaybackInfo = {
+  playbackUrl: string;
+  size: number;
+  height: number;
+  width: number;
+  bitrate: number;
+};
+
+export function getStaticPlaybackInfo(
+  asset: WithID<Asset>,
+  os: ObjectStore
+): StaticPlaybackInfo[] {
+  return (asset.files ?? [])
+    .filter((f) => f.type === "static_transcoded_mp4")
+    .map((f) => ({
+      playbackUrl: pathJoin(os.publicUrl, asset.playbackId, f.path),
+      size: f.spec?.size,
+      height: f.spec?.height,
+      width: f.spec?.width,
+      bitrate: f.spec?.bitrate,
+    }))
+    .sort((a, b) => b.bitrate - a.bitrate);
 }
 
 export function getPlaybackUrl(
@@ -591,10 +597,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, catalystPipelineStrategy } = req.body as NewAssetPayload;
-  if (!req.user.admin && !req.user.isTestUser) {
-    catalystPipelineStrategy = undefined;
-  }
+  let { url } = req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -603,13 +606,12 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
-  const useCatalyst = shouldUseCatalyst(req);
   const newAsset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
     Date.now(),
-    defaultObjectStoreId(req, useCatalyst),
+    defaultObjectStoreId(req),
     req.body
   );
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
@@ -629,11 +631,13 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
 
   const asset = await createAsset(newAsset, req.queue);
-  const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
-    taskType,
+    "upload",
     {
-      [taskType]: { url, catalystPipelineStrategy },
+      upload: {
+        url,
+        catalystPipelineStrategy: catalystPipelineStrategy(req),
+      },
     },
     undefined,
     asset
@@ -685,7 +689,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     playbackId,
     req.user.id,
     Date.now(),
-    defaultObjectStoreId(req, false), // transcode only in old pipeline for now
+    defaultObjectStoreId(req, true), // transcode only in old pipeline for now
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -731,19 +735,15 @@ app.post(
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(id);
 
-    const useCatalyst = shouldUseCatalyst(req);
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
-      defaultObjectStoreId(req, useCatalyst),
+      defaultObjectStoreId(req),
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const { catalystPipelineStrategy = undefined } = req.user.admin
-      ? (req.body as NewAssetPayload)
-      : {};
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
@@ -768,11 +768,13 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
     asset = await createAsset(asset, req.queue);
 
-    const taskType = shouldUseCatalyst(req) ? "upload" : "import";
     const task = await req.taskScheduler.spawnTask(
-      taskType,
+      "upload",
       {
-        [taskType]: { url: downloadUrl, catalystPipelineStrategy },
+        upload: {
+          url: downloadUrl,
+          catalystPipelineStrategy: catalystPipelineStrategy(req),
+        },
       },
       null,
       asset

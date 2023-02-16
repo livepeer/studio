@@ -4,11 +4,15 @@ import {
   getPlaybackUrl as streamPlaybackUrl,
   getRecordingFields,
 } from "./stream";
-import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
+import {
+  getPlaybackUrl as assetPlaybackUrl,
+  getStaticPlaybackInfo,
+  StaticPlaybackInfo,
+} from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import Table from "../store/table";
-import { Asset, Stream } from "../schema/types";
+import { Asset, Stream, User } from "../schema/types";
 import { isExperimentSubject } from "../store/experiment-table";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
@@ -18,44 +22,64 @@ type PlaybackInfo = {
     live?: 0 | 1;
     playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
     source: {
-      // the only supported format is HLS for now
-      hrn: "HLS (TS)";
-      type: "html5/application/vnd.apple.mpegurl";
+      hrn: "HLS (TS)" | "MP4";
+      type: "html5/application/vnd.apple.mpegurl" | "html5/video/mp4";
       url: string;
+      size?: number;
+      width?: number;
+      height?: number;
+      bitrate?: number;
     }[];
   };
 };
 
-const newPlaybackInfo = (
+function newPlaybackInfo(
   type: PlaybackInfo["type"],
   hlsUrl: string,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
+  staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   live?: PlaybackInfo["meta"]["live"]
-): PlaybackInfo => ({
-  type,
-  meta: {
-    live,
-    playbackPolicy,
-    source: [
-      {
-        hrn: "HLS (TS)",
-        type: "html5/application/vnd.apple.mpegurl",
-        url: hlsUrl,
-      },
-    ],
-  },
-});
+): PlaybackInfo {
+  let playbackInfo: PlaybackInfo = {
+    type,
+    meta: {
+      live,
+      playbackPolicy,
+      source: [],
+    },
+  };
+  if (staticFilesPlaybackInfo && staticFilesPlaybackInfo.length > 0) {
+    for (let staticFile of staticFilesPlaybackInfo) {
+      playbackInfo.meta.source.push({
+        hrn: "MP4",
+        type: "html5/video/mp4",
+        url: staticFile.playbackUrl,
+        size: staticFile.size,
+        width: staticFile.width,
+        height: staticFile.height,
+        bitrate: staticFile.bitrate,
+      });
+    }
+  }
+  playbackInfo.meta.source.push({
+    hrn: "HLS (TS)",
+    type: "html5/application/vnd.apple.mpegurl",
+    url: hlsUrl,
+  });
 
+  return playbackInfo;
+}
 const getAssetPlaybackUrl = async (
   config: Request["config"],
   ingest: string,
-  id: string
+  id: string,
+  user?: User
 ) => {
   const asset =
     (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id)) ??
-    (await db.asset.getBySourceURL("ar://" + id));
+    (await db.asset.getByIpfsCid(id, user)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user));
   if (!asset || asset.deleted) {
     return null;
   }
@@ -64,6 +88,7 @@ const getAssetPlaybackUrl = async (
     return null;
   }
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
+  const staticFilesPlaybackInfo = getStaticPlaybackInfo(asset, os);
   const inExperiment = await isExperimentSubject(
     "lit-signing-condition",
     asset.userId
@@ -71,6 +96,7 @@ const getAssetPlaybackUrl = async (
   return !playbackUrl
     ? null
     : {
+        staticFilesPlaybackInfo,
         playbackUrl,
         playbackPolicy: inExperiment ? asset.playbackPolicy : null,
       };
@@ -90,7 +116,7 @@ const getRecordingPlaybackUrl = async (
 };
 
 async function getPlaybackInfo(
-  { config }: Request,
+  { config, user }: Request,
   ingest: string,
   id: string
 ): Promise<PlaybackInfo> {
@@ -100,12 +126,18 @@ async function getPlaybackInfo(
       "live",
       streamPlaybackUrl(ingest, stream),
       stream.playbackPolicy,
+      null,
       stream.isActive ? 1 : 0
     );
   }
   const asset = await getAssetPlaybackUrl(config, ingest, id);
   if (asset) {
-    return newPlaybackInfo("vod", asset.playbackUrl, asset.playbackPolicy);
+    return newPlaybackInfo(
+      "vod",
+      asset.playbackUrl,
+      asset.playbackPolicy,
+      asset.staticFilesPlaybackInfo
+    );
   }
 
   const recordingUrl =

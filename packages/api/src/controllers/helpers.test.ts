@@ -7,6 +7,7 @@ import {
   deleteCredentials,
   getS3PresignedUrl,
   toObjectStoreUrl,
+  toWeb3StorageUrl,
 } from "./helpers";
 
 let server: TestServer;
@@ -180,5 +181,54 @@ describe("controllers/helpers", () => {
         "s3+https://USERNAME_NO_PASSWORD:@gateway.storjshare.io/testbucket"
       );
     });
+  });
+});
+
+describe("convert w3 storage to object store URL", () => {
+  it("should convert correct object with base64-encoded proof", () => {
+    const storageObj = {
+      type: "web3.storage",
+      credentials: {
+        proof:
+          "EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn+/",
+      },
+    };
+    expect(toWeb3StorageUrl(storageObj)).toBe(
+      "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_@/"
+    );
+  });
+
+  it("should convert correct object with base64url-encoded proof", () => {
+    const storageObj = {
+      type: "web3.storage",
+      credentials: {
+        proof:
+          "EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_",
+      },
+    };
+    expect(toWeb3StorageUrl(storageObj)).toBe(
+      "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_@/"
+    );
+  });
+
+  it("should fail if credentials are not defined", () => {
+    const storageObj = {
+      type: "web3.storage",
+    };
+    // @ts-expect-error
+    expect(() => toWeb3StorageUrl(storageObj)).toThrow(
+      "undefined property 'credentials.proof'"
+    );
+  });
+
+  it("should fail if proof is not defined", () => {
+    const storageObj = {
+      type: "web3.storage",
+      credentials: {},
+    };
+    // @ts-expect-error
+    expect(() => toWeb3StorageUrl(storageObj)).toThrow(
+      "undefined property 'credentials.proof'"
+    );
   });
 });

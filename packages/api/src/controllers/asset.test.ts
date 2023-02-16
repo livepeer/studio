@@ -111,10 +111,10 @@ describe("controllers/asset", () => {
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toMatchObject({
         id: taskId,
-        type: "import",
+        type: "upload",
         outputAssetId: asset.id,
         params: {
-          import: {
+          upload: {
             url: spec.url,
           },
         },
