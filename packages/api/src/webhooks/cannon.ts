@@ -510,7 +510,7 @@ export default class WebhookCannon {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(sessionId);
 
-    const session = await this.db.session.get(sessionId);
+    const session = await this.db.stream.get(sessionId);
     if (!session) {
       throw new Error("session not found");
     }
