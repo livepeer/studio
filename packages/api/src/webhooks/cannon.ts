@@ -519,15 +519,14 @@ export default class WebhookCannon {
     var startedAt = new Date(session.createdAt).toISOString();
     startedAt = startedAt.substring(0, startedAt.length - 8) + "Z";
 
-    const createdAt = Date.now();
     const asset = await createAsset(
       {
         id,
         playbackId,
         userId,
-        createdAt,
+        createdAt: session.createdAt,
         source: { type: "recording", sessionId },
-        status: { phase: "waiting", updatedAt: createdAt },
+        status: { phase: "waiting", updatedAt: Date.now() },
         name: `live-${startedAt}`,
         objectStoreId: this.vodObjectStoreId,
       },
