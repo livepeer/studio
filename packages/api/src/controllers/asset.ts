@@ -612,7 +612,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     Date.now(),
     defaultObjectStoreId(req),
     req.body,
-    { type: "url", url, encryption }
+    { type: "url", url, encryption: { ...encryption, key: "***" } }
   );
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
   if (dupAsset) {
@@ -749,7 +749,7 @@ app.post(
       Date.now(),
       defaultObjectStoreId(req),
       req.body,
-      { type: "directUpload", encryption }
+      { type: "directUpload", encryption: { ...encryption, key: "***" } }
     );
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
