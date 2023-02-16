@@ -1065,6 +1065,29 @@ components:
                   Path to the file in the asset subfolder in the object store.
                   This means that all these paths are relative to a folder in
                   the OS the asset playback ID as the name.
+              spec:
+                type: object
+                additionalProperties: false
+                description:
+                  Additional information about the file. For example, for
+                  manifests it contains the list of media files.
+                properties:
+                  size:
+                    type: number
+                    example: 123456
+                    description: Size of the file in bytes.
+                  height:
+                    type: number
+                    example: 1080
+                    description: Height of the video in pixels.
+                  width:
+                    type: number
+                    example: 1920
+                    description: Width of the video in pixels.
+                  bitrate:
+                    type: number
+                    example: 1000000
+                    description: Bitrate of the video in bits per second.
         playbackUrl:
           type: string
           readOnly: true

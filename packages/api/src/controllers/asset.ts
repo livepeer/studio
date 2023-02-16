@@ -169,6 +169,30 @@ async function getActiveObjectStore(id: string) {
   return os;
 }
 
+export type StaticPlaybackInfo = {
+  playbackUrl: string;
+  size: number;
+  height: number;
+  width: number;
+  bitrate: number;
+};
+
+export function getStaticPlaybackInfo(
+  asset: WithID<Asset>,
+  os: ObjectStore
+): StaticPlaybackInfo[] {
+  return (asset.files ?? [])
+    .filter((f) => f.type === "static_transcoded_mp4")
+    .map((f) => ({
+      playbackUrl: pathJoin(os.publicUrl, asset.playbackId, f.path),
+      size: f.spec?.size,
+      height: f.spec?.height,
+      width: f.spec?.width,
+      bitrate: f.spec?.bitrate,
+    }))
+    .sort((a, b) => b.bitrate - a.bitrate);
+}
+
 export function getPlaybackUrl(
   { vodCatalystObjectStoreId }: Request["config"],
   ingest: string,
