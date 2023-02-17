@@ -17,7 +17,7 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
-import { withIpfsUrls } from "./asset";
+import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { TooManyRequestsError } from "../store/errors";
 
@@ -86,7 +86,7 @@ export function taskParamsWithoutCredentials(
     case "upload":
       const encryption = params.upload?.encryption;
       if (encryption) {
-        result.upload.encryption = { ...encryption, key: "***" };
+        result.upload.encryption = assetEncryptionWithoutKey(encryption);
       }
       break;
   }

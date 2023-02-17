@@ -67,6 +67,18 @@ function defaultObjectStoreId(
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
 }
 
+export function assetEncryptionWithoutKey(
+  encryption: NewAssetPayload["encryption"]
+) {
+  if (!encryption) {
+    return encryption;
+  }
+  return {
+    ...encryption,
+    key: "***",
+  };
+}
+
 function cleanAssetTracks(asset: WithID<Asset>) {
   return !asset.videoSpec
     ? asset
@@ -617,7 +629,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     Date.now(),
     defaultObjectStoreId(req),
     req.body,
-    { type: "url", url, encryption: { ...encryption, key: "***" } }
+    { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
   );
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
   if (dupAsset) {
@@ -754,7 +766,10 @@ app.post(
       Date.now(),
       defaultObjectStoreId(req),
       req.body,
-      { type: "directUpload", encryption: { ...encryption, key: "***" } }
+      {
+        type: "directUpload",
+        encryption: assetEncryptionWithoutKey(encryption),
+      }
     );
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
