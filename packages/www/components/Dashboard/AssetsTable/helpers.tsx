@@ -78,7 +78,7 @@ const hasLivestreamImportTask = (tasks: Task[], assetId: string) => {
     const sourceUrl = get(task, "params.import.url");
     if (!sourceUrl) return false;
 
-    const sourceHost = sourceUrl && new URL(sourceUrl).host;
+    const sourceHost = new URL(sourceUrl).host;
     return liveStreamHosts.includes(sourceHost);
   } catch (err) {
     console.error("Error in checking import tasks: ", err);
