@@ -246,7 +246,12 @@ export async function withPlaybackUrls(
   if (asset.status.phase !== "ready") {
     return asset;
   }
-  os = os || (await getActiveObjectStore(asset.objectStoreId));
+  try {
+    os = os || (await getActiveObjectStore(asset.objectStoreId));
+  } catch (err) {
+    console.error("Error getting asset object store", err);
+    return asset;
+  }
   return {
     ...asset,
     playbackUrl: getPlaybackUrl(config, ingest, asset, os),
