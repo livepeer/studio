@@ -110,7 +110,9 @@ export const rowsPageFromState = async (
 
   const rows: AssetsTableData[] = assets.map(
     (asset: ApiAsset): AssetsTableData => {
-      const isLiveStream = hasLivestreamImportTask(tasks, asset.id);
+      const isLiveStream = asset.source?.type
+        ? asset.source.type === "recording"
+        : hasLivestreamImportTask(tasks, asset.id);
       const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
