@@ -71,6 +71,21 @@ export const makeColumns = () => [
   },
 ];
 
+const hasLivestreamImportTask = (tasks: Task[], assetId: string) => {
+  try {
+    const task: Task =
+      tasks && tasks.find((task: Task) => task.outputAssetId === assetId);
+    const sourceUrl = get(task, "params.import.url");
+    if (!sourceUrl) return false;
+
+    const sourceHost = sourceUrl && new URL(sourceUrl).host;
+    return liveStreamHosts.includes(sourceHost);
+  } catch (err) {
+    console.error("Error in checking import tasks: ", err);
+    return false;
+  }
+};
+
 export const rowsPageFromState = async (
   state: State<AssetsTableData>,
   userId: string,
@@ -95,12 +110,7 @@ export const rowsPageFromState = async (
 
   const rows: AssetsTableData[] = assets.map(
     (asset: ApiAsset): AssetsTableData => {
-      const source: Task =
-        tasks && tasks.find((task: Task) => task.outputAssetId === asset.id);
-      const sourceUrl = get(source, "params.import.url");
-      const sourceHost = sourceUrl && new URL(sourceUrl).host;
-      const isLiveStream = !!sourceUrl && liveStreamHosts.includes(sourceHost);
-
+      const isLiveStream = hasLivestreamImportTask(tasks, asset.id);
       const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
