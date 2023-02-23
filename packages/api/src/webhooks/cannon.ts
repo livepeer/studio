@@ -510,16 +510,24 @@ export default class WebhookCannon {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(sessionId);
 
-    const createdAt = Date.now();
+    const session = await this.db.stream.get(sessionId);
+    if (!session) {
+      throw new Error("session not found");
+    }
+
+    // trim the second precision from the time string
+    var startedAt = new Date(session.createdAt).toISOString();
+    startedAt = startedAt.substring(0, startedAt.length - 8) + "Z";
+
     const asset = await createAsset(
       {
         id,
         playbackId,
         userId,
-        createdAt,
+        createdAt: session.createdAt,
         source: { type: "recording", sessionId },
-        status: { phase: "waiting", updatedAt: createdAt },
-        name: `live-to-vod-${sessionId}`,
+        status: { phase: "waiting", updatedAt: Date.now() },
+        name: `live-${startedAt}`,
         objectStoreId: this.vodObjectStoreId,
       },
       this.queue

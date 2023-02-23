@@ -72,6 +72,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
     const query = [
       sql`asset.data->'source'->>'type' = 'url'`,
       sql`asset.data->'source'->>'url' = ${url}`,
+      sql`asset.data->'source'->>'encryption' IS NULL`,
       sql`asset.data->>'deleted' IS NULL`,
       sql`asset.data->'status'->>'phase' = 'ready'`,
     ];
