@@ -32,19 +32,13 @@ interface DBUsageHistoryData extends QueryResultRow {
   streamCount: number;
 }
 
-export interface StreamStats {
+export interface DBStreamFields {
   sourceBytes?: number;
   transcodedBytes?: number;
   sourceSegments?: number;
   transcodedSegments?: number;
   sourceSegmentsDuration?: number;
   transcodedSegmentsDuration?: number;
-}
-
-export interface DBStreamFields extends StreamStats {
-  previousStats?: StreamStats;
-  lastSessionId?: string;
-  userSessionCreatedAt?: number;
 }
 
 export type DBStream = WithID<Stream> & DBStreamFields;
@@ -369,9 +363,6 @@ const adminOnlyFields = ["mistHost", "broadcasterHost", "createdByTokenId"];
 
 const privateFields = [
   "recordObjectStoreId",
-  "previousSessions",
-  "partialSession",
   "previousStats",
-  "lastSessionId",
   "userSessionCreatedAt",
 ];
