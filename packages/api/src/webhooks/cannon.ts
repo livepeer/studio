@@ -106,10 +106,6 @@ export default class WebhookCannon {
       if (!session) {
         return true;
       }
-      if (session.partialSession) {
-        // new session was started, so recording is not ready yet
-        return true;
-      }
       try {
         await this.recordingToVodAsset(
           event.payload.mp4Url,

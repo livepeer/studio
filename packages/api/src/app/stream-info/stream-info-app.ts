@@ -137,17 +137,6 @@ function newStreamInfo(mid: string, stream?: DBStream): streamInfo {
   };
 }
 
-function getSessionId(storedInfo: DBStream): string {
-  let userSessionId = storedInfo.id;
-  if (
-    Array.isArray(storedInfo.previousSessions) &&
-    storedInfo.previousSessions.length > 0
-  ) {
-    userSessionId = storedInfo.previousSessions[0];
-  }
-  return userSessionId;
-}
-
 class statusPoller {
   readonly broadcaster: string;
   readonly region: string;
@@ -289,8 +278,7 @@ class statusPoller {
           await db.stream.update(storedInfo.id, zeroRate);
           if (storedInfo.parentId) {
             await db.stream.update(storedInfo.parentId, zeroRate);
-            const userSessionId = getSessionId(storedInfo);
-            await db.session.update(userSessionId, zeroRate);
+            await db.session.update(storedInfo.id, zeroRate);
           }
           if (!storedInfo.parentId) {
             // this is not a session created by our Mist, so manage isActive field for this stream
@@ -348,10 +336,9 @@ class statusPoller {
     await db.stream.add(storedInfo.id, incObj, setObj);
     if (storedInfo.parentId) {
       await db.stream.add(storedInfo.parentId, incObj, setObj);
-      const userSessionId = getSessionId(storedInfo);
       // update session table
       try {
-        await db.session.add(userSessionId, incObj, setObj);
+        await db.session.add(storedInfo.id, incObj, setObj);
       } catch (e) {
         console.log(`error updating session table:`, e);
       }
