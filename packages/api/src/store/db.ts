@@ -18,7 +18,10 @@ import {
   SigningKey,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
-import StreamTable, { DBStreamFields } from "./stream-table";
+import StreamTable, {
+  DeprecatedStreamFields,
+  StreamStats,
+} from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
@@ -37,10 +40,7 @@ export interface PostgresParams {
   appName?: string;
 }
 
-export type DBSession = WithID<Session> &
-  DBStreamFields & {
-    broadcasterHost?: string;
-  };
+export type DBSession = WithID<Session> & StreamStats & DeprecatedStreamFields;
 
 type Table<T> = BaseTable<WithID<T>>;
 

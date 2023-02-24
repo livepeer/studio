@@ -13,6 +13,7 @@ import {
   MasterPlaylist,
   MasterPlaylistDictionary,
 } from "./livepeer-types";
+import { DBStream } from "../../store/stream-table";
 
 const pollInterval = 2 * 1000; // 2s
 const updateInterval = 60 * 1000; // 60s
@@ -88,7 +89,7 @@ function countSegments(si: streamInfo, mpl: MasterPlaylist) {
 
 interface streamInfo {
   mid: string;
-  stream?: Stream;
+  stream?: DBStream;
 
   lastSeen: Date;
   lastSeenSavedToDb: Date;
@@ -110,7 +111,7 @@ interface streamInfo {
   transcodedBytesLastUpdated: number;
 }
 
-function newStreamInfo(mid: string, stream?: Stream): streamInfo {
+function newStreamInfo(mid: string, stream?: DBStream): streamInfo {
   const now = new Date();
   return {
     mid,
@@ -136,7 +137,7 @@ function newStreamInfo(mid: string, stream?: Stream): streamInfo {
   };
 }
 
-function getSessionId(storedInfo: Stream): string {
+function getSessionId(storedInfo: DBStream): string {
   let userSessionId = storedInfo.id;
   if (
     Array.isArray(storedInfo.previousSessions) &&
@@ -184,9 +185,9 @@ class statusPoller {
     for (const k of Object.keys(status.InternalManifests || {})) {
       playback2session.set(status.InternalManifests[k], k);
     }
-    const getStreamObject = async (mid: string): Promise<Stream | null> => {
+    const getStreamObject = async (mid: string) => {
       const sid = playback2session.has(mid) ? playback2session.get(mid) : mid;
-      let storedInfo: Stream = await db.stream.get(sid);
+      let storedInfo: DBStream | null = await db.stream.get(sid);
       if (!storedInfo) {
         const [objs, _] = await db.stream.find({ playbackId: mid });
         if (objs?.length) {

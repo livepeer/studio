@@ -846,6 +846,9 @@ components:
           type: number
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
+        broadcasterHost:
+          type: string
+          description: Hostname of the broadcaster that transcodes that stream
         deleted:
           type: boolean
           description: Set to true when stream deleted

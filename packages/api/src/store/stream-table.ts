@@ -32,7 +32,7 @@ interface DBUsageHistoryData extends QueryResultRow {
   streamCount: number;
 }
 
-export interface DBStreamFields {
+export interface StreamStats {
   sourceBytes?: number;
   transcodedBytes?: number;
   sourceSegments?: number;
@@ -41,7 +41,36 @@ export interface DBStreamFields {
   transcodedSegmentsDuration?: number;
 }
 
-export type DBStream = WithID<Stream> & DBStreamFields;
+/**
+ * These are deprecated fields from when we used to combine consecutive
+ * livestream sessions (a "session chain") into single "user session" objects.
+ * Kept the fields for backwards compatibility with existing objects in DB.
+ */
+export type DeprecatedStreamFields = {
+  /**
+   * @deprecated Used to represent the ID of the last session to have started in
+   * a chain of sessions.
+   */
+  lastSessionId?: string;
+  /**
+   * @deprecated Indicates that this is not final object of user's session.
+   */
+  partialSession?: boolean;
+  /**
+   * @deprecated Ids of the previous sessions which are part of user's session.
+   */
+  previousSessions?: string[];
+  /**
+   * @deprecated Stats from the previous session in the session chain.
+   */
+  previousStats?: StreamStats;
+  /**
+   * @deprecated createdAt from the first session to start in the session chain.
+   */
+  userSessionCreatedAt?: number;
+};
+
+export type DBStream = WithID<Stream> & StreamStats & DeprecatedStreamFields;
 
 export default class StreamTable extends Table<DBStream> {
   async cachedUsageHistory(
@@ -363,6 +392,9 @@ const adminOnlyFields = ["mistHost", "broadcasterHost", "createdByTokenId"];
 
 const privateFields = [
   "recordObjectStoreId",
+  "previousSessions",
+  "partialSession",
   "previousStats",
+  "lastSessionId",
   "userSessionCreatedAt",
 ];
