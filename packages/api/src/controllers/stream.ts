@@ -911,8 +911,7 @@ async function sendSetActiveHooks(
         // last session is too old, probably transcoding wasn't happening, and so there
         // will be no recording
       } else {
-        const userSessionId = session.previousSessions?.[0] ?? session.id;
-        const userSession = await db.session.get(userSessionId);
+        const userSession = await db.session.get(stream.id);
         await queue.delayedPublishWebhook(
           "events.recording.ready",
           {
@@ -1382,7 +1381,7 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
         recordObjectStoreId: req.config.recordObjectStoreId,
       });
       stream.recordObjectStoreId = req.config.recordObjectStoreId;
-      if (stream.parentId && !stream.previousSessions) {
+      if (stream.parentId) {
         await db.session.update(stream.id, {
           recordObjectStoreId: req.config.recordObjectStoreId,
         });
