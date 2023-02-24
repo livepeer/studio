@@ -657,77 +657,9 @@ app.post(
     // The first four letters of our playback id are the shard key.
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
+    const region = req.config.ownRegion;
 
-    let previousSessions: string[],
-      previousStats: StreamStats,
-      userSessionCreatedAt: number;
-    let firstSession = true;
-    if (stream.record && req.config.recordObjectStoreId) {
-      // find previous sessions to form 'user' session
-      const tooOld = createdAt - USER_SESSION_TIMEOUT;
-      const query = [];
-      query.push(sql`data->>'parentId' = ${stream.id}`);
-      query.push(
-        sql`((data->'lastSeen')::bigint > ${tooOld} OR  (data->'createdAt')::bigint > ${tooOld})`
-      );
-
-      const [prevSessionsDocs] = await db.stream.find(query, {
-        order: `data->'lastSeen' DESC, data->'createdAt' DESC `,
-      });
-      if (
-        prevSessionsDocs.length &&
-        prevSessionsDocs[0].recordObjectStoreId ==
-          req.config.recordObjectStoreId
-      ) {
-        const latestSession = prevSessionsDocs[0];
-        userSessionCreatedAt =
-          latestSession.userSessionCreatedAt || latestSession.createdAt;
-        previousSessions = latestSession.previousSessions;
-        if (!Array.isArray(previousSessions)) {
-          previousSessions = [];
-        }
-        previousSessions.push(latestSession.id);
-        previousStats = getCombinedStats(
-          latestSession,
-          latestSession.previousStats || {}
-        );
-        firstSession = false;
-        setImmediate(() => {
-          db.session
-            .update(previousSessions[0], {
-              lastSessionId: id,
-            })
-            .catch((e) => {
-              logger.error(e);
-            });
-        });
-        setImmediate(() => {
-          db.stream
-            .update(previousSessions[0], {
-              lastSessionId: id,
-            })
-            .catch((e) => {
-              logger.error(e);
-            });
-        });
-        setImmediate(() => {
-          db.stream
-            .update(latestSession.id, {
-              partialSession: true,
-            })
-            .catch((e) => {
-              logger.error(e);
-            });
-        });
-      }
-    }
-
-    let region;
-    if (req.config.ownRegion) {
-      region = req.config.ownRegion;
-    }
-
-    const doc: DBStream = wowzaHydrate({
+    const childStream: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
       userId: stream.userId,
@@ -738,64 +670,57 @@ app.post(
       id,
       createdAt,
       parentId: stream.id,
-      previousSessions,
-      previousStats,
-      userSessionCreatedAt,
       region,
       lastSeen: 0,
       isActive: false,
     });
-
-    doc.profiles = hackMistSettings(
+    childStream.profiles = hackMistSettings(
       req,
-      useParentProfiles ? stream.profiles : doc.profiles
+      useParentProfiles ? stream.profiles : childStream.profiles
     );
 
-    if (firstSession) {
-      // create 'session' object in 'session table
-      const session: DBSession = {
-        id,
-        parentId: stream.id,
-        playbackId: stream.playbackId,
-        userId: stream.userId,
-        kind: "session",
-        name: req.body.name,
-        createdAt,
-        lastSeen: 0,
-        sourceSegments: 0,
-        transcodedSegments: 0,
-        sourceSegmentsDuration: 0,
-        transcodedSegmentsDuration: 0,
-        sourceBytes: 0,
-        transcodedBytes: 0,
-        ingestRate: 0,
-        outgoingRate: 0,
-        deleted: false,
-        recordObjectStoreId: stream.recordObjectStoreId,
-        record: stream.record,
-        profiles: doc.profiles,
-      };
-      if (session.record) {
-        session.recordingStatus = "waiting";
-        session.recordingUrl = "";
-        session.mp4Url = "";
-      }
-      await db.session.create(session);
-      if (session.record) {
-        const ingest = ((await req.getIngest()) ?? [])[0]?.base;
-        publishRecordingStartedHook(session, req.queue, ingest);
-      }
+    // Create corresponding 'session' object in 'session table. Notice that
+    // these used to be different from 'stream' objects as we combined
+    // consecutive streams into one 'session' object. Now they are mapped 1:1.
+    const session: DBSession = {
+      id,
+      parentId: stream.id,
+      playbackId: stream.playbackId,
+      userId: stream.userId,
+      kind: "session",
+      name: req.body.name,
+      createdAt,
+      lastSeen: 0,
+      sourceSegments: 0,
+      transcodedSegments: 0,
+      sourceSegmentsDuration: 0,
+      transcodedSegmentsDuration: 0,
+      sourceBytes: 0,
+      transcodedBytes: 0,
+      ingestRate: 0,
+      outgoingRate: 0,
+      deleted: false,
+      recordObjectStoreId: stream.recordObjectStoreId,
+      profiles: childStream.profiles,
+      record: stream.record,
+      ...(!stream.record
+        ? null
+        : {
+            recordingStatus: "waiting",
+            recordingUrl: "",
+            mp4Url: "",
+          }),
+    };
+    await db.session.create(session);
+    if (session.record) {
+      const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+      publishRecordingStartedHook(session, req.queue, ingest);
     }
 
-    try {
-      await req.store.create(doc);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
+    await db.stream.create(childStream);
 
     res.status(201);
-    res.json(db.stream.removePrivateFields(doc, req.user.admin));
+    res.json(db.stream.removePrivateFields(childStream, req.user.admin));
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
