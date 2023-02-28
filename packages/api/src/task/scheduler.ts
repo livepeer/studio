@@ -138,6 +138,30 @@ export class TaskScheduler {
           },
         });
         break;
+      case "delete":
+        await this.updateAsset(task.inputAssetId, {
+          deleted: true,
+          status: {
+            phase: "deleted",
+            updatedAt: Date.now(),
+          },
+        });
+        let asset = await db.asset.get(task.inputAssetId);
+        asset = db.asset.cleanWriteOnlyResponse(asset);
+        await this.queue.publishWebhook("events.asset.deleted", {
+          type: "webhook_event",
+          id: uuid(),
+          timestamp: Date.now(),
+          event: "asset.deleted",
+          userId: asset.userId,
+          payload: {
+            asset: {
+              id: asset.id,
+              snapshot: asset,
+            },
+          },
+        });
+        break;
       case "transcode":
         assetSpec = event.output?.transcode?.asset?.assetSpec;
         if (!assetSpec) {
@@ -409,7 +433,7 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
-    await db.asset.markDeleted(asset.id);
+
     await db.asset.update(asset.id, {
       status: {
         phase: "deleting",
@@ -426,21 +450,6 @@ export class TaskScheduler {
       },
       asset
     );
-
-    this.enqueueTask(task);
-    await this.queue.publishWebhook("events.asset.deleted", {
-      type: "webhook_event",
-      id: uuid(),
-      timestamp: Date.now(),
-      event: "asset.deleted",
-      userId: asset.userId,
-      payload: {
-        asset: {
-          id: asset.id,
-          snapshot: asset,
-        },
-      },
-    });
   }
 
   async updateAsset(

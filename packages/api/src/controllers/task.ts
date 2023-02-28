@@ -285,17 +285,31 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   }
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);
-    if (task.id === asset?.storage?.status?.tasks.pending) {
-      await req.taskScheduler.updateAsset(asset.id, {
-        storage: {
-          ...asset.storage,
+    if (task.type === "export") {
+      if (task.id === asset?.storage?.status?.tasks.pending) {
+        await req.taskScheduler.updateAsset(asset.id, {
+          storage: {
+            ...asset.storage,
+            status: {
+              phase: "processing",
+              progress: doc.progress,
+              tasks: asset.storage.status.tasks,
+            },
+          },
+        });
+      }
+    } else if (task.type === "delete") {
+      await req.taskScheduler.updateAsset(
+        asset.id,
+        {
           status: {
-            phase: "processing",
+            phase: "deleting",
             progress: doc.progress,
-            tasks: asset.storage.status.tasks,
+            updatedAt: Date.now(),
           },
         },
-      });
+        { allowedPhases: ["deleting"] }
+      );
     }
   }
 

@@ -384,7 +384,7 @@ app.use(
       if (req.user.admin) {
         return a;
       }
-      a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      a = db.asset.cleanWriteOnlyResponse(a);
       if (!details) {
         a = cleanAssetTracks(a);
       }
