@@ -961,7 +961,7 @@ async function sendSetActiveHooks(
             },
           },
         },
-        USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
+        USER_SESSION_TIMEOUT
       );
     }
   }

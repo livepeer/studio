@@ -16,7 +16,7 @@ import {
 import { DBStream } from "../../store/stream-table";
 
 const pollInterval = 2 * 1000; // 2s
-const updateInterval = 60 * 1000; // 60s
+const updateInterval = 50 * 1000; // 50s, slightly lower than USER_SESSION_TIMEOUT in API
 const deleteTimeout = 30 * 1000; // 30s
 const seenSegmentsTimeout = 2 * 60 * 1000; // 2m. should be at least two time longer than HTTP push timeout in go-livepeer
 
