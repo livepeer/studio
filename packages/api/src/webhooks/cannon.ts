@@ -4,7 +4,7 @@ import isLocalIP from "is-local-ip";
 import { Response } from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { parse as parseUrl } from "url";
-import { DB } from "../store/db";
+import { DB, DBSession } from "../store/db";
 import messages from "../store/messages";
 import Queue from "../store/queue";
 import { DBWebhook } from "../store/webhook-table";
@@ -16,6 +16,7 @@ import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
+import { UnprocessableEntityError } from "../store/errors";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -90,55 +91,29 @@ export default class WebhookCannon {
     }
   }
 
-  async processWebhookEvent(event: messages.WebhookEvent): Promise<boolean> {
-    if (event.event === "recording.ready") {
-      const sessionId = event.sessionId;
-      if (!sessionId) {
-        return true;
-      }
-
-      const session = await this.db.stream.get(sessionId, {
-        useReplica: false,
-      });
-      if (!session) {
-        return true;
-      }
-
-      const { lastSeen, sourceSegments } = session;
-      const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
-      if (!lastSeen || !sourceSegments || lastSeen > activeThreshold) {
-        // session was either never used or is still active as it was seen
-        // recently (after delayed event was sent).
-        return true;
-      }
-      if (typeof session.isActive === "boolean" && !session.isActive) {
-        // session recording was already handled.
-        return true;
-      }
-
-      await this.db.stream.update(sessionId, { isActive: false });
-
+  async processWebhookEvent(msg: messages.WebhookEvent): Promise<boolean> {
+    const { event, streamId, sessionId, userId } = msg;
+    const { mp4Url } = msg.payload ?? {};
+    if (event === "recording.ready" && sessionId && mp4Url) {
       try {
-        await this.recordingToVodAsset(
-          event.payload.mp4Url,
-          session.userId,
-          session.id
-        );
+        await this.handleRecordingReadyChecks(sessionId, mp4Url);
       } catch (e) {
         console.log(
-          `Unable to make vod asset from recording with session id ${sessionId}`,
+          `Error handling recording.ready event sessionId=${sessionId} err=`,
           e
         );
+        // only ack the event if it's an explicit unprocessable entity error
+        return e instanceof UnprocessableEntityError;
       }
     }
 
     const { data: webhooks } = await this.db.webhook.listSubscribed(
-      event.userId,
-      event.event
+      userId,
+      event
     );
 
     console.log(
-      `fetched webhooks. userId=${event.userId} event=${event.event} webhooks=`,
+      `fetched webhooks. userId=${userId} event=${event} webhooks=`,
       webhooks
     );
     if (webhooks.length === 0) {
@@ -146,14 +121,14 @@ export default class WebhookCannon {
     }
 
     let stream: DBStream | undefined;
-    if (event.streamId) {
-      stream = await this.db.stream.get(event.streamId, {
+    if (streamId) {
+      stream = await this.db.stream.get(streamId, {
         useReplica: false,
       });
       if (!stream) {
         // if stream isn't found. don't fire the webhook, log an error
         throw new Error(
-          `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
+          `webhook Cannon: onTrigger: Stream Not found , streamId: ${streamId}`
         );
       }
       // basic sanitization.
@@ -163,11 +138,11 @@ export default class WebhookCannon {
       delete stream.streamKey;
     }
 
-    let user = await this.db.user.get(event.userId);
+    let user = await this.db.user.get(userId);
     if (!user || user.suspended) {
       // if user isn't found. don't fire the webhook, log an error
       throw new Error(
-        `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
+        `webhook Cannon: onTrigger: User Not found , userId: ${userId}`
       );
     }
 
@@ -175,8 +150,8 @@ export default class WebhookCannon {
       const baseTrigger = {
         type: "webhook_trigger" as const,
         timestamp: Date.now(),
-        streamId: event.streamId,
-        event,
+        streamId,
+        event: msg,
         stream,
         user,
       };
@@ -216,12 +191,6 @@ export default class WebhookCannon {
       this.queue.ack(data);
     }
   }
-
-  // async processEvent(msg: Notification) {
-  //   console.log("EVENT TRIGGERED ON THE WEBHOOK");
-  //   let event = await this.db.queue.pop(this.onTrigger.bind(this));
-  //   console.log("event: ", event);
-  // }
 
   stop() {
     // this.db.queue.unsetMsgHandler();
@@ -510,18 +479,31 @@ export default class WebhookCannon {
     }
   }
 
-  async recordingToVodAsset(
-    mp4RecordingUrl: string,
-    userId: string,
-    sessionId: string
-  ) {
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(sessionId);
-
-    const session = await this.db.stream.get(sessionId);
+  async handleRecordingReadyChecks(sessionId: string, mp4Url: string) {
+    const session = await this.db.stream.get(sessionId, {
+      useReplica: false,
+    });
     if (!session) {
-      throw new Error("session not found");
+      throw new UnprocessableEntityError("Session not found");
     }
+
+    const { lastSeen, sourceSegments, isActive } = session;
+    const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
+    if (!lastSeen || !sourceSegments || lastSeen > activeThreshold) {
+      throw new UnprocessableEntityError("Session unused or still active");
+    }
+
+    if (typeof isActive === "boolean" && !isActive) {
+      throw new UnprocessableEntityError("Session recording already handled");
+    }
+    await this.db.stream.update(sessionId, { isActive: false });
+
+    await this.recordingToVodAsset(session, mp4Url);
+  }
+
+  async recordingToVodAsset(session: DBSession, mp4RecordingUrl: string) {
+    const id = uuid();
+    const playbackId = await generateUniquePlaybackId(id);
 
     // trim the second precision from the time string
     var startedAt = new Date(session.createdAt).toISOString();
@@ -531,9 +513,9 @@ export default class WebhookCannon {
       {
         id,
         playbackId,
-        userId,
+        userId: session.userId,
         createdAt: session.createdAt,
-        source: { type: "recording", sessionId },
+        source: { type: "recording", sessionId: session.id },
         status: { phase: "waiting", updatedAt: Date.now() },
         name: `live-${startedAt}`,
         objectStoreId: this.vodObjectStoreId,
@@ -546,7 +528,7 @@ export default class WebhookCannon {
       {
         import: {
           url: mp4RecordingUrl,
-          recordedSessionId: sessionId,
+          recordedSessionId: session.id,
         },
       },
       undefined,
