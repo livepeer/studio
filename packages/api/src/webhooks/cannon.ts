@@ -25,6 +25,16 @@ const MAX_RETRIES = 33;
 
 const SIGNATURE_HEADER = "Livepeer-Signature";
 
+function isRuntimeError(err: any): boolean {
+  const runtimeErrors: ErrorConstructor[] = [
+    TypeError,
+    ReferenceError,
+    RangeError,
+    SyntaxError,
+  ];
+  return runtimeErrors.some((re) => err instanceof re);
+}
+
 export default class WebhookCannon {
   db: DB;
   running: boolean;
@@ -80,7 +90,7 @@ export default class WebhookCannon {
     try {
       ack = await this.processWebhookEvent(event);
     } catch (err) {
-      ack = true;
+      ack = isRuntimeError(err);
       console.log("handleEventQueue Error ", err);
     } finally {
       if (ack) {
