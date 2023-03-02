@@ -8,7 +8,7 @@ import { DB, DBSession } from "../store/db";
 import messages from "../store/messages";
 import Queue from "../store/queue";
 import { DBWebhook } from "../store/webhook-table";
-import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
+import { fetchWithTimeout, RequestInitWithTimeout, sleep } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
@@ -489,7 +489,11 @@ export default class WebhookCannon {
     }
   }
 
-  async handleRecordingReadyChecks(sessionId: string, mp4Url: string) {
+  async handleRecordingReadyChecks(
+    sessionId: string,
+    mp4Url: string,
+    isRetry = false
+  ) {
     const session = await this.db.stream.get(sessionId, {
       useReplica: false,
     });
@@ -499,8 +503,17 @@ export default class WebhookCannon {
 
     const { lastSeen, sourceSegments, isActive } = session;
     const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
-    if (!lastSeen || !sourceSegments || lastSeen > activeThreshold) {
-      throw new UnprocessableEntityError("Session unused or still active");
+    if (!lastSeen || !sourceSegments) {
+      throw new UnprocessableEntityError("Session is unused");
+    }
+    if (lastSeen > activeThreshold) {
+      if (isRetry) {
+        throw new UnprocessableEntityError("Session is still active");
+      }
+      // there was an update after the delayed event was sent, so sleep a few
+      // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
+      await sleep(5000 + (lastSeen - activeThreshold));
+      return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
     }
 
     if (typeof isActive === "boolean" && !isActive) {
