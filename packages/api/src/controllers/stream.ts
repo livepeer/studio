@@ -17,7 +17,7 @@ import {
 } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/db";
-import { BadRequestError } from "../store/errors";
+import { BadRequestError, InternalServerError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
 import messages from "../store/messages";
@@ -44,9 +44,8 @@ type MultistreamOptions = DBStream["multistream"];
 type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
-const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
 const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
-const STALE_SESSION_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours
+const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
 
 const DEFAULT_STREAM_FIELDS: Partial<DBStream> = {
   profiles: [
@@ -197,24 +196,48 @@ function isActuallyNotActive(stream: DBStream) {
   );
 }
 
-function activeCleanupOne(stream: DBStream) {
+function activeCleanupOne(stream: DBStream, queue: Queue, ingest: string) {
   if (isActuallyNotActive(stream)) {
-    db.stream.setActiveToFalse(stream);
+    setImmediate(async () => {
+      try {
+        await db.stream.setActiveToFalse(stream);
+
+        const hooksThreshold = Date.now() - STALE_SESSION_TIMEOUT;
+        if (stream.lastSeen >= hooksThreshold) {
+          await sendSetActiveHooks(stream, { active: false }, queue, ingest);
+        }
+      } catch (err) {
+        logger.error("Error sending /setactive hooks err=", err);
+      }
+    });
     stream.isActive = false;
     return true;
   }
   return false;
 }
 
-function activeCleanup(streams: DBStream[], activeOnly = false) {
+function activeCleanup(
+  streams: DBStream[],
+  queue: Queue,
+  ingest: string,
+  filterToActiveOnly = false
+) {
   let hasStreamsToClean: boolean;
   for (const stream of streams) {
-    hasStreamsToClean = activeCleanupOne(stream);
+    hasStreamsToClean = activeCleanupOne(stream, queue, ingest);
   }
-  if (activeOnly && hasStreamsToClean) {
+  if (filterToActiveOnly && hasStreamsToClean) {
     return streams.filter((s) => !isActuallyNotActive(s));
   }
   return streams;
+}
+
+async function getIngestBase(req: Request) {
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    throw new InternalServerError("ingest not configured");
+  }
+  return ingests[0].base;
 }
 
 const fieldsMap: FieldsMap = {
@@ -317,6 +340,7 @@ app.get("/", authorizer({}), async (req, res) => {
     },
   });
 
+  const ingest = await getIngestBase(req);
   res.status(200);
 
   if (newCursor) {
@@ -327,6 +351,8 @@ app.get("/", authorizer({}), async (req, res) => {
       db.stream.addDefaultFieldsMany(
         db.stream.removePrivateFieldsMany(output, req.user.admin)
       ),
+      req.queue,
+      ingest,
       !!active
     )
   );
@@ -373,13 +399,6 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   let { limit, cursor } = toStringValues(req.query);
   const raw = req.query.raw && req.user.admin;
 
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-  const ingest = ingests[0].base;
-
   const stream = await db.stream.get(parentId);
   if (
     !stream ||
@@ -412,6 +431,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
     cursor,
   });
 
+  const ingest = await getIngestBase(req);
   sessions = sessions.map((session) => {
     session = withRecordingFields(ingest, session, !!forceUrl);
     if (!raw) {
@@ -502,6 +522,7 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
     order: `data->'lastSeen' DESC NULLS LAST, data->'createdAt' DESC NULLS LAST`,
   });
 
+  const ingest = await getIngestBase(req);
   res.status(200);
 
   if (newCursor) {
@@ -511,7 +532,9 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
     activeCleanup(
       db.stream.addDefaultFieldsMany(
         db.stream.removePrivateFieldsMany(streams, req.user.admin)
-      )
+      ),
+      req.queue,
+      ingest
     )
   );
 });
@@ -528,7 +551,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  activeCleanupOne(stream);
+  activeCleanupOne(stream, req.queue, await getIngestBase(req));
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -549,11 +572,8 @@ app.get("/:id", authorizer({}), async (req, res) => {
     };
   }
   if (stream.record) {
-    const ingests = await req.getIngest();
-    if (ingests.length) {
-      const ingest = ingests[0].base;
-      stream = withRecordingFields(ingest, stream, !!forceUrl);
-    }
+    const ingest = await getIngestBase(req);
+    stream = withRecordingFields(ingest, stream, !!forceUrl);
   }
   res.status(200);
   if (!raw) {
@@ -732,7 +752,7 @@ app.post(
     };
     await db.session.create(session);
     if (record) {
-      const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+      const ingest = await getIngestBase(req);
       publishRecordingStartedHook(session, req.queue, ingest);
     }
 
@@ -867,7 +887,7 @@ app.put(
     await db.stream.update(stream.id, patch);
 
     if (isActiveChanged || mediaServerChanged) {
-      const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+      const ingest = await getIngestBase(req);
       sendSetActiveHooks(stream, req.body, req.queue, ingest).catch((err) => {
         logger.error("Error sending /setactive hooks err=", err);
       });
@@ -906,21 +926,24 @@ async function sendSetActiveHooks(
   queue: Queue,
   ingest: string
 ) {
-  // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
-  // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-  const event = active ? "stream.started" : "stream.idle";
-  await queue.publishWebhook(`events.${event}`, {
-    type: "webhook_event",
-    id: uuid(),
-    timestamp: Date.now(),
-    streamId: stream.id,
-    event: event,
-    userId: stream.userId,
-  });
+  if (!stream.parentId) {
+    // only parent streams get the started/idle webhooks
+    const event = active ? "stream.started" : "stream.idle";
+    await queue.publishWebhook(`events.${event}`, {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp: Date.now(),
+      streamId: stream.id,
+      event: event,
+      userId: stream.userId,
+    });
+  }
 
   if (!active && stream.record === true) {
     // emit delayed recording.ready event of all currently active sessions in the stream
-    let sessions = await db.stream.getActiveSessions(stream.id);
+    let sessions = stream.parentId
+      ? [stream]
+      : await db.stream.getActiveSessions(stream.id);
     if (sessions.length === 0) {
       // backward compat with child streams that didn't have isActive field
       const last = await db.stream.getLastSession(stream.id);
@@ -928,9 +951,9 @@ async function sendSetActiveHooks(
         sessions = [last];
       }
     }
-    const staleThreshold = (startedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
 
     for (const session of sessions) {
+      const staleThreshold = (startedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
       if (session.lastSeen && session.lastSeen < staleThreshold) {
         // session is too stale now for us to send a webhook, let's just update the db silently.
         await this.db.stream.update(session.id, { isActive: false });
@@ -1174,7 +1197,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
       errors: ["not found"],
     });
   }
-  activeCleanupOne(stream);
+  activeCleanupOne(stream, req.queue, await getIngestBase(req));
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
