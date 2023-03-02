@@ -874,7 +874,7 @@ components:
           type: string
           readonly: true
           description: Status of the recording process of this stream session.
-          enum: [waiting, ready]
+          enum: [waiting, ready, none]
         recordingUrl:
           type: string
           readonly: true

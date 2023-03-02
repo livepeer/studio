@@ -337,15 +337,19 @@ export function getRecordingFields(
   session: DBSession,
   forceUrl: boolean
 ): Pick<DBSession, "recordingStatus" | "recordingUrl" | "mp4Url"> {
-  if (!session.record || !session.recordObjectStoreId || !session.lastSeen) {
+  if (!session.record) {
     return {};
   }
+
   const readyThreshold = Date.now() - USER_SESSION_TIMEOUT;
   const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
+  const isUnused = !session.lastSeen && session.createdAt < readyThreshold;
+
+  const recordingStatus = isReady ? "ready" : isUnused ? "none" : "waiting";
   return !isReady && !forceUrl
-    ? { recordingStatus: "waiting" }
+    ? { recordingStatus }
     : {
-        recordingStatus: isReady ? "ready" : "waiting",
+        recordingStatus,
         recordingUrl: getRecordingUrl(ingest, session),
         mp4Url: getRecordingUrl(ingest, session, true),
       };
@@ -676,14 +680,18 @@ app.post(
     const createdAt = Date.now();
     const region = req.config.ownRegion;
 
+    const record = stream.record;
+    const recordObjectStoreId =
+      stream.recordObjectStoreId ||
+      (record ? req.config.recordObjectStoreId : undefined);
     const childStream: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
       userId: stream.userId,
       renditions: {},
       objectStoreId: stream.objectStoreId,
-      recordObjectStoreId: stream.recordObjectStoreId,
-      record: stream.record,
+      record,
+      recordObjectStoreId,
       id,
       createdAt,
       parentId: stream.id,
@@ -717,19 +725,13 @@ app.post(
       ingestRate: 0,
       outgoingRate: 0,
       deleted: false,
-      recordObjectStoreId: stream.recordObjectStoreId,
       profiles: childStream.profiles,
-      record: stream.record,
-      ...(!stream.record
-        ? null
-        : {
-            recordingStatus: "waiting",
-            recordingUrl: "",
-            mp4Url: "",
-          }),
+      record,
+      recordObjectStoreId,
+      recordingStatus: record ? "waiting" : undefined,
     };
     await db.session.create(session);
-    if (session.record) {
+    if (record) {
       const ingest = ((await req.getIngest()) ?? [])[0]?.base;
       publishRecordingStartedHook(session, req.queue, ingest);
     }
@@ -1400,7 +1402,7 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     isLive &&
     stream.record &&
     req.config.recordObjectStoreId &&
-    !stream.recordObjectStoreId
+    !stream.recordObjectStoreId // we used to create sessions without recordObjectStoreId
   ) {
     const ros = await db.objectStore.get(req.config.recordObjectStoreId);
     if (ros && !ros.deleted && !ros.disabled) {
