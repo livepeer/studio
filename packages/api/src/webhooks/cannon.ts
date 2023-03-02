@@ -15,6 +15,7 @@ import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
+import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -91,21 +92,32 @@ export default class WebhookCannon {
 
   async processWebhookEvent(event: messages.WebhookEvent): Promise<boolean> {
     if (event.event === "recording.ready") {
-      if (event.payload?.sessionId) {
-        // TODO: Remove this. Backward compat only during deploy
-        event.sessionId = event.payload.sessionId;
-        event.payload = { ...event.payload, sessionId: undefined };
-      }
       const sessionId = event.sessionId;
       if (!sessionId) {
         return true;
       }
+
       const session = await this.db.stream.get(sessionId, {
         useReplica: false,
       });
       if (!session) {
         return true;
       }
+
+      const { lastSeen, sourceSegments } = session;
+      const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
+      if (!lastSeen || !sourceSegments || lastSeen > activeThreshold) {
+        // session was either never used or is still active as it was seen
+        // recently (after delayed event was sent).
+        return true;
+      }
+      if (typeof session.isActive === "boolean" && !session.isActive) {
+        // session recording was already handled.
+        return true;
+      }
+
+      await this.db.stream.update(sessionId, { isActive: false });
+
       try {
         await this.recordingToVodAsset(
           event.payload.mp4Url,

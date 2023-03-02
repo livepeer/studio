@@ -304,6 +304,19 @@ export default class StreamTable extends Table<DBStream> {
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
+  async getActiveSessions(
+    id: string,
+    opts?: QueryOptions
+  ): Promise<DBStream[]> {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT data FROM stream WHERE data->>'parentId'=${id} AND (data->>'isActive')::boolean = TRUE`.setName(
+        `${this.name}_by_parentid_active_sessions`
+      ),
+      opts
+    );
+    return res.rowCount < 1 ? [] : res.rows.map((row) => row.data as DBStream);
+  }
+
   async setActiveToFalse(stream: {
     id: string;
     lastSeen?: number;

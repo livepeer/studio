@@ -45,7 +45,8 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
-const ACTIVE_TIMEOUT = 90 * 1000;
+const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
+const STALE_SESSION_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours
 
 const DEFAULT_STREAM_FIELDS: Partial<DBStream> = {
   profiles: [
@@ -654,6 +655,22 @@ app.post(
       return res.json({ errors: ["not found"] });
     }
 
+    const last = await db.stream.getLastSession(stream.id);
+    const reuseThreshold = Date.now() - USER_SESSION_TIMEOUT;
+    if (last && !last.lastSeen && last.createdAt > reuseThreshold) {
+      // reuse previous recent+unused session as transcode loop is likely crash-looping
+      logger.info(
+        `stream session re-used for ` +
+          `stream_id=${stream.id} stream_name='${stream.name}' playbackid=${stream.playbackId} ` +
+          `session_id=${last.id} session_created_at=${last.createdAt} ` +
+          `elapsed=${Date.now() - start}ms`
+      );
+
+      return res
+        .status(200)
+        .json(db.stream.removePrivateFields(last, req.user.admin));
+    }
+
     // The first four letters of our playback id are the shard key.
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
@@ -900,40 +917,50 @@ async function sendSetActiveHooks(
   });
 
   if (!active && stream.record === true) {
-    // emit recording.ready
-    // find last session
-    const session = await db.stream.getLastSession(stream.id);
-    if (session) {
-      if (
-        (session.lastSeen ?? 0) <
-        (startedAt ?? Date.now() - USER_SESSION_TIMEOUT)
-      ) {
-        // last session is too old, probably transcoding wasn't happening, and so there
-        // will be no recording
-      } else {
-        const userSession = await db.session.get(stream.id);
-        await queue.delayedPublishWebhook(
-          "events.recording.ready",
-          {
-            type: "webhook_event",
-            id: uuid(),
-            timestamp: Date.now(),
-            streamId: stream.id,
-            event: "recording.ready",
-            userId: stream.userId,
-            sessionId: session.id,
-            payload: {
-              recordingUrl: getRecordingUrl(ingest, userSession),
-              mp4Url: getRecordingUrl(ingest, userSession, true),
-              session: {
-                ...toExternalSession(userSession, ingest, true),
-                recordingStatus: "ready", // recording will be ready if this webhook is actually sent
-              },
+    // emit delayed recording.ready event of all currently active sessions in the stream
+    let sessions = await db.stream.getActiveSessions(stream.id);
+    if (sessions.length === 0) {
+      // backward compat with child streams that didn't have isActive field
+      const last = await db.stream.getLastSession(stream.id);
+      if (last && last.isActive === undefined) {
+        sessions = [last];
+      }
+    }
+    const staleThreshold = (startedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
+
+    for (const session of sessions) {
+      if (session.lastSeen && session.lastSeen < staleThreshold) {
+        // session is too stale now for us to send a webhook, let's just update the db silently.
+        await this.db.stream.update(session.id, { isActive: false });
+        continue;
+      }
+
+      const userSession = await db.session.get(stream.id);
+
+      // we don't actually send the webhook here, but schedule an event after a
+      // timeout. the handler for the delayed event will then check if the
+      // session has actually stopped and send the webhook if it is.
+      await queue.delayedPublishWebhook(
+        "events.recording.ready",
+        {
+          type: "webhook_event",
+          id: uuid(),
+          timestamp: Date.now(),
+          streamId: stream.id,
+          event: "recording.ready",
+          userId: stream.userId,
+          sessionId: session.id,
+          payload: {
+            recordingUrl: getRecordingUrl(ingest, userSession),
+            mp4Url: getRecordingUrl(ingest, userSession, true),
+            session: {
+              ...toExternalSession(userSession, ingest, true),
+              recordingStatus: "ready", // recording will be ready if this webhook is actually sent
             },
           },
-          USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
-        );
-      }
+        },
+        USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
+      );
     }
   }
 }
