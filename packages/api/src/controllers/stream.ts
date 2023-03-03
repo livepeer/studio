@@ -197,27 +197,26 @@ function isActuallyNotActive(stream: DBStream) {
 }
 
 function activeCleanupOne(stream: DBStream, queue: Queue, ingest: string) {
-  if (isActuallyNotActive(stream)) {
-    setImmediate(async () => {
-      try {
-        const hooksThreshold = Date.now() - STALE_SESSION_TIMEOUT;
-        const isStale = stream.lastSeen < hooksThreshold;
-
-        if (!stream.parentId || isStale) {
-          // non-stale child streams are cleaned up async on the recording.ready hook
-          await db.stream.setActiveToFalse(stream);
-        }
-        if (!isStale) {
-          await sendSetActiveHooks(stream, { active: false }, queue, ingest);
-        }
-      } catch (err) {
-        logger.error("Error sending /setactive hooks err=", err);
-      }
-    });
-    stream.isActive = false;
-    return true;
+  if (!isActuallyNotActive(stream)) {
+    return false;
   }
-  return false;
+
+  setImmediate(async () => {
+    try {
+      if (stream.parentId) {
+        // this is a session so trigger the recording.ready logic to clean-up the isActive field
+        await triggerSessionRecordingHooks(stream, queue, ingest);
+      } else {
+        const patch = { isActive: false };
+        await setStreamActiveWithHooks(stream, patch, queue, ingest);
+      }
+    } catch (err) {
+      logger.error("Error sending /setactive hooks err=", err);
+    }
+  });
+
+  stream.isActive = false;
+  return true;
 }
 
 function activeCleanup(
@@ -757,7 +756,9 @@ app.post(
     await db.session.create(session);
     if (record) {
       const ingest = await getIngestBase(req);
-      publishRecordingStartedHook(session, req.queue, ingest);
+      publishRecordingStartedHook(session, req.queue, ingest).catch((err) => {
+        logger.error("Error sending recording.started hook err=", err);
+      });
     }
 
     await db.stream.create(childStream);
@@ -869,7 +870,7 @@ app.put(
       return res.json({ errors: ["user is suspended"] });
     }
 
-    const isActiveChanged = stream.isActive != active;
+    const isActiveChanged = stream.isActive !== active;
     const mediaServerChanged =
       stream.region !== req.config.ownRegion || stream.mistHost !== hostName;
     if (isActiveChanged && !active && mediaServerChanged) {
@@ -890,12 +891,8 @@ app.put(
     };
     await db.stream.update(stream.id, patch);
 
-    if (isActiveChanged || mediaServerChanged) {
-      const ingest = await getIngestBase(req);
-      sendSetActiveHooks(stream, req.body, req.queue, ingest).catch((err) => {
-        logger.error("Error sending /setactive hooks err=", err);
-      });
-    }
+    const ingest = await getIngestBase(req);
+    await setStreamActiveWithHooks(stream, patch, req.queue, ingest);
 
     // update the other auxiliary info in the database in background.
     setImmediate(async () => {
@@ -924,71 +921,98 @@ app.put(
   }
 );
 
-async function sendSetActiveHooks(
+/**
+ * Updates the isActive field synchronously on the DB and sends corresponding
+ * webhooks if appropriate.
+ *
+ * @param stream The stream to update which MUST be a parent stream (no
+ * parentId). Child streams are processed through the delayed `recording.ready`
+ * events from {@link triggerSessionRecordingHooks}.
+ */
+async function setStreamActiveWithHooks(
   stream: DBStream,
-  { active, startedAt }: StreamSetActivePayload,
+  patch: Partial<DBStream> & { isActive: boolean },
   queue: Queue,
   ingest: string
 ) {
-  if (!stream.parentId) {
-    // only parent streams get the started/idle webhooks
-    const event = active ? "stream.started" : "stream.idle";
-    await queue.publishWebhook(`events.${event}`, {
-      type: "webhook_event",
-      id: uuid(),
-      timestamp: Date.now(),
-      streamId: stream.id,
-      event: event,
-      userId: stream.userId,
-    });
+  if (stream.parentId) {
+    throw new Error(
+      "must only set stream active synchronously for parent streams"
+    );
   }
 
-  if (!active && stream.record === true) {
-    // emit delayed recording.ready event of all currently active sessions in the stream
-    let sessions = stream.parentId
-      ? [stream]
-      : await db.stream.getActiveSessions(stream.id);
-    if (sessions.length === 0) {
-      // backward compat with child streams that didn't have isActive field
-      const last = await db.stream.getLastSession(stream.id);
-      if (last && last.isActive === undefined) {
-        sessions = [last];
-      }
-    }
+  await db.stream.update(stream.id, patch);
 
-    for (const session of sessions) {
-      const staleThreshold = (startedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
-      if (session.lastSeen && session.lastSeen < staleThreshold) {
-        // session is too stale now for us to send a webhook, let's just update the db silently.
+  const changed =
+    stream.isActive !== patch.isActive ||
+    stream.region !== patch.region ||
+    stream.mistHost !== patch.mistHost;
+  const isStaleCleanup = !patch.isActive && isStreamStale(stream);
+
+  if (changed && !isStaleCleanup) {
+    const event = patch.isActive ? "stream.started" : "stream.idle";
+    await queue
+      .publishWebhook(`events.${event}`, {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp: Date.now(),
+        streamId: stream.id,
+        event: event,
+        userId: stream.userId,
+      })
+      .catch((err) => {
+        logger.error(
+          `Error sending /setactive hooks stream_id=${stream.id} event=${event} err=`,
+          err
+        );
+      });
+  }
+
+  // opportunistically trigger recording.ready logic for this stream's sessions
+  triggerSessionRecordingHooks(stream, queue, ingest).catch((err) => {
+    logger.error(
+      `Error triggering session recording hooks stream_id=${stream.id} err=`,
+      err
+    );
+  });
+}
+
+/**
+ * Trigger delayed recording.ready events for each active session in the stream.
+ * These recording.ready events aren't sent directly to the user, but instead
+ * the handler will check if the session is actually inactive to fire the hook.
+ */
+async function triggerSessionRecordingHooks(
+  streamOrSession: DBStream,
+  queue: Queue,
+  ingest: string
+) {
+  const { id, parentId } = streamOrSession;
+  let sessions = parentId
+    ? [streamOrSession]
+    : await db.stream.getActiveSessions(id);
+
+  // backward compat with child streams that didn't have isActive field
+  if (sessions.length === 0) {
+    const last = await db.stream.getLastSession(id);
+    if (last && last.isActive === undefined) {
+      sessions = [last];
+    }
+  }
+
+  for (const session of sessions) {
+    try {
+      if (!session.record || isStreamStale(session)) {
         await this.db.stream.update(session.id, { isActive: false });
         continue;
       }
 
       const userSession = await db.session.get(session.id);
-
-      // we don't actually send the webhook here, but schedule an event after a
-      // timeout. the handler for the delayed event will then check if the
-      // session has actually stopped and send the webhook if it is.
-      await queue.delayedPublishWebhook(
-        "events.recording.ready",
-        {
-          type: "webhook_event",
-          id: uuid(),
-          timestamp: Date.now(),
-          streamId: session.parentId,
-          event: "recording.ready",
-          userId: session.userId,
-          sessionId: session.id,
-          payload: {
-            recordingUrl: getRecordingUrl(ingest, userSession),
-            mp4Url: getRecordingUrl(ingest, userSession, true),
-            session: {
-              ...toExternalSession(userSession, ingest, true),
-              recordingStatus: "ready", // recording will be ready if this webhook is actually sent
-            },
-          },
-        },
-        USER_SESSION_TIMEOUT + 10_000
+      await publishDelayedRecordingReadyHook(userSession, queue, ingest);
+    } catch (err) {
+      logger.error(
+        `Error sending recording.ready hook for session_id=${session.id} err=`,
+        err
       );
     }
   }
@@ -999,19 +1023,57 @@ function publishRecordingStartedHook(
   queue: Queue,
   ingest: string
 ) {
-  queue
-    .publishWebhook("events.recording.started", {
+  return queue.publishWebhook("events.recording.started", {
+    type: "webhook_event",
+    id: uuid(),
+    timestamp: Date.now(),
+    streamId: session.parentId,
+    userId: session.userId,
+    event: "recording.started",
+    payload: { session: toExternalSession(session, ingest) },
+  });
+}
+
+/**
+ * We don't actually send the webhook here, but schedule an event after a timeout.
+ */
+function publishDelayedRecordingReadyHook(
+  session: DBSession,
+  queue: Queue,
+  ingest: string
+) {
+  return queue.delayedPublishWebhook(
+    "events.recording.ready",
+    {
       type: "webhook_event",
       id: uuid(),
       timestamp: Date.now(),
       streamId: session.parentId,
+      event: "recording.ready",
       userId: session.userId,
-      event: "recording.started",
-      payload: { session: toExternalSession(session, ingest) },
-    })
-    .catch((err) => {
-      logger.error("Error sending recording.started hook err=", err);
-    });
+      sessionId: session.id,
+      payload: {
+        recordingUrl: getRecordingUrl(ingest, session),
+        mp4Url: getRecordingUrl(ingest, session, true),
+        session: {
+          ...toExternalSession(session, ingest, true),
+          recordingStatus: "ready", // recording will be ready if this webhook is actually sent
+        },
+      },
+    },
+    USER_SESSION_TIMEOUT + 10_000
+  );
+}
+
+/**
+ * A stream (or session, a child stream) is considered stale if it is too old
+ * for us to send a webhook about it. This can happen on background clean-up
+ * ops, in which case we just update the DB silently without sending hooks.
+ */
+function isStreamStale(s: DBStream, lastSessionStartedAt?: number) {
+  const staleThreshold =
+    (lastSessionStartedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
+  return s.lastSeen && s.lastSeen < staleThreshold;
 }
 
 // sets 'isActive' field to false for many objects at once
