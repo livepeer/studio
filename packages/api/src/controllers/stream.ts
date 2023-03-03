@@ -200,10 +200,14 @@ function activeCleanupOne(stream: DBStream, queue: Queue, ingest: string) {
   if (isActuallyNotActive(stream)) {
     setImmediate(async () => {
       try {
-        await db.stream.setActiveToFalse(stream);
-
         const hooksThreshold = Date.now() - STALE_SESSION_TIMEOUT;
-        if (stream.lastSeen >= hooksThreshold) {
+        const isStale = stream.lastSeen < hooksThreshold;
+
+        if (!stream.parentId || isStale) {
+          // non-stale child streams are cleaned up async on the recording.ready hook
+          await db.stream.setActiveToFalse(stream);
+        }
+        if (!isStale) {
           await sendSetActiveHooks(stream, { active: false }, queue, ingest);
         }
       } catch (err) {
