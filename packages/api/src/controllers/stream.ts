@@ -964,7 +964,7 @@ async function sendSetActiveHooks(
         continue;
       }
 
-      const userSession = await db.session.get(stream.id);
+      const userSession = await db.session.get(session.id);
 
       // we don't actually send the webhook here, but schedule an event after a
       // timeout. the handler for the delayed event will then check if the
@@ -975,9 +975,9 @@ async function sendSetActiveHooks(
           type: "webhook_event",
           id: uuid(),
           timestamp: Date.now(),
-          streamId: stream.id,
+          streamId: session.parentId,
           event: "recording.ready",
-          userId: stream.userId,
+          userId: session.userId,
           sessionId: session.id,
           payload: {
             recordingUrl: getRecordingUrl(ingest, userSession),
