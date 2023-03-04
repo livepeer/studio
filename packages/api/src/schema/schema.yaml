@@ -654,21 +654,7 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         storage:
-          additionalProperties: false
-          properties:
-            ipfs:
-              oneOf:
-                - type: object
-                  additionalProperties: false
-                  properties:
-                    spec:
-                      oneOf:
-                        - type: "null"
-                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
-                - type: [boolean, "null"]
-                  description:
-                    Set to true to make default export to IPFS. False or null
-                    means to unpin from IPFS, but is unsupported right now.
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
 
     stream-patch-payload:
       type: object
@@ -1423,6 +1409,22 @@ components:
           example: filename.mp4
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        storage:
+          additionalProperties: false
+          properties:
+            ipfs:
+              oneOf:
+                - type: object
+                  additionalProperties: false
+                  properties:
+                    spec:
+                      oneOf:
+                        - type: "null"
+                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
+                - type: [boolean, "null"]
+                  description:
+                    Set to true to make default export to IPFS. False or null
+                    means to unpin from IPFS, but is unsupported right now.
         url:
           type: string
           format: uri
