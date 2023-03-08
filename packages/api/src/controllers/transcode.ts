@@ -48,7 +48,7 @@ app.post(
           },
           outputs: params.outputs,
           profiles: params.profiles,
-          targetSegmentSizeSecs: params.target_segment_size_secs,
+          target_segment_size_secs: params.target_segment_size_secs,
           catalystPipelineStrategy,
         },
       },
