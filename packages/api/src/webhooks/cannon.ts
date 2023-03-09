@@ -16,8 +16,7 @@ import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { NotFoundError, UnprocessableEntityError } from "../store/errors";
-import { db } from "../store";
+import { UnprocessableEntityError } from "../store/errors";
 import sql from "sql-template-strings";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
@@ -384,8 +383,7 @@ export default class WebhookCannon {
 
       // sign payload if there is a webhook secret
       if (webhook.sharedSecret) {
-        let signature = sign(params.body, webhook.sharedSecret);
-        params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
+        params = await addSignatureHeader(params, webhook, timestamp);
       }
       const triggerTime = Date.now();
       const startTime = process.hrtime();
@@ -567,4 +565,14 @@ export default class WebhookCannon {
       asset
     );
   }
+}
+
+export async function addSignatureHeader(
+  params: any,
+  webhook: DBWebhook,
+  timestamp: number
+) {
+  let signature = sign(params.body, webhook.sharedSecret);
+  params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
+  return params;
 }

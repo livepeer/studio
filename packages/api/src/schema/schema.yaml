@@ -769,6 +769,7 @@ components:
             - public
             - jwt
             - lit_signing_condition # only for lit-signing-condition experiment
+            - webhook
         unifiedAccessControlConditions:
           type: array
           description: LIT Unified Access Control Conditions
@@ -790,6 +791,13 @@ components:
               type: string
             extraData:
               type: string
+        webhookId:
+          type: string
+          description: ID of the webhook to use for playback policy
+        webhookContext:
+          type: object
+          description: User-defined webhook context
+          additionalProperties: true
 
     session:
       type: object
