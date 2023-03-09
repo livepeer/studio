@@ -129,7 +129,8 @@ app.post(
         }
         const statusCode = await fireGateWebhook(
           webhook,
-          content.playbackPolicy
+          content.playbackPolicy,
+          req.body.pub
         );
         switch (statusCode) {
           case 200:
@@ -164,7 +165,8 @@ app.post(
 
 async function fireGateWebhook(
   webhook: DBWebhook,
-  plabackPolicy: PlaybackPolicy
+  plabackPolicy: PlaybackPolicy,
+  accessKey: string
 ) {
   let timestamp = Date.now();
   let params = {
@@ -174,7 +176,10 @@ async function fireGateWebhook(
       "user-agent": "livepeer.studio",
     },
     timeout: WEBHOOK_TIMEOUT,
-    body: JSON.stringify(plabackPolicy.webhookContext),
+    body: JSON.stringify({
+      context: plabackPolicy.webhookContext,
+      accessKey: accessKey,
+    }),
   };
 
   if (webhook.sharedSecret) {
