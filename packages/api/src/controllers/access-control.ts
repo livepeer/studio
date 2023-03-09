@@ -118,6 +118,14 @@ app.post(
         res.status(204);
         return res.end();
       case "webhook":
+        if (!req.body.accessKey) {
+          console.log(`
+            access-control: gate: no accessKey provided for playbackId ${playbackId}, disallowing playback
+          `);
+          throw new ForbiddenError(
+            "Content is gated and requires an access key"
+          );
+        }
         const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
         if (!webhook) {
           console.log(`
@@ -130,7 +138,7 @@ app.post(
         const statusCode = await fireGateWebhook(
           webhook,
           content.playbackPolicy,
-          req.body.pub
+          req.body.accessKey
         );
         switch (statusCode) {
           case 200:
