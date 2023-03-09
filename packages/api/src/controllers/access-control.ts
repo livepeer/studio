@@ -8,6 +8,7 @@ import {
   NotFoundError,
   ForbiddenError,
   BadRequestError,
+  BadGatewayError,
 } from "../store/errors";
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
@@ -149,14 +150,18 @@ app.post(
             console.log(`
               access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} failed, disallowing playback
             `);
-            throw new ForbiddenError(
+            throw new BadGatewayError(
               "Content is gated and corresponding webhook failed"
             );
           default:
             console.log(`
               access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} returned status code ${statusCode}, disallowing playback
             `);
-            throw new ForbiddenError(
+            if (statusCode >= 400 && statusCode < 500) {
+              res.status(statusCode);
+              return res.end();
+            }
+            throw new BadGatewayError(
               "Content is gated and corresponding webhook failed"
             );
         }
