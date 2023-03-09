@@ -141,29 +141,28 @@ app.post(
           content.playbackPolicy,
           req.body.accessKey
         );
-        switch (statusCode) {
-          case 200:
-            res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
-            res.status(204);
+        if (statusCode >= 200 && statusCode < 300) {
+          res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
+          res.status(204);
+          return res.end();
+        } else if (statusCode === 0) {
+          console.log(`
+            access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} failed, disallowing playback
+          `);
+          throw new BadGatewayError(
+            "Content is gated and corresponding webhook failed"
+          );
+        } else {
+          console.log(`
+            access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} returned status code ${statusCode}, disallowing playback
+          `);
+          if (statusCode >= 400 && statusCode < 500) {
+            res.status(statusCode);
             return res.end();
-          case 0:
-            console.log(`
-              access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} failed, disallowing playback
-            `);
-            throw new BadGatewayError(
-              "Content is gated and corresponding webhook failed"
-            );
-          default:
-            console.log(`
-              access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} returned status code ${statusCode}, disallowing playback
-            `);
-            if (statusCode >= 400 && statusCode < 500) {
-              res.status(statusCode);
-              return res.end();
-            }
-            throw new BadGatewayError(
-              "Content is gated and corresponding webhook failed"
-            );
+          }
+          throw new BadGatewayError(
+            "Content is gated and corresponding webhook failed"
+          );
         }
       default:
         console.log(`
@@ -192,6 +191,7 @@ async function fireGateWebhook(
     body: JSON.stringify({
       context: plabackPolicy.webhookContext,
       accessKey: accessKey,
+      timestamp: timestamp,
     }),
   };
 
@@ -202,13 +202,11 @@ async function fireGateWebhook(
   const startTime = process.hrtime();
   let resp: Response;
   let errorMessage: string;
-  let responseBody: string;
   let statusCode: number;
 
   try {
     console.log(`webhook ${webhook.id} firing`);
     resp = await fetchWithTimeout(webhook.url, params);
-    responseBody = await resp.text();
     statusCode = resp.status;
 
     if (resp.status >= 200 && resp.status < 300) {
@@ -231,7 +229,7 @@ async function fireGateWebhook(
       timestamp,
       statusCode,
       errorMessage,
-      responseBody
+      undefined
     );
     return statusCode;
   }
