@@ -131,6 +131,15 @@ export class TaskScheduler {
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
           files: assetSpec.files,
+          storage: !assetSpec.storage?.ipfs
+            ? undefined
+            : {
+                ...assetSpec.storage,
+                status: {
+                  tasks: { last: task.id },
+                  phase: "ready",
+                },
+              },
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",

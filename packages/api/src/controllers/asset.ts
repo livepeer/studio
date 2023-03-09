@@ -130,6 +130,7 @@ async function validateAssetPayload(
     source,
     playbackPolicy: payload.playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
+    storage: storageInputToState(payload.storage),
   };
 }
 
@@ -300,6 +301,22 @@ function assetWithIpfsUrls(
       },
     },
   });
+}
+
+function storageInputToState(
+  input: NewAssetPayload["storage"]
+): Asset["storage"] {
+  if (typeof input?.ipfs === "undefined") {
+    return undefined;
+  }
+
+  let { ipfs } = input;
+  if (typeof ipfs === "boolean" || !ipfs) {
+    ipfs = { spec: ipfs ? {} : null };
+  } else if (typeof ipfs.spec === "undefined") {
+    ipfs = { spec: {} };
+  }
+  return { ...input, ipfs };
 }
 
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {
@@ -988,17 +1005,6 @@ app.patch(
       storage: storageInput,
     } = req.body as AssetPatchPayload;
 
-    let storage: Asset["storage"];
-    if (storageInput?.ipfs !== undefined) {
-      let { ipfs } = storageInput;
-      if (typeof ipfs === "boolean" || !ipfs) {
-        ipfs = { spec: ipfs ? {} : null };
-      } else if (typeof ipfs.spec === "undefined") {
-        ipfs = { spec: {} };
-      }
-      storage = { ...storageInput, ipfs };
-    }
-
     // update a specific asset
     const { id } = req.params;
     const asset = await db.asset.get(id);
@@ -1008,6 +1014,7 @@ app.patch(
       throw new UnprocessableEntityError(`asset is not ready`);
     }
 
+    let storage = storageInputToState(storageInput);
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
