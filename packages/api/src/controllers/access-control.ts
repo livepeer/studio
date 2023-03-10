@@ -9,6 +9,7 @@ import {
   ForbiddenError,
   BadRequestError,
   BadGatewayError,
+  InternalServerError,
 } from "../store/errors";
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
@@ -27,18 +28,14 @@ app.post(
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace(/^\w+\+/, "");
-    console.log(`
-      access-control: gate: request for playbackId: ${playbackId}
-    `);
     const content =
       (await db.stream.getByPlaybackId(playbackId)) ||
       (await db.asset.getByPlaybackId(playbackId));
 
     if (!content || content.deleted) {
       const contentLog = JSON.stringify(JSON.stringify(content));
-
       console.log(`
-        access-control: gate: content not found for playbackId ${playbackId}, disallowing playback, content=${contentLog}
+        access-control: gate: content not found for playbackId=${playbackId}, disallowing playback, content=${contentLog}
       `);
       throw new NotFoundError("Content not found");
     }
@@ -47,10 +44,8 @@ app.post(
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
       const contentLog = JSON.stringify(JSON.stringify(content));
-      const userLog = JSON.stringify(JSON.stringify(user));
-
       console.log(`
-        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user ${user.id} is suspended, content=${contentLog}, user=${userLog}
+        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user=${user.id} is suspended, content=${contentLog}
       `);
       throw new NotFoundError("Content not found");
     }
@@ -65,7 +60,7 @@ app.post(
       case "jwt":
         if (!req.body.pub) {
           console.log(`
-            access-control: gate: no pub provided for playbackId ${playbackId}, disallowing playback
+            access-control: gate: no pub provided for playbackId=${playbackId}, disallowing playback
           `);
           throw new ForbiddenError(
             "Content is gated and requires a public key"
@@ -80,7 +75,7 @@ app.post(
 
         if (signingKeyOutput.length == 0) {
           console.log(`
-            access-control: gate: content with playbackId ${playbackId} is gated but corresponding public key not found for key ${req.body.pub}, disallowing playback
+            access-control: gate: content with playbackId=${playbackId} is gated but corresponding public key not found for key=${req.body.pub}, disallowing playback
           `);
           throw new ForbiddenError(
             "Content is gated and corresponding public key not found"
@@ -90,7 +85,7 @@ app.post(
         if (signingKeyOutput.length > 1) {
           let collisionKeys = JSON.stringify(signingKeyOutput);
           console.log(`
-            access-control: gate: content contentId ${content.id} with playbackId=${playbackId} is gated but multiple (${signingKeyOutput.length}) public keys found for key ${req.body.pub}, disallowing playback, colliding keys=${collisionKeys}
+            access-control: gate: content contentId=${content.id} with playbackId=${playbackId} is gated but multiple (${signingKeyOutput.length}) public keys found for key=${req.body.pub}, disallowing playback, colliding keys=${collisionKeys}
           `);
           throw new BadRequestError(
             "Multiple signing keys found for the same public key."
@@ -119,10 +114,7 @@ app.post(
         res.status(204);
         return res.end();
       case "webhook":
-        if (!req.body.accessKey) {
-          console.log(`
-            access-control: gate: no accessKey provided for playbackId ${playbackId}, disallowing playback
-          `);
+        if (!req.body.accessKey || req.body.type == "accessKey") {
           throw new ForbiddenError(
             "Content is gated and requires an access key"
           );
@@ -130,9 +122,9 @@ app.post(
         const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
         if (!webhook) {
           console.log(`
-            access-control: gate: content with playbackId ${playbackId} is gated but corresponding webhook not found for webhookId ${content.playbackPolicy.webhookId}, disallowing playback
+            access-control: gate: content with playbackId=${playbackId} is gated but corresponding webhook not found for webhookId=${content.playbackPolicy.webhookId}, disallowing playback
           `);
-          throw new ForbiddenError(
+          throw new InternalServerError(
             "Content is gated and corresponding webhook not found"
           );
         }
@@ -147,27 +139,20 @@ app.post(
           return res.end();
         } else if (statusCode === 0) {
           console.log(`
-            access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} failed, disallowing playback
+            access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} failed, disallowing playback
           `);
           throw new BadGatewayError(
             "Content is gated and corresponding webhook failed"
           );
         } else {
           console.log(`
-            access-control: gate: content with playbackId ${playbackId} is gated but webhook ${webhook.id} returned status code ${statusCode}, disallowing playback
+            access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} returned status code ${statusCode}, disallowing playback
           `);
-          if (statusCode >= 400 && statusCode < 500) {
-            res.status(statusCode);
-            return res.end();
-          }
           throw new BadGatewayError(
             "Content is gated and corresponding webhook failed"
           );
         }
       default:
-        console.log(`
-          access-control: gate: content with playbackId ${playbackId} is gated but playbackPolicyType ${playbackPolicyType} is not supported, disallowing playback
-        `);
         throw new BadRequestError(
           `unknown playbackPolicy type: ${playbackPolicyType}`
         );
@@ -205,22 +190,16 @@ async function fireGateWebhook(
   let statusCode: number;
 
   try {
-    console.log(`webhook ${webhook.id} firing`);
     resp = await fetchWithTimeout(webhook.url, params);
+    // TODO: remember to handle redirects
     statusCode = resp.status;
 
-    if (resp.status >= 200 && resp.status < 300) {
-      // 2xx requests are cool. all is good
-      console.log(`webhook ${webhook.id} fired successfully`);
+    if (resp.status <= 200 || resp.status > 400) {
+      console.error(
+        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
+      );
     }
-
-    console.error(
-      `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
-    );
   } catch (e) {
-    console.log(`
-      webhook ${webhook.id} failed to fire: ${e.message}
-    `);
     errorMessage = e.message;
     statusCode = 0;
   } finally {
@@ -231,8 +210,12 @@ async function fireGateWebhook(
       errorMessage,
       undefined
     );
-    return statusCode;
+    if (resp) {
+      // Dispose of the response body
+      await resp.text();
+    }
   }
+  return statusCode;
 }
 
 export default app;
