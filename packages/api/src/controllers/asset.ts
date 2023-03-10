@@ -578,6 +578,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(asset);
 });
 
+// deprecated: use PATCH /:id setting storage instead
 app.post(
   "/:id/export",
   authorizer({}),
