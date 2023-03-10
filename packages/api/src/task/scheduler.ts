@@ -301,18 +301,21 @@ export class TaskScheduler {
     return task;
   }
 
-  async enqueueTask(task: WithID<Task>) {
-    const status: Task["status"] = {
-      phase: "waiting",
-      updatedAt: Date.now(),
-      retries: task.status.retries,
-    };
-    await this.updateTask(task, { status });
+  async enqueueTask(task: WithID<Task>, retries?: number) {
+    const timestamp = Date.now();
+    await this.updateTask(task, {
+      scheduledAt: retries ? undefined : timestamp,
+      status: {
+        phase: "waiting",
+        updatedAt: timestamp,
+        retries,
+      },
+    });
     try {
       await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
         type: "task_trigger",
         id: uuid(),
-        timestamp: status.updatedAt,
+        timestamp,
         task: taskInfo(task),
       });
     } catch (err) {
@@ -338,12 +341,12 @@ export class TaskScheduler {
 
     task = await this.updateTask(task, { status });
     await sleep(retries * TASK_RETRY_BASE_DELAY);
-    await this.enqueueTask(task);
+    await this.enqueueTask(task, retries);
   }
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output">,
+    updates: Pick<Task, "scheduledAt" | "status" | "output">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
     updates = this.deleteCredentials(task, updates);

@@ -1682,6 +1682,13 @@ components:
           readOnly: true
           description: Timestamp (in milliseconds) at which task was created
           example: 1587667174725
+        scheduledAt:
+          type: number
+          readOnly: true
+          description: |
+            Timestamp (in milliseconds) at which the task was scheduled or
+            execution (e.g. after file upload finished).
+          example: 1587667174725
         deleted:
           type: boolean
           description: Set to true when the task is deleted
