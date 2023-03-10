@@ -123,7 +123,7 @@ async function validateAssetPayload(
     userId,
     createdAt,
     status: {
-      phase: "waiting",
+      phase: source.type === "directUpload" ? "uploading" : "waiting",
       updatedAt: createdAt,
     },
     name: payload.name,
@@ -886,17 +886,27 @@ type TusFileMetadata = {
 const onTusUploadComplete =
   (isTest: boolean) =>
   async ({ file }: { file: TusFileMetadata }) => {
-    try {
-      const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
-      const { task } = await getPendingAssetAndTask(playbackId);
-      await taskScheduler.enqueueTask(task);
-    } catch (err) {
-      console.error(
-        `error processing finished upload fileId=${file.id} err=`,
-        err
-      );
-    }
+    const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
+    await onUploadComplete(playbackId);
   };
+
+const onUploadComplete = async (playbackId: string) => {
+  try {
+    const { task, asset } = await getPendingAssetAndTask(playbackId);
+    await taskScheduler.enqueueTask(task);
+    await db.asset.update(asset.id, {
+      status: {
+        phase: "waiting",
+        updatedAt: Date.now(),
+      },
+    });
+  } catch (err) {
+    console.error(
+      `error processing upload complete playbackId=${playbackId} err=`,
+      err
+    );
+  }
+};
 
 const getPendingAssetAndTask = async (playbackId: string) => {
   const asset = await db.asset.getByPlaybackId(playbackId, {
@@ -960,12 +970,14 @@ app.put("/upload/direct", async (req, res) => {
     jwtAudience
   );
 
-  const { task } = await getPendingAssetAndTask(playbackId);
+  // ensure upload exists and is pending
+  await getPendingAssetAndTask(playbackId);
+
   var proxy = httpProxy.createProxyServer({});
   proxy.on("end", async function (proxyReq, _, res) {
     if (res.statusCode == 200) {
       // TODO: Find a way to return the task in the response
-      await req.taskScheduler.enqueueTask(task);
+      await onUploadComplete(playbackId);
     } else {
       console.log(
         `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`

@@ -1232,6 +1232,7 @@ components:
               type: string
               description: Phase of the asset
               enum:
+                - uploading
                 - waiting
                 - processing
                 - ready
