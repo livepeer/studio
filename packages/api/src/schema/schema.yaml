@@ -1044,7 +1044,7 @@ components:
           example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
           index: true
           description: Used to form recording URL for HLS playback
-        generateMp4s:
+        staticMp4:
           type: boolean
           writeOnly: true
           description: Whether to generate MP4s for the asset.
@@ -1425,7 +1425,7 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
-        generateMp4s:
+        staticMp4:
           type: boolean
           description: Whether to generate MP4s for the asset.
           example: true
