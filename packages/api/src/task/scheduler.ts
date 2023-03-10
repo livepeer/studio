@@ -250,7 +250,7 @@ export class TaskScheduler {
     }
   }
 
-  async scheduleTask(
+  async spawnAndScheduleTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
@@ -264,7 +264,7 @@ export class TaskScheduler {
       outputAsset,
       userId
     );
-    await this.enqueueTask(task);
+    await this.scheduleTask(task);
     return task;
   }
 
@@ -301,7 +301,7 @@ export class TaskScheduler {
     return task;
   }
 
-  async enqueueTask(task: WithID<Task>, retries?: number) {
+  async scheduleTask(task: WithID<Task>, retries?: number) {
     const timestamp = Date.now();
     await this.updateTask(task, {
       scheduledAt: retries ? undefined : timestamp,
@@ -341,7 +341,7 @@ export class TaskScheduler {
 
     task = await this.updateTask(task, { status });
     await sleep(retries * TASK_RETRY_BASE_DELAY);
-    await this.enqueueTask(task, retries);
+    await this.scheduleTask(task, retries);
   }
 
   async updateTask(

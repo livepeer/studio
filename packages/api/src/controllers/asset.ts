@@ -357,7 +357,7 @@ async function reconcileAssetStorage(
     if (!task) {
       await ensureQueueCapacity(config, asset.userId);
 
-      task = await taskScheduler.scheduleTask(
+      task = await taskScheduler.spawnAndScheduleTask(
         "export",
         { export: { ipfs: newSpec } },
         asset
@@ -601,7 +601,7 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
 
     const params = req.body as ExportTaskParams;
-    const task = await req.taskScheduler.scheduleTask(
+    const task = await req.taskScheduler.spawnAndScheduleTask(
       "export",
       { export: params },
       asset
@@ -666,7 +666,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
 
   const asset = await createAsset(newAsset, req.queue);
-  const task = await req.taskScheduler.scheduleTask(
+  const task = await req.taskScheduler.spawnAndScheduleTask(
     "upload",
     {
       upload: {
@@ -736,7 +736,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
   outputAsset = await createAsset(outputAsset, req.queue);
 
-  const task = await req.taskScheduler.scheduleTask(
+  const task = await req.taskScheduler.spawnAndScheduleTask(
     "transcode",
     {
       transcode: {
@@ -893,7 +893,7 @@ const onTusUploadComplete =
 const onUploadComplete = async (playbackId: string) => {
   try {
     const { task, asset } = await getPendingAssetAndTask(playbackId);
-    await taskScheduler.enqueueTask(task);
+    await taskScheduler.scheduleTask(task);
     await db.asset.update(asset.id, {
       status: {
         phase: "waiting",
