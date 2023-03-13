@@ -128,6 +128,7 @@ async function validateAssetPayload(
     },
     name: payload.name,
     source,
+    staticMp4: payload.staticMp4,
     playbackPolicy: payload.playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
     storage: storageInputToState(payload.storage),
