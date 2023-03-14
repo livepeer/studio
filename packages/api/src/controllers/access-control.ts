@@ -1,6 +1,6 @@
 import signingKeyApp from "./signing-key";
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { Request, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -10,6 +10,10 @@ import {
   BadRequestError,
 } from "../store/errors";
 import tracking from "../middleware/tracking";
+import { v4 as uuid } from "uuid";
+import { DBStream } from "../store/stream-table";
+import { Asset } from "../schema/types";
+import { WithID } from "../store/types";
 
 const app = Router();
 
@@ -49,6 +53,11 @@ app.post(
     }
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
+
+    if (playbackPolicyType !== "public") {
+      // TODO: move it into specific policy conditions
+      fireEventWebhook(req, content);
+    }
 
     if (playbackPolicyType === "public") {
       res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
@@ -118,5 +127,20 @@ app.post(
     }
   }
 );
+
+async function fireEventWebhook(
+  req: Request,
+  content: DBStream | WithID<Asset>
+) {
+  const queue = req.queue;
+  await queue.publishWebhook(`events.playback.accessControl`, {
+    type: "webhook_event",
+    id: uuid(),
+    timestamp: Date.now(),
+    streamId: content.id,
+    event: "playback.accessControl",
+    userId: content.userId,
+  });
+}
 
 export default app;
