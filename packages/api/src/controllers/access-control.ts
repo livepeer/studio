@@ -14,9 +14,9 @@ import {
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
 import { PlaybackPolicy } from "../schema/types";
-import { addSignatureHeader } from "../webhooks/cannon";
+import { signatureHeaders } from "../webhooks/cannon";
 import { Response } from "node-fetch";
-import { fetchWithTimeout } from "../util";
+import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const app = Router();
@@ -180,9 +180,12 @@ async function fireGateWebhook(
     }),
   };
 
-  if (webhook.sharedSecret) {
-    params = await addSignatureHeader(params, webhook, timestamp);
-  }
+  const sigHeaders = signatureHeaders(
+    params.body,
+    webhook.sharedSecret,
+    timestamp
+  );
+  params.headers = { ...params.headers, ...sigHeaders };
 
   const startTime = process.hrtime();
   let resp: Response;

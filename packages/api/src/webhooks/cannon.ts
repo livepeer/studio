@@ -381,10 +381,13 @@ export default class WebhookCannon {
         }),
       };
 
-      // sign payload if there is a webhook secret
-      if (webhook.sharedSecret) {
-        params = await addSignatureHeader(params, webhook, timestamp);
-      }
+      const sigHeaders = signatureHeaders(
+        params.body,
+        webhook.sharedSecret,
+        timestamp
+      );
+      params.headers = { ...params.headers, ...sigHeaders };
+
       const triggerTime = Date.now();
       const startTime = process.hrtime();
       let resp: Response;
@@ -567,12 +570,12 @@ export default class WebhookCannon {
   }
 }
 
-export async function addSignatureHeader(
-  params: any,
-  webhook: DBWebhook,
+export function signatureHeaders(
+  payload: string,
+  sharedSecret: string,
   timestamp: number
 ) {
-  let signature = sign(params.body, webhook.sharedSecret);
-  params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
-  return params;
+  if (!sharedSecret) return {};
+  let signature = sign(payload, sharedSecret);
+  return { [SIGNATURE_HEADER]: `t=${timestamp},v1=${signature}` };
 }
