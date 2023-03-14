@@ -1640,16 +1640,8 @@ components:
                   description: Path for the HLS output
                   example: /samplevideo/hls
             mp4:
-              type: object
-              additionalProperties: false
-              required:
-                - path
-              description: MP4 output format
-              properties:
-                path:
-                  type: string
-                  description: Path for the MP4 output
-                  example: /samplevideo/mp4
+              type: bool
+              description: Whether to output MP4 files
         profiles:
           type: array
           items:
