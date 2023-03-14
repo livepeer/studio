@@ -14,7 +14,7 @@ import {
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
 import { PlaybackPolicy } from "../schema/types";
-import { signatureHeaders } from "../webhooks/cannon";
+import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 
@@ -206,7 +206,7 @@ async function fireGateWebhook(
     errorMessage = e.message;
     statusCode = 0;
   } finally {
-    await this.storeTriggerStatus(
+    await storeTriggerStatus(
       webhook,
       timestamp,
       statusCode,

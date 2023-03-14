@@ -439,29 +439,17 @@ export default class WebhookCannon {
   async storeTriggerStatus(
     webhook: DBWebhook,
     triggerTime: number,
-    statusCode?: number,
-    errorMessage?: string,
-    responseBody?: string
+    statusCode: number,
+    errorMessage: string,
+    responseBody: string
   ) {
-    try {
-      let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
-      if (statusCode >= 300 || !statusCode) {
-        status = {
-          ...status,
-          lastFailure: {
-            timestamp: triggerTime,
-            statusCode,
-            error: errorMessage,
-            response: responseBody,
-          },
-        };
-      }
-      await this.db.webhook.updateStatus(webhook.id, status);
-    } catch (e) {
-      console.log(
-        `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
-      );
-    }
+    await storeTriggerStatus(
+      webhook,
+      triggerTime,
+      statusCode,
+      errorMessage,
+      responseBody
+    );
   }
 
   async storeResponse(
@@ -566,6 +554,34 @@ export default class WebhookCannon {
       },
       undefined,
       asset
+    );
+  }
+}
+
+export async function storeTriggerStatus(
+  webhook: DBWebhook,
+  triggerTime: number,
+  statusCode?: number,
+  errorMessage?: string,
+  responseBody?: string
+) {
+  try {
+    let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+    if (statusCode >= 300 || !statusCode) {
+      status = {
+        ...status,
+        lastFailure: {
+          timestamp: triggerTime,
+          statusCode,
+          error: errorMessage,
+          response: responseBody,
+        },
+      };
+    }
+    await this.db.webhook.updateStatus(webhook.id, status);
+  } catch (e) {
+    console.log(
+      `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
     );
   }
 }
