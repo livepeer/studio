@@ -18,6 +18,7 @@ import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { UnprocessableEntityError } from "../store/errors";
 import sql from "sql-template-strings";
+import { db } from "../store";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -578,7 +579,7 @@ export async function storeTriggerStatus(
         },
       };
     }
-    await this.db.webhook.updateStatus(webhook.id, status);
+    await db.webhook.updateStatus(webhook.id, status);
   } catch (e) {
     console.log(
       `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
