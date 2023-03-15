@@ -565,7 +565,7 @@ export async function storeTriggerStatus(
   statusCode?: number,
   errorMessage?: string,
   responseBody?: string
-) {
+): Promise<void> {
   try {
     let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
     if (statusCode >= 300 || !statusCode) {
@@ -591,7 +591,7 @@ export function signatureHeaders(
   payload: string,
   sharedSecret: string,
   timestamp: number
-): { [key: string]: string } {
+): { [key: string]: string } | {} {
   if (!sharedSecret) return {};
   let signature = sign(payload, sharedSecret);
   return { [SIGNATURE_HEADER]: `t=${timestamp},v1=${signature}` };
