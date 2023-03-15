@@ -1633,9 +1633,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
-        target_segment_size_secs:
+        targetSegmentSizeSecs:
           type: number
-          description: How many seconds the duration of each output segment should be
+          description:
+            How many seconds the duration of each output segment should be
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
@@ -1778,9 +1779,11 @@ components:
                   type: array
                   items:
                     $ref: "#/components/schemas/ffmpeg-profile"
-                target_segment_size_secs:
+                targetSegmentSizeSecs:
                   type: number
-                  description: How many seconds the duration of each output segment should be
+                  description:
+                    How many seconds the duration of each output segment should
+                    be
                 catalystPipelineStrategy:
                   type: string
                   description:
