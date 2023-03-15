@@ -591,7 +591,7 @@ export function signatureHeaders(
   payload: string,
   sharedSecret: string,
   timestamp: number
-) {
+): { [key: string]: string } {
   if (!sharedSecret) return {};
   let signature = sign(payload, sharedSecret);
   return { [SIGNATURE_HEADER]: `t=${timestamp},v1=${signature}` };
