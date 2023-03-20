@@ -106,6 +106,12 @@ export default class WebhookCannon {
   async processWebhookEvent(msg: messages.WebhookEvent): Promise<boolean> {
     const { event, streamId, sessionId, userId } = msg;
     const { mp4Url } = msg.payload ?? {};
+
+    if (event === "playback.accessControl") {
+      // Cannot fire this event as a webhook, this is specific to access control and fired there
+      return true;
+    }
+
     if (event === "recording.ready" && sessionId && mp4Url) {
       try {
         await this.handleRecordingReadyChecks(sessionId, mp4Url);
