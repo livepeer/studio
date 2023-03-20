@@ -89,16 +89,13 @@ const getAssetPlaybackUrl = async (
   }
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
   const staticFilesPlaybackInfo = getStaticPlaybackInfo(asset, os);
-  const inExperiment = await isExperimentSubject(
-    "lit-signing-condition",
-    asset.userId
-  );
+
   return !playbackUrl
     ? null
     : {
         staticFilesPlaybackInfo,
         playbackUrl,
-        playbackPolicy: inExperiment ? asset.playbackPolicy : null,
+        playbackPolicy: asset.playbackPolicy || null,
       };
 };
 
