@@ -1050,6 +1050,15 @@ app.patch(
       }
     }
 
+    if (
+      (playbackPolicy && asset.playbackPolicy?.type === "webhook") ||
+      playbackPolicy?.type === "webhook"
+    ) {
+      throw new UnprocessableEntityError(
+        `cannot update playback policy from or to webhook policy type`
+      );
+    }
+
     playbackPolicy = await validateAssetPlaybackPolicy(
       { playbackPolicy },
       asset.playbackId,
