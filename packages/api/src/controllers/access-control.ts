@@ -114,7 +114,7 @@ app.post(
         res.status(204);
         return res.end();
       case "webhook":
-        if (!req.body.accessKey || req.body.type == "accessKey") {
+        if (!req.body.accessKey || req.body.type !== "accessKey") {
           throw new ForbiddenError(
             "Content is gated and requires an access key"
           );
