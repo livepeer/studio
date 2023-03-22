@@ -301,7 +301,7 @@ export class TaskScheduler {
     return task;
   }
 
-  async scheduleTask(task: WithID<Task>, retries?: number) {
+  async scheduleTask(task: WithID<Task>, retries = 0) {
     const timestamp = Date.now();
     await this.updateTask(task, {
       scheduledAt: retries ? undefined : timestamp,
