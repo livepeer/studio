@@ -1686,7 +1686,7 @@ components:
           type: number
           readOnly: true
           description: |
-            Timestamp (in milliseconds) at which the task was scheduled or
+            Timestamp (in milliseconds) at which the task was scheduled for
             execution (e.g. after file upload finished).
           example: 1587667174725
         deleted:
