@@ -357,7 +357,7 @@ async function reconcileAssetStorage(
     if (!task) {
       await ensureQueueCapacity(config, asset.userId);
 
-      task = await taskScheduler.spawnAndScheduleTask(
+      task = await taskScheduler.createAndScheduleTask(
         "export",
         { export: { ipfs: newSpec } },
         asset
@@ -601,7 +601,7 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
 
     const params = req.body as ExportTaskParams;
-    const task = await req.taskScheduler.spawnAndScheduleTask(
+    const task = await req.taskScheduler.createAndScheduleTask(
       "export",
       { export: params },
       asset
@@ -666,7 +666,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
 
   const asset = await createAsset(newAsset, req.queue);
-  const task = await req.taskScheduler.spawnAndScheduleTask(
+  const task = await req.taskScheduler.createAndScheduleTask(
     "upload",
     {
       upload: {
@@ -736,7 +736,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
   outputAsset = await createAsset(outputAsset, req.queue);
 
-  const task = await req.taskScheduler.spawnAndScheduleTask(
+  const task = await req.taskScheduler.createAndScheduleTask(
     "transcode",
     {
       transcode: {
@@ -813,7 +813,7 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
     asset = await createAsset(asset, req.queue);
 
-    const task = await req.taskScheduler.spawnTask(
+    const task = await req.taskScheduler.createTask(
       "upload",
       {
         upload: {

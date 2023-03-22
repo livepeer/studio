@@ -36,7 +36,7 @@ app.post(
         ? toWeb3StorageUrl(params.storage)
         : toObjectStoreUrl(params.storage);
 
-    const task = await req.taskScheduler.spawnAndScheduleTask(
+    const task = await req.taskScheduler.createAndScheduleTask(
       "transcode-file",
       {
         ["transcode-file"]: {

@@ -250,14 +250,14 @@ export class TaskScheduler {
     }
   }
 
-  async spawnAndScheduleTask(
+  async createAndScheduleTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset,
     userId?: string
   ) {
-    const task = await this.spawnTask(
+    const task = await this.createTask(
       type,
       params,
       inputAsset,
@@ -268,7 +268,7 @@ export class TaskScheduler {
     return task;
   }
 
-  async spawnTask(
+  async createTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
