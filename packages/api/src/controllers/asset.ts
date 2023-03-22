@@ -914,7 +914,7 @@ const getPendingAssetAndTask = async (playbackId: string) => {
   });
   if (!asset) {
     throw new NotFoundError(`asset not found`);
-  } else if (asset.status.phase !== "waiting") {
+  } else if (asset.status.phase !== "uploading") {
     throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
 
