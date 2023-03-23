@@ -1001,21 +1001,29 @@ async function triggerSessionRecordingHooks(
   }
 
   for (const session of sessions) {
-    try {
-      if (!session.record || isStreamStale(session)) {
-        await this.db.stream.update(session.id, { isActive: false });
-        continue;
+    await publishSingleRecordingReadyHook(session, queue, ingest).catch(
+      (err) => {
+        logger.error(
+          `Error sending recording.ready hook for session_id=${session.id} err=`,
+          err
+        );
       }
-
-      const userSession = await db.session.get(session.id);
-      await publishDelayedRecordingReadyHook(userSession, queue, ingest);
-    } catch (err) {
-      logger.error(
-        `Error sending recording.ready hook for session_id=${session.id} err=`,
-        err
-      );
-    }
+    );
   }
+}
+
+async function publishSingleRecordingReadyHook(
+  session: DBSession,
+  queue: Queue,
+  ingest: string
+) {
+  if (!session.record || isStreamStale(session)) {
+    await this.db.stream.update(session.id, { isActive: false });
+    return;
+  }
+
+  const userSession = await db.session.get(session.id);
+  await publishDelayedRecordingReadyHook(userSession, queue, ingest);
 }
 
 function publishRecordingStartedHook(
