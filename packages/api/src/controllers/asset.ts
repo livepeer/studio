@@ -123,7 +123,7 @@ async function validateAssetPayload(
     userId,
     createdAt,
     status: {
-      phase: "waiting",
+      phase: source.type === "directUpload" ? "uploading" : "waiting",
       updatedAt: createdAt,
     },
     name: payload.name,
@@ -357,7 +357,7 @@ async function reconcileAssetStorage(
     if (!task) {
       await ensureQueueCapacity(config, asset.userId);
 
-      task = await taskScheduler.scheduleTask(
+      task = await taskScheduler.createAndScheduleTask(
         "export",
         { export: { ipfs: newSpec } },
         asset
@@ -601,7 +601,7 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
 
     const params = req.body as ExportTaskParams;
-    const task = await req.taskScheduler.scheduleTask(
+    const task = await req.taskScheduler.createAndScheduleTask(
       "export",
       { export: params },
       asset
@@ -666,7 +666,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
 
   const asset = await createAsset(newAsset, req.queue);
-  const task = await req.taskScheduler.scheduleTask(
+  const task = await req.taskScheduler.createAndScheduleTask(
     "upload",
     {
       upload: {
@@ -736,7 +736,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   await ensureQueueCapacity(req.config, req.user.id);
   outputAsset = await createAsset(outputAsset, req.queue);
 
-  const task = await req.taskScheduler.scheduleTask(
+  const task = await req.taskScheduler.createAndScheduleTask(
     "transcode",
     {
       transcode: {
@@ -813,7 +813,7 @@ app.post(
     await ensureQueueCapacity(req.config, req.user.id);
     asset = await createAsset(asset, req.queue);
 
-    const task = await req.taskScheduler.spawnTask(
+    const task = await req.taskScheduler.createTask(
       "upload",
       {
         upload: {
@@ -886,17 +886,27 @@ type TusFileMetadata = {
 const onTusUploadComplete =
   (isTest: boolean) =>
   async ({ file }: { file: TusFileMetadata }) => {
-    try {
-      const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
-      const { task } = await getPendingAssetAndTask(playbackId);
-      await taskScheduler.enqueueTask(task);
-    } catch (err) {
-      console.error(
-        `error processing finished upload fileId=${file.id} err=`,
-        err
-      );
-    }
+    const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
+    await onUploadComplete(playbackId);
   };
+
+const onUploadComplete = async (playbackId: string) => {
+  try {
+    const { task, asset } = await getPendingAssetAndTask(playbackId);
+    await taskScheduler.scheduleTask(task);
+    await db.asset.update(asset.id, {
+      status: {
+        phase: "waiting",
+        updatedAt: Date.now(),
+      },
+    });
+  } catch (err) {
+    console.error(
+      `error processing upload complete playbackId=${playbackId} err=`,
+      err
+    );
+  }
+};
 
 const getPendingAssetAndTask = async (playbackId: string) => {
   const asset = await db.asset.getByPlaybackId(playbackId, {
@@ -904,7 +914,7 @@ const getPendingAssetAndTask = async (playbackId: string) => {
   });
   if (!asset) {
     throw new NotFoundError(`asset not found`);
-  } else if (asset.status.phase !== "waiting") {
+  } else if (asset.status.phase !== "uploading") {
     throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
 
@@ -960,12 +970,14 @@ app.put("/upload/direct", async (req, res) => {
     jwtAudience
   );
 
-  const { task } = await getPendingAssetAndTask(playbackId);
+  // ensure upload exists and is pending
+  await getPendingAssetAndTask(playbackId);
+
   var proxy = httpProxy.createProxyServer({});
   proxy.on("end", async function (proxyReq, _, res) {
     if (res.statusCode == 200) {
       // TODO: Find a way to return the task in the response
-      await req.taskScheduler.enqueueTask(task);
+      await onUploadComplete(playbackId);
     } else {
       console.log(
         `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`

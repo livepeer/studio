@@ -250,25 +250,25 @@ export class TaskScheduler {
     }
   }
 
-  async scheduleTask(
+  async createAndScheduleTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset,
     userId?: string
   ) {
-    const task = await this.spawnTask(
+    const task = await this.createTask(
       type,
       params,
       inputAsset,
       outputAsset,
       userId
     );
-    await this.enqueueTask(task);
+    await this.scheduleTask(task);
     return task;
   }
 
-  async spawnTask(
+  async createTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
@@ -301,18 +301,22 @@ export class TaskScheduler {
     return task;
   }
 
-  async enqueueTask(task: WithID<Task>) {
-    const status: Task["status"] = {
-      phase: "waiting",
-      updatedAt: Date.now(),
-      retries: task.status.retries,
-    };
-    await this.updateTask(task, { status });
+  async scheduleTask(task: WithID<Task>, retries = 0) {
+    const timestamp = Date.now();
+    await this.updateTask(task, {
+      // only update scheduledAt on the first schedule (retries == 0)
+      scheduledAt: retries ? undefined : timestamp,
+      status: {
+        phase: "waiting",
+        updatedAt: timestamp,
+        retries,
+      },
+    });
     try {
       await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
         type: "task_trigger",
         id: uuid(),
-        timestamp: status.updatedAt,
+        timestamp,
         task: taskInfo(task),
       });
     } catch (err) {
@@ -338,12 +342,12 @@ export class TaskScheduler {
 
     task = await this.updateTask(task, { status });
     await sleep(retries * TASK_RETRY_BASE_DELAY);
-    await this.enqueueTask(task);
+    await this.scheduleTask(task, retries);
   }
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output">,
+    updates: Pick<Task, "scheduledAt" | "status" | "output">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
     updates = this.deleteCredentials(task, updates);

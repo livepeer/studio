@@ -1232,6 +1232,7 @@ components:
               type: string
               description: Phase of the asset
               enum:
+                - uploading
                 - waiting
                 - processing
                 - ready
@@ -1680,6 +1681,13 @@ components:
           type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which task was created
+          example: 1587667174725
+        scheduledAt:
+          type: number
+          readOnly: true
+          description: |
+            Timestamp (in milliseconds) at which the task was scheduled for
+            execution (e.g. after file upload finished).
           example: 1587667174725
         deleted:
           type: boolean
