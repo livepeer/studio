@@ -17,6 +17,7 @@ import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { UnprocessableEntityError } from "../store/errors";
+import sql from "sql-template-strings";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -516,10 +517,13 @@ export default class WebhookCannon {
       return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
     }
 
-    if (typeof isActive === "boolean" && !isActive) {
+    const res = await this.db.stream.update(
+      [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
+      { isActive: false }
+    );
+    if (res.rowCount < 1) {
       throw new UnprocessableEntityError("Session recording already handled");
     }
-    await this.db.stream.update(sessionId, { isActive: false });
 
     await this.recordingToVodAsset(session, mp4Url);
   }
