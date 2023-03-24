@@ -115,7 +115,10 @@ export default class WebhookCannon {
           e
         );
         // only ack the event if it's an explicit unprocessable entity error
-        return e instanceof UnprocessableEntityError;
+        if (e instanceof UnprocessableEntityError) {
+          return true;
+        }
+        throw e;
       }
     }
 
