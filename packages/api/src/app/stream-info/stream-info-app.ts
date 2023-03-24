@@ -229,7 +229,7 @@ class statusPoller {
       countSegments(si, manifest);
       if (needUpdate) {
         try {
-          await this.flushStreamMetrics(si);
+          await this.flushStreamMetrics(si, playback2session.has(mid));
         } catch (err) {
           console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
@@ -262,7 +262,7 @@ class statusPoller {
       const shouldDelete = now - si.lastSeen.valueOf() > deleteTimeout;
       if (needUpdate || shouldDelete) {
         try {
-          await this.flushStreamMetrics(si);
+          await this.flushStreamMetrics(si, !!si.stream.parentId);
         } catch (err) {
           console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
@@ -293,23 +293,28 @@ class statusPoller {
     }
   }
 
-  private async flushStreamMetrics(si: streamInfo) {
+  private async flushStreamMetrics(si: streamInfo, hasSession: boolean) {
     const storedInfo = si.stream;
     if (!storedInfo) {
       return;
     }
 
-    const sessionSetObj = {
+    let setObj = {
       lastSeen: si.lastSeen.valueOf(),
       ingestRate: si.ingestRate,
       outgoingRate: si.outgoingRate,
       broadcasterHost: this.hostname,
     };
-    const streamSetObj = {
-      ...sessionSetObj,
+    const setObjWithActive = {
+      ...setObj,
       region: this.region,
       isActive: true,
     };
+    if (!storedInfo.parentId && hasSession !== undefined && !hasSession) {
+      // this is not a session created by our Mist, so manage isActive field for this stream
+      setObj = setObjWithActive;
+    }
+
     const incObj = {
       sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
       transcodedSegments:
@@ -333,12 +338,18 @@ class statusPoller {
     };
     // console.log(`---> setting`, setObj)
     // console.log(`---> inc`, incObj)
-    await db.stream.add(storedInfo.id, incObj, streamSetObj);
+
+    await db.stream.add(
+      storedInfo.id,
+      incObj,
+      // only set the active field of child streams (transcoding sessions)
+      storedInfo.parentId ? setObjWithActive : setObj
+    );
     if (storedInfo.parentId) {
-      await db.stream.add(storedInfo.parentId, incObj, streamSetObj);
+      await db.stream.add(storedInfo.parentId, incObj, setObj);
       // update session table
       try {
-        await db.session.add(storedInfo.id, incObj, sessionSetObj);
+        await db.session.add(storedInfo.id, incObj, setObj);
       } catch (e) {
         console.log(`error updating session table:`, e);
       }
