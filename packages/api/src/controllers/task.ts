@@ -285,41 +285,35 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   }
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);
-    if (task.type === "export") {
-      if (task.id === asset?.storage?.status?.tasks.pending) {
-        await req.taskScheduler.updateAsset(asset.id, {
-          storage: {
-            ...asset.storage,
+    switch (task.type) {
+      case "export":
+        if (task.id === asset?.storage?.status?.tasks.pending) {
+          await req.taskScheduler.updateAsset(asset, {
+            storage: {
+              ...asset.storage,
+              status: {
+                phase: "processing",
+                progress: doc.progress,
+                tasks: asset.storage.status.tasks,
+              },
+            },
+          });
+        }
+        break;
+      case "delete":
+        await req.taskScheduler.updateAsset(
+          asset,
+          {
             status: {
-              phase: "processing",
+              phase: "deleting",
               progress: doc.progress,
-              tasks: asset.storage.status.tasks,
+              updatedAt: Date.now(),
             },
           },
-        });
-      }
-    } else if (task.type === "delete") {
-      await req.taskScheduler.updateAsset(
-        asset.id,
-        {
-          status: {
-            phase: "deleting",
-            progress: doc.progress,
-            updatedAt: Date.now(),
-          },
-        },
-        { allowedPhases: ["deleting"] }
-      );
+          { allowedPhases: ["deleting"] }
+        );
+        break;
     }
-  }
-
-  if (task.type == "delete" && task.status.phase == "completed") {
-    await req.taskScheduler.updateAsset(task.inputAssetId, {
-      status: {
-        phase: "deleted",
-        updatedAt: Date.now(),
-      },
-    });
   }
 
   res.status(200);

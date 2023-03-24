@@ -1219,8 +1219,8 @@ components:
                 - processing
                 - ready
                 - failed
-                - deleted
                 - deleting
+                - deleted
             updatedAt:
               type: number
               description:
@@ -1684,7 +1684,9 @@ components:
               properties:
                 id:
                   type: string
-                  description: ID of the asset to delete
+                  description:
+                    ID of the asset to delete. Only here to avoid an empty
+                    object, as the ID is already known by task runner
             transcode:
               type: object
               additionalProperties: false
@@ -1809,7 +1811,7 @@ components:
               additionalProperties: false
               description: Output of the delete task
               properties:
-                objectStoreId:
+                id:
                   type: string
                   description: ID of the deleted asset
             export:

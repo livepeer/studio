@@ -434,13 +434,6 @@ export class TaskScheduler {
       asset = await db.asset.get(asset);
     }
 
-    await db.asset.update(asset.id, {
-      status: {
-        phase: "deleting",
-        updatedAt: Date.now(),
-      },
-    });
-
     const task = await this.scheduleTask(
       "delete",
       {
@@ -450,6 +443,13 @@ export class TaskScheduler {
       },
       asset
     );
+
+    await db.asset.update(asset.id, {
+      status: {
+        phase: "deleting",
+        updatedAt: Date.now(),
+      },
+    });
   }
 
   async updateAsset(

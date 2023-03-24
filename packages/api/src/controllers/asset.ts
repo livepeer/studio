@@ -913,8 +913,14 @@ app.put("/upload/direct", async (req, res) => {
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const asset = await db.asset.get(id);
-  if (!asset) {
+  if (!asset || (asset.deleted && !req.user.admin)) {
     throw new NotFoundError(`Asset not found`);
+  }
+  if (asset.status.phase === "deleted") {
+    throw new NotFoundError(`Asset not found`);
+  }
+  if (asset.status.phase === "deleting" && !req.user.admin) {
+    throw new UnprocessableEntityError(`asset is already being deleted`);
   }
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
