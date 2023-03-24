@@ -299,12 +299,16 @@ class statusPoller {
       return;
     }
 
-    let setObj = {
-      lastSeen: si.lastSeen.valueOf(),
+    let setObj: Partial<DBStream> = {
       ingestRate: si.ingestRate,
       outgoingRate: si.outgoingRate,
       broadcasterHost: this.hostname,
     };
+    if (si.sourceSegments !== si.sourceSegmentsLastUpdated) {
+      // only update last seen if we've actually seen more segments
+      setObj = { ...setObj, lastSeen: si.lastSeen.valueOf() };
+    }
+
     const setObjWithActive = {
       ...setObj,
       region: this.region,
