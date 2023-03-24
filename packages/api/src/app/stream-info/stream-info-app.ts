@@ -299,20 +299,19 @@ class statusPoller {
       return;
     }
 
+    // only update lastSeen and isActive if we've actually seen more segments
+    const hasSeenSegments = si.sourceSegments !== si.sourceSegmentsLastUpdated;
     let setObj: Partial<DBStream> = {
+      lastSeen: hasSeenSegments ? si.lastSeen.valueOf() : undefined,
       ingestRate: si.ingestRate,
       outgoingRate: si.outgoingRate,
       broadcasterHost: this.hostname,
     };
-    if (si.sourceSegments !== si.sourceSegmentsLastUpdated) {
-      // only update last seen if we've actually seen more segments
-      setObj = { ...setObj, lastSeen: si.lastSeen.valueOf() };
-    }
 
     const setObjWithActive = {
       ...setObj,
       region: this.region,
-      isActive: true,
+      isActive: hasSeenSegments ? true : undefined,
     };
     if (!storedInfo.parentId && hasSession !== undefined && !hasSession) {
       // this is not a session created by our Mist, so manage isActive field for this stream
