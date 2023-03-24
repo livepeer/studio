@@ -16,7 +16,8 @@ import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { UnprocessableEntityError } from "../store/errors";
+import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+import { db } from "../store";
 import sql from "sql-template-strings";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
@@ -502,7 +503,7 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session not found");
     }
 
-    const { lastSeen, sourceSegments, isActive } = session;
+    const { lastSeen, sourceSegments } = session;
     const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
     if (!lastSeen || !sourceSegments) {
       throw new UnprocessableEntityError("Session is unused");
@@ -517,12 +518,16 @@ export default class WebhookCannon {
       return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
     }
 
-    const res = await this.db.stream.update(
-      [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
-      { isActive: false }
-    );
-    if (res.rowCount < 1) {
-      throw new UnprocessableEntityError("Session recording already handled");
+    try {
+      await this.db.stream.update(
+        [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
+        { isActive: false }
+      );
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        new UnprocessableEntityError("Session recording already handled");
+      }
+      throw err;
     }
 
     await this.recordingToVodAsset(session, mp4Url);

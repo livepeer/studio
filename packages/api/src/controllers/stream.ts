@@ -883,15 +883,13 @@ app.put(
       return res.status(204).end();
     }
 
+    const ingest = await getIngestBase(req);
     const patch = {
       isActive: active,
       lastSeen: Date.now(),
       mistHost: hostName,
       region: req.config.ownRegion,
     };
-    await db.stream.update(stream.id, patch);
-
-    const ingest = await getIngestBase(req);
     await setStreamActiveWithHooks(stream, patch, req.queue, ingest);
 
     // update the other auxiliary info in the database in background.
