@@ -518,16 +518,13 @@ export default class WebhookCannon {
       return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
     }
 
-    try {
-      await this.db.stream.update(
-        [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
-        { isActive: false }
-      );
-    } catch (err) {
-      if (err instanceof NotFoundError) {
-        new UnprocessableEntityError("Session recording already handled");
-      }
-      throw err;
+    const res = await this.db.stream.update(
+      [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
+      { isActive: false },
+      { throwIfEmpty: false }
+    );
+    if (res.rowCount < 1) {
+      throw new UnprocessableEntityError("Session recording already handled");
     }
 
     await this.recordingToVodAsset(session, mp4Url);
