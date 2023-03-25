@@ -682,9 +682,14 @@ app.post(
       return res.json({ errors: ["not found"] });
     }
 
+    const region = req.config.ownRegion;
     const last = await db.stream.getLastSession(stream.id);
     const reuseThreshold = Date.now() - USER_SESSION_TIMEOUT;
-    if (last && !last.lastSeen && last.createdAt > reuseThreshold) {
+    if (
+      last?.region === region &&
+      !last.lastSeen &&
+      last.createdAt > reuseThreshold
+    ) {
       // reuse previous recent+unused session as transcode loop is likely crash-looping
       logger.info(
         `stream session re-used for ` +
@@ -701,7 +706,6 @@ app.post(
     // The first four letters of our playback id are the shard key.
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
-    const region = req.config.ownRegion;
 
     const record = stream.record;
     const recordObjectStoreId =
@@ -720,7 +724,7 @@ app.post(
       parentId: stream.id,
       region,
       lastSeen: 0,
-      isActive: false,
+      isActive: true,
     });
     childStream.profiles = hackMistSettings(
       req,

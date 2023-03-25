@@ -307,15 +307,13 @@ class statusPoller {
       outgoingRate: si.outgoingRate,
       broadcasterHost: this.hostname,
     };
-
-    const setObjWithActive = {
-      ...setObj,
-      region: this.region,
-      isActive: hasSeenSegments ? true : undefined,
-    };
     if (!storedInfo.parentId && hasSession !== undefined && !hasSession) {
       // this is not a session created by our Mist, so manage isActive field for this stream
-      setObj = setObjWithActive;
+      setObj = {
+        ...setObj,
+        region: this.region,
+        isActive: hasSeenSegments ? true : undefined,
+      };
     }
 
     const incObj = {
@@ -342,12 +340,7 @@ class statusPoller {
     // console.log(`---> setting`, setObj)
     // console.log(`---> inc`, incObj)
 
-    await db.stream.add(
-      storedInfo.id,
-      incObj,
-      // only set the active field of child streams (transcoding sessions)
-      storedInfo.parentId ? setObjWithActive : setObj
-    );
+    await db.stream.add(storedInfo.id, incObj, setObj);
     if (storedInfo.parentId) {
       await db.stream.add(storedInfo.parentId, incObj, setObj);
       // update session table
