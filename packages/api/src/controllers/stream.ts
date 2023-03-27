@@ -686,7 +686,8 @@ app.post(
     const last = await db.stream.getLastSession(stream.id);
     const reuseThreshold = Date.now() - USER_SESSION_TIMEOUT;
     if (
-      last?.region === region &&
+      last &&
+      last.region === region &&
       !last.lastSeen &&
       last.createdAt > reuseThreshold
     ) {
@@ -1019,7 +1020,14 @@ async function publishSingleRecordingReadyHook(
   queue: Queue,
   ingest: string
 ) {
-  if (!session.record || isStreamStale(session)) {
+  const isStale = isStreamStale(session);
+  if (!session.record || isStale) {
+    if (isStale) {
+      logger.info(
+        `Skipping recording for stale session ` +
+          `session_id=${session.id} last_seen=${session.lastSeen}`
+      );
+    }
     await this.db.stream.update(session.id, { isActive: false });
     return;
   }
