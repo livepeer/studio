@@ -174,8 +174,11 @@ class statusPoller {
     for (const k of Object.keys(status.InternalManifests || {})) {
       playback2session.set(status.InternalManifests[k], k);
     }
+    const getStreamId = (mid: string) => {
+      return playback2session.has(mid) ? playback2session.get(mid) : mid;
+    };
     const getStreamObject = async (mid: string) => {
-      const sid = playback2session.has(mid) ? playback2session.get(mid) : mid;
+      const sid = getStreamId(mid);
       let storedInfo: DBStream | null = await db.stream.get(sid);
       if (!storedInfo) {
         const [objs, _] = await db.stream.find({ playbackId: mid });
@@ -187,22 +190,37 @@ class statusPoller {
     };
     const now = new Date();
     for (const mid of Object.keys(status.Manifests)) {
-      let si,
+      let si: streamInfo,
         timeSinceLastSeen = 0,
         needUpdate = false;
-      if (!this.seenStreams.has(mid)) {
+
+      if (this.seenStreams.has(mid)) {
+        si = this.seenStreams.get(mid);
+
+        if (si.stream?.id !== getStreamId(mid)) {
+          console.log(
+            `stream id changed from ${si.stream?.id} to ${getStreamId(mid)}`
+          );
+          // save the old stream info so it's properly housekept later
+          this.seenStreams.set(`old_${mid}_${si.stream?.id}`, si);
+          this.seenStreams.delete(mid);
+          si = null;
+        }
+      }
+
+      if (si) {
+        needUpdate = now.valueOf() - si.lastUpdated.valueOf() > updateInterval;
+        timeSinceLastSeen = (now.valueOf() - si.lastSeen.valueOf()) / 1000;
+        si.lastSeen = now;
+      } else {
         // new stream
         // console.log(`got new stream ${mid}`)
         const stream = await getStreamObject(mid);
         si = newStreamInfo(mid, stream);
         this.seenStreams.set(mid, si);
         needUpdate = true;
-      } else {
-        si = this.seenStreams.get(mid);
-        needUpdate = now.valueOf() - si.lastUpdated.valueOf() > updateInterval;
-        timeSinceLastSeen = (now.valueOf() - si.lastSeen.valueOf()) / 1000;
-        si.lastSeen = now;
       }
+
       if (mid in (status.StreamInfo || {})) {
         const statusStreamInfo = status.StreamInfo[mid];
         if (
