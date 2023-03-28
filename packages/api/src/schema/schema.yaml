@@ -434,16 +434,6 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
           index: true
-        partialSession:
-          description:
-            Indicates that this is not final object of `user's` session
-          type: boolean
-        previousSessions:
-          description:
-            Ids of the previous sessions which are part of `user's` session
-          type: array
-          items:
-            type: string
         streamKey:
           type: string
           example: hgebdhhigq
@@ -856,6 +846,9 @@ components:
           type: number
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
+        broadcasterHost:
+          type: string
+          description: Hostname of the broadcaster that transcodes that stream
         deleted:
           type: boolean
           description: Set to true when stream deleted
@@ -881,7 +874,7 @@ components:
           type: string
           readonly: true
           description: Status of the recording process of this stream session.
-          enum: [waiting, ready]
+          enum: [waiting, ready, none]
         recordingUrl:
           type: string
           readonly: true
@@ -903,8 +896,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
-        lastSessionId:
-          type: string
 
     error:
       required:

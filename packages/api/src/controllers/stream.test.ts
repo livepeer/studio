@@ -1254,7 +1254,7 @@ describe("controllers/stream", () => {
   });
 
   describe("user sessions", () => {
-    it("should join sessions", async () => {
+    it("should not join sessions", async () => {
       // create parent stream
       let res = await client.post("/stream", smallStream);
       expect(res.status).toBe(201);
@@ -1329,41 +1329,45 @@ describe("controllers/stream", () => {
       expect(sess2.partialSession).toBeUndefined();
       expect(sess2.previousSessions).toBeUndefined();
       expect(sess2.previousStats).toBeUndefined();
-      // get raw second session
+
+      // get raw second session, which should also not show any join
       res = await client.get(`/stream/${sess2.id}?raw=1`);
       expect(res.status).toBe(200);
       let sess2r = await res.json();
       expect(sess2r.record).toEqual(true);
       expect(sess2r.parentId).toEqual(parent.id);
-      expect(sess2r.previousStats).toBeDefined();
-      expect(sess2r.previousStats.sourceSegments).toEqual(3);
+      expect(sess2r.previousStats).toBeUndefined();
+
       await sleep(20);
+
       res = await client.get(`/stream/${sess1.id}?raw=1`);
       expect(res.status).toBe(200);
       let sess1r = await res.json();
-      expect(sess1r.lastSessionId).toEqual(sess2r.id);
-      expect(sess1r.partialSession).toEqual(true);
+      expect(sess1r.lastSeen).toEqual(sess1.lastSeen);
+      expect(sess1r.lastSessionId).toBeUndefined();
+      expect(sess1r.partialSession).toBeUndefined();
 
       res = await client.get(`/stream/${sess1.id}`);
       expect(res.status).toBe(200);
       let sess1n = await res.json();
       expect(sess1n.lastSessionId).toBeUndefined();
       expect(sess1n.createdAt).toEqual(sess1r.createdAt);
-      expect(sess1n.lastSeen).toEqual(sess2r.lastSeen);
+      expect(sess1n.lastSeen).toEqual(sess1r.lastSeen);
       expect(sess1n.previousStats).toBeUndefined();
-      // sourceSegments should equal to sum of both sessions
-      expect(sess1n.sourceSegments).toEqual(10);
+      // sourceSegments should equal to only the first session data
+      expect(sess1n.sourceSegments).toEqual(3);
 
       // get user sessions
       res = await client.get(`/stream/${parent.id}/sessions?forceUrl=1`);
       expect(res.status).toBe(200);
       sessions = await res.json();
-      expect(sessions).toHaveLength(1);
-      expect(sessions[0].id).toEqual(sess1r.id);
-      expect(sessions[0].transcodedSegments).toEqual(12);
-      expect(sessions[0].createdAt).toEqual(sess1r.createdAt);
-      expect(sessions[0].recordingUrl).toEqual(
-        `https://test/recordings/${sess2r.id}/index.m3u8`
+      expect(sessions).toHaveLength(2);
+      expect(sessions).toMatchObject(
+        [sess2, sess1].map((s) => ({
+          ...s,
+          recordingUrl: `https://test/recordings/${s.id}/index.m3u8`,
+          mp4Url: `https://test/recordings/${s.id}/source.mp4`,
+        }))
       );
     });
   });
