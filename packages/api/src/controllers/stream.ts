@@ -837,7 +837,7 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
     isActive: false,
     lastSeen: 0,
   });
-  validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
 
   doc.profiles = hackMistSettings(req, doc.profiles);
   doc.multistream = await validateMultistreamOpts(
@@ -1179,7 +1179,7 @@ app.patch(
       );
       patch = { ...patch, multistream };
     }
-    validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+    await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
     if (playbackPolicy) {
       patch = { ...patch, playbackPolicy };
     }
