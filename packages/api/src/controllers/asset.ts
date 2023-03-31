@@ -171,6 +171,19 @@ async function validateAssetPlaybackPolicy(
       `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
     );
   }
+  if (playbackPolicy?.type == "webhook") {
+    let webhook = await db.webhook.get(playbackPolicy.webhookId);
+    if (!webhook) {
+      throw new BadRequestError(
+        `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
+    if (webhook.userId !== userId) {
+      throw new BadRequestError(
+        `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
+  }
   return playbackPolicy;
 }
 

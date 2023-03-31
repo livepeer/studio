@@ -144,8 +144,9 @@ async function validateMultistreamOpts(
   return { targets };
 }
 
-function validateStreamPlaybackPolicy(
-  playbackPolicy: DBStream["playbackPolicy"]
+async function validateStreamPlaybackPolicy(
+  playbackPolicy: DBStream["playbackPolicy"],
+  userId: string
 ) {
   if (
     playbackPolicy?.type === "lit_signing_condition" ||
@@ -155,6 +156,19 @@ function validateStreamPlaybackPolicy(
     throw new BadRequestError(
       `playbackPolicy type "lit_signing_condition" with a resourceId or unifiedAccessControlConditions is not supported for streams`
     );
+  }
+  if (playbackPolicy?.type == "webhook") {
+    let webhook = await db.webhook.get(playbackPolicy.webhookId);
+    if (!webhook) {
+      throw new BadRequestError(
+        `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
+    if (webhook.userId !== userId) {
+      throw new BadRequestError(
+        `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
   }
 }
 
@@ -823,7 +837,7 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
     isActive: false,
     lastSeen: 0,
   });
-  validateStreamPlaybackPolicy(doc.playbackPolicy);
+  validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
 
   doc.profiles = hackMistSettings(req, doc.profiles);
   doc.multistream = await validateMultistreamOpts(
@@ -1165,7 +1179,7 @@ app.patch(
       );
       patch = { ...patch, multistream };
     }
-    validateStreamPlaybackPolicy(playbackPolicy);
+    validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
     if (playbackPolicy) {
       patch = { ...patch, playbackPolicy };
     }
