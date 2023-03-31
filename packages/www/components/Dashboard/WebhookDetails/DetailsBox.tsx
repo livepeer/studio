@@ -1,6 +1,7 @@
 import { Text, Box, Badge, styled } from "@livepeer/design-system";
 import { format } from "date-fns";
 import { STATUS_CODES } from "http";
+import ClipButton from "../Clipping/ClipButton";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -20,6 +21,10 @@ const DetailsBox = ({ data }) => (
       borderBottomRightRadius: 6,
       backgroundColor: "$panel",
     }}>
+    <Cell variant="gray">Webhook ID</Cell>
+    <Cell>
+      <ClipButton text={data.id} value={data.id} />
+    </Cell>
     <Cell variant="gray">URL</Cell>
     <Cell>{data.url}</Cell>
     <Cell variant="gray">Name</Cell>
@@ -59,7 +64,7 @@ const DetailsBox = ({ data }) => (
         <>
           <Cell variant="gray">Error Status Code</Cell>
           <Cell>
-            {`${data.status.lastFailure.statusCode} 
+            {`${data.status.lastFailure.statusCode}
             ${STATUS_CODES[data.status.lastFailure.statusCode]}`}
           </Cell>
         </>
