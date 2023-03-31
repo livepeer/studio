@@ -153,12 +153,12 @@ async function validateAssetPlaybackPolicy(
   userId: string,
   createdAt: number
 ) {
+  if (isPrivatePlaybackPolicy(playbackPolicy) && objectStoreId) {
+    throw new ForbiddenError(`private assets cannot use custom object store`);
+  }
+
   if (playbackPolicy?.type === "lit_signing_condition") {
     await ensureExperimentSubject("lit-signing-condition", userId);
-
-    if (objectStoreId) {
-      throw new ForbiddenError(`lit-gated assets cant use custom object store`);
-    }
 
     if (!playbackPolicy.unifiedAccessControlConditions) {
       throw new UnprocessableEntityError(
