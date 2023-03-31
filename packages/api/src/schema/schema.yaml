@@ -731,13 +731,16 @@ components:
       properties:
         type:
           type: string
-          enum: [jwt]
+          enum: [jwt, accessKey]
         stream:
           type: string
           description: Stream ID to which this gate applies
         pub:
           type: string
           description: Base64 of Public key used for JWT verification
+        accessKey:
+          type: string
+          description: Access key used for access-control verification
 
     experiment-audience-payload:
       type: object
@@ -769,6 +772,7 @@ components:
             - public
             - jwt
             - lit_signing_condition # only for lit-signing-condition experiment
+            - webhook
         unifiedAccessControlConditions:
           type: array
           description: LIT Unified Access Control Conditions
@@ -790,6 +794,13 @@ components:
               type: string
             extraData:
               type: string
+        webhookId:
+          type: string
+          description: ID of the webhook to use for playback policy
+        webhookContext:
+          type: object
+          description: User-defined webhook context
+          additionalProperties: true
 
     session:
       type: object

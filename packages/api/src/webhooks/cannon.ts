@@ -16,9 +16,9 @@ import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { NotFoundError, UnprocessableEntityError } from "../store/errors";
-import { db } from "../store";
+import { UnprocessableEntityError } from "../store/errors";
 import sql from "sql-template-strings";
+import { db } from "../store";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -382,11 +382,13 @@ export default class WebhookCannon {
         }),
       };
 
-      // sign payload if there is a webhook secret
-      if (webhook.sharedSecret) {
-        let signature = sign(params.body, webhook.sharedSecret);
-        params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
-      }
+      const sigHeaders = signatureHeaders(
+        params.body,
+        webhook.sharedSecret,
+        timestamp
+      );
+      params.headers = { ...params.headers, ...sigHeaders };
+
       const triggerTime = Date.now();
       const startTime = process.hrtime();
       let resp: Response;
@@ -438,29 +440,17 @@ export default class WebhookCannon {
   async storeTriggerStatus(
     webhook: DBWebhook,
     triggerTime: number,
-    statusCode?: number,
-    errorMessage?: string,
-    responseBody?: string
+    statusCode: number,
+    errorMessage: string,
+    responseBody: string
   ) {
-    try {
-      let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
-      if (statusCode >= 300 || !statusCode) {
-        status = {
-          ...status,
-          lastFailure: {
-            timestamp: triggerTime,
-            statusCode,
-            error: errorMessage,
-            response: responseBody,
-          },
-        };
-      }
-      await this.db.webhook.updateStatus(webhook.id, status);
-    } catch (e) {
-      console.log(
-        `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
-      );
-    }
+    await storeTriggerStatus(
+      webhook,
+      triggerTime,
+      statusCode,
+      errorMessage,
+      responseBody
+    );
   }
 
   async storeResponse(
@@ -567,4 +557,42 @@ export default class WebhookCannon {
       asset
     );
   }
+}
+
+export async function storeTriggerStatus(
+  webhook: DBWebhook,
+  triggerTime: number,
+  statusCode?: number,
+  errorMessage?: string,
+  responseBody?: string
+): Promise<void> {
+  try {
+    let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+    if (statusCode >= 300 || !statusCode) {
+      status = {
+        ...status,
+        lastFailure: {
+          timestamp: triggerTime,
+          statusCode,
+          error: errorMessage,
+          response: responseBody,
+        },
+      };
+    }
+    await db.webhook.updateStatus(webhook.id, status);
+  } catch (e) {
+    console.log(
+      `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
+    );
+  }
+}
+
+export function signatureHeaders(
+  payload: string,
+  sharedSecret: string,
+  timestamp: number
+): { [key: string]: string } | {} {
+  if (!sharedSecret) return {};
+  let signature = sign(payload, sharedSecret);
+  return { [SIGNATURE_HEADER]: `t=${timestamp},v1=${signature}` };
 }

@@ -61,7 +61,8 @@ function defaultObjectStoreId(
   if (isOldPipeline) {
     return config.vodObjectStoreId;
   }
-  if (body.playbackPolicy?.type === "lit_signing_condition") {
+  const policyType = body.playbackPolicy?.type;
+  if (policyType && policyType !== "public") {
     return config.vodCatalystPrivateAssetsObjectStoreId;
   }
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
@@ -167,6 +168,19 @@ async function validateAssetPlaybackPolicy(
     throw new BadRequestError(
       `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
     );
+  }
+  if (playbackPolicy?.type == "webhook") {
+    let webhook = await db.webhook.get(playbackPolicy.webhookId);
+    if (!webhook || webhook.deleted) {
+      throw new BadRequestError(
+        `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
+    if (webhook.userId !== userId) {
+      throw new BadRequestError(
+        `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
   }
   return playbackPolicy;
 }
@@ -1045,6 +1059,15 @@ app.patch(
           `cannot update playback policy from lit_signing_condition nor change the resource ID`
         );
       }
+    }
+
+    if (
+      (playbackPolicy && asset.playbackPolicy?.type === "webhook") ||
+      playbackPolicy?.type === "webhook"
+    ) {
+      throw new UnprocessableEntityError(
+        `cannot update playback policy from or to webhook policy type`
+      );
     }
 
     playbackPolicy = await validateAssetPlaybackPolicy(

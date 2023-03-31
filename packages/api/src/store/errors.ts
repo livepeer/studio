@@ -74,3 +74,11 @@ export class NotImplementedError extends APIError {
     this.status = 501;
   }
 }
+
+export class BadGatewayError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "BadGatewayError";
+    this.status = 502;
+  }
+}
