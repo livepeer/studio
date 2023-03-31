@@ -16,7 +16,7 @@ import { DBWebhook } from "../store/webhook-table";
 import { PlaybackPolicy } from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
-import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
+import { fetchWithTimeout } from "../util";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const app = Router();
@@ -31,6 +31,8 @@ app.post(
     const content =
       (await db.stream.getByPlaybackId(playbackId)) ||
       (await db.asset.getByPlaybackId(playbackId));
+
+    res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
     if (!content || content.deleted) {
       const contentLog = JSON.stringify(JSON.stringify(content));
@@ -54,7 +56,6 @@ app.post(
 
     switch (playbackPolicyType) {
       case "public":
-        res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
         res.status(204);
         return res.end();
       case "jwt":
@@ -110,7 +111,6 @@ app.post(
         }
 
         tracking.recordSigningKeyValidation(signingKey.id);
-        res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
         res.status(204);
         return res.end();
       case "webhook":
@@ -134,7 +134,6 @@ app.post(
           req.body.accessKey
         );
         if (statusCode >= 200 && statusCode < 300) {
-          res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
           res.status(204);
           return res.end();
         } else if (statusCode === 0) {
