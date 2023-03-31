@@ -173,7 +173,7 @@ async function validateAssetPlaybackPolicy(
   }
   if (playbackPolicy?.type == "webhook") {
     let webhook = await db.webhook.get(playbackPolicy.webhookId);
-    if (!webhook) {
+    if (!webhook || webhook.deleted) {
       throw new BadRequestError(
         `webhook ${playbackPolicy.webhookId} not found`
       );
