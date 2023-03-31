@@ -15,7 +15,13 @@ function hashChallenge(authChallenge, password) {
   challenge = authChallenge;
 }
 
-export async function listActiveStreams(mistHost, mistPort, login, password) {
+export async function listActiveStreams(
+  mistHost,
+  mistPort,
+  login,
+  password,
+  isRetry = false
+) {
   try {
     const req = {
       active_streams: 1,
@@ -50,9 +56,9 @@ export async function listActiveStreams(mistHost, mistPort, login, password) {
     }
     const body = await res1.json();
     const authStatus = ((body || {}).authorize || {}).status;
-    if (authStatus === "CHALL") {
+    if (authStatus === "CHALL" && !isRetry) {
       hashChallenge(((body || {}).authorize || {}).challenge, password);
-      return await listActiveStreams(mistHost, mistPort, login, password);
+      return await listActiveStreams(mistHost, mistPort, login, password, true);
     } else if (authStatus !== "OK") {
       logger.error(`Unexpected authorize status=${authStatus}`);
       return [];
@@ -70,7 +76,8 @@ export async function terminateStream(
   mistPort,
   streamName,
   login,
-  password
+  password,
+  isRetry = false
 ) {
   try {
     const req = {
@@ -99,14 +106,15 @@ export async function terminateStream(
     }
     const body = await res1.json();
     const authStatus = ((body || {}).authorize || {}).status;
-    if (authStatus === "CHALL") {
+    if (authStatus === "CHALL" && !isRetry) {
       hashChallenge(((body || {}).authorize || {}).challenge, password);
       return await terminateStream(
         mistHost,
         mistPort,
         streamName,
         login,
-        password
+        password,
+        true
       );
     } else if (authStatus !== "OK") {
       logger.error(`Unexpected authorize status=${authStatus}`);
