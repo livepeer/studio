@@ -289,7 +289,7 @@ const CreateEditDialog = ({
                     }}
                   />
                 )}
-                {action} endpoint
+                {action} webhook
               </Button>
             </Flex>
           </Box>
