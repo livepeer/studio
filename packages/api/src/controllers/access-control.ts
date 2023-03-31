@@ -17,6 +17,7 @@ import { PlaybackPolicy } from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeout } from "../util";
+import { error } from "winston";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const app = Router();
@@ -196,10 +197,11 @@ async function fireGateWebhook(
     // TODO: remember to handle redirects
     statusCode = resp.status;
 
-    if (resp.status <= 200 || resp.status >= 300) {
+    if (resp.status < 200 || resp.status >= 300) {
       console.error(
         `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
       );
+      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`;
     }
   } catch (e) {
     errorMessage = e.message;
