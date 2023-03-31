@@ -175,12 +175,7 @@ async function validateAssetPlaybackPolicy(
       };
     }
   }
-  if (playbackPolicy?.type == "jwt") {
-    throw new BadRequestError(
-      `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
-    );
-  }
-  if (playbackPolicy?.type == "webhook") {
+  if (playbackPolicy?.type === "webhook") {
     let webhook = await db.webhook.get(playbackPolicy.webhookId);
     if (!webhook || webhook.deleted) {
       throw new BadRequestError(
