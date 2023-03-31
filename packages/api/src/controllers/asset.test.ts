@@ -223,7 +223,7 @@ describe("controllers/asset", () => {
       const res = await client.patch(`/asset/${asset.id}`, {
         playbackPolicy,
       });
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
     it("should start export task when adding IPFS storage", async () => {
       let res = await client.patch(`/asset/${asset.id}`, {

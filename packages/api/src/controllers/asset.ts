@@ -36,6 +36,7 @@ import {
   IpfsFileInfo,
   NewAssetPayload,
   ObjectStore,
+  PlaybackPolicy,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -54,6 +55,16 @@ function catalystPipelineStrategy(req: Request) {
   return catalystPipelineStrategy;
 }
 
+function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
+  if (!playbackPolicy) {
+    return false;
+  }
+  if (playbackPolicy.type === "public") {
+    return false;
+  }
+  return true;
+}
+
 function defaultObjectStoreId(
   { config, body }: Request,
   isOldPipeline?: boolean
@@ -61,8 +72,8 @@ function defaultObjectStoreId(
   if (isOldPipeline) {
     return config.vodObjectStoreId;
   }
-  const policyType = body.playbackPolicy?.type;
-  if (policyType && policyType !== "public") {
+
+  if (isPrivatePlaybackPolicy(body.playbackPolicy)) {
     return config.vodCatalystPrivateAssetsObjectStoreId;
   }
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
@@ -1062,11 +1073,11 @@ app.patch(
     }
 
     if (
-      (playbackPolicy && asset.playbackPolicy?.type === "webhook") ||
-      playbackPolicy?.type === "webhook"
+      isPrivatePlaybackPolicy(playbackPolicy) !==
+      isPrivatePlaybackPolicy(asset.playbackPolicy)
     ) {
       throw new UnprocessableEntityError(
-        `cannot update playback policy from or to webhook policy type`
+        `cannot update playback policy from private to public or vice versa`
       );
     }
 
