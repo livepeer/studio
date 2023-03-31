@@ -19,13 +19,15 @@ export async function listActiveStreams(mistHost, mistPort, login, password) {
   try {
     const req = {
       active_streams: 1,
+      ...(!challengeResponse
+        ? {}
+        : {
+            authorize: {
+              username: login,
+              password: challengeResponse,
+            },
+          }),
     };
-    if (challengeResponse) {
-      req.authorize = {
-        username: login,
-        password: challengeResponse,
-      };
-    }
     const params = {
       method: "POST",
       headers: {
@@ -73,13 +75,15 @@ export async function terminateStream(
   try {
     const req = {
       nuke_stream: streamName,
+      ...(!challengeResponse
+        ? {}
+        : {
+            authorize: {
+              username: login,
+              password: challengeResponse,
+            },
+          }),
     };
-    if (challengeResponse) {
-      req.authorize = {
-        username: login,
-        password: challengeResponse,
-      };
-    }
     const params = {
       method: "POST",
       headers: {
