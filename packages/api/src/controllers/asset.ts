@@ -1072,21 +1072,23 @@ app.patch(
       }
     }
 
-    if (
-      isPrivatePlaybackPolicy(playbackPolicy) !==
-      isPrivatePlaybackPolicy(asset.playbackPolicy)
-    ) {
-      throw new UnprocessableEntityError(
-        `cannot update playback policy from private to public or vice versa`
+    if (playbackPolicy) {
+      if (
+        isPrivatePlaybackPolicy(playbackPolicy) !==
+        isPrivatePlaybackPolicy(asset.playbackPolicy)
+      ) {
+        throw new UnprocessableEntityError(
+          `cannot update playback policy from private to public or vice versa`
+        );
+      }
+
+      playbackPolicy = await validateAssetPlaybackPolicy(
+        { playbackPolicy },
+        asset.playbackId,
+        asset.userId,
+        asset.createdAt
       );
     }
-
-    playbackPolicy = await validateAssetPlaybackPolicy(
-      { playbackPolicy },
-      asset.playbackId,
-      asset.userId,
-      asset.createdAt
-    );
 
     await req.taskScheduler.updateAsset(asset, {
       name,
