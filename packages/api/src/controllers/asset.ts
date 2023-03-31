@@ -153,12 +153,12 @@ async function validateAssetPlaybackPolicy(
   userId: string,
   createdAt: number
 ) {
+  if (isPrivatePlaybackPolicy(playbackPolicy) && objectStoreId) {
+    throw new ForbiddenError(`private assets cannot use custom object store`);
+  }
+
   if (playbackPolicy?.type === "lit_signing_condition") {
     await ensureExperimentSubject("lit-signing-condition", userId);
-
-    if (objectStoreId) {
-      throw new ForbiddenError(`lit-gated assets cant use custom object store`);
-    }
 
     if (!playbackPolicy.unifiedAccessControlConditions) {
       throw new UnprocessableEntityError(
@@ -175,12 +175,7 @@ async function validateAssetPlaybackPolicy(
       };
     }
   }
-  if (playbackPolicy?.type == "jwt") {
-    throw new BadRequestError(
-      `playbackPolicy.type jwt is not supported for vod. Please use lit_signing_condition instead.`
-    );
-  }
-  if (playbackPolicy?.type == "webhook") {
+  if (playbackPolicy?.type === "webhook") {
     let webhook = await db.webhook.get(playbackPolicy.webhookId);
     if (!webhook || webhook.deleted) {
       throw new BadRequestError(
@@ -1072,21 +1067,23 @@ app.patch(
       }
     }
 
-    if (
-      isPrivatePlaybackPolicy(playbackPolicy) !==
-      isPrivatePlaybackPolicy(asset.playbackPolicy)
-    ) {
-      throw new UnprocessableEntityError(
-        `cannot update playback policy from private to public or vice versa`
+    if (playbackPolicy) {
+      if (
+        isPrivatePlaybackPolicy(playbackPolicy) !==
+        isPrivatePlaybackPolicy(asset.playbackPolicy)
+      ) {
+        throw new UnprocessableEntityError(
+          `cannot update playback policy from private to public or vice versa`
+        );
+      }
+
+      playbackPolicy = await validateAssetPlaybackPolicy(
+        { playbackPolicy },
+        asset.playbackId,
+        asset.userId,
+        asset.createdAt
       );
     }
-
-    playbackPolicy = await validateAssetPlaybackPolicy(
-      { playbackPolicy },
-      asset.playbackId,
-      asset.userId,
-      asset.createdAt
-    );
 
     await req.taskScheduler.updateAsset(asset, {
       name,
