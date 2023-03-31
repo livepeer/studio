@@ -197,7 +197,7 @@ async function fireGateWebhook(
     // TODO: remember to handle redirects
     statusCode = resp.status;
 
-    if (resp.status <= 200 || resp.status > 400) {
+    if (resp.status <= 200 || resp.status >= 300) {
       console.error(
         `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
       );

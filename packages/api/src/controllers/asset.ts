@@ -61,10 +61,8 @@ function defaultObjectStoreId(
   if (isOldPipeline) {
     return config.vodObjectStoreId;
   }
-  if (
-    body.playbackPolicy?.type === "lit_signing_condition" ||
-    body.playbackPolicy?.type === "webhook"
-  ) {
+  const policyType = body.playbackPolicy?.type;
+  if (policyType && policyType !== "public") {
     return config.vodCatalystPrivateAssetsObjectStoreId;
   }
   return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
