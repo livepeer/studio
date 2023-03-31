@@ -213,6 +213,7 @@ components:
               - multistream.error
               - multistream.disconnected
               - playback.user.new
+              - playback.accessControl
               - asset.created
               - asset.updated
               - asset.failed

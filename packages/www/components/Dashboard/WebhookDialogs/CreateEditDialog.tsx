@@ -48,6 +48,7 @@ const eventOptions: Webhook["events"] = [
   "task.completed",
   "task.failed",
   // "playback.user.new",
+  "playback.accessControl",
 ];
 
 export enum Action {
