@@ -73,10 +73,7 @@ const StreamDetailsBox = ({
                 <ClipButton value={stream.streamKey} text={stream.streamKey} />
               </Flex>
             ) : (
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => setKeyRevealed(true)}>
+              <Button type="button" onClick={() => setKeyRevealed(true)}>
                 Reveal stream key
               </Button>
             )}

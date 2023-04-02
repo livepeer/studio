@@ -133,7 +133,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               <Text
                 variant={id === "home" ? "green" : null}
                 css={{
-                  fontWeight: id === "home" ? 700 : 400,
+                  fontWeight: id === "home" ? 600 : 400,
                   backgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
@@ -149,7 +149,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 <Text
                   variant={id === "streams" ? "green" : null}
                   css={{
-                    fontWeight: id === "streams" ? 700 : 400,
+                    fontWeight: id === "streams" ? 600 : 400,
                     backgroundClip: "text",
                     ml: "$2",
                     lineHeight: 1.2,
@@ -171,7 +171,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     <Text
                       variant={id === "streams/sessions" ? "green" : null}
                       css={{
-                        fontWeight: id === "streams/sessions" ? 700 : 400,
+                        fontWeight: id === "streams/sessions" ? 600 : 400,
                         backgroundClip: "text",
                         ml: 31,
                         mt: "$1",
@@ -191,7 +191,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               <Text
                 variant={id === "assets" ? "green" : null}
                 css={{
-                  fontWeight: id === "assets" ? 700 : 400,
+                  fontWeight: id === "assets" ? 600 : 400,
                   backgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
@@ -232,7 +232,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     <Text
                       variant={id === "developers" ? "green" : null}
                       css={{
-                        fontWeight: id === "developers" ? 700 : 400,
+                        fontWeight: id === "developers" ? 600 : 400,
                         backgroundClip: "text",
                         ml: 31,
                         mt: "$1",
@@ -254,7 +254,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       }
                       css={{
                         fontWeight:
-                          id === "developers/signing-keys" ? 700 : 400,
+                          id === "developers/signing-keys" ? 600 : 400,
                         backgroundClip: "text",
                         ml: 31,
                         mt: "$1",
@@ -273,7 +273,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     <Text
                       variant={id === "developers/webhooks" ? "green" : null}
                       css={{
-                        fontWeight: id === "developers/webhooks" ? 700 : 400,
+                        fontWeight: id === "developers/webhooks" ? 600 : 400,
                         backgroundClip: "text",
                         ml: 31,
                         mt: "$1",
@@ -296,7 +296,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   variant={id === "billing" ? "green" : null}
                   css={{
                     display: "flex",
-                    fontWeight: id === "billing" ? 700 : 400,
+                    fontWeight: id === "billing" ? 600 : 400,
                     backgroundClip: "text",
                     WebkitTextFillColor: "initial",
                     ml: "$2",
@@ -319,7 +319,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     <Text
                       variant={id === "billing/plans" ? "green" : null}
                       css={{
-                        fontWeight: id === "billing/plans" ? 700 : 400,
+                        fontWeight: id === "billing/plans" ? 600 : 400,
                         backgroundClip: "text",
                         ml: 31,
                         mt: "$1",

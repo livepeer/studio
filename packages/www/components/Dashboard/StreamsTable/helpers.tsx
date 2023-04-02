@@ -1,4 +1,4 @@
-import { Box, Link } from "@livepeer/design-system";
+import { Box, Text } from "@livepeer/design-system";
 import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import { RenditionDetailsCellProps } from "../Table/cells/streams-table";
@@ -87,11 +87,7 @@ export const rowsPageFromState = async (
     name: {
       id: stream.id,
       value: stream.name,
-      children: (
-        <Link as="div" variant="primary">
-          {stream.name}
-        </Link>
-      ),
+      children: <Text size={2}>{stream.name}</Text>,
       tooltipChildren: stream.createdByTokenName ? (
         <>
           Created by token <b>{stream.createdByTokenName}</b>
@@ -102,12 +98,12 @@ export const rowsPageFromState = async (
     details: { stream },
     createdAt: {
       date: new Date(stream.createdAt),
-      fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+      fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
       href: `/dashboard/streams/${stream.id}`,
     },
     lastSeen: {
       date: stream.lastSeen ? new Date(stream.lastSeen) : null,
-      fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+      fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
       href: `/dashboard/streams/${stream.id}`,
     },
     status: {

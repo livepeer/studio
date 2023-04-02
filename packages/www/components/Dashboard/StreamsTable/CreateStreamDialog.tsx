@@ -33,7 +33,6 @@ const CreateStreamDialog = ({
         <AlertDialogTitle asChild>
           <Heading size="1">Create a new stream</Heading>
         </AlertDialogTitle>
-
         <Box
           css={{ mt: "$3" }}
           as="form"

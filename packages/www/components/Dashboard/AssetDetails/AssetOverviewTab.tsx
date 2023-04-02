@@ -126,16 +126,15 @@ const AssetOverviewTab = ({
           <Flex css={{ mb: "$2" }} align="center">
             <StyledDatabaseIcon />
             <Heading size="1" css={{ fontWeight: 500 }}>
-              Decentralized Storage Providers
+              Storage Providers
             </Heading>
           </Flex>
           <Text variant="neutral" size="2">
-            By default video assets are stored in the Livepeer Studio database,
-            but you may also replicate them to the following decentralized
-            storage providers.
+            By default video assets are cached in the Livepeer network, but you
+            may also archive them using the following storage providers.
           </Text>
         </Box>
-        <Promo size="2">
+        <Promo size="2" css={{ borderRadius: "$2" }}>
           <Flex css={{ justifyContent: "space-between" }}>
             <Flex align="center">
               <StyledIpfsIcon />
@@ -162,8 +161,7 @@ const AssetOverviewTab = ({
                   size="2"
                   disabled={
                     Boolean(asset?.status?.phase !== "ready") || isUploading
-                  }
-                  variant="primary">
+                  }>
                   {isUploading && (
                     <Spinner
                       css={{

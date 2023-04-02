@@ -6,14 +6,14 @@ const IdleStream = () => (
       width: "100%",
       height: 265,
       borderRadius: "$2",
-      overflow: "hidden",
       position: "relative",
-      bc: "#28282c",
+      bc: "$panel",
+      border: "1px solid $neutral6",
     }}>
     <Badge
       size="2"
       css={{
-        backgroundColor: "$primary7",
+        backgroundColor: "$neutral7",
         position: "absolute",
         zIndex: 1,
         left: 10,
@@ -21,7 +21,7 @@ const IdleStream = () => (
         letterSpacing: 0,
       }}>
       <Box css={{ mr: 5 }}>
-        <Status css={{ backgroundColor: "$primary9" }} size="1" />
+        <Status css={{ backgroundColor: "$neutral9" }} size="1" />
       </Box>
       Idle
     </Badge>
