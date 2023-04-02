@@ -16,7 +16,7 @@ const GettingStarted = ({ firstName = "" }) => {
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
-        Welcome to your dashboard{firstName && `, ${firstName}`}
+        Welcome to Livepeer Studio{firstName && `, ${firstName}`}
       </Heading>
       <Accordion type="single" defaultValue="accordion-one">
         <AccordionItem value="accordion-one">
@@ -75,8 +75,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   cursor: "default",
                   ai: "center",
                 }}
-                size="2"
-                variant="primary">
+                size="2">
                 <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
                 <ArrowRightIcon />
               </Button>
@@ -118,8 +117,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   cursor: "default",
                   ai: "center",
                 }}
-                size="2"
-                variant="primary">
+                size="2">
                 <Box css={{ mr: "$1" }}>Check out our documentation</Box>
                 <ArrowRightIcon />
               </Button>
@@ -166,8 +164,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   cursor: "default",
                   ai: "center",
                 }}
-                size="2"
-                variant="primary">
+                size="2">
                 <Box css={{ mr: "$1" }}>Explore the API</Box>
                 <ArrowRightIcon />
               </Button>
@@ -202,8 +199,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   display: "inline-flex",
                   ai: "center",
                 }}
-                size="2"
-                variant="primary">
+                size="2">
                 <Box css={{ mr: "$1" }}>Clone and create</Box>
                 <ArrowRightIcon />
               </Button>

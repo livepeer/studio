@@ -162,7 +162,7 @@ const CreateDialog = ({
                   placeholder="e.g. New key"
                 />
 
-                <Box css={{ display: "flex", mt: "$2" }}>
+                <Box css={{ display: "flex", mt: "$2", alignItems: "center" }}>
                   <Checkbox
                     id="allowCors"
                     checked={allowCors}

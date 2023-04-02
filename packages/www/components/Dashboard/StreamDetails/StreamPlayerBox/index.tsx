@@ -26,7 +26,7 @@ const StreamPlayerBox = ({
       <Box
         css={{
           borderRadius: "$3",
-          overflow: "hidden",
+          overflow: stream.isActive ? "hidden" : "visible",
           position: "relative",
           mb: "$2",
         }}>

@@ -25,11 +25,13 @@ const DeleteDialog = ({ total, onUnselect, onDelete }) => {
     <AlertDialog open={open}>
       <Flex css={{ ai: "center" }}>
         <Flex css={{ ai: "center", mr: "$3" }}>
-          <Box css={{ fontSize: "$2", color: "$primary9" }}>
+          <Box css={{ fontSize: "$2", color: "$neutral9" }}>
             {total} selected
           </Box>
-          <Box css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }} />
-          <Box css={{ fontSize: "$2", color: "$green11" }} onClick={onUnselect}>
+          <Box css={{ height: 18, width: "1px", bc: "$neutral7", mx: "$3" }} />
+          <Box
+            css={{ fontSize: "$2", color: "$primary9" }}
+            onClick={onUnselect}>
             Deselect
           </Box>
         </Flex>

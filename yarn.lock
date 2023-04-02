@@ -4177,10 +4177,10 @@
     tus-js-client "^3.0.1"
     zustand "^4.3.2"
 
-"@livepeer/design-system@^1.0.13":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@livepeer/design-system/-/design-system-1.0.13.tgz#5eee2177dfaf2abfea5db2a45aa146be8fe843b3"
-  integrity sha512-2NfMxRots0cLsSLeaD6Zl+N5MXrMC6gFb7x7eKRaxLZoH3g39fMhJ9Fp312ZZMQDAtWyCiTk+fzG57+nrWk/Wg==
+"@livepeer/design-system@^1.0.15":
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/@livepeer/design-system/-/design-system-1.0.15.tgz#6f3c1c297676c425fb1cb8a4c68a8685e39d08f9"
+  integrity sha512-NOi7lcgRUo3jbzgsO9ux7VoonZ7DSkJwVawbyZkPrqnpmAlzQ5LGTpIGgplisOAv7lfzVNdtL1bX94h4u8hRSA==
   dependencies:
     "@radix-ui/colors" "0.1.8"
     "@radix-ui/react-accessible-icon" "^1.0.0"

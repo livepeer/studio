@@ -306,20 +306,20 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
               <Flex css={{ ai: "center", mr: "$3" }}>
-                <Box css={{ fontSize: "$2", color: "$primary9" }}>
+                <Box css={{ fontSize: "$2", px: "$2", color: "$neutral9" }}>
                   {state.selectedRows.length} selected
                 </Box>
                 <Box
-                  css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }}
+                  css={{ height: 18, width: "1px", bc: "$neutral7", mx: "$3" }}
                 />
-                <Box
+                <Button
+                  ghost
                   css={{
                     fontSize: "$2",
-                    color: "$green11",
                   }}
                   onClick={() => toggleAllRowsSelected(false)}>
                   Deselect
-                </Box>
+                </Button>
               </Flex>
               {selectAction && (
                 <Button
@@ -492,9 +492,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               </Text>
               {viewAll ? (
                 <Link href={viewAll} passHref legacyBehavior>
-                  <A
-                    variant="primary"
-                    css={{ cursor: "default", display: "flex", ai: "center" }}>
+                  <A variant="primary" css={{ display: "flex", ai: "center" }}>
                     <Box>View all</Box> <ArrowRightIcon />
                   </A>
                 </Link>
