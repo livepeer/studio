@@ -294,6 +294,11 @@ const config = {
           "https://medium.com/livepeer-blog/how-to-multistream-twitter-spaces-with-livepeer-59997f5c0f2e",
         permanent: false,
       },
+      {
+        source: "/login",
+        destination: "https://livepeer.org",
+        permanent: false,
+      },
     ];
   },
 };

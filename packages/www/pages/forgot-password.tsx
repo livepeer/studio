@@ -1,12 +1,6 @@
 import Layout from "layouts/main";
-import Login from "components/Site/Login";
-import {
-  Flex,
-  Box,
-  Heading,
-  Container,
-  Link as A,
-} from "@livepeer/design-system";
+import ForgotPassword from "components/Dashboard/ForgotPassword";
+import { Flex, Box, Text, Container, Link as A } from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
@@ -35,16 +29,22 @@ const ForgotPasswordPage = () => {
       {success ? (
         <Box
           css={{
-            minHeight: "calc(100vh - 510px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            height: "100vh",
             zIndex: 1,
           }}>
           Password reset link sent to your email.
         </Box>
       ) : (
-        <Box css={{ position: "relative" }}>
+        <Box
+          css={{
+            position: "relative",
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+          }}>
           <Container
             size="3"
             css={{
@@ -63,13 +63,21 @@ const ForgotPasswordPage = () => {
                 flexGrow: 1,
                 flexDirection: "column",
               }}>
-              <Heading size="3" as="h1" css={{ mb: "$5" }}>
-                Reset your password
-              </Heading>
-              <Login
+              <Text
+                size="8"
+                as="h1"
+                css={{
+                  textTransform: "uppercase",
+                  mb: "$6",
+                  fontWeight: 700,
+                  width: 150,
+                  lineHeight: "30px",
+                  textAlign: "center",
+                }}>
+                Livepeer Studio
+              </Text>
+              <ForgotPassword
                 id="forgot-password"
-                showEmail={true}
-                showPassword={false}
                 buttonText="Get reset link"
                 onSubmit={onSubmit}
                 errors={errors}
@@ -77,7 +85,7 @@ const ForgotPasswordPage = () => {
               />
               <Box>
                 Nevermind!&nbsp;
-                <Link href="/login" passHref legacyBehavior>
+                <Link href="/" passHref legacyBehavior>
                   <A>Take me back to log in</A>
                 </Link>
               </Box>
@@ -89,5 +97,5 @@ const ForgotPasswordPage = () => {
   );
 };
 
-ForgotPasswordPage.theme = "dark-theme-blue";
+ForgotPasswordPage.theme = "dark-theme-green";
 export default ForgotPasswordPage;

@@ -172,7 +172,7 @@ export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
     title="Upload your first video asset"
     description="Upload video assets for optimized and cached on-demand playback."
-    learnMoreUrl="https://docs.livepeer.studio/category/on-demand"
+    learnMoreUrl="https://docs.livepeer.org"
     actionTitle="Upload asset"
     actionToggleState={actionToggleState}
   />
