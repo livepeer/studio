@@ -143,5 +143,5 @@ your interest in speaking with our team. The more information, the better."
   );
 };
 
-ContactPage.theme = "dark-theme-blue";
+ContactPage.theme = "dark-theme-green";
 export default ContactPage;

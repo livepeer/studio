@@ -62,5 +62,5 @@ export async function getStaticProps() {
   };
 }
 
-TeamPage.theme = "dark-theme-blue";
+TeamPage.theme = "dark-theme-green";
 export default TeamPage;
