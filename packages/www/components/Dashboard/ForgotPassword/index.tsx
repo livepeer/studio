@@ -72,6 +72,42 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
           maxWidth: 450,
         }}
         id={id}>
+        <Text
+          variant="neutral"
+          size={1}
+          css={{
+            mb: "$1",
+            fontSize: "11px",
+            textTransform: "uppercase",
+            fontWeight: 600,
+          }}>
+          Broadcasting provider
+        </Text>
+        <TextField
+          readOnly
+          size="3"
+          id="email"
+          css={{
+            width: "100%",
+            bc: "$neutral2",
+            mb: "$4",
+          }}
+          name="broadcastingProvider"
+          type="text"
+          required
+          value="Livepeer Inc (default)"
+        />
+        <Text
+          variant="neutral"
+          size={1}
+          css={{
+            mb: "$1",
+            fontSize: "11px",
+            textTransform: "uppercase",
+            fontWeight: 600,
+          }}>
+          Email Address
+        </Text>
         <TextField
           size="3"
           id="email"
@@ -82,7 +118,7 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
           }}
           name="email"
           type="email"
-          placeholder="Email"
+          placeholder="Email address"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
