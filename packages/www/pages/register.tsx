@@ -103,7 +103,7 @@ const RegisterPage = () => {
         <Container
           size="3"
           css={{
-            px: "$6",
+            px: "$3",
             py: "$7",
             width: "100%",
             "@bp3": {
