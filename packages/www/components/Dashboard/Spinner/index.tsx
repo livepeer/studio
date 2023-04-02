@@ -9,7 +9,7 @@ const Index = ({ css = {}, speed = "1s" }) => (
     css={{
       color: "$gray4",
       border: "3px solid",
-      borderColor: "$blue7",
+      borderColor: "$green7",
       borderRadius: "50%",
       borderTopColor: "inherit",
       width: 26,
