@@ -472,6 +472,9 @@ const Footer = () => {
                   <Link href="/pricing-faq" passHref legacyBehavior>
                     <A>Pricing</A>
                   </Link>
+                  <Link href="https://livepeer.typeform.com/to/McJZ2nMI" passHref legacyBehavior>
+                    <A>Streaming Credits Application</A>
+                  </Link>
                   <A href="https://livepeer.org/jobs" target="_blank">
                     Jobs
                   </A>
