@@ -93,8 +93,8 @@ const App = ({ Component, pageProps }) => {
           defaultTheme={DEFAULT_THEME}
           value={{
             ...themeMap,
-            dark: "dark-theme-blue",
-            light: "light-theme-blue",
+            dark: "dark-theme-green",
+            light: "light-theme-green",
           }}>
           <SnackbarProvider>
             <QueryClientProvider client={queryClient}>
