@@ -27,7 +27,7 @@ const Select = styled("select", {
   background: "$loContrast",
   border: "none",
   outline: "none",
-  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  boxShadow: "inset 0 0 0 1px $colors$neutral7",
   "&:focus": {
     border: "none",
     outline: "none",
@@ -54,7 +54,7 @@ const DateInput = styled("input", {
   background: "$loContrast",
   border: "none",
   outline: "none",
-  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  boxShadow: "inset 0 0 0 1px $colors$neutral7",
   "&::-webkit-calendar-picker-indicator": {
     position: "absolute",
     left: -18,
