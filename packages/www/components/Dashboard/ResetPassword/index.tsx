@@ -95,7 +95,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           required
           value="Livepeer Inc (default)"
         />
-
         <Text
           variant="neutral"
           size={1}
