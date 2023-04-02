@@ -53,7 +53,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           maxWidth: 460,
           textAlign: "center",
           mx: "auto",
-          mb: "$6",
+          mb: "$7",
         }}>
         Reset your password.
       </Text>

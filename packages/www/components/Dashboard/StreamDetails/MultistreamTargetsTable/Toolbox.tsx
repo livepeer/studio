@@ -46,7 +46,10 @@ const DisableDialog = ({
           <Heading size="1">Disable multistream target?</Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             Changes will take effect when the next stream session is started.
           </Text>
         </AlertDialogDescription>
@@ -110,7 +113,10 @@ const DeleteDialog = ({
           <Heading size="1">Delete multistream target?</Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             Deleting a target cannot be undone. Any active sessions will
             continue to be multistreamed to this destination.
           </Text>

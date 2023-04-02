@@ -43,7 +43,7 @@ const Post = ({ href, title, label }) => (
           textDecoration: "none",
         },
       }}>
-      <Text variant="gray">{title}</Text>
+      <Text variant="neutral">{title}</Text>
       <Flex align="center" css={{ mt: "$2" }}>
         <Box>{label ?? "Read guide"}</Box>
         <svg

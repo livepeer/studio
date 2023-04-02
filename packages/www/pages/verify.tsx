@@ -152,10 +152,10 @@ const Verify = ({
                   Check your email
                 </Heading>
                 <Box css={{ fontSize: "$2" }}>
-                  <Text variant="gray" size="3">
+                  <Text variant="neutral" size="3">
                     We've sent you a link to verify your email.
                   </Text>
-                  <Text variant="gray" size="3">
+                  <Text variant="neutral" size="3">
                     Please check your inbox at
                     <Box
                       as="span"

@@ -403,7 +403,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   </Box>
                 </Box>
               ) : (
-                <Text variant="gray">
+                <Text variant="neutral">
                   You are currently using the{" "}
                   {products[user.stripeProductId].name} plan. Do you want to{" "}
                   {products[stripeProductId].order <

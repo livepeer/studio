@@ -1,6 +1,13 @@
 import Layout from "layouts/main";
 import ForgotPassword from "components/Dashboard/ForgotPassword";
-import { Flex, Box, Text, Container, Link as A } from "@livepeer/design-system";
+import {
+  Button,
+  Flex,
+  Box,
+  Text,
+  Container,
+  Link as A,
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
@@ -78,15 +85,39 @@ const ForgotPasswordPage = () => {
               </Text>
               <ForgotPassword
                 id="forgot-password"
-                buttonText="Get reset link"
+                buttonText="Email reset link"
                 onSubmit={onSubmit}
                 errors={errors}
                 loading={loading}
               />
-              <Box>
-                Nevermind!&nbsp;
+              <Box css={{ maxWidth: 450, width: "100%" }}>
+                <Box
+                  css={{
+                    width: "100%",
+                    height: "1px",
+                    mb: "$3",
+                    bc: "$neutral6",
+                  }}
+                />
                 <Link href="/" passHref legacyBehavior>
-                  <A>Take me back to log in</A>
+                  <A
+                    css={{
+                      "&:hover": {
+                        textDecoration: "none",
+                      },
+                    }}>
+                    <Button
+                      size="4"
+                      css={{
+                        width: "100%",
+                        fontSize: "$3",
+                        "&:hover": {
+                          textDecoration: "none",
+                        },
+                      }}>
+                      Nevermind! Take me back to sign in
+                    </Button>
+                  </A>
                 </Link>
               </Box>
             </Flex>

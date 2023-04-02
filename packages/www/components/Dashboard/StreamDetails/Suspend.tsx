@@ -38,7 +38,10 @@ const Suspend = ({ stream, invalidate }) => {
           </Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             {!stream.suspended
               ? `Are you sure you want to suspend this stream? 
             Any active stream sessions will immediately end. 

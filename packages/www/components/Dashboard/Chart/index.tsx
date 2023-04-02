@@ -72,7 +72,7 @@ const Chart = ({
         },
       }}>
       <Text
-        variant="gray"
+        variant="neutral"
         size="1"
         css={{
           transform: "rotate(-90deg)",
@@ -83,7 +83,7 @@ const Chart = ({
         kbps (multiplied by 1000)
       </Text>
       <Text
-        variant="gray"
+        variant="neutral"
         size="1"
         css={{
           position: "absolute",

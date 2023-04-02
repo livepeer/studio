@@ -86,7 +86,12 @@ const LoginPage = () => {
                 }}
               />
               <Link href="/register" passHref legacyBehavior>
-                <A href="/register">
+                <A
+                  css={{
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                  }}>
                   <Button
                     size="4"
                     css={{

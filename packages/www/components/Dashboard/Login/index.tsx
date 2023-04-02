@@ -64,7 +64,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           maxWidth: 460,
           textAlign: "center",
           mx: "auto",
-          mb: "$6",
+          mb: "$7",
         }}>
         Your home for building onchain video experiences with Livepeer, the
         world's open video infrastructure.
@@ -165,6 +165,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
               <A
                 variant="primary"
                 css={{
+                  display: "block",
                   textDecoration: "none",
                   fontSize: "$1",
                   fontWeight: 450,

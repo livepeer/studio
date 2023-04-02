@@ -24,7 +24,7 @@ const EmptyState = ({
       maxWidth: 450,
     }}>
     <Heading css={{ fontWeight: 500, mb: "$3" }}>Create a Signing key</Heading>
-    <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+    <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
       Signing keys allow you to use playback policies with your streams to
       restrict access to them
     </Text>

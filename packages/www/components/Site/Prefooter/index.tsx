@@ -52,7 +52,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
           Ready to get started?
         </Heading>
         <Text
-          variant="gray"
+          variant="neutral"
           size="4"
           css={{
             color: "white",

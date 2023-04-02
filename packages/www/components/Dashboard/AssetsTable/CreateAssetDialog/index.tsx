@@ -205,7 +205,7 @@ const CreateAssetDialog = ({
           <AlertDialogDescription asChild>
             <Text
               size="3"
-              variant="gray"
+              variant="neutral"
               css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
               Select up to {maxFiles} files. Files are uploaded 5 at a time.
               <br />

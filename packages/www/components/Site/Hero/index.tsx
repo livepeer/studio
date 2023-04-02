@@ -63,7 +63,10 @@ const Hero = ({
                 }}>
                 {heading}
               </Box>
-              <Text variant="gray" size="4" css={{ mb: "$6", lineHeight: 1.6 }}>
+              <Text
+                variant="neutral"
+                size="4"
+                css={{ mb: "$6", lineHeight: 1.6 }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (

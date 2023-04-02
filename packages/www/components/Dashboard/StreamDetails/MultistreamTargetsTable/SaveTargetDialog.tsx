@@ -355,7 +355,7 @@ const SaveTargetDialog = ({
           <AlertDialogDescription asChild>
             <Text
               size="3"
-              variant="gray"
+              variant="neutral"
               css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
               {`${
                 action === Action.Create

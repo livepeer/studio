@@ -146,7 +146,7 @@ const CreateDialog = ({
               <AlertDialogDescription asChild>
                 <Text
                   size="3"
-                  variant="gray"
+                  variant="neutral"
                   css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                   Enter a name for your key to differentiate it from other keys.
                 </Text>
@@ -279,7 +279,7 @@ const CreateDialog = ({
                           <Text css={{ fontWeight: 600 }}>
                             No origins allowed
                           </Text>
-                          <Text variant="gray">
+                          <Text variant="neutral">
                             Add origins with the input field above.
                           </Text>
                         </Flex>
@@ -357,11 +357,14 @@ const CreateDialog = ({
             <AlertDialogDescription asChild>
               <Text
                 size="3"
-                variant="gray"
+                variant="neutral"
                 css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                 <Box>
                   <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
-                  <Button variant="gray" size="2" css={{ cursor: "pointer" }}>
+                  <Button
+                    variant="neutral"
+                    size="2"
+                    css={{ cursor: "pointer" }}>
                     <ClipButton value={newToken.id} text={newToken.id} />
                   </Button>
                 </Box>

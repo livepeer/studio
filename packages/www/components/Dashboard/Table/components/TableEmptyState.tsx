@@ -33,7 +33,7 @@ const TableEmptyState = ({
     }}>
     <Heading css={{ fontWeight: 500, mb: "$3" }}>{title}</Heading>
 
-    <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+    <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
       {description}
     </Text>
 
