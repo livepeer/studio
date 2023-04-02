@@ -14,7 +14,7 @@ const StyledHeader = styled(Accordion.Header, {
   margin: 0,
   display: "flex",
   borderTop: "1px solid",
-  borderColor: "$slate6",
+  borderColor: "$neutral6",
   alignItems: "center",
   padding: "11px",
   width: "100%",
@@ -41,7 +41,7 @@ const StyledButton = styled(Accordion.Trigger, {
 const StyledPanel = styled(Accordion.Content, {
   padding: "12px 11px",
   borderTop: "1px solid",
-  borderColor: "$slate6",
+  borderColor: "$neutral6",
   background: "$panel",
   margin: 0,
 });
