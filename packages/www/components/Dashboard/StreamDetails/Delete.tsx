@@ -39,7 +39,10 @@ const Delete = ({ stream, invalidate, ...props }) => {
           <Heading size="1">Delete stream?</Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             Are you sure you want to delete stream {stream.name}? Deleting a
             stream cannot be undone.
           </Text>

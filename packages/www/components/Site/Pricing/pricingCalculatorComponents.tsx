@@ -324,13 +324,13 @@ const Calculator = ({
               px: "$4",
               width: "100%",
             }}>
-            <Text variant="gray" size="1">
+            <Text variant="neutral" size="1">
               hours
             </Text>
-            <Text variant="gray" size="1">
+            <Text variant="neutral" size="1">
               minutes
             </Text>
-            <Text variant="gray" size="1">
+            <Text variant="neutral" size="1">
               seconds
             </Text>
           </Box>
@@ -455,7 +455,7 @@ const PreviewItem = ({
             {title}
           </Text>
         </Box>
-        <Text variant="gray" size="2">
+        <Text variant="neutral" size="2">
           {description}
         </Text>
       </Box>
@@ -518,7 +518,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           pb: "$2",
         }}>
         <Text size="4">Monthly cost</Text>
-        <Text size="3" variant="gray" css={{ fontStyle: "italic" }}>
+        <Text size="3" variant="neutral" css={{ fontStyle: "italic" }}>
           Prices listed in USD
         </Text>
       </Box>

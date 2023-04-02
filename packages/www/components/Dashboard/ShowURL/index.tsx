@@ -74,7 +74,7 @@ const ShowURL = ({ url, shortendUrl, anchor = false }: ShowURLProps) => {
       </HoverCardTrigger>
       <HoverCardContent>
         <Text
-          variant="gray"
+          variant="neutral"
           css={{
             backgroundColor: "$panel",
             borderRadius: 6,

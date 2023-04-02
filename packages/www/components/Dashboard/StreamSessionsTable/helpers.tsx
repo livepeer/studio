@@ -141,7 +141,7 @@ export const rowsPageFromState = async (
                 </HoverCardTrigger>
                 <HoverCardContent>
                   <Text
-                    variant="gray"
+                    variant="neutral"
                     css={{
                       backgroundColor: "$panel",
                       borderRadius: 6,

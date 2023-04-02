@@ -61,7 +61,10 @@ const DeleteKeysDialog = ({
           </Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             This will permanently remove the signing key
             {state.selectedRows.length > 1 && "s"}. This action cannot be
             undone.

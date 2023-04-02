@@ -11,7 +11,7 @@ const StreamOverviewTab = ({ id, stream, streamHealth, invalidateStream }) => {
         invalidateStream={invalidateStream}
         css={{ mb: "$7" }}
         emptyState={
-          <Text variant="gray" size="2">
+          <Text variant="neutral" size="2">
             No targets
           </Text>
         }
@@ -21,7 +21,7 @@ const StreamOverviewTab = ({ id, stream, streamHealth, invalidateStream }) => {
       <SessionsTable
         streamId={id}
         emptyState={
-          <Text variant="gray" size="2">
+          <Text variant="neutral" size="2">
             No sessions
           </Text>
         }

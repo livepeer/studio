@@ -259,7 +259,7 @@ const CreateEditDialog = ({
                   css={{ just: "center" }}
                   align="center">
                   <Text css={{ fontWeight: 600 }}>No events selected</Text>
-                  <Text variant="gray">
+                  <Text variant="neutral">
                     Search for events with the dropdown above.
                   </Text>
                 </Flex>

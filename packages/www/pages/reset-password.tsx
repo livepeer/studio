@@ -1,7 +1,14 @@
 import Layout from "layouts/main";
 import ResetPassword from "components/Dashboard/ResetPassword";
 import Link from "next/link";
-import { Flex, Box, Container, Text, Link as A } from "@livepeer/design-system";
+import {
+  Button,
+  Flex,
+  Box,
+  Container,
+  Text,
+  Link as A,
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
@@ -74,9 +81,34 @@ const ResetPasswordPage = () => {
               errors={errors}
               loading={loading}
             />
-            <Box>
+            <Box css={{ maxWidth: 450, width: "100%" }}>
+              <Box
+                css={{
+                  width: "100%",
+                  height: "1px",
+                  mb: "$3",
+                  bc: "$neutral6",
+                }}
+              />
               <Link href="/" passHref legacyBehavior>
-                <A>Nevermind! Take me back to sign in</A>
+                <A
+                  css={{
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                  }}>
+                  <Button
+                    size="4"
+                    css={{
+                      width: "100%",
+                      fontSize: "$3",
+                      "&:hover": {
+                        textDecoration: "none",
+                      },
+                    }}>
+                    Nevermind! Take me back to sign in
+                  </Button>
+                </A>
               </Link>
             </Box>
           </Flex>

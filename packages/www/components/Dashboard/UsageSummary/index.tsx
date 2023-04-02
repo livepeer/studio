@@ -169,7 +169,7 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Text variant="gray" css={{ display: "flex", ai: "center" }}>
+        <Text variant="neutral" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
           Upcoming invoice:{" "}
           <Box css={{ ml: "$1", fontWeight: 600 }}>

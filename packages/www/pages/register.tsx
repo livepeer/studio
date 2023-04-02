@@ -5,7 +5,7 @@ import Register from "../components/Dashboard/Register";
 import {
   Flex,
   Box,
-  Heading,
+  Button,
   Text,
   Container,
   Link as A,
@@ -139,11 +139,33 @@ const RegisterPage = () => {
               loading={loading}
               errors={errors}
             />
-            <Flex align="center" css={{ color: "$hiContrast" }}>
+            <Box css={{ maxWidth: 450, width: "100%" }}>
+              <Box
+                css={{
+                  width: "100%",
+                  height: "1px",
+                  mb: "$3",
+                  bc: "$neutral6",
+                }}
+              />
               <Link href="/" passHref legacyBehavior>
-                <A>Sign in instead</A>
+                <A
+                  css={{
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                  }}>
+                  <Button
+                    size="4"
+                    css={{
+                      width: "100%",
+                      fontSize: "$3",
+                    }}>
+                    Sign in instead
+                  </Button>
+                </A>
               </Link>
-            </Flex>
+            </Box>
           </Flex>
         </Container>
       </Box>

@@ -344,7 +344,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               )}
               {createAction && (
                 <Button
-                  variant="primary"
+                  variant="neutral"
                   size="2"
                   // @ts-ignore
                   css={{ display: "flex", alignItems: "center" }}
@@ -377,7 +377,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             <Heading css={{ fontWeight: 500, mb: "$3" }}>
               No results found
             </Heading>
-            <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+            <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
               There aren't any results for that query.
             </Text>
           </Flex>

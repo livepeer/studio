@@ -24,7 +24,7 @@ const TeamPage = ({ content }) => {
             <Heading size="4" css={{ fontWeight: 600, mb: "$4" }}>
               We’re building the future of video.
             </Heading>
-            <Text variant="gray" size="5">
+            <Text variant="neutral" size="5">
               We're comprised of team members dedicated to building affordable,
               scalable, reliable, and easy-to-use video developer tools.
             </Text>

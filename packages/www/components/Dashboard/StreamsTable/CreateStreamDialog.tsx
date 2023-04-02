@@ -70,7 +70,7 @@ const CreateStreamDialog = ({
           <AlertDialogDescription asChild>
             <Text
               size="3"
-              variant="gray"
+              variant="neutral"
               css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
               Newly created streams are assigned a special key and RTMP ingest
               URL to stream into.

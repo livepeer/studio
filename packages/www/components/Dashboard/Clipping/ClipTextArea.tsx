@@ -57,7 +57,7 @@ const ClipTextArea = ({
       </HoverCardTrigger>
       <HoverCardContent>
         <Text
-          variant="gray"
+          variant="neutral"
           css={{
             backgroundColor: "$panel",
             borderRadius: 6,

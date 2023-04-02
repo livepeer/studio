@@ -63,7 +63,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          mb: "$3",
           ml: "auto",
           mr: "auto",
           maxWidth: 450,
@@ -76,7 +75,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             maxWidth: 450,
             textAlign: "center",
             mx: "auto",
-            mb: "$6",
+            mb: "$7",
           }}>
           Create an account
         </Text>
@@ -195,7 +194,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             width: "100%",
             my: "$3",
             px: "$3",
-            fontSize: "$3",
           }}>
           {loading ? "Loading..." : buttonText}
         </Button>

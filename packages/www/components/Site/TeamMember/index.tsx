@@ -67,7 +67,7 @@ const TeamMember = ({
             }}>
             {fullname}
           </Heading>
-          <Text size="3" variant="gray" css={{ color: "$primary9" }}>
+          <Text size="3" variant="neutral" css={{ color: "$primary9" }}>
             {role}
           </Text>
         </Box>

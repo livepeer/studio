@@ -28,7 +28,7 @@ const GettingStarted = ({ firstName = "" }) => {
           <AccordionContent>
             <Box>
               <Text
-                variant="gray"
+                variant="neutral"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
                 No code required! All you need to do is create a RTMP stream
@@ -43,7 +43,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 . Here’s how:
               </Text>
               <Text
-                variant="gray"
+                variant="neutral"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
                 1. Navigate to the streams view, tap "Create stream", and give
@@ -56,7 +56,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 streaming. <br />
               </Text>
               <Text
-                variant="gray"
+                variant="neutral"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
                 Need more help? Read our step-by-step getting started tutorial.
@@ -92,14 +92,14 @@ const GettingStarted = ({ firstName = "" }) => {
           <AccordionContent>
             <Box>
               <Text
-                variant="gray"
+                variant="neutral"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
                 Easily add video assets to your application for on demand
                 playback. Navigate to the "Assets" view to get started.
               </Text>
               <Text
-                variant="gray"
+                variant="neutral"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
                 Want to learn more?
@@ -134,7 +134,7 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionTrigger>
           <AccordionContent>
             <Text
-              variant="gray"
+              variant="neutral"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
               Ready to code? The API is nimble and designed for customization.
@@ -182,7 +182,7 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionTrigger>
           <AccordionContent>
             <Text
-              variant="gray"
+              variant="neutral"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
               Livepeer Studio is designed to serve your app, from the ground up

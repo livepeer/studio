@@ -108,7 +108,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenu.Trigger asChild>
-        <Button css={{ display: "flex", ai: "center" }} size="2" variant="gray">
+        <Button css={{ display: "flex", ai: "center" }} size="2">
           <Flex css={{ mr: "$2" }}>
             <FilterIcon />
           </Flex>
@@ -151,7 +151,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
               padding: "6px 7px",
               background: "$panel",
             }}>
-            <Button onClick={handleClear} size="1" variant="gray">
+            <Button onClick={handleClear} size="1" variant="neutral">
               Clear
             </Button>
             <Text size="2" css={{ margin: "0px" }}>

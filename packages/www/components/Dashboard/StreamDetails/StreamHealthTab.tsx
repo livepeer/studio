@@ -125,7 +125,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         invalidateStream={invalidateStream}
         css={{ mb: "$7" }}
         emptyState={
-          <Text variant="gray" size="2">
+          <Text variant="neutral" size="2">
             No data
           </Text>
         }
@@ -144,7 +144,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
           Session bitrate
         </Heading>
-        <Text variant="gray" size="3">
+        <Text variant="neutral" size="3">
           After the stream loads, ingest rate updates every 10 seconds.
         </Text>
       </Box>

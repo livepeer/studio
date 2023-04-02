@@ -79,7 +79,7 @@ const AssetOverviewTab = ({
               Metadata
             </Heading>
           </Flex>
-          <Text variant="gray" size="2">
+          <Text variant="neutral" size="2">
             A list of key value pairs that you use to provide metadata for your
             video.{" "}
             <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
@@ -96,7 +96,7 @@ const AssetOverviewTab = ({
                 cursor: "pointer",
                 justifyContent: "space-between",
               }}>
-              <Text variant="gray" size="2">
+              <Text variant="neutral" size="2">
                 {metadataStringified}
               </Text>
 
@@ -129,7 +129,7 @@ const AssetOverviewTab = ({
               Decentralized Storage Providers
             </Heading>
           </Flex>
-          <Text variant="gray" size="2">
+          <Text variant="neutral" size="2">
             By default video assets are stored in the Livepeer Studio database,
             but you may also replicate them to the following decentralized
             storage providers.
@@ -143,7 +143,7 @@ const AssetOverviewTab = ({
             </Flex>
 
             {asset?.storage?.ipfs?.updatedAt && (
-              <Text size="3" variant="gray">
+              <Text size="3" variant="neutral">
                 Uploaded on{" "}
                 {moment
                   .unix(asset?.storage?.ipfs?.updatedAt / 1000)
@@ -199,7 +199,7 @@ const AssetOverviewTab = ({
                     />
                   </Flex>
                   <Text
-                    variant="gray"
+                    variant="neutral"
                     size="2"
                     css={{ mt: "$1", lineHeight: 1.4 }}>
                     ipfs://{asset?.storage?.ipfs?.cid}

@@ -43,7 +43,10 @@ const DeleteDialog = ({
           <Heading size="1">Delete Webhook</Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             Are you sure you want to delete this webhook?
           </Text>
         </AlertDialogDescription>
