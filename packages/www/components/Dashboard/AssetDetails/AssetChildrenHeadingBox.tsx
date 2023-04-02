@@ -35,7 +35,7 @@ const AssetChildrenHeadingBox = ({
               cursor: "pointer",
               textDecoration: "none",
               borderBottom: "2px solid",
-              borderColor: activeTab === "Overview" ? "$blue9" : "transparent",
+              borderColor: activeTab === "Overview" ? "$green9" : "transparent",
               mr: "$5",
               "&:hover": {
                 textDecoration: "none",
@@ -54,7 +54,7 @@ const AssetChildrenHeadingBox = ({
               cursor: "pointer",
               borderBottom: "2px solid",
               borderColor:
-                activeTab === "Event Logs" ? "$blue9" : "transparent",
+                activeTab === "Event Logs" ? "$green9" : "transparent",
               whiteSpace: "nowrap",
               "&:hover": {
                 textDecoration: "none",

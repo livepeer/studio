@@ -53,7 +53,7 @@ const StreamChildrenHeadingBox = ({
             cursor: "pointer",
             textDecoration: "none",
             borderBottom: "2px solid",
-            borderColor: activeTab === "Overview" ? "$blue9" : "transparent",
+            borderColor: activeTab === "Overview" ? "$green9" : "transparent",
             mr: "$5",
             "&:hover": {
               textDecoration: "none",
@@ -71,7 +71,7 @@ const StreamChildrenHeadingBox = ({
             width: "100%",
             cursor: "pointer",
             borderBottom: "2px solid",
-            borderColor: activeTab === "Health" ? "$blue9" : "transparent",
+            borderColor: activeTab === "Health" ? "$green9" : "transparent",
             "&:hover": {
               textDecoration: "none",
             },

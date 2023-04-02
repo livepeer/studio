@@ -213,7 +213,7 @@ const Billing = () => {
             css={{
               ".rccs__card__background": {
                 background:
-                  "linear-gradient(to right, $colors$blue11, $colors$blue11) !important",
+                  "linear-gradient(to right, $colors$green11, $colors$green11) !important",
               },
               ".rccs__card--front": {
                 color: "white !important",

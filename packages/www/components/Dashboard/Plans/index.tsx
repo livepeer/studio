@@ -314,7 +314,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                       "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
                     );
                   }}
-                  variant="blue">
+                  variant="green">
                   Contact Us
                 </Button>
               </Link>

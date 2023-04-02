@@ -152,7 +152,7 @@ const CreateKeyDialog = ({
             </AlertDialogDescription>
 
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button variant="blue" onClick={() => onClose()} size="2">
+              <Button variant="green" onClick={() => onClose()} size="2">
                 Continue
               </Button>
             </Flex>

@@ -32,7 +32,7 @@ const StyledPolygonIcon = styled(PolygonIcon, {
 });
 
 const StyledCheckedIcon = styled(CheckedIcon, {
-  color: "$blue9",
+  color: "$green9",
 });
 
 const StyledDocumentationIcon = styled(DocumentationIcon, {
@@ -214,7 +214,7 @@ const Header = ({ breadcrumbs = [] }) => {
                               borderRadius: "50%",
                               border:
                                 reaction === form.reaction
-                                  ? "1px solid $blue9"
+                                  ? "1px solid $green9"
                                   : "1px solid $primary7",
                               display: "flex",
                               alignItems: "center",

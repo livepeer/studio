@@ -30,10 +30,10 @@ const StyledButton = styled(Accordion.Trigger, {
   outline: "none",
   "&:focus": {
     boxShadow:
-      "inset 0px 0px 0px 1px $colors$blue8, 0px 0px 0px 1px $colors$blue8",
+      "inset 0px 0px 0px 1px $colors$green8, 0px 0px 0px 1px $colors$green8",
     "&:-webkit-autofill": {
       boxShadow:
-        "inset 0px 0px 0px 1px $colors$blue8, 0px 0px 0px 1px $colors$blue8, inset 0 0 0 100px $colors$blue3",
+        "inset 0px 0px 0px 1px $colors$green8, 0px 0px 0px 1px $colors$green8, inset 0 0 0 100px $colors$green3",
     },
   },
 });

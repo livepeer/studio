@@ -73,7 +73,7 @@ const livepeerClient = createReactClient({
 
 const livepeerTheme: ThemeConfig = {
   colors: {
-    accent: "$colors$blue10",
+    accent: "$colors$green10",
   },
 };
 

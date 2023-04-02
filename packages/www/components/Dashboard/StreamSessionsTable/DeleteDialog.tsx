@@ -30,7 +30,7 @@ const DeleteDialog = ({ total, onUnselect, onDelete }) => {
           </Box>
           <Box css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }} />
           <Box
-            css={{ cursor: "pointer", fontSize: "$2", color: "$blue11" }}
+            css={{ cursor: "pointer", fontSize: "$2", color: "$green11" }}
             onClick={onUnselect}>
             Deselect
           </Box>

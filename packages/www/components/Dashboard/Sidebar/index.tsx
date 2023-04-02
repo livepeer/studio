@@ -132,7 +132,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             <NavLink>
               <HomeIcon active={id === "home"} />
               <Text
-                variant={id === "home" ? "blue" : null}
+                variant={id === "home" ? "green" : null}
                 css={{
                   fontWeight: id === "home" ? 700 : 400,
                   backgroundClip: "text",
@@ -148,7 +148,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               <NavLink>
                 <StreamIcon active={id === "streams"} />
                 <Text
-                  variant={id === "streams" ? "blue" : null}
+                  variant={id === "streams" ? "green" : null}
                   css={{
                     fontWeight: id === "streams" ? 700 : 400,
                     backgroundClip: "text",
@@ -170,7 +170,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 <Link href="/dashboard/sessions" passHref legacyBehavior>
                   <NavLink>
                     <Text
-                      variant={id === "streams/sessions" ? "blue" : null}
+                      variant={id === "streams/sessions" ? "green" : null}
                       css={{
                         fontWeight: id === "streams/sessions" ? 700 : 400,
                         backgroundClip: "text",
@@ -190,7 +190,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             <NavLink>
               <AssetsIcon active={id === "assets"} />
               <Text
-                variant={id === "assets" ? "blue" : null}
+                variant={id === "assets" ? "green" : null}
                 css={{
                   fontWeight: id === "assets" ? 700 : 400,
                   backgroundClip: "text",
@@ -231,7 +231,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   legacyBehavior>
                   <NavLink>
                     <Text
-                      variant={id === "developers" ? "blue" : null}
+                      variant={id === "developers" ? "green" : null}
                       css={{
                         fontWeight: id === "developers" ? 700 : 400,
                         backgroundClip: "text",
@@ -250,7 +250,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   legacyBehavior>
                   <NavLink>
                     <Text
-                      variant={id === "developers/signing-keys" ? "blue" : null}
+                      variant={
+                        id === "developers/signing-keys" ? "green" : null
+                      }
                       css={{
                         fontWeight:
                           id === "developers/signing-keys" ? 700 : 400,
@@ -270,7 +272,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   legacyBehavior>
                   <NavLink>
                     <Text
-                      variant={id === "developers/webhooks" ? "blue" : null}
+                      variant={id === "developers/webhooks" ? "green" : null}
                       css={{
                         fontWeight: id === "developers/webhooks" ? 700 : 400,
                         backgroundClip: "text",
@@ -292,7 +294,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               <NavLink>
                 <BillingIcon active={id === "billing"} />
                 <Text
-                  variant={id === "billing" ? "blue" : null}
+                  variant={id === "billing" ? "green" : null}
                   css={{
                     display: "flex",
                     fontWeight: id === "billing" ? 700 : 400,
@@ -316,7 +318,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 <Link href="/dashboard/billing/plans" passHref legacyBehavior>
                   <NavLink>
                     <Text
-                      variant={id === "billing/plans" ? "blue" : null}
+                      variant={id === "billing/plans" ? "green" : null}
                       css={{
                         fontWeight: id === "billing/plans" ? 700 : 400,
                         backgroundClip: "text",
