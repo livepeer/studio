@@ -17,6 +17,7 @@ const Banner = ({
     <Promo
       size="2"
       css={{
+        borderRadius: "$2",
         display: "grid",
         gridTemplateColumns: "repeat(2, auto)",
         ...css,
