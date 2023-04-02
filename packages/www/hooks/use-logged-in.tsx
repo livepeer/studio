@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 
 /**
- * Verifies that the user is logged in. Redirects to /login if not. Pass
+ * Verifies that the user is logged in. Redirects to / if not. Pass
  * `false` to verify that the user is _not_ logged in.
  */
 export default function useLoggedIn(shouldBeLoggedIn = true) {
@@ -17,7 +17,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   useEffect(() => {
     if (shouldBeLoggedIn === true) {
       if (!token) {
-        router.replace("/login");
+        router.replace("/");
       } else if (emailVerificationMode && user && user.emailValid === false) {
         router.replace("/verify");
       }

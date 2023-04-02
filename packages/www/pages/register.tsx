@@ -1,6 +1,7 @@
 import Layout from "layouts/main";
 import { withRecaptcha } from "layouts/withRecaptcha";
-import Login from "../components/Site/Login";
+import Login from "../components/Dashboard/Login";
+import Register from "../components/Dashboard/Register";
 import {
   Flex,
   Box,
@@ -92,7 +93,13 @@ const RegisterPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Box css={{ position: "relative" }}>
+      <Box
+        css={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+        }}>
         <Container
           size="3"
           css={{
@@ -112,25 +119,29 @@ const RegisterPage = () => {
               flexDirection: "column",
               py: "$5",
             }}>
-            <Heading size="4" as="h1" css={{ mb: "$4" }}>
-              Create an account
-            </Heading>
-            <Login
+            <Text
+              size="8"
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                mb: "$6",
+                fontWeight: 700,
+                width: 150,
+                lineHeight: "30px",
+                textAlign: "center",
+              }}>
+              Livepeer Studio
+            </Text>
+            <Register
               id="register"
               onSubmit={onSubmit}
-              showName={true}
-              showOrganization={true}
-              showPhone={true}
-              showEmail={true}
-              showPassword={true}
               buttonText="Register"
               loading={loading}
               errors={errors}
             />
             <Flex align="center" css={{ color: "$hiContrast" }}>
-              Already have an account?&nbsp;
-              <Link href="/login" passHref legacyBehavior>
-                <A>Log in</A>
+              <Link href="/" passHref legacyBehavior>
+                <A>Sign in instead</A>
               </Link>
             </Flex>
           </Flex>
@@ -141,6 +152,6 @@ const RegisterPage = () => {
 };
 
 const RegisterPageWithRecaptcha: any = withRecaptcha(RegisterPage);
-RegisterPageWithRecaptcha.theme = "dark-theme-blue";
+RegisterPageWithRecaptcha.theme = "dark-theme-green";
 
 export default RegisterPageWithRecaptcha;

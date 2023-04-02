@@ -229,6 +229,11 @@ const config = {
         destination: "https://livepeer.org/jobs",
         permanent: false,
       },
+      {
+        source: "/login",
+        destination: "https://livepeer.org",
+        permanent: false,
+      },
     ];
   },
 };

@@ -1,13 +1,7 @@
 import Layout from "layouts/main";
-import Login from "components/Site/Login";
+import ResetPassword from "components/Dashboard/ResetPassword";
 import Link from "next/link";
-import {
-  Flex,
-  Box,
-  Container,
-  Heading,
-  Link as A,
-} from "@livepeer/design-system";
+import { Flex, Box, Container, Text, Link as A } from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
@@ -34,7 +28,13 @@ const ResetPasswordPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Box css={{ position: "relative" }}>
+      <Box
+        css={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+        }}>
         <Container
           size="3"
           css={{
@@ -54,22 +54,29 @@ const ResetPasswordPage = () => {
               flexDirection: "column",
               py: "$5",
             }}>
-            <Heading size="4" as="h1" css={{ mb: "$5" }}>
-              Reset your password
-            </Heading>
-            <Login
+            <Text
+              size="8"
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                mb: "$6",
+                fontWeight: 700,
+                width: 150,
+                lineHeight: "30px",
+                textAlign: "center",
+              }}>
+              Livepeer Studio
+            </Text>
+            <ResetPassword
               id="reset-password"
-              showEmail={false}
-              showPassword={true}
-              buttonText="Change password"
               onSubmit={onSubmit}
+              buttonText="Sign in"
               errors={errors}
               loading={loading}
             />
             <Box>
-              Nevermind!&nbsp;
-              <Link href="/login" passHref legacyBehavior>
-                <A>Take me back to log in</A>
+              <Link href="/" passHref legacyBehavior>
+                <A>Nevermind! Take me back to sign in</A>
               </Link>
             </Box>
           </Flex>
@@ -79,5 +86,5 @@ const ResetPasswordPage = () => {
   );
 };
 
-ResetPasswordPage.theme = "dark-theme-blue";
+ResetPasswordPage.theme = "dark-theme-green";
 export default ResetPasswordPage;
