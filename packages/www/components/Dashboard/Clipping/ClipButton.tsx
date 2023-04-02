@@ -44,7 +44,7 @@ const ClipButton = ({
             <Flex
               css={{
                 alignItems: "center",
-                cursor: "pointer",
+
                 ml: 0,
                 mr: 0,
               }}>

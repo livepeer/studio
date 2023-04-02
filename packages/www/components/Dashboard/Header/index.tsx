@@ -47,7 +47,6 @@ const StyledHyperlinkIcon = styled(HyperlinkIcon, {
 
 const StyledQuestionMarkIcon = styled(QuestionIcon, {
   color: "$hiContrast",
-  cursor: "pointer",
 });
 
 const reactions: string[] = ["🤩", "😀", "😕", "😭"];
@@ -113,7 +112,6 @@ const Header = ({ breadcrumbs = [] }) => {
           <Flex
             align="center"
             css={{
-              cursor: "pointer",
               mr: "$5",
               background: "transparent",
               appearance: "none",
@@ -140,7 +138,6 @@ const Header = ({ breadcrumbs = [] }) => {
               as={DropdownMenuTrigger}
               align="center"
               css={{
-                cursor: "pointer",
                 mr: "$5",
                 background: "transparent",
                 appearance: "none",
@@ -221,7 +218,7 @@ const Header = ({ breadcrumbs = [] }) => {
                               justifyContent: "center",
                               fontSize: "20px",
                               marginRight: "$1",
-                              cursor: "pointer",
+
                               ":last-of-type": {
                                 marginRight: "0px",
                               },
@@ -301,7 +298,6 @@ const Header = ({ breadcrumbs = [] }) => {
                     alignItems: "center",
                     textDecoration: "none",
                     mb: "$3",
-                    cursor: "pointer",
                   }}>
                   <StyledDocumentationIcon />
                   <Text css={{ margin: "0 $2" }}>Documentation</Text>
@@ -310,7 +306,7 @@ const Header = ({ breadcrumbs = [] }) => {
               </Link>
               <Link href="/contact" passHref legacyBehavior>
                 <A>
-                  <Flex align="center" css={{ cursor: "pointer" }}>
+                  <Flex align="center">
                     <StyledSupportIcon />
                     <Text css={{ margin: "0 $2" }}>Contact Support</Text>
                   </Flex>

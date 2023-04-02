@@ -25,9 +25,7 @@ import { Webhook } from "@livepeer.studio/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { v4 as uuid } from "uuid";
 
-const StyledCrossIcon = styled(Cross1Icon, {
-  cursor: "pointer",
-});
+const StyledCrossIcon = styled(Cross1Icon, {});
 
 const eventOptions: Webhook["events"] = [
   "playback.accessControl",

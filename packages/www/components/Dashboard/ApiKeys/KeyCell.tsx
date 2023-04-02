@@ -28,7 +28,7 @@ const KeyCell = ({ token }) => {
                 <Box
                   css={{
                     fontFamily: "monospace",
-                    cursor: "pointer",
+
                     fontSize: "$1",
                   }}>
                   {token.id}

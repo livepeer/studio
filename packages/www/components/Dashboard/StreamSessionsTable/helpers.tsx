@@ -127,7 +127,6 @@ export const rowsPageFromState = async (
                       onCopy={() => openSnackbar("Copied to clipboard")}>
                       <Flex
                         css={{
-                          cursor: "pointer",
                           fontSize: "$1",
                           ai: "center",
                         }}>

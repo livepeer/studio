@@ -32,7 +32,7 @@ const AssetChildrenHeadingBox = ({
             css={{
               pb: "$2",
               width: "100%",
-              cursor: "pointer",
+
               textDecoration: "none",
               borderBottom: "2px solid",
               borderColor: activeTab === "Overview" ? "$green9" : "transparent",
@@ -51,7 +51,7 @@ const AssetChildrenHeadingBox = ({
               textDecoration: "none",
               pb: "$2",
               width: "100%",
-              cursor: "pointer",
+
               borderBottom: "2px solid",
               borderColor:
                 activeTab === "Event Logs" ? "$green9" : "transparent",

@@ -32,9 +32,7 @@ const initialCorsOpts: ApiToken["access"]["cors"] = {
   allowedOrigins: ["http://localhost:3000"],
 };
 
-const StyledCross = styled(Cross, {
-  cursor: "pointer",
-});
+const StyledCross = styled(Cross, {});
 
 const CreateDialog = ({
   isOpen,
@@ -361,10 +359,7 @@ const CreateDialog = ({
                 css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                 <Box>
                   <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
-                  <Button
-                    variant="neutral"
-                    size="2"
-                    css={{ cursor: "pointer" }}>
+                  <Button variant="neutral" size="2">
                     <ClipButton value={newToken.id} text={newToken.id} />
                   </Button>
                 </Box>

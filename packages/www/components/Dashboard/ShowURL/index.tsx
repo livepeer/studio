@@ -44,7 +44,7 @@ const ShowURL = ({ url, shortendUrl, anchor = false }: ShowURLProps) => {
             <Flex
               css={{
                 alignItems: "center",
-                cursor: "pointer",
+
                 ml: 0,
                 mr: 0,
               }}>
