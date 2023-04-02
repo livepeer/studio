@@ -78,7 +78,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               border: 0,
               background: "transparent",
               p: 0,
-              cursor: "pointer",
             }}>
             <Avatar
               size="3"

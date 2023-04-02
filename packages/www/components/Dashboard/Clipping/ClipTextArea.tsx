@@ -44,7 +44,6 @@ const ClipTextArea = ({
             <Flex direction="column">
               <Alert
                 css={{
-                  cursor: "pointer",
                   overflow: "clip",
                   overflowWrap: "anywhere",
                   backgroundColor: "$gray4",

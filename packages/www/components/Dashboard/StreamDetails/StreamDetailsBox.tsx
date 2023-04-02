@@ -82,11 +82,11 @@ const StreamDetailsBox = ({
             )}
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>RTMP ingest URL</Cell>
-          <Cell css={{ cursor: "pointer" }}>
+          <Cell>
             <ShowURL url={globalIngestUrl} anchor={false} />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>SRT ingest URL</Cell>
-          <Cell css={{ cursor: "pointer" }}>
+          <Cell>
             <ShowURL
               url={globalSrtIngestUrl}
               shortendUrl={globalSrtIngestUrl.replace(
@@ -101,7 +101,7 @@ const StreamDetailsBox = ({
             <ClipButton value={stream.playbackId} text={stream.playbackId} />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Playback URL</Cell>
-          <Cell css={{ cursor: "pointer" }}>
+          <Cell>
             <ShowURL
               url={globalPlaybackUrl}
               shortendUrl={globalPlaybackUrl.replace(

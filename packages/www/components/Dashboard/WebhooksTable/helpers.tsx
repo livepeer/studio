@@ -71,7 +71,6 @@ export const rowsPageFromState = async (
           children: webhook.name,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {
-            cursor: "pointer",
             overflow: "hidden",
             "text-overflow": "ellipsis",
           },
@@ -90,17 +89,13 @@ export const rowsPageFromState = async (
             </Link>
           ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {
-            cursor: "pointer",
-          },
+          css: {},
         },
         created: {
           date: new Date(webhook.createdAt),
           fallback: <i>unseen</i>,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {
-            cursor: "pointer",
-          },
+          css: {},
         },
         status: {
           children: (
@@ -130,9 +125,7 @@ export const rowsPageFromState = async (
             </Box>
           ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {
-            cursor: "pointer",
-          },
+          css: {},
         },
       };
     }),

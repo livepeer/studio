@@ -29,9 +29,7 @@ const DeleteDialog = ({ total, onUnselect, onDelete }) => {
             {total} selected
           </Box>
           <Box css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }} />
-          <Box
-            css={{ cursor: "pointer", fontSize: "$2", color: "$green11" }}
-            onClick={onUnselect}>
+          <Box css={{ fontSize: "$2", color: "$green11" }} onClick={onUnselect}>
             Deselect
           </Box>
         </Flex>

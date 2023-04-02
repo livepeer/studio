@@ -314,7 +314,6 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                 />
                 <Box
                   css={{
-                    cursor: "pointer",
                     fontSize: "$2",
                     color: "$green11",
                   }}

@@ -82,7 +82,7 @@ const AssetOverviewTab = ({
           <Text variant="neutral" size="2">
             A list of key value pairs that you use to provide metadata for your
             video.{" "}
-            <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
+            <A css={{  }} onClick={onEditAsset}>
               Edit asset
             </A>{" "}
             to add metadata.
@@ -93,7 +93,7 @@ const AssetOverviewTab = ({
             <Flex
               align="center"
               css={{
-                cursor: "pointer",
+                
                 justifyContent: "space-between",
               }}>
               <Text variant="neutral" size="2">
@@ -181,7 +181,7 @@ const AssetOverviewTab = ({
           </Flex>
           {asset?.storage?.ipfs?.cid && (
             <Box css={{ mt: "$3" }}>
-              <Flex css={{ cursor: "pointer" }}>
+              <Flex>
                 <Box>
                   <Flex align="center">
                     <Text
