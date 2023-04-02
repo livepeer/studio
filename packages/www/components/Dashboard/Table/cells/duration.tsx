@@ -13,12 +13,12 @@ const DurationCell = <D extends TableData>({
     return "In progress";
   }
   if (cell.value.sourceSegmentsDuration === 0) {
-    return "n/a";
+    return "—";
   }
   try {
     const durationMins = Math.round(cell.value.sourceSegmentsDuration / 60);
     if (!durationMins) {
-      return "<1 minute";
+      return "Less than 1 minute";
     }
     const dur = intervalToDuration({
       start: new Date(0),
@@ -26,7 +26,7 @@ const DurationCell = <D extends TableData>({
     });
     return formatDuration(dur);
   } catch (error) {
-    return "n/a";
+    return "—";
   }
 };
 

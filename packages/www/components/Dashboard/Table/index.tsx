@@ -460,6 +460,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                               legacyBehavior>
                               <A
                                 css={{
+                                  cursor: "default",
                                   textDecoration: "none",
                                   py: "$2",
                                   pl: i === 0 ? "$1" : 0,
@@ -491,7 +492,9 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               </Text>
               {viewAll ? (
                 <Link href={viewAll} passHref legacyBehavior>
-                  <A variant="primary" css={{ display: "flex", ai: "center" }}>
+                  <A
+                    variant="primary"
+                    css={{ cursor: "default", display: "flex", ai: "center" }}>
                     <Box>View all</Box> <ArrowRightIcon />
                   </A>
                 </Link>
