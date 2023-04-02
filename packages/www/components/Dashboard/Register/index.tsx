@@ -105,9 +105,11 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           required
           value="Livepeer Inc (default)"
         />
-        <Text variant="neutral" size={1} css={{ mx: "$1", mt: "$1", mb: "$5" }}>
+        <Text
+          variant="neutral"
+          css={{ fontSize: "11px", mx: "$1", mt: "$1", mb: "$5" }}>
           This is the organization that provides hosted access to the Livepeer
-          network. 100% permissionless broadcasting is coming soon.
+          network. Permissionless broadcasting is coming soon.
         </Text>
         <Text
           variant="neutral"
