@@ -60,7 +60,7 @@ const CreateStreamDialog = ({
               autoFocus={true}
               value={streamName}
               onChange={(e) => setStreamName(e.target.value)}
-              placeholder="e.g. My mirst livestream"
+              placeholder="e.g. My first livestream"
             />
             {/* <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
               A-Z, a-z, 0-9, -, _, ~ only
