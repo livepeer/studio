@@ -150,7 +150,7 @@ export const makeEmptyState = (actionToggleState) => (
     title="Create your first stream"
     description="Create a unique stream object, broadcast live video content and playback your live stream with Livepeer Studio."
     learnMoreUrl="https://docs.livepeer.studio/category/live"
-    actionTitle="Create stream"
+    primaryActionTitle="Create stream"
     actionToggleState={actionToggleState}
   />
 );

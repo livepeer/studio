@@ -23,7 +23,7 @@ const EmptyState = ({
       height: "calc(100vh - 400px)",
       maxWidth: 450,
     }}>
-    <Heading css={{ fontWeight: 500, mb: "$3" }}>Create a Signing key</Heading>
+    <Heading css={{ fontWeight: 500, mb: "$3" }}>Create a signing key</Heading>
     <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
       Signing keys allow you to use playback policies with your streams to
       restrict access to them
@@ -47,7 +47,7 @@ const EmptyState = ({
       variant="primary">
       <PlusIcon />{" "}
       <Box as="span" css={{ ml: "$2" }}>
-        Create signing key
+        Create a signing key
       </Box>
     </Button>
   </Flex>

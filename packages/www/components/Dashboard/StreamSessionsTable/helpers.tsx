@@ -170,8 +170,8 @@ export const rowsPageFromState = async (
 
 export const makeEmptyState = () => (
   <TableEmptyState
-    title="No sessions"
-    description="Stream sessions belong to parent streams."
+    title="No stream sessions"
+    description="New stream sessions are created whenever streams becomes active."
     learnMoreUrl="https://docs.livepeer.studio/reference/api/get-session"
   />
 );

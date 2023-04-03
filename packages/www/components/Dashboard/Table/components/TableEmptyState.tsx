@@ -6,7 +6,11 @@ import {
   Text,
   Link as A,
 } from "@livepeer/design-system";
-import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
+import {
+  ArrowRightIcon,
+  ArrowTopRightIcon,
+  PlusIcon,
+} from "@radix-ui/react-icons";
 import { ToggleState } from "hooks/use-toggle-state";
 import Link from "next/link";
 
@@ -14,13 +18,15 @@ const TableEmptyState = ({
   title,
   description,
   learnMoreUrl,
-  actionTitle,
+  primaryActionTitle,
+  secondaryActionTitle = "Learn more",
   actionToggleState,
 }: {
   title: string;
   description: string;
   learnMoreUrl: string;
-  actionTitle?: string;
+  secondaryActionTitle?: string;
+  primaryActionTitle?: string;
   actionToggleState?: ToggleState;
 }) => (
   <Flex
@@ -37,27 +43,36 @@ const TableEmptyState = ({
       {description}
     </Text>
 
-    <Link href={learnMoreUrl} passHref legacyBehavior>
-      <A
-        target="_blank"
-        variant="primary"
-        css={{ display: "flex", ai: "center", mb: "$5" }}>
-        <Box>Learn more</Box>
-        <ArrowRightIcon />
-      </A>
-    </Link>
+    {actionToggleState && (
+      <Flex align="center">
+        <Button
+          onClick={actionToggleState.onOn}
+          css={{ alignSelf: "flex-start", mr: "$2" }}
+          size="2"
+          variant="primary">
+          <PlusIcon />{" "}
+          <Box as="span" css={{ ml: "$2" }}>
+            {primaryActionTitle}
+          </Box>
+        </Button>
 
-    {actionTitle !== undefined && (
-      <Button
-        onClick={actionToggleState.onOn}
-        css={{ alignSelf: "flex-start" }}
-        size="2"
-        variant="primary">
-        <PlusIcon />{" "}
-        <Box as="span" css={{ ml: "$2" }}>
-          {actionTitle}
-        </Box>
-      </Button>
+        <Link href={learnMoreUrl} passHref legacyBehavior>
+          <A
+            target="_blank"
+            css={{
+              textDecoration: "none",
+              "&:hover": { textDecoration: "none" },
+            }}>
+            <Button
+              ghost
+              size={2}
+              css={{ display: "flex", ai: "center", mb: "$5", gap: "$2" }}>
+              {secondaryActionTitle}
+              <ArrowTopRightIcon />
+            </Button>
+          </A>
+        </Link>
+      </Flex>
     )}
   </Flex>
 );

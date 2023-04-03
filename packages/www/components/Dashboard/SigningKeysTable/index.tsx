@@ -55,7 +55,7 @@ const SigningKeysTable = ({
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
-          "Create a Signing Key",
+          "Create a signing Key",
           createDialogState.onOn
         )}
       />

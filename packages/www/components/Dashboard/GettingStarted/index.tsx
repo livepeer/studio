@@ -7,10 +7,11 @@ import {
   Text,
   Button,
   Box,
+  Flex,
   Link as A,
 } from "@livepeer/design-system";
 import Link from "next/link";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
 
 const GettingStarted = ({ firstName = "" }) => {
   return (
@@ -18,195 +19,159 @@ const GettingStarted = ({ firstName = "" }) => {
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
         Welcome to Livepeer Studio{firstName && `, ${firstName}`}
       </Heading>
-      <Accordion type="single" defaultValue="accordion-one">
-        <AccordionItem value="accordion-one">
-          <AccordionTrigger css={{ color: "$primary12" }}>
-            <Text size="3" css={{ color: "inherit" }}>
-              Create your first live stream
-            </Text>
-          </AccordionTrigger>
-          <AccordionContent>
-            <Box>
-              <Text
-                variant="neutral"
-                size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
-                No code required! All you need to do is create a RTMP stream
-                with broadcasting software like{" "}
-                <Link passHref href="https://obsproject.com/" legacyBehavior>
-                  <A target="_blank">OBS Studio</A>
-                </Link>{" "}
-                or{" "}
-                <Link passHref href="https://streamlabs.com/" legacyBehavior>
-                  <A target="_blank">streamlabs</A>
+      <Box css={{ bc: "$panel" }}>
+        <Accordion type="single" defaultValue="accordion-one">
+          <AccordionItem value="accordion-one">
+            <AccordionTrigger css={{ color: "$primary12" }}>
+              <Text size="4" css={{ color: "inherit" }}>
+                Upload your first video
+              </Text>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Box>
+                <Text
+                  variant="neutral"
+                  size="3"
+                  css={{ mb: "$3", lineHeight: "23px" }}>
+                  Upload a video asset for on-demand playback.
+                </Text>
+              </Box>
+              <Flex align="center" gap={2}>
+                <Link href="/dashboard/assets" passHref legacyBehavior>
+                  <Button
+                    variant="primary"
+                    css={{
+                      display: "inline-flex",
+                      cursor: "default",
+                      ai: "center",
+                    }}
+                    size="2">
+                    <Box css={{ mr: "$1" }}>Upload your first video</Box>
+                  </Button>
                 </Link>
-                . Here’s how:
+                <Link
+                  href="https://docs.livepeer.org/guides/developing/upload-a-video-asset"
+                  passHref
+                  legacyBehavior>
+                  <Button
+                    as="a"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    css={{
+                      display: "inline-flex",
+                      cursor: "default",
+                      ai: "center",
+                    }}
+                    size="2">
+                    <Box css={{ mr: "$1" }}>See the developer guide</Box>
+                    <ArrowTopRightIcon />
+                  </Button>
+                </Link>
+              </Flex>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="accordion-two">
+            <AccordionTrigger css={{ color: "$primary12" }}>
+              <Text size="4" css={{ color: "inherit" }}>
+                Create your first livestream
               </Text>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Box>
+                <Text
+                  variant="neutral"
+                  size="3"
+                  css={{ mb: "$3", lineHeight: "23px" }}>
+                  Generate a stream key to use in your favorite broadcasting
+                  software.
+                </Text>
+              </Box>
+              <Flex align="center" gap={2}>
+                <Link href="/dashboard/streams" passHref legacyBehavior>
+                  <Button
+                    variant="primary"
+                    css={{
+                      display: "inline-flex",
+                      cursor: "default",
+                      ai: "center",
+                    }}
+                    size="2">
+                    <Box css={{ mr: "$1" }}>Create your first livestream</Box>
+                  </Button>
+                </Link>
+                <Link
+                  href="https://docs.livepeer.org/guides/developing/create-a-livestream"
+                  passHref
+                  legacyBehavior>
+                  <Button
+                    as="a"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    css={{
+                      display: "inline-flex",
+                      cursor: "default",
+                      ai: "center",
+                    }}
+                    size="2">
+                    <Box css={{ mr: "$1" }}>See the developer guide</Box>
+                    <ArrowTopRightIcon />
+                  </Button>
+                </Link>
+              </Flex>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="accordion-three">
+            <AccordionTrigger css={{ color: "$primary12" }}>
+              <Text size="4" css={{ color: "inherit" }}>
+                Integrate with your app
+              </Text>
+            </AccordionTrigger>
+            <AccordionContent>
               <Text
                 variant="neutral"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
-                1. Navigate to the streams view, tap "Create stream", and give
-                your stream a name.
-                <br />
-                2. Copy the Playback URL and Stream Key in the stream detail
-                view and paste them into your broadcasting software.
-                <br />
-                3. Tap "Go Live" in your broadcasting software to start
-                streaming. <br />
+                Create an API key and start coding.
               </Text>
-              <Text
-                variant="neutral"
-                size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
-                Need more help? Read our step-by-step getting started tutorial.
-              </Text>
-            </Box>
-            <Link
-              href="https://docs.livepeer.studio/guides/live/create-a-livestream"
-              passHref
-              legacyBehavior>
-              <Button
-                as="a"
-                target="_blank"
-                rel="noopener noreferrer"
-                css={{
-                  display: "inline-flex",
-                  cursor: "default",
-                  ai: "center",
-                }}
-                size="2">
-                <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
-                <ArrowRightIcon />
-              </Button>
-            </Link>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="accordion-two">
-          <AccordionTrigger css={{ color: "$primary12" }}>
-            <Text size="3" css={{ color: "inherit" }}>
-              Upload your first video
-            </Text>
-          </AccordionTrigger>
-          <AccordionContent>
-            <Box>
-              <Text
-                variant="neutral"
-                size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
-                Easily add video assets to your application for on demand
-                playback. Navigate to the "Assets" view to get started.
-              </Text>
-              <Text
-                variant="neutral"
-                size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
-                Want to learn more?
-              </Text>
-            </Box>
-            <Link
-              href="https://docs.livepeer.studio/guides/on-demand/upload-video-asset/dashboard"
-              passHref
-              legacyBehavior>
-              <Button
-                as="a"
-                target="_blank"
-                rel="noopener noreferrer"
-                css={{
-                  display: "inline-flex",
-                  cursor: "default",
-                  ai: "center",
-                }}
-                size="2">
-                <Box css={{ mr: "$1" }}>Check out our documentation</Box>
-                <ArrowRightIcon />
-              </Button>
-            </Link>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="accordion-three">
-          <AccordionTrigger css={{ color: "$primary12" }}>
-            <Text size="3" css={{ color: "inherit" }}>
-              Build with the API
-            </Text>
-          </AccordionTrigger>
-          <AccordionContent>
-            <Text
-              variant="neutral"
-              size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
-              Ready to code? The API is nimble and designed for customization.
-              All you need to do is create an RTMP stream with broadcasting
-              software like{" "}
-              <Link passHref href="https://obsproject.com/" legacyBehavior>
-                <A target="_blank">OBS Studio</A>
-              </Link>
-              ,{" "}
-              <Link passHref href="https://streamlabs.com/" legacyBehavior>
-                <A target="_blank">streamlabs</A>
-              </Link>
-              , or{" "}
-              <Link passHref href="https://ffmpeg.org/" legacyBehavior>
-                <A target="_blank">ffmpeg</A>
-              </Link>
-              .
-            </Text>
-            <Link
-              href="https://docs.livepeer.studio/category/api"
-              passHref
-              legacyBehavior>
-              <Button
-                as="a"
-                target="_blank"
-                rel="noopener noreferrer"
-                css={{
-                  display: "inline-flex",
-                  cursor: "default",
-                  ai: "center",
-                }}
-                size="2">
-                <Box css={{ mr: "$1" }}>Explore the API</Box>
-                <ArrowRightIcon />
-              </Button>
-            </Link>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="accordion-four">
-          <AccordionTrigger css={{ color: "$primary12" }}>
-            <Text size="3" css={{ color: "inherit" }}>
-              Create your own app
-            </Text>
-          </AccordionTrigger>
-          <AccordionContent>
-            <Text
-              variant="neutral"
-              size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
-              Livepeer Studio is designed to serve your app, from the ground up
-              and at scale. Get started by reviewing and cloning one of our
-              sample apps.
-            </Text>
-            <Link
-              href="https://docs.livepeer.studio/reference/examples"
-              passHref
-              legacyBehavior>
-              <Button
-                as="a"
-                target="_blank"
-                rel="noopener noreferrer"
-                css={{
-                  cursor: "default",
-                  display: "inline-flex",
-                  ai: "center",
-                }}
-                size="2">
-                <Box css={{ mr: "$1" }}>Clone and create</Box>
-                <ArrowRightIcon />
-              </Button>
-            </Link>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+              <Flex align="center" gap={2}>
+                <Link
+                  href="dashboard/developers/api-keys"
+                  passHref
+                  legacyBehavior>
+                  <Button
+                    variant="primary"
+                    css={{
+                      display: "inline-flex",
+                      cursor: "default",
+                      ai: "center",
+                    }}
+                    size="2">
+                    <Box css={{ mr: "$1" }}>Generate an API Key</Box>
+                  </Button>
+                </Link>
+                <Link
+                  href="https://docs.livepeer.org/guides/developing/quickstart"
+                  passHref
+                  legacyBehavior>
+                  <Button
+                    as="a"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    css={{
+                      display: "inline-flex",
+                      cursor: "default",
+                      ai: "center",
+                    }}
+                    size="2">
+                    <Box css={{ mr: "$1" }}>See the developer guide</Box>
+                    <ArrowTopRightIcon />
+                  </Button>
+                </Link>
+              </Flex>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </Box>
     </>
   );
 };
