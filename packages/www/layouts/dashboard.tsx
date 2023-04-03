@@ -77,7 +77,7 @@ function DashboardLayout({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.org/api/og/studio.png",
+          url: image ? image.url : "https://assets.livepeer.studio/api/og",
           alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,

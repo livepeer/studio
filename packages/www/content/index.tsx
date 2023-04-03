@@ -6,7 +6,7 @@
 
 const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
 const defaultDescription =
-  "Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.";
+  "Your home for building onchain video experiences with Livepeer, the world's open video infrastructure.";
 const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
 
 // Main website
