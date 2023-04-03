@@ -1,0 +1,70 @@
+import { Flex, Link as A } from "@livepeer/design-system";
+import Link from "next/link";
+import { FaTwitter, FaDiscord, FaMedium, FaGithub } from "react-icons/fa";
+
+const Footer = () => {
+  return (
+    <Flex direction="column" gap={4}>
+      <Flex align="center" justify="center" gap={5}>
+        <Link href="https://livepeer.org" passHref legacyBehavior>
+          <A css={{ fontSize: 11 }} variant="subtle">
+            Livepeer.org
+          </A>
+        </Link>
+        <Link href="https://docs.livepeer.org" passHref legacyBehavior>
+          <A css={{ fontSize: 11 }} variant="subtle">
+            Documentation
+          </A>
+        </Link>
+        <Link
+          href="https://livepeer.typeform.com/to/McJZ2nMI"
+          passHref
+          legacyBehavior>
+          <A css={{ fontSize: 10 }} variant="subtle">
+            Stream Credits Application
+          </A>
+        </Link>
+      </Flex>
+      {/* <Flex align="center" justify="center" gap={5}>
+        <Link
+          href="https://discord.gg/livepeer"
+          target="_blank"
+          passHref
+          legacyBehavior>
+          <A css={{ width: 16 }} variant="subtle">
+            <FaDiscord />
+          </A>
+        </Link>
+        <Link
+          href="https://twitter.com/livepeer"
+          target="_blank"
+          passHref
+          legacyBehavior>
+          <A css={{ width: 16 }} variant="subtle">
+            <FaTwitter />
+          </A>
+        </Link>
+        <Link
+          href="https://github.com/livepeer/studio"
+          target="_blank"
+          passHref
+          legacyBehavior>
+          <A css={{ width: 16 }} variant="subtle">
+            <FaGithub />
+          </A>
+        </Link>
+        <Link
+          href="https://medium.com/livepeer-blog"
+          target="_blank"
+          passHref
+          legacyBehavior>
+          <A css={{ width: 16 }} variant="subtle">
+            <FaMedium />
+          </A>
+        </Link>
+      </Flex> */}
+    </Flex>
+  );
+};
+
+export default Footer;

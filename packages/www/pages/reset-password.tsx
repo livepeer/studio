@@ -85,7 +85,8 @@ const ResetPasswordPage = () => {
                   width: "100%",
                   height: "1px",
                   mb: "$3",
-                  bc: "$neutral6",
+                  background:
+                    "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
               <Link href="/" passHref legacyBehavior>

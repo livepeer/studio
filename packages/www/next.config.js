@@ -22,6 +22,9 @@ const SentryWebpackPluginOptions = {
 };
 
 const config = {
+  sentry: {
+    hideSourceMaps: true,
+  },
   images: {
     domains: ["cdn.sanity.io", "picsum.photos"],
   },

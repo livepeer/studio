@@ -115,14 +115,14 @@ const RegisterPage = () => {
               justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
-              py: "$5",
+              py: "$3",
             }}>
             <Text
               size="8"
               as="h1"
               css={{
                 textTransform: "uppercase",
-                mb: "$6",
+                mb: "$5",
                 fontWeight: 700,
                 width: 150,
                 lineHeight: "30px",
@@ -143,7 +143,8 @@ const RegisterPage = () => {
                   width: "100%",
                   height: "1px",
                   mb: "$3",
-                  bc: "$neutral6",
+                  background:
+                    "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
               <Link href="/" passHref legacyBehavior>

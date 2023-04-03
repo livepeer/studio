@@ -6,6 +6,7 @@ import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
 import { DEFAULT_THEME } from "lib/theme";
 import GoogleTagManager from "components/Site/GoogleTagManager";
+import Footer from "components/Dashboard/Footer";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -112,6 +113,38 @@ function Layout({
           </Box>
         )}
         {children}
+
+        <Flex
+          align="center"
+          justify="center"
+          direction="column"
+          css={{
+            width: "100%",
+            position: "relative",
+            mb: "$4",
+            "@bp1": {
+              mb: "$2",
+              width: "100%",
+              bottom: "$2",
+              position: "absolute",
+            },
+          }}>
+          <Box
+            css={{
+              background:
+                "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
+              width: "calc(100% - $6)",
+              mx: "auto",
+              height: "1px",
+              mb: "$4",
+              "@bp1": {
+                width: "100%",
+                maxWidth: 550,
+              },
+            }}
+          />
+          <Footer />
+        </Flex>
       </Flex>
     </>
   );

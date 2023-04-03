@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
 import { useHubspotForm } from "hooks";
+import BroadcastingProvider from "../Login/BroadcastingProvider";
 
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
@@ -75,41 +76,11 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             maxWidth: 450,
             textAlign: "center",
             mx: "auto",
-            mb: "$7",
+            mb: "$6",
           }}>
-          Create an account
+          Create an account.
         </Text>
-        <Text
-          variant="neutral"
-          size={1}
-          css={{
-            mb: "$1",
-            fontSize: "11px",
-            textTransform: "uppercase",
-            fontWeight: 600,
-          }}>
-          Broadcasting provider
-        </Text>
-        <TextField
-          readOnly
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            bc: "$neutral2",
-          }}
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value="Livepeer Inc (default)"
-        />
-        <Text
-          variant="neutral"
-          css={{ fontSize: "11px", mx: "$1", mt: "$1", mb: "$5" }}>
-          This is the organization that provides hosted access to the Livepeer
-          network. Permissionless broadcasting is coming soon.
-        </Text>
+        <BroadcastingProvider />
         <Text
           variant="neutral"
           size={1}
@@ -126,7 +97,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           id="firstName"
           css={{
             width: "100%",
-            // bc: "$neutral2",
             mb: "$2",
           }}
           name="firstName"
@@ -141,7 +111,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           id="lastName"
           css={{
             width: "100%",
-            // bc: "$neutral2",
             mb: "$2",
           }}
           name="lastName"
@@ -156,7 +125,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           id="email"
           css={{
             width: "100%",
-            // bc: "$neutral2",
             mb: "$2",
           }}
           name="email"
@@ -172,7 +140,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           id="password"
           css={{
             width: "100%",
-            // bc: "$neutral2",
             mx: 0,
           }}
           name="password"

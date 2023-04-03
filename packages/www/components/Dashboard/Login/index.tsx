@@ -11,6 +11,7 @@ import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
 import { useHubspotForm } from "hooks";
 import Link from "next/link";
+import BroadcastingProvider from "./BroadcastingProvider";
 
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
@@ -82,36 +83,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           maxWidth: 450,
         }}
         id={id}>
-        <Text
-          variant="neutral"
-          size={1}
-          css={{
-            mb: "$1",
-            fontSize: "11px",
-            textTransform: "uppercase",
-            fontWeight: 600,
-          }}>
-          Broadcasting provider
-        </Text>
-        <TextField
-          readOnly
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            bc: "$neutral2",
-          }}
-          name="broadcastingProvider"
-          type="text"
-          required
-          value="Livepeer Inc (default)"
-        />
-        <Text
-          variant="neutral"
-          css={{ fontSize: "11px", mx: "$1", mt: "$1", mb: "$5" }}>
-          This is the organization that provides hosted access to the Livepeer
-          network. Permissionless broadcasting is coming soon.
-        </Text>
+        <BroadcastingProvider />
         <Text
           variant="neutral"
           size={1}
