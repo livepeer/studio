@@ -46,10 +46,8 @@ const ResetPasswordPage = () => {
           size="3"
           css={{
             px: "$3",
-            py: "$7",
             width: "100%",
             "@bp3": {
-              py: "$8",
               px: "$4",
             },
           }}>

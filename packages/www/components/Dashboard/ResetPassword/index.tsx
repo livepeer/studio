@@ -116,7 +116,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             }}
             name="password"
             type="password"
-            placeholder="Choose password"
+            placeholder="Choose new password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
