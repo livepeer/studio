@@ -13,7 +13,7 @@ export default {
     defaultImageHeight: 642,
     images: [
       {
-        url: "https://livepeer.studio/img/OG.png",
+        url: "https://livepeer.org/api/og/studio.png",
         width: 1200,
         height: 642,
         alt: "Livepeer Studio",

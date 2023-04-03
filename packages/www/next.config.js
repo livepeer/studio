@@ -299,7 +299,7 @@ const config = {
       },
       {
         source: "/login",
-        destination: "https://livepeer.org",
+        destination: "https://livepeer.studio",
         permanent: false,
       },
     ];

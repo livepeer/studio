@@ -75,7 +75,7 @@ const ResetPasswordPage = () => {
             <ResetPassword
               id="reset-password"
               onSubmit={onSubmit}
-              buttonText="Sign in"
+              buttonText="Reset password"
               errors={errors}
               loading={loading}
             />

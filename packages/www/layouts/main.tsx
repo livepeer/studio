@@ -68,7 +68,7 @@ function Layout({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          url: image ? image.url : "https://livepeer.org/api/og/studio.png",
           alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,
