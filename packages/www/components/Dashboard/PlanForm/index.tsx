@@ -403,15 +403,17 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   </Box>
                 </Box>
               ) : (
-                <Text variant="neutral">
-                  You are currently using the{" "}
-                  {products[user.stripeProductId].name} plan. Do you want to{" "}
-                  {products[stripeProductId].order <
-                  products[user.stripeProductId].order
-                    ? "downgrade"
-                    : "upgrade"}{" "}
-                  to the {products[stripeProductId].name} plan?
-                </Text>
+                <Box css={{ mt: "$4" }}>
+                  <Text variant="neutral">
+                    You are currently using the{" "}
+                    {products[user.stripeProductId].name} plan. Do you want to{" "}
+                    {products[stripeProductId].order <
+                    products[user.stripeProductId].order
+                      ? "downgrade"
+                      : "upgrade"}{" "}
+                    to the {products[stripeProductId].name} plan?
+                  </Text>
+                </Box>
               )}
             </AlertDialogDescription>
 
