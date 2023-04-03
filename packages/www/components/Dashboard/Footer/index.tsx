@@ -6,30 +6,21 @@ const Footer = () => {
   return (
     <Flex direction="column" gap={4}>
       <Flex align="center" justify="center" gap={5}>
-        <Link
-          href="https://livepeer.org"
-          target="_blank"
-          passHref
-          legacyBehavior>
-          <A css={{ fontSize: 11 }} variant="subtle">
+        <Link href="https://livepeer.org" passHref legacyBehavior>
+          <A target="_blank" css={{ fontSize: 11 }} variant="subtle">
             Livepeer.org
           </A>
         </Link>
-        <Link
-          href="https://docs.livepeer.org"
-          target="_blank"
-          passHref
-          legacyBehavior>
-          <A css={{ fontSize: 11 }} variant="subtle">
+        <Link href="https://docs.livepeer.org" passHref legacyBehavior>
+          <A target="_blank" css={{ fontSize: 11 }} variant="subtle">
             Documentation
           </A>
         </Link>
         <Link
           href="https://livepeer.typeform.com/to/McJZ2nMI"
-          target="_blank"
           passHref
           legacyBehavior>
-          <A css={{ fontSize: 10 }} variant="subtle">
+          <A target="_blank" css={{ fontSize: 10 }} variant="subtle">
             Apply for stream credits
           </A>
         </Link>
