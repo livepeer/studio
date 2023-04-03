@@ -31,12 +31,12 @@ const BroadcastingProvider = () => {
       <Text
         variant="neutral"
         css={{
-          fontSize: "10.7px",
+          fontSize: "11px",
           mt: "$1",
           mb: "$5",
         }}>
         This is the org that provides hosted access to the Livepeer network. In
-        a future release you'll be able to switch providers at any time.
+        a future release you may switch providers at any time.
       </Text>
     </>
   );
