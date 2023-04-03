@@ -302,6 +302,11 @@ const config = {
         destination: "https://livepeer.studio",
         permanent: false,
       },
+      {
+        source: "/blog",
+        destination: "https://medium.com/livepeer-blog",
+        permanent: false,
+      },
     ];
   },
 };

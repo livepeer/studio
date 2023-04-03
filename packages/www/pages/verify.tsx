@@ -110,6 +110,19 @@ const Verify = ({
               height: "calc(100vh - 280px)",
               mb: 65,
             }}>
+            <Text
+              size="8"
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                mb: "$5",
+                fontWeight: 700,
+                width: 150,
+                lineHeight: "30px",
+                textAlign: "center",
+              }}>
+              Livepeer Studio
+            </Text>
             {email && emailValidToken ? (
               <>
                 {errors ? (
@@ -148,7 +161,7 @@ const Verify = ({
               </>
             ) : (
               <>
-                <Heading size="2" css={{ my: "$3", fontWeight: 600 }}>
+                <Heading size="2" css={{ my: "$3" }}>
                   Check your email
                 </Heading>
                 <Box css={{ fontSize: "$2" }}>
@@ -159,7 +172,7 @@ const Verify = ({
                     Please check your inbox at
                     <Box
                       as="span"
-                      css={{ color: "$hiContrast", fontWeight: 600 }}>
+                      css={{ color: "$hiContrast", fontWeight: 500 }}>
                       {" "}
                       {user?.email}.
                     </Box>
