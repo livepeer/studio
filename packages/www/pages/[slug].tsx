@@ -4,7 +4,7 @@ import imageUrlBuilder from "@sanity/image-url";
 import DefaultError from "components/Dashboard/DefaultError";
 import { getComponent } from "lib/utils";
 import { useRouter } from "next/router";
-import { Box } from "@livepeer/design-system";
+import { Text, Box, Container } from "@livepeer/design-system";
 import { client } from "lib/client";
 
 const Page = ({
@@ -52,9 +52,46 @@ const Page = ({
       }}
       url={metaUrl}
       preview={preview}>
-      {content.map((component, i) => (
-        <Fade key={i}>{getComponent(component)}</Fade>
-      ))}
+      <Container
+        size="3"
+        css={{
+          px: "$3",
+          py: "$7",
+          width: "100%",
+          "@bp3": {
+            px: "$4",
+          },
+        }}>
+        <Text
+          size="8"
+          as="h1"
+          css={{
+            textTransform: "uppercase",
+            mb: "$7",
+            fontWeight: 700,
+            width: 150,
+            lineHeight: "30px",
+            textAlign: "center",
+            mx: "auto",
+          }}>
+          Livepeer Studio
+        </Text>
+        <Box
+          css={{
+            width: "100%",
+            maxWidth: 600,
+            height: "1px",
+            mb: "$3",
+            mx: "auto",
+            mt: "$4",
+            background:
+              "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
+          }}
+        />
+        {content.map((component, i) => (
+          <Fade key={i}>{getComponent(component)}</Fade>
+        ))}
+      </Container>
     </Layout>
   );
 };
