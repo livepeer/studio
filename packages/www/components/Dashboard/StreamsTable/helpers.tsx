@@ -147,10 +147,11 @@ export const defaultCreateProfiles = [
 
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
-    title="Create your first stream"
-    description="Create a unique stream object, broadcast live video content and playback your live stream with Livepeer Studio."
-    learnMoreUrl="https://docs.livepeer.studio/category/live"
-    primaryActionTitle="Create stream"
+    title="Create your first livestream"
+    description="Create a livestream and go live using your favorite broadcasting software."
+    learnMoreUrl="https://docs.livepeer.org/guides/developing/create-a-livestream"
+    primaryActionTitle="Create livestream"
+    secondaryActionTitle="See the developer guide"
     actionToggleState={actionToggleState}
   />
 );
