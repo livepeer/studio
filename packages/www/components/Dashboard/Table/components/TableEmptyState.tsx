@@ -66,7 +66,14 @@ const TableEmptyState = ({
             <Button
               ghost
               size={2}
-              css={{ display: "flex", ai: "center", mb: "$5", gap: "$2" }}>
+              variant="neutral"
+              css={{
+                display: "flex",
+                ai: "center",
+                mb: "$5",
+                gap: "$2",
+                fontWeight: 500,
+              }}>
               {secondaryActionTitle}
               <ArrowTopRightIcon />
             </Button>
