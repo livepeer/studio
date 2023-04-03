@@ -1,5 +1,4 @@
 import Layout from "layouts/main";
-import Button from "components/Site/Button";
 import {
   Container,
   Heading,
@@ -14,26 +13,11 @@ const DefaultError = () => {
   return (
     <Layout>
       <Box css={{ position: "relative" }}>
-        <Image
-          src="/img/404.png"
-          alt="404"
-          style={{ objectFit: "contain" }}
-          width={1024}
-          height={400}
-          css={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        />
         <Container
           size="3"
           css={{
             position: "relative",
             px: "$4",
-            pt: 250,
-            pb: 250,
             my: "auto",
           }}>
           <Box
@@ -44,20 +28,29 @@ const DefaultError = () => {
               justifyContent: "center",
               textAlign: "center",
               position: "relative",
+              height: "100vh",
             }}>
+            <Image
+              src="/img/404.png"
+              alt="404"
+              layout="fill"
+              objectFit="contain"
+            />
             <Heading
               as="h1"
               css={{
                 fontWeight: 700,
                 mb: "$8",
-                lineHeight: "80px",
-                fontSize: 80,
+                lineHeight: "60px",
+                fontSize: "$9",
               }}>
               Something went wrong.
             </Heading>
             <Text size="5">The page you requested could not be found.</Text>
             <Link href="/" passHref legacyBehavior>
-              <A css={{ mt: "$4" }}>Go to the homepage</A>
+              <A css={{ zIndex: 100, position: "relative", mt: "$4" }}>
+                Go to the homepage
+              </A>
             </Link>
           </Box>
         </Container>
