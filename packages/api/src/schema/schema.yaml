@@ -1,45 +1,62 @@
 openapi: 3.0.1
 info:
-  title: Livepeer Studio API Reference
-  version: 0.0.1-alpha.0
+  title: Livepeer API Reference
+  description: >-
+    This API reference provides documentation for the Livepeer Studio API, which
+    is a RESTful API that allows users to manage and interact with Livepeer
+    Studio, the gateway to Livepeer network.
+  version: 1.0.0
+  termsOfService: "https://livepeer.studio/terms-of-service"
+
+servers:
+  - url: https://livepeer.studio/api
 
 tags:
-  - name: stream
-    description: Stream Endpoints
-  - name: object-store
-    description: Object Stores Endpoints
-  - name: multistream-target
-    description: Multistream Target Endpoints
-  - name: user
-    description: User Endpoints
-  - name: api-token
-    description: Api Token Endpoints
-  - name: login
-    description: User login
-  - name: verification
-    description: User Email Verification
-  - name: password-reset
-    description: User Password Reset
-  - name: make-admin
-    description: Changes user admin status
-  - name: webhook
-    description: Webhooks endpoints
-  - name: asset
-    description: Asset Endpoints
-  - name: task
-    description: Task Endpoints
-  - name: signing-key
-    description: Signing Key Endpoints
-  - name: webhook-response
-    description: webhook client responses
-  - name: verify-email
-    description: Resend User Email Verification
+  - name: Stream Endpoints
+    description: "Endpoints for creating, managing and deleting streams."
+  - name: Object Stores Endpoints
+    description: >-
+      Endpoints for managing object stores, such as Amazon S3 and Google Cloud
+      Storage.
+  - name: Multistream Target Endpoints
+    description: >-
+      Endpoints for managing multistream targets, which allow users to
+      distribute their streams to multiple destinations.
+  - name: User Endpoints
+    description: >-
+      Endpoints for managing users, such as creating new users and retrieving
+      user information.
+  - name: API Token Endpoints
+    description: >-
+      Endpoints for managing API tokens, which are used to authenticate requests
+      to the Livepeer Studio API.
+  - name: User Login Endpoints
+    description: Endpoints for user authentication and login.
+  - name: User Email Verification Endpoints
+    description: Endpoints for verifying a user's email address.
+  - name: User Password Reset Endpoints
+    description: Endpoints for resetting a user's password.
+  - name: Make Admin Endpoints
+    description: Endpoints for changing a user's admin status.
+  - name: Webhook Endpoints
+    description: Endpoints for managing webhooks and their subscriptions.
+  - name: Asset Endpoints
+    description: Endpoints for managing the video assets.
+  - name: Task Endpoints
+    description:
+      "Endpoints for managing background tasks, such as video transcoding."
+  - name: Signing Key Endpoints
+    description: Endpoints for managing signing keys.
+  - name: Webhook Response Endpoints
+    description: Endpoints for handling responses from webhook clients.
+  - name: Verify Email Endpoints
+    description: Endpoints for resending email verification requests to users.
 
 components:
   schemas:
     ffmpeg-profile:
       type: object
-      description: LMPS ffmpeg profile
+      description: LMPS ffmpeg profile for video encoding
       additionalProperties: false
       required:
         - width
@@ -50,80 +67,106 @@ components:
       properties:
         width:
           type: integer
+          description: The width of the encoded video in pixels.
           minimum: 128
+          example: 1920
         name:
           type: string
+          description: A descriptive name for the video profile.
           minLength: 1
           maxLength: 500
-          example: "720p"
+          example: 1080p
         height:
           type: integer
+          description: The height of the encoded video in pixels.
           minimum: 128
+          example: 1080
         bitrate:
           type: integer
+          description:
+            The target bitrate for the encoded video in bits per second.
           minimum: 400
+          example: 4000000
         fps:
           type: integer
-          minimum: 0
+          description: The target frames per second for the encoded video.
+          minimum: 1
+          example: 30
         fpsDen:
           type: integer
+          description: >-
+            The denominator of the target frames per second. Used in conjunction
+            with `fps` to specify the exact frame rate as a fraction.
           minimum: 1
+          example: 1
         gop:
           type: string
+          description: >-
+            The GOP (Group of Pictures) structure for the encoded video. This is
+            a string in the format of "M/N", where M is the number of frames in
+            a GOP and N is the distance in frames between two I-frames (also
+            known as keyframes).
+          example: 25/250
         profile:
           type: string
+          description: The video codec profile to use for encoding the video.
           enum:
             - H264Baseline
             - H264Main
             - H264High
             - H264ConstrainedHigh
+            - HEVCMain
+            - HEVCHigh
+            - VP8
+            - VP9
+          example: H264High
         encoder:
           type: string
+          description: The video codec to use for encoding the video.
           enum:
             - h264
             - hevc
             - vp8
             - vp9
+          example: h264
     cdn-data-row:
       type: object
       description:
-        Fields names taken from log format description
-        https://support.highwinds.com/hc/en-us/articles/360052181571-Raw-Log-Access-through-GCS
+        Fields taken from raw log access data provided by StackPath CDN.
       additionalProperties: false
       required:
         - unique_client_ips
         - total_sc_bytes
-      # oneOf: # allows validation, but generates too generic type definition
-      #   - required:
-      #       - stream_id
-      #   - required:
-      #       - playback_id
       properties:
         stream_id:
           type: string
-          description: Session UUID. Used in recordings URLs.
+          description:
+            A unique session UUID that can be used to retrieve recording URLs.
         playback_id:
           type: string
-          description: Playback ID.
+          description:
+            A playback ID that can be used to retrieve recording URLs.
         unique_client_ips:
           type: number
-          description:
-            Number of unique IP addresses of clients. Not accurate because
-            StackPath zeroes last part of the IP address.
+          description: >-
+            The number of unique client IP addresses. Note that StackPath zeroes
+            out the last part of the IP address for privacy reasons.
         total_filesize:
           type: number
-          description: Size of the asset being delivered.
+          description: The size of the asset being delivered.
         total_cs_bytes:
           type: number
           description: The total size of the request header.
         total_sc_bytes:
           type: number
-          description: Total bytes in the response to the client.
+          description: The total size of the response to the client.
         count:
           type: number
-          description: Number of parsed log lines
+          description: The number of parsed log lines.
     cdn-data-payload:
       type: array
+      description:
+        An array of log data entries obtained from StackPath CDN logs.
       items:
         type: object
         additionalProperties: false
@@ -135,10 +178,15 @@ components:
         properties:
           region:
             type: string
+            description: The region where the log data was obtained from.
           file_name:
             type: string
+            description: The name of the file containing the log data.
           date:
             type: number
+            description: >-
+              The date when the log data was obtained (in Unix timestamp
+              format).
           data:
             type: array
             minItems: 1
@@ -146,7 +194,9 @@ components:
               $ref: "#/components/schemas/cdn-data-row"
     cdn-usage-last:
       type: object
-      table: cdn_usage_last
+      description: >-
+        This schema represents a record of the last CDN usage for a specific
+        region and file name.
       required:
         - region
         - fileName
@@ -156,16 +206,16 @@ components:
           type: string
           readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+          description: The unique identifier for this record.
         fileName:
           type: number
-          index: true
+          description: The unique identifier of the file.
         region:
           type: string
-          index: true
           unique: true
+          description: The region where the file is stored.
     webhook:
       type: object
-      table: webhook
       required:
         - name
         - url
@@ -173,34 +223,29 @@ components:
       properties:
         id:
           type: string
-          readOnly: true
+          format: uuid
+          description: The unique identifier for the webhook
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         kind:
           type: string
-          readOnly: true
+          description: 'The kind of object, always set to "webhook"'
           example: webhook
         name:
           type: string
+          description: The name of the webhook
+          example: my-webhook
         userId:
           type: string
-          readOnly: true
-          index: true
+          format: uuid
+          description: The unique identifier of the user who created the webhook
         createdAt:
-          type: number
-          readOnly: true
+          type: integer
           description:
-            Timestamp (in milliseconds) at which stream object was created
+            The timestamp (in milliseconds) at which the webhook was created
           example: 1587667174725
-        event:
-          writeOnly: true
-          deprecated: true
-          description:
-            "@deprecated Non-persisted field. To be used on creation API only."
-          $ref: "#/components/schemas/webhook/properties/events/items"
         events:
           type: array
-          index: true
-          indexType: gin
+          description: The events that will trigger the webhook
           items:
             type: string
             enum:
@@ -213,7 +258,6 @@ components:
               - multistream.error
               - multistream.disconnected
               - playback.user.new
-              - playback.accessControl
               - asset.created
               - asset.updated
               - asset.failed
@@ -226,59 +270,58 @@ components:
         url:
           type: string
           format: uri
-          pattern: ^http(s)?://
+          pattern: "^http(s)?://"
+          description: The URL to which the webhook will send its payloads
+          example: "https://example.com/webhook"
         deleted:
           type: boolean
+          description: A flag indicating whether the webhook has been deleted
           default: false
         sharedSecret:
           type: string
+          description: The shared secret used to sign the webhook payload
           writeOnly: true
-          description: shared secret used to sign the webhook payload
         streamId:
           type: string
-          description: streamId of the stream on which the webhook is applied
+          format: uuid
+          description:
+            The unique identifier of the stream on which the webhook is applied
         status:
           type: object
-          description: status of webhook
-          readOnly: true
+          description: The status of the webhook
           properties:
             lastFailure:
               type: object
-              description: failure timestamp and error message with status code
-              readOnly: true
+              description: "The details of the last failure, if any"
               properties:
                 timestamp:
-                  type: number
-                  readOnly: true
+                  type: integer
+                  description: >-
+                    The timestamp (in milliseconds) at which the last failure
+                    occurred
                   example: 1587667174725
-                  description:
-                    Timestamp (in milliseconds) at which the webhook last failed
                 error:
                   type: string
-                  readOnly: true
-                  description: Webhook failure error message
-                  example: "Error message"
+                  description:
+                    The error message associated with the last failure
+                  example: Error message
                 response:
                   type: string
-                  readOnly: true
-                  description: Webhook failure response
-                  example: "Response body"
+                  description:
+                    The response body associated with the last failure
+                  example: Response body
                 statusCode:
-                  type: number
-                  readOnly: true
-                  description: Webhook failure status code
+                  type: integer
+                  description: The status code associated with the last failure
                   example: 500
             lastTriggeredAt:
-              type: number
-              readyOnly: true
-              description:
-                Timestamp (in milliseconds) at which the webhook last was
+              type: integer
+              description: >-
+                The timestamp (in milliseconds) at which the webhook was last
                 triggered
               example: 1587667174725
-
     webhook-response:
       type: object
-      table: webhook_response
       required:
         - webhookId
         - statusCode
@@ -286,51 +329,56 @@ components:
       properties:
         id:
           type: string
-          readOnly: true
+          description: Unique identifier of the webhook response
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         kind:
           type: string
-          readOnly: true
+          description: Type of the response object
           example: webhookResponse
         webhookId:
           type: string
-          readOnly: true
-          index: true
+          description: Unique identifier of the associated webhook
         eventId:
           type: string
-          readOnly: true
-          index: true
+          description: Unique identifier of the associated event
         createdAt:
           type: number
-          readOnly: true
-          description:
-            Timestamp (in milliseconds) at which webhook response object was
+          description: >-
+            Timestamp (in milliseconds) at which the webhook response object was
             created
           example: 1587667174725
         duration:
           type: number
+          description: Duration (in milliseconds) of the webhook response
         statusCode:
           type: number
           default: 0
+          description: HTTP status code of the webhook response
         response:
           type: object
           additionalProperties: false
+          description: HTTP response details of the webhook
           properties:
             body:
               type: string
+              description: Body of the HTTP response
             headers:
               type: object
               additionalProperties:
                 type: array
                 items:
                   type: string
+              description: Headers of the HTTP response
             redirected:
               type: boolean
+              description:
+                Boolean indicating if the HTTP response was redirected
             status:
               type: number
+              description: HTTP status code of the HTTP response
             statusText:
               type: string
-
+              description: Status text of the HTTP response
     detection-webhook-payload:
       type: object
       required:
@@ -354,21 +402,17 @@ components:
                 type: string
               probability:
                 type: number
-
     stream:
       type: object
-      table: stream
       required:
         - name
       additionalProperties: false
       properties:
         id:
           type: string
-          readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         kind:
           type: string
-          readOnly: true
           example: stream
         name:
           type: string
@@ -376,11 +420,9 @@ components:
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
         lastSeen:
           type: number
           example: 1587667174725
-          index: true
         sourceSegments:
           type: number
           example: 1
@@ -390,11 +432,11 @@ components:
         sourceSegmentsDuration:
           type: number
           example: 1
-          description: Duration of all the source segments, sec
+          description: "Duration of all the source segments, sec"
         transcodedSegmentsDuration:
           type: number
           example: 2
-          description: Duration of all the transcoded segments, sec
+          description: "Duration of all the transcoded segments, sec"
         sourceBytes:
           type: number
           example: 1
@@ -415,46 +457,63 @@ components:
         isActive:
           type: boolean
           description: If currently active
-          index: true
         createdByTokenName:
           type: string
-          readOnly: true
           description: Name of the token used to create this object
         createdByTokenId:
           type: string
-          readOnly: true
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
-          index: true
         parentId:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
-          index: true
+        partialSession:
+          description:
+            Indicates that this is not final object of `user's` session
+          type: boolean
+        previousSessions:
+          description:
+            Ids of the previous sessions which are part of `user's` session
+          type: array
+          items:
+            type: string
         streamKey:
           type: string
           example: hgebdhhigq
           description: Used to form RTMP ingest URL
-          unique: true
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
           description: Used to form playback URL
-          unique: true
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
           default:
-            # prettier-ignore
-            - { name: "240p0", fps: 0, bitrate: 250000, width: 426, height: 240 }
-            - { name: "360p0", fps: 0, bitrate: 800000, width: 640, height: 360 }
-            - { name: "480p0", fps: 0, bitrate: 1600000, width: 854, height: 480 }
-            - { name: "720p0", fps: 0, bitrate: 3000000, width: 1280, height: 720 }
+            - name: 240p0
+              fps: 0
+              bitrate: 250000
+              width: 426
+              height: 240
+            - name: 360p0
+              fps: 0
+              bitrate: 800000
+              width: 640
+              height: 360
+            - name: 480p0
+              fps: 0
+              bitrate: 1600000
+              width: 854
+              height: 480
+            - name: 720p0
+              fps: 0
+              bitrate: 3000000
+              width: 1280
+              height: 720
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
         objectStoreId:
@@ -476,7 +535,7 @@ components:
               - P144p30fps16x9
             example: P720p60fps16x9
         record:
-          description:
+          description: >-
             Should this stream be recorded? Uses default settings. For more
             customization, create and configure an object store.
           type: boolean
@@ -492,18 +551,21 @@ components:
           properties:
             targets:
               type: array
-              example: [{ "id": "PUSH123", "profile": "720p" }]
-              description:
+              example:
+                - id: PUSH123
+                  profile: 720p
+              description: >-
                 References to targets where this stream will be simultaneously
                 streamed to
               items:
                 type: object
-                required: [profile]
+                required:
+                  - profile
                 additionalProperties: false
                 properties:
                   profile:
                     type: string
-                    description:
+                    description: >-
                       Name of transcoding profile that should be sent. Use
                       "source" for pushing source stream data
                     minLength: 1
@@ -511,7 +573,7 @@ components:
                     example: 720p
                   videoOnly:
                     type: boolean
-                    description:
+                    description: >-
                       If true, the stream audio will be muted and only silent
                       video will be pushed to the target.
                     default: false
@@ -522,7 +584,7 @@ components:
                   spec:
                     type: object
                     writeOnly: true
-                    description:
+                    description: >-
                       Inline multistream target object. Will automatically
                       create the target resource to be used by the created
                       stream.
@@ -549,6 +611,9 @@ components:
               type: object
             streamNameGroups:
               type: array
+              items: #test
+                type: object
+
             sourceInfo:
               type: object
               required:
@@ -559,28 +624,26 @@ components:
               properties:
                 width:
                   type: integer
-                  minValue: 1
                 height:
                   type: integer
-                  minValue: 1
                 fps:
                   type: integer
-                  minVallue: 1
         renditions:
           type: object
           additionalProperties:
             type: string
         detection:
           type: object
-          description:
+          description: >-
             Custom configuration for audio/video detection algorithms to be run
             on the stream. If no config is provided and a webhook is subscribed
             to the stream.detection event, a default config will be used.
           default:
             sceneClassification:
-              - name: "soccer"
-              - name: "adult"
-          required: [sceneClassification]
+              - name: soccer
+              - name: adult
+          required:
+            - sceneClassification
           additionalProperties: false
           properties:
             sceneClassification:
@@ -588,11 +651,12 @@ components:
               minItems: 1
               items:
                 type: object
-                description:
+                description: >-
                   Scene classification options. Must contain name property with
                   one of the well-defined classes supported by detection models.
                 additionalProperties: false
-                required: [name]
+                required:
+                  - name
                 properties:
                   name:
                     type: string
@@ -612,7 +676,6 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
-
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -622,10 +685,10 @@ components:
           minItems: 1
           items:
             type: string
-
     stream-set-active-payload:
       type: object
-      required: [active]
+      required:
+        - active
       properties:
         active:
           $ref: "#/components/schemas/stream/properties/isActive"
@@ -635,7 +698,6 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
-
     asset-patch-payload:
       type: object
       additionalProperties: false
@@ -646,7 +708,6 @@ components:
           $ref: "#/components/schemas/playback-policy"
         storage:
           $ref: "#/components/schemas/new-asset-payload/properties/storage"
-
     stream-patch-payload:
       type: object
       additionalProperties: false
@@ -659,7 +720,6 @@ components:
           $ref: "#/components/schemas/stream/properties/multistream"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
-
     object-store-patch-payload:
       type: object
       additionalProperties: false
@@ -672,11 +732,11 @@ components:
           $ref: "#/components/schemas/object-store/properties/url"
         publicUrl:
           $ref: "#/components/schemas/object-store/properties/publicUrl"
-
     suspend-user-payload:
       type: object
       additionalProperties: false
-      required: [suspended]
+      required:
+        - suspended
       properties:
         suspended:
           $ref: "#/components/schemas/user/properties/suspended"
@@ -684,13 +744,10 @@ components:
           type: string
           description:
             Name of template to send to the users regarding the suspension.
-          enum: [copyright]
-
+          enum:
+            - copyright
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
-      required: []
-      table: null
-
     signing-key-patch-payload:
       type: object
       additionalProperties: false
@@ -699,7 +756,6 @@ components:
           $ref: "#/components/schemas/signing-key/properties/name"
         disabled:
           $ref: "#/components/schemas/signing-key/properties/disabled"
-
     webhook-patch-payload:
       type: object
       additionalProperties: false
@@ -714,7 +770,6 @@ components:
           $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
           $ref: "#/components/schemas/webhook/properties/streamId"
-
     webhook-status-payload:
       type: object
       additionalProperties: false
@@ -724,25 +779,23 @@ components:
           description: Error message if the webhook failed to process the event
         response:
           $ref: "#/components/schemas/webhook-response"
-
     access-control-gate-payload:
       type: object
       additionalProperties: false
-      required: [type, stream]
+      required:
+        - type
+        - stream
       properties:
         type:
           type: string
-          enum: [jwt, accessKey]
+          enum:
+            - jwt
         stream:
           type: string
           description: Stream ID to which this gate applies
         pub:
           type: string
           description: Base64 of Public key used for JWT verification
-        accessKey:
-          type: string
-          description: Access key used for access-control verification
-
     experiment-audience-payload:
       type: object
       additionalProperties: false
@@ -759,21 +812,20 @@ components:
             type: string
             description:
               Email or ID of users that should be removed from the experiment
-
     playback-policy:
       type: object
       description:
         Whether the playback policy for a asset or stream is public or signed
       additionalProperties: false
-      required: [type]
+      required:
+        - type
       properties:
         type:
           type: string
           enum:
             - public
             - jwt
-            - lit_signing_condition # only for lit-signing-condition experiment
-            - webhook
+            - lit_signing_condition
         unifiedAccessControlConditions:
           type: array
           description: LIT Unified Access Control Conditions
@@ -783,7 +835,12 @@ components:
           type: object
           description: LIT Resource ID
           additionalProperties: false
-          required: [baseUrl, path, orgId, role, extraData]
+          required:
+            - baseUrl
+            - path
+            - orgId
+            - role
+            - extraData
           properties:
             baseUrl:
               type: string
@@ -795,17 +852,8 @@ components:
               type: string
             extraData:
               type: string
-        webhookId:
-          type: string
-          description: ID of the webhook to use for playback policy
-        webhookContext:
-          type: object
-          description: User-defined webhook context
-          additionalProperties: true
-
     session:
       type: object
-      table: session
       required:
         - name
         - streamId
@@ -813,11 +861,9 @@ components:
       properties:
         id:
           type: string
-          readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         kind:
           type: string
-          readOnly: true
           example: stream
         name:
           type: string
@@ -825,11 +871,9 @@ components:
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
         lastSeen:
           type: number
           example: 1587667174725
-          index: true
         sourceSegments:
           type: number
           example: 1
@@ -839,11 +883,11 @@ components:
         sourceSegmentsDuration:
           type: number
           example: 1
-          description: Duration of all the source segments, sec
+          description: "Duration of all the source segments, sec"
         transcodedSegmentsDuration:
           type: number
           example: 2
-          description: Duration of all the transcoded segments, sec
+          description: "Duration of all the transcoded segments, sec"
         sourceBytes:
           type: number
           example: 1
@@ -858,42 +902,35 @@ components:
           type: number
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
-        broadcasterHost:
-          type: string
-          description: Hostname of the broadcaster that transcodes that stream
         deleted:
           type: boolean
           description: Set to true when stream deleted
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
-          index: true
         parentId:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
-          index: true
         record:
-          description:
+          description: >-
             Should this stream be recorded? Uses default settings. For more
             customization, create and configure an object store.
           type: boolean
           example: false
         recordingStatus:
           type: string
-          readonly: true
           description: Status of the recording process of this stream session.
-          enum: [waiting, ready, none]
+          enum:
+            - waiting
+            - ready
         recordingUrl:
           type: string
-          readonly: true
           description: URL for accessing the recording of this stream session.
         mp4Url:
           type: string
-          readonly: true
           description: URL for the stream session recording packaged in an mp4.
         recordObjectStoreId:
           type: string
@@ -908,7 +945,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
-
+        lastSessionId:
+          type: string
     error:
       required:
         - errors
@@ -919,11 +957,11 @@ components:
           minItems: 1
           items:
             type: string
-            example: ["id not provided", "user not found"]
-
+            example:
+              - id not provided
+              - user not found
     object-store:
       type: object
-      table: object_store
       required:
         - url
       additionalProperties: false
@@ -931,16 +969,16 @@ components:
         url:
           type: string
           description: Livepeer-compatible object store URL
-          example: s3://access-key:secret-key@us-west-2/bucket-name
+          example: "s3://access-key:secret-key@us-west-2/bucket-name"
           writeOnly: true
         publicUrl:
           type: string
           description:
             Public URL at which data in this object storage can be accessed
-          example: https://reg-rec.livepeer.live/some/path
+          example: "https://reg-rec.livepeer.live/some/path"
         disabled:
           type: boolean
-          description:
+          description: >-
             If true then these object store will not be used for recording even
             if it is configured in the API command line.
         deleted:
@@ -952,26 +990,21 @@ components:
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
         name:
           type: string
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which object store object was created
           example: 1587667174725
-
     multistream-target:
       type: object
-      table: multistream_target
       required:
         - url
       additionalProperties: false
       properties:
         id:
           type: string
-          readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
@@ -980,30 +1013,25 @@ components:
           writeOnly: true
           description:
             Livepeer-compatible multistream target URL (RTMP(S) or SRT)
-          example: rtmps://live.my-service.tv/channel/secretKey
+          example: "rtmps://live.my-service.tv/channel/secretKey"
           format: uri
-          pattern: ^(srt|rtmps?)://
+          pattern: "^(srt|rtmps?)://"
         disabled:
           type: boolean
-          description:
+          description: >-
             If true then this multistream target will not be used for pushing
             even if it is configured in a stream object.
         userId:
           type: string
-          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
         createdAt:
           type: number
-          readOnly: true
-          description:
+          description: >-
             Timestamp (in milliseconds) at which multistream target object was
             created
           example: 1587667174725
-
     asset:
       type: object
-      table: asset
       additionalProperties: false
       required:
         - id
@@ -1012,9 +1040,7 @@ components:
       properties:
         id:
           type: string
-          readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-          index: true
         type:
           type: string
           enum:
@@ -1025,13 +1051,11 @@ components:
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
-          index: true
           description: Used to form playback URL and storage folder
         playbackRecordingId:
           type: string
           writeOnly: true
           example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
-          index: true
           description: Used to form recording URL for HLS playback
         staticMp4:
           type: boolean
@@ -1045,7 +1069,9 @@ components:
           items:
             type: object
             additionalProperties: false
-            required: [type, path]
+            required:
+              - type
+              - path
             properties:
               type:
                 type: string
@@ -1054,14 +1080,14 @@ components:
               path:
                 type: string
                 example: /path/to/file
-                description:
+                description: >-
                   Path to the file in the asset subfolder in the object store.
                   This means that all these paths are relative to a folder in
                   the OS the asset playback ID as the name.
               spec:
                 type: object
                 additionalProperties: false
-                description:
+                description: >-
                   Additional information about the file. For example, for
                   manifests it contains the list of media files.
                 properties:
@@ -1083,21 +1109,18 @@ components:
                     description: Bitrate of the video in bits per second.
         playbackUrl:
           type: string
-          readOnly: true
-          example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
+          example: >-
+            https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
         downloadUrl:
           type: string
-          readOnly: true
-          example: https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video
+          example: "https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video"
           description: URL to manually download the asset if desired
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         userId:
           type: string
-          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
           description: owner of the asset
         deleted:
           type: boolean
@@ -1110,44 +1133,54 @@ components:
         source:
           oneOf:
             - additionalProperties: false
-              required: [type, url]
+              required:
+                - type
+                - url
               properties:
                 type:
                   type: string
-                  enum: [url]
+                  enum:
+                    - url
                 url:
                   type: string
-                  index: true
                   description: URL from which the asset was uploaded
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
-              required: [type]
+              required:
+                - type
               properties:
                 type:
                   type: string
-                  enum: [directUpload]
+                  enum:
+                    - directUpload
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
-              required: [type, sessionId]
+              required:
+                - type
+                - sessionId
               properties:
                 type:
                   type: string
-                  enum: [recording]
+                  enum:
+                    - recording
                 sessionId:
                   type: string
                   description:
                     ID of the session from which this asset was created
             - additionalProperties: false
-              required: [type, inputAssetId]
+              required:
+                - type
+                - inputAssetId
               properties:
                 type:
                   type: string
-                  enum: [transcode]
+                  enum:
+                    - transcode
                 inputAssetId:
                   type: string
-                  description:
+                  description: >-
                     ID of the source asset that was processed by a transcode
                     task to create this asset
         storage:
@@ -1164,32 +1197,34 @@ components:
                   properties:
                     nftMetadataTemplate:
                       type: string
-                      enum: [file, player]
+                      enum:
+                        - file
+                        - player
                       default: file
-                      description:
+                      description: >-
                         Name of the NFT metadata template to export. 'player'
                         will embed the Livepeer Player on the NFT while 'file'
                         will reference only the immutable MP4 files.
                     nftMetadata:
                       type: object
-                      description:
+                      description: >-
                         Additional data to add to the NFT metadata exported to
                         IPFS. Will be deep merged with the default metadata
                         exported.
-                $ref: "#/components/schemas/ipfs-file-info/properties"
+
                 nftMetadata:
                   $ref: "#/components/schemas/ipfs-file-info"
                 updatedAt:
                   type: number
-                  readOnly: true
-                  description:
+                  description: >-
                     Timestamp (in milliseconds) at which IPFS export task was
                     updated
                   example: 1587667174725
             status:
-              readOnly: true
               additionalProperties: false
-              required: [phase, tasks]
+              required:
+                - phase
+                - tasks
               properties:
                 phase:
                   type: string
@@ -1213,12 +1248,12 @@ components:
                   properties:
                     pending:
                       type: string
-                      description:
+                      description: >-
                         ID of any currently running task that is exporting this
                         asset to IPFS.
                     last:
                       type: string
-                      description:
+                      description: >-
                         ID of the last task to run successfully, that created
                         the currently saved data.
                     failed:
@@ -1227,15 +1262,15 @@ components:
         status:
           type: object
           additionalProperties: false
-          readOnly: true
-          required: [phase, updatedAt]
+          required:
+            - phase
+            - updatedAt
           description: Status of the asset
           properties:
             phase:
               type: string
               description: Phase of the asset
               enum:
-                - uploading
                 - waiting
                 - processing
                 - ready
@@ -1253,18 +1288,16 @@ components:
               description: Error message if the asset creation failed.
         name:
           type: string
-          description:
+          description: >-
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
         createdAt:
           type: number
-          readOnly: true
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
         size:
           type: number
-          readOnly: true
           description: Size of the asset in bytes
           example: 84934509
         hash:
@@ -1277,7 +1310,8 @@ components:
               hash:
                 type: string
                 description: Hash of the asset
-                example: 9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
+                example: >-
+                  9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
               algorithm:
                 type: string
                 description: Hash algorithm used to compute the hash
@@ -1285,7 +1319,6 @@ components:
         videoSpec:
           type: object
           additionalProperties: false
-          readOnly: true
           description: Video metadata
           properties:
             format:
@@ -1302,7 +1335,7 @@ components:
               example: 1000000
             tracks:
               type: array
-              description:
+              description: >-
                 List of tracks associated with the asset when the format
                 contemplates them (e.g. mp4)
               items:
@@ -1358,7 +1391,7 @@ components:
                     example: 2
                   sampleRate:
                     type: number
-                    description:
+                    description: >-
                       Sample rate of the track in samples per second - only for
                       audio tracks
                     example: 44100
@@ -1368,37 +1401,30 @@ components:
                     example: 16
         sourceAssetId:
           type: string
-          index: true
-          readOnly: true
           description:
-            ID of the source asset (root) - If missing, this is a root asset
+            "ID of the source asset (root) - If missing, this is a root asset"
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-
     ipfs-file-info:
       type: object
-      required: [cid]
+      required:
+        - cid
       additionalProperties: false
       properties:
         cid:
           type: string
-          index: true
           description: CID of the file on IPFS
         url:
           type: string
-          readOnly: true
           description: URL with IPFS scheme for the file
         gatewayUrl:
           type: string
-          readOnly: true
           description: URL to access file via HTTP through an IPFS gateway
-
     new-signing-key-payload:
       additionalProperties: false
       properties:
         name:
           type: string
           description: Name of the signing key
-
     new-asset-payload:
       additionalProperties: false
       required:
@@ -1411,7 +1437,7 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
-          description:
+          description: >-
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
@@ -1428,46 +1454,44 @@ components:
               oneOf:
                 - type: object
                   additionalProperties: false
-                  properties:
-                    spec:
-                      oneOf:
-                        - type: "null"
-                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
-                - type: [boolean, "null"]
-                  description:
+
+                - type: boolean
+                  description: >-
                     Set to true to make default export to IPFS. False or null
                     means to unpin from IPFS, but is unsupported right now.
         url:
           type: string
           format: uri
-          pattern: ^(https?|ipfs|ar)://
-          description:
+          pattern: "^(https?|ipfs|ar)://"
+          description: >-
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
-          example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+          example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
           type: object
           additionalProperties: false
-          required: [key]
+          required:
+            - key
           properties:
             key:
               type: string
               writeOnly: true
-              description:
+              description: >-
                 Encryption key used to encrypt the asset encoded in base16. Only
                 writable in the upload asset endpoints and cannot be retrieved
                 back.
               example: 74686973206d65616e73206e6f7468696e672120676f2061776179206672656e
             algorithm:
               type: string
-              description:
+              description: >-
                 Encryption algorithm used to encrypt the asset, defaults to AES
                 in CBC block cipher mode.
-              enum: [aes-cbc]
+              enum:
+                - aes-cbc
               default: aes-cbc
         catalystPipelineStrategy:
-          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
-
+          $ref: >-
+            #/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy
     transcode-asset-payload:
       additionalProperties: false
       required:
@@ -1484,13 +1508,12 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
-          description:
+          description: >-
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
         profile:
           $ref: "#/components/schemas/ffmpeg-profile"
-
     transcode-payload:
       additionalProperties: false
       required:
@@ -1503,14 +1526,15 @@ components:
             - type: object
               additionalProperties: false
               description: URL input video
-              required: [url]
+              required:
+                - url
               properties:
                 url:
                   type: string
                   format: uri
-                  pattern: ^(https?|ipfs|ar)://
+                  pattern: "^(https?|ipfs|ar)://"
                   description: URL of the video to transcode
-                  example: https://s3.amazonaws.com/bucket/file.mp4
+                  example: "https://s3.amazonaws.com/bucket/file.mp4"
             - type: object
               additionalProperties: false
               description: S3-like storage input video
@@ -1525,15 +1549,15 @@ components:
                   type: string
                   enum:
                     - s3
-                  description:
+                  description: >-
                     Type of service. This is optional and defaults to `url` if
                     ŚURL field is provided.
                 endpoint:
                   type: string
                   format: uri
-                  pattern: ^http(s)?://
+                  pattern: "^http(s)?://"
                   description: Service endpoint URL
-                  example: https://gateway.storjshare.io
+                  example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
                   description: Bucket with input file
@@ -1577,9 +1601,9 @@ components:
                 endpoint:
                   type: string
                   format: uri
-                  pattern: ^http(s)?://
+                  pattern: "^http(s)?://"
                   description: Service endpoint URL
-                  example: https://gateway.storjshare.io
+                  example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
                   description: Bucket with output files
@@ -1617,17 +1641,20 @@ components:
                   additionalProperties: false
                   required:
                     - proof
-                  description:
+                  description: >-
                     Delegation proof for Livepeer to be able to upload to
                     web3.storage
                   properties:
                     proof:
                       type: string
                       description: Base64 encoded UCAN delegation proof
-                      example: EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
+                      example: >-
+                        EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
         outputs:
           type: object
           additionalProperties: false
+          required:
+            - hls
           description: Output formats
           properties:
             hls:
@@ -1641,18 +1668,6 @@ components:
                   type: string
                   description: Path for the HLS output
                   example: /samplevideo/hls
-            mp4:
-              type: object
-              additionalProperties: false
-              required:
-                - path
-              description: MP4 output format
-              properties:
-                path:
-                  type: string
-                  description: Path for the MP4 output
-                  example: /samplevideo/mp4
-
         profiles:
           type: array
           items:
@@ -1662,23 +1677,18 @@ components:
           description:
             How many seconds the duration of each output segment should be
         catalystPipelineStrategy:
-          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
-
+          $ref: >-
+            #/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy
     task:
       type: object
-      table: task
       additionalProperties: false
       properties:
         id:
           type: string
-          readOnly: true
-          index: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         userId:
           type: string
-          readOnly: true
-          index: true
           description: User ID of the task owner
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         type:
@@ -1686,21 +1696,13 @@ components:
           description: Type of the task
           enum:
             - upload
-            - import # Import is the deprecated pipeline, upload is on Catalyst
+            - import
             - export
-            - transcode # Transcode is the deprecated pipeline, used for deprecated `/api/asset/transcode` and `/api/asset/:assetId/transcode` endpoints
+            - transcode
             - transcode-file
         createdAt:
           type: number
-          readOnly: true
           description: Timestamp (in milliseconds) at which task was created
-          example: 1587667174725
-        scheduledAt:
-          type: number
-          readOnly: true
-          description: |
-            Timestamp (in milliseconds) at which the task was scheduled for
-            execution (e.g. after file upload finished).
           example: 1587667174725
         deleted:
           type: boolean
@@ -1708,12 +1710,10 @@ components:
         inputAssetId:
           type: string
           description: ID of the input asset
-          index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         outputAssetId:
           type: string
           description: ID of the output asset
-          index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
           type: object
@@ -1728,12 +1728,12 @@ components:
                 url:
                   type: string
                   description: URL of the asset to "upload"
-                  example: https://cdn.livepeer.com/ABC123/filename.mp4
+                  example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
                 recordedSessionId:
                   type: string
-                  description:
+                  description: >-
                     ID of the original recorded session to avoid re-transcoding
                     of the same content. Only used for import task.
                   example: 78df0075-b5f3-4683-a618-1086faca35dc
@@ -1743,7 +1743,7 @@ components:
                   example: ABC123/filename.mp4
                 catalystPipelineStrategy:
                   type: string
-                  description:
+                  description: >-
                     Force to use a specific strategy in the Catalyst pipeline.
                     If not specified, the default strategy that Catalyst is
                     configured for will be used. This field only available for
@@ -1777,10 +1777,10 @@ components:
                   properties:
                     url:
                       type: string
-                      description:
+                      description: >-
                         URL of a video to transcode, accepts object-store format
                         "s3+https"
-                      example: https://cdn.livepeer.com/ABC123/filename.mp4
+                      example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 storage:
                   type: object
                   additionalProperties: false
@@ -1788,7 +1788,7 @@ components:
                   properties:
                     url:
                       type: string
-                      description:
+                      description: >-
                         URL of the output storage, accepts object-store format
                         "s3+https"
                       example: "s3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket"
@@ -1806,27 +1806,18 @@ components:
                           type: string
                           description: Path for the HLS output
                           example: /samplevideo/hls
-                    mp4:
-                      type: object
-                      additionalProperties: false
-                      description: MP4 output format
-                      properties:
-                        path:
-                          type: string
-                          description: Path for the MP4 output
-                          example: /samplevideo/mp4
                 profiles:
                   type: array
                   items:
                     $ref: "#/components/schemas/ffmpeg-profile"
                 targetSegmentSizeSecs:
                   type: number
-                  description:
+                  description: >-
                     How many seconds the duration of each output segment should
                     be
                 catalystPipelineStrategy:
                   type: string
-                  description:
+                  description: >-
                     Force to use a specific strategy in the Catalyst pipeline.
                     If not specified, the default strategy that Catalyst is
                     configured for will be used. This field only available for
@@ -1840,9 +1831,10 @@ components:
         status:
           type: object
           additionalProperties: false
-          readOnly: true
           description: Status of the task
-          required: [phase, updatedAt]
+          required:
+            - phase
+            - updatedAt
           properties:
             phase:
               type: string
@@ -1906,18 +1898,17 @@ components:
                 ipfs:
                   type: object
                   additionalProperties: false
-                  required: [videoFileCid]
+                  required:
+                    - videoFileCid
                   properties:
                     videoFileCid:
                       type: string
                       description: IPFS CID of the exported video file
                     videoFileUrl:
                       type: string
-                      readOnly: true
                       description: URL for the file with the IPFS protocol
                     videoFileGatewayUrl:
                       type: string
-                      readOnly: true
                       description:
                         URL to access file via HTTP through an IPFS gateway
                     nftMetadataCid:
@@ -1926,13 +1917,11 @@ components:
                         IPFS CID of the default metadata exported for the video
                     nftMetadataUrl:
                       type: string
-                      readOnly: true
                       description:
                         URL for the metadata file with the IPFS protocol
                     nftMetadataGatewayUrl:
                       type: string
-                      readOnly: true
-                      description:
+                      description: >-
                         URL to access metadata file via HTTP through an IPFS
                         gateway
             transcode:
@@ -1950,26 +1939,28 @@ components:
                     assetSpec:
                       type: object
                       $ref: "#/components/schemas/asset"
-
     export-task-params:
       description: Parameters for the export task
       oneOf:
         - type: object
           additionalProperties: false
-          required: [custom]
+          required:
+            - custom
           properties:
             custom:
               type: object
               description: custom URL parameters for the export task
               additionalProperties: false
-              required: [url]
+              required:
+                - url
               properties:
                 url:
                   type: string
                   format: uri
-                  pattern: ^http(s)?://
+                  pattern: "^http(s)?://"
                   description: URL where to export the asset
-                  example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
+                  example: >-
+                    https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
                 method:
                   type: string
                   description: Method to use on the export request
@@ -1981,31 +1972,34 @@ components:
                     type: string
         - type: object
           additionalProperties: false
-          required: [ipfs]
+          required:
+            - ipfs
           properties:
             ipfs:
               type: object
               additionalProperties: false
               properties:
-                $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties"
                 pinata:
-                  description:
+                  description: >-
                     Custom credentials for the Piñata service. Must have either
                     a JWT or an API key and an API secret.
                   oneOf:
                     - type: object
                       additionalProperties: false
-                      required: [jwt]
+                      required:
+                        - jwt
                       properties:
                         jwt:
                           type: string
                           writeOnly: true
-                          description:
+                          description: >-
                             Will be added to the Authorization header as a
                             Bearer token.
                     - type: object
                       additionalProperties: false
-                      required: [apiKey, apiSecret]
+                      required:
+                        - apiKey
+                        - apiSecret
                       properties:
                         apiKey:
                           type: string
@@ -2016,37 +2010,30 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
-
     signing-key:
       type: object
       additionalProperties: false
-      required: [publicKey]
-      table: signing_key
+      required:
+        - publicKey
       properties:
         id:
           type: string
-          readOnly: true
-          index: true
           example: 78df0075-b5f3-4683-a618-1086faca35dc
         name:
           type: string
           description: Name of the signing key
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
         lastSeen:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which the signing-key was last used
           example: 1587667174725
         userId:
           type: string
-          readOnly: true
-          index: true
           example: 78df0075-b5f3-4683-a618-1086faca35dc
         publicKey:
           type: string
@@ -2056,23 +2043,24 @@ components:
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
-
     signing-key-response-payload:
       type: object
-      required: [publicKey, privateKey]
+      required:
+        - publicKey
+        - privateKey
       properties:
-        $ref: "#/components/schemas/signing-key/properties"
+        signing-key:
+          type: object
+          $ref: "#/components/schemas/signing-key"
         privateKey:
           type: string
-
+          description: The private key associated with the signing key.
     api-token:
       type: object
       additionalProperties: false
-      table: api_token
       properties:
         kind:
           type: string
-          readOnly: true
           example: user
         id:
           type: string
@@ -2080,7 +2068,6 @@ components:
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
         name:
           type: string
           example: Example Token
@@ -2094,28 +2081,31 @@ components:
               properties:
                 fullAccess:
                   type: boolean
-                  description:
+                  description: >-
                     Whether the token grants full access to the API. If false,
                     the token will only have access to some pre-defined
                     endpoints, not expose the whole account from the webpage.
                   default: false
                 allowedOrigins:
                   type: array
-                  description:
+                  description: >-
                     Origins from which the token can be used. If empty, CORS
                     will be prohibited by default (safest). To allow all origin
                     values set this to `[*]`.
                   default: []
                   items:
                     type: string
-                    example: https://example.com
+                    example: "https://example.com"
             rules:
               type: array
-              default: [{ resources: ["*"] }]
+              default:
+                - resources:
+                    - "*"
               items:
                 type: object
                 additionalProperties: false
-                required: [resources]
+                required:
+                  - resources
                 properties:
                   resources:
                     type: array
@@ -2125,21 +2115,27 @@ components:
                   methods:
                     type: array
                     minItems: 1
-                    default: ["*"]
+                    default:
+                      - "*"
                     items:
                       type: string
-                      enum: [post, get, put, patch, delete, head, options, "*"]
-
+                      enum:
+                        - post
+                        - get
+                        - put
+                        - patch
+                        - delete
+                        - head
+                        - options
+                        - "*"
         lastSeen:
           type: number
           example: 1587667174725
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which token object was created
           example: 1587667174725
-
     user-verification:
       type: object
       required:
@@ -2150,14 +2146,11 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
-          unique: true
-          index: true
+          example: john.doe@gmail.com
         emailValidToken:
           type: string
           example: E1F53135E559C253
           writeOnly: true
-
     verify-email:
       type: object
       required:
@@ -2167,9 +2160,7 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
-          unique: true
-
+          example: john.doe@gmail.com
     make-admin:
       type: object
       required:
@@ -2180,14 +2171,12 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
+          example: john.doe@gmail.com
         admin:
           type: boolean
           example: true
-
     password-reset-token:
       type: object
-      table: password_reset_token
       required:
         - kind
         - userId
@@ -2197,24 +2186,20 @@ components:
       properties:
         kind:
           type: string
-          readOnly: true
-          enum: [password-reset-token]
+          enum:
+            - password-reset-token
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          readOnly: true
-          index: true
         resetToken:
           type: string
           example: E1F53135E559C253
           writeOnly: true
         expiration:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which reset token will be expired
           example: 1587667174725
-
     password-reset-token-request:
       type: object
       required:
@@ -2224,8 +2209,7 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
-
+          example: john.doe@gmail.com
     password-reset-confirm:
       type: object
       required:
@@ -2237,8 +2221,7 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
-          index: true
+          example: john.doe@gmail.com
         resetToken:
           type: string
           example: E1F53135E559C253
@@ -2251,8 +2234,6 @@ components:
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
-
     create-customer:
       type: object
       required:
@@ -2262,8 +2243,7 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
-
+          example: john.doe@gmail.com
     create-subscription:
       type: object
       required:
@@ -2286,7 +2266,6 @@ components:
             - prod_0
             - prod_1
             - prod_2
-
     update-subscription:
       type: object
       required:
@@ -2313,7 +2292,6 @@ components:
             - prod_0
             - prod_1
             - prod_2
-
     update-customer-payment-method:
       type: object
       required:
@@ -2329,7 +2307,6 @@ components:
           type: string
           description: stripe payment method id
           example: pm_xxxxxxxxxxxxxxxxxxxxxxxx
-
     retrieve-customer-payment-method:
       type: object
       required:
@@ -2340,10 +2317,8 @@ components:
           type: string
           description: stripe payment method id
           example: src_xxxxxxxxxxxxxxxxxxxxxxxx
-
     region:
       type: object
-      table: regions
       required:
         - region
         - orchestrators
@@ -2352,8 +2327,6 @@ components:
           type: string
           description: region name
           example: ber
-          unique: true
-          index: true
         orchestrators:
           type: array
           items:
@@ -2364,10 +2337,8 @@ components:
             properties:
               address:
                 type: string
-
     user:
       type: object
-      table: users # 'user' is a keyword in postgres, this causes problems otherwise
       required:
         - email
         - password
@@ -2376,9 +2347,7 @@ components:
         email:
           type: string
           description: user email address
-          example: useremail@gmail.com
-          unique: true
-          index: true
+          example: john.doe@gmail.com
         password:
           type: string
           example: thisisapassword
@@ -2403,11 +2372,9 @@ components:
           example: true
         kind:
           type: string
-          readOnly: true
           example: user
         id:
           type: string
-          readOnly: true
           example: abc123
         firstName:
           type: string
@@ -2429,7 +2396,6 @@ components:
             - prod_2
         stripeCustomerId:
           type: string
-          unique: true
           example: cus_Jv6KvgT0DCH8HU
         stripeCustomerPaymentMethodId:
           type: string
@@ -2445,7 +2411,6 @@ components:
           example: 1234
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which user object was created
           example: 1587667174725
@@ -2461,7 +2426,7 @@ components:
           example: 1587667174725
         lastStreamedAt:
           type: number
-          description:
+          description: >-
             Timestamp (in milliseconds) at which user streamed RTMP stream last
             time
           example: 1587667174725
@@ -2472,7 +2437,8 @@ components:
           example: 1587667174725
         recaptchaToken:
           type: string
-          example: 03AGdBq24blDQQCyt9BSYjS0YZ3-tZapaQ5xO2-oykG_4dS_91TzH9qOziOwXbff_QiDOsXmWKxqtOrmOEx7qjijNhbexBzvNjM6HbbhXcji1rKcxxQRsL-t3SbycwZuNXos9OjnrYmfV9F3zsy1o73ia5Wlw_Zcf1jwbm3n-yQ2epifcMHXJhsUrqmUe6a1J1mPaD2heHvCOS3vYm0rWijdMl2E4bXQf75BiWvbLKxCWv5ZF8279nCMcGyJBIw1kno-A0x5KTOlEVxV369nz12lkvRfOtRABKB49jMTygAc2BKh9GBlAYGO6PBPoIk7_BCo7I_hsHoJeT4c80ucOPraZby0QJM5jcCQcqVCYrcaPKPiUMcIEixIhB5FAfDs88uYqDWMcgZdMRKCvmxEC3ONDVDtq0nLMc4rniuC5sQTz1E4D6SR_Adik
+          example: >-
+            03AGdBq24blDQQCyt9BSYjS0YZ3-tZapaQ5xO2-oykG_4dS_91TzH9qOziOwXbff_QiDOsXmWKxqtOrmOEx7qjijNhbexBzvNjM6HbbhXcji1rKcxxQRsL-t3SbycwZuNXos9OjnrYmfV9F3zsy1o73ia5Wlw_Zcf1jwbm3n-yQ2epifcMHXJhsUrqmUe6a1J1mPaD2heHvCOS3vYm0rWijdMl2E4bXQf75BiWvbLKxCWv5ZF8279nCMcGyJBIw1kno-A0x5KTOlEVxV369nz12lkvRfOtRABKB49jMTygAc2BKh9GBlAYGO6PBPoIk7_BCo7I_hsHoJeT4c80ucOPraZby0QJM5jcCQcqVCYrcaPKPiUMcIEixIhB5FAfDs88uYqDWMcgZdMRKCvmxEC3ONDVDtq0nLMc4rniuC5sQTz1E4D6SR_Adik
           description: Recaptcha v3 Token
           writeOnly: true
         internal:
@@ -2485,69 +2451,54 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
-
     experiment:
       type: object
-      table: experiment
       additionalProperties: false
-      required: [name]
+      required:
+        - name
       properties:
         name:
           type: string
-          index: true
-          unique: true
           description: Name that identifies the experiment. Must be unique
         userId:
           type: string
-          index: true
-          description:
+          description: >-
             User ID of the creator of the experiment. Only used for auditing as
             experiment APIs is only accessible to admins, which can all
             experiments anyway.
         createdAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which the experiment was created
           example: 1587667174725
         updatedAt:
           type: number
-          readOnly: true
           description:
             Timestamp (in milliseconds) at which experiment was updated
           example: 1587667174725
         audienceUserIds:
           type: array
-          index: true
-          indexType: gin
           description: List of user IDs in the experiment
           items:
             type: string
         audienceUsers:
           type: array
           description: User objects of users in the experiment for convenience
-          readonly: true
           items:
             $ref: "#/components/schemas/user"
-
     usage:
       type: object
-      table: usage
       additionalProperties: false
       properties:
         id:
           type: string
           description: day associated with usage
-          example: 2021-01-30
-          unique: true
-          index: true
+          example: 2021-01-30T00:00:00.000Z
         kind:
           type: string
-          readOnly: true
           example: usage
         date:
           type: number
-          readOnly: true
           example: usage
         sourceSegments:
           type: number
@@ -2567,20 +2518,19 @@ components:
 
 paths:
   /stream:
-    tags:
-      - stream
     post:
-      description: Creates a stream
+      summary: Create a new stream
+      description: This endpoint allows users to create a new stream resource.
       requestBody:
+        description: Stream resource to be created
         required: true
         content:
           application/json:
             schema:
               type: object
               $ref: "#/components/schemas/stream"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2588,17 +2538,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/stream"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     get:
-      description: Lists streams
+      summary: Retrieve the list of all streams
+      description:
+        This endpoint allows users to retrieve the list of all streams
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2606,6 +2569,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/stream"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -2613,35 +2588,51 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /stream/{id}:
-    tags:
-      - stream
+  "/stream/{id}":
     parameters:
       - name: id
-        description: ID of the stream
+        description: The ID of the stream to retrieve
         in: path
         required: true
         schema:
           type: string
-
     get:
-      description: Gets a specific stream details
+      summary: Retrieve a specific stream
+      description: This endpoint allows users to retrieve a specific stream
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/stream"
+        "404":
+          description: Stream not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     patch:
-      description: Patch a specific stream
+      summary: Update a specific stream
+      description: This endpoint allows users to update a specific stream
       requestBody:
         required: true
         content:
@@ -2649,8 +2640,26 @@ paths:
             schema:
               $ref: "#/components/schemas/stream-patch-payload"
       responses:
-        204:
+        "204":
           description: Success
+        "404":
+          description: Stream not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -2659,8 +2668,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /object-store:
-    tags:
-      - object-store
     post:
       description: Receives store credentials
       requestBody:
@@ -2670,9 +2677,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/object-store"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2686,11 +2692,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     get:
       description: Lists object store credentials by userId
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2706,13 +2711,12 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /multistream/target:
-    tags:
-      - multistream-target
-
     get:
-      description: Lists existing multistream targets
+      summary: Retrieve existing multistream targets
+      description:
+        This endpoint allows users to retrieve existing multistream targets
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2720,15 +2724,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/multistream-target"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     post:
-      description: Creates new multistream target
+      summary: Creates new multistream target
+      description: This endpoint allows users to create a new multistream target
       requestBody:
         required: true
         content:
@@ -2736,7 +2752,7 @@ paths:
             schema:
               $ref: "#/components/schemas/multistream-target"
       responses:
-        201:
+        "201":
           description: Success
           content:
             application/json:
@@ -2744,6 +2760,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/multistream-target"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -2751,9 +2779,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /multistream/target/{id}:
-    tags:
-      - multistream-target
+  "/multistream/target/{id}":
     parameters:
       - name: id
         description: ID of the multistream target
@@ -2761,25 +2787,47 @@ paths:
         required: true
         schema:
           type: string
-
     get:
-      description: Gets a specific multistream target details
+      summary: Retrieve a specific multistream target details
+      description:
+        This endpoint allows users to retrieve a specific multistream target
+        details
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/multistream-target"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     patch:
-      description: Enables or disables an existing multistream target
+      summary: Update an existing multistream target
+      description:
+        This endpoint allows users to update (enable/disable) an existing
+        multistream target
       requestBody:
         required: true
         content:
@@ -2787,20 +2835,57 @@ paths:
             schema:
               $ref: "#/components/schemas/multistream-target-patch-payload"
       responses:
-        204:
+        "204":
           description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     delete:
-      description: Deletes an existing multistream target
+      summary: Delete an existing multistream target
+      description:
+        This endpoint allows users to delete an existing multistream target
       responses:
-        204:
+        "204":
           description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -2809,8 +2894,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /user-verification:
-    tags:
-      - verification
     post:
       description: Verifies user email
       requestBody:
@@ -2820,9 +2903,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/user-verification"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2838,8 +2920,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /password-reset-token:
-    tags:
-      - password-reset
     post:
       description: Creates a password reset token
       requestBody:
@@ -2849,9 +2929,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/password-reset-token-request"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2867,8 +2946,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /password-reset:
-    tags:
-      - password-reset
     post:
       description: Confirms password reset token
       requestBody:
@@ -2878,9 +2955,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/password-reset-confirm"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2896,8 +2972,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /verify-email:
-    tags:
-      - verify-email
     post:
       description: Resend User Email Verification
       requestBody:
@@ -2907,9 +2981,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/verify-email"
-
       responses:
-        200:
+        "200":
           description: Success
         default:
           description: Error
@@ -2919,8 +2992,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /make-admin:
-    tags:
-      - make-admin
     post:
       description: Changes user admin status
       requestBody:
@@ -2930,9 +3001,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/make-admin"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2948,8 +3018,6 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /user/token:
-    tags:
-      - login
     post:
       description: Receives user login information
       requestBody:
@@ -2959,9 +3027,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/user"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -2977,10 +3044,8 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /user:
-    tags:
-      - user
     post:
-      description: Receives user information
+      description: Endpoint that receives user information
       requestBody:
         required: true
         content:
@@ -2988,9 +3053,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/user"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3005,9 +3069,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
-      description: Lists users
+      description: Retrieves a list of users
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3022,17 +3086,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /user/{id}:
+  "/user/{id}":
     patch:
+      summary: Update a user
+      description: Updates the information for the user with the specified ID.
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the user to update
           schema:
             type: string
-      description: updates a user
+      requestBody:
+        description: The updated user information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3046,10 +3119,8 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /api-token:
-    tags:
-      - api-token
     post:
-      description: Contains api token information
+      description: Create a new API token
       requestBody:
         required: true
         content:
@@ -3057,9 +3128,8 @@ paths:
             schema:
               type: object
               $ref: "#/components/schemas/api-token"
-
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3073,11 +3143,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
     get:
-      description: Lists api tokens
+      description: List all API tokens created by the user
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3093,12 +3162,13 @@ paths:
                 $ref: "#/components/schemas/api-token"
 
   /webhook:
-    tags:
-      - webhook
     get:
-      description: gets a list of webhooks defined by the user
+      summary: Retrieve a list of webhooks
+      description:
+        This endpoint allows users to retrieve a list of webhooks defined by the
+        user.
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3106,6 +3176,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/webhook"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3113,14 +3195,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     post:
-      description: creates a new webhook
+      summary: Create a new webhook.
+      description:
+        This endpoint allows users to create a new webhook with the specified
+        configuration.
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3128,24 +3225,44 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /webhook/{id}:
-    tags:
-      - webhook
+  "/webhook/{id}":
     get:
-      description: gets a specific webhook details
+      summary: Get webhook details
+      description:
+        This endpoint allows users to get details about a specific webhook by
+        its ID.
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the webhook to retrieve.
           schema:
             type: string
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        "404":
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3153,20 +3270,41 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     put:
+      summary: Update a webhook
+      description:
+        This endpoint allows users to update an existing webhook by its ID.
       parameters:
         - name: id
           in: path
+          description: The ID of the webhook to update.
           required: true
           schema:
             type: string
-      description: updates a specific webhook
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        "404":
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3174,20 +3312,41 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      summary: Delete a webhook
+      description:
+        This endpoint allows users to delete a specific webhook by its ID.
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the webhook to delete.
           schema:
             type: string
-      description: deletes a specific webhook details
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        "404":
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3196,12 +3355,13 @@ paths:
                 $ref: "#/components/schemas/error"
 
   /asset:
-    tags:
-      - asset
     get:
-      description: gets a list of assets defined by the user
+      summary: Retrieves a list of assets
+      description:
+        This endpoint allows users to retrieve a list of assets defined by the
+        user
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
@@ -3209,6 +3369,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/asset"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3216,24 +3388,44 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /region/{region}:
-    tags:
-      - regions
+  "/region/{region}":
     get:
-      description: get a regions list of orchestrators
+      description:
+        This endpoint allows users to retrieves a list of orchestrators for a
+        specific region
+      summary: Retrieve the list of orchestrators
       parameters:
         - name: region
           in: path
+          description: The name of the region to retrieve orchestrators for
           required: true
           schema:
             type: string
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/region"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3244,17 +3436,37 @@ paths:
       parameters:
         - name: region
           in: path
+          description: The name of the region to update
           required: true
           schema:
             type: string
-      description: updates a specific region
+      description: This endpoint allows users to updates a specific region
+      summary: Updates a specific region
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/region"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
@@ -3265,17 +3477,37 @@ paths:
       parameters:
         - name: region
           in: path
+          description: The name of the region to delete
           required: true
           schema:
             type: string
-      description: deletes a specific region
+      summary: Deletes a specific region
+      description: This endpoint allows users to delete a specific region
       responses:
-        200:
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
         default:
           description: Error
           content:
