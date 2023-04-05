@@ -171,7 +171,7 @@ export const rowsPageFromState = async (
 export const makeEmptyState = () => (
   <TableEmptyState
     title="No stream sessions"
-    description="New stream sessions are created whenever streams becomes active."
+    description="New stream sessions are created whenever streams become active."
     learnMoreUrl="https://docs.livepeer.studio/reference/api/get-session"
   />
 );
