@@ -418,7 +418,7 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
-    await db.asset.markDeleted(asset.id);
+    await this.updateAsset(asset, { deleted: true });
     await this.queue.publishWebhook("events.asset.deleted", {
       type: "webhook_event",
       id: uuid(),
@@ -459,9 +459,10 @@ export class TaskScheduler {
       );
     }
     const res = await db.asset.update(query, updates);
-    if (!res?.rowCount) {
+    if (!res?.rowCount && !updates.deleted) {
       return;
     }
+
     asset = {
       ...asset,
       ...updates,
