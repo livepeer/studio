@@ -179,7 +179,7 @@ const JobApplicationForm = ({
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: "application/pdf",
+    accept: { "application/pdf": [".pdf"] },
     maxFiles: 1,
     onDrop,
   });

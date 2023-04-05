@@ -22,6 +22,16 @@ export interface TableOptions {
   schema: TableSchema;
 }
 
+function parseLimit({ limit }: FindOptions<any>) {
+  if (typeof limit === "string") {
+    limit = parseInt(limit);
+  }
+  if (typeof limit !== "number" || isNaN(limit) || limit < 1) {
+    limit = 20;
+  }
+  return Math.min(limit, 1000);
+}
+
 export default class Table<T extends DBObject> {
   db: DB;
   schema: TableSchema;
@@ -84,10 +94,10 @@ export default class Table<T extends DBObject> {
   }
 
   // returns [docs, cursor]
-  async find(
+  async find<Q = T>(
     query: FindQuery | Array<SQLStatement> = {},
-    opts: FindOptions = {}
-  ): Promise<[Array<T>, string]> {
+    opts: FindOptions<Q> = {}
+  ): Promise<[Array<Q>, string]> {
     const {
       cursor = "",
       useReplica = true,
@@ -96,10 +106,7 @@ export default class Table<T extends DBObject> {
       from = this.name,
       process,
     } = opts;
-    let limit = opts.hasOwnProperty("limit") ? opts.limit : 100;
-    if (typeof limit === "string") {
-      limit = parseInt(limit);
-    }
+    const limit = parseLimit(opts);
 
     const q = sql`SELECT `.append(fields).append(` FROM `).append(from);
     let filters = [];
@@ -131,7 +138,9 @@ export default class Table<T extends DBObject> {
       q.append(" ");
     }
 
-    q.append(` ORDER BY ${order}`);
+    if (order) {
+      q.append(` ORDER BY ${order}`);
+    }
     if (limit) {
       q.append(sql` LIMIT ${limit}`);
     }
@@ -139,14 +148,14 @@ export default class Table<T extends DBObject> {
       q.append(sql` OFFSET ${cursor.replace("skip", "")}`);
     }
 
-    let res;
+    let res: QueryResult;
     if (useReplica) {
       res = await this.db.replicaQuery(q);
     } else {
       res = await this.db.query(q);
     }
 
-    const docs = res.rows.map(process ? process : ({ data }) => data);
+    const docs = res.rows.map(process ? process : ({ data }) => data as Q);
 
     if (docs.length < 1) {
       return [docs, null];
@@ -338,7 +347,10 @@ export default class Table<T extends DBObject> {
 
   // on startup: auto-create indices if they don't exist
   async ensureIndex(propName: string, prop: FieldSpec, parents: string[] = []) {
-    if (process.env.NODE_ENV !== "test" && this.name !== "asset") {
+    if (
+      process.env.NODE_ENV !== "test" &&
+      !["asset", "experiment"].includes(this.name)
+    ) {
       // avoid creating indexes in production right now...
       return;
     }
@@ -364,12 +376,18 @@ export default class Table<T extends DBObject> {
     if (prop.unique) {
       unique = "unique";
     }
+    const indexType = prop.indexType?.toUpperCase() || "BTREE";
+    if (!["GIN", "BTREE"].includes(indexType)) {
+      throw new Error(`unknown index type ${indexType} for ${propName}}`);
+    }
     const indexName = `${this.name}_${[...parents, propName].join("_")}`;
+
     const parentsAcc = parents.map((p) => `->'${p}'`).join("");
-    const propAccessor = `data${parentsAcc}->>'${propName}'`;
+    const propAccessOp = indexType === "GIN" ? "->" : "->>";
+    const propAccessor = `data${parentsAcc}${propAccessOp}'${propName}'`;
     try {
       await this.db.query(`
-          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((${propAccessor}));
+          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING ${indexType} ((${propAccessor}));
         `);
     } catch (e) {
       if (!e.message.includes("already exists")) {

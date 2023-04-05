@@ -30,8 +30,8 @@ const StyledCrossIcon = styled(Cross1Icon, {
 });
 
 const eventOptions: Webhook["events"] = [
+  "playback.accessControl",
   "stream.started",
-  // "stream.detection", // not yet...
   "stream.idle",
   "recording.ready",
   "recording.started",
@@ -47,7 +47,6 @@ const eventOptions: Webhook["events"] = [
   "task.updated",
   "task.completed",
   "task.failed",
-  // "playback.user.new",
 ];
 
 export enum Action {
@@ -290,7 +289,7 @@ const CreateEditDialog = ({
                     }}
                   />
                 )}
-                {action} endpoint
+                {action} webhook
               </Button>
             </Flex>
           </Box>

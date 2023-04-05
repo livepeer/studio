@@ -1,38 +1,56 @@
-import Fade from "react-reveal/Fade";
 import {
   Container,
   Flex,
   Box,
   Heading,
-  Grid,
   Link as A,
 } from "@livepeer/design-system";
 import { blocksToText } from "lib/utils";
-import { GraphQLClient } from "graphql-request";
-import { print } from "graphql/language/printer";
 import { useRouter } from "next/router";
-import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
-import BlogPostCard from "components/Site/BlogPostCard";
-import client from "lib/client";
+import { client } from "lib/client";
 import Image from "next/image";
-import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Player from "components/Site/BlogVideoPlayer";
+import BlogPlayer from "components/Site/BlogPlayer";
 import React from "react";
 import readingTime from "reading-time";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import BlogCTA from "components/Site/BlogCTA";
+import { urlFor } from "lib/sanity";
+import Code from "components/Site/Code";
 
 const serializers = {
   types: {
-    code: (props) => (
-      <SyntaxHighlighter language={props.node.language || "text"}>
-        {props.node.code}
-      </SyntaxHighlighter>
-    ),
-    cta: (props) => (
+    code: (props: {
+      node: {
+        language: any;
+        code:
+          | string
+          | number
+          | boolean
+          | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+          | React.ReactFragment
+          | React.ReactPortal;
+      };
+    }) => {
+      return (
+        <Code
+          className={""}
+          language={props.node.language}
+          value={props.node.code}>
+          {props.node.code}
+        </Code>
+      );
+    },
+    cta: (props: {
+      node: {
+        title: any;
+        variant: any;
+        internalLink: any;
+        anchorLink: any;
+        externalLink: any;
+      };
+    }) => (
       <BlogCTA
         title={props.node.title}
         variant={props.node.variant}
@@ -41,7 +59,9 @@ const serializers = {
         externalLink={props.node.externalLink}
       />
     ),
-    "mux.video": (props) => <Player assetId={props.node.asset._ref} />,
+    "mux.video": (props: { node: { asset: { _ref: any } } }) => (
+      <BlogPlayer assetId={props.node.asset._ref} />
+    ),
   },
 };
 
@@ -54,7 +74,7 @@ const Post = ({
   excerpt,
   noindex = false,
   preview,
-  contentRaw,
+  content,
   furtherReading,
   metaTitle,
   metaDescription,
@@ -69,9 +89,8 @@ const Post = ({
       </Layout>
     );
   }
-  const text = blocksToText(contentRaw);
+  const text = blocksToText(content);
   const stats = readingTime(text);
-  const builder = imageUrlBuilder(client as any);
 
   return (
     <Layout
@@ -79,7 +98,7 @@ const Post = ({
       description={metaDescription}
       noindex={noindex}
       image={{
-        url: builder.image(openGraphImage).url(),
+        url: urlFor(openGraphImage).url(),
         alt: openGraphImage?.alt,
       }}
       url={metaUrl}
@@ -169,7 +188,7 @@ const Post = ({
                   }}>
                   <Image
                     alt={author.image?.alt}
-                    src={builder.image(author.image).url()}
+                    src={urlFor(author.image).url()}
                     fill
                     style={{ objectFit: "cover" }}
                   />
@@ -213,7 +232,7 @@ const Post = ({
                 layout="responsive"
                 width={mainImage.asset.metadata.dimensions.width}
                 height={mainImage.asset.metadata.dimensions.height}
-                src={builder.image(mainImage).url()}
+                src={urlFor(mainImage).url()}
               />
             </Box>
             <Box
@@ -243,39 +262,11 @@ const Post = ({
                 },
               }}>
               <BlockContent
-                blocks={contentRaw}
+                blocks={content}
                 serializers={serializers}
                 {...client.config()}
               />
             </Box>
-            {/* {!!furtherReading && (
-              <>
-                <Box
-                  css={{
-                    bc: "$neutral5",
-                    height: "1px",
-                    width: "100%",
-                    my: "$8",
-                  }}
-                />
-                <Heading size="2" as="h3" css={{ mb: "$6" }}>
-                  Articles you may be interested in
-                </Heading>
-                <Grid
-                  gap={4}
-                  css={{
-                    mb: "$5",
-                    gridTemplateColumns: "repeat(1,1fr)",
-                    "@bp2": {
-                      gridTemplateColumns: "repeat(2,1fr)",
-                    },
-                  }}>
-                  {furtherReading.map((p, i) => (
-                    <BlogPostCard post={p} key={`post-${i}`} />
-                  ))}
-                </Grid>
-              </>
-            )} */}
           </Box>
         </Container>
       </Box>
@@ -287,17 +278,10 @@ Post.theme = "dark-theme-blue";
 export default Post;
 
 export async function getStaticPaths() {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
-  const { allPost }: any = await graphQLClient.request(print(allPosts), {
-    where: {},
-  });
+  const query = `*[_type=="post"  && defined(slug.current)][].slug.current`;
+  const data = await client.fetch(query);
+  const paths = data.map((path: string) => ({ params: { slug: path } }));
 
-  let paths = [];
-  for (const post of allPost) {
-    paths.push({ params: { slug: post.slug.current } });
-  }
   return {
     fallback: true,
     paths,
@@ -306,27 +290,35 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const { slug } = params;
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
 
-  let data: any = await graphQLClient.request(print(allPosts), {
-    where: {},
-  });
+  const queryParams = {
+    slug,
+  };
 
-  let post = data.allPost.find((p) => p.slug.current === slug);
+  const query = `*[_type=="post"  && slug.current == $slug][0]{...,
+    author->{...},
+    category->{...},
+    mainImage{
+      asset->{...}
+    },
+  }`;
+  const pageData = (await client.fetch(query, queryParams)) ?? {};
 
-  // TODO: fetch related posts from sanity
-  const furtherReading = data.allPost
-    .filter((p) => p.slug.current !== slug)
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 2);
+  const furtherQuery = `*[_type == "post"   && slug.current !=$slug] | order(_createdAt desc) [0..1]{
+    ...,
+    author->{...},
+    category->{...},
+    mainImage{
+      asset->{...}
+    },
+  }`;
+  const furtherReads = await client.fetch(furtherQuery, queryParams);
 
   return {
     props: {
-      ...post,
-      furtherReading,
+      ...pageData,
+      furtherReads,
     },
-    revalidate: 1,
+    revalidate: 300,
   };
 }

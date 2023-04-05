@@ -1,18 +1,11 @@
-import { request } from "graphql-request";
-import { print } from "graphql/language/printer";
-import allCategories from "../../../queries/allCategories.gql";
-import allPosts from "../../../queries/allPosts.gql";
+import { client } from "lib/client";
 import BlogIndex from "../index";
 
 export async function getStaticPaths() {
-  const { allCategory } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allCategories)
-  );
-  let paths = [];
-  for (const category of allCategory) {
-    paths.push({ params: { slug: category.slug.current } });
-  }
+  const categoriesQuery = `*[_type=="category" && defined(slug.current)][].slug.current`;
+  const categories = (await client.fetch(categoriesQuery)) ?? [];
+  const paths = categories.map((category) => ({ params: { slug: category } }));
+
   return {
     fallback: true,
     paths,
@@ -21,25 +14,26 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const { slug } = params;
-  const { allCategory: categories } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allCategories)
-  );
-  categories.push({ title: "All", slug: { current: "" } });
-  const { allPost: posts } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allPosts),
-    {
-      where: {
-        hide: { neq: true },
-        category: { slug: { current: { eq: slug } } },
-      },
-    }
-  );
+
+  const queryParams = {
+    slug,
+  };
+  const postQuery = `*[_type == "post" && defined(hide) && hide ==false && category._ref in (*[_type == "category" && slug.current == $slug]._id)]{
+    ...,
+    author->{...},
+    category->{...},
+    mainImage{
+      asset->{...}
+    },
+    }`;
+  const posts = (await client.fetch(postQuery, queryParams)) ?? [];
+
+  const categoriesQuery = `*[_type=="category"]`;
+  const categories = await client.fetch(categoriesQuery);
 
   return {
     props: {
-      categories: categories.reverse(),
+      categories,
       posts,
     },
     revalidate: 1,

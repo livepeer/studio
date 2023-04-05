@@ -42,6 +42,73 @@ fragment hero on Hero {
   }
 }
 
+fragment heroImage on HeroImage {
+  _type
+  title
+  portableTextRaw
+  defaultImage {
+    asset {
+      url
+    }
+  }
+}
+fragment centerTitle on CenterTitle {
+  _type
+  title
+  portableTextRaw
+}
+
+fragment offsetPortableText on OffsetPortableText {
+  _type
+  title
+  portableTextRaw
+  buttons {
+    _key
+    buttonText
+    url {
+      external
+      internal {
+        _rev
+        _key
+        slug {
+          current
+        }
+      }
+      blank
+    }
+  }
+}
+fragment splitImage on SplitImage {
+  _type
+  inverted
+  title
+  portableTextRaw
+  defaultImage {
+    asset {
+      url
+    }
+  }
+}
+fragment iconGrid on IconGrid {
+  _type
+  title
+  portableTextRaw
+  icons {
+    asset {
+      url
+    }
+  }
+}
+
+fragment form on Form {
+  _type
+  title
+  subtitle
+  region
+  portalId
+  formId
+}
+
 fragment valuesSection on ValuesSection {
   _type
   heading

@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "hooks";
-import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
+import Table, {
+  useTableState,
+  Fetcher,
+  DefaultSortBy,
+  sortByToString,
+} from "components/Dashboard/Table";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
@@ -37,6 +42,7 @@ const StreamsTable = ({
   const { state, stateSetter } = useTableState<StreamsTableData>({
     pageSize,
     tableId,
+    initialOrder: sortByToString(DefaultSortBy),
   });
   const columns = useMemo(makeColumns, []);
   const fetcher: Fetcher<StreamsTableData> = useCallback(
@@ -70,7 +76,7 @@ const StreamsTable = ({
         rowSelection="all"
         filterItems={!viewAll && filterItems}
         viewAll={viewAll}
-        initialSortBy={[{ id: "createdAt", desc: true }]}
+        initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction("Create stream", createDialogState.onOn)}

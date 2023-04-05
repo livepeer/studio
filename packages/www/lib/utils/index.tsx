@@ -20,7 +20,7 @@ export const getComponent = (component) => {
       </Element>
     );
   } catch (e) {
-    return null;
+    return <></>;
   }
 };
 

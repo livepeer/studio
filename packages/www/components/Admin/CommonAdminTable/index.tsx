@@ -15,6 +15,7 @@ import {
 import Help from "../../../public/img/help.svg";
 import ReactTooltip from "react-tooltip";
 import { User, Stream } from "@livepeer.studio/api";
+import "regenerator-runtime/runtime";
 
 const loadingAnim = keyframes`
 0% {
@@ -375,6 +376,7 @@ const CommonAdminTable = ({
         {filtersDesc.map((fd) => {
           if (typeof fd.render === "function") {
             return fd.render({
+              id: fd.id,
               value: (filters.find((o) => o.id === fd.id) || [])[0]?.value,
               setValue: (v) => setFilter(fd.id, v),
             });
@@ -403,9 +405,12 @@ const CommonAdminTable = ({
           }}
           {...getTableProps()}>
           <Box as="thead" sx={{ position: "relative" }}>
-            {headerGroups.map((headerGroup, i) => (
-              <Box as="tr" key={i} {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column: any, i) => (
+            {headerGroups.map((headerGroup, headerIndex) => (
+              <Box
+                as="tr"
+                key={`header-${headerIndex}`}
+                {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column: any, columnIndex) => (
                   <Box
                     as="th"
                     sx={{
@@ -438,7 +443,7 @@ const CommonAdminTable = ({
                     {...column.getHeaderProps(
                       column.getSortByToggleProps({ title: "" })
                     )}
-                    key={i}>
+                    key={`header-column-${columnIndex}`}>
                     <Flex sx={{ mr: "-18px" }}>
                       {column.render("Header")}
                       <span>
@@ -449,7 +454,7 @@ const CommonAdminTable = ({
                               : "⭡"
                             : "⭥")}
                       </span>
-                      {i === headerGroup.headers.length - 1 && (
+                      {columnIndex === headerGroup.headers.length - 1 && (
                         <Flex
                           sx={{ alignItems: "center", ml: "auto", mr: "1em" }}>
                           <Flex>
@@ -520,14 +525,16 @@ const CommonAdminTable = ({
               return (
                 <Box
                   as="tr"
+                  key={`row-${rowIndex}`}
                   sx={{
                     bg: "transparent !important",
                   }}
                   {...row.getRowProps()}>
-                  {row.cells.map((cell) => {
+                  {row.cells.map((cell, cellIndex) => {
                     return (
                       <Box
                         as="td"
+                        key={`row-${rowIndex}-cell-${cellIndex}`}
                         sx={{
                           fontSize: 1,
                           borderBottomColor: "muted",

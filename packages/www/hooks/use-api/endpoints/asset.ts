@@ -2,7 +2,7 @@ import { ApiState, FileUpload } from "../types";
 import { SetStateAction } from "react";
 import { Asset, AssetPatchPayload } from "@livepeer.studio/api";
 import { HttpError } from "../../../lib/utils";
-import * as tus from "tus-js-client";
+import { Upload } from "tus-js-client";
 import qs from "qs";
 import { getCursor } from "../helpers";
 
@@ -80,7 +80,7 @@ export const uploadAssets = async (
   };
 
   const getTusUpload = (file: File, tusEndpoint?: string) =>
-    new tus.Upload(file, {
+    new Upload(file, {
       endpoint: tusEndpoint ?? undefined, // URL from `tusEndpoint` field in the `/request-upload` response
       metadata: {
         filetype: file.type,
@@ -121,10 +121,16 @@ export const uploadAssets = async (
   }
 };
 
+export const getFileUploads = (): FileUpload[] => {
+  return Object.keys(context.currentFileUploads ?? {}).map(
+    (key) => context.currentFileUploads?.[key]
+  );
+};
+
 export const getFilteredFileUploads = (): FileUpload[] => {
-  return Object.keys(context.currentFileUploads ?? {})
-    .map((key) => context.currentFileUploads?.[key])
-    .filter((file) => file && !file.error && file.file.name);
+  return getFileUploads().filter(
+    (file) => file && !file.error && file.file.name
+  );
 };
 
 export const clearFileUploads = async () => {
@@ -138,7 +144,6 @@ export const getAssets = async (
     limit?: number | string;
     cursor?: string;
     order?: string;
-    active?: boolean;
     count?: boolean;
   }
 ): Promise<[Asset[], string, number]> => {
@@ -147,12 +152,11 @@ export const getAssets = async (
     `/asset?${qs.stringify({
       userId,
       filters,
-      active: opts?.active,
       order: opts?.order,
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
-      streamsonly: 1,
+      details: 1,
     })}`
   );
   if (res.status !== 200) {
@@ -165,7 +169,7 @@ export const getAssets = async (
 };
 
 export const getAsset = async (assetId): Promise<Asset> => {
-  const [res, asset] = await context.fetch(`/asset/${assetId}`);
+  const [res, asset] = await context.fetch(`/asset/${assetId}?details=1`);
   if (res.status !== 200) {
     throw asset && typeof asset === "object"
       ? { ...asset, status: res.status }

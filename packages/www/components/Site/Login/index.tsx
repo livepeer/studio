@@ -180,11 +180,14 @@ const Login = ({
             onChange={(e) => setPassword(e.target.value)}
           />
         )}
-        <Box>{errors.join(", ")}&nbsp;</Box>
+
+        {errors.length > 0 && (
+          <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+        )}
 
         <Button
           small
-          css={{ width: "100%", mb: "$1", px: "$3", fontSize: "$3" }}>
+          css={{ width: "100%", my: "$3", px: "$3", fontSize: "$3" }}>
           {loading ? "Loading..." : buttonText}
         </Button>
       </Box>

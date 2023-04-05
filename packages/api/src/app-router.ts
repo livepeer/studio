@@ -23,7 +23,7 @@ import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
-import taskScheduler from "./task/scheduler";
+import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
 
 enum OrchestratorSource {
@@ -76,6 +76,7 @@ export default async function makeApp(params: CliArgs) {
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,
+    amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
   } = params;
@@ -98,7 +99,7 @@ export default async function makeApp(params: CliArgs) {
 
   // RabbitMQ
   const queue: Queue = amqpUrl
-    ? await RabbitQueue.connect(amqpUrl)
+    ? await RabbitQueue.connect(amqpUrl, amqpTasksExchange)
     : new NoopQueue();
 
   // Task Scheduler

@@ -1,5 +1,5 @@
 import Router from "express/lib/router";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import sql from "sql-template-strings";
 
 import { makeNextHREF, parseOrder, parseFilters } from "./helpers";

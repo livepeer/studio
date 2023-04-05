@@ -2,10 +2,12 @@
 
 ## Table of Contents
 
-- [Requirements](#requirements)
-- [Getting Started](#getting-started)
-- [Contributing](#contributing)
-- [Packages](#packages)
+- [Livepeer Studio](#livepeer-studio)
+  - [Table of Contents](#table-of-contents)
+  - [Requirements](#requirements)
+  - [Getting Started](#getting-started)
+  - [Contributing](#contributing)
+  - [Packages](#packages)
 
 ## Requirements
 
@@ -42,8 +44,7 @@ username on our
 
 ## Packages
 
-| Name                                                                                      | Description                                 |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------- |
-| [`@livepeer.studio/api`](https://github.com/livepeer/studio/tree/master/packages/api)     | Livepeer Studio API for controlling streams |
-| [`@livepeer.studio/www`](https://github.com/livepeer/studio/tree/master/packages/www)     | The Livepeer Studio frontend                |
-| [`@livepeer.studio/admin`](https://github.com/livepeer/studio/tree/master/packages/admin) | The Livepeer Studio Sanity CMS              |
+| Name                                                                                  | Description                                 |
+| ------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [`@livepeer.studio/api`](https://github.com/livepeer/studio/tree/master/packages/api) | Livepeer Studio API for controlling streams |
+| [`@livepeer.studio/www`](https://github.com/livepeer/studio/tree/master/packages/www) | The Livepeer Studio frontend                |

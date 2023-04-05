@@ -1,28 +1,18 @@
-import { HttpError } from "lib/utils";
 import { Asset } from "livepeer";
 import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogTitle,
   Box,
   Button,
   Flex,
   Heading,
   Label,
-  Text,
-  TextArea,
   TextField,
 } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
-import { useEffect, useMemo, useState } from "react";
-
-const demoIpfsContent = {
-  name: "Singularity in Heritage - Chapter III #095",
-  tokenID: "316",
-  image: "ipfs://QmUrkCHzXHFE2DVucEcarXSe7po39mcKereN1wd9k6gQfw/316.jpg",
-} as const;
+import { useEffect, useState } from "react";
 
 export type EditAssetReturnValue = {
   name: string;
@@ -39,30 +29,30 @@ const EditAssetDialog = ({
   onEdit: (v: EditAssetReturnValue) => Promise<void>;
   asset: Asset;
 }) => {
-  const [editing, setEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
-  const [metadata, setMetadata] = useState("");
-  const [metadataError, setMetadataError] = useState("");
 
   useEffect(() => {
     setName(asset?.name);
-    if (asset?.meta) {
-      setMetadata(JSON.stringify(asset?.meta ?? {}, null, 4));
-    }
   }, [asset]);
 
-  const isMetadataValid = useMemo(() => {
-    if (!metadata) {
-      return true;
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (isLoading || !name) {
+      return;
     }
-
+    setIsLoading(true);
     try {
-      const value = JSON.parse(metadata);
-      return Boolean(value);
-    } catch (e) {}
-
-    return false;
-  }, [metadata]);
+      await onEdit({
+        name,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -78,35 +68,7 @@ const EditAssetDialog = ({
           <Heading size="1">Edit Asset</Heading>
         </AlertDialogTitle>
 
-        <Box
-          css={{ mt: "$3" }}
-          as="form"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            if (editing || !name) {
-              return;
-            }
-            setMetadataError("");
-            setEditing(true);
-            try {
-              await onEdit({
-                name,
-              });
-              onOpenChange(false);
-            } catch (error) {
-              console.error(error);
-              if (
-                (error as HttpError)?.status === 422 &&
-                (error as HttpError)?.message?.includes("should be string")
-              ) {
-                setMetadataError(
-                  "Metadata must only contain string key value pairs."
-                );
-              }
-            } finally {
-              setEditing(false);
-            }
-          }}>
+        <Box css={{ mt: "$3" }} as="form" onSubmit={onSubmit}>
           <Flex css={{ mt: "$2" }} direction="column" gap="1">
             <Label htmlFor="name">Display Name</Label>
             <TextField
@@ -120,30 +82,9 @@ const EditAssetDialog = ({
             />
           </Flex>
 
-          {/* <Flex css={{ mt: "$2" }} direction="column" gap="1">
-            <Label htmlFor="metadata">Metadata</Label>
-            <TextArea
-              size="2"
-              id="metadata"
-              value={metadata}
-              onChange={(e) => setMetadata(e.target.value)}
-              placeholder={JSON.stringify(demoIpfsContent, null, 4)}
-            />
-          </Flex>
-          {(metadataError || !isMetadataValid) && (
-            <AlertDialogDescription asChild>
-              <Text
-                size="3"
-                variant="red"
-                css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-                {metadataError || "Metadata must be valid JSON."}
-              </Text>
-            </AlertDialogDescription>
-          )} */}
-
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
             <AlertDialogCancel asChild>
-              <Button disabled={editing} size="2" ghost>
+              <Button disabled={isLoading} size="2" ghost>
                 Cancel
               </Button>
             </AlertDialogCancel>
@@ -151,9 +92,9 @@ const EditAssetDialog = ({
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
-              disabled={editing || !name} // || !isMetadataValid
+              disabled={isLoading || !name}
               variant="primary">
-              {editing && (
+              {isLoading && (
                 <Spinner
                   css={{
                     color: "$hiContrast",

@@ -16,8 +16,14 @@ import {
 } from "@livepeer/design-system";
 import { ThemeProvider } from "next-themes";
 import { DEFAULT_THEME } from "../lib/theme";
-import { createReactClient, LivepeerConfig } from "@livepeer/react";
-import { studioProvider } from "livepeer/providers/studio";
+import {
+  createReactClient,
+  LivepeerConfig,
+  studioProvider,
+  ThemeConfig,
+} from "@livepeer/react";
+import "../css/hubspot.scss";
+import { isStaging } from "lib/utils";
 
 const queryClient = new QueryClient();
 
@@ -56,7 +62,22 @@ Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
-const livepeerClient = createReactClient({ provider: studioProvider() });
+const livepeerClient = createReactClient({
+  provider: studioProvider({
+    // we intentionally provide no API key so any requests requiring auth will fail
+    // eventually should move to using JWT from user's login
+    apiKey: "",
+    baseUrl: isStaging()
+      ? "https://livepeer.monster"
+      : "https://livepeer.studio",
+  }),
+});
+
+const livepeerTheme: ThemeConfig = {
+  colors: {
+    accent: "$colors$blue10",
+  },
+};
 
 const App = ({ Component, pageProps }) => {
   globalStyles();
@@ -82,7 +103,9 @@ const App = ({ Component, pageProps }) => {
               <MetaMaskProvider>
                 <ApiProvider>
                   <AnalyzerProvider>
-                    <LivepeerConfig client={livepeerClient}>
+                    <LivepeerConfig
+                      theme={livepeerTheme}
+                      client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
                     </LivepeerConfig>

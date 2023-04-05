@@ -4,15 +4,16 @@ import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
-import express from "express";
-import sql from "sql-template-strings";
+import express, { Request } from "express";
+import sql, { SQLStatement } from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import base64url from "base64url";
 
-import { db } from "../store";
-import { ObjectStore } from "../schema/types";
+import { WithID } from "../store/types";
+import { ObjectStore, Task } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -84,6 +85,14 @@ export function toStringValues(obj: Record<string, any>) {
   return strObj;
 }
 
+export function reqUseReplica(req: Request) {
+  if (!req.user.admin) {
+    return true;
+  }
+  // intentional single equal comparison to coalesce arrays
+  return req.query.strongConsistency != "1";
+}
+
 function bytesToHexString(bytes: Uint8Array, separate = false) {
   /// <signature>
   ///     <summary>Converts an Array of bytes values (0-255) to a Hex string</summary>
@@ -119,8 +128,70 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
+export interface ObjectStoreStorage {
+  endpoint?: string;
+  bucket?: string;
+  credentials?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
+}
+
+export interface Web3StoreStorage {
+  credentials: {
+    proof: string;
+  };
+}
+
+export function toWeb3StorageUrl(storage: Web3StoreStorage): string {
+  if (!storage.credentials || !storage.credentials.proof) {
+    throw new Error("undefined property 'credentials.proof'");
+  }
+  return `w3s://${base64url.fromBase64(storage.credentials.proof)}@/`;
+}
+
+export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
+  if (!storage.endpoint) {
+    throw new Error("undefined property 'endpoint'");
+  }
+  if (!storage.bucket) {
+    throw new Error("undefined property 'bucket'");
+  }
+  if (
+    !storage.credentials ||
+    !storage.credentials.accessKeyId ||
+    !storage.credentials.secretAccessKey
+  ) {
+    throw new Error("undefined property 'credentials'");
+  }
+  const endpointUrl = new URL(storage.endpoint);
+  return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
+}
+
+export function deleteCredentials(objectStoreUrl: string): string {
+  const match = [
+    ...objectStoreUrl.matchAll(/^s3\+https?:\/\/(.*):(.*)@.*\/.*$/g),
+  ];
+  if (match.length == 0) {
+    return objectStoreUrl;
+  }
+  if (match[0].length < 3) {
+    return objectStoreUrl;
+  }
+  const [_, accessKeyId, secretAccessKey] = match[0];
+  if (!accessKeyId || !secretAccessKey) {
+    return objectStoreUrl;
+  }
+  return objectStoreUrl
+    .replace(accessKeyId, "***")
+    .replace(secretAccessKey, "***");
+}
+
 export type OSS3Config = S3ClientConfig &
-  Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
+  Pick<TusS3Opts, "region" | "bucket"> & {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
 
 export async function getObjectStoreS3Config(
   os: ObjectStore
@@ -301,12 +372,15 @@ export function parseOrder(fieldsMap: FieldsMap, val: string) {
   return prep.length ? prep.join(", ") : undefined;
 }
 
-export function parseFilters(fieldsMap: FieldsMap, val: string) {
+export function parseFilters(
+  fieldsMap: FieldsMap,
+  val: string
+): SQLStatement[] {
   const isObject = function (a) {
     return !!a && a.constructor === Object;
   };
 
-  const q = [];
+  const q: SQLStatement[] = [];
   if (!val) {
     return q;
   }
@@ -317,10 +391,11 @@ export function parseFilters(fieldsMap: FieldsMap, val: string) {
   try {
     json = JSON.parse(decodeURIComponent(val));
   } catch (e) {
-    console.log("error decoding filters", e);
+    console.error("parseFilters: error decoding filters", e);
     return q;
   }
   if (!Array.isArray(json)) {
+    console.error("parseFilters: filters are not an array");
     return q;
   }
   for (const filter of json) {
@@ -372,6 +447,8 @@ export function parseFilters(fieldsMap: FieldsMap, val: string) {
           q.push(sql``.append(fv.val).append(sql` = ${filter.value}`));
         }
       }
+    } else {
+      console.error("parseFilters: unknown field: ", filter.id);
     }
   }
   return q;

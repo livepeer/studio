@@ -1,6 +1,7 @@
 import yargs from "yargs";
 import yargsToMist from "./yargs-to-mist";
 import { CamelKeys } from "./types/common";
+import { defaultTaskExchange } from "./store/queue";
 
 function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
@@ -81,6 +82,12 @@ export default function parseCli(argv?: string | readonly string[]) {
       "amqp-url": {
         describe: "the RabbitMQ Url",
         type: "string",
+      },
+      "amqp-tasks-exchange": {
+        describe:
+          "the name of the exchange for scheduling tasks and receiving results",
+        type: "string",
+        default: defaultTaskExchange,
       },
       "client-id": {
         describe: "google auth ID",
@@ -230,9 +237,30 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "object store ID to use for Catalyst VOD",
         type: "string",
       },
-      vodCatalystPipelineRolloutPercent: {
-        describe: "percentage of assets to test the new Catalyst VOD pipeline",
-        default: 0,
+      vodCatalystPrivateAssetsObjectStoreId: {
+        describe: "object store ID to use for private assets in Catalyst VOD",
+        type: "string",
+      },
+      googleCloudUrlSigningKeyName: {
+        describe:
+          "name of the signing key to use for signing access cookies for private assets on Google Cloud CDN",
+        type: "string",
+      },
+      googleCloudUrlSigningKey: {
+        describe:
+          "value of the signing key to use for signing access cookies for private assets on Google Cloud CDN",
+        type: "string",
+      },
+      vodMaxConcurrentTasksPerUser: {
+        describe:
+          "maximum number of tasks that can be running for a given user",
+        default: 5,
+        type: "number",
+      },
+      vodMaxScheduledTasksPerUser: {
+        describe:
+          "maximum number of tasks that can be in the VOD execution queue for a given user",
+        default: 100,
         type: "number",
       },
       "ingest-region": {
@@ -318,6 +346,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: false,
         type: "boolean",
         alias: "j",
+      },
+      did: {
+        describe: "Livepeer DID key",
+        type: "string",
       },
     })
     .usage(

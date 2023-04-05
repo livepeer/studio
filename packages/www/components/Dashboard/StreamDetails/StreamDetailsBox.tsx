@@ -18,6 +18,7 @@ const Cell = ({ children, css = {} }) => {
 export type StreamDetailsBoxProps = {
   stream: Stream & { suspended?: boolean };
   globalIngestUrl: string;
+  globalSrtIngestUrl: string;
   globalPlaybackUrl: string;
   invalidateStream: () => void;
 };
@@ -25,6 +26,7 @@ export type StreamDetailsBoxProps = {
 const StreamDetailsBox = ({
   stream,
   globalIngestUrl,
+  globalSrtIngestUrl,
   globalPlaybackUrl,
   invalidateStream,
 }: StreamDetailsBoxProps) => {
@@ -82,6 +84,17 @@ const StreamDetailsBox = ({
           <Cell css={{ color: "$hiContrast" }}>RTMP ingest URL</Cell>
           <Cell css={{ cursor: "pointer" }}>
             <ShowURL url={globalIngestUrl} anchor={false} />
+          </Cell>
+          <Cell css={{ color: "$hiContrast" }}>SRT ingest URL</Cell>
+          <Cell css={{ cursor: "pointer" }}>
+            <ShowURL
+              url={globalSrtIngestUrl}
+              shortendUrl={globalSrtIngestUrl.replace(
+                globalSrtIngestUrl.slice(38),
+                "…"
+              )}
+              anchor={false}
+            />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Playback ID</Cell>
           <Cell>

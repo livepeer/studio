@@ -26,7 +26,7 @@ const Logo = ({ navBackgroundColor = "$hiContrast", badge = "" }) => {
           }}>
           <Box
             as="svg"
-            width="inherit"
+            width="107"
             height="38"
             viewBox="0 0 107 38"
             fill="none"

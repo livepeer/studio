@@ -35,7 +35,7 @@ function adminListQuery(
   cursor: string,
   orderStr: string,
   filters: string
-): [SQLStatement[], FindOptions] {
+): [SQLStatement[], FindOptions<DBMultistreamTarget & { user: User }>] {
   type ResultRow = {
     id: string;
     data: DBMultistreamTarget;
@@ -98,7 +98,7 @@ target.get("/", authorizer({}), async (req, res) => {
   }
 
   let query: FindQuery | Array<SQLStatement>;
-  let opts: FindOptions;
+  let opts: FindOptions<any>;
   if (!userId) {
     if (!isAdmin) {
       return badRequest(res, "required query parameter: userId");

@@ -67,7 +67,7 @@ const WebhookDetails = ({ id, data }) => {
               width: "100%",
               ai: "flex-start",
             }}>
-            {data.url}
+            {data.name}
           </Heading>
 
           <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>

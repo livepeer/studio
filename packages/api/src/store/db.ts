@@ -10,7 +10,6 @@ import {
   ApiToken,
   User,
   PasswordResetToken,
-  Task,
   Usage,
   Region,
   WebhookResponse,
@@ -19,13 +18,18 @@ import {
   SigningKey,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
-import StreamTable, { DBStreamFields } from "./stream-table";
+import StreamTable, {
+  DeprecatedStreamFields,
+  StreamStats,
+} from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
 import { CdnUsageTable } from "./cdn-usage-table";
 import AssetTable from "./asset-table";
+import TaskTable from "./task-table";
+import ExperimentTable from "./experiment-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -36,10 +40,7 @@ export interface PostgresParams {
   appName?: string;
 }
 
-export type DBSession = WithID<Session> &
-  DBStreamFields & {
-    broadcasterHost?: string;
-  };
+export type DBSession = WithID<Session> & StreamStats & DeprecatedStreamFields;
 
 type Table<T> = BaseTable<WithID<T>>;
 
@@ -64,10 +65,11 @@ export class DB {
   objectStore: Table<ObjectStore>;
   multistreamTarget: MultistreamTargetTable;
   asset: AssetTable;
-  task: Table<Task>;
+  task: TaskTable;
   signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
+  experiment: ExperimentTable;
   usage: Table<Usage>;
   webhook: WebhookTable;
   webhookResponse: Table<WebhookResponse>;
@@ -151,7 +153,7 @@ export class DB {
       db: this,
       schema: schemas["asset"],
     });
-    this.task = makeTable<Task>({
+    this.task = new TaskTable({
       db: this,
       schema: schemas["task"],
     });
@@ -160,6 +162,10 @@ export class DB {
       schema: schemas["signing-key"],
     });
     this.user = makeTable<User>({ db: this, schema: schemas["user"] });
+    this.experiment = new ExperimentTable({
+      db: this,
+      schema: schemas["experiment"],
+    });
     this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
     this.webhook = new WebhookTable({ db: this, schema: schemas["webhook"] });
     this.passwordResetToken = makeTable<PasswordResetToken>({

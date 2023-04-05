@@ -199,6 +199,8 @@ components:
           $ref: "#/components/schemas/webhook/properties/events/items"
         events:
           type: array
+          index: true
+          indexType: gin
           items:
             type: string
             enum:
@@ -211,6 +213,7 @@ components:
               - multistream.error
               - multistream.disconnected
               - playback.user.new
+              - playback.accessControl
               - asset.created
               - asset.updated
               - asset.failed
@@ -432,16 +435,6 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
           index: true
-        partialSession:
-          description:
-            Indicates that this is not final object of `user's` session
-          type: boolean
-        previousSessions:
-          description:
-            Ids of the previous sessions which are part of `user's` session
-          type: array
-          items:
-            type: string
         streamKey:
           type: string
           example: hgebdhhigq
@@ -652,21 +645,7 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         storage:
-          additionalProperties: false
-          properties:
-            ipfs:
-              oneOf:
-                - type: object
-                  additionalProperties: false
-                  properties:
-                    spec:
-                      oneOf:
-                        - type: "null"
-                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
-                - type: [boolean, "null"]
-                  description:
-                    Set to true to make default export to IPFS. False or null
-                    means to unpin from IPFS, but is unsupported right now.
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
 
     stream-patch-payload:
       type: object
@@ -753,13 +732,33 @@ components:
       properties:
         type:
           type: string
-          enum: [jwt]
+          enum: [jwt, accessKey]
         stream:
           type: string
           description: Stream ID to which this gate applies
         pub:
           type: string
           description: Base64 of Public key used for JWT verification
+        accessKey:
+          type: string
+          description: Access key used for access-control verification
+
+    experiment-audience-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        addUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be added to the experiment
+        removeUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be removed from the experiment
 
     playback-policy:
       type: object
@@ -770,7 +769,39 @@ components:
       properties:
         type:
           type: string
-          enum: [public, jwt]
+          enum:
+            - public
+            - jwt
+            - lit_signing_condition # only for lit-signing-condition experiment
+            - webhook
+        unifiedAccessControlConditions:
+          type: array
+          description: LIT Unified Access Control Conditions
+          items:
+            type: object
+        resourceId:
+          type: object
+          description: LIT Resource ID
+          additionalProperties: false
+          required: [baseUrl, path, orgId, role, extraData]
+          properties:
+            baseUrl:
+              type: string
+            path:
+              type: string
+            orgId:
+              type: string
+            role:
+              type: string
+            extraData:
+              type: string
+        webhookId:
+          type: string
+          description: ID of the webhook to use for playback policy
+        webhookContext:
+          type: object
+          description: User-defined webhook context
+          additionalProperties: true
 
     session:
       type: object
@@ -827,6 +858,9 @@ components:
           type: number
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
+        broadcasterHost:
+          type: string
+          description: Hostname of the broadcaster that transcodes that stream
         deleted:
           type: boolean
           description: Set to true when stream deleted
@@ -852,7 +886,7 @@ components:
           type: string
           readonly: true
           description: Status of the recording process of this stream session.
-          enum: [waiting, ready]
+          enum: [waiting, ready, none]
         recordingUrl:
           type: string
           readonly: true
@@ -874,8 +908,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
-        lastSessionId:
-          type: string
 
     error:
       required:
@@ -1001,6 +1033,10 @@ components:
           example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
           index: true
           description: Used to form recording URL for HLS playback
+        staticMp4:
+          type: boolean
+          writeOnly: true
+          description: Whether to generate MP4s for the asset.
         files:
           type: array
           writeOnly: true
@@ -1022,6 +1058,29 @@ components:
                   Path to the file in the asset subfolder in the object store.
                   This means that all these paths are relative to a folder in
                   the OS the asset playback ID as the name.
+              spec:
+                type: object
+                additionalProperties: false
+                description:
+                  Additional information about the file. For example, for
+                  manifests it contains the list of media files.
+                properties:
+                  size:
+                    type: number
+                    example: 123456
+                    description: Size of the file in bytes.
+                  height:
+                    type: number
+                    example: 1080
+                    description: Height of the video in pixels.
+                  width:
+                    type: number
+                    example: 1920
+                    description: Width of the video in pixels.
+                  bitrate:
+                    type: number
+                    example: 1000000
+                    description: Bitrate of the video in bits per second.
         playbackUrl:
           type: string
           readOnly: true
@@ -1060,12 +1119,16 @@ components:
                   type: string
                   index: true
                   description: URL from which the asset was uploaded
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required: [type]
               properties:
                 type:
                   type: string
                   enum: [directUpload]
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required: [type, sessionId]
               properties:
@@ -1172,6 +1235,7 @@ components:
               type: string
               description: Phase of the asset
               enum:
+                - uploading
                 - waiting
                 - processing
                 - ready
@@ -1351,8 +1415,28 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
+        staticMp4:
+          type: boolean
+          description: Whether to generate MP4s for the asset.
+          example: true
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        storage:
+          additionalProperties: false
+          properties:
+            ipfs:
+              oneOf:
+                - type: object
+                  additionalProperties: false
+                  properties:
+                    spec:
+                      oneOf:
+                        - type: "null"
+                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
+                - type: [boolean, "null"]
+                  description:
+                    Set to true to make default export to IPFS. False or null
+                    means to unpin from IPFS, but is unsupported right now.
         url:
           type: string
           format: uri
@@ -1361,6 +1445,28 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+        encryption:
+          type: object
+          additionalProperties: false
+          required: [key]
+          properties:
+            key:
+              type: string
+              writeOnly: true
+              description:
+                Encryption key used to encrypt the asset encoded in base16. Only
+                writable in the upload asset endpoints and cannot be retrieved
+                back.
+              example: 74686973206d65616e73206e6f7468696e672120676f2061776179206672656e
+            algorithm:
+              type: string
+              description:
+                Encryption algorithm used to encrypt the asset, defaults to AES
+                in CBC block cipher mode.
+              enum: [aes-cbc]
+              default: aes-cbc
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
     transcode-asset-payload:
       additionalProperties: false
@@ -1384,6 +1490,179 @@ components:
           example: filename.mp4
         profile:
           $ref: "#/components/schemas/ffmpeg-profile"
+
+    transcode-payload:
+      additionalProperties: false
+      required:
+        - input
+        - storage
+        - outputs
+      properties:
+        input:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              description: URL input video
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  pattern: ^(https?|ipfs|ar)://
+                  description: URL of the video to transcode
+                  example: https://s3.amazonaws.com/bucket/file.mp4
+            - type: object
+              additionalProperties: false
+              description: S3-like storage input video
+              required:
+                - type
+                - endpoint
+                - bucket
+                - path
+                - credentials
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - s3
+                  description:
+                    Type of service. This is optional and defaults to `url` if
+                    ŚURL field is provided.
+                endpoint:
+                  type: string
+                  format: uri
+                  pattern: ^http(s)?://
+                  description: Service endpoint URL
+                  example: https://gateway.storjshare.io
+                bucket:
+                  type: string
+                  description: Bucket with input file
+                  example: inputbucket
+                path:
+                  type: string
+                  description: Path to the input file inside the bucket
+                  example: /path/file.mp4
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - accessKeyId
+                    - secretAccessKey
+                  description: Credentials for the private input video storage
+                  properties:
+                    accessKeyId:
+                      type: string
+                      description: Access Key ID
+                      example: AKIAIOSFODNN7EXAMPLE
+                    secretAccessKey:
+                      type: string
+                      description: Secret Access Key
+                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        storage:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+                - type
+                - endpoint
+                - bucket
+                - credentials
+              description: Storage for the output files
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - s3
+                  description: Type of service used for output files
+                endpoint:
+                  type: string
+                  format: uri
+                  pattern: ^http(s)?://
+                  description: Service endpoint URL
+                  example: https://gateway.storjshare.io
+                bucket:
+                  type: string
+                  description: Bucket with output files
+                  example: outputbucket
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - accessKeyId
+                    - secretAccessKey
+                  description: Credentials for the output video storage
+                  properties:
+                    accessKeyId:
+                      type: string
+                      description: Access Key ID
+                      example: AKIAIOSFODNN7EXAMPLE
+                    secretAccessKey:
+                      type: string
+                      description: Secret Access Key
+                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+            - type: object
+              additionalProperties: false
+              required:
+                - type
+                - credentials
+              description: Storage for the output files
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - web3.storage
+                  description: Type of service used for output files
+                credentials:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - proof
+                  description:
+                    Delegation proof for Livepeer to be able to upload to
+                    web3.storage
+                  properties:
+                    proof:
+                      type: string
+                      description: Base64 encoded UCAN delegation proof
+                      example: EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
+        outputs:
+          type: object
+          additionalProperties: false
+          description: Output formats
+          properties:
+            hls:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+              description: HLS output format
+              properties:
+                path:
+                  type: string
+                  description: Path for the HLS output
+                  example: /samplevideo/hls
+            mp4:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+              description: MP4 output format
+              properties:
+                path:
+                  type: string
+                  description: Path for the MP4 output
+                  example: /samplevideo/mp4
+
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
+        targetSegmentSizeSecs:
+          type: number
+          description:
+            How many seconds the duration of each output segment should be
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
 
     task:
       type: object
@@ -1409,11 +1688,19 @@ components:
             - upload
             - import # Import is the deprecated pipeline, upload is on Catalyst
             - export
-            - transcode
+            - transcode # Transcode is the deprecated pipeline, used for deprecated `/api/asset/transcode` and `/api/asset/:assetId/transcode` endpoints
+            - transcode-file
         createdAt:
           type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which task was created
+          example: 1587667174725
+        scheduledAt:
+          type: number
+          readOnly: true
+          description: |
+            Timestamp (in milliseconds) at which the task was scheduled for
+            execution (e.g. after file upload finished).
           example: 1587667174725
         deleted:
           type: boolean
@@ -1442,16 +1729,31 @@ components:
                   type: string
                   description: URL of the asset to "upload"
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
                 recordedSessionId:
                   type: string
                   description:
                     ID of the original recorded session to avoid re-transcoding
-                    of the same content.
+                    of the same content. Only used for import task.
                   example: 78df0075-b5f3-4683-a618-1086faca35dc
                 uploadedObjectKey:
                   type: string
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
+                catalystPipelineStrategy:
+                  type: string
+                  description:
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
             import:
               $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:
@@ -1463,6 +1765,78 @@ components:
               properties:
                 profile:
                   $ref: "#/components/schemas/ffmpeg-profile"
+            transcode-file:
+              type: object
+              additionalProperties: false
+              description: Parameters for the transcode-file task
+              properties:
+                input:
+                  type: object
+                  additionalProperties: false
+                  description: Input video file to transcode
+                  properties:
+                    url:
+                      type: string
+                      description:
+                        URL of a video to transcode, accepts object-store format
+                        "s3+https"
+                      example: https://cdn.livepeer.com/ABC123/filename.mp4
+                storage:
+                  type: object
+                  additionalProperties: false
+                  description: Storage for the output files
+                  properties:
+                    url:
+                      type: string
+                      description:
+                        URL of the output storage, accepts object-store format
+                        "s3+https"
+                      example: "s3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket"
+                outputs:
+                  type: object
+                  additionalProperties: false
+                  description: Output formats
+                  properties:
+                    hls:
+                      type: object
+                      additionalProperties: false
+                      description: HLS output format
+                      properties:
+                        path:
+                          type: string
+                          description: Path for the HLS output
+                          example: /samplevideo/hls
+                    mp4:
+                      type: object
+                      additionalProperties: false
+                      description: MP4 output format
+                      properties:
+                        path:
+                          type: string
+                          description: Path for the MP4 output
+                          example: /samplevideo/mp4
+                profiles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ffmpeg-profile"
+                targetSegmentSizeSecs:
+                  type: number
+                  description:
+                    How many seconds the duration of each output segment should
+                    be
+                catalystPipelineStrategy:
+                  type: string
+                  description:
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
         status:
           type: object
           additionalProperties: false
@@ -1495,6 +1869,7 @@ components:
               description: Number of retries done on the task
             step:
               type: string
+              writeOnly: true
               description: Step of the task processing
         output:
           type: object
@@ -2110,6 +2485,51 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
+
+    experiment:
+      type: object
+      table: experiment
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          index: true
+          unique: true
+          description: Name that identifies the experiment. Must be unique
+        userId:
+          type: string
+          index: true
+          description:
+            User ID of the creator of the experiment. Only used for auditing as
+            experiment APIs is only accessible to admins, which can all
+            experiments anyway.
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the experiment was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which experiment was updated
+          example: 1587667174725
+        audienceUserIds:
+          type: array
+          index: true
+          indexType: gin
+          description: List of user IDs in the experiment
+          items:
+            type: string
+        audienceUsers:
+          type: array
+          description: User objects of users in the experiment for convenience
+          readonly: true
+          items:
+            $ref: "#/components/schemas/user"
+
     usage:
       type: object
       table: usage

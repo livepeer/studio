@@ -9,7 +9,10 @@ import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
-import sql, { SQLStatement } from "sql-template-strings";
+import sql from "sql-template-strings";
+import { TooManyRequestsError } from "../store/errors";
+import { CliArgs } from "../parse-cli";
+import { taskParamsWithoutCredentials } from "../controllers/task";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -128,6 +131,15 @@ export class TaskScheduler {
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
           files: assetSpec.files,
+          storage: !assetSpec.storage?.ipfs
+            ? undefined
+            : {
+                ...assetSpec.storage,
+                status: {
+                  tasks: { last: task.id },
+                  phase: "ready",
+                },
+              },
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
@@ -186,7 +198,7 @@ export class TaskScheduler {
     return true;
   }
 
-  private async failTask(
+  public async failTask(
     task: WithID<Task>,
     error: string,
     output?: Task["output"]
@@ -238,22 +250,30 @@ export class TaskScheduler {
     }
   }
 
-  async scheduleTask(
+  async createAndScheduleTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    userId?: string
   ) {
-    const task = await this.spawnTask(type, params, inputAsset, outputAsset);
-    await this.enqueueTask(task);
+    const task = await this.createTask(
+      type,
+      params,
+      inputAsset,
+      outputAsset,
+      userId
+    );
+    await this.scheduleTask(task);
     return task;
   }
 
-  async spawnTask(
+  async createTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    userId?: string
   ) {
     const task = await db.task.create({
       id: uuid(),
@@ -261,7 +281,7 @@ export class TaskScheduler {
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
-      userId: inputAsset?.userId || outputAsset?.userId,
+      userId: inputAsset?.userId || outputAsset?.userId || userId,
       params,
       status: {
         phase: "pending",
@@ -281,19 +301,34 @@ export class TaskScheduler {
     return task;
   }
 
-  async enqueueTask(task: WithID<Task>) {
-    const status: Task["status"] = {
-      phase: "waiting",
-      updatedAt: Date.now(),
-      retries: task.status.retries,
-    };
-    await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
-      type: "task_trigger",
-      id: uuid(),
-      timestamp: status.updatedAt,
-      task: taskInfo(task),
+  async scheduleTask(task: WithID<Task>, retries = 0) {
+    const timestamp = Date.now();
+    await this.updateTask(task, {
+      // only update scheduledAt on the first schedule (retries == 0)
+      scheduledAt: retries ? undefined : timestamp,
+      status: {
+        phase: "waiting",
+        updatedAt: timestamp,
+        retries,
+      },
     });
-    await this.updateTask(task, { status });
+    try {
+      await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
+        type: "task_trigger",
+        id: uuid(),
+        timestamp,
+        task: taskInfo(task),
+      });
+    } catch (err) {
+      console.error(`Failed to enqueue task: taskId=${task.id} err=`, err);
+      this.failTask(task, "Failed to enqueue task").catch((err) =>
+        console.error(
+          `Error failing task after enqueue error: taskId=${task.id} err=`,
+          err
+        )
+      );
+      throw new Error(`Failed to enqueue task: ${err}`);
+    }
   }
 
   async retryTask(task: WithID<Task>, errorMessage: string) {
@@ -307,14 +342,15 @@ export class TaskScheduler {
 
     task = await this.updateTask(task, { status });
     await sleep(retries * TASK_RETRY_BASE_DELAY);
-    await this.enqueueTask(task);
+    await this.scheduleTask(task, retries);
   }
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output">,
+    updates: Pick<Task, "scheduledAt" | "status" | "output">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
+    updates = this.deleteCredentials(task, updates);
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
       query.push(
@@ -358,6 +394,24 @@ export class TaskScheduler {
       });
     }
     return task;
+  }
+
+  private deleteCredentials(
+    task: WithID<Task>,
+    updates: Pick<Task, "status" | "output" | "params">
+  ): Pick<Task, "status" | "output" | "params"> {
+    // We should remove this at some point and do not store credentials at all
+    const isTerminal =
+      updates?.status.phase === "completed" ||
+      updates?.status.phase === "failed";
+    if (!isTerminal) {
+      return updates;
+    }
+
+    return {
+      ...updates,
+      params: taskParamsWithoutCredentials(task.type, task.params),
+    };
   }
 
   async deleteAsset(asset: string | Asset) {
@@ -445,5 +499,13 @@ export class TaskScheduler {
   }
 }
 
-const taskScheduler = new TaskScheduler();
-export default taskScheduler;
+export async function ensureQueueCapacity(config: CliArgs, userId: string) {
+  const numScheduled = await db.task.countScheduledTasks(userId);
+  if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
+    throw new TooManyRequestsError(
+      `user ${userId} has reached the maximum number of pending tasks`
+    );
+  }
+}
+
+export const taskScheduler = new TaskScheduler();

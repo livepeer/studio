@@ -41,13 +41,36 @@ export interface StreamStats {
   transcodedSegmentsDuration?: number;
 }
 
-export interface DBStreamFields extends StreamStats {
-  previousStats?: StreamStats;
+/**
+ * These are deprecated fields from when we used to combine consecutive
+ * livestream sessions (a "session chain") into single "user session" objects.
+ * Kept the fields for backwards compatibility with existing objects in DB.
+ */
+export type DeprecatedStreamFields = {
+  /**
+   * @deprecated Used to represent the ID of the last session to have started in
+   * a chain of sessions.
+   */
   lastSessionId?: string;
+  /**
+   * @deprecated Indicates that this is not final object of user's session.
+   */
+  partialSession?: boolean;
+  /**
+   * @deprecated Ids of the previous sessions which are part of user's session.
+   */
+  previousSessions?: string[];
+  /**
+   * @deprecated Stats from the previous session in the session chain.
+   */
+  previousStats?: StreamStats;
+  /**
+   * @deprecated createdAt from the first session to start in the session chain.
+   */
   userSessionCreatedAt?: number;
-}
+};
 
-export type DBStream = WithID<Stream> & DBStreamFields;
+export type DBStream = WithID<Stream> & StreamStats & DeprecatedStreamFields;
 
 export default class StreamTable extends Table<DBStream> {
   async cachedUsageHistory(
@@ -279,6 +302,19 @@ export default class StreamTable extends Table<DBStream> {
       opts
     );
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
+  }
+
+  async getActiveSessions(
+    id: string,
+    opts?: QueryOptions
+  ): Promise<DBStream[]> {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT data FROM stream WHERE data->>'parentId'=${id} AND (data->>'isActive')::boolean = TRUE`.setName(
+        `${this.name}_by_parentid_active_sessions`
+      ),
+      opts
+    );
+    return res.rowCount < 1 ? [] : res.rows.map((row) => row.data as DBStream);
   }
 
   async setActiveToFalse(stream: {

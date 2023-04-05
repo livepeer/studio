@@ -1,0 +1,20 @@
+# General git and node frameworks files
+.git
+.github
+.cache
+**/Dockerfile
+**/.next
+*/*/.next
+**/node_modules
+**/coverage
+**/yarn-error.log
+
+# Package to build
+packages/*
+!packages/api
+!packages/www
+
+*/*/dist
+*/*/docs
+*/*/minio
+*/*/out

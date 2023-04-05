@@ -154,7 +154,7 @@ export const resetPassword = async (email, resetToken, password) => {
       "content-type": "application/json",
     },
   });
-  if (res.status !== 201) {
+  if (res.status !== 200) {
     return body;
   }
   return login(email, password);

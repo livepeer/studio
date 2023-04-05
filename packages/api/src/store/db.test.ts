@@ -1,4 +1,4 @@
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import { DB } from "./db";
 import Table from "./table";
 import { Pool } from "pg";

@@ -59,12 +59,15 @@ const Suspend = ({ stream, invalidate }) => {
               disabled={saving}
               onClick={async (e) => {
                 e.preventDefault();
-                setSaving(true);
-                const suspended = !stream.suspended;
-                await patchStream(stream.id, { suspended });
-                await invalidate();
-                setSaving(false);
-                setOpen(false);
+                try {
+                  setSaving(true);
+                  const suspended = !stream.suspended;
+                  await patchStream(stream.id, { suspended });
+                  await invalidate();
+                } finally {
+                  setSaving(false);
+                  setOpen(false);
+                }
               }}>
               {saving && (
                 <Spinner

@@ -19,14 +19,6 @@ export class BadRequestError extends APIError {
   }
 }
 
-export class UnprocessableEntityError extends APIError {
-  constructor(message) {
-    super(message);
-    this.type = "UnprocessableEntityError";
-    this.status = 422;
-  }
-}
-
 export class NotFoundError extends APIError {
   constructor(message) {
     super(message);
@@ -51,6 +43,22 @@ export class ForbiddenError extends APIError {
   }
 }
 
+export class UnprocessableEntityError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "UnprocessableEntityError";
+    this.status = 422;
+  }
+}
+
+export class TooManyRequestsError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "TooManyRequestsError";
+    this.status = 429;
+  }
+}
+
 export class InternalServerError extends APIError {
   constructor(message) {
     super(message);
@@ -64,5 +72,13 @@ export class NotImplementedError extends APIError {
     super(message);
     this.type = "NotImplementedError";
     this.status = 501;
+  }
+}
+
+export class BadGatewayError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "BadGatewayError";
+    this.status = 502;
   }
 }

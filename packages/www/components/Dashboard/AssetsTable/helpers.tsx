@@ -1,5 +1,5 @@
 import { Asset } from "livepeer";
-import { Task } from "@livepeer.studio/api";
+import { Asset as ApiAsset, Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import { FileUpload } from "hooks/use-api/types";
 import { get } from "lodash";
@@ -13,6 +13,9 @@ import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { State } from "../Table";
 import TableEmptyState from "../Table/components/TableEmptyState";
+import { useApi } from "hooks";
+
+type ApiClient = ReturnType<typeof useApi>;
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
 
@@ -68,31 +71,48 @@ export const makeColumns = () => [
   },
 ];
 
+const hasLivestreamImportTask = (tasks: Task[], assetId: string) => {
+  try {
+    const task: Task =
+      tasks && tasks.find((task: Task) => task.outputAssetId === assetId);
+    const sourceUrl = get(task, "params.import.url");
+    if (!sourceUrl) return false;
+
+    const sourceHost = new URL(sourceUrl).host;
+    return liveStreamHosts.includes(sourceHost);
+  } catch (err) {
+    console.error("Error in checking import tasks: ", err);
+    return false;
+  }
+};
+
 export const rowsPageFromState = async (
   state: State<AssetsTableData>,
   userId: string,
-  getAssets: Function,
-  getTasks: Function,
+  getAssets: ApiClient["getAssets"],
+  getTasks: ApiClient["getTasks"],
   onDeleteAsset: Function
 ): Promise<RowsPageFromStateResult<AssetsTableData>> => {
-  const [assets, nextCursor, count] = await getAssets(userId, {
+  const assetsPromise = getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
     limit: state.pageSize.toString(),
     cursor: state.cursor,
     order: state.order,
     count: true,
   });
-
-  const [tasks] = await getTasks(userId);
+  const tasksPromise = getTasks(userId, {
+    limit: state.pageSize.toString(),
+  });
+  const [[assets, nextCursor, count], [tasks]] = await Promise.all([
+    assetsPromise,
+    tasksPromise,
+  ]);
 
   const rows: AssetsTableData[] = assets.map(
-    (asset: Asset): AssetsTableData => {
-      const source: Task =
-        tasks && tasks.find((task: Task) => task.outputAssetId === asset.id);
-      const sourceUrl = get(source, "params.import.url");
-      const sourceHost = sourceUrl && new URL(sourceUrl).host;
-      const isLiveStream = !!sourceUrl && liveStreamHosts.includes(sourceHost);
-
+    (asset: ApiAsset): AssetsTableData => {
+      const isLiveStream = asset.source?.type
+        ? asset.source.type === "recording"
+        : hasLivestreamImportTask(tasks, asset.id);
       const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
@@ -115,7 +135,7 @@ export const rowsPageFromState = async (
           date: new Date(asset.createdAt),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/assets/${asset.id}`,
-          asset,
+          asset: asset as Asset, // CreatedAt cell expect SDK asset instead of API
         },
         updatedAt: {
           date:
@@ -144,14 +164,14 @@ export const fileUploadProgressForAsset = (
     (upload) => upload.file.name === asset.name
   );
   return fileUpload && asset.status?.phase === "waiting"
-    ? fileUpload.progress
+    ? (fileUpload.completed ? 1 : 0.99) * fileUpload.progress
     : undefined;
 };
 
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
-    title="Upload your first On Demand asset"
-    description="Livepeer Studio supports video on demand which allows you to import video assets, store them on decentralized storage, and easily mint a video NFT."
+    title="Upload your first video asset"
+    description="Upload video assets for optimized and cached on-demand playback."
     learnMoreUrl="https://docs.livepeer.studio/category/on-demand"
     actionTitle="Upload asset"
     actionToggleState={actionToggleState}

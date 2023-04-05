@@ -10,13 +10,16 @@ import {
   parseOrder,
   toStringValues,
   FieldsMap,
+  reqUseReplica,
+  deleteCredentials,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
-import { withIpfsUrls } from "./asset";
+import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
+import { TooManyRequestsError } from "../store/errors";
 
 const app = Router();
 
@@ -66,6 +69,30 @@ function taskWithIpfsUrls(
   });
 }
 
+export function taskParamsWithoutCredentials(
+  type: Task["type"],
+  params: Task["params"]
+): Task["params"] {
+  const result = _.cloneDeep(params);
+  switch (type) {
+    case "transcode-file":
+      result["transcode-file"].input.url = deleteCredentials(
+        params["transcode-file"].input.url
+      );
+      result["transcode-file"].storage.url = deleteCredentials(
+        params["transcode-file"].storage.url
+      );
+      break;
+    case "upload":
+      const encryption = params.upload?.encryption;
+      if (encryption) {
+        result.upload.encryption = assetEncryptionWithoutKey(encryption);
+      }
+      break;
+  }
+  return result;
+}
+
 const fieldsMap: FieldsMap = {
   id: `task.ID`,
   name: { val: `task.data->>'name'`, type: "full-text" },
@@ -74,22 +101,31 @@ const fieldsMap: FieldsMap = {
   userId: `task.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   type: `task.data->>'type'`,
+  inputAssetId: `task.data->>'inputAssetId'`,
+  outputAssetId: `task.data->>'outputAssetId'`,
 };
 
-app.use(
-  mung.json(function cleanWriteOnlyResponses(data, req) {
-    if (req.user.admin) {
-      return data;
-    }
+export const cleanTaskResponses = () =>
+  mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
+    const toExternalTask = async (t: WithID<Task>) => {
+      t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
+      if (req.user.admin) {
+        return t;
+      }
+      t.params = taskParamsWithoutCredentials(t.type, t.params);
+      return db.task.cleanWriteOnlyResponse(t);
+    };
+
     if (Array.isArray(data)) {
-      return db.task.cleanWriteOnlyResponses(data);
+      return Promise.all(data.map(toExternalTask));
     }
     if ("id" in data) {
-      return db.task.cleanWriteOnlyResponse(data as WithID<Task>);
+      return toExternalTask(data as WithID<Task>);
     }
     return data;
-  })
-);
+  });
+
+app.use(cleanTaskResponses());
 
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
@@ -175,7 +211,9 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const task = await db.task.get(req.params.id);
+  const task = await db.task.get(req.params.id, {
+    useReplica: reqUseReplica(req),
+  });
   if (!task) {
     res.status(404);
     return res.json({
@@ -190,7 +228,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     });
   }
 
-  res.json(taskWithIpfsUrls(req.config.ipfsGatewayUrl, task));
+  res.json(task);
 });
 
 app.post(
@@ -214,11 +252,27 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   const task = await db.task.get(id, { useReplica: false });
   if (!task) {
     return res.status(404).json({ errors: ["not found"] });
-  } else if (
-    task.status?.phase !== "waiting" &&
-    task.status?.phase !== "running"
-  ) {
-    return res.status(400).json({ errors: ["task is not running"] });
+  } else if (!["waiting", "running"].includes(task.status?.phase)) {
+    return res
+      .status(400)
+      .json({ errors: ["task is not in an executable state"] });
+  }
+
+  const user = await db.user.get(task.userId);
+  if (!user) {
+    return res.status(500).json({ errors: ["user not found"] });
+  }
+
+  const { phase, retries } = task.status;
+  // allow test users to run as many tasks as necessary
+  if (!user.isTestUser && phase === "waiting" && !retries) {
+    // this is an attempt to start executing the task for the first time. check concurrent tasks limit
+    const numRunning = await db.task.countRunningTasks(req.user.id);
+    if (numRunning >= req.config.vodMaxConcurrentTasksPerUser) {
+      throw new TooManyRequestsError(
+        `too many tasks running for user ${user.id} (${numRunning})`
+      );
+    }
   }
 
   const doc = req.body.status;

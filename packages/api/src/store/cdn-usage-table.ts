@@ -1,6 +1,6 @@
 import { DB } from "./db";
 import logger from "../logger";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 
 import { CdnDataRow } from "../schema/types";
 
@@ -67,7 +67,7 @@ export class CdnUsageTable {
         await client.query(
           `INSERT INTO ${name} VALUES (to_timestamp($1), $2, $3, $4, $5, $6, $7, $8, $9, $10)
           ON CONFLICT (date, region, playback_id)
-          DO UPDATE SET 
+          DO UPDATE SET
               unique_client_ips = ${name}.unique_client_ips + EXCLUDED.unique_client_ips,
               total_filesize = ${name}.total_filesize + EXCLUDED.total_filesize,
               total_cs_bytes = ${name}.total_cs_bytes + EXCLUDED.total_cs_bytes,
@@ -91,7 +91,7 @@ export class CdnUsageTable {
       await client.query(
         `INSERT INTO cdn_usage_last VALUES ($1, $2)
           ON CONFLICT ((data ->> 'region'::text) )
-          DO UPDATE SET 
+          DO UPDATE SET
             data = EXCLUDED.data
       `,
         [newId, JSON.stringify({ region, fileName })]

@@ -3,7 +3,7 @@ import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
