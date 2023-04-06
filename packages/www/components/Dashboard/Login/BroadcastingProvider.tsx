@@ -35,8 +35,8 @@ const BroadcastingProvider = () => {
           mt: "$1",
           mb: "$5",
         }}>
-        This is the org that provides hosted access to the Livepeer network. In
-        a future release you may switch providers at any time.
+        This is the operator that provides hosted access to the Livepeer
+        network. In a future release you may switch providers at any time.
       </Text>
     </>
   );

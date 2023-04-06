@@ -156,6 +156,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
         <Button
           variant="primary"
+          disabled={loading ? true : false}
           size={4}
           css={{
             width: "100%",

@@ -133,7 +133,7 @@ const RegisterPage = () => {
             <Register
               id="register"
               onSubmit={onSubmit}
-              buttonText="Register"
+              buttonText="Create account with Livepeer Inc"
               loading={loading}
               errors={errors}
             />
