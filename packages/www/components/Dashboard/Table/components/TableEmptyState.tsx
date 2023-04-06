@@ -61,6 +61,7 @@ const TableEmptyState = ({
             target="_blank"
             css={{
               textDecoration: "none",
+              cursor: "default",
               "&:hover": { textDecoration: "none" },
             }}>
             <Button

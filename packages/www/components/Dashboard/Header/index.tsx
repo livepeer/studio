@@ -16,7 +16,6 @@ import HornIcon from "../../../public/img/icons/horn.svg";
 import QuestionIcon from "../../../public/img/icons/question.svg";
 import SupportIcon from "../../../public/img/icons/support.svg";
 import DocumentationIcon from "../../../public/img/icons/documentation.svg";
-import HyperlinkIcon from "../../../public/img/icons/hyperlink.svg";
 import PolygonIcon from "../../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../../public/img/icons/checked.svg";
 import { useEffect, useState, useRef } from "react";
@@ -24,7 +23,6 @@ import { useApi, useHubspotForm } from "hooks";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
-  mr: "$2",
 });
 
 const StyledPolygonIcon = styled(PolygonIcon, {
@@ -38,10 +36,8 @@ const StyledCheckedIcon = styled(CheckedIcon, {
 const StyledDocumentationIcon = styled(DocumentationIcon, {
   color: "$hiContrast",
 });
+
 const StyledSupportIcon = styled(SupportIcon, {
-  color: "$hiContrast",
-});
-const StyledHyperlinkIcon = styled(HyperlinkIcon, {
   color: "$hiContrast",
 });
 
@@ -112,43 +108,54 @@ const Header = ({ breadcrumbs = [] }) => {
           <Flex
             align="center"
             css={{
-              mr: "$5",
               background: "transparent",
               appearance: "none",
               border: "none",
             }}>
-            <StyledDocumentationIcon />
             <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
-              <A
+              <Button
+                ghost
+                as={A}
                 target="_blank"
+                size={2}
                 css={{
-                  ml: "$2",
+                  cursor: "default",
                   color: "$hiContrast",
                   textDecoration: "none",
+                  fontWeight: 500,
+                  display: "flex",
+                  gap: "$2",
                   "&:hover": {
                     textDecoration: "none",
                   },
                 }}>
+                <StyledDocumentationIcon />
                 <Box>Documentation</Box>
-              </A>
+              </Button>
             </Link>
           </Flex>
           <DropdownMenu>
-            <Flex
+            <Button
+              ghost
               as={DropdownMenuTrigger}
-              align="center"
+              size={2}
               css={{
-                mr: "$5",
-                background: "transparent",
-                appearance: "none",
-                border: "none",
+                mr: "$2",
+                display: "flex",
+                gap: "$2",
+                color: "$hiContrast",
+                textDecoration: "none",
+                fontWeight: 500,
+                "&:hover": {
+                  textDecoration: "none",
+                },
               }}>
               <StyledHornIcon />
-              <Box css={{ fontSize: "$3", color: "$hiContrast" }}>Feedback</Box>
-            </Flex>
+              <Box>Feedback</Box>
+            </Button>
             <DropdownMenuContent
               css={{
-                padding: "18px 20px 12px",
+                padding: "18px 0 12px",
                 position: "relative",
                 width: "313px",
                 minHeight: "180px",
@@ -206,19 +213,22 @@ const Header = ({ breadcrumbs = [] }) => {
                               }));
                             }}
                             css={{
+                              cursor: "default",
                               width: "36px",
                               height: "36px",
                               borderRadius: "50%",
                               border:
                                 reaction === form.reaction
-                                  ? "1px solid $green9"
+                                  ? "1px solid $primary9"
                                   : "1px solid $primary7",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               fontSize: "20px",
                               marginRight: "$1",
-
+                              "&:hover": {
+                                borderColor: "$primary9",
+                              },
                               ":last-of-type": {
                                 marginRight: "0px",
                               },
@@ -276,7 +286,10 @@ const Header = ({ breadcrumbs = [] }) => {
             </Box>
             <DropdownMenuContent
               css={{
-                padding: "18px 54px 18px 18px",
+                mr: "$6",
+                pt: "$4",
+                pb: "$3",
+                px: "$3",
                 position: "relative",
                 mt: "$4",
                 boxShadow:
@@ -287,31 +300,64 @@ const Header = ({ breadcrumbs = [] }) => {
               <Box css={{ position: "absolute", right: "6px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
-              <Text size="2" css={{ mb: "$3", color: "$hiContrast" }}>
+              <Text
+                size="2"
+                css={{
+                  ml: "$2",
+                  fontWeight: 600,
+                  mb: "$3",
+                  color: "$hiContrast",
+                }}>
                 HELP
               </Text>
-              <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
-                <A
-                  target="_blank"
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                    textDecoration: "none",
-                    mb: "$3",
-                  }}>
-                  <StyledDocumentationIcon />
-                  <Text css={{ margin: "0 $2" }}>Documentation</Text>
-                  <StyledHyperlinkIcon />
-                </A>
-              </Link>
-              <Link href="/contact" passHref legacyBehavior>
-                <A>
-                  <Flex align="center">
+              <Box>
+                <Link
+                  href="https://docs.livepeer.studio"
+                  passHref
+                  legacyBehavior>
+                  <Button
+                    as={A}
+                    ghost
+                    size={1}
+                    target="_blank"
+                    css={{
+                      cursor: "default",
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      gap: "$2",
+                      mb: "$2",
+                      "&:hover": {
+                        textDecoration: "none",
+                      },
+                    }}>
+                    <StyledDocumentationIcon />
+                    <Text>Documentation</Text>
+                  </Button>
+                </Link>
+                <Link href="/contact" passHref legacyBehavior>
+                  <Button
+                    as={A}
+                    ghost
+                    size={1}
+                    target="_blank"
+                    css={{
+                      cursor: "default",
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      gap: "$2",
+                      "&:hover": {
+                        textDecoration: "none",
+                      },
+                    }}>
                     <StyledSupportIcon />
-                    <Text css={{ margin: "0 $2" }}>Contact Support</Text>
-                  </Flex>
-                </A>
-              </Link>
+                    <Text>Contact</Text>
+                  </Button>
+                </Link>
+              </Box>
             </DropdownMenuContent>
           </DropdownMenu>
         </Flex>
