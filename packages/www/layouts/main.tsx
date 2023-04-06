@@ -1,4 +1,4 @@
-import { Flex, Box } from "@livepeer/design-system";
+import { Flex, Box, Text } from "@livepeer/design-system";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -7,6 +7,9 @@ import { hotjar } from "react-hotjar";
 import { DEFAULT_THEME } from "lib/theme";
 import GoogleTagManager from "components/Site/GoogleTagManager";
 import Footer from "components/Dashboard/Footer";
+import Spinner from "components/Dashboard/Spinner";
+import { useLoggedIn } from "hooks";
+import Fade from "react-reveal/Fade";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -51,6 +54,8 @@ function Layout({
   preview = false,
   css = {},
 }: Props) {
+  const isLoggedIn = useLoggedIn(false);
+
   useEffect(() => {
     if (window.location.hostname === "livepeer.studio") {
       ReactGA.pageview(window.location.pathname + window.location.search);
@@ -85,67 +90,97 @@ function Layout({
     <>
       <NextSeo {...seo} />
       <GoogleTagManager />
-
-      <Flex
-        className="main"
-        css={{
-          flexGrow: 1,
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          zIndex: 1,
-          position: "relative",
-          ...css,
-        }}>
-        {preview && (
-          <Box
-            css={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 24,
-              fontSize: 12,
-              fontWeight: 500,
-              backgroundColor: "$blue9",
-              color: "white",
-              lineHeight: "32px",
-            }}>
-            Preview Mode
-          </Box>
-        )}
-        {children}
-
+      <Fade big when={isLoggedIn === false}>
         <Flex
-          align="center"
-          justify="center"
-          direction="column"
+          className="main"
           css={{
-            width: "100%",
+            flexGrow: 1,
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            zIndex: 1,
             position: "relative",
-            mb: "$4",
-            "@bp1": {
-              mb: "$2",
-              width: "100%",
-              bottom: "$2",
-              position: "absolute",
-            },
+            ...css,
           }}>
-          <Box
-            css={{
-              background:
-                "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
-              width: "calc(100% - $6)",
-              mx: "auto",
-              height: "1px",
-              mb: "$4",
-              "@bp1": {
-                width: "100%",
-                maxWidth: 550,
-              },
-            }}
-          />
-          <Footer />
+          {preview && (
+            <Box
+              css={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: 24,
+                fontSize: 12,
+                fontWeight: 500,
+                backgroundColor: "$blue9",
+                color: "white",
+                lineHeight: "32px",
+              }}>
+              Preview Mode
+            </Box>
+          )}
+
+          {isLoggedIn || isLoggedIn === null ? (
+            <Flex
+              css={{
+                height: "calc(100vh)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+              <Flex direction="column" align="center">
+                <Text
+                  size="8"
+                  as="h1"
+                  css={{
+                    textTransform: "uppercase",
+                    mb: "$5",
+                    fontWeight: 700,
+                    width: 150,
+                    lineHeight: "30px",
+                    textAlign: "center",
+                  }}>
+                  Livepeer Studio
+                </Text>
+
+                <Spinner />
+              </Flex>
+            </Flex>
+          ) : (
+            <>
+              {children}
+              <Flex
+                align="center"
+                justify="center"
+                direction="column"
+                css={{
+                  width: "100%",
+                  position: "relative",
+                  mb: "$4",
+                  "@bp1": {
+                    mb: "$2",
+                    width: "100%",
+                    bottom: "$2",
+                    position: "absolute",
+                  },
+                }}>
+                <Box
+                  css={{
+                    background:
+                      "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
+                    width: "calc(100% - $6)",
+                    mx: "auto",
+                    height: "1px",
+                    mb: "$4",
+                    "@bp1": {
+                      width: "100%",
+                      maxWidth: 550,
+                    },
+                  }}
+                />
+                <Footer />
+              </Flex>
+            </>
+          )}
         </Flex>
-      </Flex>
+      </Fade>
     </>
   );
 }
