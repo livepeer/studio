@@ -116,6 +116,14 @@ export const DashboardStreams = {
   },
 };
 
+export const DashboardSessions = {
+  metaData: {
+    title: makeCompleteTitle("Sessions"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
 export const DashboardStreamHealth = {
   metaData: {
     title: makeCompleteTitle("Stream Health"),
@@ -143,6 +151,14 @@ export const DashboardAPIKeys = {
 export const DashboardSigningKeys = {
   metaData: {
     title: makeCompleteTitle("Signing Keys"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardWebhooks = {
+  metaData: {
+    title: makeCompleteTitle("Webhooks"),
     description: defaultDescription,
     url: makeCompleteUrl(),
   },
