@@ -38,9 +38,9 @@ const DetailsBox = ({ data }) => (
       {data.events.map((event, index) => (
         <Badge
           key={`badge-event${index}`}
-          variant="primary"
+          variant="neutral"
           size="2"
-          css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
+          css={{ mr: "$1", mb: "$1" }}>
           {event}
         </Badge>
       ))}

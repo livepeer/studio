@@ -25,17 +25,29 @@ import {
 import { useApi } from "../../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon } from "@radix-ui/react-icons";
+console.log(styled);
 
 const NavLink = styled(A, {
-  fontSize: "$3",
+  fontSize: 14,
   display: "flex",
   alignItems: "center",
   color: "$primary12",
+  px: "$2",
+  py: 6,
+  borderRadius: "$2",
+  cursor: "default",
+  lineHeight: 1.2,
+  fontWeight: 500,
+  gap: "$2",
   "&:hover": {
+    bc: "$neutral4",
     textDecoration: "none",
   },
   "&:focus": {
     outline: "none",
+  },
+  variants: {
+    active: { true: { bc: "$neutral4" } },
   },
 });
 
@@ -126,78 +138,46 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         css={{ px: "$4", height: "calc(100vh - 100px)" }}
         direction="column"
         justify="between">
-        <Grid css={{ a: { textDecoration: "none" } }} gap="3">
+        <Grid
+          gap={1}
+          css={{
+            a: {
+              textDecoration: "none",
+            },
+          }}>
           <Link href="/dashboard" passHref legacyBehavior>
-            <NavLink>
+            <NavLink active={id === "home"}>
               <HomeIcon active={id === "home"} />
-              <Text
-                variant={id === "home" ? "green" : null}
-                css={{
-                  fontWeight: id === "home" ? 600 : 400,
-                  backgroundClip: "text",
-                  ml: "$2",
-                  lineHeight: 1.2,
-                }}>
-                Home
-              </Text>
+              Home
             </NavLink>
           </Link>
           <Box>
             <Link href="/dashboard/streams" passHref legacyBehavior>
-              <NavLink>
+              <NavLink active={id === "streams"}>
                 <StreamIcon active={id === "streams"} />
-                <Text
-                  variant={id === "streams" ? "green" : null}
-                  css={{
-                    fontWeight: id === "streams" ? 600 : 400,
-                    backgroundClip: "text",
-                    ml: "$2",
-                    lineHeight: 1.2,
-                  }}>
-                  Streams
-                </Text>
+                Streams
               </NavLink>
             </Link>
 
             {id?.split("/")[0] === "streams" && (
               <Box
                 css={{
+                  a: { pl: 35 },
                   "> :first-child": {
                     mt: "$1",
                   },
                 }}>
                 <Link href="/dashboard/sessions" passHref legacyBehavior>
-                  <NavLink>
-                    <Text
-                      variant={id === "streams/sessions" ? "green" : null}
-                      css={{
-                        fontWeight: id === "streams/sessions" ? 600 : 400,
-                        backgroundClip: "text",
-                        ml: 31,
-                        mt: "$1",
-                        lineHeight: 1.2,
-                      }}>
-                      Sessions
-                    </Text>
-                  </NavLink>
+                  <NavLink active={id === "streams/sessions"}>Sessions</NavLink>
                 </Link>
               </Box>
             )}
           </Box>
 
           <Link href="/dashboard/assets" passHref legacyBehavior>
-            <NavLink>
+            <NavLink active={id === "assets"}>
               <AssetsIcon active={id === "assets"} />
-              <Text
-                variant={id === "assets" ? "green" : null}
-                css={{
-                  fontWeight: id === "assets" ? 600 : 400,
-                  backgroundClip: "text",
-                  ml: "$2",
-                  lineHeight: 1.2,
-                }}>
-                Assets
-              </Text>
+              Assets
             </NavLink>
           </Link>
 
@@ -205,22 +185,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
               <NavLink>
                 <TerminalIcon active={id?.split("/")[0] === "developers"} />
-                <Text
-                  css={{
-                    fontWeight: id?.split("/")[0] === "developers" ? 500 : 400,
-                    backgroundClip: "text",
-                    ml: "$2",
-                    lineHeight: 1.2,
-                  }}>
-                  Developers
-                </Text>
+                Developers
               </NavLink>
             </Link>
 
             {id?.split("/")[0] === "developers" && (
               <Box
                 css={{
-                  "> :first-child": {
+                  a: {
+                    pl: 35,
                     mt: "$1",
                   },
                 }}>
@@ -228,60 +201,22 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   href="/dashboard/developers/api-keys"
                   passHref
                   legacyBehavior>
-                  <NavLink>
-                    <Text
-                      variant={id === "developers" ? "green" : null}
-                      css={{
-                        fontWeight: id === "developers" ? 600 : 400,
-                        backgroundClip: "text",
-                        ml: 31,
-                        mt: "$1",
-                        mb: "$1",
-                        lineHeight: 1.2,
-                      }}>
-                      API Keys
-                    </Text>
-                  </NavLink>
+                  <NavLink active={id === "developers"}>API Keys</NavLink>
                 </Link>
                 <Link
                   href="/dashboard/developers/signing-keys"
                   passHref
                   legacyBehavior>
-                  <NavLink>
-                    <Text
-                      variant={
-                        id === "developers/signing-keys" ? "green" : null
-                      }
-                      css={{
-                        fontWeight:
-                          id === "developers/signing-keys" ? 600 : 400,
-                        backgroundClip: "text",
-                        ml: 31,
-                        mt: "$1",
-                        mb: "$1",
-                        lineHeight: 1.2,
-                      }}>
-                      Signing Keys
-                    </Text>
+                  <NavLink active={id === "developers/signing-keys"}>
+                    Signing Keys
                   </NavLink>
                 </Link>
                 <Link
                   href="/dashboard/developers/webhooks"
                   passHref
                   legacyBehavior>
-                  <NavLink>
-                    <Text
-                      variant={id === "developers/webhooks" ? "green" : null}
-                      css={{
-                        fontWeight: id === "developers/webhooks" ? 600 : 400,
-                        backgroundClip: "text",
-                        ml: 31,
-                        mt: "$1",
-                        mb: "$1",
-                        lineHeight: 1.2,
-                      }}>
-                      Webhooks
-                    </Text>
+                  <NavLink active={id === "developers/webhooks"}>
+                    Webhooks
                   </NavLink>
                 </Link>
               </Box>
@@ -290,44 +225,24 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
           <Box>
             <Link href="/dashboard/billing" passHref legacyBehavior>
-              <NavLink>
+              <NavLink active={id === "billing"}>
                 <BillingIcon active={id === "billing"} />
-                <Text
-                  variant={id === "billing" ? "green" : null}
-                  css={{
-                    display: "flex",
-                    fontWeight: id === "billing" ? 600 : 400,
-                    backgroundClip: "text",
-                    WebkitTextFillColor: "initial",
-                    ml: "$2",
-                    lineHeight: 1.2,
-                  }}>
-                  Billing
-                </Text>
+                Billing
               </NavLink>
             </Link>
 
             {id?.split("/")[0] === "billing" && (
               <Box
                 css={{
+                  a: {
+                    pl: 35,
+                  },
                   "> :first-child": {
                     mt: "$1",
                   },
                 }}>
                 <Link href="/dashboard/billing/plans" passHref legacyBehavior>
-                  <NavLink>
-                    <Text
-                      variant={id === "billing/plans" ? "green" : null}
-                      css={{
-                        fontWeight: id === "billing/plans" ? 600 : 400,
-                        backgroundClip: "text",
-                        ml: 31,
-                        mt: "$1",
-                        lineHeight: 1.2,
-                      }}>
-                      Plans
-                    </Text>
-                  </NavLink>
+                  <NavLink active={id === "billing/plans"}>Plans</NavLink>
                 </Link>
               </Box>
             )}

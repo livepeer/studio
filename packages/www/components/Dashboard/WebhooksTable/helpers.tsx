@@ -80,7 +80,6 @@ export const rowsPageFromState = async (
           children: (
             <Link
               as="div"
-              variant="primary"
               css={{
                 overflow: "hidden",
                 "text-overflow": "ellipsis",
