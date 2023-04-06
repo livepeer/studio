@@ -11,6 +11,9 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
   DropdownMenuItem,
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
 } from "@livepeer/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
@@ -25,9 +28,9 @@ import {
 import { useApi } from "../../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon } from "@radix-ui/react-icons";
-console.log(styled);
+import Contact from "../Contact";
 
-const NavLink = styled(A, {
+export const NavLink = styled(A, {
   fontSize: 14,
   display: "flex",
   alignItems: "center",
@@ -249,7 +252,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             )}
           </Box>
         </Grid>
-        <Box>
+        <Flex direction="column" gap={1}>
           <NavLink
             href="https://livepeer.canny.io/changelog?labels=studio"
             target="_blank"
@@ -298,7 +301,8 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               Feature Requests
             </Text>
           </NavLink>
-        </Box>
+          <Contact />
+        </Flex>
       </Flex>
     </Box>
   );
