@@ -150,6 +150,7 @@ const RegisterPage = () => {
               <Link href="/" passHref legacyBehavior>
                 <A
                   css={{
+                    cursor: "default",
                     "&:hover": {
                       textDecoration: "none",
                     },
