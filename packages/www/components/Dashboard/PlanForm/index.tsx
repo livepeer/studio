@@ -373,7 +373,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                           base: {
                             backgroundColor:
                               theme === "light" ? "white" : "#161618",
-                            iconColor: "#5746af",
+                            iconColor: "#3cb179",
                             color: theme === "light" ? "#161618" : "white",
                             fontWeight: "500",
                             fontFamily:

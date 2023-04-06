@@ -108,7 +108,6 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
       <Flex css={{ ai: "center" }}>
         <Button
           size="2"
-          variant="primary"
           onClick={() => {
             setOpen(true);
           }}>
@@ -283,7 +282,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                       base: {
                         backgroundColor:
                           resolvedTheme === "light" ? "white" : "#161618",
-                        iconColor: "#5746af",
+                        iconColor: "#3cb179",
                         color: resolvedTheme === "light" ? "#161618" : "white",
                         fontWeight: "500",
                         fontFamily:

@@ -113,7 +113,7 @@ const Chart = ({
             cursor="pointer"
             type="monotone"
             dataKey="Session bitrate"
-            stroke="#5746AF"
+            stroke="#3cb179"
             strokeWidth="2px"
           />
           {multistreamNames?.map((item, index) => {

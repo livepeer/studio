@@ -133,8 +133,10 @@ your interest in speaking with our team. The more information, the better."
             />
             <Box>
               <Flex align="center" css={{ jc: "flex-end", gap: "$3" }}>
-                <AlertDialogCancel asChild size={3}>
-                  <Button ghost>Cancel</Button>
+                <AlertDialogCancel asChild>
+                  <Button size={3} ghost>
+                    Cancel
+                  </Button>
                 </AlertDialogCancel>
                 <Button size="3" variant="primary">
                   Submit
