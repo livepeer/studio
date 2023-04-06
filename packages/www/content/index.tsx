@@ -102,7 +102,7 @@ export const Jobs = {
 
 export const Dashboard = {
   metaData: {
-    title: makeCompleteTitle("Dashboard"),
+    title: makeCompleteTitle("Home"),
     description: defaultDescription,
     url: makeCompleteUrl("dashboard"),
   },
