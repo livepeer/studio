@@ -127,8 +127,7 @@ export default () => {
               id="message"
               css={{ width: "100%", boxSizing: "border-box", mb: "$2" }}
               name="TICKET.content"
-              placeholder="How can we help you? To guide the discussion, please give us specific details on
-your interest in speaking with our team. The more information, the better."
+              placeholder="How can we help you?"
               required
             />
             <Box>
