@@ -39,6 +39,7 @@ const NavLink = styled(A, {
   lineHeight: 1.2,
   fontWeight: 500,
   gap: "$2",
+  textDecoration: "none",
   "&:hover": {
     bc: "$neutral4",
     textDecoration: "none",
@@ -254,8 +255,8 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             target="_blank"
             css={{
               color: "$neutral10",
-              mb: "$3",
               transition: "color .3s",
+              textDecoration: "none",
               "&:hover": {
                 color: "$neutral11",
                 transition: "color .3s",
@@ -279,6 +280,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             css={{
               color: "$neutral10",
               transition: "color .3s",
+              textDecoration: "none",
               "&:hover": {
                 color: "$neutral11",
                 transition: "color .3s",
