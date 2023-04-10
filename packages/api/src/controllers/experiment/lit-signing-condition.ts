@@ -85,7 +85,7 @@ app.post("/verify-lit-jwt", async (req, res) => {
   if (!asset) {
     throw new NotFoundError("asset not found");
   }
-  asset = await withPlaybackUrls(req, ingest, asset);
+  asset = await withPlaybackUrls(req.config, ingest, asset);
   if (!asset?.playbackUrl) {
     throw new BadRequestError("asset is not playable");
   }
