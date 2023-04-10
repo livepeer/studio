@@ -44,6 +44,7 @@ import Queue from "../store/queue";
 import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
 import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
+import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -224,7 +225,7 @@ export function getStaticPlaybackInfo(
 }
 
 export function getPlaybackUrl(
-  { vodCatalystObjectStoreId }: Request["config"],
+  { vodCatalystObjectStoreId }: CliArgs,
   ingest: string,
   asset: WithID<Asset>,
   os: ObjectStore
@@ -272,7 +273,7 @@ function getDownloadUrl(
 }
 
 export async function withPlaybackUrls(
-  { config }: Request,
+  config: CliArgs,
   ingest: string,
   asset: WithID<Asset>,
   os?: ObjectStore
@@ -441,41 +442,47 @@ function parseUploadUrl(
   return { playbackId, uploadUrl };
 }
 
+export async function toExternalAsset(
+  a: WithID<Asset>,
+  config: CliArgs,
+  details = false,
+  isAdmin = false
+) {
+  const { ipfsGatewayUrl, ingests } = config;
+  const ingest = ingests[0]?.base;
+
+  a = await withPlaybackUrls(config, ingest, a);
+  a = assetWithIpfsUrls(ipfsGatewayUrl, a);
+  if (isAdmin) {
+    return a;
+  }
+  a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+  if (!details) {
+    a = cleanAssetTracks(a);
+  }
+
+  return a;
+}
+
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
-    const { ipfsGatewayUrl } = req.config;
-    const ingests = await req.getIngest();
-    if (!ingests.length) {
-      throw new InternalServerError("Ingest not configured");
-    }
     const { details } = toStringValues(req.query);
-    const ingest = ingests[0].base;
-    let toExternalAsset = async (a: WithID<Asset>) => {
-      a = await withPlaybackUrls(req, ingest, a);
-      a = assetWithIpfsUrls(ipfsGatewayUrl, a);
-      if (req.user.admin) {
-        return a;
-      }
-      a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
-      if (!details) {
-        a = cleanAssetTracks(a);
-      }
-      return a;
-    };
+    const toExternalAssetFunc = (a: Asset) =>
+      toExternalAsset(a, req.config, !!details, req.user.admin);
 
     if (Array.isArray(data)) {
-      return Promise.all(data.map(toExternalAsset));
+      return Promise.all(data.map(toExternalAssetFunc));
     }
     if ("id" in data) {
-      return toExternalAsset(data);
+      return toExternalAssetFunc(data);
     }
     if ("asset" in data) {
       return {
         ...data,
-        asset: await toExternalAsset(data.asset),
+        asset: await toExternalAssetFunc(data.asset),
       };
     }
     return data;
