@@ -4,40 +4,24 @@
  */
 
 import { RequestHandler } from "express";
-import { NodeAddress, OrchestratorNodeAddress } from "../types/common";
+import {
+  Ingest,
+  NodeAddress,
+  OrchestratorNodeAddress,
+  Price,
+} from "../types/common";
+import { CliArgs } from "../parse-cli";
 
-export interface Ingest {
-  origin?: string;
-  base?: string;
-  ingest: string;
-  playback: string;
-}
-
-export interface Price {
-  address: string;
-  priceInfo: {
-    pricePerUnit: string;
-    pixelsPerUnit: string;
-  };
-}
-
+// This is kept for backward compatibility with the old CLI arg parsing logic.
+// It provided the JSON parsed values of the CLI args through getter functions
+// in the request object. Now these args are parsed on the CLI arg parsing code
+// but we still have a lot of code using the old getter functions.
 export default function hardcodedNodes({
   broadcasters,
   orchestrators,
   ingest,
   prices,
-}): RequestHandler {
-  try {
-    broadcasters = JSON.parse(broadcasters);
-    orchestrators = JSON.parse(orchestrators);
-    ingest = JSON.parse(ingest);
-    prices = JSON.parse(prices);
-  } catch (e) {
-    console.error(
-      "Error parsing LP_API_BROADCASTERS, LP_API_ORCHESTRATORS, LP_API_INGEST and AND LP_API_PRICES"
-    );
-    throw e;
-  }
+}: CliArgs): RequestHandler {
   return (req, res, next) => {
     if (!req.getBroadcasters) {
       req.getBroadcasters = async () => broadcasters as NodeAddress[];
