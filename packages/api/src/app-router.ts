@@ -103,7 +103,7 @@ export default async function makeApp(params: CliArgs) {
     : new NoopQueue();
 
   // Task Scheduler
-  await taskScheduler.start({ queue });
+  await taskScheduler.start(params, queue);
 
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({

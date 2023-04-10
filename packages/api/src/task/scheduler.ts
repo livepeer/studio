@@ -13,6 +13,7 @@ import sql from "sql-template-strings";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
 import { taskParamsWithoutCredentials } from "../controllers/task";
+import { toExternalAsset } from "../controllers/asset";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -34,19 +35,22 @@ const MAX_RETRIES = 2;
 const TASK_RETRY_BASE_DELAY = 30 * 1000;
 
 export class TaskScheduler {
+  config: CliArgs;
   queue: Queue;
   running: boolean;
 
   constructor() {
-    // initialized through start to allow for singleton instance
+    // no-args contruction on start up to allow for singleton instance
   }
 
-  async start({ queue }) {
+  async start(config: CliArgs, queue: Queue) {
     if (this.running) {
       throw new Error("task scheduler already running");
     }
     this.running = true;
+    this.config = config;
     this.queue = queue;
+
     await this.queue.consume("task", this.handleTaskQueue.bind(this));
   }
 
@@ -451,6 +455,7 @@ export class TaskScheduler {
     }
     asset = { ...asset, ...updates };
 
+    const snapshot = toExternalAsset(asset, this.config, true);
     const timestamp = asset.status.updatedAt;
     const event = updates.deleted ? "asset.deleted" : "asset.updated";
     await this.queue.publishWebhook(`events.${event}`, {
@@ -462,7 +467,7 @@ export class TaskScheduler {
       payload: {
         asset: {
           id: asset.id,
-          snapshot: asset,
+          snapshot,
         },
       },
     });
@@ -479,7 +484,7 @@ export class TaskScheduler {
         userId: asset.userId,
         payload: {
           id: asset.id,
-          snapshot: asset,
+          snapshot,
         },
       });
     }
