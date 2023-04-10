@@ -17,7 +17,7 @@ let mockNonAdminUserInput2: User;
 
 beforeAll(async () => {
   server = await serverPromise;
-  ingest = JSON.parse(server.ingest)[0].base;
+  ingest = server.ingest[0].base;
 
   mockAdminUserInput = {
     email: "user_admin@gmail.com",

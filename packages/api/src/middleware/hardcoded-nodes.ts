@@ -21,7 +21,10 @@ export default function hardcodedNodes({
   orchestrators,
   ingest,
   prices,
-}: CliArgs): RequestHandler {
+}: Pick<
+  CliArgs,
+  "broadcasters" | "orchestrators" | "ingest" | "prices"
+>): RequestHandler {
   return (req, res, next) => {
     if (!req.getBroadcasters) {
       req.getBroadcasters = async () => broadcasters as NodeAddress[];
