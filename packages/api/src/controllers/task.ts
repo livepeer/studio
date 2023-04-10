@@ -20,6 +20,7 @@ import { WithID } from "../store/types";
 import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { TooManyRequestsError } from "../store/errors";
+import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -105,22 +106,30 @@ const fieldsMap: FieldsMap = {
   outputAssetId: `task.data->>'outputAssetId'`,
 };
 
+export function toExternalTask(
+  t: WithID<Task>,
+  config: CliArgs,
+  isAdmin = false
+) {
+  t = taskWithIpfsUrls(config.ipfsGatewayUrl, t);
+  if (isAdmin) {
+    return t;
+  }
+
+  t.params = taskParamsWithoutCredentials(t.type, t.params);
+  return db.task.cleanWriteOnlyResponse(t);
+}
+
 export const cleanTaskResponses = () =>
   mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
-    const toExternalTask = async (t: WithID<Task>) => {
-      t = taskWithIpfsUrls(req.config.ipfsGatewayUrl, t);
-      if (req.user.admin) {
-        return t;
-      }
-      t.params = taskParamsWithoutCredentials(t.type, t.params);
-      return db.task.cleanWriteOnlyResponse(t);
-    };
+    const toExternalTaskFunc = (t: WithID<Task>) =>
+      toExternalTask(t, req.config, req.user.admin);
 
     if (Array.isArray(data)) {
-      return Promise.all(data.map(toExternalTask));
+      return data.map(toExternalTaskFunc);
     }
     if ("id" in data) {
-      return toExternalTask(data as WithID<Task>);
+      return toExternalTaskFunc(data as WithID<Task>);
     }
     return data;
   });

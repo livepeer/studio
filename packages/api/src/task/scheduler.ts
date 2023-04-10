@@ -12,13 +12,16 @@ import { sleep } from "../util";
 import sql from "sql-template-strings";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
-import { taskParamsWithoutCredentials } from "../controllers/task";
+import {
+  taskParamsWithoutCredentials,
+  toExternalTask,
+} from "../controllers/task";
 import { toExternalAsset } from "../controllers/asset";
 
-const taskInfo = (task: Task): messages.TaskInfo => ({
+const taskInfo = (task: WithID<Task>, config: CliArgs): messages.TaskInfo => ({
   id: task.id,
   type: task.type,
-  snapshot: task,
+  snapshot: toExternalTask(task, config),
 });
 
 function sqlQueryGroup(values: string[]) {
@@ -299,7 +302,7 @@ export class TaskScheduler {
       event: "task.spawned",
       userId: task.userId,
       payload: {
-        task: taskInfo(task),
+        task: taskInfo(task, this.config),
       },
     });
     return task;
@@ -321,7 +324,7 @@ export class TaskScheduler {
         type: "task_trigger",
         id: uuid(),
         timestamp,
-        task: taskInfo(task),
+        task: taskInfo(task, this.config),
       });
     } catch (err) {
       console.error(`Failed to enqueue task: taskId=${task.id} err=`, err);
@@ -379,7 +382,7 @@ export class TaskScheduler {
       event: "task.updated",
       userId: task.userId,
       payload: {
-        task: taskInfo(task),
+        task: taskInfo(task, this.config),
       },
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
@@ -393,7 +396,7 @@ export class TaskScheduler {
         userId: task.userId,
         payload: {
           success: task.status.phase === "completed",
-          task: taskInfo(task),
+          task: taskInfo(task, this.config),
         },
       });
     }
