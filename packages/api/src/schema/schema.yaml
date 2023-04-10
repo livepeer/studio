@@ -1245,6 +1245,11 @@ components:
               description:
                 Timestamp (in milliseconds) at which the asset was last updated
               example: 1587667174725
+            deletedAt:
+              type: number
+              description:
+                Timestamp (in milliseconds) at which the asset was deleted
+              example: 1587667174725
             progress:
               type: number
               description: Current progress of the task creating this asset.

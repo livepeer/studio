@@ -425,7 +425,13 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
-    await this.updateAsset(asset, { deleted: true });
+    await this.updateAsset(asset, {
+      deleted: true,
+      status: {
+        ...asset.status,
+        deletedAt: Date.now(),
+      },
+    });
   }
 
   async updateAsset(
