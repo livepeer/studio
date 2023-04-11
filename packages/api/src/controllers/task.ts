@@ -312,12 +312,16 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);
     if (task.id === asset?.storage?.status?.tasks.pending) {
+      const progress = Math.max(
+        doc.progress,
+        asset.storage.status.progress ?? 0
+      );
       await req.taskScheduler.updateAsset(asset, {
         storage: {
           ...asset.storage,
           status: {
             phase: "processing",
-            progress: doc.progress,
+            progress,
             tasks: asset.storage.status.tasks,
           },
         },
