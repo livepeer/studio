@@ -448,8 +448,8 @@ export async function toExternalAsset(
   details = false,
   isAdmin = false
 ) {
-  const { ipfsGatewayUrl, ingests } = config;
-  const ingest = ingests[0]?.base;
+  const { ipfsGatewayUrl, ingest: ingestsConfig } = config;
+  const ingest = ingestsConfig[0]?.base;
 
   a = await withPlaybackUrls(config, ingest, a);
   a = assetWithIpfsUrls(ipfsGatewayUrl, a);
