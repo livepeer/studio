@@ -39,7 +39,7 @@ const dbSchemaStr = fs.readFileSync(
 );
 const apiData = parseYaml(apiSchemaStr);
 const dbData = parseYaml(dbSchemaStr);
-const data = _({}).merge(apiData).merge(dbData).value();
+const data = _.merge({}, apiData, dbData);
 
 (async () => {
   await $RefParser.dereference({ components: data.components });
