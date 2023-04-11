@@ -498,6 +498,7 @@ const fieldsMap = {
   sourceUrl: `asset.data->'source'->>'url'`,
 } as const;
 
+// GET /api/asset
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
@@ -582,6 +583,7 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
+// GET /api/asset/:id
 app.get("/:id", authorizer({}), async (req, res) => {
   const asset = await db.asset.get(req.params.id, {
     useReplica: reqUseReplica(req),
@@ -599,9 +601,11 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(asset);
 });
 
+// deprecated
 app.post(
   "/:id/export",
   authorizer({}),
+  // this documents the request payload
   validatePost("export-task-params"),
   async (req, res) => {
     const assetId = req.params.id;

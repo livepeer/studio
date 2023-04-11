@@ -2,6 +2,7 @@ import Ajv from "ajv";
 import pack from "ajv-pack";
 import { safeLoad as parseYaml } from "js-yaml";
 import fs from "fs-extra";
+import _ from "lodash";
 import path from "path";
 import { compile as generateTypes } from "json-schema-to-typescript";
 import $RefParser from "json-schema-ref-parser";
@@ -28,11 +29,17 @@ const schemaDistDir = path.resolve(__dirname, "..", "dist", "schema");
 fs.ensureDirSync(validatorDir);
 fs.ensureDirSync(schemaDistDir);
 
-const schemaStr = fs.readFileSync(
-  path.resolve(schemaDir, "schema.yaml"),
+const apiSchemaStr = fs.readFileSync(
+  path.resolve(schemaDir, "api-schema.yaml"),
   "utf8"
 );
-const data = parseYaml(schemaStr);
+const dbSchemaStr = fs.readFileSync(
+  path.resolve(schemaDir, "db-schema.yaml"),
+  "utf8"
+);
+const apiData = parseYaml(apiSchemaStr);
+const dbData = parseYaml(dbSchemaStr);
+const data = _({}).merge(apiData).merge(dbData).value();
 
 (async () => {
   await $RefParser.dereference({ components: data.components });

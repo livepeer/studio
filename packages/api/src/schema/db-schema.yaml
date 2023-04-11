@@ -1,0 +1,7 @@
+components:
+  schemas:
+    task:
+      table: task
+      properties:
+        id:
+          index: true
