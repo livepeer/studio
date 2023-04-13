@@ -1102,6 +1102,11 @@ components:
         deleted:
           type: boolean
           description: Set to true when the asset is deleted
+        deletedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which the asset was deleted
+          example: 1587667174725
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
@@ -1244,11 +1249,6 @@ components:
               type: number
               description:
                 Timestamp (in milliseconds) at which the asset was last updated
-              example: 1587667174725
-            deletedAt:
-              type: number
-              description:
-                Timestamp (in milliseconds) at which the asset was deleted
               example: 1587667174725
             progress:
               type: number

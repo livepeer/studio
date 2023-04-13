@@ -427,10 +427,8 @@ export class TaskScheduler {
     }
     await this.updateAsset(asset, {
       deleted: true,
-      status: {
-        ...asset.status,
-        deletedAt: Date.now(),
-      },
+      deletedAt: Date.now(),
+      status: asset.status, // prevent updatedAt from being bumped
     });
   }
 
