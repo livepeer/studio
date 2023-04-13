@@ -449,6 +449,9 @@ export async function toExternalAsset(
   isAdmin = false
 ) {
   const { ipfsGatewayUrl, ingest: ingestsConfig } = config;
+  // Not sure why the ingests config was originally made an array and not a
+  // single object, but we always configure it as a single element array on
+  // deployments. So we always grab only the first element here.
   const ingest = ingestsConfig[0]?.base;
 
   a = await withPlaybackUrls(config, ingest, a);
