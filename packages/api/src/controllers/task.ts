@@ -296,13 +296,14 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     { allowedPhases: ["waiting", "running"] }
   );
   if (task.outputAssetId) {
+    const asset = await db.asset.get(task.outputAssetId);
     await req.taskScheduler.updateAsset(
-      task.outputAssetId,
+      asset,
       {
         status: {
           phase: "processing",
           updatedAt: Date.now(),
-          progress: doc.progress,
+          progress: Math.max(doc.progress, asset.status.progress ?? 0),
         },
       },
       { allowedPhases: ["waiting", "processing"] }
@@ -311,12 +312,16 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);
     if (task.id === asset?.storage?.status?.tasks.pending) {
-      await req.taskScheduler.updateAsset(asset.id, {
+      const progress = Math.max(
+        doc.progress,
+        asset.storage.status.progress ?? 0
+      );
+      await req.taskScheduler.updateAsset(asset, {
         storage: {
           ...asset.storage,
           status: {
             phase: "processing",
-            progress: doc.progress,
+            progress,
             tasks: asset.storage.status.tasks,
           },
         },
