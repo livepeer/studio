@@ -89,11 +89,13 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
             width: "100%",
             bc: "$neutral2",
             mb: "$4",
+            color: "$neutral11",
+            fontSize: "$2",
           }}
           name="broadcastingProvider"
           type="text"
           required
-          value="Livepeer Inc (default)"
+          value="Livepeer Inc (livepeer.eth)"
         />
         <Text
           variant="neutral"

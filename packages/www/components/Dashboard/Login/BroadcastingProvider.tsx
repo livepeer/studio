@@ -1,5 +1,4 @@
-import { Text, TextField } from "@livepeer/design-system";
-import Link from "next/link";
+import { Box, Text, TextField } from "@livepeer/design-system";
 
 const BroadcastingProvider = () => {
   return (
@@ -15,19 +14,23 @@ const BroadcastingProvider = () => {
         }}>
         Broadcasting provider
       </Text>
-      <TextField
-        readOnly
-        size="3"
-        id="broadcastingProvider"
-        css={{
-          width: "100%",
-          bc: "$neutral2",
-        }}
-        name="broadcastingProvider"
-        type="text"
-        required
-        value="Livepeer Inc (default)"
-      />
+      <Box css={{ position: "relative" }}>
+        <TextField
+          readOnly
+          size="3"
+          id="broadcastingProvider"
+          css={{
+            width: "100%",
+            bc: "$neutral2",
+            color: "$neutral11",
+            fontSize: "$2",
+          }}
+          name="broadcastingProvider"
+          type="text"
+          value="Livepeer Inc (livepeer.eth)"
+          required
+        />
+      </Box>
       <Text
         variant="neutral"
         css={{
