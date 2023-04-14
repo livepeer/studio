@@ -15,6 +15,21 @@ export interface OrchestratorNodeAddress extends NodeAddress {
   score: number;
 }
 
+export interface Ingest {
+  origin?: string;
+  base?: string;
+  ingest: string;
+  playback: string;
+}
+
+export interface Price {
+  address: string;
+  priceInfo: {
+    pricePerUnit: string;
+    pixelsPerUnit: string;
+  };
+}
+
 declare global {
   namespace Express {
     // add custom properties to Request object

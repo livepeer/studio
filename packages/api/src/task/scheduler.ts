@@ -12,12 +12,16 @@ import { sleep } from "../util";
 import sql from "sql-template-strings";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
-import { taskParamsWithoutCredentials } from "../controllers/task";
+import {
+  taskParamsWithoutCredentials,
+  toExternalTask,
+} from "../controllers/task";
+import { toExternalAsset } from "../controllers/asset";
 
-const taskInfo = (task: Task): messages.TaskInfo => ({
+const taskInfo = (task: WithID<Task>, config: CliArgs): messages.TaskInfo => ({
   id: task.id,
   type: task.type,
-  snapshot: task,
+  snapshot: toExternalTask(task, config),
 });
 
 function sqlQueryGroup(values: string[]) {
@@ -34,19 +38,22 @@ const MAX_RETRIES = 2;
 const TASK_RETRY_BASE_DELAY = 30 * 1000;
 
 export class TaskScheduler {
+  config: CliArgs;
   queue: Queue;
   running: boolean;
 
   constructor() {
-    // initialized through start to allow for singleton instance
+    // no-args contruction on start up to allow for singleton instance
   }
 
-  async start({ queue }) {
+  async start(config: CliArgs, queue: Queue) {
     if (this.running) {
       throw new Error("task scheduler already running");
     }
     this.running = true;
+    this.config = config;
     this.queue = queue;
+
     await this.queue.consume("task", this.handleTaskQueue.bind(this));
   }
 
@@ -295,7 +302,7 @@ export class TaskScheduler {
       event: "task.spawned",
       userId: task.userId,
       payload: {
-        task: taskInfo(task),
+        task: taskInfo(task, this.config),
       },
     });
     return task;
@@ -317,7 +324,7 @@ export class TaskScheduler {
         type: "task_trigger",
         id: uuid(),
         timestamp,
-        task: taskInfo(task),
+        task: taskInfo(task, this.config),
       });
     } catch (err) {
       console.error(`Failed to enqueue task: taskId=${task.id} err=`, err);
@@ -375,7 +382,7 @@ export class TaskScheduler {
       event: "task.updated",
       userId: task.userId,
       payload: {
-        task: taskInfo(task),
+        task: taskInfo(task, this.config),
       },
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
@@ -389,7 +396,7 @@ export class TaskScheduler {
         userId: task.userId,
         payload: {
           success: task.status.phase === "completed",
-          task: taskInfo(task),
+          task: taskInfo(task, this.config),
         },
       });
     }
@@ -418,19 +425,10 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
-    await db.asset.markDeleted(asset.id);
-    await this.queue.publishWebhook("events.asset.deleted", {
-      type: "webhook_event",
-      id: uuid(),
-      timestamp: Date.now(),
-      event: "asset.deleted",
-      userId: asset.userId,
-      payload: {
-        asset: {
-          id: asset.id,
-          snapshot: asset,
-        },
-      },
+    await this.updateAsset(asset, {
+      deleted: true,
+      deletedAt: Date.now(),
+      status: asset.status, // prevent updatedAt from being bumped
     });
   }
 
@@ -442,7 +440,7 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
-    const statusChanged =
+    const phaseChanged =
       updates.status && asset.status.phase !== updates.status.phase;
     if (!updates.status) {
       updates = {
@@ -462,26 +460,27 @@ export class TaskScheduler {
     if (!res?.rowCount) {
       return;
     }
-    asset = {
-      ...asset,
-      ...updates,
-    };
+    asset = { ...asset, ...updates };
+
+    const snapshot = toExternalAsset(asset, this.config, true);
     const timestamp = asset.status.updatedAt;
-    await this.queue.publishWebhook("events.asset.updated", {
+    const event = updates.deleted ? "asset.deleted" : "asset.updated";
+    await this.queue.publishWebhook(`events.${event}`, {
       type: "webhook_event",
       id: uuid(),
       timestamp,
-      event: "asset.updated",
+      event,
       userId: asset.userId,
       payload: {
         asset: {
           id: asset.id,
-          snapshot: asset,
+          snapshot,
         },
       },
     });
+
     const newPhase = asset.status.phase;
-    if (statusChanged && (newPhase === "ready" || newPhase === "failed")) {
+    if (phaseChanged && (newPhase === "ready" || newPhase === "failed")) {
       let assetEvent: EventKey = `asset.${newPhase}`;
       let routingKey: RoutingKey = `events.${assetEvent}`;
       await this.queue.publishWebhook(routingKey, {
@@ -492,7 +491,7 @@ export class TaskScheduler {
         userId: asset.userId,
         payload: {
           id: asset.id,
-          snapshot: asset,
+          snapshot,
         },
       });
     }

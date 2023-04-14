@@ -68,10 +68,10 @@ export default async function makeApp(params: CliArgs) {
     ownRegion,
     subgraphUrl,
     fallbackProxy,
-    orchestrators = "[]",
-    broadcasters = "[]",
-    ingest = "[]",
-    prices = "[]",
+    orchestrators = [],
+    broadcasters = [],
+    ingest = [],
+    prices = [],
     corsJwtAllowlist = [`https://${frontendDomain}`],
     insecureTestToken,
     stripeSecretKey,
@@ -103,7 +103,7 @@ export default async function makeApp(params: CliArgs) {
     : new NoopQueue();
 
   // Task Scheduler
-  await taskScheduler.start({ queue });
+  await taskScheduler.start(params, queue);
 
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({

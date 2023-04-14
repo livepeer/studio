@@ -1,6 +1,12 @@
 import yargs from "yargs";
 import yargsToMist from "./yargs-to-mist";
-import { CamelKeys } from "./types/common";
+import {
+  CamelKeys,
+  Ingest,
+  NodeAddress,
+  OrchestratorNodeAddress,
+  Price,
+} from "./types/common";
 import { defaultTaskExchange } from "./store/queue";
 
 function coerceArr(arg: any) {
@@ -40,6 +46,20 @@ function coerceCorsList(flagName: string) {
         }
         return str;
       });
+    } catch (err) {
+      throw new Error(`Error in CLI flag --${flagName}: ${err.message}`);
+    }
+  };
+}
+
+function coerceJsonValue<T>(flagName: string) {
+  return (arg: string): T => {
+    if (!arg) {
+      return undefined;
+    }
+
+    try {
+      return JSON.parse(arg);
     } catch (err) {
       throw new Error(`Error in CLI flag --${flagName}: ${err.message}`);
     }
@@ -169,23 +189,27 @@ export default function parseCli(argv?: string | readonly string[]) {
           "hardcoded list of broadcasters to return from /api/broadcaster.",
         type: "string",
         default: "[]",
+        coerce: coerceJsonValue<NodeAddress[]>("broadcasters"),
       },
       orchestrators: {
         describe:
           "hardcoded list of orchestrators to return from /api/orchestrator.",
         type: "string",
         default: "[]",
+        coerce: coerceJsonValue<OrchestratorNodeAddress[]>("orchestrators"),
       },
       ingest: {
         describe: "hardcoded list of ingest points to return from /api/ingest.",
         type: "string",
         default: "[]",
+        coerce: coerceJsonValue<Ingest[]>("ingest"),
       },
       prices: {
         describe:
           "hardcoded list of prices for broadcasters to return from /api/orchestrator/hook/auth",
         type: "string",
         default: "[]",
+        coerce: coerceJsonValue<Price[]>("prices"),
       },
       "support-addr": {
         describe:

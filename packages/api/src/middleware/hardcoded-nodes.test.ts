@@ -1,6 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 
-import hardcodedNodes, { Ingest, Price } from "./hardcoded-nodes";
+import hardcodedNodes from "./hardcoded-nodes";
+import { Ingest, Price } from "../types/common";
 
 /**
  * See also the mock implementation of @kubernetes/client-node in __mocks__
@@ -29,14 +30,17 @@ describe("kubernetes middleware", () => {
     {
       address: "https://gke-ams-prod-cpu-efde94aa-2k9f.example.com",
       cliAddress: "http://10.40.0.46:7935",
+      score: 1,
     },
     {
       address: "https://gke-ams-prod-cpu-efde94aa-k8lz.example.com",
       cliAddress: "http://10.40.1.52:7935",
+      score: 2,
     },
     {
       address: "https://gke-ams-prod-cpu-efde94aa-5sr7.example.com",
       cliAddress: "http://10.40.2.67:7935",
+      score: 3,
     },
   ];
 
@@ -60,10 +64,10 @@ describe("kubernetes middleware", () => {
   beforeEach(async () => {
     req = { orchestratorsGetters: [] } as Request;
     middleware = hardcodedNodes({
-      broadcasters: JSON.stringify(broadcasters),
-      orchestrators: JSON.stringify(orchestrators),
-      ingest: JSON.stringify(ingest),
-      prices: JSON.stringify(prices),
+      broadcasters,
+      orchestrators,
+      ingest,
+      prices,
     });
     await new Promise((resolve) => {
       middleware(req, {} as Response, resolve);
@@ -86,16 +90,5 @@ describe("kubernetes middleware", () => {
 
   it("should return prices from getPrices()", async () => {
     expect(await req.getPrices()).toEqual(prices);
-  });
-
-  it("should throw an error with bad JSON", async () => {
-    expect(() => {
-      hardcodedNodes({
-        broadcasters: "this is not json",
-        orchestrators: "neither is this",
-        ingest: "definitely not this",
-        prices: "nor this",
-      });
-    }).toThrow();
   });
 });
