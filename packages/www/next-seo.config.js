@@ -1,14 +1,14 @@
 export default {
   title: "Livepeer Studio",
   description:
-    "Your home for building onchain video experiences with Livepeer, the world’s open video infrastructure.",
+    "Your home for building onchain and open social video experiences with Livepeer, the world’s open video infrastructure.",
   openGraph: {
     type: "website",
     locale: "en_IE",
     url: "https://livepeer.studio",
     title: "Livepeer Studio",
     description:
-      "Your home for building onchain video experiences with Livepeer, the world’s open video infrastructure.",
+      "Your home for building onchain and open social video experiences with Livepeer, the world’s open video infrastructure.",
     defaultImageWidth: 1200,
     defaultImageHeight: 642,
     images: [
