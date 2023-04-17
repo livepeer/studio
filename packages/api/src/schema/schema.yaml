@@ -1755,6 +1755,7 @@ components:
                     admin users, and is only used for E2E testing.
                   enum:
                     - catalyst
+                    - catalyst_ffmpeg
                     - background_external
                     - background_mist
                     - fallback_external
@@ -1838,6 +1839,7 @@ components:
                     admin users, and is only used for E2E testing.
                   enum:
                     - catalyst
+                    - catalyst_ffmpeg
                     - background_external
                     - background_mist
                     - fallback_external
