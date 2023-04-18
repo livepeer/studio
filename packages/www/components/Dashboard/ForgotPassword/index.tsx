@@ -95,7 +95,7 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
           name="broadcastingProvider"
           type="text"
           required
-          value="Livepeer Inc (livepeer.eth)"
+          value="Livepeer Inc"
         />
         <Text
           variant="neutral"

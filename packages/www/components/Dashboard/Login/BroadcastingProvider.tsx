@@ -27,7 +27,7 @@ const BroadcastingProvider = () => {
           }}
           name="broadcastingProvider"
           type="text"
-          value="Livepeer Inc (livepeer.eth)"
+          value="Livepeer Inc"
           required
         />
       </Box>
