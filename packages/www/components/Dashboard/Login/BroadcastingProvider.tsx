@@ -38,7 +38,7 @@ const BroadcastingProvider = () => {
           mt: "$1",
           mb: "$5",
         }}>
-        This is the operator that provides hosted access to the Livepeer
+        This is the operator that provides gateway access to the Livepeer
         network. In a future release you may switch providers at any time.
       </Text>
     </>
