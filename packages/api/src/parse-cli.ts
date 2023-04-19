@@ -375,6 +375,19 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "Livepeer DID key",
         type: "string",
       },
+      livekitHost: {
+        describe: "Endpoint for LiveKit server",
+        type: "string",
+        default: "",
+      },
+      livekitApiKey: {
+        describe: "API key for LiveKit access",
+        type: "string",
+      },
+      livekitSecret: {
+        describe: "Secret for LiveKit access",
+        type: "string",
+      },
     })
     .usage(
       `

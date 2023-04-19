@@ -3289,3 +3289,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+
+  /room:
+    post:
+      description: create a new room
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
