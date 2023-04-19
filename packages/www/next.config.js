@@ -288,6 +288,12 @@ const config = {
           "https://medium.com/livepeer-blog/how-huddle01-built-the-worlds-first-web3-meeting-app-c4bc24bb16f0",
         permanent: false,
       },
+      {
+        source: "/blog/how-to-multistream-twitter-spaces-with-livepeer-studio",
+        destination:
+          "https://medium.com/livepeer-blog/how-to-multistream-twitter-spaces-with-livepeer-59997f5c0f2e",
+        permanent: false,
+      },
     ];
   },
 };
