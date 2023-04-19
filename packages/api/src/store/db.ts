@@ -16,6 +16,7 @@ import {
   Session,
   CdnUsageLast,
   SigningKey,
+  Room,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, {
@@ -78,6 +79,7 @@ export class DB {
   session: Table<DBSession>;
   cdnUsageLast: Table<CdnUsageLast>;
   cdnUsageTable: CdnUsageTable;
+  room: Table<Room>;
 
   postgresUrl: string;
   replicaUrl: string;
@@ -183,6 +185,7 @@ export class DB {
       db: this,
       schema: schemas["cdn-usage-last"],
     });
+    this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => "table" in schema && schema.table

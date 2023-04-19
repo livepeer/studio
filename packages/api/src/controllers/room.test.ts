@@ -57,6 +57,13 @@ describe("controllers/room", () => {
       expect(mockCreateRoom).toHaveBeenCalledTimes(1);
       const createOpts = mockCreateRoom.mock.calls[0][0];
       expect(roomRes.id).toBe(createOpts.name);
+
+      res = await client.get(`/room/${roomRes.id}`);
+      expect(res.status).toBe(200);
+
+      const getRoomRes = await res.json();
+      expect(getRoomRes.id).toBe(roomRes.id);
+      expect(getRoomRes.userId).toBeUndefined();
     });
   });
 });

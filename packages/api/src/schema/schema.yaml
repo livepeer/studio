@@ -2572,6 +2572,64 @@ components:
           type: number
           example: 200000
 
+    room:
+      type: object
+      table: rooms
+      required:
+        - id
+        - participants
+        - events
+      properties:
+        id:
+          type: string
+          unique: true
+          index: true
+          readOnly: true
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the room
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+              timestamp:
+                type: integer
+        participants:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              identity:
+                type: string
+              name:
+                type: string
+              joinedAt:
+                type: integer
+              leftAt:
+                type: integer
+              tracksPublished:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    sid:
+                      type: string
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    mimeType:
+                      type: string
+                    timestamp:
+                      type: integer
+
 paths:
   /stream:
     tags:
