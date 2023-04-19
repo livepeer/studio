@@ -1,7 +1,8 @@
 import { Request, Router } from "express";
 import { db } from "../store";
 import {
-  getPlaybackUrl as streamPlaybackUrl,
+  getHLSPlaybackUrl as getHLSPlaybackUrl,
+  getWebRTCPlaybackUrl as getWebRTCPlaybackUrl,
   getRecordingFields,
 } from "./stream";
 import {
@@ -22,8 +23,11 @@ type PlaybackInfo = {
     live?: 0 | 1;
     playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
     source: {
-      hrn: "HLS (TS)" | "MP4";
-      type: "html5/application/vnd.apple.mpegurl" | "html5/video/mp4";
+      hrn: "HLS (TS)" | "MP4" | "WebRTC (VP8)";
+      type:
+        | "html5/application/vnd.apple.mpegurl"
+        | "html5/video/mp4"
+        | "html5/video/vp8";
       url: string;
       size?: number;
       width?: number;
@@ -36,6 +40,7 @@ type PlaybackInfo = {
 function newPlaybackInfo(
   type: PlaybackInfo["type"],
   hlsUrl: string,
+  webRtcUrl?: string | null,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   live?: PlaybackInfo["meta"]["live"]
@@ -66,7 +71,13 @@ function newPlaybackInfo(
     type: "html5/application/vnd.apple.mpegurl",
     url: hlsUrl,
   });
-
+  if (webRtcUrl) {
+    playbackInfo.meta.source.push({
+      hrn: "WebRTC (VP8)",
+      type: "html5/video/vp8",
+      url: webRtcUrl,
+    });
+  }
   return playbackInfo;
 }
 const getAssetPlaybackUrl = async (
@@ -121,7 +132,8 @@ async function getPlaybackInfo(
   if (stream && !stream.deleted) {
     return newPlaybackInfo(
       "live",
-      streamPlaybackUrl(ingest, stream),
+      getHLSPlaybackUrl(ingest, stream),
+      getWebRTCPlaybackUrl(ingest, stream),
       stream.playbackPolicy,
       null,
       stream.isActive ? 1 : 0
@@ -132,6 +144,7 @@ async function getPlaybackInfo(
     return newPlaybackInfo(
       "vod",
       asset.playbackUrl,
+      null,
       asset.playbackPolicy,
       asset.staticFilesPlaybackInfo
     );

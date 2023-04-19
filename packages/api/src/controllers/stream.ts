@@ -189,8 +189,12 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-export function getPlaybackUrl(ingest: string, stream: DBStream) {
+export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
+}
+
+export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
+  return pathJoin(ingest, `webrtc`, stream.playbackId);
 }
 
 function getRecordingUrl(ingest: string, session: DBSession, mp4 = false) {
