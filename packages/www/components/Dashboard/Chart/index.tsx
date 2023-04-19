@@ -72,7 +72,7 @@ const Chart = ({
         },
       }}>
       <Text
-        variant="gray"
+        variant="neutral"
         size="1"
         css={{
           transform: "rotate(-90deg)",
@@ -83,7 +83,7 @@ const Chart = ({
         kbps (multiplied by 1000)
       </Text>
       <Text
-        variant="gray"
+        variant="neutral"
         size="1"
         css={{
           position: "absolute",
@@ -113,7 +113,7 @@ const Chart = ({
             cursor="pointer"
             type="monotone"
             dataKey="Session bitrate"
-            stroke="#5746AF"
+            stroke="#3cb179"
             strokeWidth="2px"
           />
           {multistreamNames?.map((item, index) => {

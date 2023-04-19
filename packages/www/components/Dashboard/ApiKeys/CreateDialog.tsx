@@ -32,9 +32,7 @@ const initialCorsOpts: ApiToken["access"]["cors"] = {
   allowedOrigins: ["http://localhost:3000"],
 };
 
-const StyledCross = styled(Cross, {
-  cursor: "pointer",
-});
+const StyledCross = styled(Cross, {});
 
 const CreateDialog = ({
   isOpen,
@@ -146,7 +144,7 @@ const CreateDialog = ({
               <AlertDialogDescription asChild>
                 <Text
                   size="3"
-                  variant="gray"
+                  variant="neutral"
                   css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                   Enter a name for your key to differentiate it from other keys.
                 </Text>
@@ -164,7 +162,7 @@ const CreateDialog = ({
                   placeholder="e.g. New key"
                 />
 
-                <Box css={{ display: "flex", mt: "$2" }}>
+                <Box css={{ display: "flex", mt: "$2", alignItems: "center" }}>
                   <Checkbox
                     id="allowCors"
                     checked={allowCors}
@@ -279,7 +277,7 @@ const CreateDialog = ({
                           <Text css={{ fontWeight: 600 }}>
                             No origins allowed
                           </Text>
-                          <Text variant="gray">
+                          <Text variant="neutral">
                             Add origins with the input field above.
                           </Text>
                         </Flex>
@@ -357,11 +355,11 @@ const CreateDialog = ({
             <AlertDialogDescription asChild>
               <Text
                 size="3"
-                variant="gray"
+                variant="neutral"
                 css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                 <Box>
                   <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
-                  <Button variant="gray" size="2" css={{ cursor: "pointer" }}>
+                  <Button variant="neutral" size="2">
                     <ClipButton value={newToken.id} text={newToken.id} />
                   </Button>
                 </Box>

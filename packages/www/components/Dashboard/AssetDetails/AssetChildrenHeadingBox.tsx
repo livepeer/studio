@@ -32,10 +32,10 @@ const AssetChildrenHeadingBox = ({
             css={{
               pb: "$2",
               width: "100%",
-              cursor: "pointer",
+              cursor: "default",
               textDecoration: "none",
               borderBottom: "2px solid",
-              borderColor: activeTab === "Overview" ? "$blue9" : "transparent",
+              borderColor: activeTab === "Overview" ? "$green9" : "transparent",
               mr: "$5",
               "&:hover": {
                 textDecoration: "none",
@@ -51,10 +51,10 @@ const AssetChildrenHeadingBox = ({
               textDecoration: "none",
               pb: "$2",
               width: "100%",
-              cursor: "pointer",
+              cursor: "default",
               borderBottom: "2px solid",
               borderColor:
-                activeTab === "Event Logs" ? "$blue9" : "transparent",
+                activeTab === "Event Logs" ? "$green9" : "transparent",
               whiteSpace: "nowrap",
               "&:hover": {
                 textDecoration: "none",
@@ -64,10 +64,7 @@ const AssetChildrenHeadingBox = ({
           </Box>
         </Box>
         <Box css={{ position: "relative", top: "-8px" }}>
-          <Button
-            size="2"
-            onClick={() => setEditAssetDialogOpen(true)}
-            variant="primary">
+          <Button size="2" onClick={() => setEditAssetDialogOpen(true)}>
             <Box
               as={Pencil1Icon}
               css={{

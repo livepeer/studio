@@ -44,7 +44,7 @@ const ShowURL = ({ url, shortendUrl, anchor = false }: ShowURLProps) => {
             <Flex
               css={{
                 alignItems: "center",
-                cursor: "pointer",
+
                 ml: 0,
                 mr: 0,
               }}>
@@ -74,7 +74,7 @@ const ShowURL = ({ url, shortendUrl, anchor = false }: ShowURLProps) => {
       </HoverCardTrigger>
       <HoverCardContent>
         <Text
-          variant="gray"
+          variant="neutral"
           css={{
             backgroundColor: "$panel",
             borderRadius: 6,

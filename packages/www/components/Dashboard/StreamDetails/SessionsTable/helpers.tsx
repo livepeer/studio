@@ -108,7 +108,6 @@ export const rowsPageFromState = async (
                       onCopy={() => openSnackbar("Copied to clipboard")}>
                       <Flex
                         css={{
-                          cursor: "pointer",
                           fontSize: "$1",
                           ai: "center",
                         }}>
@@ -122,7 +121,7 @@ export const rowsPageFromState = async (
                 </HoverCardTrigger>
                 <HoverCardContent>
                   <Text
-                    variant="gray"
+                    variant="neutral"
                     css={{
                       backgroundColor: "$panel",
                       borderRadius: 6,

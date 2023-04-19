@@ -62,7 +62,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
                 <ClipButton value={asset.playbackId} text={asset.playbackId} />
               </Cell>
               <Cell css={{ color: "$hiContrast" }}>Playback URL</Cell>
-              <Cell css={{ cursor: "pointer" }}>
+              <Cell>
                 <ShowURL
                   url={asset.playbackUrl}
                   shortendUrl={asset.playbackUrl.replace(

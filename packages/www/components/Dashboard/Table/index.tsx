@@ -306,21 +306,20 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
               <Flex css={{ ai: "center", mr: "$3" }}>
-                <Box css={{ fontSize: "$2", color: "$primary9" }}>
+                <Box css={{ fontSize: "$2", px: "$2", color: "$neutral9" }}>
                   {state.selectedRows.length} selected
                 </Box>
                 <Box
-                  css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }}
+                  css={{ height: 18, width: "1px", bc: "$neutral7", mx: "$3" }}
                 />
-                <Box
+                <Button
+                  ghost
                   css={{
-                    cursor: "pointer",
                     fontSize: "$2",
-                    color: "$blue11",
                   }}
                   onClick={() => toggleAllRowsSelected(false)}>
                   Deselect
-                </Box>
+                </Button>
               </Flex>
               {selectAction && (
                 <Button
@@ -344,7 +343,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               )}
               {createAction && (
                 <Button
-                  variant="primary"
+                  variant="neutral"
                   size="2"
                   // @ts-ignore
                   css={{ display: "flex", alignItems: "center" }}
@@ -377,7 +376,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             <Heading css={{ fontWeight: 500, mb: "$3" }}>
               No results found
             </Heading>
-            <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+            <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
               There aren't any results for that query.
             </Text>
           </Flex>
@@ -461,6 +460,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                               legacyBehavior>
                               <A
                                 css={{
+                                  cursor: "default",
                                   textDecoration: "none",
                                   py: "$2",
                                   pl: i === 0 ? "$1" : 0,

@@ -44,7 +44,7 @@ const ClipButton = ({
             <Flex
               css={{
                 alignItems: "center",
-                cursor: "pointer",
+
                 ml: 0,
                 mr: 0,
               }}>
@@ -63,7 +63,7 @@ const ClipButton = ({
       </HoverCardTrigger>
       <HoverCardContent>
         <Text
-          variant="gray"
+          variant="neutral"
           css={{
             backgroundColor: "$panel",
             borderRadius: 6,

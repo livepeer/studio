@@ -73,20 +73,17 @@ const StreamDetailsBox = ({
                 <ClipButton value={stream.streamKey} text={stream.streamKey} />
               </Flex>
             ) : (
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => setKeyRevealed(true)}>
+              <Button type="button" onClick={() => setKeyRevealed(true)}>
                 Reveal stream key
               </Button>
             )}
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>RTMP ingest URL</Cell>
-          <Cell css={{ cursor: "pointer" }}>
+          <Cell>
             <ShowURL url={globalIngestUrl} anchor={false} />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>SRT ingest URL</Cell>
-          <Cell css={{ cursor: "pointer" }}>
+          <Cell>
             <ShowURL
               url={globalSrtIngestUrl}
               shortendUrl={globalSrtIngestUrl.replace(
@@ -101,7 +98,7 @@ const StreamDetailsBox = ({
             <ClipButton value={stream.playbackId} text={stream.playbackId} />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Playback URL</Cell>
-          <Cell css={{ cursor: "pointer" }}>
+          <Cell>
             <ShowURL
               url={globalPlaybackUrl}
               shortendUrl={globalPlaybackUrl.replace(

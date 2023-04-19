@@ -96,11 +96,7 @@ export const rowsPageFromState = async (
         parentStream: {
           id: stream.parentId,
           name: stream.parentStream.name,
-          children: (
-            <Link variant="primary" as={Box}>
-              {stream.parentStream.name}
-            </Link>
-          ),
+          children: <Box>{stream.parentStream.name}</Box>,
           tooltipChildren: stream.createdByTokenName ? (
             <>
               Created by stream <b>{stream.parentStream.name}</b>
@@ -127,7 +123,6 @@ export const rowsPageFromState = async (
                       onCopy={() => openSnackbar("Copied to clipboard")}>
                       <Flex
                         css={{
-                          cursor: "pointer",
                           fontSize: "$1",
                           ai: "center",
                         }}>
@@ -141,7 +136,7 @@ export const rowsPageFromState = async (
                 </HoverCardTrigger>
                 <HoverCardContent>
                   <Text
-                    variant="gray"
+                    variant="neutral"
                     css={{
                       backgroundColor: "$panel",
                       borderRadius: 6,
@@ -175,8 +170,8 @@ export const rowsPageFromState = async (
 
 export const makeEmptyState = () => (
   <TableEmptyState
-    title="No sessions"
-    description="Stream sessions belong to parent streams."
+    title="No stream sessions"
+    description="New stream sessions are created whenever streams become active."
     learnMoreUrl="https://docs.livepeer.studio/reference/api/get-session"
   />
 );

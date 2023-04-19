@@ -22,6 +22,9 @@ const SentryWebpackPluginOptions = {
 };
 
 const config = {
+  sentry: {
+    hideSourceMaps: true,
+  },
   images: {
     domains: ["cdn.sanity.io", "picsum.photos"],
   },
@@ -292,6 +295,16 @@ const config = {
         source: "/blog/how-to-multistream-twitter-spaces-with-livepeer-studio",
         destination:
           "https://medium.com/livepeer-blog/how-to-multistream-twitter-spaces-with-livepeer-59997f5c0f2e",
+        permanent: false,
+      },
+      {
+        source: "/login",
+        destination: "https://livepeer.studio",
+        permanent: false,
+      },
+      {
+        source: "/blog",
+        destination: "https://medium.com/livepeer-blog",
         permanent: false,
       },
     ];

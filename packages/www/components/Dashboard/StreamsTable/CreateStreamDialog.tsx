@@ -31,9 +31,8 @@ const CreateStreamDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
-          <Heading size="1">Create a new stream</Heading>
+          <Heading size="1">Create a new livestream</Heading>
         </AlertDialogTitle>
-
         <Box
           css={{ mt: "$3" }}
           as="form"
@@ -61,7 +60,7 @@ const CreateStreamDialog = ({
               autoFocus={true}
               value={streamName}
               onChange={(e) => setStreamName(e.target.value)}
-              placeholder="e.g. My First Live Stream"
+              placeholder="e.g. My first livestream"
             />
             {/* <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
               A-Z, a-z, 0-9, -, _, ~ only
@@ -70,7 +69,7 @@ const CreateStreamDialog = ({
           <AlertDialogDescription asChild>
             <Text
               size="3"
-              variant="gray"
+              variant="neutral"
               css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
               Newly created streams are assigned a special key and RTMP ingest
               URL to stream into.
@@ -99,7 +98,7 @@ const CreateStreamDialog = ({
                   }}
                 />
               )}
-              Create stream
+              Create livestream
             </Button>
           </Flex>
         </Box>

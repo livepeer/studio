@@ -29,7 +29,7 @@ const PricingCalculator = () => {
         Estimate your monthly costs
       </Heading>
       <Text
-        variant="gray"
+        variant="neutral"
         size="5"
         css={{
           mb: "$9",

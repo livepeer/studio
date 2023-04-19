@@ -100,8 +100,9 @@ export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
     title="Create an API key"
     description="API keys allow you to authenticate API requests in your app"
-    learnMoreUrl="https://docs.livepeer.studio/category/api"
-    actionTitle="Create API key"
+    learnMoreUrl="https://docs.livepeer.org/guides/developing/quickstart"
+    secondaryActionTitle="See the developer guide"
+    primaryActionTitle="Create an API key"
     actionToggleState={actionToggleState}
   />
 );

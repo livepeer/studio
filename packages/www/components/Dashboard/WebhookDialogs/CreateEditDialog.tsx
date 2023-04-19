@@ -25,9 +25,7 @@ import { Webhook } from "@livepeer.studio/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { v4 as uuid } from "uuid";
 
-const StyledCrossIcon = styled(Cross1Icon, {
-  cursor: "pointer",
-});
+const StyledCrossIcon = styled(Cross1Icon, {});
 
 const eventOptions: Webhook["events"] = [
   "playback.accessControl",
@@ -184,9 +182,9 @@ const CreateEditDialog = ({
                     position: "relative",
                     minWidth: 450,
                     top: -10,
-                    borderLeft: "1px solid $colors$slate7",
-                    borderRight: "1px solid $colors$slate7",
-                    borderBottom: "1px solid $colors$slate7",
+                    borderLeft: "1px solid $colors$neutral7",
+                    borderRight: "1px solid $colors$neutral7",
+                    borderBottom: "1px solid $colors$neutral7",
                     backgroundColor: "$loContrast",
                     borderBottomLeftRadius: 6,
                     borderBottomRightRadius: 6,
@@ -259,7 +257,7 @@ const CreateEditDialog = ({
                   css={{ just: "center" }}
                   align="center">
                   <Text css={{ fontWeight: 600 }}>No events selected</Text>
-                  <Text variant="gray">
+                  <Text variant="neutral">
                     Search for events with the dropdown above.
                   </Text>
                 </Flex>

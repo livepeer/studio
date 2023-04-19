@@ -71,7 +71,6 @@ export const rowsPageFromState = async (
           children: webhook.name,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {
-            cursor: "pointer",
             overflow: "hidden",
             "text-overflow": "ellipsis",
           },
@@ -81,7 +80,6 @@ export const rowsPageFromState = async (
           children: (
             <Link
               as="div"
-              variant="primary"
               css={{
                 overflow: "hidden",
                 "text-overflow": "ellipsis",
@@ -90,17 +88,13 @@ export const rowsPageFromState = async (
             </Link>
           ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {
-            cursor: "pointer",
-          },
+          css: {},
         },
         created: {
           date: new Date(webhook.createdAt),
           fallback: <i>unseen</i>,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {
-            cursor: "pointer",
-          },
+          css: {},
         },
         status: {
           children: (
@@ -130,9 +124,7 @@ export const rowsPageFromState = async (
             </Box>
           ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {
-            cursor: "pointer",
-          },
+          css: {},
         },
       };
     }),
@@ -142,9 +134,10 @@ export const rowsPageFromState = async (
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
     title="Create your first webhook"
-    description="Listen for events on your Livepeer Studio account so your integration can automatically trigger reactions."
-    learnMoreUrl="https://docs.livepeer.studio/guides/listen-for-webhooks"
-    actionTitle="Create webhook"
+    description="Webhooks let your application know when things happen outside of an API request cycle. After a webhook is configured it will receive a notification for all events."
+    learnMoreUrl="https://docs.livepeer.org/guides/developing/listen-for-webhooks"
+    primaryActionTitle="Create webhook"
+    secondaryActionTitle="See the developer guide"
     actionToggleState={actionToggleState}
   />
 );

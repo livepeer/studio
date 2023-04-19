@@ -26,7 +26,10 @@ const ErrorDialog = ({
           <Heading size="1">Error</Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             {description}
           </Text>
         </AlertDialogDescription>

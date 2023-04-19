@@ -20,7 +20,7 @@ type Rendition = {
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   color: "$gray8",
-  cursor: "pointer",
+
   ml: "$1",
 });
 

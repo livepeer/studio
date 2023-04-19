@@ -47,7 +47,7 @@ const PricingCardsContainer = () => {
               }}>
               Transcoding
             </Text>
-            <Text size="2" variant="gray">
+            <Text size="2" variant="neutral">
               Create multiple versions of your source stream for different
               devices in real time.
             </Text>
@@ -61,7 +61,7 @@ const PricingCardsContainer = () => {
               }}>
               Recording Storage
             </Text>
-            <Text size="2" variant="gray">
+            <Text size="2" variant="neutral">
               Automatically store your transcoded renditions for VoD playback.
             </Text>
           </PricingCardContent>
@@ -74,7 +74,7 @@ const PricingCardsContainer = () => {
               }}>
               Stream Delivery via CDN
             </Text>
-            <Text size="2" variant="gray">
+            <Text size="2" variant="neutral">
               Optimize playback for your viewers across the globe via a CDN.
             </Text>
           </PricingCardContent>
@@ -87,7 +87,7 @@ const PricingCardsContainer = () => {
               }}>
               Multistreaming*
             </Text>
-            <Text size="2" variant="gray">
+            <Text size="2" variant="neutral">
               Push source streams and transcoded renditions to multiple
               destinations (e.g. Facebook, Twitch, etc).
             </Text>
@@ -450,7 +450,7 @@ const PricingCardsContainer = () => {
         </PricingCard>
       </Grid>
       <Text
-        variant="gray"
+        variant="neutral"
         size="2"
         css={{
           mt: "$8",

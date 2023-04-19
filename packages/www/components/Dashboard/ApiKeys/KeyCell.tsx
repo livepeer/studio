@@ -28,7 +28,6 @@ const KeyCell = ({ token }) => {
                 <Box
                   css={{
                     fontFamily: "monospace",
-                    cursor: "pointer",
                     fontSize: "$1",
                   }}>
                   {token.id}
@@ -38,7 +37,7 @@ const KeyCell = ({ token }) => {
           </HoverCardTrigger>
           <HoverCardContent>
             <Text
-              variant="gray"
+              variant="neutral"
               css={{
                 backgroundColor: "$panel",
                 borderRadius: 6,

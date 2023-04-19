@@ -17,6 +17,7 @@ const Banner = ({
     <Promo
       size="2"
       css={{
+        borderRadius: "$2",
         display: "grid",
         gridTemplateColumns: "repeat(2, auto)",
         ...css,
@@ -26,7 +27,7 @@ const Banner = ({
           <Text size="2" css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
             {title}
           </Text>
-          <Text variant="gray" size="2" css={{ lineHeight: 1.4 }}>
+          <Text variant="neutral" size="2" css={{ lineHeight: 1.4 }}>
             {description}
           </Text>
         </Box>

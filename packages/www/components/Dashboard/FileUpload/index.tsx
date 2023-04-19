@@ -60,9 +60,7 @@ const FileUpload = () => {
       <Flex direction="column" justify="center">
         {!hasPendingFileUploads && (
           <Box css={{ position: "absolute", top: "$3", right: "$2" }}>
-            <IconButton
-              onClick={() => clearFileUploads()}
-              css={{ cursor: "pointer" }}>
+            <IconButton onClick={() => clearFileUploads()}>
               <Cross2Icon />
             </IconButton>
           </Box>

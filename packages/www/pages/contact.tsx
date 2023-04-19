@@ -3,16 +3,15 @@ import Layout from "layouts/main";
 import { useRef, useState, useEffect } from "react";
 import {
   Box,
+  Flex,
   Text,
   Grid,
   Container,
   TextField,
   TextArea,
-  Heading,
-  Link as A,
+  Button,
 } from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
-import Button from "components/Site/Button";
 import { useRouter } from "next/router";
 import { Contact as Content } from "content";
 
@@ -48,100 +47,132 @@ const ContactPage = () => {
           size="3"
           css={{
             px: "$6",
-            py: "$7",
             width: "100%",
             "@bp3": {
-              pt: 100,
-              pb: 120,
               px: "$4",
             },
           }}>
-          <Box css={{ mb: "$5", textAlign: "center" }}>
-            <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$7" }}>
-              Get in touch
-            </Heading>
-          </Box>
-          <Box
-            as="form"
-            id="contact-form"
-            ref={formEl}
-            onSubmit={handleSubmit}
-            css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}>
-            <Grid
-              css={{
-                mb: "$4",
-                justifyContent: "center",
-                alignItems: "center",
-                gridTemplateColumns: "repeat(1,1fr)",
-                "@bp2": {
-                  gridTemplateColumns: "repeat(2,1fr)",
-                },
-              }}
-              gap="5">
-              <TextField
-                size="3"
-                id="firstname"
-                name="firstname"
-                type="text"
-                placeholder="First Name"
-                required
-                css={{ py: "$4" }}
-              />
-              <TextField
-                size="3"
-                id="lastname"
-                name="lastname"
-                required
-                type="text"
-                placeholder="Last Name"
-              />
-            </Grid>
-            <TextField
-              css={{ width: "100%", boxSizing: "border-box", mb: "$4" }}
-              size="3"
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-            />
-            <input name="utm_source" type="hidden" value={query?.utm_source} />
-            <input name="utm_medium" type="hidden" value={query?.utm_medium} />
-            <input
-              name="utm_campaign"
-              type="hidden"
-              value={query?.utm_campaign}
-            />
-
-            <TextArea
-              size="3"
-              id="message"
-              css={{ width: "100%", boxSizing: "border-box", mb: "$4" }}
-              name="TICKET.content"
-              placeholder="How can we help you? To guide the discussion, please give us specific details on
-your interest in speaking with our team. The more information, the better."
-              required
-            />
-            <Box css={{ textAlign: "center" }}>
-              <Button
-                small
-                arrow
-                css={{ width: "100%", mx: "auto", mt: "$2", px: "$4" }}>
-                Submit
-              </Button>
-              <Fade in={submitted}>
-                <Text variant="gray" css={{ mt: "$3" }}>
-                  Thank you for getting in touch. Our team will get back to you
-                  soon.
+          <Flex
+            align="center"
+            css={{
+              height: "100vh",
+            }}>
+            <Box
+              as="form"
+              id="contact-form"
+              ref={formEl}
+              onSubmit={handleSubmit}
+              css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}>
+              <Box css={{ mb: "$5", textAlign: "center" }}>
+                <Text
+                  size="8"
+                  as="h1"
+                  css={{
+                    textTransform: "uppercase",
+                    mb: "$5",
+                    fontWeight: 700,
+                    width: 150,
+                    mx: "auto",
+                    lineHeight: "30px",
+                    textAlign: "center",
+                  }}>
+                  Livepeer Studio
                 </Text>
-              </Fade>
+                <Text
+                  variant="neutral"
+                  size={6}
+                  css={{
+                    maxWidth: 460,
+                    textAlign: "center",
+                    mx: "auto",
+                    mb: "$7",
+                  }}>
+                  Get in touch.
+                </Text>
+              </Box>
+              <Grid
+                css={{
+                  mb: "$2",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gridTemplateColumns: "repeat(1,1fr)",
+                  "@bp2": {
+                    gridTemplateColumns: "repeat(2,1fr)",
+                  },
+                }}
+                gap="2">
+                <TextField
+                  size="3"
+                  id="firstname"
+                  name="firstname"
+                  type="text"
+                  placeholder="First Name"
+                  required
+                  css={{ py: "$4" }}
+                />
+                <TextField
+                  size="3"
+                  id="lastname"
+                  name="lastname"
+                  required
+                  type="text"
+                  placeholder="Last Name"
+                />
+              </Grid>
+              <TextField
+                css={{ width: "100%", boxSizing: "border-box", mb: "$2" }}
+                size="3"
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Email"
+                required
+              />
+              <input
+                name="utm_source"
+                type="hidden"
+                value={query?.utm_source}
+              />
+              <input
+                name="utm_medium"
+                type="hidden"
+                value={query?.utm_medium}
+              />
+              <input
+                name="utm_campaign"
+                type="hidden"
+                value={query?.utm_campaign}
+              />
+
+              <TextArea
+                size="3"
+                id="message"
+                css={{ width: "100%", boxSizing: "border-box", mb: "$2" }}
+                name="TICKET.content"
+                placeholder="How can we help you?"
+                required
+              />
+              <Box css={{ textAlign: "center" }}>
+                <Button
+                  size="4"
+                  variant="primary"
+                  css={{ width: "100%", mx: "auto", px: "$4" }}>
+                  Submit
+                </Button>
+                <Fade in={submitted}>
+                  <Text variant="neutral" css={{ mt: "$3" }}>
+                    Thank you for getting in touch. Our team will get back to
+                    you soon.
+                  </Text>
+                </Fade>
+              </Box>
             </Box>
-          </Box>
+          </Flex>
         </Container>
       </Box>
     </Layout>
   );
 };
 
-ContactPage.theme = "dark-theme-blue";
+ContactPage.theme = "dark-theme-green";
 export default ContactPage;

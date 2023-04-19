@@ -438,7 +438,7 @@ const JobApplicationForm = ({
       </Box>
       <Box>
         <Fade in={submitted}>
-          <Text variant="gray" css={{ mt: "$3" }}>
+          <Text variant="neutral" css={{ mt: "$3" }}>
             Thanks for reaching out! We'll get back to you shortly.
           </Text>
         </Fade>

@@ -140,7 +140,7 @@ const NavigationBase = ({
                 <Flex>
                   {!loggedIn && (
                     <>
-                      <Link href="/login" passHref legacyBehavior>
+                      <Link href="/" passHref legacyBehavior>
                         <A
                           css={{
                             fontSize: "$4",
