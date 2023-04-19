@@ -385,7 +385,11 @@ export function getRecordingFields(
   }
 
   const readyThreshold = Date.now() - USER_SESSION_TIMEOUT;
-  const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
+
+  // TODO: Remove it
+  // Set isReady for the local setup
+  // const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
+  const isReady = true;
   const isUnused = !session.lastSeen && session.createdAt < readyThreshold;
 
   const recordingStatus = isReady ? "ready" : isUnused ? "none" : "waiting";
@@ -770,6 +774,8 @@ app.post(
       profiles: childStream.profiles,
       record,
       recordObjectStoreId,
+      // TODO: Change to the real value
+      recordingSessionId: "12345",
       recordingStatus: record ? "waiting" : undefined,
     };
     await db.session.create(session);
@@ -1094,7 +1100,7 @@ function publishDelayedRecordingReadyHook(
         },
       },
     },
-    USER_SESSION_TIMEOUT + 10_000
+    USER_SESSION_TIMEOUT + 1_000
   );
 }
 
