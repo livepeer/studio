@@ -307,6 +307,16 @@ const config = {
         destination: "https://medium.com/livepeer-blog",
         permanent: false,
       },
+      {
+        source: "/pricing",
+        destination: "https://livepeer.org/pricing",
+        permanent: false,
+      },
+      {
+        source: "/pricing-faq",
+        destination: "https://livepeer.org/pricing",
+        permanent: false,
+      },
     ];
   },
 };
