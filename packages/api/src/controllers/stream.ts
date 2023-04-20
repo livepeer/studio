@@ -863,7 +863,7 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
 });
 
 app.put(
-  "/:id//setactive",
+  "/:id/setactive",
   authorizer({ anyAdmin: true }),
   validatePost("stream-set-active-payload"),
   async (req, res) => {
