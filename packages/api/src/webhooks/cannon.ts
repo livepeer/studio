@@ -555,11 +555,12 @@ export default class WebhookCannon {
     );
     // we can't rate limit this task because it's not a user action
     await taskScheduler.createAndScheduleTask(
-      "import",
+      "upload",
       {
-        import: {
-          url: mp4RecordingUrl,
-          recordedSessionId: session.id,
+        upload: {
+          // TODO: Get URL from playbackId + recordingSessionId + public recording bucket URL
+          // url: "https://link.storjshare.io/raw/jwbmejfygkb6mdrarfplvc46zeka/cakesource/rec/b40efldl0rzdcm7b/2023.04.19.14.04.01/output.m3u8"
+          url: "https://storage.googleapis.com/thom-vod-testing/mustwork/Pexels%20Videos%203444.mp4",
         },
       },
       undefined,
