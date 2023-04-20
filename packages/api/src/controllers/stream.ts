@@ -863,15 +863,14 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
 });
 
 app.put(
-  "/:id/:recordingid/setactive",
+  "/:id//setactive",
   authorizer({ anyAdmin: true }),
   validatePost("stream-set-active-payload"),
   async (req, res) => {
     const id = req.params.id;
-    const recordingid = req.params.recordingid;
     const { active, startedAt, hostName } = req.body as StreamSetActivePayload;
     logger.info(
-      `got /setactive for stream=${id} recordingid=${recordingid} active=${active} hostName=${hostName} startedAt=${startedAt}`
+      `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`
     );
 
     const stream = await db.stream.get(id, { useReplica: false });
