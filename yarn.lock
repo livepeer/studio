@@ -4153,12 +4153,12 @@
     tweetnacl-util "^0.15.1"
     utf-8-validate "^5.0.8"
 
-"@livepeer/core-react@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@livepeer/core-react/-/core-react-1.4.0.tgz#82bea0740b328f292f7491713715dc8a70682dca"
-  integrity sha512-lqBDJtjpofZc2ZxX8rkZrm6/7ozJfachZlDEoQk7ioekkgyOFJ8V+ZyzF6DD+S6n0DF5AbMd0B4F97ZZDUuz7A==
+"@livepeer/core-react@^1.4.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@livepeer/core-react/-/core-react-1.4.3.tgz#6a3acfae99e4781754a6144e514262bc79c23739"
+  integrity sha512-DLH0HNq+DpMCn0yjYv8hfhCPcchVaQtpjHb2f/CUpXTYOR3BH9yBvvtrDTxtHDU8OsWMX9VpQ3Phq8kSU2RfIw==
   dependencies:
-    "@livepeer/core" "^1.4.0"
+    "@livepeer/core" "^1.4.3"
     "@tanstack/query-async-storage-persister" "4.22.4"
     "@tanstack/query-core" "4.22.4"
     "@tanstack/react-query" "4.22.4"
@@ -4166,10 +4166,10 @@
     use-sync-external-store "^1.2.0"
     zustand "^4.3.2"
 
-"@livepeer/core@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@livepeer/core/-/core-1.4.0.tgz#17ed31e887a78deca12df4ca45a281535acd7f31"
-  integrity sha512-4CLxrx6TPsYzjqkJSRz8iCUye/jEBmolJujId7vNHUM4KAPXTp/leMczyTlf5ug3UeJo1RxQcrNzA8pWKiDFQQ==
+"@livepeer/core@^1.4.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@livepeer/core/-/core-1.4.3.tgz#e050ce44eae105a2fefbcff24d2961e0dfc68cbe"
+  integrity sha512-vn97Gy6dLbJ1edAirrN0yhxcC/gAzQQ1Go1nQRO/wT4yZz4+ELefNlKNKUbEqRF5iD7YjSSKZwZtYenTRUOSWQ==
   dependencies:
     cross-fetch "^3.1.5"
     ms "^3.0.0-canary.1"
@@ -4224,15 +4224,15 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-2.4.0.tgz#d1e0f050a39d7f900d810c11f7f5b5f59d01305c"
-  integrity sha512-FAvPk2NCpXBuQxepP+8qFwE30lpbJ8FQrCA6oTtkb+cbw4VeTUI256rEuuUNwTU5bC62CyMvd3LSL1DaB0u03Q==
+"@livepeer/react@^2.4.3":
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-2.4.3.tgz#437fcd3f40b2ff91126c48f012a4bc730e33bd2e"
+  integrity sha512-CaxDE6uhu7F9nFNL0nEoDiow5Yy+T0iPH8SDN9vpTdKrDpWD44imp19jSH2hs8OGgfzwUW3UfVSQixXPgKPIFw==
   dependencies:
-    "@livepeer/core-react" "^1.4.0"
+    "@livepeer/core-react" "^1.4.3"
     "@stitches/react" "^1.2.8"
     core-js "^3.27.2"
-    livepeer "2.4.0"
+    livepeer "2.4.3"
     zustand "^4.3.2"
 
 "@livepeer/sdk@1.0.0-alpha.7":
@@ -14673,10 +14673,10 @@ hex-color-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
 
-hls.js@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.3.1.tgz#2e43949aeaee8f3d54cabd7c4c1a9a718a03e7c2"
-  integrity sha512-6f4Qyrfj9sNUWMzNFKruqeD2KdisOwQ1GQJqnWAgMQ1hequlFK7e2dmF9qQD3mF/RI76hvztCMBptlPb+HcDow==
+hls.js@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.4.0.tgz#e73af3e7c8d4310a2bcc92d5ade362dfb781fef7"
+  integrity sha512-VEjg7Rx5FlE9TB3MIn0HPgq3J+vR7EoQnjaqMCk/ISEaCOSZlAFh4g867f1QkSxZiq9kHeUZo+iH16X7VS3jKA==
 
 hmac-drbg@^1.0.1:
   version "1.0.1"
@@ -17433,16 +17433,16 @@ live-server@^1.2.1:
     send latest
     serve-index "^1.9.1"
 
-livepeer@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-2.4.0.tgz#3720b211ce7a7e08419a0ec705234f0ae7a0f24a"
-  integrity sha512-goTPodKWKIwHXrn2Zf/U9The+G91lOqkgQuaSeG78FRhReZOFQGbPi0gL72BVmidOZYnGlUIdz+CH8Z9JzrLRQ==
+livepeer@2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-2.4.3.tgz#99a64e1a0a9a3ff6532a7ffbeaa24c7f2737f2cc"
+  integrity sha512-MufpHS1k/MICk6xLJldaJs6Lx9+RsCj1ZOWh7X/9IrnRCbTDD3Dv2G6P0w96w6+Hkml7M0CkeuU0HCfoZwWQWw==
   dependencies:
-    "@livepeer/core" "^1.4.0"
+    "@livepeer/core" "^1.4.3"
     "@stitches/core" "^1.2.8"
     core-js "^3.27.2"
     cross-fetch "^3.1.5"
-    hls.js "^1.3.1"
+    hls.js "^1.4.0"
     ms "^3.0.0-canary.1"
     multiformats "9.9.0"
     tus-js-client "^3.0.1"
