@@ -539,7 +539,6 @@ export default class WebhookCannon {
     var startedAt = new Date(session.createdAt).toISOString();
     startedAt = startedAt.substring(0, startedAt.length - 8) + "Z";
 
-    // TODO: Start Catalyst VOD, wait for the result, update session status (and mp4/hls outputs)
     const asset = await createAsset(
       {
         id,

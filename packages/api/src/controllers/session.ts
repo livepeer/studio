@@ -158,7 +158,7 @@ export async function toExternalSession(
   ingest: string,
   forceUrl = false,
   isAdmin = false
-) {
+): Promise<DBSession> {
   obj = await withRecordingFields(ingest, obj, forceUrl);
   if (!isAdmin) {
     removePrivateFields(obj);

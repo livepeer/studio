@@ -215,13 +215,10 @@ async function getRecordingUrl(
     return;
   }
   const os = await db.objectStore.get(asset.objectStoreId);
+
   // For transcoded recordings, we store only one MP4 output file
   const type = mp4 ? "static_transcoded_mp4" : "catalyst_hls_manifest";
   const path = asset.files?.find((f) => f.type === type)?.path;
-
-  const res = pathJoin(os.publicUrl, asset.playbackId, path);
-  console.log(res);
-
   if (!path) {
     // Recording renditions not yet ready
     return;
@@ -897,7 +894,7 @@ app.put(
   authorizer({ anyAdmin: true }),
   validatePost("stream-set-active-payload"),
   async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
     const { active, startedAt, hostName } = req.body as StreamSetActivePayload;
     logger.info(
       `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`
