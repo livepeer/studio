@@ -507,20 +507,18 @@ export default class WebhookCannon {
 
     const { lastSeen, sourceSegments } = session;
     const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
-    // TODO: Uncomment it
-    // Temp comment-out for the local setup
-    // if (!lastSeen || !sourceSegments) {
-    //   throw new UnprocessableEntityError("Session is unused");
-    // }
-    // if (lastSeen > activeThreshold) {
-    //   if (isRetry) {
-    //     throw new UnprocessableEntityError("Session is still active");
-    //   }
-    //   // there was an update after the delayed event was sent, so sleep a few
-    //   // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
-    //   await sleep(5000 + (lastSeen - activeThreshold));
-    //   return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
-    // }
+    if (!lastSeen || !sourceSegments) {
+      throw new UnprocessableEntityError("Session is unused");
+    }
+    if (lastSeen > activeThreshold) {
+      if (isRetry) {
+        throw new UnprocessableEntityError("Session is still active");
+      }
+      // there was an update after the delayed event was sent, so sleep a few
+      // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
+      await sleep(5000 + (lastSeen - activeThreshold));
+      return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
+    }
 
     const res = await this.db.stream.update(
       [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],

@@ -902,8 +902,8 @@ components:
             ID of object store where to which this stream was recorded
         recordingSessionId:
           type: string
-          example: c613d69e-5f4d-451b-9d3a-d28beff86a81
-          description: ID of Recording Session created by Mist
+          example: 39bf51c4-38eb-4e71-8d29-36da22035dc2
+          description: UUID of Recording Session created by Mist
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb

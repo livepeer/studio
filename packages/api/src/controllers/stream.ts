@@ -410,11 +410,7 @@ export async function getRecordingFields(
   }
 
   const readyThreshold = Date.now() - USER_SESSION_TIMEOUT;
-
-  // TODO: Remove it
-  // Set isReady for the local setup
-  // const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
-  const isReady = true;
+  const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
   const isUnused = !session.lastSeen && session.createdAt < readyThreshold;
 
   const recordingStatus = isReady ? "ready" : isUnused ? "none" : "waiting";
@@ -1127,7 +1123,7 @@ async function publishDelayedRecordingReadyHook(
         },
       },
     },
-    USER_SESSION_TIMEOUT + 1_000
+    USER_SESSION_TIMEOUT + 10_000
   );
 }
 
