@@ -6,8 +6,11 @@ import {
 } from "components/Dashboard/Table/types";
 import { truncate } from "../../../lib/utils";
 
-function makeMP4Url(hlsUrl: string, profileName: string): string {
-  const pp = hlsUrl.split("/");
+function makeMP4Url(url: string, profileName: string): string {
+  if (url.endsWith(".mp4")) {
+    return url;
+  }
+  const pp = url.split("/");
   pp.pop();
   return pp.join("/") + "/" + profileName + ".mp4";
 }

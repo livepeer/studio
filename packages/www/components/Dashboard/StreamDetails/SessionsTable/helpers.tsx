@@ -139,7 +139,7 @@ export const rowsPageFromState = async (
             ) : (
               <Box>—</Box>
             ),
-          mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
+          mp4Url: stream.mp4Url ? stream.mp4Url : stream.recordingUrl,
         },
         sourceSegmentsDuration: {
           sourceSegmentsDuration: stream.sourceSegmentsDuration || 0,
