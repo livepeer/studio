@@ -418,13 +418,15 @@ export async function getRecordingFields(
   const isUnused = !session.lastSeen && session.createdAt < readyThreshold;
 
   const recordingStatus = isReady ? "ready" : isUnused ? "none" : "waiting";
-  return !isReady && !forceUrl
-    ? { recordingStatus }
-    : {
-        recordingStatus: recordingStatus,
-        recordingUrl: await getRecordingUrl(ingest, session),
-        mp4Url: await getRecordingUrl(ingest, session, true),
-      };
+  if (!isReady && !forceUrl) {
+    return { recordingStatus };
+  }
+  const recordingUrl = await getRecordingUrl(ingest, session);
+  const mp4Url = await getRecordingUrl(ingest, session, true);
+  if (!recordingUrl) {
+    return { recordingStatus: "waiting" };
+  }
+  return { recordingStatus, recordingUrl, mp4Url };
 }
 
 export async function withRecordingFields(
