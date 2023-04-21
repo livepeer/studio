@@ -1517,6 +1517,15 @@ components:
         profile:
           $ref: "#/components/schemas/ffmpeg-profile"
 
+    room-user-payload:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+
     transcode-payload:
       additionalProperties: false
       required:
@@ -2611,6 +2620,26 @@ components:
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
           description: owner of the room
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which the room was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which room was updated
+          example: 1587667174725
+        deleted:
+          type: boolean
+          description: Set to true when the room is deleted
+        deletedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the room was deleted
+          example: 1587667174725
+        egressId:
+          type: string
+          description: internal ID for egress output
         events:
           type: array
           items:
@@ -3398,6 +3427,29 @@ paths:
           content:
             application/json:
               $ref: "#/components/schemas/room"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /room/{room}/user:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-user-payload"
+      parameters:
+        - name: room
+          in: path
+          required: true
+          schema:
+            type: string
+      description: create a new room
+      responses:
         default:
           description: Error
           content:
