@@ -128,8 +128,10 @@ app.get("/", authorizer({}), async (req, res, next) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  let sessions = output.map((session) =>
-    toExternalSession(session, ingest, !!forceUrl, req.user.admin)
+  let sessions = await Promise.all(
+    output.map(async (session) =>
+      toExternalSession(session, ingest, !!forceUrl, req.user.admin)
+    )
   );
   res.json(sessions);
 });
@@ -147,17 +149,17 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.status(200);
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
-  session = toExternalSession(session, ingest, false, req.user.admin);
+  session = await toExternalSession(session, ingest, false, req.user.admin);
   res.json(session);
 });
 
-export function toExternalSession(
+export async function toExternalSession(
   obj: DBSession,
   ingest: string,
   forceUrl = false,
   isAdmin = false
 ) {
-  obj = withRecordingFields(ingest, obj, forceUrl);
+  obj = await withRecordingFields(ingest, obj, forceUrl);
   if (!isAdmin) {
     removePrivateFields(obj);
   }

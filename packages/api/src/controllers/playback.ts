@@ -108,7 +108,7 @@ const getRecordingPlaybackUrl = async (
   if (!session || session.deleted) {
     return null;
   }
-  const { recordingUrl } = getRecordingFields(ingest, session, false);
+  const { recordingUrl } = await getRecordingFields(ingest, session, false);
   return recordingUrl;
 };
 

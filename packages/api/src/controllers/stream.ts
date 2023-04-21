@@ -193,13 +193,41 @@ export function getPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
 }
 
-function getRecordingUrl(ingest: string, session: DBSession, mp4 = false) {
-  return pathJoin(
-    ingest,
-    `recordings`,
-    session.lastSessionId ?? session.id,
-    mp4 ? `source.mp4` : `index.m3u8`
-  );
+async function getRecordingUrl(
+  ingest: string,
+  session: DBSession,
+  mp4 = false
+) {
+  if (!session.recordingSessionId) {
+    // Backwards-compatibility for Recording V1
+    return pathJoin(
+      ingest,
+      `recordings`,
+      session.lastSessionId ?? session.id,
+      mp4 ? `source.mp4` : `index.m3u8`
+    );
+  }
+
+  // Recording V2
+  const asset = await db.asset.getBySessionId(session.id);
+  if (!asset) {
+    // Recording asset not created yet
+    return;
+  }
+  const os = await db.objectStore.get(asset.objectStoreId);
+  // For transcoded recordings, we store only one MP4 output file
+  const type = mp4 ? "static_transcoded_mp4" : "catalyst_hls_manifest";
+  const path = asset.files?.find((f) => f.type === type)?.path;
+
+  const res = pathJoin(os.publicUrl, asset.playbackId, path);
+  console.log(res);
+
+  if (!path) {
+    // Recording renditions not yet ready
+    return;
+  }
+
+  return pathJoin(os.publicUrl, asset.playbackId, path);
 }
 
 function isActuallyNotActive(stream: DBStream) {
@@ -375,11 +403,11 @@ app.get("/", authorizer({}), async (req, res) => {
   );
 });
 
-export function getRecordingFields(
+export async function getRecordingFields(
   ingest: string,
   session: DBSession,
   forceUrl: boolean
-): Pick<DBSession, "recordingStatus" | "recordingUrl" | "mp4Url"> {
+): Promise<Pick<DBSession, "recordingStatus" | "recordingUrl" | "mp4Url">> {
   if (!session.record) {
     return {};
   }
@@ -396,20 +424,20 @@ export function getRecordingFields(
   return !isReady && !forceUrl
     ? { recordingStatus }
     : {
-        recordingStatus,
-        recordingUrl: getRecordingUrl(ingest, session),
-        mp4Url: getRecordingUrl(ingest, session, true),
+        recordingStatus: recordingStatus,
+        recordingUrl: await getRecordingUrl(ingest, session),
+        mp4Url: await getRecordingUrl(ingest, session, true),
       };
 }
 
-export function withRecordingFields(
+export async function withRecordingFields(
   ingest: string,
   session: DBSession,
   forceUrl: boolean
-): DBSession {
+) {
   return {
     ...session,
-    ...getRecordingFields(ingest, session, forceUrl),
+    ...(await getRecordingFields(ingest, session, forceUrl)),
   };
 }
 
@@ -453,25 +481,27 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   });
 
   const ingest = await getIngestBase(req);
-  sessions = sessions.map((session) => {
-    session = withRecordingFields(ingest, session, !!forceUrl);
-    if (!raw) {
-      if (session.previousSessions && session.previousSessions.length) {
-        session.id = session.previousSessions[0]; // return id of the first session object so
-        // user always see same id for the 'user' session
+  sessions = await Promise.all(
+    sessions.map(async (session) => {
+      session = await withRecordingFields(ingest, session, !!forceUrl);
+      if (!raw) {
+        if (session.previousSessions && session.previousSessions.length) {
+          session.id = session.previousSessions[0]; // return id of the first session object so
+          // user always see same id for the 'user' session
+        }
+        const combinedStats = getCombinedStats(
+          session,
+          session.previousStats || {}
+        );
+        return {
+          ...session,
+          ...combinedStats,
+          createdAt: session.userSessionCreatedAt || session.createdAt,
+        };
       }
-      const combinedStats = getCombinedStats(
-        session,
-        session.previousStats || {}
-      );
-      return {
-        ...session,
-        ...combinedStats,
-        createdAt: session.userSessionCreatedAt || session.createdAt,
-      };
-    }
-    return session;
-  });
+      return session;
+    })
+  );
 
   if (filterOut) {
     sessions = sessions.filter((sess) => !sess.record);
@@ -594,7 +624,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   }
   if (stream.record) {
     const ingest = await getIngestBase(req);
-    stream = withRecordingFields(ingest, stream, !!forceUrl);
+    stream = await withRecordingFields(ingest, stream, !!forceUrl);
   }
   res.status(200);
   if (!raw) {
@@ -1075,12 +1105,12 @@ function publishRecordingStartedHook(
 /**
  * We don't actually send the webhook here, but schedule an event after a timeout.
  */
-function publishDelayedRecordingReadyHook(
+async function publishDelayedRecordingReadyHook(
   session: DBSession,
   queue: Queue,
   ingest: string
 ) {
-  return queue.delayedPublishWebhook(
+  return await queue.delayedPublishWebhook(
     "events.recording.ready",
     {
       type: "webhook_event",
@@ -1091,8 +1121,8 @@ function publishDelayedRecordingReadyHook(
       userId: session.userId,
       sessionId: session.id,
       payload: {
-        recordingUrl: getRecordingUrl(ingest, session),
-        mp4Url: getRecordingUrl(ingest, session, true),
+        recordingUrl: await getRecordingUrl(ingest, session),
+        mp4Url: await getRecordingUrl(ingest, session, true),
         session: {
           ...toExternalSession(session, ingest, true),
           recordingStatus: "ready", // recording will be ready if this webhook is actually sent
