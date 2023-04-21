@@ -316,6 +316,11 @@ export default function parseCli(argv?: string | readonly string[]) {
           "base stream name to be used in wildcard-based routing scheme.",
         type: "string",
       },
+      "recording-source-url": {
+        describe:
+          "base stream name to be used in wildcard-based routing scheme.",
+        type: "string",
+      },
       "own-region": {
         describe: "identify region in which this server runs (fra, mdw, etc)",
         type: "string",

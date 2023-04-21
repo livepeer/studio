@@ -10,7 +10,7 @@ import Queue from "../store/queue";
 import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout, sleep } from "../util";
 import logger from "../logger";
-import { sign, sendgridEmail } from "../controllers/helpers";
+import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
@@ -48,6 +48,7 @@ export default class WebhookCannon {
   vodObjectStoreId: string;
   resolver: any;
   queue: Queue;
+  recordingSourceUrl: string;
   constructor({
     db,
     frontendDomain,
@@ -57,6 +58,7 @@ export default class WebhookCannon {
     vodObjectStoreId,
     verifyUrls,
     queue,
+    recordingSourceUrl,
   }) {
     this.db = db;
     this.running = true;
@@ -68,6 +70,7 @@ export default class WebhookCannon {
     this.vodObjectStoreId = vodObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
+    this.recordingSourceUrl = recordingSourceUrl;
     // this.start();
   }
 
@@ -112,7 +115,7 @@ export default class WebhookCannon {
       return true;
     }
 
-    if (event === "recording.ready" && sessionId && mp4Url) {
+    if (event === "recording.ready" && sessionId) {
       try {
         await this.handleRecordingReadyChecks(sessionId, mp4Url);
       } catch (e) {
@@ -553,12 +556,19 @@ export default class WebhookCannon {
       this.queue
     );
     // we can't rate limit this task because it's not a user action
+    const url = pathJoin(
+      this.recordingSourceUrl,
+      playbackId,
+      session.recordingSessionId,
+      "output.m3u8"
+    );
+    console.log(url);
     await taskScheduler.createAndScheduleTask(
       "upload",
       {
         upload: {
-          // TODO: Get URL from playbackId + recordingSessionId + public recording bucket URL
-          // url: "https://link.storjshare.io/raw/jwbmejfygkb6mdrarfplvc46zeka/cakesource/rec/b40efldl0rzdcm7b/2023.04.19.14.04.01/output.m3u8"
+          // TODO: Uncomment, when the Mist part is ready
+          // url: pathJoin(this.recordingSourceUrl, playbackId, session.recordingSessionId, "output.m3u8")
           url: "https://storage.googleapis.com/thom-vod-testing/mustwork/Pexels%20Videos%203444.mp4",
         },
       },

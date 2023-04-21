@@ -79,6 +79,7 @@ export default async function makeApp(params: CliArgs) {
     amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
+    recordingSourceUrl,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -115,6 +116,7 @@ export default async function makeApp(params: CliArgs) {
     supportAddr,
     verifyUrls: true,
     queue,
+    recordingSourceUrl,
   });
   await webhookCannon.start();
 

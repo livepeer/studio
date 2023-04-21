@@ -801,8 +801,7 @@ app.post(
       profiles: childStream.profiles,
       record,
       recordObjectStoreId,
-      // TODO: Change to the real value
-      recordingSessionId: "12345",
+      recordingSessionId: req.query.sessionId?.toString(),
       recordingStatus: record ? "waiting" : undefined,
     };
     await db.session.create(session);
