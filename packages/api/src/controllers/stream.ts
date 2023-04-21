@@ -1074,7 +1074,7 @@ async function publishSingleRecordingReadyHook(
           `session_id=${session.id} last_seen=${session.lastSeen}`
       );
     }
-    await this.db.stream.update(session.id, { isActive: false });
+    await db.stream.update(session.id, { isActive: false });
     return;
   }
 

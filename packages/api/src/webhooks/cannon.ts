@@ -556,13 +556,6 @@ export default class WebhookCannon {
       this.queue
     );
     // we can't rate limit this task because it's not a user action
-    const url = pathJoin(
-      this.recordingSourceUrl,
-      playbackId,
-      session.recordingSessionId,
-      "output.m3u8"
-    );
-    console.log(url);
     await taskScheduler.createAndScheduleTask(
       "upload",
       {
