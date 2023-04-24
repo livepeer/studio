@@ -725,6 +725,7 @@ app.post(
       return res.json({ errors: ["not found"] });
     }
 
+    const recordingSessionId = req.query.sessionId?.toString();
     const region = req.config.ownRegion;
 
     // The first four letters of our playback id are the shard key.
@@ -743,6 +744,7 @@ app.post(
       objectStoreId: stream.objectStoreId,
       record,
       recordObjectStoreId,
+      recordingSessionId,
       id,
       createdAt,
       parentId: stream.id,
@@ -779,7 +781,7 @@ app.post(
       profiles: childStream.profiles,
       record,
       recordObjectStoreId,
-      recordingSessionId: req.query.sessionId?.toString(),
+      recordingSessionId,
       recordingStatus: record ? "waiting" : undefined,
     };
     await db.session.create(session);
