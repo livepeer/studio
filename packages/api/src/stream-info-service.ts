@@ -37,7 +37,7 @@ function parseCli() {
         broadcaster: {
           describe: "broadcaster host:port to fetch info from",
           type: "string",
-          default: "localhost:7935",
+          default: "127.0.0.1:7935",
         },
         "postgres-url": {
           describe: "url of a postgres database",
