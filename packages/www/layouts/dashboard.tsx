@@ -41,6 +41,7 @@ export interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  nofollow?: boolean;
   image?: any;
   url?: string;
   canonical?: string;
@@ -53,6 +54,7 @@ function DashboardLayout({
   title,
   description,
   noindex = true,
+  nofollow = true,
   image,
   url,
   canonical,

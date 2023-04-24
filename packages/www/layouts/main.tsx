@@ -34,6 +34,7 @@ interface Props {
   url?: string;
   canonical?: string;
   noindex?: boolean;
+  nofollow?: boolean;
   preview?: boolean;
   theme?: string;
   navBackgroundColor?: string;
@@ -49,6 +50,7 @@ function Layout({
   url,
   canonical,
   noindex = process.env.NEXT_PUBLIC_SITE_URL !== "livepeer.studio",
+  nofollow = process.env.NEXT_PUBLIC_SITE_URL !== "livepeer.studio",
   preview = false,
   css = {},
 }: Props) {
@@ -65,6 +67,7 @@ function Layout({
     title,
     description,
     noindex,
+    nofollow,
     openGraph: {
       title,
       description,
