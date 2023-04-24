@@ -726,26 +726,6 @@ app.post(
     }
 
     const region = req.config.ownRegion;
-    const last = await db.stream.getLastSession(stream.id);
-    const reuseThreshold = Date.now() - USER_SESSION_TIMEOUT;
-    if (
-      last &&
-      last.region === region &&
-      !last.lastSeen &&
-      last.createdAt > reuseThreshold
-    ) {
-      // reuse previous recent+unused session as transcode loop is likely crash-looping
-      logger.info(
-        `stream session re-used for ` +
-          `stream_id=${stream.id} stream_name='${stream.name}' playbackid=${stream.playbackId} ` +
-          `session_id=${last.id} session_created_at=${last.createdAt} ` +
-          `elapsed=${Date.now() - start}ms`
-      );
-
-      return res
-        .status(200)
-        .json(db.stream.removePrivateFields(last, req.user.admin));
-    }
 
     // The first four letters of our playback id are the shard key.
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
