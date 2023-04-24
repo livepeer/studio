@@ -553,11 +553,12 @@ export default class WebhookCannon {
       "upload",
       {
         upload: {
-          // TODO: Uncomment, when the following tasks are ready:
-          // 1. Catalyst VOD Ingest for HLS
-          // 2. Mist recording in $uuid
-          // url: pathJoin(this.recordingSourceUrl, playbackId, session.recordingSessionId, "output.m3u8")
-          url: "https://storage.googleapis.com/thom-vod-testing/mustwork/Pexels%20Videos%203444.mp4",
+          url: pathJoin(
+            this.recordingSourceUrl,
+            playbackId,
+            session.recordingSessionId,
+            "output.m3u8"
+          ),
         },
       },
       undefined,
