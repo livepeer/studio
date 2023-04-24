@@ -79,7 +79,10 @@ const StreamsTable = ({
         initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
-        createAction={makeCreateAction("Create stream", createDialogState.onOn)}
+        createAction={makeCreateAction(
+          "Create livestream",
+          createDialogState.onOn
+        )}
         header={
           <TableHeader title={title}>
             <ActiveStreamsBadge />

@@ -16,7 +16,6 @@ import HornIcon from "../../../public/img/icons/horn.svg";
 import QuestionIcon from "../../../public/img/icons/question.svg";
 import SupportIcon from "../../../public/img/icons/support.svg";
 import DocumentationIcon from "../../../public/img/icons/documentation.svg";
-import HyperlinkIcon from "../../../public/img/icons/hyperlink.svg";
 import PolygonIcon from "../../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../../public/img/icons/checked.svg";
 import { useEffect, useState, useRef } from "react";
@@ -24,7 +23,6 @@ import { useApi, useHubspotForm } from "hooks";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
-  mr: "$2",
 });
 
 const StyledPolygonIcon = styled(PolygonIcon, {
@@ -32,22 +30,11 @@ const StyledPolygonIcon = styled(PolygonIcon, {
 });
 
 const StyledCheckedIcon = styled(CheckedIcon, {
-  color: "$blue9",
+  color: "$green9",
 });
 
 const StyledDocumentationIcon = styled(DocumentationIcon, {
   color: "$hiContrast",
-});
-const StyledSupportIcon = styled(SupportIcon, {
-  color: "$hiContrast",
-});
-const StyledHyperlinkIcon = styled(HyperlinkIcon, {
-  color: "$hiContrast",
-});
-
-const StyledQuestionMarkIcon = styled(QuestionIcon, {
-  color: "$hiContrast",
-  cursor: "pointer",
 });
 
 const reactions: string[] = ["🤩", "😀", "😕", "😭"];
@@ -82,6 +69,7 @@ const Header = ({ breadcrumbs = [] }) => {
 
   return (
     <Box
+      id="test123"
       css={{
         width: "100%",
         borderBottom: "1px solid",
@@ -102,7 +90,7 @@ const Header = ({ breadcrumbs = [] }) => {
             if (breadcrumb?.href) {
               return (
                 <Link key={i} href={breadcrumb.href} passHref legacyBehavior>
-                  <A variant="primary">{breadcrumb.title}</A>
+                  <A css={{ textDecoration: "none" }}>{breadcrumb.title}</A>
                 </Link>
               );
             }
@@ -113,45 +101,54 @@ const Header = ({ breadcrumbs = [] }) => {
           <Flex
             align="center"
             css={{
-              cursor: "pointer",
-              mr: "$5",
               background: "transparent",
               appearance: "none",
               border: "none",
             }}>
-            <StyledDocumentationIcon />
             <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
-              <A
+              <Button
+                ghost
+                as={A}
                 target="_blank"
+                size={2}
                 css={{
-                  ml: "$2",
+                  cursor: "default",
                   color: "$hiContrast",
                   textDecoration: "none",
+                  fontWeight: 500,
+                  display: "flex",
+                  gap: "$2",
                   "&:hover": {
                     textDecoration: "none",
                   },
                 }}>
+                <StyledDocumentationIcon />
                 <Box>Documentation</Box>
-              </A>
+              </Button>
             </Link>
           </Flex>
           <DropdownMenu>
-            <Flex
+            <Button
+              ghost
               as={DropdownMenuTrigger}
-              align="center"
+              size={2}
               css={{
-                cursor: "pointer",
-                mr: "$5",
-                background: "transparent",
-                appearance: "none",
-                border: "none",
+                mr: "$2",
+                display: "flex",
+                gap: "$2",
+                color: "$hiContrast",
+                textDecoration: "none",
+                fontWeight: 500,
+                "&:hover": {
+                  textDecoration: "none",
+                },
               }}>
               <StyledHornIcon />
-              <Box css={{ fontSize: "$3", color: "$hiContrast" }}>Feedback</Box>
-            </Flex>
+              <Box>Feedback</Box>
+            </Button>
             <DropdownMenuContent
               css={{
-                padding: "18px 20px 12px",
+                padding: "18px 0 12px",
                 position: "relative",
                 width: "313px",
                 minHeight: "180px",
@@ -209,19 +206,22 @@ const Header = ({ breadcrumbs = [] }) => {
                               }));
                             }}
                             css={{
+                              cursor: "default",
                               width: "36px",
                               height: "36px",
                               borderRadius: "50%",
                               border:
                                 reaction === form.reaction
-                                  ? "1px solid $blue9"
+                                  ? "1px solid $primary9"
                                   : "1px solid $primary7",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               fontSize: "20px",
                               marginRight: "$1",
-                              cursor: "pointer",
+                              "&:hover": {
+                                borderColor: "$primary9",
+                              },
                               ":last-of-type": {
                                 marginRight: "0px",
                               },
@@ -263,59 +263,6 @@ const Header = ({ breadcrumbs = [] }) => {
                   <Text> Thank you for your help.</Text>
                 </Flex>
               )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <Box
-              as={DropdownMenuTrigger}
-              css={{
-                background: "transparent",
-                appearance: "none",
-                WebkitAppearance: "none",
-                border: "none",
-                p: 0,
-              }}>
-              <StyledQuestionMarkIcon />
-            </Box>
-            <DropdownMenuContent
-              css={{
-                padding: "18px 54px 18px 18px",
-                position: "relative",
-                mt: "$4",
-                boxShadow:
-                  "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
-                background: "$panel",
-                right: "-13px",
-              }}>
-              <Box css={{ position: "absolute", right: "6px", top: "-12px" }}>
-                <StyledPolygonIcon />
-              </Box>
-              <Text size="2" css={{ mb: "$3", color: "$hiContrast" }}>
-                HELP
-              </Text>
-              <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
-                <A
-                  target="_blank"
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                    textDecoration: "none",
-                    mb: "$3",
-                    cursor: "pointer",
-                  }}>
-                  <StyledDocumentationIcon />
-                  <Text css={{ margin: "0 $2" }}>Documentation</Text>
-                  <StyledHyperlinkIcon />
-                </A>
-              </Link>
-              <Link href="/contact" passHref legacyBehavior>
-                <A>
-                  <Flex align="center" css={{ cursor: "pointer" }}>
-                    <StyledSupportIcon />
-                    <Text css={{ margin: "0 $2" }}>Contact Support</Text>
-                  </Flex>
-                </A>
-              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
         </Flex>

@@ -33,7 +33,7 @@ const Card = ({ id, logo, quote, author }: CardProps) => {
         },
       }}>
       {logo}
-      <Text variant="gray" css={{ fontWeight: 400, my: "$5" }}>
+      <Text variant="neutral" css={{ fontWeight: 400, my: "$5" }}>
         "{quote}"
       </Text>
       <Flex
@@ -70,10 +70,10 @@ const Card = ({ id, logo, quote, author }: CardProps) => {
           }}
         />
         <Box>
-          <Text variant="gray" css={{ fontWeight: 600 }}>
+          <Text variant="neutral" css={{ fontWeight: 600 }}>
             {author.name}
           </Text>
-          <Text variant="gray" css={{ fontWeight: 400 }}>
+          <Text variant="neutral" css={{ fontWeight: 400 }}>
             {author.role}, {author.company}
           </Text>
         </Box>

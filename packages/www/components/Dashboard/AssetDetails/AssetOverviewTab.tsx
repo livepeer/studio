@@ -79,10 +79,10 @@ const AssetOverviewTab = ({
               Metadata
             </Heading>
           </Flex>
-          <Text variant="gray" size="2">
+          <Text variant="neutral" size="2">
             A list of key value pairs that you use to provide metadata for your
             video.{" "}
-            <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
+            <A css={{  }} onClick={onEditAsset}>
               Edit asset
             </A>{" "}
             to add metadata.
@@ -93,10 +93,10 @@ const AssetOverviewTab = ({
             <Flex
               align="center"
               css={{
-                cursor: "pointer",
+                
                 justifyContent: "space-between",
               }}>
-              <Text variant="gray" size="2">
+              <Text variant="neutral" size="2">
                 {metadataStringified}
               </Text>
 
@@ -126,16 +126,15 @@ const AssetOverviewTab = ({
           <Flex css={{ mb: "$2" }} align="center">
             <StyledDatabaseIcon />
             <Heading size="1" css={{ fontWeight: 500 }}>
-              Decentralized Storage Providers
+              Storage Providers
             </Heading>
           </Flex>
-          <Text variant="gray" size="2">
-            By default video assets are stored in the Livepeer Studio database,
-            but you may also replicate them to the following decentralized
-            storage providers.
+          <Text variant="neutral" size="2">
+            By default video assets are cached in the Livepeer network, but you
+            may also archive them using the following storage providers.
           </Text>
         </Box>
-        <Promo size="2">
+        <Promo size="2" css={{ borderRadius: "$2" }}>
           <Flex css={{ justifyContent: "space-between" }}>
             <Flex align="center">
               <StyledIpfsIcon />
@@ -143,7 +142,7 @@ const AssetOverviewTab = ({
             </Flex>
 
             {asset?.storage?.ipfs?.updatedAt && (
-              <Text size="3" variant="gray">
+              <Text size="3" variant="neutral">
                 Uploaded on{" "}
                 {moment
                   .unix(asset?.storage?.ipfs?.updatedAt / 1000)
@@ -162,8 +161,7 @@ const AssetOverviewTab = ({
                   size="2"
                   disabled={
                     Boolean(asset?.status?.phase !== "ready") || isUploading
-                  }
-                  variant="primary">
+                  }>
                   {isUploading && (
                     <Spinner
                       css={{
@@ -181,7 +179,7 @@ const AssetOverviewTab = ({
           </Flex>
           {asset?.storage?.ipfs?.cid && (
             <Box css={{ mt: "$3" }}>
-              <Flex css={{ cursor: "pointer" }}>
+              <Flex>
                 <Box>
                   <Flex align="center">
                     <Text
@@ -199,7 +197,7 @@ const AssetOverviewTab = ({
                     />
                   </Flex>
                   <Text
-                    variant="gray"
+                    variant="neutral"
                     size="2"
                     css={{ mt: "$1", lineHeight: 1.4 }}>
                     ipfs://{asset?.storage?.ipfs?.cid}

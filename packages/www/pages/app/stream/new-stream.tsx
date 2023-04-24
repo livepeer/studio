@@ -39,7 +39,7 @@ const NewStream = () => {
         </Box>
 
         <Heading as="h3" sx={{ mb: 4 }}>
-          Create a new stream
+          Create a new livestream
         </Heading>
         <form
           id={"New Stream"}

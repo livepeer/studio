@@ -77,10 +77,11 @@ export const rowsPageFromState = async (
 
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
-    title="Create a Signing key"
+    title="Create a signing key"
     description="Signing keys allow you to use playback policies with your streams to restrict access to them"
-    learnMoreUrl="https://docs.livepeer.studio/category/api/create-signing-keys"
-    actionTitle="Create signing key"
+    learnMoreUrl="https://docs.livepeer.org/guides/developing/access-control"
+    secondaryActionTitle="See the developer guide"
+    primaryActionTitle="Create a signing key"
     actionToggleState={actionToggleState}
   />
 );

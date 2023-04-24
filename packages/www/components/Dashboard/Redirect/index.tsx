@@ -7,7 +7,7 @@ export const DashboardRedirect = () => {
       dangerouslySetInnerHTML={{
         __html: `
 if (!window.localStorage || !window.localStorage.getItem('${TOKEN_KEY}')) {
-  location.replace('/login?next=' + encodeURIComponent(
+  location.replace('/?next=' + encodeURIComponent(
     location.pathname + location.search
   ))
 }

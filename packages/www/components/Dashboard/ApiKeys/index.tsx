@@ -51,7 +51,7 @@ const ApiKeysTable = ({
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
-          "Create an API Key",
+          "Create API Key",
           createDialogState.onOn
         )}
       />

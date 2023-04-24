@@ -21,37 +21,37 @@ const DetailsBox = ({ data }) => (
       borderBottomRightRadius: 6,
       backgroundColor: "$panel",
     }}>
-    <Cell variant="gray">Webhook ID</Cell>
+    <Cell variant="neutral">Webhook ID</Cell>
     <Cell>
       <ClipButton text={data.id} value={data.id} />
     </Cell>
-    <Cell variant="gray">URL</Cell>
+    <Cell variant="neutral">URL</Cell>
     <Cell>{data.url}</Cell>
-    <Cell variant="gray">Name</Cell>
+    <Cell variant="neutral">Name</Cell>
     <Cell>{data.name}</Cell>
-    <Cell variant="gray">Secret</Cell>
+    <Cell variant="neutral">Secret</Cell>
     <Cell>{data.sharedSecret}</Cell>
-    <Cell variant="gray">Created</Cell>
+    <Cell variant="neutral">Created</Cell>
     <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
-    <Cell variant="gray">Event types</Cell>
+    <Cell variant="neutral">Event types</Cell>
     <Cell css={{ display: "flex", fw: "wrap" }}>
       {data.events.map((event, index) => (
         <Badge
           key={`badge-event${index}`}
-          variant="primary"
+          variant="neutral"
           size="2"
-          css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
+          css={{ mr: "$1", mb: "$1" }}>
           {event}
         </Badge>
       ))}
     </Cell>
-    <Cell variant="gray">Last trigger</Cell>
+    <Cell variant="neutral">Last trigger</Cell>
     <Cell>
       {data.status
         ? format(data.status?.lastTriggeredAt, "MMMM dd, yyyy h:mm:ss a")
         : "Never"}
     </Cell>
-    <Cell variant="gray">Last failure</Cell>
+    <Cell variant="neutral">Last failure</Cell>
     <Cell>
       {!data.status
         ? "Never"
@@ -62,7 +62,7 @@ const DetailsBox = ({ data }) => (
     {data.status ? (
       data.status.lastFailure?.statusCode ? (
         <>
-          <Cell variant="gray">Error Status Code</Cell>
+          <Cell variant="neutral">Error Status Code</Cell>
           <Cell>
             {`${data.status.lastFailure.statusCode}
             ${STATUS_CODES[data.status.lastFailure.statusCode]}`}
@@ -70,7 +70,7 @@ const DetailsBox = ({ data }) => (
         </>
       ) : data.status.lastFailure ? (
         <>
-          <Cell variant="gray">Error message</Cell>
+          <Cell variant="neutral">Error message</Cell>
           <Cell
             css={{
               fontFamily: "monospace",
@@ -86,7 +86,7 @@ const DetailsBox = ({ data }) => (
     )}
     {data.status?.lastFailure?.response ? (
       <>
-        <Cell variant="gray">Error response</Cell>
+        <Cell variant="neutral">Error response</Cell>
         <Cell
           css={{
             fontFamily: "monospace",

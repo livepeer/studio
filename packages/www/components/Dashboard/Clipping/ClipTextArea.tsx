@@ -44,7 +44,6 @@ const ClipTextArea = ({
             <Flex direction="column">
               <Alert
                 css={{
-                  cursor: "pointer",
                   overflow: "clip",
                   overflowWrap: "anywhere",
                   backgroundColor: "$gray4",
@@ -57,7 +56,7 @@ const ClipTextArea = ({
       </HoverCardTrigger>
       <HoverCardContent>
         <Text
-          variant="gray"
+          variant="neutral"
           css={{
             backgroundColor: "$panel",
             borderRadius: 6,

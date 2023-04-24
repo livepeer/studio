@@ -144,7 +144,7 @@ const CreateAssetDialog = ({
             <Box
               css={{
                 width: "100%",
-                cursor: "pointer",
+
                 p: "$1",
                 mb: "$0",
                 height: "auto",
@@ -187,7 +187,7 @@ const CreateAssetDialog = ({
                   <Flex key={key} align="center">
                     <IconButton
                       onClick={() => setVideoFiles((prev) => omit(prev, key))}
-                      css={{ mr: "$1", cursor: "pointer" }}>
+                      css={{ mr: "$1" }}>
                       <Cross2Icon />
                     </IconButton>
                     <Text
@@ -205,7 +205,7 @@ const CreateAssetDialog = ({
           <AlertDialogDescription asChild>
             <Text
               size="3"
-              variant="gray"
+              variant="neutral"
               css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
               Select up to {maxFiles} files. Files are uploaded 5 at a time.
               <br />

@@ -14,7 +14,7 @@ const StyledHeader = styled(Accordion.Header, {
   margin: 0,
   display: "flex",
   borderTop: "1px solid",
-  borderColor: "$slate6",
+  borderColor: "$neutral6",
   alignItems: "center",
   padding: "11px",
   width: "100%",
@@ -30,10 +30,10 @@ const StyledButton = styled(Accordion.Trigger, {
   outline: "none",
   "&:focus": {
     boxShadow:
-      "inset 0px 0px 0px 1px $colors$blue8, 0px 0px 0px 1px $colors$blue8",
+      "inset 0px 0px 0px 1px $colors$green8, 0px 0px 0px 1px $colors$green8",
     "&:-webkit-autofill": {
       boxShadow:
-        "inset 0px 0px 0px 1px $colors$blue8, 0px 0px 0px 1px $colors$blue8, inset 0 0 0 100px $colors$blue3",
+        "inset 0px 0px 0px 1px $colors$green8, 0px 0px 0px 1px $colors$green8, inset 0 0 0 100px $colors$green3",
     },
   },
 });
@@ -41,7 +41,7 @@ const StyledButton = styled(Accordion.Trigger, {
 const StyledPanel = styled(Accordion.Content, {
   padding: "12px 11px",
   borderTop: "1px solid",
-  borderColor: "$slate6",
+  borderColor: "$neutral6",
   background: "$panel",
   margin: 0,
 });

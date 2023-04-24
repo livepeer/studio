@@ -18,17 +18,17 @@ const FileItem = ({ fileUpload }: { fileUpload: FileUpload }) => {
   );
 
   const secondaryChildren = completed ? (
-    <Text size="2" variant="gray">
+    <Text size="2" variant="neutral">
       {"100% uploaded"}
     </Text>
   ) : (
-    <ProgressBar variant="blue" value={(progress ?? 0) * 100} />
+    <ProgressBar variant="gray" value={(progress ?? 0) * 100} />
   );
 
   const accessoryChildren = completed ? (
     <Box as={CheckIcon} css={{ align: "right", color: "$green9" }} />
   ) : (
-    <Text size="2" css={{ mr: "$2", width: 25 }} variant="gray">
+    <Text size="2" css={{ mr: "$2", width: 25 }} variant="neutral">
       {(Number(progress ?? 0) * 99).toFixed(0)}
       {"%"}
     </Text>

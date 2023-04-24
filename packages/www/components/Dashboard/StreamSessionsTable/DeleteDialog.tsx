@@ -25,12 +25,12 @@ const DeleteDialog = ({ total, onUnselect, onDelete }) => {
     <AlertDialog open={open}>
       <Flex css={{ ai: "center" }}>
         <Flex css={{ ai: "center", mr: "$3" }}>
-          <Box css={{ fontSize: "$2", color: "$primary9" }}>
+          <Box css={{ fontSize: "$2", color: "$neutral9" }}>
             {total} selected
           </Box>
-          <Box css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }} />
+          <Box css={{ height: 18, width: "1px", bc: "$neutral7", mx: "$3" }} />
           <Box
-            css={{ cursor: "pointer", fontSize: "$2", color: "$blue11" }}
+            css={{ fontSize: "$2", color: "$primary9" }}
             onClick={onUnselect}>
             Deselect
           </Box>
@@ -52,7 +52,10 @@ const DeleteDialog = ({ total, onUnselect, onDelete }) => {
           </Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             This will permanently remove the session{total > 1 && "s"}. This
             action cannot be undone.
           </Text>

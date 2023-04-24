@@ -1,4 +1,4 @@
-import { Box } from "@livepeer/design-system";
+import { Box, Flex, Text } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar, { SidebarId } from "components/Dashboard/Sidebar";
 import Header from "components/Dashboard/Header";
@@ -12,6 +12,8 @@ import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
 import { DashboardRedirect } from "components/Dashboard/Redirect";
+import { useApi, useLoggedIn } from "hooks";
+import Spinner from "components/Dashboard/Spinner";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -58,6 +60,7 @@ function DashboardLayout({
   canonical,
   requireLoggedIn = true,
 }: Props) {
+  const { user } = useApi();
   const stripePromise = useMemo(() => getStripe(), []);
 
   useEffect(() => {
@@ -77,7 +80,7 @@ function DashboardLayout({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          url: image ? image.url : "https://assets.livepeer.studio/api/og",
           alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,

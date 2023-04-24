@@ -171,9 +171,10 @@ export const fileUploadProgressForAsset = (
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
     title="Upload your first video asset"
-    description="Upload video assets for optimized and cached on-demand playback."
-    learnMoreUrl="https://docs.livepeer.studio/category/on-demand"
-    actionTitle="Upload asset"
+    description="Upload video assets for optimized playback."
+    learnMoreUrl="https://docs.livepeer.org/guides/developing/upload-a-video-asset"
+    secondaryActionTitle="See the developer guide"
+    primaryActionTitle="Upload asset"
     actionToggleState={actionToggleState}
   />
 );

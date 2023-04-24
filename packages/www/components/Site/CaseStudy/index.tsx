@@ -59,7 +59,7 @@ const CaseStudy = ({
                 }}>
                 {heading}
               </Heading>
-              <Text variant="gray" size="5" css={{ mt: "$1", mb: "$7" }}>
+              <Text variant="neutral" size="5" css={{ mt: "$1", mb: "$7" }}>
                 {about}
               </Text>
             </Grid>
@@ -109,7 +109,7 @@ const CaseStudy = ({
                     Problem
                   </Text>
                   <Text
-                    variant="gray"
+                    variant="neutral"
                     css={{
                       lineHeight: 1.6,
                     }}>
@@ -142,7 +142,7 @@ const CaseStudy = ({
                     }}>
                     Solution
                   </Text>
-                  <Text variant="gray" css={{ lineHeight: 1.6, mb: "$3" }}>
+                  <Text variant="neutral" css={{ lineHeight: 1.6, mb: "$3" }}>
                     {solution}
                   </Text>
                   {internalLink && (

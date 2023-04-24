@@ -42,7 +42,10 @@ const Terminate = ({ stream, invalidate, ...props }) => {
           <Heading size="1">Terminate stream?</Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
-          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+          <Text
+            size="3"
+            variant="neutral"
+            css={{ mt: "$2", lineHeight: "22px" }}>
             {message}
           </Text>
         </AlertDialogDescription>

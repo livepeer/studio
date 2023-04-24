@@ -274,7 +274,7 @@ const Post = ({
   );
 };
 
-Post.theme = "dark-theme-blue";
+Post.theme = "dark-theme-green";
 export default Post;
 
 export async function getStaticPaths() {

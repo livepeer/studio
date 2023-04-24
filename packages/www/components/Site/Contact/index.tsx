@@ -131,7 +131,7 @@ const Contact = () => {
               </Button>
 
               <Fade in={submitted}>
-                <Text variant="gray" css={{ mt: "$3" }}>
+                <Text variant="neutral" css={{ mt: "$3" }}>
                   Thank you for getting in touch. Our team will get back to you
                   soon.
                 </Text>

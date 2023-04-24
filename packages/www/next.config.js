@@ -22,6 +22,9 @@ const SentryWebpackPluginOptions = {
 };
 
 const config = {
+  sentry: {
+    hideSourceMaps: true,
+  },
   images: {
     domains: ["cdn.sanity.io", "picsum.photos"],
   },
@@ -227,6 +230,91 @@ const config = {
       {
         source: "/jobs/:slug",
         destination: "https://livepeer.org/jobs",
+        permanent: false,
+      },
+      {
+        source: "/blog",
+        destination: "https://medium.com/livepeer-blog",
+        permanent: false,
+      },
+      {
+        source: "/blog/category/case-study",
+        destination: "https://medium.com/livepeer-blog/tagged/case-study",
+        permanent: false,
+      },
+      {
+        source: "/blog/how-lenstube-changed-video-sharing-in-web3",
+        destination:
+          "https://medium.com/livepeer-blog/lenstube-a-decentralized-video-sharing-platform-built-with-lens-and-livepeer-b26e87e923",
+        permanent: false,
+      },
+      {
+        source:
+          "/blog/how-the402-crypto-enabled-livestreaming-benefits-creators",
+        destination:
+          "https://medium.com/livepeer-blog/how-hypeshots-crypto-enabled-livestreaming-benefits-creators-5c40c6660b62",
+        permanent: false,
+      },
+      {
+        source: "/blog/building-a-web3-bonfire-for-creators",
+        destination:
+          "https://medium.com/livepeer-blog/growing-onchain-communities-with-bonfire-and-livepeer-2135b1fa250c",
+        permanent: false,
+      },
+      {
+        source: "/blog/streameth-brings-irl-ethereum-events-online",
+        destination:
+          "https://medium.com/livepeer-blog/streameth-brings-irl-ethereum-events-online-7be3d21472f4",
+        permanent: false,
+      },
+      {
+        source: "/blog/why-the-lot-radio-livestreams-24-7-with-livepeer-studio",
+        destination:
+          "https://medium.com/livepeer-blog/why-the-lot-radio-livestreams-24-7-with-livepeer-8896e018db9b",
+        permanent: false,
+      },
+      {
+        source: "/blog/spaghetteth-livepeer-studio-stream-hackathon",
+        destination:
+          "https://medium.com/livepeer-blog/how-spaghetteth-used-livepeer-to-stream-its-hackathon-fc56206ff145",
+        permanent: false,
+      },
+      {
+        source: "/blog/beem-web3-video-streaming-filmmakers",
+        destination:
+          "https://medium.com/livepeer-blog/how-beem-built-its-video-streaming-platform-with-livepeer-39693523c51",
+        permanent: false,
+      },
+      {
+        source: "/blog/how-huddle01-built-the-worlds-first-web3-meeting-app",
+        destination:
+          "https://medium.com/livepeer-blog/how-huddle01-built-the-worlds-first-web3-meeting-app-c4bc24bb16f0",
+        permanent: false,
+      },
+      {
+        source: "/blog/how-to-multistream-twitter-spaces-with-livepeer-studio",
+        destination:
+          "https://medium.com/livepeer-blog/how-to-multistream-twitter-spaces-with-livepeer-59997f5c0f2e",
+        permanent: false,
+      },
+      {
+        source: "/login",
+        destination: "https://livepeer.studio",
+        permanent: false,
+      },
+      {
+        source: "/blog",
+        destination: "https://medium.com/livepeer-blog",
+        permanent: false,
+      },
+      {
+        source: "/pricing",
+        destination: "https://livepeer.org/pricing",
+        permanent: false,
+      },
+      {
+        source: "/pricing-faq",
+        destination: "https://livepeer.org/pricing",
         permanent: false,
       },
     ];

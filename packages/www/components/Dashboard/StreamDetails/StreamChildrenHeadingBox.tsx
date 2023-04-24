@@ -50,10 +50,10 @@ const StreamChildrenHeadingBox = ({
           css={{
             pb: "$2",
             width: "100%",
-            cursor: "pointer",
+            cursor: "default",
             textDecoration: "none",
             borderBottom: "2px solid",
-            borderColor: activeTab === "Overview" ? "$blue9" : "transparent",
+            borderColor: activeTab === "Overview" ? "$green9" : "transparent",
             mr: "$5",
             "&:hover": {
               textDecoration: "none",
@@ -69,9 +69,9 @@ const StreamChildrenHeadingBox = ({
             textDecoration: "none",
             pb: "$2",
             width: "100%",
-            cursor: "pointer",
+            cursor: "default",
             borderBottom: "2px solid",
-            borderColor: activeTab === "Health" ? "$blue9" : "transparent",
+            borderColor: activeTab === "Health" ? "$green9" : "transparent",
             "&:hover": {
               textDecoration: "none",
             },
@@ -82,10 +82,7 @@ const StreamChildrenHeadingBox = ({
       <Box css={{ position: "relative", top: "-8px" }}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="primary"
-              size="2"
-              css={{ display: "flex", ai: "center", mr: "$1" }}>
+            <Button size="2" css={{ display: "flex", ai: "center", mr: "$1" }}>
               Actions
               <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
             </Button>

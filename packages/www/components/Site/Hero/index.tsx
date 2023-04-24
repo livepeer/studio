@@ -32,11 +32,10 @@ const Hero = ({
             justify={centered ? "center" : "between"}
             css={{
               textAlign: centered ? "center" : "left",
-              mb: skinny ? 0 : 100,
+              mb: skinny ? 0 : 50,
               width: "100%",
-              pt: 50,
               "@bp2": {
-                height: skinny ? 300 : "calc(100vh - 180px)",
+                height: skinny ? 200 : "calc(100vh - 180px)",
               },
             }}>
             <Flex direction="column" css={{ maxWidth: 768 }}>
@@ -48,22 +47,13 @@ const Hero = ({
                   {tagline}
                 </Text>
               )}
-              <Box
-                css={{
-                  fontWeight: 600,
-                  fontSize: "$8",
-                  lineHeight: 1.3,
-                  color: "$hiContrast",
-                  mb: "$6",
-                  "@bp2": {
-                    fontSize: 80,
-                    lineHeight: "80px",
-                    letterSpacing: "-2px",
-                  },
-                }}>
+              <Text variant="neutral" size="9">
                 {heading}
-              </Box>
-              <Text variant="gray" size="4" css={{ mb: "$6", lineHeight: 1.6 }}>
+              </Text>
+              <Text
+                variant="neutral"
+                size="4"
+                css={{ mb: "$6", lineHeight: 1.6 }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (

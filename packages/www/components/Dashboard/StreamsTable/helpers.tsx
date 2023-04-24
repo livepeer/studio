@@ -1,4 +1,4 @@
-import { Box, Link } from "@livepeer/design-system";
+import { Box, Text } from "@livepeer/design-system";
 import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import { RenditionDetailsCellProps } from "../Table/cells/streams-table";
@@ -87,11 +87,7 @@ export const rowsPageFromState = async (
     name: {
       id: stream.id,
       value: stream.name,
-      children: (
-        <Link as="div" variant="primary">
-          {stream.name}
-        </Link>
-      ),
+      children: <Text size={2}>{stream.name}</Text>,
       tooltipChildren: stream.createdByTokenName ? (
         <>
           Created by token <b>{stream.createdByTokenName}</b>
@@ -102,12 +98,12 @@ export const rowsPageFromState = async (
     details: { stream },
     createdAt: {
       date: new Date(stream.createdAt),
-      fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+      fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
       href: `/dashboard/streams/${stream.id}`,
     },
     lastSeen: {
       date: stream.lastSeen ? new Date(stream.lastSeen) : null,
-      fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+      fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
       href: `/dashboard/streams/${stream.id}`,
     },
     status: {
@@ -151,10 +147,11 @@ export const defaultCreateProfiles = [
 
 export const makeEmptyState = (actionToggleState) => (
   <TableEmptyState
-    title="Create your first stream"
-    description="Create a unique stream object, broadcast live video content and playback your live stream with Livepeer Studio."
-    learnMoreUrl="https://docs.livepeer.studio/category/live"
-    actionTitle="Create stream"
+    title="Create your first livestream"
+    description="Create a livestream and go live using your favorite broadcasting software."
+    learnMoreUrl="https://docs.livepeer.org/guides/developing/create-a-livestream"
+    primaryActionTitle="Create livestream"
+    secondaryActionTitle="See the developer guide"
     actionToggleState={actionToggleState}
   />
 );

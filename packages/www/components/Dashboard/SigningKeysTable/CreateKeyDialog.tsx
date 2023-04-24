@@ -72,7 +72,7 @@ const CreateKeyDialog = ({
               <AlertDialogDescription asChild>
                 <Text
                   size="3"
-                  variant="gray"
+                  variant="neutral"
                   css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                   Enter a name for your signing key to differentiate it from
                   other keys.
@@ -141,7 +141,7 @@ const CreateKeyDialog = ({
                 <Text size="3" css={{ mt: "$5", fontWeight: 500 }}>
                   Private key
                 </Text>
-                <Text size="3" variant="gray" css={{ mb: "$2" }}>
+                <Text size="3" variant="neutral" css={{ mb: "$2" }}>
                   Make sure you save it - you won't be able to access it again.
                 </Text>
                 <ClipTextArea
@@ -152,7 +152,7 @@ const CreateKeyDialog = ({
             </AlertDialogDescription>
 
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button variant="blue" onClick={() => onClose()} size="2">
+              <Button variant="green" onClick={() => onClose()} size="2">
                 Continue
               </Button>
             </Flex>

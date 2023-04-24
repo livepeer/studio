@@ -71,7 +71,7 @@ const Layout = ({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          url: image ? image.url : "https://assets.livepeer.studio/api/og",
           alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,

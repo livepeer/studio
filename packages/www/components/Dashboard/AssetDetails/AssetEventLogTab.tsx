@@ -73,7 +73,7 @@ const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
                   width: "100%",
                   justifyContent: "space-between",
                 }}>
-                <Text variant="gray" size="3">
+                <Text variant="neutral" size="3">
                   {event.type === "file-import"
                     ? "Asset created from file upload"
                     : event.type === "url-import"
@@ -84,7 +84,7 @@ const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
                     ? "Uploaded to IPFS"
                     : "N/A"}
                 </Text>
-                <Text variant="gray" size="3">
+                <Text variant="neutral" size="3">
                   {moment.unix(event.timestamp / 1000).format("lll")}
                 </Text>
               </Flex>

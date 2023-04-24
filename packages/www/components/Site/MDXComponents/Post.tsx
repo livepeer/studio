@@ -41,7 +41,7 @@ const Card = ({ description, title, image, href }) => {
             {title}
           </Heading>
           {description && (
-            <Text variant="gray" css={{ mt: "$1" }}>
+            <Text variant="neutral" css={{ mt: "$1" }}>
               {description}
             </Text>
           )}
