@@ -108,7 +108,6 @@ export default class WebhookCannon {
 
   async processWebhookEvent(msg: messages.WebhookEvent): Promise<boolean> {
     const { event, streamId, sessionId, userId } = msg;
-    const { mp4Url } = msg.payload ?? {};
 
     if (event === "playback.accessControl") {
       // Cannot fire this event as a webhook, this is specific to access control and fired there
@@ -117,7 +116,7 @@ export default class WebhookCannon {
 
     if (event === "recording.ready" && sessionId) {
       try {
-        await this.handleRecordingReadyChecks(sessionId, mp4Url);
+        await this.handleRecordingReadyChecks(sessionId);
       } catch (e) {
         console.log(
           `Error handling recording.ready event sessionId=${sessionId} err=`,
@@ -493,11 +492,7 @@ export default class WebhookCannon {
     }
   }
 
-  async handleRecordingReadyChecks(
-    sessionId: string,
-    mp4Url: string,
-    isRetry = false
-  ) {
+  async handleRecordingReadyChecks(sessionId: string, isRetry = false) {
     const session = await this.db.stream.get(sessionId, {
       useReplica: false,
     });
@@ -529,10 +524,10 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session recording already handled");
     }
 
-    await this.recordingToVodAsset(session, mp4Url);
+    await this.recordingToVodAsset(session);
   }
 
-  async recordingToVodAsset(session: DBSession, mp4RecordingUrl: string) {
+  async recordingToVodAsset(session: DBSession) {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(id);
 
