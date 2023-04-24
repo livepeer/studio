@@ -512,7 +512,7 @@ export default class WebhookCannon {
       // there was an update after the delayed event was sent, so sleep a few
       // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
       await sleep(5000 + (lastSeen - activeThreshold));
-      return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
+      return this.handleRecordingReadyChecks(sessionId, true);
     }
 
     const res = await this.db.stream.update(
