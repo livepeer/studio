@@ -76,6 +76,7 @@ beforeAll(async () => {
   mockStore = {
     id: "mock_store",
     url: "https+s3://example.com/bucket-name",
+    publicUrl: "http://example-public",
     userId: mockAdminUser.id,
     kind: "object-store",
   };
@@ -1270,17 +1271,35 @@ describe("controllers/stream", () => {
       expect(sess1.record).toEqual(true);
       expect(sess1.parentId).toEqual(parent.id);
       // add some usage and lastSeen
-      let now = Date.now();
       await server.db.stream.update(sess1.id, {
-        lastSeen: now,
+        lastSeen: Date.now(),
         sourceBytes: 1,
         transcodedBytes: 2,
         sourceSegments: 3,
         transcodedSegments: 4,
         sourceSegmentsDuration: 1.5,
         transcodedSegmentsDuration: 2.5,
+        recordingSessionId: "1",
         recordObjectStoreId: "mock_store",
       });
+      await db.asset.create({
+        id: "1",
+        playbackId: "playback_id",
+        source: { type: "recording", sessionId: sess1.id },
+        name: `live-12345`,
+        objectStoreId: "mock_store",
+        files: [
+          {
+            type: "static_transcoded_mp4",
+            path: "output.mp4",
+          },
+          {
+            type: "catalyst_hls_manifest",
+            path: "output.m3u8",
+          },
+        ],
+      });
+
       res = await client.get(`/stream/${sess1.id}`);
       expect(res.status).toBe(200);
       sess1 = await res.json();
@@ -1309,9 +1328,8 @@ describe("controllers/stream", () => {
       expect(sess2.partialSession).toBeUndefined();
       expect(sess2.previousSessions).toBeUndefined();
       // add some usage and lastSeen
-      now = Date.now();
       await server.db.stream.update(sess2.id, {
-        lastSeen: now,
+        lastSeen: Date.now(),
         sourceBytes: 5,
         transcodedBytes: 6,
         sourceSegments: 7,
@@ -1320,6 +1338,7 @@ describe("controllers/stream", () => {
         transcodedSegmentsDuration: 9.5,
         recordObjectStoreId: "mock_store",
       });
+
       res = await client.get(`/stream/${sess2.id}`);
       expect(res.status).toBe(200);
       sess2 = await res.json();
@@ -1362,13 +1381,17 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       sessions = await res.json();
       expect(sessions).toHaveLength(2);
-      expect(sessions).toMatchObject(
-        [sess2, sess1].map((s) => ({
-          ...s,
-          recordingUrl: `https://test/recordings/${s.id}/index.m3u8`,
-          mp4Url: `https://test/recordings/${s.id}/source.mp4`,
-        }))
-      );
+      expect(sessions[1]).toMatchObject({
+        ...sess1,
+        recordingUrl: `http://example-public/playback_id/output.m3u8`,
+        mp4Url: `http://example-public/playback_id/output.mp4`,
+      });
+      expect(sessions[0]).toMatchObject({
+        ...sess2,
+        // Deprecated Recording V1
+        recordingUrl: `https://test/recordings/${sess2.id}/index.m3u8`,
+        mp4Url: `https://test/recordings/${sess2.id}/source.mp4`,
+      });
     });
   });
 });
