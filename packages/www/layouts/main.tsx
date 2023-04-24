@@ -4,7 +4,6 @@ import Router from "next/router";
 import { useEffect } from "react";
 import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
-import { DEFAULT_THEME } from "lib/theme";
 import GoogleTagManager from "components/Site/GoogleTagManager";
 import Footer from "components/Dashboard/Footer";
 import Spinner from "components/Dashboard/Spinner";
@@ -49,8 +48,7 @@ function Layout({
   image,
   url,
   canonical,
-  theme = DEFAULT_THEME,
-  noindex = false,
+  noindex = process.env.NEXT_PUBLIC_SITE_URL !== "livepeer.studio",
   preview = false,
   css = {},
 }: Props) {
