@@ -195,20 +195,22 @@ export function getPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
 }
 
-async function getRecordingUrl(
+async function getRecordingUrls(
   config: CliArgs,
   ingest: string,
-  session: DBSession,
-  mp4 = false
-) {
+  session: DBSession
+): Promise<{ recordingUrl: string; mp4Url: string }> {
   if (!session.recordingSessionId) {
     // Backwards-compatibility for Recording V1
-    return pathJoin(
+    const base = pathJoin(
       ingest,
       `recordings`,
-      session.lastSessionId ?? session.id,
-      mp4 ? `source.mp4` : `index.m3u8`
+      session.lastSessionId ?? session.id
     );
+    return {
+      recordingUrl: pathJoin(base, "index.m3u8"),
+      mp4Url: pathJoin(base, "source.mp4"),
+    };
   }
 
   // Recording V2
@@ -218,7 +220,10 @@ async function getRecordingUrl(
     return;
   }
   const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
-  return mp4 ? assetWithPlayback.downloadUrl : assetWithPlayback.playbackUrl;
+  return {
+    recordingUrl: assetWithPlayback.playbackUrl,
+    mp4Url: assetWithPlayback.downloadUrl,
+  };
 }
 
 function isActuallyNotActive(stream: DBStream) {
@@ -419,12 +424,11 @@ export async function getRecordingFields(
   if (!isReady && !forceUrl) {
     return { recordingStatus };
   }
-  const recordingUrl = await getRecordingUrl(config, ingest, session);
-  const mp4Url = await getRecordingUrl(config, ingest, session, true);
-  if (!recordingUrl) {
+  const recordingUrls = await getRecordingUrls(config, ingest, session);
+  if (!recordingUrls || !recordingUrls.recordingUrl) {
     return { recordingStatus: "waiting" };
   }
-  return { recordingStatus, recordingUrl, mp4Url };
+  return { recordingStatus, ...recordingUrls };
 }
 
 export async function withRecordingFields(
@@ -1119,8 +1123,7 @@ async function publishDelayedRecordingReadyHook(
       userId: session.userId,
       sessionId: session.id,
       payload: {
-        recordingUrl: await getRecordingUrl(config, ingest, session),
-        mp4Url: await getRecordingUrl(config, ingest, session, true),
+        ...(await getRecordingUrls(config, ingest, session)),
         session: {
           ...toExternalSession(config, session, ingest, true),
           recordingStatus: "ready", // recording will be ready if this webhook is actually sent
