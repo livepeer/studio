@@ -265,6 +265,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "object store ID to use for private assets in Catalyst VOD",
         type: "string",
       },
+      recordCatalystObjectStoreId: {
+        describe: "object store ID used by Catalyst to store recordings",
+        type: "string",
+      },
       googleCloudUrlSigningKeyName: {
         describe:
           "name of the signing key to use for signing access cookies for private assets on Google Cloud CDN",
@@ -312,11 +316,6 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "boolean",
       },
       "base-stream-name": {
-        describe:
-          "base stream name to be used in wildcard-based routing scheme.",
-        type: "string",
-      },
-      "recording-source-url": {
         describe:
           "base stream name to be used in wildcard-based routing scheme.",
         type: "string",

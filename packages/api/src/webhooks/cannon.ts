@@ -46,9 +46,9 @@ export default class WebhookCannon {
   sendgridApiKey: string;
   supportAddr: [string, string];
   vodObjectStoreId: string;
+  recordObjectStoreId: string;
   resolver: any;
   queue: Queue;
-  recordingSourceUrl: string;
   constructor({
     db,
     frontendDomain,
@@ -56,9 +56,9 @@ export default class WebhookCannon {
     sendgridApiKey,
     supportAddr,
     vodObjectStoreId,
+    recordObjectStoreId,
     verifyUrls,
     queue,
-    recordingSourceUrl,
   }) {
     this.db = db;
     this.running = true;
@@ -68,9 +68,9 @@ export default class WebhookCannon {
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
     this.vodObjectStoreId = vodObjectStoreId;
+    this.recordObjectStoreId = recordObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
-    this.recordingSourceUrl = recordingSourceUrl;
     // this.start();
   }
 
@@ -548,13 +548,15 @@ export default class WebhookCannon {
       },
       this.queue
     );
+
+    const os = await db.objectStore.get(this.recordObjectStoreId);
     // we can't rate limit this task because it's not a user action
     await taskScheduler.createAndScheduleTask(
       "upload",
       {
         upload: {
           url: pathJoin(
-            this.recordingSourceUrl,
+            os.publicUrl,
             playbackId,
             session.recordingSessionId,
             "output.m3u8"

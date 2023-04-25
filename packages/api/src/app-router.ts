@@ -60,6 +60,7 @@ export default async function makeApp(params: CliArgs) {
     sendgridTemplateId,
     sendgridApiKey,
     vodObjectStoreId,
+    recordObjectStoreId,
     kubeNamespace,
     kubeBroadcasterService,
     kubeBroadcasterTemplate,
@@ -79,7 +80,6 @@ export default async function makeApp(params: CliArgs) {
     amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
-    recordingSourceUrl,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -113,10 +113,10 @@ export default async function makeApp(params: CliArgs) {
     sendgridTemplateId,
     sendgridApiKey,
     vodObjectStoreId,
+    recordObjectStoreId,
     supportAddr,
     verifyUrls: true,
     queue,
-    recordingSourceUrl,
   });
   await webhookCannon.start();
 
