@@ -1123,7 +1123,6 @@ async function publishDelayedRecordingReadyHook(
       userId: session.userId,
       sessionId: session.id,
       payload: {
-        ...(await getRecordingUrls(config, ingest, session)),
         session: {
           ...toExternalSession(config, session, ingest, true),
           recordingStatus: "ready", // recording will be ready if this webhook is actually sent
