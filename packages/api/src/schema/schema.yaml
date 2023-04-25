@@ -490,6 +490,7 @@ components:
           type: string
           example: c613d69e-5f4d-451b-9d3a-d28beff86a81
           description: ID of Recording Session created by Mist
+          index: true
         multistream:
           type: object
           additionalProperties: false
@@ -908,6 +909,7 @@ components:
           type: string
           example: 39bf51c4-38eb-4e71-8d29-36da22035dc2
           description: UUID of Recording Session created by Mist
+          index: true
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
