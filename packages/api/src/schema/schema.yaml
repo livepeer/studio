@@ -1438,6 +1438,12 @@ components:
           example: true
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        creatorId:
+          oneOf:
+            - $ref: "#/components/schemas/asset/properties/creatorId"
+            - type: string
+              description:
+                Developer-managed (unverified) creator ID of the asset
         storage:
           additionalProperties: false
           properties:
