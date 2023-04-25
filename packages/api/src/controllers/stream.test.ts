@@ -1286,6 +1286,7 @@ describe("controllers/stream", () => {
         id: "1",
         playbackId: "playback_id",
         source: { type: "recording", sessionId: sess1.id },
+        status: { phase: "ready", updatedAt: Date.now() },
         name: `live-12345`,
         objectStoreId: "mock_store",
         files: [
