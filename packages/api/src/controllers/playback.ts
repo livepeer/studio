@@ -9,11 +9,11 @@ import {
   getStaticPlaybackInfo,
   StaticPlaybackInfo,
 } from "./asset";
+import { CliArgs } from "../parse-cli";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import Table from "../store/table";
 import { Asset, Stream, User } from "../schema/types";
-import { isExperimentSubject } from "../store/experiment-table";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -100,6 +100,7 @@ const getAssetPlaybackUrl = async (
 };
 
 const getRecordingPlaybackUrl = async (
+  config: CliArgs,
   ingest: string,
   id: string,
   table: Table<DBSession>
@@ -108,7 +109,12 @@ const getRecordingPlaybackUrl = async (
   if (!session || session.deleted) {
     return null;
   }
-  const { recordingUrl } = await getRecordingFields(ingest, session, false);
+  const { recordingUrl } = await getRecordingFields(
+    config,
+    ingest,
+    session,
+    false
+  );
   return recordingUrl;
 };
 
@@ -138,8 +144,8 @@ async function getPlaybackInfo(
   }
 
   const recordingUrl =
-    (await getRecordingPlaybackUrl(ingest, id, db.session)) ??
-    (await getRecordingPlaybackUrl(ingest, id, db.stream));
+    (await getRecordingPlaybackUrl(config, ingest, id, db.session)) ??
+    (await getRecordingPlaybackUrl(config, ingest, id, db.stream));
   if (recordingUrl) {
     return newPlaybackInfo("recording", recordingUrl);
   }

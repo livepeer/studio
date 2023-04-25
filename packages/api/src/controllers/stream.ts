@@ -9,6 +9,7 @@ import logger from "../logger";
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
+import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
   StreamPatchPayload,
@@ -38,6 +39,7 @@ import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
 import { toExternalSession } from "./session";
+import { withPlaybackUrls } from "./asset";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -194,6 +196,7 @@ export function getPlaybackUrl(ingest: string, stream: DBStream) {
 }
 
 async function getRecordingUrl(
+  config: CliArgs,
   ingest: string,
   session: DBSession,
   mp4 = false
@@ -214,17 +217,8 @@ async function getRecordingUrl(
     // Recording asset not created yet
     return;
   }
-  const os = await db.objectStore.get(asset.objectStoreId);
-
-  // For transcoded recordings, we store only one MP4 output file
-  const type = mp4 ? "static_transcoded_mp4" : "catalyst_hls_manifest";
-  const path = asset.files?.find((f) => f.type === type)?.path;
-  if (!path) {
-    // Recording renditions not yet ready
-    return;
-  }
-
-  return pathJoin(os.publicUrl, asset.playbackId, path);
+  const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
+  return mp4 ? assetWithPlayback.downloadUrl : assetWithPlayback.playbackUrl;
 }
 
 function isActuallyNotActive(stream: DBStream) {
@@ -235,7 +229,12 @@ function isActuallyNotActive(stream: DBStream) {
   );
 }
 
-function activeCleanupOne(stream: DBStream, queue: Queue, ingest: string) {
+function activeCleanupOne(
+  config: CliArgs,
+  stream: DBStream,
+  queue: Queue,
+  ingest: string
+) {
   if (!isActuallyNotActive(stream)) {
     return false;
   }
@@ -244,10 +243,10 @@ function activeCleanupOne(stream: DBStream, queue: Queue, ingest: string) {
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.ready logic to clean-up the isActive field
-        await triggerSessionRecordingHooks(stream, queue, ingest);
+        await triggerSessionRecordingHooks(config, stream, queue, ingest);
       } else {
         const patch = { isActive: false };
-        await setStreamActiveWithHooks(stream, patch, queue, ingest);
+        await setStreamActiveWithHooks(config, stream, patch, queue, ingest);
       }
     } catch (err) {
       logger.error("Error sending /setactive hooks err=", err);
@@ -259,6 +258,7 @@ function activeCleanupOne(stream: DBStream, queue: Queue, ingest: string) {
 }
 
 function activeCleanup(
+  config: CliArgs,
   streams: DBStream[],
   queue: Queue,
   ingest: string,
@@ -266,7 +266,7 @@ function activeCleanup(
 ) {
   let hasStreamsToClean: boolean;
   for (const stream of streams) {
-    hasStreamsToClean = activeCleanupOne(stream, queue, ingest);
+    hasStreamsToClean = activeCleanupOne(config, stream, queue, ingest);
   }
   if (filterToActiveOnly && hasStreamsToClean) {
     return streams.filter((s) => !isActuallyNotActive(s));
@@ -390,6 +390,7 @@ app.get("/", authorizer({}), async (req, res) => {
   }
   res.json(
     activeCleanup(
+      req.config,
       db.stream.addDefaultFieldsMany(
         db.stream.removePrivateFieldsMany(output, req.user.admin)
       ),
@@ -401,6 +402,7 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 export async function getRecordingFields(
+  config: CliArgs,
   ingest: string,
   session: DBSession,
   forceUrl: boolean
@@ -417,8 +419,8 @@ export async function getRecordingFields(
   if (!isReady && !forceUrl) {
     return { recordingStatus };
   }
-  const recordingUrl = await getRecordingUrl(ingest, session);
-  const mp4Url = await getRecordingUrl(ingest, session, true);
+  const recordingUrl = await getRecordingUrl(config, ingest, session);
+  const mp4Url = await getRecordingUrl(config, ingest, session, true);
   if (!recordingUrl) {
     return { recordingStatus: "waiting" };
   }
@@ -426,13 +428,14 @@ export async function getRecordingFields(
 }
 
 export async function withRecordingFields(
+  config: CliArgs,
   ingest: string,
   session: DBSession,
   forceUrl: boolean
 ) {
   return {
     ...session,
-    ...(await getRecordingFields(ingest, session, forceUrl)),
+    ...(await getRecordingFields(config, ingest, session, forceUrl)),
   };
 }
 
@@ -478,7 +481,12 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const ingest = await getIngestBase(req);
   sessions = await Promise.all(
     sessions.map(async (session) => {
-      session = await withRecordingFields(ingest, session, !!forceUrl);
+      session = await withRecordingFields(
+        req.config,
+        ingest,
+        session,
+        !!forceUrl
+      );
       if (!raw) {
         if (session.previousSessions && session.previousSessions.length) {
           session.id = session.previousSessions[0]; // return id of the first session object so
@@ -576,6 +584,7 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   }
   res.json(
     activeCleanup(
+      req.config,
       db.stream.addDefaultFieldsMany(
         db.stream.removePrivateFieldsMany(streams, req.user.admin)
       ),
@@ -597,7 +606,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  activeCleanupOne(stream, req.queue, await getIngestBase(req));
+  activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -619,7 +628,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   }
   if (stream.record) {
     const ingest = await getIngestBase(req);
-    stream = await withRecordingFields(ingest, stream, !!forceUrl);
+    stream = await withRecordingFields(req.config, ingest, stream, !!forceUrl);
   }
   res.status(200);
   if (!raw) {
@@ -787,9 +796,11 @@ app.post(
     await db.session.create(session);
     if (record) {
       const ingest = await getIngestBase(req);
-      publishRecordingStartedHook(session, req.queue, ingest).catch((err) => {
-        logger.error("Error sending recording.started hook err=", err);
-      });
+      publishRecordingStartedHook(req.config, session, req.queue, ingest).catch(
+        (err) => {
+          logger.error("Error sending recording.started hook err=", err);
+        }
+      );
     }
 
     await db.stream.create(childStream);
@@ -921,7 +932,13 @@ app.put(
       mistHost: hostName,
       region: req.config.ownRegion,
     };
-    await setStreamActiveWithHooks(stream, patch, req.queue, ingest);
+    await setStreamActiveWithHooks(
+      req.config,
+      stream,
+      patch,
+      req.queue,
+      ingest
+    );
 
     // update the other auxiliary info in the database in background.
     setImmediate(async () => {
@@ -959,6 +976,7 @@ app.put(
  * events from {@link triggerSessionRecordingHooks}.
  */
 async function setStreamActiveWithHooks(
+  config: CliArgs,
   stream: DBStream,
   patch: Partial<DBStream> & { isActive: boolean },
   queue: Queue,
@@ -998,7 +1016,7 @@ async function setStreamActiveWithHooks(
   }
 
   // opportunistically trigger recording.ready logic for this stream's sessions
-  triggerSessionRecordingHooks(stream, queue, ingest).catch((err) => {
+  triggerSessionRecordingHooks(config, stream, queue, ingest).catch((err) => {
     logger.error(
       `Error triggering session recording hooks stream_id=${stream.id} err=`,
       err
@@ -1012,6 +1030,7 @@ async function setStreamActiveWithHooks(
  * the handler will check if the session is actually inactive to fire the hook.
  */
 async function triggerSessionRecordingHooks(
+  config: CliArgs,
   streamOrSession: DBStream,
   queue: Queue,
   ingest: string
@@ -1030,7 +1049,7 @@ async function triggerSessionRecordingHooks(
   }
 
   for (const session of sessions) {
-    await publishSingleRecordingReadyHook(session, queue, ingest).catch(
+    await publishSingleRecordingReadyHook(config, session, queue, ingest).catch(
       (err) => {
         logger.error(
           `Error sending recording.ready hook for session_id=${session.id} err=`,
@@ -1042,6 +1061,7 @@ async function triggerSessionRecordingHooks(
 }
 
 async function publishSingleRecordingReadyHook(
+  config: CliArgs,
   session: DBSession,
   queue: Queue,
   ingest: string
@@ -1059,10 +1079,11 @@ async function publishSingleRecordingReadyHook(
   }
 
   const userSession = await db.session.get(session.id);
-  await publishDelayedRecordingReadyHook(userSession, queue, ingest);
+  await publishDelayedRecordingReadyHook(config, userSession, queue, ingest);
 }
 
 function publishRecordingStartedHook(
+  config: CliArgs,
   session: DBSession,
   queue: Queue,
   ingest: string
@@ -1074,7 +1095,7 @@ function publishRecordingStartedHook(
     streamId: session.parentId,
     userId: session.userId,
     event: "recording.started",
-    payload: { session: toExternalSession(session, ingest) },
+    payload: { session: toExternalSession(config, session, ingest) },
   });
 }
 
@@ -1082,6 +1103,7 @@ function publishRecordingStartedHook(
  * We don't actually send the webhook here, but schedule an event after a timeout.
  */
 async function publishDelayedRecordingReadyHook(
+  config: CliArgs,
   session: DBSession,
   queue: Queue,
   ingest: string
@@ -1097,10 +1119,10 @@ async function publishDelayedRecordingReadyHook(
       userId: session.userId,
       sessionId: session.id,
       payload: {
-        recordingUrl: await getRecordingUrl(ingest, session),
-        mp4Url: await getRecordingUrl(ingest, session, true),
+        recordingUrl: await getRecordingUrl(config, ingest, session),
+        mp4Url: await getRecordingUrl(config, ingest, session, true),
         session: {
-          ...toExternalSession(session, ingest, true),
+          ...toExternalSession(config, session, ingest, true),
           recordingStatus: "ready", // recording will be ready if this webhook is actually sent
         },
       },
@@ -1307,7 +1329,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
       errors: ["not found"],
     });
   }
-  activeCleanupOne(stream, req.queue, await getIngestBase(req));
+  activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);

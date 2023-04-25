@@ -263,6 +263,13 @@ function getDownloadUrl(
   asset: WithID<Asset>,
   os: ObjectStore
 ): string {
+  // If mp4 rendition file exists, then use it as download url
+  const staticPlaybackInfos = getStaticPlaybackInfo(asset, os);
+  if (staticPlaybackInfos.length > 0) {
+    return staticPlaybackInfos[0].playbackUrl;
+  }
+
+  // If no mp4 rendition file exists, then return source file
   const base =
     os.id !== vodObjectStoreId ? os.publicUrl : pathJoin(ingest, "asset");
   const source = asset.files?.find((f) => f.type === "source_file");

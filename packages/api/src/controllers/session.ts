@@ -7,6 +7,7 @@ import { db } from "../store";
 import { DBSession } from "../store/db";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
+import { CliArgs } from "../parse-cli";
 import {
   FieldsMap,
   makeNextHREF,
@@ -130,7 +131,7 @@ app.get("/", authorizer({}), async (req, res, next) => {
   }
   let sessions = await Promise.all(
     output.map(async (session) =>
-      toExternalSession(session, ingest, !!forceUrl, req.user.admin)
+      toExternalSession(req.config, session, ingest, !!forceUrl, req.user.admin)
     )
   );
   res.json(sessions);
@@ -149,17 +150,24 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.status(200);
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
-  session = await toExternalSession(session, ingest, false, req.user.admin);
+  session = await toExternalSession(
+    req.config,
+    session,
+    ingest,
+    false,
+    req.user.admin
+  );
   res.json(session);
 });
 
 export async function toExternalSession(
+  config: CliArgs,
   obj: DBSession,
   ingest: string,
   forceUrl = false,
   isAdmin = false
 ): Promise<DBSession> {
-  obj = await withRecordingFields(ingest, obj, forceUrl);
+  obj = await withRecordingFields(config, ingest, obj, forceUrl);
   if (!isAdmin) {
     removePrivateFields(obj);
   }
