@@ -2572,6 +2572,12 @@ components:
           type: number
           example: 200000
 
+    create-room-response:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+
     room:
       type: object
       table: rooms
@@ -3352,6 +3358,25 @@ paths:
     post:
       description: create a new room
       responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              $ref: "#/components/schemas/create-room-response"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    get:
+      description: get room details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              $ref: "#/components/schemas/room"
         default:
           description: Error
           content:

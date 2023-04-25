@@ -58,7 +58,10 @@ function toExternalRoom(room: Room, isAdmin = false) {
     return room;
   }
   room.userId = undefined;
-  room.participants = {};
+  for (const key in room.participants) {
+    room.participants[key].tracksPublished = undefined;
+  }
+  room.events = undefined;
   return room;
 }
 
