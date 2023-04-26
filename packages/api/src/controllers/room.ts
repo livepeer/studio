@@ -57,10 +57,6 @@ app.post("/", authorizer({}), async (req, res) => {
 
 app.get("/:roomId", authorizer({}), async (req, res) => {
   const room = await db.room.get(req.params.roomId);
-  if (!room) {
-    throw new NotFoundError(`room not found`);
-  }
-
   if (!room || room.deleted) {
     throw new NotFoundError(`room not found`);
   }
@@ -257,7 +253,7 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
     throw new BadRequestError(`no room name on event`);
   }
   const room = await db.room.get(roomId);
-  if (!room) {
+  if (!room || room.deleted) {
     throw new NotFoundError(`room not found`);
   }
 

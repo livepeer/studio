@@ -3428,7 +3428,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  /room/{room}:
     get:
+      parameters:
+        - name: room
+          in: path
+          required: true
+          schema:
+            type: string
       description: get room details
       responses:
         200:
@@ -3436,6 +3443,65 @@ paths:
           content:
             application/json:
               $ref: "#/components/schemas/room"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      parameters:
+        - name: room
+          in: path
+          required: true
+          schema:
+            type: string
+      description: delete a room
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /room/{room}/egress:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-egress-payload"
+      parameters:
+        - name: room
+          in: path
+          required: true
+          schema:
+            type: string
+      description: start room RTMP egress
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      parameters:
+        - name: room
+          in: path
+          required: true
+          schema:
+            type: string
+      description: stop room RTMP egress
+      responses:
+        204:
+          description: Success
         default:
           description: Error
           content:
@@ -3459,6 +3525,29 @@ paths:
             type: string
       description: create a new room
       responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{room}/user/{user}:
+    delete:
+      parameters:
+        - name: room
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: string
+      description: removes a specific user
+      responses:
+        204:
+          description: Success
         default:
           description: Error
           content:
