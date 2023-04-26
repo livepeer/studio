@@ -40,6 +40,8 @@ app.all(
   async (req, res) => {
     await checkUserOwned(req, "x-livepeer-stream-id", db.stream);
     await checkUserOwned(req, "x-livepeer-asset-id", db.asset);
+
+    res.header("x-livepeer-user-id", req.user.id);
     res.status(204).end();
   }
 );
