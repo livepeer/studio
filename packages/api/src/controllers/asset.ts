@@ -261,15 +261,16 @@ function getDownloadUrl(
   { vodObjectStoreId }: Request["config"],
   ingest: string,
   asset: WithID<Asset>,
-  os: ObjectStore
+  os: ObjectStore,
+  useStaticRenditions: boolean
 ): string {
-  // If mp4 rendition file exists, then use it as download url
-  const staticPlaybackInfos = getStaticPlaybackInfo(asset, os);
-  if (staticPlaybackInfos.length > 0) {
-    return staticPlaybackInfos[0].playbackUrl;
+  if (useStaticRenditions) {
+    const staticPlaybackInfos = getStaticPlaybackInfo(asset, os);
+    if (staticPlaybackInfos.length > 0) {
+      return staticPlaybackInfos[0].playbackUrl;
+    }
   }
 
-  // If no mp4 rendition file exists, then return source file
   const base =
     os.id !== vodObjectStoreId ? os.publicUrl : pathJoin(ingest, "asset");
   const source = asset.files?.find((f) => f.type === "source_file");
@@ -283,7 +284,8 @@ export async function withPlaybackUrls(
   config: CliArgs,
   ingest: string,
   asset: WithID<Asset>,
-  os?: ObjectStore
+  os?: ObjectStore,
+  useStaticRenditions: boolean = false
 ): Promise<WithID<Asset>> {
   if (asset.status.phase !== "ready") {
     return asset;
@@ -297,7 +299,7 @@ export async function withPlaybackUrls(
   return {
     ...asset,
     playbackUrl: getPlaybackUrl(config, ingest, asset, os),
-    downloadUrl: getDownloadUrl(config, ingest, asset, os),
+    downloadUrl: getDownloadUrl(config, ingest, asset, os, useStaticRenditions),
   };
 }
 

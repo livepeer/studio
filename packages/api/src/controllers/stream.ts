@@ -219,7 +219,13 @@ async function getRecordingUrls(
     // Recording asset not created yet
     return;
   }
-  const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
+  const assetWithPlayback = await withPlaybackUrls(
+    config,
+    ingest,
+    asset,
+    null,
+    true
+  );
   return {
     recordingUrl: assetWithPlayback.playbackUrl,
     mp4Url: assetWithPlayback.downloadUrl,
