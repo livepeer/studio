@@ -2572,6 +2572,67 @@ components:
           type: number
           example: 200000
 
+    room:
+      type: object
+      table: room
+      required:
+        - id
+        - participants
+        - events
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: room ID
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the room
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+              timestamp:
+                type: integer
+        participants:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              identity:
+                type: string
+                description: participant ID
+              name:
+                type: string
+                description: user defined participant name
+              joinedAt:
+                type: integer
+                description: the time the participant joined
+              leftAt:
+                type: integer
+                description: the time the participant left
+              tracksPublished:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    sid:
+                      type: string
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    mimeType:
+                      type: string
+                    timestamp:
+                      type: integer
+
 paths:
   /stream:
     tags:
@@ -3294,6 +3355,28 @@ paths:
     post:
       description: create a new room
       responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    get:
+      description: get room details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              $ref: "#/components/schemas/room"
         default:
           description: Error
           content:
