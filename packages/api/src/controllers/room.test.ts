@@ -1,10 +1,11 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { User } from "../schema/types";
-import { RoomServiceClient } from "livekit-server-sdk";
+import { EgressClient, RoomServiceClient } from "livekit-server-sdk";
 jest.mock("livekit-server-sdk");
 const MockedRoomServiceClient =
   RoomServiceClient as jest.Mock<RoomServiceClient>;
+const MockedEgressClient = EgressClient as jest.Mock<EgressClient>;
 
 let server: TestServer;
 let mockAdminUserInput: User;
@@ -34,22 +35,24 @@ describe("controllers/room", () => {
   let adminApiKey: string;
   let nonAdminUser: User;
   let nonAdminToken: string;
+  let roomServiceClient = new RoomServiceClient("");
+  let mockCreateRoom: jest.SpyInstance;
+  let egressClient = new EgressClient("");
 
   beforeEach(async () => {
     ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminToken } =
       await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     client.jwtAuth = nonAdminToken;
+
+    MockedRoomServiceClient.mockReturnValue(roomServiceClient);
+    mockCreateRoom = jest.spyOn(roomServiceClient, "createRoom");
+    mockCreateRoom.mockReturnValueOnce(Promise.resolve(undefined));
+    MockedEgressClient.mockReturnValueOnce(egressClient);
   });
 
   describe("room creation", () => {
-    it("should create a room", async () => {
-      let roomServiceClient = new RoomServiceClient("");
-      const mockCreateRoom = jest.spyOn(roomServiceClient, "createRoom");
-      MockedRoomServiceClient.mockReturnValueOnce(roomServiceClient);
-      mockCreateRoom.mockReturnValueOnce(Promise.resolve(undefined));
-
+    it("should create and delete rooms", async () => {
       let res = await client.post(`/room`);
-
       expect(res.status).toBe(201);
       const roomRes = await res.json();
       expect(roomRes.id).toBeDefined();
@@ -64,6 +67,60 @@ describe("controllers/room", () => {
       const getRoomRes = await res.json();
       expect(getRoomRes.id).toBe(roomRes.id);
       expect(getRoomRes.userId).toBeUndefined();
+
+      const mockDeleteRoom = jest.spyOn(roomServiceClient, "deleteRoom");
+      res = await client.delete(`/room/${roomRes.id}`);
+      expect(res.status).toBe(204);
+      expect(mockDeleteRoom).toHaveBeenCalledTimes(1);
+      expect(mockDeleteRoom.mock.calls[0][0]).toBe(roomRes.id);
+
+      // should no longer exist
+      res = await client.get(`/room/${roomRes.id}`);
+      expect(res.status).toBe(404);
+    });
+
+    it("should start and stop egress", async () => {
+      let res = await client.post(`/room`);
+      expect(res.status).toBe(201);
+      const roomRes = await res.json();
+      expect(roomRes.id).toBeDefined();
+
+      let mockStartEgress = jest.spyOn(
+        egressClient,
+        "startRoomCompositeEgress"
+      );
+      mockStartEgress.mockReturnValueOnce(
+        Promise.resolve({
+          egressId: "egress-id",
+        })
+      );
+      let mockStopEgress = jest.spyOn(egressClient, "stopEgress");
+      mockStopEgress.mockReturnValueOnce(Promise.resolve(undefined));
+
+      res = await client.delete(`/room/${roomRes.id}/egress`);
+      expect(res.status).toBe(400);
+
+      res = await client.post(`/room/${roomRes.id}/egress`, {
+        rtmpURL: "rtmp",
+      });
+      expect(res.status).toBe(204);
+
+      // already started so should 400
+      res = await client.post(`/room/${roomRes.id}/egress`, {
+        rtmpURL: "rtmp",
+      });
+      expect(res.status).toBe(400);
+
+      res = await client.delete(`/room/${roomRes.id}/egress`);
+      expect(res.status).toBe(204);
+
+      // already stopped so should 400
+      res = await client.delete(`/room/${roomRes.id}/egress`);
+      expect(res.status).toBe(400);
+
+      expect(mockStartEgress).toHaveBeenCalledTimes(1);
+      expect(mockStopEgress).toHaveBeenCalledTimes(1);
+      expect(mockStopEgress.mock.calls[0][0]).toBe("egress-id");
     });
   });
 });

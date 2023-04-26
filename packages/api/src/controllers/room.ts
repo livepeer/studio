@@ -110,43 +110,48 @@ app.delete("/:roomId", authorizer({}), async (req, res) => {
   res.status(204).end();
 });
 
-app.post("/:roomId/egress", authorizer({}), async (req, res) => {
-  const room = await db.room.get(req.params.roomId);
+app.post(
+  "/:roomId/egress",
+  authorizer({}),
+  validatePost("room-egress-payload"),
+  async (req, res) => {
+    const room = await db.room.get(req.params.roomId);
 
-  if (!req.user.admin && req.user.id !== room.userId) {
-    throw new ForbiddenError(`users may only modify their own rooms`);
-  }
-
-  if (room.egressId !== undefined) {
-    throw new BadRequestError("egress already started");
-  }
-
-  const egressClient = new EgressClient(
-    req.config.livekitHost,
-    req.config.livekitApiKey,
-    req.config.livekitSecret
-  );
-  const output: StreamOutput = {
-    protocol: StreamProtocol.RTMP,
-    urls: [req.body.rtmpURL],
-  };
-
-  const info = await egressClient.startRoomCompositeEgress(
-    req.params.roomId,
-    output,
-    {
-      layout: "speaker-dark",
-      encodingOptions: {
-        keyFrameInterval: 2,
-      },
+    if (!req.user.admin && req.user.id !== room.userId) {
+      throw new ForbiddenError(`users may only modify their own rooms`);
     }
-  );
-  console.log("egress started", info);
-  room.egressId = info.egressId;
-  room.updatedAt = new Date().getTime();
-  await db.room.replace(room);
-  res.status(204).end();
-});
+
+    if (room.egressId !== undefined) {
+      throw new BadRequestError("egress already started");
+    }
+
+    const egressClient = new EgressClient(
+      req.config.livekitHost,
+      req.config.livekitApiKey,
+      req.config.livekitSecret
+    );
+    const output: StreamOutput = {
+      protocol: StreamProtocol.RTMP,
+      urls: [req.body.rtmpURL],
+    };
+
+    const info = await egressClient.startRoomCompositeEgress(
+      req.params.roomId,
+      output,
+      {
+        layout: "speaker-dark",
+        encodingOptions: {
+          keyFrameInterval: 2,
+        },
+      }
+    );
+    console.log("egress started", info);
+    room.egressId = info.egressId;
+    room.updatedAt = new Date().getTime();
+    await db.room.replace(room);
+    res.status(204).end();
+  }
+);
 
 app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
   const room = await db.room.get(req.params.roomId);
