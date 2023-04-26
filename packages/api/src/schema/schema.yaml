@@ -2572,15 +2572,9 @@ components:
           type: number
           example: 200000
 
-    create-room-response:
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-
     room:
       type: object
-      table: rooms
+      table: room
       required:
         - id
         - participants
@@ -2588,9 +2582,8 @@ components:
       properties:
         id:
           type: string
-          unique: true
-          index: true
           readOnly: true
+          description: room ID
         userId:
           type: string
           readOnly: true
@@ -2614,12 +2607,16 @@ components:
             properties:
               identity:
                 type: string
+                description: participant ID
               name:
                 type: string
+                description: user defined participant name
               joinedAt:
                 type: integer
+                description: the time the participant joined
               leftAt:
                 type: integer
+                description: the time the participant left
               tracksPublished:
                 type: object
                 additionalProperties:
@@ -3362,7 +3359,10 @@ paths:
           description: Success
           content:
             application/json:
-              $ref: "#/components/schemas/create-room-response"
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
         default:
           description: Error
           content:
