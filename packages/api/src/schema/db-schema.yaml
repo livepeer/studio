@@ -1,0 +1,336 @@
+components:
+  schemas:
+    cdn-usage-last:
+      table: cdn_usage_last
+      properties:
+        id:
+          readOnly: true
+        fileName:
+          index: true
+        region:
+          index: true
+          unique: true
+    webhook:
+      table: webhook
+      properties:
+        id:
+          readOnly: true
+        kind:
+          readOnly: true
+        userId:
+          readOnly: true
+          index: true
+        createdAt:
+          readOnly: true
+        events:
+          index: true
+          indexType: gin
+        status:
+          readOnly: true
+          properties:
+            lastFailure:
+              readOnly: true
+              properties:
+                timestamp:
+                  readOnly: true
+                error:
+                  readOnly: true
+                response:
+                  readOnly: true
+                statusCode:
+                  readOnly: true
+            lastTriggeredAt:
+              readyOnly: true
+    webhook-response:
+      table: webhook_response
+      properties:
+        id:
+          readOnly: true
+        kind:
+          readOnly: true
+        webhookId:
+          readOnly: true
+          index: true
+        eventId:
+          readOnly: true
+          index: true
+        createdAt:
+          readOnly: true
+    detection-webhook-payload:
+      type: object
+      required:
+        - manifestID
+        - seqNo
+        - sceneClassification
+      properties:
+        manifestID:
+          type: string
+        seqNo:
+          type: number
+        sceneClassification:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - probability
+            properties:
+              name:
+                type: string
+              probability:
+                type: number
+    stream:
+      table: stream
+      properties:
+        id:
+          readOnly: true
+        kind:
+          readOnly: true
+        userId:
+          index: true
+        lastSeen:
+          index: true
+        isActive:
+          index: true
+        createdByTokenName:
+          readOnly: true
+        createdByTokenId:
+          readOnly: true
+        createdAt:
+          readOnly: true
+          index: true
+        parentId:
+          index: true
+        streamKey:
+          unique: true
+        playbackId:
+          unique: true
+        wowza:
+          properties:
+            sourceInfo:
+              properties:
+                width:
+                  minValue: 1
+                height:
+                  minValue: 1
+                fps:
+                  minValue: 1
+    multistream-target-patch-payload:
+      table: null
+    session:
+      table: session
+      properties:
+        id:
+          readOnly: true
+        kind:
+          readOnly: true
+        userId:
+          index: true
+        lastSeen:
+          index: true
+        createdAt:
+          readOnly: true
+          index: true
+        parentId:
+          index: true
+        record:
+        recordingStatus:
+          readonly: true
+        recordingUrl:
+          readonly: true
+        mp4Url:
+          readonly: true
+    object-store:
+      table: object_store
+      properties:
+        userId:
+          index: true
+        createdAt:
+          readOnly: true
+    multistream-target:
+      table: multistream_target
+      properties:
+        id:
+          readOnly: true
+        userId:
+          readOnly: true
+          index: true
+        createdAt:
+          readOnly: true
+    asset:
+      table: asset
+      properties:
+        id:
+          readOnly: true
+          index: true
+        playbackId:
+          index: true
+        playbackRecordingId:
+          index: true
+        playbackUrl:
+          readOnly: true
+        downloadUrl:
+          readOnly: true
+        userId:
+          readOnly: true
+          index: true
+        source:
+          oneOf:
+            - additionalProperties: false
+              properties:
+                url:
+                  index: true
+        storage:
+          properties:
+            ipfs:
+              properties:
+                updatedAt:
+                  readOnly: true
+            status:
+              readOnly: true
+        status:
+          readOnly: true
+        createdAt:
+          readOnly: true
+        size:
+          readOnly: true
+        videoSpec:
+          readOnly: true
+        sourceAssetId:
+          index: true
+          readOnly: true
+    ipfs-file-info:
+      properties:
+        cid:
+          index: true
+        url:
+          readOnly: true
+        gatewayUrl:
+          readOnly: true
+    task:
+      table: task
+      properties:
+        id:
+          readOnly: true
+          index: true
+        userId:
+          readOnly: true
+          index: true
+        createdAt:
+          readOnly: true
+        scheduledAt:
+          readOnly: true
+        inputAssetId:
+          index: true
+        outputAssetId:
+          index: true
+        status:
+          readOnly: true
+        output:
+          properties:
+            export:
+              properties:
+                ipfs:
+                  properties:
+                    videoFileUrl:
+                      readOnly: true
+                    videoFileGatewayUrl:
+                      readOnly: true
+                    nftMetadataUrl:
+                      readOnly: true
+                    nftMetadataGatewayUrl:
+                      readOnly: true
+    signing-key:
+      table: signing_key
+      properties:
+        id:
+          readOnly: true
+          index: true
+        createdAt:
+          readOnly: true
+        lastSeen:
+          readOnly: true
+        userId:
+          readOnly: true
+          index: true
+    api-token:
+      table: api_token
+      properties:
+        kind:
+          readOnly: true
+        userId:
+          index: true
+        createdAt:
+          readOnly: true
+    user-verification:
+      properties:
+        email:
+          unique: true
+          index: true
+    verify-email:
+      properties:
+        email:
+          unique: true
+    password-reset-token:
+      table: password_reset_token
+      properties:
+        kind:
+          readOnly: true
+        userId:
+          readOnly: true
+          index: true
+        expiration:
+          readOnly: true
+    password-reset-confirm:
+      properties:
+        email:
+          index: true
+        userId:
+          index: true
+    region:
+      table: regions
+      properties:
+        region:
+          unique: true
+          index: true
+    user:
+      table: users # 'user' is a keyword in postgres, this causes problems otherwise
+      properties:
+        email:
+          unique: true
+          index: true
+        kind:
+          readOnly: true
+        id:
+          readOnly: true
+        stripeCustomerId:
+          unique: true
+        createdAt:
+          readOnly: true
+    experiment:
+      table: experiment
+      properties:
+        name:
+          index: true
+          unique: true
+        userId:
+          index: true
+        createdAt:
+          readOnly: true
+        updatedAt:
+          readOnly: true
+        audienceUserIds:
+          index: true
+          indexType: gin
+        audienceUsers:
+          readonly: true
+    usage:
+      table: usage
+      properties:
+        id:
+          unique: true
+          index: true
+        kind:
+          readOnly: true
+        date:
+          readOnly: true
