@@ -1114,7 +1114,8 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         creatorId:
           oneOf:
-            - additionalProperties: false
+            - type: object
+              additionalProperties: false
               required: [type, value]
               properties:
                 type:
@@ -1443,8 +1444,10 @@ components:
             - $ref: "#/components/schemas/asset/properties/creatorId"
             - type: string
               description:
-                Developer-managed (unverified) creator ID of the asset
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         storage:
+          type: object
           additionalProperties: false
           properties:
             ipfs:
