@@ -99,7 +99,7 @@ const frontendUrl = (
     config: { frontendDomain },
   }: Request,
   path: string
-) => `${proto || "http"}://${frontendDomain}${path}`;
+) => `${proto || "https"}://${frontendDomain}${path}`;
 
 const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
 
