@@ -114,9 +114,10 @@ export default class WebhookCannon {
       return true;
     }
 
+    let assetId: string;
     if (event === "recording.ready" && sessionId) {
       try {
-        await this.handleRecordingReadyChecks(sessionId);
+        assetId = await this.handleRecordingReadyChecks(sessionId);
       } catch (e) {
         console.log(
           `Error handling recording.ready event sessionId=${sessionId} err=`,
@@ -177,6 +178,7 @@ export default class WebhookCannon {
         event: msg,
         stream,
         user,
+        assetId,
       };
       await Promise.all(
         webhooks.map((webhook) =>
@@ -492,7 +494,10 @@ export default class WebhookCannon {
     }
   }
 
-  async handleRecordingReadyChecks(sessionId: string, isRetry = false) {
+  async handleRecordingReadyChecks(
+    sessionId: string,
+    isRetry = false
+  ): Promise<string> {
     const session = await this.db.session.get(sessionId, {
       useReplica: false,
     });
@@ -520,10 +525,10 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session recording already handled");
     }
 
-    await this.recordingToVodAsset(session);
+    return await this.recordingToVodAsset(session);
   }
 
-  async recordingToVodAsset(session: DBSession) {
+  async recordingToVodAsset(session: DBSession): Promise<string> {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(id);
 
@@ -557,6 +562,7 @@ export default class WebhookCannon {
       undefined,
       asset
     );
+    return id.toString();
   }
 }
 
