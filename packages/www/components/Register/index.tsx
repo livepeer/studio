@@ -2,6 +2,7 @@ import { TextField, Button, Box, Text } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
+import { useMailChimp } from "react-use-mailchimp-signup";
 import { useHubspotForm } from "hooks";
 import BroadcastingProvider from "../Login/BroadcastingProvider";
 
@@ -22,6 +23,10 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
     formId: process.env.NEXT_PUBLIC_HUBSPOT_LOGIN_FORM_ID,
   });
 
+  const { subscribe } = useMailChimp({
+    action: `https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=ecd3bf60d5&f_id=00ae69e0f0&tags=3536469`,
+  });
+
   useEffect(() => {
     if (router?.query?.email) {
       setEmail(router.query.email as string);
@@ -30,6 +35,13 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
   const submit = async (e) => {
     e.preventDefault();
+
+    // Subscribe user to newsletter in Mailchimp
+    subscribe({
+      EMAIL: email,
+      FNAME: firstName,
+      LNAME: lastName,
+    });
 
     // only handle submission to hubspot on prod
     if (process.env.NEXT_PUBLIC_SITE_URL === "livepeer.studio") {
