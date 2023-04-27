@@ -58,8 +58,6 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
         Reset your password.
       </Text>
       <Box
-        as="form"
-        onSubmit={submit}
         css={{
           width: "100%",
           display: "flex",
@@ -68,77 +66,78 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
           ml: "auto",
           mr: "auto",
           maxWidth: 450,
-        }}
-        id={id}>
-        <Text
-          variant="neutral"
-          size={1}
-          css={{
-            mb: "$1",
-            fontSize: "11px",
-            textTransform: "uppercase",
-            fontWeight: 600,
-          }}>
-          Broadcasting provider
-        </Text>
-        <TextField
-          readOnly
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            bc: "$neutral2",
-            mb: "$4",
-            color: "$neutral11",
-            fontSize: "$2",
-          }}
-          name="broadcastingProvider"
-          type="text"
-          required
-          value="Livepeer Inc"
-        />
-        <Text
-          variant="neutral"
-          size={1}
-          css={{
-            mb: "$1",
-            fontSize: "11px",
-            textTransform: "uppercase",
-            fontWeight: 600,
-          }}>
-          Email Address
-        </Text>
-        <TextField
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            bc: "$neutral2",
-            mb: "$2",
-          }}
-          name="email"
-          type="email"
-          placeholder="Email address"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        }}>
+        <form id={id} onSubmit={submit}>
+          <Text
+            variant="neutral"
+            size={1}
+            css={{
+              mb: "$1",
+              fontSize: "11px",
+              textTransform: "uppercase",
+              fontWeight: 600,
+            }}>
+            Broadcasting provider
+          </Text>
+          <TextField
+            readOnly
+            size="3"
+            id="email"
+            css={{
+              width: "100%",
+              bc: "$neutral2",
+              mb: "$4",
+              color: "$neutral11",
+              fontSize: "$2",
+            }}
+            name="broadcastingProvider"
+            type="text"
+            required
+            value="Livepeer Inc"
+          />
+          <Text
+            variant="neutral"
+            size={1}
+            css={{
+              mb: "$1",
+              fontSize: "11px",
+              textTransform: "uppercase",
+              fontWeight: 600,
+            }}>
+            Email Address
+          </Text>
+          <TextField
+            size="3"
+            id="email"
+            css={{
+              width: "100%",
+              bc: "$neutral2",
+              mb: "$2",
+            }}
+            name="email"
+            type="email"
+            placeholder="Email address"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        {errors.length > 0 && (
-          <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
-        )}
+          {errors.length > 0 && (
+            <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+          )}
 
-        <Button
-          variant="primary"
-          size={4}
-          css={{
-            width: "100%",
-            mt: "$3",
-            px: "$3",
-            fontSize: "$3",
-          }}>
-          {loading ? "Loading..." : buttonText}
-        </Button>
+          <Button
+            variant="primary"
+            size={4}
+            css={{
+              width: "100%",
+              mt: "$3",
+              px: "$3",
+              fontSize: "$3",
+            }}>
+            {loading ? "Loading..." : buttonText}
+          </Button>
+        </form>
       </Box>
     </Box>
   );

@@ -71,8 +71,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
         Livepeer, the world's open video infrastructure.
       </Text>
       <Box
-        as="form"
-        onSubmit={submit}
         css={{
           width: "100%",
           display: "flex",
@@ -81,89 +79,90 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           ml: "auto",
           mr: "auto",
           maxWidth: 450,
-        }}
-        id={id}>
-        <BroadcastingProvider />
-        <Text
-          variant="neutral"
-          size={1}
-          css={{
-            fontWeight: 600,
-            mb: "$1",
-            fontSize: "11px",
-            textTransform: "uppercase",
-          }}>
-          Account
-        </Text>
+        }}>
+        <form id={id} onSubmit={submit}>
+          <BroadcastingProvider />
+          <Text
+            variant="neutral"
+            size={1}
+            css={{
+              fontWeight: 600,
+              mb: "$1",
+              fontSize: "11px",
+              textTransform: "uppercase",
+            }}>
+            Account
+          </Text>
 
-        <TextField
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            mb: "$2",
-          }}
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <Box css={{ position: "relative", width: "100%" }}>
           <TextField
             size="3"
-            id="password"
+            id="email"
             css={{
               width: "100%",
-              mx: 0,
+              mb: "$2",
             }}
-            name="password"
-            type="password"
-            placeholder="Password"
+            name="email"
+            type="email"
+            placeholder="Email"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <Box
-            css={{
-              right: 20,
-              position: "absolute",
-              transform: "translateY(-50%)",
-              top: "50%",
-            }}>
-            <Link href="/forgot-password" passHref legacyBehavior>
-              <A
-                variant="primary"
-                css={{
-                  display: "block",
-                  textDecoration: "none",
-                  fontSize: "$1",
-                  fontWeight: 450,
-                }}>
-                Forgot
-              </A>
-            </Link>
+
+          <Box css={{ position: "relative", width: "100%" }}>
+            <TextField
+              size="3"
+              id="password"
+              css={{
+                width: "100%",
+                mx: 0,
+              }}
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Box
+              css={{
+                right: 20,
+                position: "absolute",
+                transform: "translateY(-50%)",
+                top: "50%",
+              }}>
+              <Link href="/forgot-password" passHref legacyBehavior>
+                <A
+                  variant="primary"
+                  css={{
+                    display: "block",
+                    textDecoration: "none",
+                    fontSize: "$1",
+                    fontWeight: 450,
+                  }}>
+                  Forgot
+                </A>
+              </Link>
+            </Box>
           </Box>
-        </Box>
 
-        {errors.length > 0 && (
-          <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
-        )}
+          {errors.length > 0 && (
+            <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+          )}
 
-        <Button
-          variant="primary"
-          disabled={loading ? true : false}
-          size={4}
-          css={{
-            width: "100%",
-            mt: "$3",
-            px: "$3",
-            fontSize: "$3",
-          }}>
-          {loading ? "Loading..." : buttonText}
-        </Button>
+          <Button
+            variant="primary"
+            disabled={loading ? true : false}
+            size={4}
+            css={{
+              width: "100%",
+              mt: "$3",
+              px: "$3",
+              fontSize: "$3",
+            }}>
+            {loading ? "Loading..." : buttonText}
+          </Button>
+        </form>
       </Box>
     </Box>
   );
