@@ -1,11 +1,4 @@
-import {
-  TextField,
-  Button,
-  Grid,
-  Box,
-  Link as A,
-  Text,
-} from "@livepeer/design-system";
+import { TextField, Button, Box, Text } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useHubspotForm } from "hooks";
@@ -15,12 +8,7 @@ export const FRONTEND_SALT = "69195A9476F08546";
 
 const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const { handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
