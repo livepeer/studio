@@ -12,10 +12,10 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { products } from "@livepeer.studio/api/src/config";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import PaymentMethodDialog from "components/Dashboard/PaymentMethodDialog";
-import PaymentMethod from "components/Dashboard/PaymentMethod";
-import UpcomingInvoiceTable from "components/Dashboard/UpcomingInvoiceTable";
-import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
+import PaymentMethodDialog from "components/PaymentMethodDialog";
+import PaymentMethod from "components/PaymentMethod";
+import UpcomingInvoiceTable from "components/UpcomingInvoiceTable";
+import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 

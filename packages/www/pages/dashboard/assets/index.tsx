@@ -1,7 +1,7 @@
 import Layout from "../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import AssetsTable from "components/Dashboard/AssetsTable";
+import AssetsTable from "components/AssetsTable";
 import { DashboardAssets as Content } from "content";
 
 const Assets = () => {

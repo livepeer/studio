@@ -2,11 +2,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Layout from "../../layouts/dashboard";
 import { Box, Button, useSnackbar } from "@livepeer/design-system";
-import GettingStarted from "components/Dashboard/GettingStarted";
-import UsageSummary from "components/Dashboard/UsageSummary";
-import StreamsTable from "components/Dashboard/StreamsTable";
-import Spinner from "components/Dashboard/Spinner";
-import Banner from "components/Dashboard/Banner";
+import GettingStarted from "components/GettingStarted";
+import UsageSummary from "components/UsageSummary";
+import StreamsTable from "components/StreamsTable";
+import Spinner from "components/Spinner";
+import Banner from "components/Banner";
 
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";

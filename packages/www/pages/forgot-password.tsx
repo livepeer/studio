@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import ForgotPassword from "components/Dashboard/ForgotPassword";
+import ForgotPassword from "components/ForgotPassword";
 import {
   Button,
   Flex,
