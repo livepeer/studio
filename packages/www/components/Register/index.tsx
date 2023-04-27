@@ -1,11 +1,4 @@
-import {
-  TextField,
-  Button,
-  Grid,
-  Box,
-  Link as A,
-  Text,
-} from "@livepeer/design-system";
+import { TextField, Button, Box, Text } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
@@ -37,7 +30,11 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
   const submit = async (e) => {
     e.preventDefault();
-    handleSubmit(e);
+
+    // only handle submission to hubspot on prod
+    if (process.env.NEXT_PUBLIC_SITE_URL === "livepeer.studio") {
+      handleSubmit(e);
+    }
 
     const [hashedPassword] = await hash(password, FRONTEND_SALT);
     // hash password, then

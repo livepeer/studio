@@ -16,12 +16,6 @@ import Link from "next/link";
 export const FRONTEND_SALT = "69195A9476F08546";
 
 const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
-  const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { handleSubmit } = useHubspotForm({
@@ -31,7 +25,11 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
   const submit = async (e) => {
     e.preventDefault();
-    handleSubmit(e);
+
+    // only handle submission to hubspot on prod
+    if (process.env.NEXT_PUBLIC_SITE_URL === "livepeer.studio") {
+      handleSubmit(e);
+    }
 
     const [hashedPassword] = await hash(password, FRONTEND_SALT);
     // hash password, then

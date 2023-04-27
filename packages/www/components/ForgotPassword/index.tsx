@@ -35,7 +35,11 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
 
   const submit = async (e) => {
     e.preventDefault();
-    handleSubmit(e);
+
+    // only handle submission to hubspot on prod
+    if (process.env.NEXT_PUBLIC_SITE_URL === "livepeer.studio") {
+      handleSubmit(e);
+    }
 
     return onSubmit({ email });
   };
