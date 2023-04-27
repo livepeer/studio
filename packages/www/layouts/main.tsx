@@ -4,7 +4,7 @@ import Router from "next/router";
 import { useEffect } from "react";
 import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
-import GoogleTagManager from "components/Site/GoogleTagManager";
+import GoogleTagManager from "components/Dashboard/GoogleTagManager";
 import Footer from "components/Dashboard/Footer";
 import Spinner from "components/Dashboard/Spinner";
 import { useLoggedIn } from "hooks";

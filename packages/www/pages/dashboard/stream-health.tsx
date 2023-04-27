@@ -12,7 +12,7 @@ import { useApi } from "hooks";
 import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api/types";
 import Chart from "components/Dashboard/Chart";
-import AppPlayer from "components/Site/AppPlayer";
+import AppPlayer from "components/Dashboard/AppPlayer";
 import { DashboardStreamHealth as Content } from "content";
 
 const Arrow = ({ active }: Props) => {
