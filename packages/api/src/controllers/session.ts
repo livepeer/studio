@@ -185,9 +185,6 @@ function removePrivateFields(obj: DBSession) {
 
 const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 
-const privateFields: (keyof DBSession)[] = [
-  "recordObjectStoreId",
-  "recordingSessionId",
-];
+const privateFields: (keyof DBSession)[] = ["recordObjectStoreId"];
 
 export default app;

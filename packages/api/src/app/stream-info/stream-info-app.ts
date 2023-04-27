@@ -296,7 +296,8 @@ class statusPoller {
           await db.stream.update(storedInfo.id, zeroRate);
           if (storedInfo.parentId) {
             await db.stream.update(storedInfo.parentId, zeroRate);
-            await db.session.update(storedInfo.id, zeroRate);
+            const sessionId = si.stream.sessionId ?? si.stream.id;
+            await db.session.update(sessionId, zeroRate);
           }
           if (!storedInfo.parentId) {
             // this is not a session created by our Mist, so manage isActive field for this stream
@@ -363,7 +364,8 @@ class statusPoller {
       await db.stream.add(storedInfo.parentId, incObj, setObj);
       // update session table
       try {
-        await db.session.add(storedInfo.id, incObj, setObj);
+        const sessionId = si.stream.sessionId ?? si.stream.id;
+        await db.session.add(sessionId, incObj, setObj);
       } catch (e) {
         console.log(`error updating session table:`, e);
       }

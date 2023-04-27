@@ -1279,7 +1279,6 @@ describe("controllers/stream", () => {
         transcodedSegments: 4,
         sourceSegmentsDuration: 1.5,
         transcodedSegmentsDuration: 2.5,
-        recordingSessionId: "1",
         recordObjectStoreId: "mock_store",
       });
       await db.asset.create({

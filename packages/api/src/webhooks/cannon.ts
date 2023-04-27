@@ -493,7 +493,7 @@ export default class WebhookCannon {
   }
 
   async handleRecordingReadyChecks(sessionId: string, isRetry = false) {
-    const session = await this.db.stream.get(sessionId, {
+    const session = await this.db.session.get(sessionId, {
       useReplica: false,
     });
     if (!session) {
@@ -515,12 +515,8 @@ export default class WebhookCannon {
       return this.handleRecordingReadyChecks(sessionId, true);
     }
 
-    const res = await this.db.stream.update(
-      [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
-      { isActive: false },
-      { throwIfEmpty: false }
-    );
-    if (res.rowCount < 1) {
+    const res = await this.db.asset.getBySessionId(sessionId);
+    if (res) {
       throw new UnprocessableEntityError("Session recording already handled");
     }
 
@@ -555,12 +551,7 @@ export default class WebhookCannon {
       "upload",
       {
         upload: {
-          url: pathJoin(
-            os.publicUrl,
-            playbackId,
-            session.recordingSessionId,
-            "output.m3u8"
-          ),
+          url: pathJoin(os.publicUrl, playbackId, session.id, "output.m3u8"),
         },
       },
       undefined,
