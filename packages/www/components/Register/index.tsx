@@ -58,8 +58,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
         width: "100%",
       }}>
       <Box
-        as="form"
-        onSubmit={submit}
         css={{
           width: "100%",
           display: "flex",
@@ -67,104 +65,105 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           ml: "auto",
           mr: "auto",
           maxWidth: 450,
-        }}
-        id={id}>
-        <Text
-          variant="neutral"
-          size={5}
-          css={{
-            maxWidth: 450,
-            textAlign: "center",
-            mx: "auto",
-            mb: "$6",
-          }}>
-          Create an account.
-        </Text>
-        <BroadcastingProvider />
-        <Text
-          variant="neutral"
-          size={1}
-          css={{
-            fontWeight: 600,
-            mb: "$1",
-            fontSize: "11px",
-            textTransform: "uppercase",
-          }}>
-          Account details
-        </Text>
-        <TextField
-          size="3"
-          id="firstName"
-          css={{
-            width: "100%",
-            mb: "$2",
-          }}
-          name="firstName"
-          type="text"
-          placeholder="First name"
-          required
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
-        <TextField
-          size="3"
-          id="lastName"
-          css={{
-            width: "100%",
-            mb: "$2",
-          }}
-          name="lastName"
-          type="text"
-          placeholder="Last name"
-          required
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
-        <TextField
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            mb: "$2",
-          }}
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        }}>
+        <form id={id} onSubmit={submit}>
+          <Text
+            variant="neutral"
+            size={5}
+            css={{
+              maxWidth: 450,
+              textAlign: "center",
+              mx: "auto",
+              mb: "$6",
+            }}>
+            Create an account.
+          </Text>
+          <BroadcastingProvider />
+          <Text
+            variant="neutral"
+            size={1}
+            css={{
+              fontWeight: 600,
+              mb: "$1",
+              fontSize: "11px",
+              textTransform: "uppercase",
+            }}>
+            Account details
+          </Text>
+          <TextField
+            size="3"
+            id="firstName"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="firstName"
+            type="text"
+            placeholder="First name"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <TextField
+            size="3"
+            id="lastName"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="lastName"
+            type="text"
+            placeholder="Last name"
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+          <TextField
+            size="3"
+            id="email"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <TextField
-          size="3"
-          id="password"
-          css={{
-            width: "100%",
-            mx: 0,
-          }}
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <TextField
+            size="3"
+            id="password"
+            css={{
+              width: "100%",
+              mx: 0,
+            }}
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        {errors.length > 0 && (
-          <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
-        )}
+          {errors.length > 0 && (
+            <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+          )}
 
-        <Button
-          variant="primary"
-          disabled={loading ? true : false}
-          size={4}
-          css={{
-            width: "100%",
-            my: "$3",
-            px: "$3",
-          }}>
-          {loading ? "Loading..." : buttonText}
-        </Button>
+          <Button
+            variant="primary"
+            disabled={loading ? true : false}
+            size={4}
+            css={{
+              width: "100%",
+              my: "$3",
+              px: "$3",
+            }}>
+            {loading ? "Loading..." : buttonText}
+          </Button>
+        </form>
       </Box>
     </Box>
   );
