@@ -300,16 +300,14 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
       break;
     case "room_started":
     case "room_finished":
+    case "egress_started":
+    case "egress_ended":
       room.events.push({
         eventName: event.event,
         timestamp: new Date().getTime(),
       });
       room.updatedAt = new Date().getTime();
       await db.room.replace(room);
-      break;
-    case "egress_started":
-    case "egress_ended":
-      // TODO
       break;
   }
 
