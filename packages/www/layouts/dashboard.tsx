@@ -1,8 +1,8 @@
 import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
-import Sidebar, { SidebarId } from "components/Dashboard/Sidebar";
-import Header from "components/Dashboard/Header";
-import FileUpload from "components/Dashboard/FileUpload";
+import Sidebar, { SidebarId } from "components/Sidebar";
+import Header from "components/Header";
+import FileUpload from "components/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
-import { DashboardRedirect } from "components/Dashboard/Redirect";
+import { DashboardRedirect } from "components/Redirect";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);

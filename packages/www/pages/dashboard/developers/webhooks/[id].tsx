@@ -3,7 +3,7 @@ import { useApi, useLoggedIn } from "hooks";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
-import WebhookDetails from "components/Dashboard/WebhookDetails";
+import WebhookDetails from "components/WebhookDetails";
 import { DashboardWebhooks as Content } from "content";
 
 const WebhookDetail = () => {

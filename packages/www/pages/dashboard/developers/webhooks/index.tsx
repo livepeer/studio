@@ -1,6 +1,6 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import WebhooksTable from "components/Dashboard/WebhooksTable";
+import WebhooksTable from "components/WebhooksTable";
 import { DashboardWebhooks as Content } from "content";
 
 const Webhooks = () => {
