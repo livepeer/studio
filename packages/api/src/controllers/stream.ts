@@ -971,6 +971,8 @@ app.put(
     const ingest = await getIngestBase(req);
     const patch = {
       isActive: active,
+      // initialize isHealthy to true on stream initialization
+      isHealthy: stream.isHealthy ?? (active ? true : undefined),
       lastSeen: Date.now(),
       mistHost: hostName,
       region: req.config.ownRegion,
