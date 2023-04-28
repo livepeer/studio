@@ -554,7 +554,12 @@ export default class WebhookCannon {
       "upload",
       {
         upload: {
-          url: pathJoin(os.publicUrl, playbackId, session.id, "output.m3u8"),
+          url: pathJoin(
+            os.publicUrl,
+            session.playbackId,
+            session.id,
+            "output.m3u8"
+          ),
         },
       },
       undefined,
