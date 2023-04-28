@@ -97,6 +97,20 @@ export default class AssetTable extends Table<WithID<Asset>> {
     return assets[0];
   }
 
+  async getBySessionId(sessionId: string): Promise<WithID<Asset>> {
+    const query = [
+      sql`asset.data->'source'->>'type' = 'recording'`,
+      sql`asset.data->'source'->>'sessionId' = ${sessionId}`,
+    ];
+    const [assets] = await this.find(query, {
+      limit: 1,
+    });
+    if (assets.length < 1) {
+      return null;
+    }
+    return assets[0];
+  }
+
   async findDuplicateUrlUpload(
     url: string,
     userId: string

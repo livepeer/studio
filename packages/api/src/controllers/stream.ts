@@ -200,26 +200,26 @@ async function getRecordingUrls(
   ingest: string,
   session: DBSession
 ): Promise<{ recordingUrl: string; mp4Url: string }> {
-  // TODO: Handle backwards-compatibility
-  // if (!session.recordingSessionId) {
-  //   // Backwards-compatibility for Recording V1
-  //   const base = pathJoin(
-  //     ingest,
-  //     `recordings`,
-  //     session.lastSessionId ?? session.id
-  //   );
-  //   return {
-  //     recordingUrl: pathJoin(base, "index.m3u8"),
-  //     mp4Url: pathJoin(base, "source.mp4"),
-  //   };
-  // }
-
-  // Recording V2
-  const asset = await db.asset.get(session.id);
+  const asset = await db.asset.getBySessionId(session.id);
   if (!asset || ["waiting", "processing"].includes(asset.status?.phase)) {
     // Recording processing in progress
     return;
   }
+
+  if (asset.id != session.id) {
+    // Backwards-compatibility for Recording V1
+    const base = pathJoin(
+      ingest,
+      `recordings`,
+      session.lastSessionId ?? session.id
+    );
+    return {
+      recordingUrl: pathJoin(base, "index.m3u8"),
+      mp4Url: pathJoin(base, "source.mp4"),
+    };
+  }
+
+  // Recording V2
   const assetWithPlayback = await withPlaybackUrls(
     config,
     ingest,
