@@ -2319,6 +2319,7 @@ components:
           example: 2034212122
         stripeProductId:
           type: string
+          description: Identifier of the plan that the user is subscribed to.
           enum:
             - prod_0
             - prod_1
