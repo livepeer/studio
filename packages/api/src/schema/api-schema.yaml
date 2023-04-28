@@ -416,8 +416,7 @@ components:
             example: P720p60fps16x9
         record:
           description: >-
-            Should this stream be recorded? Uses default settings. For more
-            customization, create and configure an object store.
+            Whether this stream should be recorded.
           type: boolean
           example: false
         recordObjectStoreId:
