@@ -216,8 +216,8 @@ async function getRecordingUrls(
 
   // Recording V2
   const asset = await db.asset.getBySessionId(session.id);
-  if (!asset) {
-    // Recording asset not created yet
+  if (!asset || ["waiting", "processing"].includes(asset.status?.phase)) {
+    // Recording processing in progress
     return;
   }
   const assetWithPlayback = await withPlaybackUrls(
@@ -432,8 +432,11 @@ export async function getRecordingFields(
     return { recordingStatus };
   }
   const recordingUrls = await getRecordingUrls(config, ingest, session);
-  if (!recordingUrls || !recordingUrls.recordingUrl) {
+  if (!recordingUrls) {
     return { recordingStatus: "waiting" };
+  }
+  if (!recordingUrls.recordingUrl) {
+    return { recordingStatus: "none" };
   }
   return { recordingStatus, ...recordingUrls };
 }
