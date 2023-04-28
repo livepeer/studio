@@ -520,7 +520,7 @@ export default class WebhookCannon {
       return this.handleRecordingReadyChecks(sessionId, true);
     }
 
-    const res = await this.db.asset.getBySessionId(sessionId);
+    const res = await this.db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");
     }
@@ -529,7 +529,7 @@ export default class WebhookCannon {
   }
 
   async recordingToVodAsset(session: DBSession): Promise<string> {
-    const id = uuid();
+    const id = session.id;
     const playbackId = await generateUniquePlaybackId(id);
 
     // trim the second precision from the time string

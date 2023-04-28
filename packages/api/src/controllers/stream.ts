@@ -215,7 +215,7 @@ async function getRecordingUrls(
   // }
 
   // Recording V2
-  const asset = await db.asset.getBySessionId(session.id);
+  const asset = await db.asset.get(session.id);
   if (!asset || ["waiting", "processing"].includes(asset.status?.phase)) {
     // Recording processing in progress
     return;
