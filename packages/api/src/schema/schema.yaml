@@ -416,6 +416,10 @@ components:
           type: boolean
           description: If currently active
           index: true
+        isHealthy:
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
+        issues:
+          $ref: "#/components/schemas/stream-health-payload/properties/issues"
         createdByTokenName:
           type: string
           readOnly: true
@@ -635,6 +639,70 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
+
+    stream-health-payload:
+      type: object
+      description:
+        Payload received from Catalyst about the health of livestreams currently
+        or recently active on Mist.
+      required:
+        - stream_name
+        - is_active
+        - is_healthy
+      properties:
+        stream_name:
+          type: string
+          description:
+            The name of the stream within Catalyst/Mist, normally comprised of
+            the base stream name with the playback ID after the + sign.
+          example: videorec+eaw4nk06ts2d0mzb
+        session_id:
+          description:
+            The unique identifier for the specific session, created by Mist and
+            used for creating the session object in the DB.
+          type: string
+        is_active:
+          type: boolean
+          description: Indicates whether the stream is currently live or not.
+        is_healthy:
+          type: boolean
+          description: Indicates whether the stream is healthy or not.
+        issues:
+          type: string
+          description:
+            A human-readable string describing issues affecting the stream, if
+            any.
+        tracks:
+          type: array
+          description:
+            A map of track objects containing information about the stream's
+            tracks. The keys are the unique track ID from Mist.
+          additionalProperties:
+            type: object
+            properties:
+              codec:
+                type: string
+                description: The codec being used for the track.
+              kbits:
+                type: number
+                description: The bitrate of the track, in kilobits per second.
+              keys:
+                type: object
+                description:
+                  An object containing additional track-specific metrics.
+                additionalProperties:
+                  type: number
+              fpks:
+                type: number
+                description:
+                  The framerate of the track, in frames per thousand seconds
+                  (kilo-second).
+              height:
+                type: number
+                description: The height of the track's video resolution.
+              width:
+                type: number
+                description: The width of the track's video resolution.
 
     asset-patch-payload:
       type: object
@@ -861,6 +929,10 @@ components:
         broadcasterHost:
           type: string
           description: Hostname of the broadcaster that transcodes that stream
+        isHealthy:
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
+        issues:
+          $ref: "#/components/schemas/stream-health-payload/properties/issues"
         deleted:
           type: boolean
           description: Set to true when stream deleted

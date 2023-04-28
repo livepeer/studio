@@ -11,13 +11,19 @@ import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
 import {
   DetectionWebhookPayload,
+  StreamHealthPayload,
   StreamPatchPayload,
   StreamSetActivePayload,
   User,
 } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/db";
-import { BadRequestError, InternalServerError } from "../store/errors";
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+  UnprocessableEntityError,
+} from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
 import messages from "../store/messages";
@@ -791,6 +797,66 @@ app.post(
         Date.now() - start
       }ms`
     );
+  }
+);
+
+app.post(
+  "/:streamId/stream-health",
+  authorizer({ anyAdmin: true }),
+  validatePost("stream-health-payload"),
+  async (req, res) => {
+    const start = Date.now();
+    const payload = req.body as StreamHealthPayload;
+
+    // parse playback ID from the mist stream name like videorec+<playbackId>
+    if (!payload.stream_name.includes("+")) {
+      throw new UnprocessableEntityError("stream name missing base name");
+    }
+    const playbackId = payload.stream_name.split("+", 2)[1];
+
+    const stream = await db.stream.getByPlaybackId(playbackId, {
+      useReplica: false,
+    });
+    if (!stream) {
+      // allow calling this for deleted or suspended streams, we don't want to
+      // lose the data if they are already live.
+      throw new NotFoundError("stream not found");
+    }
+
+    // TODO: set the isActive field based on the payload as well (need
+    // compatibility with /setactive recordging/webhooks handling)
+    const patch: Partial<DBSession & DBStream> = {
+      isHealthy: payload.is_active ? payload.is_healthy : undefined,
+      issues: payload.is_active && payload.issues ? payload.issues : undefined,
+      lastSeen: Date.now(),
+    };
+
+    // Since we might need to delete some fields, use replace instead of update
+    await db.stream.replace({ ...stream, ...patch });
+
+    if (payload.session_id) {
+      const session = await db.session.get(payload.session_id, {
+        useReplica: false,
+      });
+      if (!session) {
+        logger.warn(
+          `stream-health-payload: session not found for stream_id=${stream.id} session_id=${payload.session_id}`
+        );
+      }
+      await db.session.replace({ ...session, ...patch });
+    }
+
+    // Log all the received payload for internal debugging (we don't expose all
+    // the info on the stream object for now).
+    console.log(
+      `stream-health: processed stream health hook for ` +
+        `stream_id=${stream.id} elapsed=${Date.now() - start}ms` +
+        `stream_name=${stream.name} session_id=${payload.session_id} ` +
+        `is_active=${payload.is_active} is_healthy=${payload.is_healthy} ` +
+        `issues=${payload.issues} tracks=${JSON.stringify(payload.tracks)}`
+    );
+
+    return res.status(204);
   }
 );
 
