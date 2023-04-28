@@ -801,7 +801,7 @@ app.post(
 );
 
 app.post(
-  "/hook/stream-health",
+  "/hook/health",
   authorizer({ anyAdmin: true }),
   validatePost("stream-health-payload"),
   async (req, res) => {
@@ -838,12 +838,13 @@ app.post(
       const session = await db.session.get(payload.session_id, {
         useReplica: false,
       });
-      if (!session) {
+      if (session) {
+        await db.session.replace({ ...session, ...patch });
+      } else {
         logger.warn(
           `stream-health-payload: session not found for stream_id=${stream.id} session_id=${payload.session_id}`
         );
       }
-      await db.session.replace({ ...session, ...patch });
     }
 
     // Log all the received payload for internal debugging (we don't expose all

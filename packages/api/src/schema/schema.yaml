@@ -673,7 +673,7 @@ components:
             A human-readable string describing issues affecting the stream, if
             any.
         tracks:
-          type: array
+          type: object
           description:
             A map of track objects containing information about the stream's
             tracks. The keys are the unique track ID from Mist.

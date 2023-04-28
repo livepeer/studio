@@ -8,6 +8,7 @@ import {
   StreamPatchPayload,
   User,
   StreamSetActivePayload,
+  StreamHealthPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
@@ -21,6 +22,7 @@ import {
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
+import { generateUniquePlaybackId } from "./generate-keys";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -882,8 +884,10 @@ describe("controllers/stream", () => {
     let res;
 
     beforeEach(async () => {
+      const id = uuid();
       stream = {
-        id: uuid(),
+        id,
+        playbackId: await generateUniquePlaybackId(id),
         kind: "stream",
         name: "the-stream",
         userId: nonAdminUser.id,
@@ -988,6 +992,122 @@ describe("controllers/stream", () => {
             403,
             expect.stringContaining("admin")
           );
+        });
+      });
+    });
+
+    describe("stream health hook", () => {
+      const samplePayload = (isActive: boolean, isHealthy: boolean) => ({
+        stream_name: "video+" + stream.playbackId,
+        session_id: "sampleSessionId",
+        is_active: isActive,
+        is_healthy: isHealthy,
+        tracks: {
+          track1: {
+            codec: "h264",
+            kbits: 1000,
+            keys: { frames_min: 142, frames_max: 420 },
+            fpks: 30,
+            height: 720,
+            width: 1280,
+          },
+        },
+        issues: isHealthy ? undefined : "Under the weather",
+      });
+
+      const sendStreamHealthHook = async (payload: StreamHealthPayload) => {
+        const res = await client.post("/stream/hook/health", payload);
+        if (res.status !== 204) {
+          await expect(res.json()).resolves.toMatchObject({ happy: {} });
+        }
+        expect(res.status).toBe(204);
+        const stream = await server.db.stream.getByPlaybackId(
+          payload.stream_name.split("+", 2)[1]
+        );
+        return stream;
+      };
+
+      beforeEach(async () => {
+        // Create a sample stream
+        client.jwtAuth = null;
+        client.apiKey = adminApiKey;
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          name: "videorec+samplePlaybackId",
+        });
+        expect(res.status).toBe(201);
+      });
+
+      it("updates the stream's isHealthy and issues fields", async () => {
+        const payload = samplePayload(true, false);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.isHealthy).toBe(false);
+        expect(updatedStream.issues).toBe("Under the weather");
+      });
+
+      it("resets the issues field when the stream becomes healthy", async () => {
+        let payload = samplePayload(true, false);
+        await sendStreamHealthHook(payload);
+
+        payload = samplePayload(true, true);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.isHealthy).toBe(true);
+        expect(updatedStream.issues).toBeUndefined();
+      });
+
+      it("clears stream's isHealthy and issues fields when is_active is false", async () => {
+        let payload = samplePayload(true, false);
+        await sendStreamHealthHook(payload);
+
+        payload = samplePayload(false, false);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.isHealthy).toBeUndefined();
+        expect(updatedStream.issues).toBeUndefined();
+      });
+
+      it("updates the stream's lastSeen field", async () => {
+        const timeBeforeUpdate = Date.now();
+        const payload = samplePayload(true, true);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.lastSeen).toBeGreaterThan(timeBeforeUpdate);
+      });
+
+      it("updates the session as well when it exists", async () => {
+        const payload = samplePayload(true, false);
+
+        // Create a sample session associated with the stream
+        const session = {
+          id: payload.session_id,
+          name: payload.stream_name,
+          streamId: stream.id,
+          lastSeen: Date.now(),
+        };
+        await db.session.create(session);
+
+        // Send a stream health hook payload
+        await sendStreamHealthHook(payload);
+
+        // Check if the session is updated as well
+        const updatedSession = await db.session.get("sampleSessionId");
+        expect(updatedSession.isHealthy).toBe(false);
+        expect(updatedSession.issues).toBe("Under the weather");
+        expect(updatedSession.lastSeen).toBeGreaterThan(session.lastSeen);
+      });
+
+      it("throws a NotFoundError when the stream is not found", async () => {
+        const payload = {
+          ...samplePayload(true, true),
+          stream_name: "videorec+nonexistentPlaybackId",
+        };
+        const res = await client.post("/stream/hook/health", payload);
+
+        expect(res.status).toBe(404);
+        await expect(res.json()).resolves.toMatchObject({
+          errors: [expect.stringContaining("stream not found")],
         });
       });
     });
