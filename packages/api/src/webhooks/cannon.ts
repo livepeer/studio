@@ -523,10 +523,10 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session recording already handled");
     }
 
-    return await this.recordingToVodAsset(session);
+    await this.recordingToVodAsset(session);
   }
 
-  async recordingToVodAsset(session: DBSession): Promise<string> {
+  async recordingToVodAsset(session: DBSession) {
     const id = session.id;
     const playbackId = await generateUniquePlaybackId(id);
 
