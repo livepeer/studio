@@ -183,29 +183,6 @@ components:
               type: number
             statusText:
               type: string
-    detection-webhook-payload:
-      type: object
-      required:
-        - manifestID
-        - seqNo
-        - sceneClassification
-      properties:
-        manifestID:
-          type: string
-        seqNo:
-          type: number
-        sceneClassification:
-          type: array
-          items:
-            type: object
-            required:
-              - name
-              - probability
-            properties:
-              name:
-                type: string
-              probability:
-                type: number
     stream:
       type: object
       required:
@@ -418,6 +395,7 @@ components:
           $ref: "#/components/schemas/object-store/properties/publicUrl"
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
+      required: []
     webhook-patch-payload:
       type: object
       additionalProperties: false
@@ -915,19 +893,21 @@ components:
           additionalProperties: false
           properties:
             ipfs:
+              description: >-
+                Set to true to make default export to IPFS. To customize the
+                pinned files, specify an object with a spec field. False or null
+                means to unpin from IPFS, but it's unsupported right now.
               oneOf:
                 - type: object
                   additionalProperties: false
                   properties:
                     spec:
                       oneOf:
-                        - type: string
+                        - type: "null"
                         - $ref: >-
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
                 - type: boolean
-                  description: >-
-                    Set to true to make default export to IPFS. False or null
-                    means to unpin from IPFS, but is unsupported right now.
+                - type: "null"
         url:
           type: string
           format: uri

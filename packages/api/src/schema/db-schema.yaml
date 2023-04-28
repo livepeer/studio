@@ -399,6 +399,7 @@ components:
         audienceUserIds:
           type: array
           index: true
+          indexType: gin
           description: List of user IDs in the experiment
           items:
             type: string
@@ -570,7 +571,7 @@ components:
                 statusCode:
                   readOnly: true
             lastTriggeredAt:
-              readyOnly: true
+              readOnly: true
         event:
           writeOnly: true
           deprecated: true
@@ -695,8 +696,6 @@ components:
               type: object
             streamNameGroups:
               type: array
-              items:
-                type: string
             sourceInfo:
               type: object
               required:
@@ -759,7 +758,11 @@ components:
     playback-policy:
       properties:
         type:
+          # We need to repeat all values here since _.merge will not concat arrays
           enum:
+            - public
+            - jwt
+            - webhook
             - lit_signing_condition
         unifiedAccessControlConditions:
           type: array
@@ -809,7 +812,6 @@ components:
           index: true
         parentId:
           index: true
-        record: false
         recordingStatus:
           readOnly: true
         recordingUrl:
@@ -1034,20 +1036,21 @@ components:
                     - fallback_external
                     - external
             transcode-file:
-              catalystPipelineStrategy:
-                type: string
-                description: >-
-                  Force to use a specific strategy in the Catalyst pipeline. If
-                  not specified, the default strategy that Catalyst is
-                  configured for will be used. This field only available for
-                  admin users, and is only used for E2E testing.
-                enum:
-                  - catalyst
-                  - catalyst_ffmpeg
-                  - background_external
-                  - background_mist
-                  - fallback_external
-                  - external
+              properties:
+                catalystPipelineStrategy:
+                  type: string
+                  description: >-
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - catalyst_ffmpeg
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
         deleted:
           type: boolean
           description: Set to true when the task is deleted
