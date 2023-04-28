@@ -123,12 +123,17 @@ async function validateAssetPayload(
   }
 
   // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
-  payload.playbackPolicy = await validateAssetPlaybackPolicy(
+  const playbackPolicy = await validateAssetPlaybackPolicy(
     payload,
     playbackId,
     userId,
     createdAt
   );
+
+  const creatorId =
+    typeof payload.creatorId === "string"
+      ? ({ type: "unverified", value: payload.creatorId } as const)
+      : payload.creatorId;
 
   return {
     id,
@@ -142,7 +147,8 @@ async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    playbackPolicy: payload.playbackPolicy,
+    creatorId,
+    playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
     storage: storageInputToState(payload.storage),
   };

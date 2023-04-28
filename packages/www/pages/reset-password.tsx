@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import ResetPassword from "components/Dashboard/ResetPassword";
+import ResetPassword from "components/ResetPassword";
 import Link from "next/link";
 import {
   Button,

@@ -1,7 +1,7 @@
 import Layout from "layouts/main";
 import { withRecaptcha } from "layouts/withRecaptcha";
-import Login from "../components/Dashboard/Login";
-import Register from "../components/Dashboard/Register";
+import Login from "../components/Login";
+import Register from "../components/Register";
 import {
   Flex,
   Box,

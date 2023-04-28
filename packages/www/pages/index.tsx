@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import Login from "components/Dashboard/Login";
+import Login from "components/Login";
 import {
   Flex,
   Box,
@@ -9,7 +9,7 @@ import {
   Link as A,
 } from "@livepeer/design-system";
 import { useState } from "react";
-import { useApi, useLoggedIn } from "../hooks";
+import { useApi } from "../hooks";
 import Link from "next/link";
 import { Home as Content } from "content";
 

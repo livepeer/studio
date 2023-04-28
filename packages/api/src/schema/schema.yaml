@@ -1117,6 +1117,19 @@ components:
           description: Object store ID where the asset is stored
           writeOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        creatorId:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [type, value]
+              properties:
+                type:
+                  type: string
+                  enum: [unverified]
+                value:
+                  type: string
+                  description:
+                    Developer-managed ID of the user who created the asset.
         source:
           oneOf:
             - additionalProperties: false
@@ -1431,7 +1444,15 @@ components:
           example: true
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        creatorId:
+          oneOf:
+            - $ref: "#/components/schemas/asset/properties/creatorId"
+            - type: string
+              description:
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         storage:
+          type: object
           additionalProperties: false
           properties:
             ipfs:
@@ -2577,6 +2598,67 @@ components:
           type: number
           example: 200000
 
+    room:
+      type: object
+      table: room
+      required:
+        - id
+        - participants
+        - events
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: room ID
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the room
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+              timestamp:
+                type: integer
+        participants:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              identity:
+                type: string
+                description: participant ID
+              name:
+                type: string
+                description: user defined participant name
+              joinedAt:
+                type: integer
+                description: the time the participant joined
+              leftAt:
+                type: integer
+                description: the time the participant left
+              tracksPublished:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    sid:
+                      type: string
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    mimeType:
+                      type: string
+                    timestamp:
+                      type: integer
+
 paths:
   /stream:
     tags:
@@ -3288,6 +3370,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /room:
+    post:
+      description: create a new room
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    get:
+      description: get room details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              $ref: "#/components/schemas/room"
         default:
           description: Error
           content:

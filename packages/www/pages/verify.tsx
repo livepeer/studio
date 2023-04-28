@@ -12,7 +12,7 @@ import {
   useSnackbar,
 } from "@livepeer/design-system";
 
-import Spinner from "components/Dashboard/Spinner";
+import Spinner from "components/Spinner";
 
 const VerifyPage = () => {
   const router = useRouter();

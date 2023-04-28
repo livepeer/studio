@@ -1,7 +1,7 @@
 import Layout from "../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import Plans from "components/Dashboard/Plans";
+import Plans from "components/Plans";
 import { DashboardPlans as Content } from "content";
 
 const PlansPage = () => {

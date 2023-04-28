@@ -1,13 +1,13 @@
-import AssetChildrenHeadingBox from "components/Dashboard/AssetDetails/AssetChildrenHeadingBox";
-import AssetDetailsBox from "components/Dashboard/AssetDetails/AssetDetailsBox";
-import AssetHeadingBox from "components/Dashboard/AssetDetails/AssetHeadingBox";
-import AssetPlayerBox from "components/Dashboard/AssetDetails/AssetPlayerBox/";
+import AssetChildrenHeadingBox from "components/AssetDetails/AssetChildrenHeadingBox";
+import AssetDetailsBox from "components/AssetDetails/AssetDetailsBox";
+import AssetHeadingBox from "components/AssetDetails/AssetHeadingBox";
+import AssetPlayerBox from "components/AssetDetails/AssetPlayerBox/";
 import EditAssetDialog, {
   EditAssetReturnValue,
-} from "components/Dashboard/AssetDetails/EditAssetDialog";
-import EmbedVideoDialog from "components/Dashboard/AssetDetails/EmbedVideoDialog";
+} from "components/AssetDetails/EditAssetDialog";
+import EmbedVideoDialog from "components/AssetDetails/EmbedVideoDialog";
 import { Box, Flex } from "@livepeer/design-system";
-import Spinner from "components/Dashboard/Spinner";
+import Spinner from "components/Spinner";
 import { useApi, useLoggedIn } from "hooks";
 import Layout, { Breadcrumb } from "layouts/dashboard";
 import { Asset } from "livepeer";
