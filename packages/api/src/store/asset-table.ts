@@ -2,6 +2,7 @@ import sql from "sql-template-strings";
 import { Asset, Task, User } from "../schema/types";
 import Table from "./table";
 import { QueryOptions, WithID } from "./types";
+import { db } from "../store";
 
 const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
 
@@ -43,6 +44,17 @@ export default class AssetTable extends Table<WithID<Asset>> {
   }
 
   async getByIpfsCid(cid: string, user?: User): Promise<WithID<Asset>> {
+    let assetByStorageCid = await db.asset.getByStorageCid(cid, user);
+    let assetBySourceUrl = await db.asset.getBySourceURL("ipfs://" + cid, user);
+
+    return assetByStorageCid && assetBySourceUrl
+      ? assetByStorageCid.createdAt <= assetBySourceUrl.createdAt
+        ? assetByStorageCid
+        : assetBySourceUrl
+      : assetByStorageCid || assetBySourceUrl;
+  }
+
+  async getByStorageCid(cid: string, user?: User): Promise<WithID<Asset>> {
     const query = [
       sql`asset.data->'storage'->'ipfs'->>'cid' = ${cid}`,
       sql`asset.data->>'deleted' IS NULL`,
