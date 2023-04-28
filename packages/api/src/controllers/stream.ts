@@ -801,7 +801,7 @@ app.post(
 );
 
 app.post(
-  "/:streamId/stream-health",
+  "/hook/stream-health",
   authorizer({ anyAdmin: true }),
   validatePost("stream-health-payload"),
   async (req, res) => {
