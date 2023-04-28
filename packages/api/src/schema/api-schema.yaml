@@ -1217,7 +1217,9 @@ components:
         videoSpec:
           type: object
           additionalProperties: false
-          description: Video metadata
+          description:
+            Specific video metadata about the asset. Most of these fields are only returned if a 
+            `?details=true` query-string is present on the request.
           properties:
             format:
               type: string
