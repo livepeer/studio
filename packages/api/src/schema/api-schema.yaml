@@ -810,8 +810,7 @@ components:
           description: Points to parent stream object
         record:
           description: >-
-            Should this stream be recorded? Uses default settings. For more
-            customization, create and configure an object store.
+            Whether this session was recorded or not.
           type: boolean
           example: false
         recordingStatus:
