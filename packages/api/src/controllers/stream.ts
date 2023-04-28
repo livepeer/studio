@@ -1075,7 +1075,7 @@ async function publishSingleRecordingReadyHook(
   queue: Queue,
   ingest: string
 ) {
-  const isStale = isSessionStale(session);
+  const isStale = isStreamStale(session);
   if (!session.record || isStale) {
     if (isStale) {
       logger.info(
@@ -1143,17 +1143,6 @@ async function publishDelayedRecordingReadyHook(
  * ops, in which case we just update the DB silently without sending hooks.
  */
 function isStreamStale(s: DBStream, lastSessionStartedAt?: number) {
-  const staleThreshold =
-    (lastSessionStartedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
-  return s.lastSeen && s.lastSeen < staleThreshold;
-}
-
-/**
- * A session is considered stale if it is too old for us to send a webhook about it.
- * This can happen on background clean-up ops, in which case we just update the DB
- * silently without sending hooks.
- */
-function isSessionStale(s: DBSession, lastSessionStartedAt?: number) {
   const staleThreshold =
     (lastSessionStartedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
   return s.lastSeen && s.lastSeen < staleThreshold;
