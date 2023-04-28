@@ -807,7 +807,7 @@ app.post(
       await db.session.create(session);
       if (record) {
         const ingest = await getIngestBase(req);
-        publishRecordingStartedHook(
+        await publishRecordingStartedHook(
           req.config,
           session,
           req.queue,
@@ -1089,7 +1089,7 @@ async function publishSingleRecordingReadyHook(
   await publishDelayedRecordingReadyHook(config, session, queue, ingest);
 }
 
-function publishRecordingStartedHook(
+async function publishRecordingStartedHook(
   config: CliArgs,
   session: DBSession,
   queue: Queue,
@@ -1102,7 +1102,7 @@ function publishRecordingStartedHook(
     streamId: session.parentId,
     userId: session.userId,
     event: "recording.started",
-    payload: { session: toExternalSession(config, session, ingest) },
+    payload: { session: await toExternalSession(config, session, ingest) },
   });
 }
 
@@ -1127,8 +1127,9 @@ async function publishDelayedRecordingReadyHook(
       sessionId: session.id,
       payload: {
         session: {
-          ...toExternalSession(config, session, ingest, true),
+          ...(await toExternalSession(config, session, ingest, true)),
           recordingStatus: "ready", // recording will be ready if this webhook is actually sent
+          assetId: session.id,
         },
       },
     },

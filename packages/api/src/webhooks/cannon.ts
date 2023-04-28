@@ -114,10 +114,9 @@ export default class WebhookCannon {
       return true;
     }
 
-    let assetId: string;
     if (event === "recording.ready" && sessionId) {
       try {
-        assetId = await this.handleRecordingReadyChecks(sessionId);
+        await this.handleRecordingReadyChecks(sessionId);
       } catch (e) {
         console.log(
           `Error handling recording.ready event sessionId=${sessionId} err=`,
@@ -178,7 +177,6 @@ export default class WebhookCannon {
         event: msg,
         stream,
         user,
-        assetId,
       };
       await Promise.all(
         webhooks.map((webhook) =>
@@ -562,7 +560,6 @@ export default class WebhookCannon {
       undefined,
       asset
     );
-    return id.toString();
   }
 }
 
