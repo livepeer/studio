@@ -388,6 +388,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "Secret for LiveKit access",
         type: "string",
       },
+      livekitMeetUrl: {
+        describe: "Livekit Meet Webapp URL",
+        type: "string",
+        default: "https://meet.livekit.io/custom",
+      },
     })
     .usage(
       `

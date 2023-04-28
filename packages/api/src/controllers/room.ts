@@ -13,6 +13,7 @@ import { db } from "../store";
 import {
   BadRequestError,
   ForbiddenError,
+  InternalServerError,
   NotFoundError,
 } from "../store/errors";
 import { Room } from "../schema/types";
@@ -44,7 +45,7 @@ app.post("/", authorizer({}), async (req, res) => {
   await db.room.create({
     id: id,
     userId: req.user.id,
-    createdAt: new Date().getTime(),
+    createdAt: Date.now(),
     participants: {},
     events: [],
   });
@@ -55,15 +56,20 @@ app.post("/", authorizer({}), async (req, res) => {
   });
 });
 
-app.get("/:roomId", authorizer({}), async (req, res) => {
+async function getRoom(req) {
   const room = await db.room.get(req.params.roomId);
   if (!room || room.deleted) {
     throw new NotFoundError(`room not found`);
   }
 
   if (!req.user.admin && req.user.id !== room.userId) {
-    throw new ForbiddenError(`users may only view their own rooms`);
+    throw new ForbiddenError(`invalid user`);
   }
+  return room;
+}
+
+app.get("/:roomId", authorizer({}), async (req, res) => {
+  const room = await getRoom(req);
 
   res.status(200).json(toExternalRoom(room, req.user.admin));
 });
@@ -86,11 +92,7 @@ function toExternalRoom(room: Room, isAdmin = false) {
 }
 
 app.delete("/:roomId", authorizer({}), async (req, res) => {
-  const room = await db.room.get(req.params.roomId);
-
-  if (!req.user.admin && req.user.id !== room.userId) {
-    throw new ForbiddenError(`users may only delete their own rooms`);
-  }
+  const room = await getRoom(req);
 
   const svc = new RoomServiceClient(
     req.config.livekitHost,
@@ -99,9 +101,7 @@ app.delete("/:roomId", authorizer({}), async (req, res) => {
   );
   await svc.deleteRoom(req.params.roomId);
 
-  room.deleted = true;
-  room.deletedAt = new Date().getTime();
-  await db.room.replace(room);
+  await db.room.update(room.id, { deleted: true, deletedAt: Date.now() });
 
   res.status(204).end();
 });
@@ -111,14 +111,19 @@ app.post(
   authorizer({}),
   validatePost("room-egress-payload"),
   async (req, res) => {
-    const room = await db.room.get(req.params.roomId);
+    const room = await getRoom(req);
 
-    if (!req.user.admin && req.user.id !== room.userId) {
-      throw new ForbiddenError(`users may only modify their own rooms`);
+    if (room.egressId !== undefined && room.egressId != "") {
+      throw new BadRequestError("egress already started");
     }
 
-    if (room.egressId !== undefined) {
-      throw new BadRequestError("egress already started");
+    const stream = await db.stream.get(req.body.streamId);
+    if (
+      !stream ||
+      stream.deleted ||
+      (!req.user.admin && req.user.id !== stream.userId)
+    ) {
+      throw new NotFoundError(`stream not found`);
     }
 
     const egressClient = new EgressClient(
@@ -128,7 +133,7 @@ app.post(
     );
     const output: StreamOutput = {
       protocol: StreamProtocol.RTMP,
-      urls: [req.body.rtmpURL],
+      urls: [req.config.ingest[0].ingest + "/" + stream.streamKey],
     };
 
     const info = await egressClient.startRoomCompositeEgress(
@@ -142,21 +147,18 @@ app.post(
       }
     );
     console.log("egress started", info);
-    room.egressId = info.egressId;
-    room.updatedAt = new Date().getTime();
-    await db.room.replace(room);
+    await db.room.update(room.id, {
+      egressId: info.egressId,
+      updatedAt: Date.now(),
+    });
     res.status(204).end();
   }
 );
 
 app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
-  const room = await db.room.get(req.params.roomId);
+  const room = await getRoom(req);
 
-  if (!req.user.admin && req.user.id !== room.userId) {
-    throw new ForbiddenError(`users may only modify their own rooms`);
-  }
-
-  if (room.egressId === undefined) {
+  if (room.egressId === undefined || room.egressId == "") {
     throw new BadRequestError("egress has not started");
   }
 
@@ -168,9 +170,7 @@ app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
 
   const info = await egressClient.stopEgress(room.egressId);
   console.log("egress stopped", info);
-  room.egressId = undefined;
-  room.updatedAt = new Date().getTime();
-  await db.room.replace(room);
+  await db.room.update(room.id, { egressId: "", updatedAt: Date.now() });
   res.status(204).end();
 });
 
@@ -179,11 +179,7 @@ app.post(
   authorizer({}),
   validatePost("room-user-payload"),
   async (req, res) => {
-    const room = await db.room.get(req.params.roomId);
-
-    if (!req.user.admin && req.user.id !== room.userId) {
-      throw new ForbiddenError(`users may only add users to their own rooms`);
-    }
+    await getRoom(req);
 
     const id = uuid();
     const at = new AccessToken(
@@ -202,29 +198,25 @@ app.post(
     res.json({
       id: id,
       joinUrl:
-        "https://meet.livekit.io/custom?liveKitUrl=" +
+        req.config.livekitMeetUrl +
+        "?liveKitUrl=" +
         req.config.livekitHost +
         "&token=" +
         token,
+      token: token,
     });
   }
 );
 
-app.delete("/:roomId/user/:userId", authorizer({}), async (req, res) => {
-  const room = await db.room.get(req.params.roomId);
-
-  if (!req.user.admin && req.user.id !== room.userId) {
-    throw new ForbiddenError(
-      `users may only delete users from their own rooms`
-    );
-  }
+app.delete("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
+  await getRoom(req);
 
   const svc = new RoomServiceClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
     req.config.livekitSecret
   );
-  await svc.removeParticipant(req.params.roomId, req.params.userId);
+  await svc.removeParticipant(req.params.roomId, req.params.participantId);
 
   res.status(204).end();
 });
@@ -253,8 +245,8 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
     throw new BadRequestError(`no room name on event`);
   }
   const room = await db.room.get(roomId);
-  if (!room || room.deleted) {
-    throw new NotFoundError(`room not found`);
+  if (!room) {
+    throw new InternalServerError(`room not found`);
   }
 
   switch (event.event) {
@@ -278,7 +270,7 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
           };
         }
         if (event.event == "participant_left") {
-          room.participants[participant.identity].leftAt = new Date().getTime();
+          room.participants[participant.identity].leftAt = Date.now();
         }
 
         let tracks = room.participants[participant.identity].tracksPublished;
@@ -291,11 +283,11 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
             height: track.height,
             width: track.width,
             mimeType: track.mimeType,
-            timestamp: new Date().getTime(),
+            timestamp: Date.now(),
           };
         }
       }
-      room.updatedAt = new Date().getTime();
+      room.updatedAt = Date.now();
       await db.room.replace(room);
       break;
     case "room_started":
@@ -304,9 +296,9 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
     case "egress_ended":
       room.events.push({
         eventName: event.event,
-        timestamp: new Date().getTime(),
+        timestamp: Date.now(),
       });
-      room.updatedAt = new Date().getTime();
+      room.updatedAt = Date.now();
       await db.room.replace(room);
       break;
   }

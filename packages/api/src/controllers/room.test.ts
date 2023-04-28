@@ -35,19 +35,22 @@ describe("controllers/room", () => {
   let adminApiKey: string;
   let nonAdminUser: User;
   let nonAdminToken: string;
-  let roomServiceClient = new RoomServiceClient("");
+  let roomServiceClient;
   let mockCreateRoom: jest.SpyInstance;
-  let egressClient = new EgressClient("");
+  let egressClient;
 
   beforeEach(async () => {
     ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminToken } =
       await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     client.jwtAuth = nonAdminToken;
 
+    roomServiceClient = new RoomServiceClient("");
+    egressClient = new EgressClient("");
+
     MockedRoomServiceClient.mockReturnValue(roomServiceClient);
     mockCreateRoom = jest.spyOn(roomServiceClient, "createRoom");
     mockCreateRoom.mockReturnValueOnce(Promise.resolve(undefined));
-    MockedEgressClient.mockReturnValueOnce(egressClient);
+    MockedEgressClient.mockReturnValue(egressClient);
   });
 
   describe("room creation", () => {
@@ -79,6 +82,33 @@ describe("controllers/room", () => {
       expect(res.status).toBe(404);
     });
 
+    it("should add and remove participants", async () => {
+      let res = await client.post(`/room`);
+      expect(res.status).toBe(201);
+      const roomRes = await res.json();
+      expect(roomRes.id).toBeDefined();
+
+      res = await client.post(`/room/${roomRes.id}/user`, {
+        name: "display name",
+      });
+      expect(res.status).toBe(201);
+      const resp = await res.json();
+      expect(resp.id).toBeDefined();
+      expect(resp.joinUrl).toBeDefined();
+
+      const mockRemoveParticipant = jest.spyOn(
+        roomServiceClient,
+        "removeParticipant"
+      );
+      res = await client.delete(`/room/${roomRes.id}/user/${resp.id}`);
+      expect(res.status).toBe(204);
+      expect(mockRemoveParticipant).toHaveBeenCalledTimes(1);
+      expect(mockRemoveParticipant.mock.calls[0]).toEqual([
+        roomRes.id,
+        resp.id,
+      ]);
+    });
+
     it("should start and stop egress", async () => {
       let res = await client.post(`/room`);
       expect(res.status).toBe(201);
@@ -100,14 +130,20 @@ describe("controllers/room", () => {
       res = await client.delete(`/room/${roomRes.id}/egress`);
       expect(res.status).toBe(400);
 
+      res = await client.post(`/stream`, {
+        name: "stream",
+      });
+      expect(res.status).toBe(201);
+      const streamResp = await res.json();
+
       res = await client.post(`/room/${roomRes.id}/egress`, {
-        rtmpURL: "rtmp",
+        streamId: streamResp.id,
       });
       expect(res.status).toBe(204);
 
       // already started so should 400
       res = await client.post(`/room/${roomRes.id}/egress`, {
-        rtmpURL: "rtmp",
+        streamId: streamResp.id,
       });
       expect(res.status).toBe(400);
 
