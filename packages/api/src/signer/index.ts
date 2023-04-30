@@ -1,94 +1,9 @@
-// import { signTypedData, SignTypedDataVersion } from "@metamask/eth-sig-util";
+import { signTypedData, SignTypedDataVersion } from "@metamask/eth-sig-util";
 import fs from "fs/promises";
 import path from "path";
 import keythereum from "keythereum";
-
-// const types = {
-//   EIP712Domain: [
-//     {
-//       name: "name",
-//       type: "string",
-//     },
-//     {
-//       name: "version",
-//       type: "string",
-//     },
-//     {
-//       name: "salt",
-//       type: "string",
-//     },
-//   ],
-//   ChannelDefinition: [
-//     {
-//       name: "id",
-//       type: "string",
-//     },
-//     {
-//       name: "time",
-//       type: "int64",
-//     },
-//     {
-//       name: "multistreamTargets",
-//       type: "MultistreamTarget[]",
-//     },
-//   ],
-//   MultistreamTarget: [
-//     {
-//       name: "url",
-//       type: "string",
-//     },
-//   ],
-// };
-
-// function str2ab(str) {
-//   var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
-//   var bufView = new Uint16Array(buf);
-//   for (var i = 0, strLen = str.length; i < strLen; i++) {
-//     bufView[i] = str.charCodeAt(i);
-//   }
-//   return buf;
-// }
-
-// const domain = {
-//   name: "Livepeer Decentralized Video Protocol",
-//   version: "0.0.1",
-//   salt: "f8b3858ac49ca50b138587d5dace09bd102b9d24d2567d9a5cde2f6122810931",
-// };
-
-// const signingDomain = {
-//   ...domain,
-//   salt: str2ab(domain.salt),
-// };
-
-// const message = {
-//   id: "my-awesome-stream",
-//   multistreamTargets: [
-//     {
-//       url: "rtmp://localhost/foo/bar",
-//     },
-//   ],
-//   time: 1681403259137,
-// };
-
-// const priv =
-//   "0x60a6e29631432fe95e36a93a66e8ac29b566c7eb8c5139ccef9253669f521c23";
-// const buf = Buffer.from(priv.slice(2), "hex");
-// const sig = signTypedData({
-//   privateKey: buf,
-//   version: SignTypedDataVersion.V4,
-//   data: {
-//     types: types,
-//     primaryType: "ChannelDefinition",
-//     domain: signingDomain,
-//     message: message,
-//   },
-// });
-// const body = {
-//   primaryType: "ChannelDefinition",
-//   domain: domain,
-//   message: message,
-//   signature: sig,
-// };
+import { types, domain } from "./schema";
+import * as ethers from "ethers";
 
 // (async () => {
 //   try {
@@ -105,14 +20,32 @@ import keythereum from "keythereum";
 //   }
 // })();
 
+function str2ab(str) {
+  var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+  var bufView = new Uint16Array(buf);
+  for (var i = 0, strLen = str.length; i < strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+}
+
 export class Signer {
   keystoreDir: string;
   catalystAddr: string;
   key: Buffer;
+  address: string;
 
   constructor(opts: { keystoreDir: string; catalystAddr: string }) {
     this.keystoreDir = opts.keystoreDir;
     this.catalystAddr = opts.catalystAddr;
+  }
+
+  // We store our domain salt a string, but @metamask/eth-sig-util requires an arraybuffer
+  _prepareDomain(domain) {
+    return {
+      ...domain,
+      salt: str2ab(domain.salt),
+    };
   }
 
   async loadKey(keystorePassword: string) {
@@ -127,6 +60,32 @@ export class Signer {
     const data = JSON.parse(str);
     const key = keythereum.recover(keystorePassword, data);
     this.key = key;
+    this.address = ethers.utils.computeAddress(key);
+  }
+
+  async sign(action) {
+    const signerAction = {
+      ...action,
+      signer: this.address,
+    };
+    debugger;
+    const sig = signTypedData({
+      privateKey: this.key,
+      version: SignTypedDataVersion.V4,
+      data: {
+        types: types,
+        primaryType: "ChannelDefinition",
+        domain: this._prepareDomain(domain),
+        message: signerAction,
+      },
+    });
+    const body = {
+      primaryType: "ChannelDefinition",
+      domain: domain,
+      message: signerAction,
+      signature: sig,
+    };
+    return body;
   }
 }
 
