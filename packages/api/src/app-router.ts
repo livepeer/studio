@@ -81,6 +81,9 @@ export default async function makeApp(params: CliArgs) {
     amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
+    keystoreDir,
+    keystorePassword,
+    catalystAddr,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -120,6 +123,10 @@ export default async function makeApp(params: CliArgs) {
     queue,
   });
   await webhookCannon.start();
+
+  // Signed Catalyst event firing
+  if (keystoreDir && keystorePassword && catalystAddr) {
+  }
 
   if (
     process.env.NODE_ENV === "test" ||
