@@ -61,4 +61,18 @@ export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
   async hasAccess(id: string, userId: string, isAdmin: boolean = false) {
     return !!(await this.getAuthed(id, userId, isAdmin));
   }
+
+  async getStreamIds(id: string): Promise<string[]> {
+    const tar = await this.get(id);
+    const res = await this.db.query(
+      `
+        SELECT id FROM stream AS s, jsonb_array_elements(data->'multistream'->'targets') AS tar
+        WHERE s.data->>'parentId' IS NULL
+        AND s.data->>'userId' = '${tar.userId}'
+        AND tar->>'id' = '${id}';
+      `
+    );
+    console.log(res.rows);
+    return res.rows.map((r) => r.id);
+  }
 }

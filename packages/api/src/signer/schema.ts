@@ -3,7 +3,6 @@
 export const domain = {
   name: "Livepeer Decentralized Video Protocol",
   version: "0.0.1",
-  salt: "f8b3858ac49ca50b138587d5dace09bd102b9d24d2567d9a5cde2f6122810931",
 };
 
 export const types = {
@@ -14,10 +13,6 @@ export const types = {
     },
     {
       name: "version",
-      type: "string",
-    },
-    {
-      name: "salt",
       type: "string",
     },
   ],

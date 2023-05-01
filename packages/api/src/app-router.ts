@@ -25,6 +25,7 @@ import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
+import { Signer, makeSigner, makeStubSigner } from "./signer";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -124,8 +125,16 @@ export default async function makeApp(params: CliArgs) {
   });
   await webhookCannon.start();
 
+  let signer: Signer;
   // Signed Catalyst event firing
   if (keystoreDir && keystorePassword && catalystAddr) {
+    signer = await makeSigner({
+      keystoreDir,
+      keystorePassword,
+      catalystAddr,
+    });
+  } else {
+    signer = await makeStubSigner();
   }
 
   if (
@@ -169,6 +178,7 @@ export default async function makeApp(params: CliArgs) {
     req.queue = queue;
     req.taskScheduler = taskScheduler;
     req.stripe = stripe;
+    req.signer = signer;
     next();
   });
   app.use(
