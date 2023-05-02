@@ -16,7 +16,7 @@ import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { UnprocessableEntityError } from "../store/errors";
+import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import sql from "sql-template-strings";
 import { db } from "../store";
 
@@ -534,37 +534,47 @@ export default class WebhookCannon {
     var startedAt = new Date(session.createdAt).toISOString();
     startedAt = startedAt.substring(0, startedAt.length - 8) + "Z";
 
-    const asset = await createAsset(
-      {
-        id,
-        playbackId,
-        userId: session.userId,
-        createdAt: session.createdAt,
-        source: { type: "recording", sessionId: session.id },
-        status: { phase: "waiting", updatedAt: Date.now() },
-        name: `live-${startedAt}`,
-        objectStoreId: this.vodObjectStoreId,
-      },
-      this.queue
-    );
-
-    const os = await db.objectStore.get(this.recordObjectStoreId);
-    // we can't rate limit this task because it's not a user action
-    await taskScheduler.createAndScheduleTask(
-      "upload",
-      {
-        upload: {
-          url: pathJoin(
-            os.publicUrl,
-            session.playbackId,
-            session.id,
-            "output.m3u8"
-          ),
+    try {
+      const asset = await createAsset(
+        {
+          id: "6fca5e03-672c-4b73-b1f5-549533f9fcd8",
+          playbackId,
+          userId: session.userId,
+          createdAt: session.createdAt,
+          source: { type: "recording", sessionId: session.id },
+          status: { phase: "waiting", updatedAt: Date.now() },
+          name: `live-${startedAt}`,
+          objectStoreId: this.vodObjectStoreId,
         },
-      },
-      undefined,
-      asset
-    );
+        this.queue
+      );
+
+      const os = await db.objectStore.get(this.recordObjectStoreId);
+      // we can't rate limit this task because it's not a user action
+      await taskScheduler.createAndScheduleTask(
+        "upload",
+        {
+          upload: {
+            url: pathJoin(
+              os.publicUrl,
+              session.playbackId,
+              session.id,
+              "output.m3u8"
+            ),
+          },
+        },
+        undefined,
+        asset
+      );
+    } catch (e) {
+      if (e instanceof BadRequestError) {
+        throw new UnprocessableEntityError(
+          "Asset for the recording session already added"
+        );
+      } else {
+        throw e;
+      }
+    }
   }
 }
 
