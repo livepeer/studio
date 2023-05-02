@@ -824,6 +824,9 @@ components:
           type: string
           readOnly: true
           example: stream
+        version:
+          type: string
+          description: Version of the session object
         name:
           type: string
           example: test_session

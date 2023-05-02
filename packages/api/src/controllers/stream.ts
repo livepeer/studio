@@ -206,24 +206,24 @@ async function getRecordingUrls(
     return;
   }
 
-  if (asset.id !== session.id) {
-    // Backwards-compatibility for Recording V1
-    const base = pathJoin(
-      ingest,
-      `recordings`,
-      session.lastSessionId ?? session.id
-    );
+  // Recording V2
+  if (session.version === "v2") {
+    const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
     return {
-      recordingUrl: pathJoin(base, "index.m3u8"),
-      mp4Url: pathJoin(base, "source.mp4"),
+      recordingUrl: assetWithPlayback.playbackUrl,
+      mp4Url: assetWithPlayback.downloadUrl,
     };
   }
 
-  // Recording V2
-  const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
+  // Backwards-compatibility for Recording V1
+  const base = pathJoin(
+    ingest,
+    `recordings`,
+    session.lastSessionId ?? session.id
+  );
   return {
-    recordingUrl: assetWithPlayback.playbackUrl,
-    mp4Url: assetWithPlayback.downloadUrl,
+    recordingUrl: pathJoin(base, "index.m3u8"),
+    mp4Url: pathJoin(base, "source.mp4"),
   };
 }
 
@@ -489,6 +489,14 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const ingest = await getIngestBase(req);
   sessions = await Promise.all(
     sessions.map(async (session) => {
+      if (session.version !== "v2") {
+        session = await db.stream.get(session.id);
+      }
+
+      if (!session) {
+        return;
+      }
+
       session = await withRecordingFields(
         req.config,
         ingest,
@@ -781,6 +789,7 @@ app.post(
         playbackId: stream.playbackId,
         userId: stream.userId,
         kind: "session",
+        version: "v2",
         name: req.body.name,
         createdAt,
         lastSeen: 0,
