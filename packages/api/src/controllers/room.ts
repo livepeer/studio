@@ -17,7 +17,6 @@ import {
   NotFoundError,
 } from "../store/errors";
 import { Room } from "../schema/types";
-import { WithID } from "../store/types";
 
 const app = Router();
 
@@ -240,8 +239,12 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
     throw e;
   }
 
-  const roomId = event.room.name;
-  if (!roomId) {
+  let roomId;
+  if (event.room && event.room.name) {
+    roomId = event.room.name;
+  } else if (event.egressInfo && event.egressInfo.roomName) {
+    roomId = event.egressInfo.roomName;
+  } else {
     throw new BadRequestError(`no room name on event`);
   }
   const room = await db.room.get(roomId);
@@ -265,7 +268,7 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
           room.participants[participant.identity] = {
             identity: participant.identity,
             name: participant.name,
-            joinedAt: participant.joinedAt,
+            joinedAt: participant.joinedAt * 1000,
             tracksPublished: {},
           };
         }
@@ -298,8 +301,10 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
         eventName: event.event,
         timestamp: Date.now(),
       });
-      room.updatedAt = Date.now();
-      await db.room.replace(room);
+      await db.room.update(room.id, {
+        updatedAt: Date.now(),
+        events: room.events,
+      });
       break;
   }
 
