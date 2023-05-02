@@ -997,6 +997,8 @@ describe("controllers/stream", () => {
     });
 
     describe("stream health hook", () => {
+      let stream: Stream;
+
       const samplePayload = (isActive: boolean, isHealthy: boolean) => ({
         stream_name: "video+" + stream.playbackId,
         session_id: "sampleSessionId",
@@ -1036,6 +1038,8 @@ describe("controllers/stream", () => {
           name: "videorec+samplePlaybackId",
         });
         expect(res.status).toBe(201);
+        stream = await res.json();
+        expect(stream.id).toBeDefined();
       });
 
       it("updates the stream's isHealthy and issues fields", async () => {

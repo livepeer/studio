@@ -858,7 +858,7 @@ app.post(
         `issues=${payload.issues} tracks=${JSON.stringify(payload.tracks)}`
     );
 
-    return res.status(204);
+    res.status(204).end();
   }
 );
 
