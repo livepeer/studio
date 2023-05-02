@@ -133,6 +133,14 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0
     );
   }
+
+  const recordingUrl =
+    (await getRecordingPlaybackUrl(config, ingest, id, db.session)) ??
+    (await getRecordingPlaybackUrl(config, ingest, id, db.stream));
+  if (recordingUrl) {
+    return newPlaybackInfo("recording", recordingUrl);
+  }
+
   const asset = await getAssetPlaybackUrl(config, ingest, id);
   if (asset) {
     return newPlaybackInfo(
@@ -143,12 +151,6 @@ async function getPlaybackInfo(
     );
   }
 
-  const recordingUrl =
-    (await getRecordingPlaybackUrl(config, ingest, id, db.session)) ??
-    (await getRecordingPlaybackUrl(config, ingest, id, db.stream));
-  if (recordingUrl) {
-    return newPlaybackInfo("recording", recordingUrl);
-  }
   throw new NotFoundError(`No playback URL found for ${id}`);
 }
 
