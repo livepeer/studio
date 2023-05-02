@@ -670,6 +670,12 @@ components:
         issues:
           type: string
           description:
+            Raw issues affecting the stream as described by Mist, if any. We
+            don't expose those to the end-user, showing only human_issues
+            instead.
+        human_issues:
+          type: string
+          description:
             A human-readable string describing issues affecting the stream, if
             any.
         tracks:
@@ -703,6 +709,12 @@ components:
               width:
                 type: number
                 description: The width of the track's video resolution.
+        extra:
+          type: object
+          description:
+            An object containing any additional fields sent by mist in the
+            health (STREAM_BUFFER) payload.
+          additionalProperties: true
 
     asset-patch-payload:
       type: object
@@ -932,7 +944,7 @@ components:
         isHealthy:
           $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
         issues:
-          $ref: "#/components/schemas/stream-health-payload/properties/issues"
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         deleted:
           type: boolean
           description: Set to true when stream deleted
