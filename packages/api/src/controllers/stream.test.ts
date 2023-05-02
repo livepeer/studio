@@ -1014,7 +1014,9 @@ describe("controllers/stream", () => {
             width: 1280,
           },
         },
-        issues: isHealthy ? undefined : "Under the weather",
+        extra: { jitter: 123 },
+        issues: isHealthy ? undefined : "Some complex error message",
+        human_issues: isHealthy ? undefined : "Under the weather",
       });
 
       const sendStreamHealthHook = async (payload: StreamHealthPayload) => {
@@ -1047,6 +1049,7 @@ describe("controllers/stream", () => {
         const updatedStream = await sendStreamHealthHook(payload);
 
         expect(updatedStream.isHealthy).toBe(false);
+        // it should send the human issues to the stream issues field
         expect(updatedStream.issues).toBe("Under the weather");
       });
 
