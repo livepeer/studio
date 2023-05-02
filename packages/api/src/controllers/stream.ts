@@ -827,7 +827,10 @@ app.post(
     // compatibility with /setactive recordging/webhooks handling)
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : undefined,
-      issues: payload.is_active && payload.issues ? payload.issues : undefined,
+      issues:
+        payload.is_active && payload.human_issues
+          ? payload.human_issues
+          : undefined,
       // do not clear the `lastSeen` field when the stream is not active
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
@@ -855,7 +858,9 @@ app.post(
         `stream_id=${stream.id} elapsed=${Date.now() - start}ms` +
         `stream_name=${stream.name} session_id=${payload.session_id} ` +
         `is_active=${payload.is_active} is_healthy=${payload.is_healthy} ` +
-        `issues=${payload.issues} tracks=${JSON.stringify(payload.tracks)}`
+        `issues=${payload.issues} human_issues=${payload.human_issues} ` +
+        `extra=${JSON.stringify(payload.extra)} ` +
+        `tracks=${JSON.stringify(payload.tracks)}`
     );
 
     res.status(204).end();
