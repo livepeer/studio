@@ -537,7 +537,7 @@ export default class WebhookCannon {
     try {
       const asset = await createAsset(
         {
-          id: "6fca5e03-672c-4b73-b1f5-549533f9fcd8",
+          id,
           playbackId,
           userId: session.userId,
           createdAt: session.createdAt,
