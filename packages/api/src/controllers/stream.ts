@@ -200,14 +200,13 @@ async function getRecordingUrls(
   ingest: string,
   session: DBSession
 ): Promise<{ recordingUrl: string; mp4Url: string }> {
-  const asset = await db.asset.getBySessionId(session.id);
-  if (!asset || ["waiting", "processing"].includes(asset.status?.phase)) {
-    // Recording processing in progress
-    return;
-  }
-
   // Recording V2
   if (session.version === "v2") {
+    const asset = await db.asset.getBySessionId(session.id);
+    if (!asset || ["waiting", "processing"].includes(asset.status?.phase)) {
+      // Recording processing in progress
+      return;
+    }
     const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
     return {
       recordingUrl: assetWithPlayback.playbackUrl,

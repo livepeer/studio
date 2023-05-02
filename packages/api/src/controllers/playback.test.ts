@@ -52,12 +52,13 @@ describe("controllers/playback", () => {
     let otherUserToken: string;
 
     let stream: DBStream;
-    let session: DBStream;
-    let userSession: DBSession;
+    let childStream: DBStream;
+    let session: DBSession;
     let asset: WithID<Asset>;
     let asset2: WithID<Asset>;
 
     beforeEach(async () => {
+      const sessionId = "5b12c779-efc3-42ba-83d9-c590955556b0";
       await db.objectStore.create({
         id: "mock_vod_store",
         url: "s3+http://user:password@localhost:8080/us-east-1/vod",
@@ -97,18 +98,21 @@ describe("controllers/playback", () => {
       expect(res.status).toBe(200);
       ({ asset: asset2 } = await res.json());
 
-      res = await client.post(`/stream/${stream.id}/stream`, {
-        name: "test-recording",
-      });
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: "test-recording",
+        }
+      );
       expect(res.status).toBe(201);
-      session = await res.json();
-      expect(session).toMatchObject({ id: expect.any(String) });
+      childStream = await res.json();
+      expect(childStream).toMatchObject({ id: expect.any(String) });
 
-      userSession = await client
-        .get(`/session/${session.id}`)
+      session = await client
+        .get(`/session/${sessionId}`)
         .then((res) => res.json());
-      expect(userSession).toMatchObject({
-        id: session.id,
+      expect(session).toMatchObject({
+        id: sessionId,
         playbackId: stream.playbackId,
       });
 
@@ -294,33 +298,45 @@ describe("controllers/playback", () => {
       it("should return 404 for unrecorded streams and sessions", async () => {
         let res = await client.get(`/playback/${stream.id}`);
         expect(res.status).toBe(404);
-        res = await client.get(`/playback/${session.id}`);
+        res = await client.get(`/playback/${childStream.id}`);
         expect(res.status).toBe(404);
-        res = await client.get(`/playback/${userSession.id}`);
+        res = await client.get(`/playback/${session.id}`);
         expect(res.status).toBe(404);
       });
 
       it("should return 404 for recorded sessions without recording ready", async () => {
-        await db.stream.update(session.id, { record: true });
-        let res = await client.get(`/playback/${session.id}`);
-        expect(res.status).toBe(404);
-
-        await db.stream.update(session.id, {
+        await db.session.update(session.id, {
+          record: true,
           recordObjectStoreId: "mock_store",
+          lastSeen: Date.now() - 60 * 60 * 1000,
         });
-        res = await client.get(`/playback/${session.id}`);
-        expect(res.status).toBe(404);
-
-        await db.stream.update(session.id, { lastSeen: Date.now() });
-        res = await client.get(`/playback/${session.id}`);
+        let res = await client.get(`/playback/${session.id}`);
         expect(res.status).toBe(404);
       });
 
       it("should return playback URL for sessions with recording ready", async () => {
-        await db.stream.update(session.id, {
+        await db.session.update(session.id, {
           record: true,
           recordObjectStoreId: "mock_store",
           lastSeen: Date.now() - 60 * 60 * 1000,
+        });
+        await db.asset.create({
+          id: session.id,
+          name: "mock_asset_recording",
+          createdAt: session.createdAt,
+          source: { type: "recording", sessionId: session.id },
+          status: { phase: "ready", updatedAt: Date.now() },
+          objectStoreId: "mock_vod_store",
+          files: [
+            {
+              type: "static_transcoded_mp4",
+              path: "output.mp4",
+            },
+            {
+              type: "catalyst_hls_manifest",
+              path: "output.m3u8",
+            },
+          ],
         });
         const res = await client.get(`/playback/${session.id}`);
         expect(res.status).toBe(200);
@@ -331,24 +347,11 @@ describe("controllers/playback", () => {
               {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
-                url: `${ingest}/recordings/${session.id}/index.m3u8`,
+                url: `http://localhost/bucket/vod/output.m3u8`,
               },
             ],
           },
         });
-      });
-    });
-
-    it("should return playback URL for user sessions", async () => {
-      await db.session.update(userSession.id, {
-        record: true,
-        recordObjectStoreId: "mock_store",
-        lastSeen: Date.now() - 60 * 60 * 1000,
-      });
-      const res = await client.get(`/playback/${userSession.id}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "recording",
       });
     });
 
