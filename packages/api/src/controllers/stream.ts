@@ -825,12 +825,12 @@ app.post(
 
     // TODO: set the isActive field based on the payload as well (need
     // compatibility with /setactive recordging/webhooks handling)
+    const issues = payload.is_active
+      ? payload.human_issues || payload.issues || undefined
+      : undefined;
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : undefined,
-      issues:
-        payload.is_active && payload.human_issues
-          ? payload.human_issues
-          : undefined,
+      issues,
       // do not clear the `lastSeen` field when the stream is not active
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
