@@ -419,7 +419,7 @@ components:
         isHealthy:
           $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
         issues:
-          $ref: "#/components/schemas/stream-health-payload/properties/issues"
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdByTokenName:
           type: string
           readOnly: true
@@ -674,10 +674,12 @@ components:
             don't expose those to the end-user, showing only human_issues
             instead.
         human_issues:
-          type: string
+          type: array
           description:
-            A human-readable string describing issues affecting the stream, if
-            any.
+            A string array of human-readable errors describing issues affecting
+            the stream, if any.
+          items:
+            type: string
         tracks:
           type: object
           description:

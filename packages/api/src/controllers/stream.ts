@@ -825,9 +825,11 @@ app.post(
 
     // TODO: set the isActive field based on the payload as well (need
     // compatibility with /setactive recordging/webhooks handling)
-    const issues = payload.is_active
-      ? payload.human_issues || payload.issues || undefined
-      : undefined;
+    const issues =
+      payload.is_active && !payload.is_healthy
+        ? payload.human_issues ||
+          (payload.issues ? [payload.issues] : undefined)
+        : undefined;
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : undefined,
       issues,

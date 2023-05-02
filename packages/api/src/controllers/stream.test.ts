@@ -1016,14 +1016,11 @@ describe("controllers/stream", () => {
         },
         extra: { jitter: 123 },
         issues: isHealthy ? undefined : "Some complex error message",
-        human_issues: isHealthy ? undefined : "Under the weather",
+        human_issues: isHealthy ? undefined : ["Under the weather"],
       });
 
       const sendStreamHealthHook = async (payload: StreamHealthPayload) => {
         const res = await client.post("/stream/hook/health", payload);
-        if (res.status !== 204) {
-          await expect(res.json()).resolves.toMatchObject({ happy: {} });
-        }
         expect(res.status).toBe(204);
         const stream = await server.db.stream.getByPlaybackId(
           payload.stream_name.split("+", 2)[1]
@@ -1050,7 +1047,7 @@ describe("controllers/stream", () => {
 
         expect(updatedStream.isHealthy).toBe(false);
         // it should send the human issues to the stream issues field
-        expect(updatedStream.issues).toBe("Under the weather");
+        expect(updatedStream.issues).toEqual(["Under the weather"]);
       });
 
       it("resets the issues field when the stream becomes healthy", async () => {
@@ -1101,7 +1098,7 @@ describe("controllers/stream", () => {
         // Check if the session is updated as well
         const updatedSession = await db.session.get("sampleSessionId");
         expect(updatedSession.isHealthy).toBe(false);
-        expect(updatedSession.issues).toBe("Under the weather");
+        expect(updatedSession.issues).toEqual(["Under the weather"]);
         expect(updatedSession.lastSeen).toBeGreaterThan(session.lastSeen);
       });
 
