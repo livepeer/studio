@@ -267,10 +267,10 @@ function getDownloadUrl(
   { vodObjectStoreId }: Request["config"],
   ingest: string,
   asset: WithID<Asset>,
-  os: ObjectStore,
-  useStaticRenditions: boolean
+  os: ObjectStore
 ): string {
-  if (useStaticRenditions) {
+  if (asset.source?.type === "recording" && !asset.playbackRecordingId) {
+    // Recording V2
     const staticPlaybackInfos = getStaticPlaybackInfo(asset, os);
     if (staticPlaybackInfos.length > 0) {
       return staticPlaybackInfos[0].playbackUrl;
@@ -290,8 +290,7 @@ export async function withPlaybackUrls(
   config: CliArgs,
   ingest: string,
   asset: WithID<Asset>,
-  os?: ObjectStore,
-  useStaticRenditions: boolean = false
+  os?: ObjectStore
 ): Promise<WithID<Asset>> {
   if (asset.status.phase !== "ready") {
     return asset;
@@ -305,7 +304,7 @@ export async function withPlaybackUrls(
   return {
     ...asset,
     playbackUrl: getPlaybackUrl(config, ingest, asset, os),
-    downloadUrl: getDownloadUrl(config, ingest, asset, os, useStaticRenditions),
+    downloadUrl: getDownloadUrl(config, ingest, asset, os),
   };
 }
 
