@@ -206,7 +206,7 @@ async function getRecordingUrls(
     return;
   }
 
-  if (asset.id != session.id) {
+  if (asset.id !== session.id) {
     // Backwards-compatibility for Recording V1
     const base = pathJoin(
       ingest,
