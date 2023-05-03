@@ -111,7 +111,11 @@ async function getResourceByPlaybackId(
 
   let stream = await db.stream.getByPlaybackId(id);
   if (!stream) {
-    stream = await db.stream.get(id);
+    const streamById = await db.stream.get(id);
+    // only allow retrieving child streams by ID
+    if (streamById?.parentId) {
+      stream = streamById;
+    }
   }
   if (stream && !stream.deleted && !stream.suspended) {
     return { stream };
@@ -138,7 +142,7 @@ async function getPlaybackInfo(
 
   // Streams represent "transcoding sessions" when they are a child stream, in
   // which case they are used to playback old recordings and not the livestream.
-  const isChildStream = stream?.parentId || !stream?.playbackId;
+  const isChildStream = stream && (stream.parentId || !stream.playbackId);
   if (isChildStream) {
     session = stream;
     stream = null;
@@ -166,7 +170,7 @@ async function getPlaybackInfo(
     }
   }
 
-  throw new NotFoundError(`No playback URL found for ${id}`);
+  return null;
 }
 
 const app = Router();
@@ -181,6 +185,9 @@ app.get("/:id", async (req, res) => {
 
   let { id } = req.params;
   const info = await getPlaybackInfo(req, ingest, id);
+  if (!info) {
+    throw new NotFoundError(`No playback URL found for ${id}`);
+  }
   res.status(200).json(info);
 });
 

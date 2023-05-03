@@ -355,17 +355,25 @@ describe("controllers/playback", () => {
       });
     });
 
-    it("should return playback URL for top-level streams", async () => {
-      await db.stream.update(stream.id, {
+    it("should return playback URL for user sessions", async () => {
+      // delete the child stream just to make sure we use the user session (they have the same id)
+      await db.stream.delete(childStream.id);
+      await db.session.update(session.id, {
         record: true,
         recordObjectStoreId: "mock_store",
         lastSeen: Date.now() - 60 * 60 * 1000,
       });
-      let res = await client.get(`/playback/${stream.id}`);
+
+      const res = await client.get(`/playback/${session.id}`);
       expect(res.status).toBe(200);
       await expect(res.json()).resolves.toMatchObject({
         type: "recording",
       });
+    });
+
+    it("should return playback URL for top-level streams by playbackId", async () => {
+      let res = await client.get(`/playback/${stream.id}`);
+      expect(res.status).toBe(404);
 
       res = await client.get(`/playback/${stream.playbackId}`);
       expect(res.status).toBe(200);
