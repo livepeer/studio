@@ -69,11 +69,12 @@ function newPlaybackInfo(
 
   return playbackInfo;
 }
+
 const getAssetPlaybackUrl = async (
   config: Request["config"],
   ingest: string,
   id: string,
-  user?: User
+  user: User
 ) => {
   const asset =
     (await db.asset.getByPlaybackId(id)) ??
@@ -141,7 +142,7 @@ async function getPlaybackInfo(
     return newPlaybackInfo("recording", recordingUrl);
   }
 
-  const asset = await getAssetPlaybackUrl(config, ingest, id);
+  const asset = await getAssetPlaybackUrl(config, ingest, id, user);
   if (asset) {
     return newPlaybackInfo(
       "vod",
