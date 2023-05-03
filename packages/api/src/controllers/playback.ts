@@ -95,9 +95,9 @@ const getAssetPlaybackInfo = async (
   );
 };
 
-async function getResourceByPlaybackId(
+export async function getResourceByPlaybackId(
   id: string,
-  user?: User
+  user: User
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
   let asset =
     (await db.asset.getByPlaybackId(id)) ??

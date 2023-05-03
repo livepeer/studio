@@ -7,6 +7,7 @@ import { authorizer } from "../middleware";
 import { db } from "../store";
 import { ForbiddenError, NotFoundError } from "../store/errors";
 import Table from "../store/table";
+import { getResourceByPlaybackId } from "./playback";
 
 type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 
@@ -16,20 +17,31 @@ type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 async function checkUserOwned(
   req: Request,
   headerName: string,
-  table: Table<UserOwnedObj>
+  objectTypeName: string,
+  getter: (id: string) => Promise<UserOwnedObj>
 ) {
   if (!(headerName in req.headers)) {
     return;
   }
   const id = req.headers[headerName]?.toString();
-  const obj = await table.get(id);
+  const obj = await getter(id);
   if (!obj || obj.deleted) {
-    throw new NotFoundError(`${table.name} not found`);
+    throw new NotFoundError(`${objectTypeName} not found`);
   }
   const hasAccess = obj.userId === req.user.id || req.user.admin;
   if (!hasAccess) {
     throw new ForbiddenError(`access forbidden`);
   }
+}
+
+function anyGetterByPlaybackId(req: Request) {
+  return async (id: string) => {
+    const { asset, stream, session } = await getResourceByPlaybackId(
+      id,
+      req.user
+    );
+    return asset || stream || session;
+  };
 }
 
 const app = Router();
@@ -38,8 +50,14 @@ app.all(
   "/",
   authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
-    await checkUserOwned(req, "x-livepeer-stream-id", db.stream);
-    await checkUserOwned(req, "x-livepeer-asset-id", db.asset);
+    await checkUserOwned(req, "x-livepeer-stream-id", "stream", db.stream.get);
+    await checkUserOwned(req, "x-livepeer-asset-id", "asset", db.asset.get);
+    await checkUserOwned(
+      req,
+      "x-livepeer-playback-id",
+      "playback ID",
+      anyGetterByPlaybackId(req)
+    );
 
     res.header("x-livepeer-user-id", req.user.id);
     res.status(204).end();
