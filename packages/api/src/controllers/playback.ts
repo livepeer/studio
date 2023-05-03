@@ -12,8 +12,9 @@ import {
 import { CliArgs } from "../parse-cli";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
-import Table from "../store/table";
 import { Asset, Stream, User } from "../schema/types";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -70,62 +71,80 @@ function newPlaybackInfo(
   return playbackInfo;
 }
 
-const getAssetPlaybackUrl = async (
+const getAssetPlaybackInfo = async (
   config: Request["config"],
   ingest: string,
-  id: string,
-  user: User
+  asset: WithID<Asset>
 ) => {
-  const asset =
-    (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id, user)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
-    (await db.asset.getBySourceURL("ar://" + id, user));
-  if (!asset || asset.deleted) {
-    return null;
-  }
   const os = await db.objectStore.get(asset.objectStoreId);
   if (!os || os.deleted || os.disabled) {
     return null;
   }
+
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
-  const staticFilesPlaybackInfo = getStaticPlaybackInfo(asset, os);
 
-  return !playbackUrl
-    ? null
-    : {
-        staticFilesPlaybackInfo,
-        playbackUrl,
-        playbackPolicy: asset.playbackPolicy || null,
-      };
-};
-
-const getRecordingPlaybackUrl = async (
-  config: CliArgs,
-  ingest: string,
-  id: string,
-  table: Table<DBSession>
-) => {
-  const session = await table.get(id);
-  if (!session || session.deleted) {
+  if (!playbackUrl) {
     return null;
   }
-  const { recordingUrl } = await getRecordingFields(
-    config,
-    ingest,
-    session,
-    false
+
+  return newPlaybackInfo(
+    "vod",
+    playbackUrl,
+    asset.playbackPolicy || null,
+    getStaticPlaybackInfo(asset, os)
   );
-  return recordingUrl;
 };
+
+async function getResourceByPlaybackId(
+  id: string,
+  user?: User
+): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
+  let asset =
+    (await db.asset.getByPlaybackId(id)) ??
+    (await db.asset.getByIpfsCid(id, user)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user));
+
+  if (asset && !asset.deleted) {
+    return { asset };
+  }
+
+  let stream = await db.stream.getByPlaybackId(id);
+  if (!stream) {
+    stream = await db.stream.get(id);
+  }
+  if (stream && !stream.deleted && !stream.suspended) {
+    return { stream };
+  }
+
+  const session = await db.session.get(id);
+  if (session && !session.deleted) {
+    return { session };
+  }
+
+  return {};
+}
 
 async function getPlaybackInfo(
   { config, user }: Request,
   ingest: string,
   id: string
 ): Promise<PlaybackInfo> {
-  const stream = await db.stream.getByPlaybackId(id);
-  if (stream && !stream.deleted) {
+  let { stream, asset, session } = await getResourceByPlaybackId(id, user);
+
+  if (asset) {
+    return await getAssetPlaybackInfo(config, ingest, asset);
+  }
+
+  // Streams represent "transcoding sessions" when they are a child stream, in
+  // which case they are used to playback old recordings and not the livestream.
+  const isChildStream = stream?.parentId || !stream?.playbackId;
+  if (isChildStream) {
+    session = stream;
+    stream = null;
+  }
+
+  if (stream) {
     return newPlaybackInfo(
       "live",
       streamPlaybackUrl(ingest, stream),
@@ -135,21 +154,16 @@ async function getPlaybackInfo(
     );
   }
 
-  const recordingUrl =
-    (await getRecordingPlaybackUrl(config, ingest, id, db.session)) ??
-    (await getRecordingPlaybackUrl(config, ingest, id, db.stream));
-  if (recordingUrl) {
-    return newPlaybackInfo("recording", recordingUrl);
-  }
-
-  const asset = await getAssetPlaybackUrl(config, ingest, id, user);
-  if (asset) {
-    return newPlaybackInfo(
-      "vod",
-      asset.playbackUrl,
-      asset.playbackPolicy,
-      asset.staticFilesPlaybackInfo
+  if (session) {
+    const { recordingUrl } = await getRecordingFields(
+      config,
+      ingest,
+      session,
+      false
     );
+    if (recordingUrl) {
+      return newPlaybackInfo("recording", recordingUrl);
+    }
   }
 
   throw new NotFoundError(`No playback URL found for ${id}`);
