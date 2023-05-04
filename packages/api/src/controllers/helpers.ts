@@ -500,3 +500,15 @@ export async function recaptchaVerify(token: string, secretKey: string) {
     .then((res) => res.json())
     .then((res) => res.score);
 }
+
+export function isValidBase64(str: string) {
+  try {
+    // Decode the string and re-encode it
+    const decoded = Buffer.from(str, "base64").toString("base64");
+    // If the re-encoded string matches the original input, it's a valid base64 string
+    return decoded === str;
+  } catch (err) {
+    // If there's an error during decoding, it's not a valid base64 string
+    return false;
+  }
+}

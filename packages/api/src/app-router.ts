@@ -56,6 +56,7 @@ export default async function makeApp(params: CliArgs) {
     postgresUrl,
     postgresReplicaUrl,
     frontendDomain = "livepeer.studio",
+    catalystBaseUrl = "http://localhost:7979",
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
@@ -162,6 +163,7 @@ export default async function makeApp(params: CliArgs) {
     req.queue = queue;
     req.taskScheduler = taskScheduler;
     req.stripe = stripe;
+    req.catalystBaseUrl = catalystBaseUrl;
     next();
   });
   app.use(

@@ -1041,9 +1041,13 @@ components:
         encryption:
           type: object
           additionalProperties: false
-          required:
-            - key
           properties:
+            encryptedKey:
+              type: string
+              writeOnly: true
+              description:
+                Encryption key used to encrypt the asset. Only writable in the
+                upload asset endpoints and cannot be retrieved back.
             key:
               type: string
               writeOnly: true
