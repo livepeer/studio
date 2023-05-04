@@ -541,8 +541,6 @@ components:
     webhook:
       table: webhook
       properties:
-        id:
-          readOnly: true
         kind:
           type: string
           example: webhook
@@ -551,27 +549,9 @@ components:
           readOnly: true
           type: string
           index: true
-        createdAt:
-          readOnly: true
         events:
           index: true
           indexType: gin
-        status:
-          readOnly: true
-          properties:
-            lastFailure:
-              readOnly: true
-              properties:
-                timestamp:
-                  readOnly: true
-                error:
-                  readOnly: true
-                response:
-                  readOnly: true
-                statusCode:
-                  readOnly: true
-            lastTriggeredAt:
-              readOnly: true
         event:
           writeOnly: true
           deprecated: true
@@ -584,20 +564,14 @@ components:
     webhook-response:
       table: webhook_response
       properties:
-        id:
-          readOnly: true
         kind:
           readOnly: true
           type: string
           example: webhookResponse
         webhookId:
-          readOnly: true
           index: true
         eventId:
-          readOnly: true
           index: true
-        createdAt:
-          readOnly: true
     detection-webhook-payload:
       type: object
       required:
@@ -624,8 +598,6 @@ components:
     stream:
       table: stream
       properties:
-        id:
-          readOnly: true
         kind:
           type: string
           example: stream
@@ -638,10 +610,7 @@ components:
           index: true
         isActive:
           index: true
-        createdByTokenName:
-          readOnly: true
         createdAt:
-          readOnly: true
           index: true
         parentId:
           index: true
@@ -758,7 +727,6 @@ components:
     playback-policy:
       properties:
         type:
-          # We need to repeat all values here since _.merge will not concat arrays
           enum:
             - public
             - jwt
@@ -795,8 +763,6 @@ components:
     session:
       table: session
       properties:
-        id:
-          readOnly: true
         kind:
           type: string
           example: stream
@@ -808,19 +774,12 @@ components:
         lastSeen:
           index: true
         createdAt:
-          readOnly: true
           index: true
         parentId:
           index: true
-        recordingStatus:
-          readOnly: true
-        recordingUrl:
-          readOnly: true
         deleted:
           type: boolean
           description: Set to true when stream deleted
-        mp4Url:
-          readOnly: true
         recordObjectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
@@ -832,27 +791,18 @@ components:
     multistream-target:
       table: multistream_target
       properties:
-        id:
-          readOnly: true
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           readOnly: true
           index: true
-        createdAt:
-          readOnly: true
     asset:
       table: asset
       properties:
         id:
-          readOnly: true
           index: true
         playbackId:
           index: true
-        playbackUrl:
-          readOnly: true
-        downloadUrl:
-          readOnly: true
         userId:
           readOnly: true
           index: true
@@ -865,22 +815,6 @@ components:
               properties:
                 url:
                   index: true
-        storage:
-          properties:
-            ipfs:
-              properties:
-                updatedAt:
-                  readOnly: true
-            status:
-              readOnly: true
-        status:
-          readOnly: true
-        createdAt:
-          readOnly: true
-        size:
-          readOnly: true
-        videoSpec:
-          readOnly: true
         deleted:
           type: boolean
           description: Set to true when the asset is deleted
@@ -966,15 +900,10 @@ components:
       properties:
         cid:
           index: true
-        url:
-          readOnly: true
-        gatewayUrl:
-          readOnly: true
     task:
       table: task
       properties:
         id:
-          readOnly: true
           index: true
         userId:
           readOnly: true
@@ -982,16 +911,10 @@ components:
           type: string
           description: User ID of the task owner
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-        createdAt:
-          readOnly: true
-        scheduledAt:
-          readOnly: true
         inputAssetId:
           index: true
         outputAssetId:
           index: true
-        status:
-          readOnly: true
         output:
           properties:
             export:
@@ -1003,16 +926,6 @@ components:
                     to users. Contains internal tracking information like which
                     service was used for the export in case it is maintained by
                     us (e.g. the first-party piñata service).
-                ipfs:
-                  properties:
-                    videoFileUrl:
-                      readOnly: true
-                    videoFileGatewayUrl:
-                      readOnly: true
-                    nftMetadataUrl:
-                      readOnly: true
-                    nftMetadataGatewayUrl:
-                      readOnly: true
         params:
           properties:
             upload:
@@ -1064,8 +977,6 @@ components:
           type: string
           readOnly: true
           example: user
-        id:
-          readOnly: true
         stripeProductId:
           type: string
           enum:
@@ -1111,12 +1022,7 @@ components:
       table: signing_key
       properties:
         id:
-          readOnly: true
           index: true
-        createdAt:
-          readOnly: true
-        lastSeen:
-          readOnly: true
         userId:
           readOnly: true
           index: true
@@ -1134,8 +1040,6 @@ components:
         kind:
           type: string
           example: usage
-          readOnly: true
-        date:
           readOnly: true
     transcode-payload:
       properties:

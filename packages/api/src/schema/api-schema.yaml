@@ -66,11 +66,13 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         name:
           type: string
         createdAt:
           type: number
+          readOnly: true
           description:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
@@ -111,26 +113,32 @@ components:
           description: streamId of the stream on which the webhook is applied
         status:
           type: object
+          readOnly: true
           description: status of webhook
           properties:
             lastFailure:
               type: object
+              readOnly: true
               description: failure timestamp and error message with status code
               properties:
                 timestamp:
                   type: number
+                  readOnly: true
                   example: 1587667174725
                   description:
                     Timestamp (in milliseconds) at which the webhook last failed
                 error:
+                  readOnly: true
                   type: string
                   description: Webhook failure error message
                   example: Error message
                 response:
+                  readOnly: true
                   type: string
                   description: Webhook failure response
                   example: Response body
                 statusCode:
+                  readOnly: true
                   type: number
                   description: Webhook failure status code
                   example: 500
@@ -149,12 +157,16 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         webhookId:
+          readOnly: true
           type: string
         eventId:
+          readOnly: true
           type: string
         createdAt:
+          readOnly: true
           type: number
           description: >-
             Timestamp (in milliseconds) at which webhook response object was
@@ -191,11 +203,11 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         name:
           type: string
           example: test_stream
-
         lastSeen:
           type: number
           example: 1587667174725
@@ -232,9 +244,11 @@ components:
           description: If currently active
         createdByTokenName:
           type: string
+          readOnly: true
           description: Name of the token used to create this object
         createdAt:
           type: number
+          readOnly: true
           description:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
@@ -428,11 +442,11 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         name:
           type: string
           example: test_session
-
         lastSeen:
           type: number
           example: 1587667174725
@@ -465,6 +479,7 @@ components:
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
         createdAt:
+          readOnly: true
           type: number
           description:
             Timestamp (in milliseconds) at which stream object was created
@@ -480,6 +495,7 @@ components:
           type: boolean
           example: false
         recordingStatus:
+          readOnly: true
           type: string
           description: Status of the recording process of this stream session.
           enum:
@@ -488,9 +504,11 @@ components:
             - none
         recordingUrl:
           type: string
+          readOnly: true
           description: URL for accessing the recording of this stream session.
         mp4Url:
           type: string
+          readOnly: true
           description: URL for the stream session recording packaged in an mp4.
         playbackId:
           type: string
@@ -521,6 +539,7 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
@@ -537,9 +556,9 @@ components:
           description: >-
             If true then this multistream target will not be used for pushing
             even if it is configured in a stream object.
-
         createdAt:
           type: number
+          readOnly: true
           description: >-
             Timestamp (in milliseconds) at which multistream target object was
             created
@@ -554,6 +573,7 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         type:
           type: string
@@ -571,11 +591,13 @@ components:
           writeOnly: true
           description: Whether to generate MP4s for the asset.
         playbackUrl:
+          readOnly: true
           type: string
           example: >-
             https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
         downloadUrl:
+          readOnly: true
           type: string
           example: "https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video"
           description: URL to manually download the asset if desired
@@ -666,12 +688,14 @@ components:
                 nftMetadata:
                   $ref: "#/components/schemas/ipfs-file-info"
                 updatedAt:
+                  readOnly: true
                   type: number
                   description: >-
                     Timestamp (in milliseconds) at which IPFS export task was
                     updated
                   example: 1587667174725
             status:
+              readOnly: true
               additionalProperties: false
               required:
                 - phase
@@ -711,6 +735,7 @@ components:
                       type: string
                       description: ID of the last task to fail execution.
         status:
+          readOnly: true
           type: object
           additionalProperties: false
           required:
@@ -745,10 +770,12 @@ components:
             custom name or title
           example: filename.mp4
         createdAt:
+          readOnly: true
           type: number
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
         size:
+          readOnly: true
           type: number
           description: Size of the asset in bytes
           example: 84934509
@@ -769,6 +796,7 @@ components:
                 description: Hash algorithm used to compute the hash
                 example: sha256
         videoSpec:
+          readOnly: true
           type: object
           additionalProperties: false
           description: Video metadata
@@ -861,9 +889,11 @@ components:
           type: string
           description: CID of the file on IPFS
         url:
+          readOnly: true
           type: string
           description: URL with IPFS scheme for the file
         gatewayUrl:
+          readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
     new-signing-key-payload:
@@ -1116,8 +1146,8 @@ components:
         id:
           type: string
           description: Task ID
+          readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-
         type:
           type: string
           description: Type of the task
@@ -1128,10 +1158,12 @@ components:
             - transcode
             - transcode-file
         createdAt:
+          readOnly: true
           type: number
           description: Timestamp (in milliseconds) at which task was created
           example: 1587667174725
         scheduledAt:
+          readOnly: true
           type: number
           description: |
             Timestamp (in milliseconds) at which the task was scheduled for
@@ -1238,6 +1270,7 @@ components:
                     How many seconds the duration of each output segment should
                     be
         status:
+          readOnly: true
           type: object
           additionalProperties: false
           description: Status of the task
@@ -1308,8 +1341,10 @@ components:
                       description: IPFS CID of the exported video file
                     videoFileUrl:
                       type: string
+                      readOnly: true
                       description: URL for the file with the IPFS protocol
                     videoFileGatewayUrl:
+                      readOnly: true
                       type: string
                       description:
                         URL to access file via HTTP through an IPFS gateway
@@ -1318,10 +1353,12 @@ components:
                       description:
                         IPFS CID of the default metadata exported for the video
                     nftMetadataUrl:
+                      readOnly: true
                       type: string
                       description:
                         URL for the metadata file with the IPFS protocol
                     nftMetadataGatewayUrl:
+                      readOnly: true
                       type: string
                       description: >-
                         URL to access metadata file via HTTP through an IPFS
@@ -1422,16 +1459,19 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: 78df0075-b5f3-4683-a618-1086faca35dc
         name:
           type: string
           description: Name of the signing key
         createdAt:
+          readOnly: true
           type: number
           description:
             Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
         lastSeen:
+          readOnly: true
           type: number
           description:
             Timestamp (in milliseconds) at which the signing-key was last used
@@ -1482,6 +1522,7 @@ components:
           writeOnly: true
         id:
           type: string
+          readOnly: true
           example: abc123
         firstName:
           type: string
@@ -1537,6 +1578,7 @@ components:
           example: 2021-01-30T00:00:00.000Z
         date:
           type: number
+          readOnly: true
           example: usage
         sourceSegments:
           type: number
