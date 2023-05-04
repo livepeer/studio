@@ -17,6 +17,7 @@ import {
   NotFoundError,
 } from "../store/errors";
 import { Room } from "../schema/types";
+import { sendgridEmail } from "./helpers";
 
 const app = Router();
 
@@ -180,32 +181,64 @@ app.post(
   async (req, res) => {
     await getRoom(req);
 
-    const id = uuid();
-    const at = new AccessToken(
-      req.config.livekitApiKey,
-      req.config.livekitSecret,
-      {
-        name: req.body.name,
-        identity: id,
-        ttl: 5 * 60,
-      }
-    );
-    at.addGrant({ roomJoin: true, room: req.params.roomId });
-    const token = at.toJwt();
+    const resp = generateToken(req, req.body.name, 5 * 60);
 
     res.status(201);
-    res.json({
-      id: id,
-      joinUrl:
-        req.config.livekitMeetUrl +
-        "?liveKitUrl=" +
-        req.config.livekitHost +
-        "&token=" +
-        token,
-      token: token,
-    });
+    res.json(resp);
   }
 );
+
+function generateToken(req, userName, ttl) {
+  const id = uuid();
+  const at = new AccessToken(
+    req.config.livekitApiKey,
+    req.config.livekitSecret,
+    {
+      name: userName,
+      identity: id,
+      ttl: ttl,
+    }
+  );
+  at.addGrant({ roomJoin: true, room: req.params.roomId });
+  const token = at.toJwt();
+
+  return {
+    id: id,
+    joinUrl:
+      req.config.livekitMeetUrl +
+      "?liveKitUrl=" +
+      req.config.livekitHost +
+      "&token=" +
+      token,
+    token: token,
+  };
+}
+
+app.post("/:roomId/user-helper", authorizer({}), async (req, res) => {
+  await getRoom(req);
+
+  const { supportAddr, sendgridApiKey } = req.config;
+
+  for (const userEmail of req.body.emails) {
+    const tokenInfo = generateToken(req, userEmail, req.body.inviteTTL);
+
+    await sendgridEmail({
+      email: userEmail,
+      supportAddr,
+      sendgridTemplateId: "d-46f40e6bc9c6435bacd4a7f931c5582e",
+      sendgridApiKey,
+      subject: `You have been invited to a meeting`,
+      preheader: "",
+      buttonText: "Join",
+      text: [
+        `You've been invited to a meeting, click the button below to join!`,
+      ].join("\n\n"),
+      unsubscribe: "",
+      buttonUrl: tokenInfo.joinUrl,
+    });
+  }
+  res.status(204).end();
+});
 
 app.delete("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
   await getRoom(req);
