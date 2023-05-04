@@ -1,4 +1,4 @@
-import sql from "sql-template-strings";
+import sql, { SQLStatement } from "sql-template-strings";
 import { Asset, Task, User } from "../schema/types";
 import Table from "./table";
 import { QueryOptions, WithID } from "./types";
@@ -42,59 +42,65 @@ export default class AssetTable extends Table<WithID<Asset>> {
     return assets[0];
   }
 
-  async getByIpfsCid(cid: string, user?: User): Promise<WithID<Asset>> {
-    const query = [
-      sql`asset.data->'storage'->'ipfs'->>'cid' = ${cid}`,
-      sql`asset.data->>'deleted' IS NULL`,
-    ];
-    let userQuery = [...query];
-    if (user) {
-      userQuery.push(sql`asset.data->>'userId' = ${user.id}`);
-    }
-    let order = "coalesce((asset.data->'createdAt')::bigint, 0) ASC";
-    var [assets] = await this.find(userQuery, {
-      limit: 2,
-      order,
-    });
-    if (!assets || assets.length < 1) {
-      [assets] = await this.find(query, {
-        limit: 2,
-        order,
-      });
-      if (!assets || assets.length < 1) {
-        return null;
-      }
-    }
-    return assets[0];
+  async getByIpfsCid(
+    cid: string,
+    user?: User,
+    crossUserCutoffDate?: number
+  ): Promise<WithID<Asset>> {
+    return this.findFirstReady(
+      [sql`asset.data->'storage'->'ipfs'->>'cid' = ${cid}`],
+      user,
+      crossUserCutoffDate
+    );
   }
 
-  async getBySourceURL(url: string, user?: User): Promise<WithID<Asset>> {
-    const query = [
-      sql`asset.data->'source'->>'type' = 'url'`,
-      sql`asset.data->'source'->>'url' = ${url}`,
-      sql`asset.data->'source'->>'encryption' IS NULL`,
-      sql`asset.data->>'deleted' IS NULL`,
-      sql`asset.data->'status'->>'phase' = 'ready'`,
-    ];
-    let userQuery = [...query];
+  async getBySourceURL(
+    url: string,
+    user?: User,
+    crossUserCutoffDate?: number
+  ): Promise<WithID<Asset>> {
+    return this.findFirstReady(
+      [
+        sql`asset.data->'source'->>'type' = 'url'`,
+        sql`asset.data->'source'->>'url' = ${url}`,
+        sql`asset.data->'source'->>'encryption' IS NULL`,
+      ],
+      user,
+      crossUserCutoffDate
+    );
+  }
+
+  private async findFirstReady(
+    query: SQLStatement[],
+    user?: User,
+    crossUserCutoffDate?: number
+  ): Promise<WithID<Asset>> {
+    const findOnce = async (userQuery: SQLStatement[]) => {
+      const [assets] = await this.find(
+        [
+          ...query,
+          ...userQuery,
+          sql`asset.data->>'deleted' IS NULL`,
+          sql`asset.data->'status'->>'phase' = 'ready'`,
+        ],
+        {
+          limit: 1,
+          order: "coalesce((asset.data->'createdAt')::bigint, 0) ASC",
+        }
+      );
+      return assets.length > 0 ? assets[0] : null;
+    };
+
     if (user) {
-      userQuery.push(sql`asset.data->>'userId' = ${user.id}`);
-    }
-    let order = "coalesce((asset.data->'createdAt')::bigint, 0) ASC";
-    let [assets] = await this.find(userQuery, {
-      limit: 2,
-      order,
-    });
-    if (!assets || assets.length < 1) {
-      [assets] = await this.find(query, {
-        limit: 2,
-        order,
-      });
-      if (!assets || assets.length < 1) {
-        return null;
+      const asset = await findOnce([sql`asset.data->>'userId' = ${user.id}`]);
+      if (asset) {
+        return asset;
       }
     }
-    return assets[0];
+
+    return await findOnce([
+      sql`coalesce((asset.data->'createdAt')::bigint, 0) < ${crossUserCutoffDate}`,
+    ]);
   }
 
   async getBySessionId(sessionId: string): Promise<WithID<Asset>> {
