@@ -16,6 +16,15 @@ import { Asset, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 
+/**
+ * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
+ * asset playback. Assets created before this date can still be played by other
+ * accounts by dStorage ID. Assets created after this date will not have
+ * cross-account playback enabled, ensuring users are billed appropriately. This
+ * was made for backward compatibiltiy during the Viewership V2 deploy.
+ */
+const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
+
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
   type: "live" | "vod" | "recording";
@@ -97,13 +106,21 @@ const getAssetPlaybackInfo = async (
 
 export async function getResourceByPlaybackId(
   id: string,
-  user: User
+  user?: User
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
   let asset =
     (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id, user)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
-    (await db.asset.getBySourceURL("ar://" + id, user));
+    (await db.asset.getByIpfsCid(id, user, CROSS_USER_ASSETS_CUTOFF_DATE)) ??
+    (await db.asset.getBySourceURL(
+      "ipfs://" + id,
+      user,
+      CROSS_USER_ASSETS_CUTOFF_DATE
+    )) ??
+    (await db.asset.getBySourceURL(
+      "ar://" + id,
+      user,
+      CROSS_USER_ASSETS_CUTOFF_DATE
+    ));
 
   if (asset && !asset.deleted) {
     return { asset };
