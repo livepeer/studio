@@ -17,7 +17,6 @@ type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 async function checkUserOwned(
   req: Request,
   headerName: string,
-  objectTypeName: string,
   getter: (id: string) => Promise<UserOwnedObj>
 ) {
   if (!(headerName in req.headers)) {
@@ -27,7 +26,7 @@ async function checkUserOwned(
 
   const obj = await getter(id);
   if (!obj || obj.deleted) {
-    throw new NotFoundError(`${objectTypeName} not found`);
+    throw new NotFoundError(`failed to find object from ${headerName} header`);
   }
 
   const hasAccess = obj.userId === req.user.id || req.user.admin;
@@ -36,7 +35,7 @@ async function checkUserOwned(
   }
 }
 
-function anyGetterByPlaybackId(req: Request) {
+function playbackIdGetter(req: Request) {
   return async (id: string): Promise<UserOwnedObj> => {
     const { asset, stream, session } = await getResourceByPlaybackId(
       id,
@@ -46,6 +45,10 @@ function anyGetterByPlaybackId(req: Request) {
   };
 }
 
+function tableGetter(table: Table<UserOwnedObj>) {
+  return table.get.bind(table);
+}
+
 const app = Router();
 
 app.all(
@@ -53,14 +56,9 @@ app.all(
   authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
     await Promise.all([
-      checkUserOwned(req, "x-livepeer-stream-id", "stream", db.stream.get),
-      checkUserOwned(req, "x-livepeer-asset-id", "asset", db.asset.get),
-      checkUserOwned(
-        req,
-        "x-livepeer-playback-id",
-        "playback ID",
-        anyGetterByPlaybackId(req)
-      ),
+      checkUserOwned(req, "x-livepeer-stream-id", tableGetter(db.stream)),
+      checkUserOwned(req, "x-livepeer-asset-id", tableGetter(db.asset)),
+      checkUserOwned(req, "x-livepeer-playback-id", playbackIdGetter(req)),
     ]);
 
     res.header("x-livepeer-user-id", req.user.id);
