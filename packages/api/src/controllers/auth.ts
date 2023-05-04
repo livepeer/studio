@@ -24,10 +24,12 @@ async function checkUserOwned(
     return;
   }
   const id = req.headers[headerName]?.toString();
+
   const obj = await getter(id);
   if (!obj || obj.deleted) {
     throw new NotFoundError(`${objectTypeName} not found`);
   }
+
   const hasAccess = obj.userId === req.user.id || req.user.admin;
   if (!hasAccess) {
     throw new ForbiddenError(`access forbidden`);
@@ -35,7 +37,7 @@ async function checkUserOwned(
 }
 
 function anyGetterByPlaybackId(req: Request) {
-  return async (id: string) => {
+  return async (id: string): Promise<UserOwnedObj> => {
     const { asset, stream, session } = await getResourceByPlaybackId(
       id,
       req.user
@@ -50,14 +52,16 @@ app.all(
   "/",
   authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
-    await checkUserOwned(req, "x-livepeer-stream-id", "stream", db.stream.get);
-    await checkUserOwned(req, "x-livepeer-asset-id", "asset", db.asset.get);
-    await checkUserOwned(
-      req,
-      "x-livepeer-playback-id",
-      "playback ID",
-      anyGetterByPlaybackId(req)
-    );
+    await Promise.all([
+      checkUserOwned(req, "x-livepeer-stream-id", "stream", db.stream.get),
+      checkUserOwned(req, "x-livepeer-asset-id", "asset", db.asset.get),
+      checkUserOwned(
+        req,
+        "x-livepeer-playback-id",
+        "playback ID",
+        anyGetterByPlaybackId(req)
+      ),
+    ]);
 
     res.header("x-livepeer-user-id", req.user.id);
     res.status(204).end();
