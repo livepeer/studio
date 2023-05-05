@@ -269,6 +269,14 @@ function getDownloadUrl(
   asset: WithID<Asset>,
   os: ObjectStore
 ): string {
+  if (asset.source?.type === "recording" && !asset.playbackRecordingId) {
+    // Recording V2
+    const staticPlaybackInfos = getStaticPlaybackInfo(asset, os);
+    if (staticPlaybackInfos.length > 0) {
+      return staticPlaybackInfos[0].playbackUrl;
+    }
+  }
+
   const base =
     os.id !== vodObjectStoreId ? os.publicUrl : pathJoin(ingest, "asset");
   const source = asset.files?.find((f) => f.type === "source_file");

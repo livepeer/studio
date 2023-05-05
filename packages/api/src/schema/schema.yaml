@@ -490,6 +490,11 @@ components:
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
           description:
             ID of object store where to which this stream was recorded
+        sessionId:
+          type: string
+          example: c613d69e-5f4d-451b-9d3a-d28beff86a81
+          description: UUID of Session created by Mist
+          index: true
         multistream:
           type: object
           additionalProperties: false
@@ -901,6 +906,9 @@ components:
           type: string
           readOnly: true
           example: stream
+        version:
+          type: string
+          description: Version of the session object
         name:
           type: string
           example: test_session

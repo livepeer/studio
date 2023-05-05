@@ -405,6 +405,7 @@ const adminOnlyFields = ["mistHost", "broadcasterHost", "createdByTokenId"];
 
 const privateFields = [
   "recordObjectStoreId",
+  "recordingSessionId",
   "previousSessions",
   "partialSession",
   "previousStats",

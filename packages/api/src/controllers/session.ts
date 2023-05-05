@@ -7,6 +7,7 @@ import { db } from "../store";
 import { DBSession } from "../store/db";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
+import { CliArgs } from "../parse-cli";
 import {
   FieldsMap,
   makeNextHREF,
@@ -128,8 +129,10 @@ app.get("/", authorizer({}), async (req, res, next) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  let sessions = output.map((session) =>
-    toExternalSession(session, ingest, !!forceUrl, req.user.admin)
+  let sessions = await Promise.all(
+    output.map(async (session) =>
+      toExternalSession(req.config, session, ingest, !!forceUrl, req.user.admin)
+    )
   );
   res.json(sessions);
 });
@@ -147,17 +150,24 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.status(200);
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
-  session = toExternalSession(session, ingest, false, req.user.admin);
+  session = await toExternalSession(
+    req.config,
+    session,
+    ingest,
+    false,
+    req.user.admin
+  );
   res.json(session);
 });
 
-export function toExternalSession(
+export async function toExternalSession(
+  config: CliArgs,
   obj: DBSession,
   ingest: string,
   forceUrl = false,
   isAdmin = false
-) {
-  obj = withRecordingFields(ingest, obj, forceUrl);
+): Promise<DBSession> {
+  obj = await withRecordingFields(config, ingest, obj, forceUrl);
   if (!isAdmin) {
     removePrivateFields(obj);
   }
@@ -175,6 +185,6 @@ function removePrivateFields(obj: DBSession) {
 
 const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 
-const privateFields: (keyof DBSession)[] = ["recordObjectStoreId"];
+const privateFields: (keyof DBSession)[] = ["recordObjectStoreId", "version"];
 
 export default app;
