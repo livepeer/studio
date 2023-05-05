@@ -473,6 +473,7 @@ describe("controller/auth", () => {
         id: uuid(),
         playbackId: await generateUniquePlaybackId(uuid()),
         userId: nonAdminUser.id,
+        status: { phase: "ready" },
       } as any);
       adminStream = await db.stream.create({
         id: uuid(),
@@ -483,6 +484,7 @@ describe("controller/auth", () => {
         id: uuid(),
         playbackId: await generateUniquePlaybackId(uuid()),
         userId: adminUser.id,
+        status: { phase: "ready" },
       } as any);
     });
 
