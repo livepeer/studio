@@ -45,7 +45,7 @@ export default class WebhookCannon {
   sendgridTemplateId: string;
   sendgridApiKey: string;
   supportAddr: [string, string];
-  catalystVodObjectStoreId: string;
+  vodCatalystObjectStoreId: string;
   recordCatalystObjectStoreId: string;
   resolver: any;
   queue: Queue;
@@ -55,7 +55,7 @@ export default class WebhookCannon {
     sendgridTemplateId,
     sendgridApiKey,
     supportAddr,
-    catalystVodObjectStoreId,
+    vodCatalystObjectStoreId,
     recordCatalystObjectStoreId,
     verifyUrls,
     queue,
@@ -67,7 +67,7 @@ export default class WebhookCannon {
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
-    this.catalystVodObjectStoreId = catalystVodObjectStoreId;
+    this.vodCatalystObjectStoreId = vodCatalystObjectStoreId;
     this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
@@ -544,7 +544,7 @@ export default class WebhookCannon {
           source: { type: "recording", sessionId: session.id },
           status: { phase: "waiting", updatedAt: Date.now() },
           name: `live-${startedAt}`,
-          objectStoreId: this.catalystVodObjectStoreId,
+          objectStoreId: this.vodCatalystObjectStoreId,
         },
         this.queue
       );
