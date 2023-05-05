@@ -123,6 +123,13 @@ export async function getResourceByPlaybackId(
     if (asset.status.phase !== "ready") {
       throw new UnprocessableEntityError("asset is not ready for playback");
     }
+    if (asset.userId !== user?.id && !isCrossUserQuery) {
+      console.log(
+        `Returning cross-user asset for playback. ` +
+          `userId=${user?.id} userEmail=${user?.email} ` +
+          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
+      );
+    }
     return { asset };
   }
 
