@@ -258,6 +258,45 @@ describe("controllers/playback", () => {
         expect(res.status).toBe(404);
       });
 
+      describe("on lvpr.tv, should still return other users playback URL by CID", () => {
+        beforeEach(async () => {
+          await db.asset.delete(asset2.id);
+        });
+
+        const checkOrigin = (origin: string, success: boolean) => {
+          it("for origin " + origin, async () => {
+            const res = await client2.get(`/playback/${cid}`, {
+              headers: { origin },
+            });
+            expect(res.status).toBe(success ? 200 : 404);
+            if (success) {
+              await expect(res.json()).resolves.toMatchObject({
+                type: "vod",
+                meta: {
+                  source: [
+                    {
+                      hrn: "HLS (TS)",
+                      type: "html5/application/vnd.apple.mpegurl",
+                      url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+                    },
+                  ],
+                },
+              });
+            }
+          });
+        };
+
+        checkOrigin(undefined, false);
+
+        checkOrigin("https://lvpr.tv", true);
+        checkOrigin("https://monster.lvpr.tv", true);
+
+        checkOrigin("https://lvpr.tv/", false);
+        checkOrigin("http://lvpr.tv", false);
+        checkOrigin("https://notlvpr.tv", false);
+        checkOrigin("http://localhost:3000", false);
+      });
+
       it("should return playback URL assets from Arweave tx ID based on source URL lookup", async () => {
         const txID = "randomstring";
         await db.asset.update(asset.id, {

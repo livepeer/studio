@@ -26,7 +26,7 @@ import { NotFoundError, UnprocessableEntityError } from "../store/errors";
  */
 export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
 
-var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv\/$/;
+var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv$/;
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
