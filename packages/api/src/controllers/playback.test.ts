@@ -5,6 +5,7 @@ import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { DBSession } from "../store/db";
+import { CROSS_USER_ASSETS_CUTOFF_DATE } from "./playback";
 
 let server: TestServer;
 let ingest: string;
@@ -57,6 +58,8 @@ describe("controllers/playback", () => {
     let asset: WithID<Asset>;
     let asset2: WithID<Asset>;
 
+    const cid = "bafyfoobar";
+
     beforeEach(async () => {
       const sessionId = "5b12c779-efc3-42ba-83d9-c590955556b0";
       await db.objectStore.create({
@@ -108,6 +111,21 @@ describe("controllers/playback", () => {
       childStream = await res.json();
       expect(childStream).toMatchObject({ id: expect.any(String) });
 
+      const assetPatch = {
+        source: { type: "url", url: "ipfs://" + cid },
+        status: { phase: "ready", updatedAt: Date.now() },
+      } as const;
+      await db.asset.update(asset.id, {
+        playbackRecordingId: "mock_asset_1",
+        createdAt: CROSS_USER_ASSETS_CUTOFF_DATE + 1000,
+        ...assetPatch,
+      });
+      await db.asset.update(asset2.id, {
+        playbackRecordingId: "mock_asset_2",
+        createdAt: CROSS_USER_ASSETS_CUTOFF_DATE + 2000,
+        ...assetPatch,
+      });
+
       session = await client
         .get(`/session/${sessionId}`)
         .then((res) => res.json());
@@ -115,9 +133,6 @@ describe("controllers/playback", () => {
         id: sessionId,
         playbackId: stream.playbackId,
       });
-
-      // API should be open without any auth
-      client.jwtAuth = null;
     });
 
     describe("for streams", () => {
@@ -154,15 +169,33 @@ describe("controllers/playback", () => {
     });
 
     describe("for assets", () => {
-      it("should return clean 404 for assets without playback recording", async () => {
+      it("should return 4xx for assets not ready", async () => {
+        await db.asset.update(asset.id, {
+          status: { phase: "processing", updatedAt: Date.now() },
+        });
+
+        let res = await client.get(`/playback/${asset.playbackId}`);
+        expect(res.status).toBe(422);
+
+        res = await client.get(`/playback/${cid}`);
+        expect(res.status).toBe(404);
+
+        const txID = "randomstring";
+        await db.asset.update(asset.id, {
+          source: { type: "url", url: "ar://" + txID },
+        });
+        res = await client.get(`/playback/${txID}`);
+        expect(res.status).toBe(404);
+      });
+
+      it("should return 404 for assets without playback recording", async () => {
+        await db.asset.update(asset.id, { playbackRecordingId: null });
+
         const res = await client.get(`/playback/${asset.playbackId}`);
         expect(res.status).toBe(404);
       });
 
       it("should return playback URL for assets", async () => {
-        await db.asset.update(asset.id, {
-          playbackRecordingId: "mock_recording_id",
-        });
         const res = await client.get(`/playback/${asset.playbackId}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
@@ -172,27 +205,19 @@ describe("controllers/playback", () => {
               {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
-                url: `${ingest}/recordings/mock_recording_id/index.m3u8`,
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
               },
             ],
           },
         });
       });
 
-      it("should return playback URL assets from CID", async () => {
-        const cid = "bafyfoobar";
+      it("should return playback URL assets with exported CID", async () => {
         await db.asset.update(asset.id, {
-          playbackRecordingId: "mock_recording_id_2",
-          storage: {
-            ipfs: {
-              cid: cid,
-            },
-            status: {
-              phase: "ready",
-              tasks: {},
-            },
-          },
+          source: { type: "directUpload" },
+          storage: { ipfs: { cid } },
         });
+
         const res = await client.get(`/playback/${cid}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
@@ -202,7 +227,7 @@ describe("controllers/playback", () => {
               {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
-                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
               },
             ],
           },
@@ -210,18 +235,6 @@ describe("controllers/playback", () => {
       });
 
       it("should return playback URL assets from CID based on source URL lookup", async () => {
-        const cid = "bafyfoobar";
-        await db.asset.update(asset.id, {
-          playbackRecordingId: "mock_recording_id_2",
-          source: {
-            type: "url",
-            url: "ipfs://" + cid,
-          },
-          status: {
-            phase: "ready",
-            updatedAt: 1234,
-          },
-        });
         const res = await client.get(`/playback/${cid}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
@@ -231,37 +244,26 @@ describe("controllers/playback", () => {
               {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
-                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
               },
             ],
           },
         });
       });
 
-      it("should return 404 for CID based on source URL lookup if asset is not ready", async () => {
-        const cid = "bafyfoobar";
-        await db.asset.update(asset.id, {
-          playbackRecordingId: "mock_recording_id_2",
-          source: {
-            type: "url",
-            url: "ipfs://" + cid,
-          },
-        });
-        const res = await client.get(`/playback/${cid}`);
+      it("should NOT return other users assets by CID", async () => {
+        await db.asset.delete(asset2.id);
+
+        const res = await client2.get(`/playback/${cid}`);
         expect(res.status).toBe(404);
       });
 
       it("should return playback URL assets from Arweave tx ID based on source URL lookup", async () => {
-        const txID = "bafyfoobar";
+        const txID = "randomstring";
         await db.asset.update(asset.id, {
-          playbackRecordingId: "mock_recording_id_2",
           source: {
             type: "url",
             url: "ar://" + txID,
-          },
-          status: {
-            phase: "ready",
-            updatedAt: 1234,
           },
         });
         const res = await client.get(`/playback/${txID}`);
@@ -273,23 +275,26 @@ describe("controllers/playback", () => {
               {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
-                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
               },
             ],
           },
         });
       });
+    });
 
-      it("should return 404 for Arweave tx ID based on source URL lookup if asset is not ready", async () => {
-        const txID = "bafyfoobar";
-        await db.asset.update(asset.id, {
-          playbackRecordingId: "mock_recording_id_2",
-          source: {
-            type: "url",
-            url: "ar://" + txID,
-          },
-        });
-        const res = await client.get(`/playback/${txID}`);
+    describe("for unauthenticated requests", () => {
+      beforeEach(() => {
+        client.jwtAuth = null;
+      });
+
+      it("should return playback URL by playback ID", async () => {
+        const res = await client.get(`/playback/${asset.playbackId}`);
+        expect(res.status).toBe(200);
+      });
+
+      it("should NOT return playback URL by dStorage ID", async () => {
+        const res = await client.get(`/playback/${cid}`);
         expect(res.status).toBe(404);
       });
     });
@@ -383,96 +388,78 @@ describe("controllers/playback", () => {
       });
     });
 
-    it("should return playback URL assets from CID when authenticated", async () => {
-      client.jwtAuth = nonAdminToken;
-      const cid = "bafyfoobar";
-      await db.asset.update(asset.id, {
-        playbackRecordingId: "mock_asset_1",
-        source: {
-          type: "url",
-          url: "ipfs://" + cid,
-        },
-        status: {
-          phase: "ready",
-          updatedAt: 1234,
-        },
+    describe("cross-user playback backward compatibility", () => {
+      beforeEach(async () => {
+        await db.asset.update(asset.id, {
+          createdAt: CROSS_USER_ASSETS_CUTOFF_DATE - 2000,
+        });
+        await db.asset.update(asset2.id, {
+          createdAt: CROSS_USER_ASSETS_CUTOFF_DATE - 1000,
+        });
       });
 
-      const res = await client.get(`/playback/${cid}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "vod",
-        meta: {
-          source: [
-            {
-              hrn: "HLS (TS)",
-              type: "html5/application/vnd.apple.mpegurl",
-              url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+      it("should return playback URL asset of user from CID", async () => {
+        const res = await client2.get(`/playback/${cid}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_asset_2/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
+
+      it("should return other available playback URL asset from CID", async () => {
+        await db.asset.delete(asset2.id);
+
+        const res = await client2.get(`/playback/${cid}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
+
+      describe("for unauthenticated requests", () => {
+        beforeEach(() => {
+          client.jwtAuth = null;
+        });
+
+        it("should return playback URL by playback ID", async () => {
+          const res = await client.get(`/playback/${asset.playbackId}`);
+          expect(res.status).toBe(200);
+        });
+
+        it("should return playback URL by dStorage ID", async () => {
+          const res = await client.get(`/playback/${cid}`);
+          expect(res.status).toBe(200);
+          await expect(res.json()).resolves.toMatchObject({
+            type: "vod",
+            meta: {
+              source: [
+                {
+                  hrn: "HLS (TS)",
+                  type: "html5/application/vnd.apple.mpegurl",
+                  url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+                },
+              ],
             },
-          ],
-        },
-      });
-    });
-
-    it("should return playback URL asset of user from CID when another one was created before and when authenticated", async () => {
-      client2.jwtAuth = otherUserToken;
-      const cid = "bafyfoobar";
-      await db.asset.update(asset2.id, {
-        playbackRecordingId: "mock_asset_2",
-        source: {
-          type: "url",
-          url: "ipfs://" + cid,
-        },
-        status: {
-          phase: "ready",
-          updatedAt: 1234,
-        },
-      });
-
-      const res = await client2.get(`/playback/${cid}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "vod",
-        meta: {
-          source: [
-            {
-              hrn: "HLS (TS)",
-              type: "html5/application/vnd.apple.mpegurl",
-              url: `${ingest}/recordings/mock_asset_2/index.m3u8`,
-            },
-          ],
-        },
-      });
-    });
-
-    it("should return other available playback URL asset from CID when authenticated", async () => {
-      const cid = "bafyfoobar";
-      await db.asset.delete(asset2.id);
-      await db.asset.update(asset.id, {
-        playbackRecordingId: "mock_asset_1",
-        source: {
-          type: "url",
-          url: "ipfs://" + cid,
-        },
-        status: {
-          phase: "ready",
-          updatedAt: 1234,
-        },
-      });
-
-      const res = await client2.get(`/playback/${cid}`);
-      expect(res.status).toBe(200);
-      await expect(res.json()).resolves.toMatchObject({
-        type: "vod",
-        meta: {
-          source: [
-            {
-              hrn: "HLS (TS)",
-              type: "html5/application/vnd.apple.mpegurl",
-              url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
-            },
-          ],
-        },
+          });
+        });
       });
     });
   });

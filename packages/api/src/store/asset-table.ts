@@ -98,9 +98,11 @@ export default class AssetTable extends Table<WithID<Asset>> {
       }
     }
 
-    return await findOnce([
-      sql`coalesce((asset.data->'createdAt')::bigint, 0) < ${crossUserCutoffDate}`,
-    ]);
+    return !crossUserCutoffDate
+      ? findOnce([])
+      : findOnce([
+          sql`coalesce((asset.data->'createdAt')::bigint, 0) < ${crossUserCutoffDate}`,
+        ]);
   }
 
   async getBySessionId(sessionId: string): Promise<WithID<Asset>> {

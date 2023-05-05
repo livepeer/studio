@@ -3,6 +3,7 @@ import { db } from "../store";
 import {
   getPlaybackUrl as streamPlaybackUrl,
   getRecordingFields,
+  USER_SESSION_TIMEOUT,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
@@ -10,11 +11,11 @@ import {
   StaticPlaybackInfo,
 } from "./asset";
 import { CliArgs } from "../parse-cli";
-import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import { Asset, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
+import { NotFoundError, UnprocessableEntityError } from "../store/errors";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -23,7 +24,7 @@ import { WithID } from "../store/types";
  * cross-account playback enabled, ensuring users are billed appropriately. This
  * was made for backward compatibiltiy during the Viewership V2 deploy.
  */
-const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
+export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -123,6 +124,9 @@ export async function getResourceByPlaybackId(
     ));
 
   if (asset && !asset.deleted) {
+    if (asset.status.phase !== "ready") {
+      throw new UnprocessableEntityError("asset is not ready for playback");
+    }
     return { asset };
   }
 
