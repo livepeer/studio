@@ -46,7 +46,7 @@ export default class WebhookCannon {
   sendgridApiKey: string;
   supportAddr: [string, string];
   vodObjectStoreId: string;
-  recordObjectStoreId: string;
+  recordCatalystObjectStoreId: string;
   resolver: any;
   queue: Queue;
   constructor({
@@ -56,7 +56,7 @@ export default class WebhookCannon {
     sendgridApiKey,
     supportAddr,
     vodObjectStoreId,
-    recordObjectStoreId,
+    recordCatalystObjectStoreId,
     verifyUrls,
     queue,
   }) {
@@ -68,7 +68,7 @@ export default class WebhookCannon {
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
     this.vodObjectStoreId = vodObjectStoreId;
-    this.recordObjectStoreId = recordObjectStoreId;
+    this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
@@ -549,7 +549,7 @@ export default class WebhookCannon {
         this.queue
       );
 
-      const os = await db.objectStore.get(this.recordObjectStoreId);
+      const os = await db.objectStore.get(this.recordCatalystObjectStoreId);
       // we can't rate limit this task because it's not a user action
       await taskScheduler.createAndScheduleTask(
         "upload",
