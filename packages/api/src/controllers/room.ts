@@ -37,7 +37,7 @@ app.post("/", authorizer({}), async (req, res) => {
     name: id,
     // timeout in seconds
     emptyTimeout: 15 * 60,
-    maxParticipants: 10,
+    maxParticipants: 50,
     metadata: JSON.stringify({ userId: req.user.id }),
   });
   console.log("livekit room created", room);
