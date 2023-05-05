@@ -223,7 +223,7 @@ app.post(
 );
 
 app.get("/public-key", async (req, res) => {
-  let catalystBaseUrl = req.catalystBaseUrl;
+  const { catalystBaseUrl } = req.config;
 
   let url = `${catalystBaseUrl}/api/pubkey`;
   let options = {
