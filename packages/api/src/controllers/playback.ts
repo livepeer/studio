@@ -72,7 +72,7 @@ function newPlaybackInfo(
 }
 
 const getAssetPlaybackInfo = async (
-  config: Request["config"],
+  config: CliArgs,
   ingest: string,
   asset: WithID<Asset>
 ) => {

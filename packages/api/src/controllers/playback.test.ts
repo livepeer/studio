@@ -359,6 +359,7 @@ describe("controllers/playback", () => {
       // delete the child stream just to make sure we use the user session (they have the same id)
       await db.stream.delete(childStream.id);
       await db.session.update(session.id, {
+        version: "v1",
         record: true,
         recordObjectStoreId: "mock_store",
         lastSeen: Date.now() - 60 * 60 * 1000,
