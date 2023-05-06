@@ -17,7 +17,6 @@ import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
-// Update: 1 year later found out I copied it wrong from the start. `source` is on the root, on mist schema, not inside `meta`.
 type PlaybackInfo = {
   type: "live" | "vod" | "recording";
   meta: {
@@ -96,22 +95,10 @@ const getAssetPlaybackInfo = async (
   );
 };
 
-export function dStorageUrlFromAsset(asset: WithID<Asset>) {
-  if (asset.storage?.ipfs?.cid) {
-    return "ipfs://" + asset.storage.ipfs.cid;
-  }
-  const { source } = asset;
-  if (source.type === "url" && source.url.match(/^(ar|ipfs):\/\//)) {
-    return source.url;
-  }
-  return undefined;
-}
-
 export async function getResourceByPlaybackId(
   id: string,
   user: User
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
-  // logic matches dStorageUrlFromAsset above
   let asset =
     (await db.asset.getByPlaybackId(id)) ??
     (await db.asset.getByIpfsCid(id, user)) ??

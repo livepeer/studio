@@ -2,12 +2,12 @@
  * Special controller for forwarding all incoming requests to a geolocated API region
  */
 
-import { Request, Response, Router } from "express";
+import { Request, Router } from "express";
 import { authorizer } from "../middleware";
 import { db } from "../store";
 import { ForbiddenError, NotFoundError } from "../store/errors";
 import Table from "../store/table";
-import { dStorageUrlFromAsset, getResourceByPlaybackId } from "./playback";
+import { getResourceByPlaybackId } from "./playback";
 
 type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 
@@ -35,22 +35,12 @@ async function checkUserOwned(
   }
 }
 
-function playbackIdGetter(req: Request, res?: Response) {
-  return async (id: string) => {
+function playbackIdGetter(req: Request) {
+  return async (id: string): Promise<UserOwnedObj> => {
     const { asset, stream, session } = await getResourceByPlaybackId(
       id,
       req.user
     );
-    if (asset || stream) {
-      const pid = (asset || stream).playbackId;
-      res.header("x-livepeer-canonical-playback-id", pid);
-    }
-    if (asset) {
-      const dStorageUrl = dStorageUrlFromAsset(asset);
-      if (dStorageUrl) {
-        res.header("x-livepeer-playback-dstorage-url", dStorageUrl);
-      }
-    }
     return asset || stream || session;
   };
 }
@@ -68,7 +58,7 @@ app.all(
     await Promise.all([
       checkUserOwned(req, "x-livepeer-stream-id", tableGetter(db.stream)),
       checkUserOwned(req, "x-livepeer-asset-id", tableGetter(db.asset)),
-      checkUserOwned(req, "x-livepeer-playback-id", playbackIdGetter(req, res)),
+      checkUserOwned(req, "x-livepeer-playback-id", playbackIdGetter(req)),
     ]);
 
     res.header("x-livepeer-user-id", req.user.id);
