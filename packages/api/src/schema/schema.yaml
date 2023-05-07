@@ -2840,27 +2840,21 @@ components:
           description: The timezone where the viewer is located
         viewCount:
           type: integer
-          format: int64
           description: The number of views for the asset
         playtimeMins:
           type: number
-          format: float
           description: The total playtime in minutes for the asset
         ttffMs:
           type: number
-          format: float
           description: The time-to-first-frame (TTFF) in milliseconds
         rebufferRatio:
           type: number
-          format: float
           description: The rebuffering ratio for the asset
         errorRate:
           type: number
-          format: float
           description: The error rate for the asset
         existsBeforeStart:
           type: number
-          format: float
           description: The percentage of sessions that existed before the asset started playing
 
 paths:
@@ -3750,7 +3744,6 @@ paths:
               - type: string
                 format: date-time
               - type: integer
-                format: int64
         - name: to
           in: query
           description: End timestamp for the query range (exclusive)
@@ -3759,7 +3752,6 @@ paths:
               - type: string
                 format: date-time
               - type: integer
-                format: int64
         - name: timeStep
           in: query
           description: The time step to aggregate viewership metrics by
@@ -3840,7 +3832,6 @@ paths:
               - type: string
                 format: date-time
               - type: integer
-                format: int64
         - name: to
           in: query
           description: End timestamp for the query range (exclusive)
@@ -3849,7 +3840,6 @@ paths:
               - type: string
                 format: date-time
               - type: integer
-                format: int64
         - name: timeStep
           in: query
           description: The time step to aggregate viewership metrics by
