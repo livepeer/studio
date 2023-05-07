@@ -3807,7 +3807,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Metric'
+                  $ref: '#/components/schemas/viewership-metric'
         default:
           description: Error
           content:
@@ -3895,7 +3895,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Metric'
+                  $ref: '#/components/schemas/viewership-metric'
         default:
           description: Error
           content:
@@ -3927,7 +3927,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Metric'
+                $ref: '#/components/schemas/viewership-metric'
         default:
           description: Error
           content:
