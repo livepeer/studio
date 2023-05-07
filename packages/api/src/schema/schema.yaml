@@ -2786,6 +2786,82 @@ components:
                       type: string
                     timestamp:
                       type: integer
+    viewership-metric:
+      type: object
+      description:
+        An individual metric about viewership of an asset. Necessarily, at least
+        1 of playbackId and dStorageUrl will be present, depending on the query.
+      required: [viewCount, playtimeMins]
+      properties:
+        playbackId:
+          type: string
+          description: The playback ID associated with the metric
+        dStorageUrl:
+          type: string
+          description: The URL of the distributed storage used for the asset
+        timestamp:
+          type: number
+          example: 1587667174725
+          description:
+            Timestamp (in milliseconds) when the metric was recorded. If the
+            query contains a time step, this timestamp will point to the
+            beginning of the time step period.
+        device:
+          type: string
+          description: The device used by the viewer
+        deviceType:
+          type: string
+          description: The type of the device used by the viewer
+        cpu:
+          type: string
+          description: The CPU used by the viewer's device
+        os:
+          type: string
+          description: The operating system used by the viewer
+        browser:
+          type: string
+          description: The browser used by the viewer
+        browserEngine:
+          type: string
+          description: The browser engine used by the viewer's browser
+        continent:
+          type: string
+          description: The continent where the viewer is located
+        country:
+          type: string
+          description: The country where the viewer is located
+        subdivision:
+          type: string
+          description:
+            The subdivision (e.g., state or province) where the viewer is
+            located
+        timezone:
+          type: string
+          description: The timezone where the viewer is located
+        viewCount:
+          type: integer
+          format: int64
+          description: The number of views for the asset
+        playtimeMins:
+          type: number
+          format: float
+          description: The total playtime in minutes for the asset
+        ttffMs:
+          type: number
+          format: float
+          description: The time-to-first-frame (TTFF) in milliseconds
+        rebufferRatio:
+          type: number
+          format: float
+          description: The rebuffering ratio for the asset
+        errorRate:
+          type: number
+          format: float
+          description: The error rate for the asset
+        existsBeforeStart:
+          type: number
+          format: float
+          description: The percentage of sessions that existed before the asset started playing
 
 paths:
   /stream:
@@ -3643,6 +3719,100 @@ paths:
       responses:
         204:
           description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /data/views/query:
+    get:
+      summary: Query viewership metrics
+      operationId: queryViewership
+      parameters:
+        - name: from
+          in: query
+          description: Start timestamp for the query range (inclusive)
+          schema:
+            oneOf:
+              - type: string
+                format: date-time
+              - type: integer
+                format: int64
+        - name: to
+          in: query
+          description: End timestamp for the query range (exclusive)
+          schema:
+            oneOf:
+              - type: string
+                format: date-time
+              - type: integer
+                format: int64
+        - name: timeStep
+          in: query
+          description: The time step to aggregate viewership metrics by
+          schema:
+            type: string
+            enum:
+              - hour
+              - day
+              - week
+              - month
+              - year
+        - name: assetId
+          in: query
+          description: The asset ID to filter metrics for
+          schema:
+            type: string
+        - name: streamId
+          in: query
+          description: The stream ID to filter metrics for
+          schema:
+            type: string
+        - name: playbackId
+          in: query
+          description:
+            The playback ID to filter the query results. This can be
+            a canonical playback ID from Livepeer assets or streams, or dStorage
+            identifiers for assets
+          schema:
+            type: string
+        - name: creatorId
+          in: query
+          description: The creator ID to filter the query results
+          schema:
+            type: string
+        - name: breakdownBy[]
+          in: query
+          description:
+            The list of fields to break down the query results. Specify this
+            query-string multiple times to break down by multiple fields.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+               - device_type
+               - device
+               - cpu
+               - os
+               - browser
+               - browser_engine
+               - continent
+               - country
+               - subdivision
+               - timezone
+               - viewer_id
+      responses:
+        '200':
+          description: A list of Metric objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Metric'
         default:
           description: Error
           content:
