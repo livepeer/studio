@@ -2855,7 +2855,9 @@ components:
           description: The error rate for the asset
         existsBeforeStart:
           type: number
-          description: The percentage of sessions that existed before the asset started playing
+          description:
+            The percentage of sessions that existed before the asset started
+            playing
 
 paths:
   /stream:
@@ -3724,15 +3726,15 @@ paths:
     get:
       summary: Query viewership metrics
       description:
-        Allows querying any metric in its raw form. Requires a
-        private (non-CORS) API key to be used.
+        Allows querying any metric in its raw form. Requires a private
+        (non-CORS) API key to be used.
       parameters:
         - name: playbackId
           in: query
           description:
-            The playback ID to filter the query results. This can be
-            a canonical playback ID from Livepeer assets or streams, or dStorage
-            identifiers for assets
+            The playback ID to filter the query results. This can be a canonical
+            playback ID from Livepeer assets or streams, or dStorage identifiers
+            for assets
           schema:
             type: string
         # From here down it's the same params as the creator query bellow
@@ -3788,26 +3790,26 @@ paths:
             items:
               type: string
               enum:
-               - device_type
-               - device
-               - cpu
-               - os
-               - browser
-               - browser_engine
-               - continent
-               - country
-               - subdivision
-               - timezone
-               - viewer_id
+                - device_type
+                - device
+                - cpu
+                - os
+                - browser
+                - browser_engine
+                - continent
+                - country
+                - subdivision
+                - timezone
+                - viewer_id
       responses:
-        '200':
+        "200":
           description: A list of Metric objects
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/viewership-metric'
+                  $ref: "#/components/schemas/viewership-metric"
         default:
           description: Error
           content:
@@ -3876,26 +3878,26 @@ paths:
             items:
               type: string
               enum:
-               - device_type
-               - device
-               - cpu
-               - os
-               - browser
-               - browser_engine
-               - continent
-               - country
-               - subdivision
-               - timezone
-               - viewer_id
+                - device_type
+                - device
+                - cpu
+                - os
+                - browser
+                - browser_engine
+                - continent
+                - country
+                - subdivision
+                - timezone
+                - viewer_id
       responses:
-        '200':
+        "200":
           description: A list of Metric objects
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/viewership-metric'
+                  $ref: "#/components/schemas/viewership-metric"
         default:
           description: Error
           content:
@@ -3914,20 +3916,19 @@ paths:
           in: path
           required: true
           description:
-            The playback ID to filter the query results. This can be
-            a canonical playback ID from Livepeer assets or streams, or dStorage
-            identifiers for assets
+            The playback ID to filter the query results. This can be a canonical
+            playback ID from Livepeer assets or streams, or dStorage identifiers
+            for assets
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description:
-            A single Metric object with the viewCount and
-            playtimeMins metrics.
+            A single Metric object with the viewCount and playtimeMins metrics.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/viewership-metric'
+                $ref: "#/components/schemas/viewership-metric"
         default:
           description: Error
           content:
