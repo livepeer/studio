@@ -218,7 +218,11 @@ export const corsApiKeyAccessRules: AuthRule[] = [
   // Data
   {
     methods: ["get"],
-    resources: ["/data/views/:id/total"],
+    resources: [
+      "/data/views/:id/total",
+      "/data/views/query/total/:id",
+      "/data/views/query/creator",
+    ],
   },
 ];
 
