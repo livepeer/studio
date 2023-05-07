@@ -3729,8 +3729,19 @@ paths:
   /data/views/query:
     get:
       summary: Query viewership metrics
-      operationId: queryViewership
+      description:
+        Allows querying any metric in its raw form. Requires a
+        private (non-CORS) API key to be used.
       parameters:
+        - name: playbackId
+          in: query
+          description:
+            The playback ID to filter the query results. This can be
+            a canonical playback ID from Livepeer assets or streams, or dStorage
+            identifiers for assets
+          schema:
+            type: string
+        # From here down it's the same params as the creator query bellow
         - name: from
           in: query
           description: Start timestamp for the query range (inclusive)
@@ -3770,12 +3781,94 @@ paths:
           description: The stream ID to filter metrics for
           schema:
             type: string
-        - name: playbackId
+        - name: creatorId
+          in: query
+          description: The creator ID to filter the query results
+          schema:
+            type: string
+        - name: breakdownBy[]
           in: query
           description:
-            The playback ID to filter the query results. This can be
-            a canonical playback ID from Livepeer assets or streams, or dStorage
-            identifiers for assets
+            The list of fields to break down the query results. Specify this
+            query-string multiple times to break down by multiple fields.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+               - device_type
+               - device
+               - cpu
+               - os
+               - browser
+               - browser_engine
+               - continent
+               - country
+               - subdivision
+               - timezone
+               - viewer_id
+      responses:
+        '200':
+          description: A list of Metric objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Metric'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /data/views/query/creator:
+    get:
+      summary: Query creator viewership metrics
+      description:
+        Allows querying creator-specific metrics. Requires a proof of ownership
+        to be sent in the request, which for now is just the assetId or streamId
+        parameters (1 of those must be in the query-string). Can be used from
+        the frontend with a CORS key.
+      parameters:
+        # Same params as the full query above, but without playbackId
+        - name: from
+          in: query
+          description: Start timestamp for the query range (inclusive)
+          schema:
+            oneOf:
+              - type: string
+                format: date-time
+              - type: integer
+                format: int64
+        - name: to
+          in: query
+          description: End timestamp for the query range (exclusive)
+          schema:
+            oneOf:
+              - type: string
+                format: date-time
+              - type: integer
+                format: int64
+        - name: timeStep
+          in: query
+          description: The time step to aggregate viewership metrics by
+          schema:
+            type: string
+            enum:
+              - hour
+              - day
+              - week
+              - month
+              - year
+        - name: assetId
+          in: query
+          description: The asset ID to filter metrics for
+          schema:
+            type: string
+        - name: streamId
+          in: query
+          description: The stream ID to filter metrics for
           schema:
             type: string
         - name: creatorId
@@ -3813,6 +3906,38 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Metric'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /data/views/query/total/{playbackid}:
+    get:
+      summary: Query public total views metrics
+      description:
+        Allows querying for the public metrics for viewership about a video.
+        This can be called from the frontend with a CORS key, or even
+        unauthenticated.
+      parameters:
+        - name: playbackId
+          in: path
+          required: true
+          description:
+            The playback ID to filter the query results. This can be
+            a canonical playback ID from Livepeer assets or streams, or dStorage
+            identifiers for assets
+          schema:
+            type: string
+      responses:
+        '200':
+          description:
+            A single Metric object with the viewCount and
+            playtimeMins metrics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metric'
         default:
           description: Error
           content:
