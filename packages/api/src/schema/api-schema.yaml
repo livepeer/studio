@@ -242,6 +242,10 @@ components:
         isActive:
           type: boolean
           description: If currently active
+        isHealthy:
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
+        issues:
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdByTokenName:
           type: string
           readOnly: true
@@ -395,6 +399,83 @@ components:
           $ref: "#/components/schemas/stream/properties/multistream"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+    stream-health-payload:
+      type: object
+      description:
+        Payload received from Catalyst about the health of livestreams currently
+        or recently active on Mist.
+      required:
+        - stream_name
+        - is_active
+        - is_healthy
+      properties:
+        stream_name:
+          type: string
+          description:
+            The name of the stream within Catalyst/Mist, normally comprised of
+            the base stream name with the playback ID after the + sign.
+          example: videorec+eaw4nk06ts2d0mzb
+        session_id:
+          description:
+            The unique identifier for the specific session, created by Mist and
+            used for creating the session object in the DB.
+          type: string
+        is_active:
+          type: boolean
+          description: Indicates whether the stream is currently live or not.
+        is_healthy:
+          type: boolean
+          description: Indicates whether the stream is healthy or not.
+        issues:
+          type: string
+          description:
+            Raw issues affecting the stream as described by Mist, if any. We
+            don't expose those to the end-user, showing only human_issues
+            instead.
+        human_issues:
+          type: array
+          description:
+            A string array of human-readable errors describing issues affecting
+            the stream, if any.
+          items:
+            type: string
+        tracks:
+          type: object
+          description:
+            A map of track objects containing information about the stream's
+            tracks. The keys are the unique track ID from Mist.
+          additionalProperties:
+            type: object
+            properties:
+              codec:
+                type: string
+                description: The codec being used for the track.
+              kbits:
+                type: number
+                description: The bitrate of the track, in kilobits per second.
+              keys:
+                type: object
+                description:
+                  An object containing additional track-specific metrics.
+                additionalProperties:
+                  type: number
+              fpks:
+                type: number
+                description:
+                  The framerate of the track, in frames per thousand seconds
+                  (kilo-second).
+              height:
+                type: number
+                description: The height of the track's video resolution.
+              width:
+                type: number
+                description: The width of the track's video resolution.
+        extra:
+          type: object
+          description:
+            An object containing any additional fields sent by mist in the
+            health (STREAM_BUFFER) payload.
+          additionalProperties: true
     object-store-patch-payload:
       type: object
       additionalProperties: false
@@ -478,6 +559,10 @@ components:
           type: number
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
+        isHealthy:
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
+        issues:
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdAt:
           readOnly: true
           type: number
