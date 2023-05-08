@@ -113,6 +113,21 @@ components:
           example: 1587667174725
           readOnly: true
           type: number
+        creatorId:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+                - type
+                - value
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - unverified
+                value:
+                  type: string
+                  description: Developer-managed ID of the user who created the asset.
         deleted:
           description: Set to true when the asset is deleted
           type: boolean
@@ -239,8 +254,8 @@ components:
                     - url
                 url:
                   type: string
-                  description: URL from which the asset was uploaded
                   index: true
+                  description: URL from which the asset was uploaded
                 encryption:
                   $ref: '#/components/schemas/new-asset-payload/properties/encryption'
             - additionalProperties: false
@@ -671,7 +686,7 @@ components:
           description: User objects of users in the experiment for convenience
           items:
             $ref: '#/components/schemas/user'
-          readOnly: true
+          readonly: true
           type: array
         createdAt:
           description: Timestamp (in milliseconds) at which the experiment was created
@@ -910,6 +925,13 @@ components:
         catalystPipelineStrategy:
           $ref: >-
             #/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy
+        creatorId:
+          oneOf:
+            - $ref: '#/components/schemas/asset/properties/creatorId'
+            - type: string
+              description: >-
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         encryption:
           additionalProperties: false
           properties:
@@ -953,10 +975,6 @@ components:
           additionalProperties: false
           properties:
             ipfs:
-              description: >-
-                Set to true to make default export to IPFS. To customize the
-                pinned files, specify an object with a spec field. False or null
-                means to unpin from IPFS, but it's unsupported right now.
               oneOf:
                 - type: object
                   additionalProperties: false
@@ -966,8 +984,13 @@ components:
                         - type: 'null'
                         - $ref: >-
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
-                - type: boolean
-                - type: 'null'
+                - type:
+                    - boolean
+                    - 'null'
+                  description: >-
+                    Set to true to make default export to IPFS. False or null
+                    means to unpin from IPFS, but is unsupported right now.
+          type: object
         url:
           description: >-
             URL where the asset contents can be retrieved. Only valid for the
@@ -1128,8 +1151,8 @@ components:
           enum:
             - public
             - jwt
-            - webhook
             - lit_signing_condition
+            - webhook
           type: string
         unifiedAccessControlConditions:
           description: LIT Unified Access Control Conditions
@@ -1179,6 +1202,103 @@ components:
       required:
         - stripeCustomerPaymentMethodId
       type: object
+    room:
+      properties:
+        createdAt:
+          description: Timestamp (in milliseconds) at which the room was created
+          example: 1587667174725
+          readOnly: true
+          type: number
+        deleted:
+          description: Set to true when the room is deleted
+          type: boolean
+        deletedAt:
+          description: Timestamp (in milliseconds) at which the room was deleted
+          example: 1587667174725
+          type: number
+        egressId:
+          description: internal ID for egress output
+          type: string
+        events:
+          items:
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+              timestamp:
+                type: integer
+            type: object
+          type: array
+        id:
+          description: room ID
+          readOnly: true
+          type: string
+        participants:
+          additionalProperties:
+            properties:
+              identity:
+                description: participant ID
+                type: string
+              joinedAt:
+                description: the time the participant joined
+                type: integer
+              leftAt:
+                description: the time the participant left
+                type: integer
+              name:
+                description: user defined participant name
+                type: string
+              tracksPublished:
+                additionalProperties:
+                  properties:
+                    height:
+                      type: integer
+                    mimeType:
+                      type: string
+                    sid:
+                      type: string
+                    timestamp:
+                      type: integer
+                    width:
+                      type: integer
+                  type: object
+                type: object
+            type: object
+          type: object
+        updatedAt:
+          description: Timestamp (in milliseconds) at which room was updated
+          example: 1587667174725
+          readOnly: true
+          type: number
+        userId:
+          description: owner of the room
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          readOnly: true
+          type: string
+      required:
+        - id
+        - participants
+        - events
+      table: room
+      type: object
+    room-egress-payload:
+      additionalProperties: false
+      properties:
+        streamId:
+          description: The ID of the Livepeer Stream to stream to
+          type: string
+      required:
+        - streamId
+      type: object
+    room-user-payload:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+      required:
+        - name
+      type: object
     session:
       additionalProperties: false
       properties:
@@ -1202,6 +1322,10 @@ components:
           description: Rate at which sourceBytes increases (bytes/second)
           example: 1
           type: number
+        isHealthy:
+          $ref: '#/components/schemas/stream-health-payload/properties/is_healthy'
+        issues:
+          $ref: '#/components/schemas/stream-health-payload/properties/human_issues'
         kind:
           example: stream
           readOnly: true
@@ -1212,7 +1336,7 @@ components:
           type: number
         mp4Url:
           description: URL for the stream session recording packaged in an mp4.
-          readOnly: true
+          readonly: true
           type: string
         name:
           example: test_session
@@ -1250,11 +1374,11 @@ components:
             - waiting
             - ready
             - none
-          readOnly: true
+          readonly: true
           type: string
         recordingUrl:
           description: URL for accessing the recording of this stream session.
-          readOnly: true
+          readonly: true
           type: string
         sourceBytes:
           example: 1
@@ -1279,6 +1403,9 @@ components:
         userId:
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
+          type: string
+        version:
+          description: Version of the session object
           type: string
       required:
         - name
@@ -1405,6 +1532,10 @@ components:
           description: If currently active
           index: true
           type: boolean
+        isHealthy:
+          $ref: '#/components/schemas/stream-health-payload/properties/is_healthy'
+        issues:
+          $ref: '#/components/schemas/stream-health-payload/properties/human_issues'
         kind:
           example: stream
           readOnly: true
@@ -1546,6 +1677,11 @@ components:
           additionalProperties:
             type: string
           type: object
+        sessionId:
+          description: UUID of Session created by Mist
+          example: c613d69e-5f4d-451b-9d3a-d28beff86a81
+          index: true
+          type: string
         sourceBytes:
           example: 1
           type: number
@@ -1585,7 +1721,7 @@ components:
               additionalProperties: false
               properties:
                 fps:
-                  minValue: 1
+                  minVallue: 1
                   type: integer
                 height:
                   minValue: 1
@@ -1613,6 +1749,82 @@ components:
       required:
         - name
       table: stream
+      type: object
+    stream-health-payload:
+      description: >-
+        Payload received from Catalyst about the health of livestreams currently
+        or recently active on Mist.
+      properties:
+        extra:
+          additionalProperties: true
+          description: >-
+            An object containing any additional fields sent by mist in the
+            health (STREAM_BUFFER) payload.
+          type: object
+        human_issues:
+          description: >-
+            A string array of human-readable errors describing issues affecting
+            the stream, if any.
+          items:
+            type: string
+          type: array
+        is_active:
+          description: Indicates whether the stream is currently live or not.
+          type: boolean
+        is_healthy:
+          description: Indicates whether the stream is healthy or not.
+          type: boolean
+        issues:
+          description: >-
+            Raw issues affecting the stream as described by Mist, if any. We
+            don't expose those to the end-user, showing only human_issues
+            instead.
+          type: string
+        session_id:
+          description: >-
+            The unique identifier for the specific session, created by Mist and
+            used for creating the session object in the DB.
+          type: string
+        stream_name:
+          description: >-
+            The name of the stream within Catalyst/Mist, normally comprised of
+            the base stream name with the playback ID after the + sign.
+          example: videorec+eaw4nk06ts2d0mzb
+          type: string
+        tracks:
+          additionalProperties:
+            properties:
+              codec:
+                description: The codec being used for the track.
+                type: string
+              fpks:
+                description: >-
+                  The framerate of the track, in frames per thousand seconds
+                  (kilo-second).
+                type: number
+              height:
+                description: The height of the track's video resolution.
+                type: number
+              kbits:
+                description: 'The bitrate of the track, in kilobits per second.'
+                type: number
+              keys:
+                additionalProperties:
+                  type: number
+                description: An object containing additional track-specific metrics.
+                type: object
+              width:
+                description: The width of the track's video resolution.
+                type: number
+            type: object
+          description: >-
+            A map of track objects containing information about the stream's
+            tracks. The keys are the unique track ID from Mist.
+          type: object
+      required:
+        - stream_name
+        - is_active
+        - is_healthy
       type: object
     stream-patch-payload:
       additionalProperties: false
@@ -2225,6 +2437,7 @@ components:
         createdAt:
           description: Timestamp (in milliseconds) at which user object was created
           example: 1587667174725
+          readOnly: true
           type: number
         email:
           description: user email address
@@ -2441,6 +2654,7 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
+              readyOnly: true
               type: number
           readOnly: true
           type: object
@@ -2538,14 +2752,54 @@ components:
           $ref: '#/components/schemas/webhook-response'
       type: object
 info:
-  description: >-
-    This API reference provides documentation for the Livepeer API - the world's
-    open video infrastructure
-  termsOfService: 'https://livepeer.org/terms-of-service'
-  title: Livepeer API Reference
-  version: 1.0.0
+  title: Livepeer Studio API Reference
+  version: 0.0.1-alpha.0
 openapi: 3.0.1
 paths:
+  /api-token:
+    get:
+      description: Lists api tokens
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/api-token'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api-token'
+          description: Error
+    post:
+      description: Contains api token information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api-token'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/api-token'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - api-token
   /asset:
     get:
       description: gets a list of assets defined by the user
@@ -2564,6 +2818,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
+    tags:
+      - asset
+  /make-admin:
+    post:
+      description: Changes user admin status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/make-admin'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user'
+                type: object
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - make-admin
   /multistream/target:
     get:
       description: Lists existing multistream targets
@@ -2605,6 +2888,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
+    tags:
+      - multistream-target
   '/multistream/target/{id}':
     delete:
       description: Deletes an existing multistream target
@@ -2656,10 +2941,308 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
+    tags:
+      - multistream-target
+  /object-store:
+    get:
+      description: Lists object store credentials by userId
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/object-store'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    post:
+      description: Receives store credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/object-store'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/object-store'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - object-store
+  /password-reset:
+    post:
+      description: Confirms password reset token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/password-reset-confirm'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - password-reset
+  /password-reset-token:
+    post:
+      description: Creates a password reset token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/password-reset-token-request'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/password-reset-token'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - password-reset
+  '/region/{region}':
+    delete:
+      description: deletes a specific region
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    get:
+      description: get a regions list of orchestrators
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/region'
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    put:
+      description: updates a specific region
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/region'
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - regions
   /room:
     post:
       description: create a new room
       responses:
+        '200':
+          content:
+            application/json:
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+  '/room/{id}':
+    delete:
+      description: delete a room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    get:
+      description: get room details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              $ref: '#/components/schemas/room'
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+  '/room/{id}/egress':
+    delete:
+      description: stop room RTMP egress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    post:
+      description: start room RTMP egress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/room-egress-payload'
+        required: true
+      responses:
+        '204':
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+  '/room/{id}/user':
+    post:
+      description: create a new room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/room-user-payload'
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+  '/room/{id}/user/{userId}':
+    delete:
+      description: removes a specific user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
         default:
           content:
             application/json:
@@ -2708,6 +3291,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
+    tags:
+      - stream
   '/stream/{id}':
     get:
       description: Gets a specific stream details
@@ -2748,6 +3333,149 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
+    tags:
+      - stream
+  /user:
+    get:
+      description: Lists users
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    post:
+      description: Receives user information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - user
+  /user-verification:
+    post:
+      description: Verifies user email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-verification'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user-verification'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - verification
+  /user/token:
+    post:
+      description: Receives user login information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user'
+                type: array
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - login
+  '/user/{id}':
+    patch:
+      description: updates a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+  /verify-email:
+    post:
+      description: Resend User Email Verification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/verify-email'
+              type: object
+        required: true
+      responses:
+        '200':
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error
+    tags:
+      - verify-email
   /webhook:
     get:
       description: gets a list of webhooks defined by the user
@@ -2781,6 +3509,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
+    tags:
+      - webhook
   '/webhook/{id}':
     delete:
       description: deletes a specific webhook details
@@ -2845,5 +3575,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
           description: Error
-servers:
-  - url: 'https://livepeer.studio/api'
+    tags:
+      - webhook
+tags:
+  - name: stream
+    description: Stream Endpoints
+  - name: object-store
+    description: Object Stores Endpoints
+  - name: multistream-target
+    description: Multistream Target Endpoints
+  - name: user
+    description: User Endpoints
+  - name: api-token
+    description: Api Token Endpoints
+  - name: login
+    description: User login
+  - name: verification
+    description: User Email Verification
+  - name: password-reset
+    description: User Password Reset
+  - name: make-admin
+    description: Changes user admin status
+  - name: webhook
+    description: Webhooks endpoints
+  - name: asset
+    description: Asset Endpoints
+  - name: task
+    description: Task Endpoints
+  - name: signing-key
+    description: Signing Key Endpoints
+  - name: webhook-response
+    description: webhook client responses
+  - name: verify-email
+    description: Resend User Email Verification
