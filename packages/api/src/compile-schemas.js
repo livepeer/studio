@@ -41,9 +41,22 @@ const apiData = parseYaml(apiSchemaStr);
 const dbData = parseYaml(dbSchemaStr);
 const data = _.merge({}, apiData, dbData);
 
+function sort(object) {
+  if (typeof object != "object" || object instanceof Array)
+    // Not to sort the array
+    return object;
+  var keys = Object.keys(object);
+  keys.sort();
+  var newObject = {};
+  for (var i = 0; i < keys.length; i++) {
+    newObject[keys[i]] = sort(object[keys[i]]);
+  }
+  return newObject;
+}
+
 (async () => {
   const str = JSON.stringify(data, null, 2);
-  const yaml = serializeYaml(data);
+  const yaml = serializeYaml(sort(data));
   write(path.resolve(schemaDir, "schema.json"), str);
   write(path.resolve(schemaDistDir, "schema.json"), str);
   write(path.resolve(schemaDir, "out-schema.yaml"), yaml);
