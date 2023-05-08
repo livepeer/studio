@@ -33,6 +33,8 @@ async function checkUserOwned(
   if (!hasAccess) {
     throw new ForbiddenError(`access forbidden`);
   }
+
+  return obj.userId;
 }
 
 function playbackIdGetter(req: Request) {
@@ -55,13 +57,18 @@ app.all(
   "/",
   authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
-    await Promise.all([
+    const userIds = await Promise.all([
       checkUserOwned(req, "x-livepeer-stream-id", tableGetter(db.stream)),
       checkUserOwned(req, "x-livepeer-asset-id", tableGetter(db.asset)),
       checkUserOwned(req, "x-livepeer-playback-id", playbackIdGetter(req)),
     ]);
 
-    res.header("x-livepeer-user-id", req.user.id);
+    // use object user ID in case it is an admin trying to impersonate the user
+    let userId = !req.user.admin
+      ? req.user.id
+      : userIds.find((id) => !!id) || req.user.id;
+    res.header("x-livepeer-user-id", userId);
+
     res.status(204).end();
   }
 );
