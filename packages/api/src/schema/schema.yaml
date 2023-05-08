@@ -3822,7 +3822,8 @@ paths:
       description:
         Allows querying creator-specific metrics. Requires a proof of ownership
         to be sent in the request, which for now is just the assetId or streamId
-        parameters (1 of those must be in the query-string). Can be used from
+        parameters (1 of those must be in the query-string). Returns only the
+        higher level metrics like viewCount and platimeMins. Can be used from
         the frontend with a CORS key.
       parameters:
         # Same params as the full query above, but without playbackId
@@ -3928,7 +3929,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/viewership-metric"
+                type: object
+              description:
+                A simplified metric object about aggregate viewership of an
+                asset. Either playbackId or dStorageUrl will be set.
+              required: [viewCount, playtimeMins]
+              properties:
+                playbackId:
+                  $ref: "#/components/schemas/viewership-metric/properties/playbackId"
+                dStorageUrl:
+                  $ref: "#/components/schemas/viewership-metric/properties/dStorageUrl"
+                viewCount:
+                  $ref: "#/components/schemas/viewership-metric/properties/viewCount"
+                playtimeMins:
+                  $ref: "#/components/schemas/viewership-metric/properties/playtimeMins"
         default:
           description: Error
           content:
