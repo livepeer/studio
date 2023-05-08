@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import pack from "ajv-pack";
-import { safeLoad as parseYaml } from "js-yaml";
+import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
 import fs from "fs-extra";
 import _ from "lodash";
 import path from "path";
@@ -42,11 +42,16 @@ const dbData = parseYaml(dbSchemaStr);
 const data = _.merge({}, apiData, dbData);
 
 (async () => {
+  const yaml = serializeYaml(data);
+  write(path.resolve(schemaDir, "schema.yaml"), yaml);
+  write(path.resolve(schemaDistDir, "schema.yaml"), yaml);
+
   await $RefParser.dereference({ components: data.components });
 
   const str = JSON.stringify(data, null, 2);
   write(path.resolve(schemaDir, "schema.json"), str);
   write(path.resolve(schemaDistDir, "schema.json"), str);
+
   const ajv = new Ajv({ sourceCode: true });
 
   const index = [];

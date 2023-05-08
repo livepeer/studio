@@ -242,6 +242,10 @@ components:
         isActive:
           type: boolean
           description: If currently active
+        isHealthy:
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
+        issues:
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdByTokenName:
           type: string
           readOnly: true
@@ -395,6 +399,83 @@ components:
           $ref: "#/components/schemas/stream/properties/multistream"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+    stream-health-payload:
+      type: object
+      description:
+        Payload received from Catalyst about the health of livestreams currently
+        or recently active on Mist.
+      required:
+        - stream_name
+        - is_active
+        - is_healthy
+      properties:
+        stream_name:
+          type: string
+          description:
+            The name of the stream within Catalyst/Mist, normally comprised of
+            the base stream name with the playback ID after the + sign.
+          example: videorec+eaw4nk06ts2d0mzb
+        session_id:
+          description:
+            The unique identifier for the specific session, created by Mist and
+            used for creating the session object in the DB.
+          type: string
+        is_active:
+          type: boolean
+          description: Indicates whether the stream is currently live or not.
+        is_healthy:
+          type: boolean
+          description: Indicates whether the stream is healthy or not.
+        issues:
+          type: string
+          description:
+            Raw issues affecting the stream as described by Mist, if any. We
+            don't expose those to the end-user, showing only human_issues
+            instead.
+        human_issues:
+          type: array
+          description:
+            A string array of human-readable errors describing issues affecting
+            the stream, if any.
+          items:
+            type: string
+        tracks:
+          type: object
+          description:
+            A map of track objects containing information about the stream's
+            tracks. The keys are the unique track ID from Mist.
+          additionalProperties:
+            type: object
+            properties:
+              codec:
+                type: string
+                description: The codec being used for the track.
+              kbits:
+                type: number
+                description: The bitrate of the track, in kilobits per second.
+              keys:
+                type: object
+                description:
+                  An object containing additional track-specific metrics.
+                additionalProperties:
+                  type: number
+              fpks:
+                type: number
+                description:
+                  The framerate of the track, in frames per thousand seconds
+                  (kilo-second).
+              height:
+                type: number
+                description: The height of the track's video resolution.
+              width:
+                type: number
+                description: The width of the track's video resolution.
+        extra:
+          type: object
+          description:
+            An object containing any additional fields sent by mist in the
+            health (STREAM_BUFFER) payload.
+          additionalProperties: true
     object-store-patch-payload:
       type: object
       additionalProperties: false
@@ -478,6 +559,10 @@ components:
           type: number
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
+        isHealthy:
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
+        issues:
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdAt:
           readOnly: true
           type: number
@@ -656,6 +741,19 @@ components:
                   description: >-
                     ID of the source asset that was processed by a transcode
                     task to create this asset
+        creatorId:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [type, value]
+              properties:
+                type:
+                  type: string
+                  enum: [unverified]
+                value:
+                  type: string
+                  description:
+                    Developer-managed ID of the user who created the asset.
         storage:
           additionalProperties: false
           properties:
@@ -919,6 +1017,13 @@ components:
           example: true
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        creatorId:
+          oneOf:
+            - $ref: "#/components/schemas/asset/properties/creatorId"
+            - type: string
+              description:
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         storage:
           additionalProperties: false
           properties:
@@ -968,6 +1073,23 @@ components:
               enum:
                 - aes-cbc
               default: aes-cbc
+    room-user-payload:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+    room-egress-payload:
+      type: object
+      required:
+        - streamId
+      additionalProperties: false
+      properties:
+        streamId:
+          type: string
+          description: The ID of the Livepeer Stream to stream to
     transcode-payload:
       additionalProperties: false
       required:
@@ -1616,6 +1738,57 @@ components:
           type: object
           description: User-defined webhook context
           additionalProperties: true
+    room:
+      type: object
+      required:
+        - id
+        - participants
+        - events
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: room ID
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which the room was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which room was updated
+          example: 1587667174725
+        egressId:
+          type: string
+          description: internal ID for egress output
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+              timestamp:
+                type: integer
+        participants:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              identity:
+                type: string
+                description: participant ID
+              name:
+                type: string
+                description: user defined participant name
+              joinedAt:
+                type: integer
+                description: the time the participant joined
+              leftAt:
+                type: integer
+                description: the time the participant left
 paths:
   /stream:
     post:
@@ -1910,6 +2083,138 @@ paths:
     post:
       description: create a new room
       responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: get room details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              $ref: "#/components/schemas/room"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: delete a room
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}/egress:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-egress-payload"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: start room RTMP egress
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: stop room RTMP egress
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}/user:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-user-payload"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: create a new room
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}/user/{userId}:
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      description: removes a specific user
+      responses:
+        204:
+          description: Success
         default:
           description: Error
           content:
