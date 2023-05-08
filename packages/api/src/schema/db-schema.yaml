@@ -624,6 +624,11 @@ components:
         broadcasterHost:
           type: string
           description: Hostname of the broadcaster that transcodes that stream
+        sessionId:
+          description: UUID of Session created by Mist
+          example: c613d69e-5f4d-451b-9d3a-d28beff86a81
+          index: true
+          type: string
         createdByTokenId:
           readOnly: true
           type: string
@@ -767,6 +772,9 @@ components:
           type: string
           example: stream
           readOnly: true
+        version:
+          type: string
+          description: Version of the session object
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
