@@ -1,0 +1,1047 @@
+components:
+  schemas:
+    cdn-data-row:
+      type: object
+      description: >-
+        Fields names taken from log format description
+        https://support.highwinds.com/hc/en-us/articles/360052181571-Raw-Log-Access-through-GCS
+      additionalProperties: false
+      required:
+        - unique_client_ips
+        - total_sc_bytes
+      properties:
+        stream_id:
+          type: string
+          description: Session UUID. Used in recordings URLs.
+        playback_id:
+          type: string
+          description: Playback ID.
+        unique_client_ips:
+          type: number
+          description: >-
+            Number of unique IP addresses of clients. Not accurate because
+            StackPath zeroes last part of the IP address.
+        total_filesize:
+          type: number
+          description: Size of the asset being delivered.
+        total_cs_bytes:
+          type: number
+          description: The total size of the request header.
+        total_sc_bytes:
+          type: number
+          description: Total bytes in the response to the client.
+        count:
+          type: number
+          description: Number of parsed log lines
+    cdn-data-payload:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - region
+          - file_name
+          - date
+          - data
+        properties:
+          region:
+            type: string
+          file_name:
+            type: string
+          date:
+            type: number
+          data:
+            type: array
+            minItems: 1
+            items:
+              $ref: "#/components/schemas/cdn-data-row"
+    cdn-usage-last:
+      table: cdn_usage_last
+      type: object
+      required:
+        - region
+        - fileName
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        fileName:
+          index: true
+          type: number
+        region:
+          index: true
+          unique: true
+          type: string
+    access-control-gate-payload:
+      type: object
+      additionalProperties: false
+      required:
+        - type
+        - stream
+      properties:
+        type:
+          type: string
+          enum:
+            - jwt
+            - accessKey
+        stream:
+          type: string
+          description: Stream ID to which this gate applies
+        pub:
+          type: string
+          description: Base64 of Public key used for JWT verification
+        accessKey:
+          type: string
+          description: Access key used for access-control verification
+    experiment-audience-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        addUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be added to the experiment
+        removeUsers:
+          type: array
+          items:
+            type: string
+            description:
+              Email or ID of users that should be removed from the experiment
+    object-store:
+      table: object_store
+      type: object
+      required:
+        - url
+      additionalProperties: false
+      properties:
+        url:
+          type: string
+          description: Livepeer-compatible object store URL
+          example: "s3://access-key:secret-key@us-west-2/bucket-name"
+          writeOnly: true
+        publicUrl:
+          type: string
+          description:
+            Public URL at which data in this object storage can be accessed
+          example: "https://reg-rec.livepeer.live/some/path"
+        disabled:
+          type: boolean
+          description: >-
+            If true then these object store will not be used for recording even
+            if it is configured in the API command line.
+        deleted:
+          type: boolean
+          description: Set to true when the object store is deleted
+        id:
+          type: string
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        userId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        name:
+          type: string
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which object store object was created
+          example: 1587667174725
+    user-verification:
+      type: object
+      required:
+        - email
+        - emailValidToken
+      additionalProperties: false
+      properties:
+        email:
+          unique: true
+          index: true
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+        emailValidToken:
+          type: string
+          example: E1F53135E559C253
+          writeOnly: true
+    verify-email:
+      type: object
+      required:
+        - email
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          unique: true
+          description: user email address
+          example: useremail@gmail.com
+    make-admin:
+      type: object
+      required:
+        - email
+        - admin
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+        admin:
+          type: boolean
+          example: true
+    password-reset-token:
+      table: password_reset_token
+      type: object
+      required:
+        - kind
+        - userId
+        - resetToken
+        - expiration
+      additionalProperties: false
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          enum:
+            - password-reset-token
+        userId:
+          readOnly: true
+          index: true
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        resetToken:
+          type: string
+          example: E1F53135E559C253
+          writeOnly: true
+        expiration:
+          readOnly: true
+          type: number
+          description:
+            Timestamp (in milliseconds) at which reset token will be expired
+          example: 1587667174725
+    password-reset-token-request:
+      type: object
+      required:
+        - email
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+    password-reset-confirm:
+      type: object
+      required:
+        - email
+        - resetToken
+        - password
+      additionalProperties: false
+      properties:
+        email:
+          index: true
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+        resetToken:
+          type: string
+          example: E1F53135E559C253
+          writeOnly: true
+        password:
+          type: string
+          example: thisisapassword
+          minLength: 64
+          maxLength: 64
+        userId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+    create-customer:
+      type: object
+      required:
+        - email
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+    create-subscription:
+      type: object
+      required:
+        - stripeCustomerId
+        - stripeProductId
+      additionalProperties: false
+      properties:
+        stripeCustomerId:
+          type: string
+          description: stripe customer id
+          example: cus_xxxxxxxxxxxxxx
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: src_xxxxxxxxxxxxxxxxxxxxxxxx
+        stripeProductId:
+          type: string
+          description: stripe product id
+          enum:
+            - prod_0
+            - prod_1
+            - prod_2
+    update-subscription:
+      type: object
+      required:
+        - stripeCustomerId
+        - stripeProductId
+      additionalProperties: false
+      properties:
+        stripeCustomerId:
+          type: string
+          description: stripe customer id
+          example: cus_xxxxxxxxxxxxxx
+        stripeCustomerSubscriptionId:
+          type: string
+          description: stripe subscription id
+          example: sub_xxxxxxxxxxxxxx
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: pm_xxxxxxxxxxxxxxxxxxxxxxxx
+        stripeProductId:
+          type: string
+          description: stripe product id
+          enum:
+            - prod_0
+            - prod_1
+            - prod_2
+    update-customer-payment-method:
+      type: object
+      required:
+        - stripeCustomerId
+        - stripeCustomerPaymentMethodId
+      additionalProperties: false
+      properties:
+        stripeCustomerId:
+          type: string
+          description: stripe customer id
+          example: cus_xxxxxxxxxxxxxx
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: pm_xxxxxxxxxxxxxxxxxxxxxxxx
+    retrieve-customer-payment-method:
+      type: object
+      required:
+        - stripeCustomerPaymentMethodId
+      additionalProperties: false
+      properties:
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: src_xxxxxxxxxxxxxxxxxxxxxxxx
+    region:
+      table: regions
+      type: object
+      required:
+        - region
+        - orchestrators
+      properties:
+        region:
+          type: string
+          unique: true
+          index: true
+          description: region name
+          example: ber
+        orchestrators:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - address
+            properties:
+              address:
+                type: string
+    experiment:
+      type: object
+      table: experiment
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          index: true
+          unique: true
+          type: string
+          description: Name that identifies the experiment. Must be unique
+        userId:
+          index: true
+          type: string
+          description: >-
+            User ID of the creator of the experiment. Only used for auditing as
+            experiment APIs is only accessible to admins, which can all
+            experiments anyway.
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the experiment was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which experiment was updated
+          example: 1587667174725
+        audienceUserIds:
+          type: array
+          index: true
+          indexType: gin
+          description: List of user IDs in the experiment
+          items:
+            type: string
+        audienceUsers:
+          readOnly: true
+          type: array
+          description: User objects of users in the experiment for convenience
+          items:
+            $ref: "#/components/schemas/user"
+    api-token:
+      type: object
+      table: api_token
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          example: user
+          readOnly: true
+        id:
+          type: string
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        userId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        name:
+          type: string
+          example: Example Token
+        access:
+          type: object
+          additionalProperties: false
+          properties:
+            cors:
+              type: object
+              additionalProperties: false
+              properties:
+                fullAccess:
+                  type: boolean
+                  description: >-
+                    Whether the token grants full access to the API. If false,
+                    the token will only have access to some pre-defined
+                    endpoints, not expose the whole account from the webpage.
+                  default: false
+                allowedOrigins:
+                  type: array
+                  description: >-
+                    Origins from which the token can be used. If empty, CORS
+                    will be prohibited by default (safest). To allow all origin
+                    values set this to `[*]`.
+                  default: []
+                  items:
+                    type: string
+                    example: "https://example.com"
+            rules:
+              type: array
+              default:
+                - resources:
+                    - "*"
+              items:
+                type: object
+                additionalProperties: false
+                required:
+                  - resources
+                properties:
+                  resources:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  methods:
+                    type: array
+                    minItems: 1
+                    default:
+                      - "*"
+                    items:
+                      type: string
+                      enum:
+                        - post
+                        - get
+                        - put
+                        - patch
+                        - delete
+                        - head
+                        - options
+                        - "*"
+        lastSeen:
+          type: number
+          example: 1587667174725
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which token object was created
+          example: 1587667174725
+    transcode-asset-payload:
+      additionalProperties: false
+      required:
+        - name
+        - profile
+      properties:
+        assetId:
+          type: string
+          description: ID of the asset to transcode
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description: >-
+            Name of the asset. This is not necessarily the filename, can be a
+            custom name or title
+          example: filename.mp4
+        profile:
+          $ref: "#/components/schemas/ffmpeg-profile"
+    signing-key-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/signing-key/properties/name"
+        disabled:
+          $ref: "#/components/schemas/signing-key/properties/disabled"
+    suspend-user-payload:
+      type: object
+      additionalProperties: false
+      required:
+        - suspended
+      properties:
+        suspended:
+          $ref: "#/components/schemas/user/properties/suspended"
+        emailTemplate:
+          type: string
+          description:
+            Name of template to send to the users regarding the suspension.
+          enum:
+            - copyright
+    webhook:
+      table: webhook
+      properties:
+        kind:
+          type: string
+          example: webhook
+          readOnly: true
+        userId:
+          readOnly: true
+          type: string
+          index: true
+        events:
+          index: true
+          indexType: gin
+        event:
+          writeOnly: true
+          deprecated: true
+          description:
+            "@deprecated Non-persisted field. To be used on creation API only."
+          $ref: "#/components/schemas/webhook/properties/events/items"
+        deleted:
+          type: boolean
+          default: false
+    webhook-response:
+      table: webhook_response
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          example: webhookResponse
+        webhookId:
+          index: true
+        eventId:
+          index: true
+    detection-webhook-payload:
+      type: object
+      required:
+        - manifestID
+        - seqNo
+        - sceneClassification
+      properties:
+        manifestID:
+          type: string
+        seqNo:
+          type: number
+        sceneClassification:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - probability
+            properties:
+              name:
+                type: string
+              probability:
+                type: number
+    stream:
+      table: stream
+      properties:
+        kind:
+          type: string
+          example: stream
+          readOnly: true
+        userId:
+          index: true
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        lastSeen:
+          index: true
+        isActive:
+          index: true
+        createdAt:
+          index: true
+        parentId:
+          index: true
+        streamKey:
+          unique: true
+        playbackId:
+          unique: true
+        mistHost:
+          type: string
+          description: Hostname of the Mist server that processes that stream
+        broadcasterHost:
+          type: string
+          description: Hostname of the broadcaster that transcodes that stream
+        createdByTokenId:
+          readOnly: true
+          type: string
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description:
+            ID of object store where to which this stream was recorded
+        objectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+        presets:
+          type: array
+          items:
+            type: string
+            enum:
+              - P720p60fps16x9
+              - P720p30fps16x9
+              - P720p30fps4x3
+              - P576p30fps16x9
+              - P360p30fps16x9
+              - P360p30fps4x3
+              - P240p30fps16x9
+              - P240p30fps4x3
+              - P144p30fps16x9
+            example: P720p60fps16x9
+        wowza:
+          type: object
+          required:
+            - transcoderAppConfig
+            - transcoderTemplateAppConfig
+            - streamNameGroups
+            - sourceInfo
+          additionalProperties: false
+          properties:
+            transcoderAppConfig:
+              type: object
+            transcoderTemplateAppConfig:
+              type: object
+            streamNameGroups:
+              type: array
+            sourceInfo:
+              type: object
+              required:
+                - width
+                - height
+                - fps
+              additionalProperties: false
+              properties:
+                width:
+                  type: integer
+                  minValue: 1
+                height:
+                  type: integer
+                  minValue: 1
+                fps:
+                  type: integer
+                  minValue: 1
+        renditions:
+          type: object
+          additionalProperties:
+            type: string
+        detection:
+          type: object
+          description: >-
+            Custom configuration for audio/video detection algorithms to be run
+            on the stream. If no config is provided and a webhook is subscribed
+            to the stream.detection event, a default config will be used.
+          default:
+            sceneClassification:
+              - name: soccer
+              - name: adult
+          required:
+            - sceneClassification
+          additionalProperties: false
+          properties:
+            sceneClassification:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                description: >-
+                  Scene classification options. Must contain name property with
+                  one of the well-defined classes supported by detection models.
+                additionalProperties: false
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    enum:
+                      - soccer
+                      - adult
+        region:
+          type: string
+          example: fra
+          description: Region in which this session object was created
+        deleted:
+          type: boolean
+          description: Set to true when stream deleted
+    playback-policy:
+      properties:
+        type:
+          enum:
+            - public
+            - jwt
+            - webhook
+            - lit_signing_condition
+        unifiedAccessControlConditions:
+          type: array
+          description: LIT Unified Access Control Conditions
+          items:
+            type: object
+        resourceId:
+          type: object
+          description: LIT Resource ID
+          additionalProperties: false
+          required:
+            - baseUrl
+            - path
+            - orgId
+            - role
+            - extraData
+          properties:
+            baseUrl:
+              type: string
+            path:
+              type: string
+            orgId:
+              type: string
+            role:
+              type: string
+            extraData:
+              type: string
+    multistream-target-patch-payload:
+      table: null
+    session:
+      table: session
+      properties:
+        kind:
+          type: string
+          example: stream
+          readOnly: true
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+        lastSeen:
+          index: true
+        createdAt:
+          index: true
+        parentId:
+          index: true
+        deleted:
+          type: boolean
+          description: Set to true when stream deleted
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description:
+            ID of object store where to which this stream was recorded
+        broadcasterHost:
+          type: string
+          description: Hostname of the broadcaster that transcodes that stream
+    multistream-target:
+      table: multistream_target
+      properties:
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          readOnly: true
+          index: true
+    asset:
+      table: asset
+      properties:
+        id:
+          index: true
+        playbackId:
+          index: true
+        userId:
+          readOnly: true
+          index: true
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          description: owner of the asset
+        source:
+          oneOf:
+            - additionalProperties: false
+              properties:
+                url:
+                  index: true
+        deleted:
+          type: boolean
+          description: Set to true when the asset is deleted
+        playbackRecordingId:
+          type: string
+          writeOnly: true
+          example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
+          description: Used to form recording URL for HLS playback
+          index: true
+        files:
+          type: array
+          writeOnly: true
+          description:
+            Internal field with the list of files stored in the object store
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - type
+              - path
+            properties:
+              type:
+                type: string
+                example: catalyst_hls_manifest
+                description: Type of the file in the VOD system.
+              path:
+                type: string
+                example: /path/to/file
+                description: >-
+                  Path to the file in the asset subfolder in the object store.
+                  This means that all these paths are relative to a folder in
+                  the OS the asset playback ID as the name.
+              spec:
+                type: object
+                additionalProperties: false
+                description: >-
+                  Additional information about the file. For example, for
+                  manifests it contains the list of media files.
+                properties:
+                  size:
+                    type: number
+                    example: 123456
+                    description: Size of the file in bytes.
+                  height:
+                    type: number
+                    example: 1080
+                    description: Height of the video in pixels.
+                  width:
+                    type: number
+                    example: 1920
+                    description: Width of the video in pixels.
+                  bitrate:
+                    type: number
+                    example: 1000000
+                    description: Bitrate of the video in bits per second.
+        deletedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which the asset was deleted
+          example: 1587667174725
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        sourceAssetId:
+          type: string
+          description:
+            "ID of the source asset (root) - If missing, this is a root asset"
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+          index: true
+          readOnly: true
+    new-asset-payload:
+      properties:
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+    ipfs-file-info:
+      properties:
+        cid:
+          index: true
+    task:
+      table: task
+      properties:
+        id:
+          index: true
+        userId:
+          readOnly: true
+          index: true
+          type: string
+          description: User ID of the task owner
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        inputAssetId:
+          index: true
+        outputAssetId:
+          index: true
+        output:
+          properties:
+            export:
+              properties:
+                internal:
+                  writeOnly: true
+                  description: |
+                    Internal data of the export task that should not be returned
+                    to users. Contains internal tracking information like which
+                    service was used for the export in case it is maintained by
+                    us (e.g. the first-party piñata service).
+        params:
+          properties:
+            upload:
+              properties:
+                uploadedObjectKey:
+                  type: string
+                  description: S3 object key of the uploaded asset
+                  example: ABC123/filename.mp4
+                catalystPipelineStrategy:
+                  type: string
+                  description: >-
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - catalyst_ffmpeg
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
+            transcode-file:
+              properties:
+                catalystPipelineStrategy:
+                  type: string
+                  description: >-
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - catalyst_ffmpeg
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
+        deleted:
+          type: boolean
+          description: Set to true when the task is deleted
+    user:
+      table: users
+      properties:
+        email:
+          unique: true
+          index: true
+        kind:
+          type: string
+          readOnly: true
+          example: user
+        stripeProductId:
+          type: string
+          enum:
+            - prod_0
+            - prod_1
+            - prod_2
+        stripeCustomerId:
+          type: string
+          example: cus_Jv6KvgT0DCH8HU
+          unique: true
+        stripeCustomerPaymentMethodId:
+          type: string
+          example: pm_2FSSNNJfrKDAwlJ9n4EN15Du
+        stripeCustomerSubscriptionId:
+          type: string
+          example: sub_I29pdyfOTPBkjb
+        ccLast4:
+          type: string
+          example: 1234
+        ccBrand:
+          type: string
+          example: 1234
+        recaptchaToken:
+          type: string
+          example: >-
+            03AGdBq24blDQQCyt9BSYjS0YZ3-tZapaQ5xO2-oykG_4dS_91TzH9qOziOwXbff_QiDOsXmWKxqtOrmOEx7qjijNhbexBzvNjM6HbbhXcji1rKcxxQRsL-t3SbycwZuNXos9OjnrYmfV9F3zsy1o73ia5Wlw_Zcf1jwbm3n-yQ2epifcMHXJhsUrqmUe6a1J1mPaD2heHvCOS3vYm0rWijdMl2E4bXQf75BiWvbLKxCWv5ZF8279nCMcGyJBIw1kno-A0x5KTOlEVxV369nz12lkvRfOtRABKB49jMTygAc2BKh9GBlAYGO6PBPoIk7_BCo7I_hsHoJeT4c80ucOPraZby0QJM5jcCQcqVCYrcaPKPiUMcIEixIhB5FAfDs88uYqDWMcgZdMRKCvmxEC3ONDVDtq0nLMc4rniuC5sQTz1E4D6SR_Adik
+          description: Recaptcha v3 Token
+          writeOnly: true
+        admin:
+          type: boolean
+          example: true
+        internal:
+          type: boolean
+          example: false
+          description:
+            Internal user that should be disregarded from usage information
+        isTestUser:
+          type: boolean
+          example: false
+          description:
+            User creates test streams and playbackIds should be flagged as such
+    signing-key:
+      table: signing_key
+      properties:
+        id:
+          index: true
+        userId:
+          readOnly: true
+          index: true
+          type: string
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
+        deleted:
+          type: boolean
+          default: false
+    usage:
+      table: usage
+      properties:
+        id:
+          unique: true
+          index: true
+        kind:
+          type: string
+          example: usage
+          readOnly: true
+    transcode-payload:
+      properties:
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
