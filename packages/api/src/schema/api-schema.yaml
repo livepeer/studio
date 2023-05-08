@@ -656,6 +656,19 @@ components:
                   description: >-
                     ID of the source asset that was processed by a transcode
                     task to create this asset
+        creatorId:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [type, value]
+              properties:
+                type:
+                  type: string
+                  enum: [unverified]
+                value:
+                  type: string
+                  description:
+                    Developer-managed ID of the user who created the asset.
         storage:
           additionalProperties: false
           properties:
@@ -919,6 +932,13 @@ components:
           example: true
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        creatorId:
+          oneOf:
+            - $ref: "#/components/schemas/asset/properties/creatorId"
+            - type: string
+              description:
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         storage:
           additionalProperties: false
           properties:
