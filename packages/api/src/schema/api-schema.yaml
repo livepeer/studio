@@ -1740,7 +1740,6 @@ components:
           additionalProperties: true
     room:
       type: object
-      table: room
       required:
         - id
         - participants
@@ -1750,12 +1749,6 @@ components:
           type: string
           readOnly: true
           description: room ID
-        userId:
-          type: string
-          readOnly: true
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
-          description: owner of the room
         createdAt:
           type: number
           readOnly: true
@@ -1765,13 +1758,6 @@ components:
           type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which room was updated
-          example: 1587667174725
-        deleted:
-          type: boolean
-          description: Set to true when the room is deleted
-        deletedAt:
-          type: number
-          description: Timestamp (in milliseconds) at which the room was deleted
           example: 1587667174725
         egressId:
           type: string
@@ -1803,21 +1789,6 @@ components:
               leftAt:
                 type: integer
                 description: the time the participant left
-              tracksPublished:
-                type: object
-                additionalProperties:
-                  type: object
-                  properties:
-                    sid:
-                      type: string
-                    width:
-                      type: integer
-                    height:
-                      type: integer
-                    mimeType:
-                      type: string
-                    timestamp:
-                      type: integer
 paths:
   /stream:
     post:

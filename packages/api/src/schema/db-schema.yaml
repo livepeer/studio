@@ -1053,3 +1053,38 @@ components:
       properties:
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+    room:
+      table: room
+      properties:
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the room
+        deleted:
+          type: boolean
+          description: Set to true when the room is deleted
+        deletedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the room was deleted
+          example: 1587667174725
+        participants:
+          type: object
+          additionalProperties:
+            properties:
+              tracksPublished:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    sid:
+                      type: string
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    mimeType:
+                      type: string
+                    timestamp:
+                      type: integer
