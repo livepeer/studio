@@ -17,6 +17,7 @@ import {
   toExternalTask,
 } from "../controllers/task";
 import { toExternalAsset } from "../controllers/asset";
+import { toExternalSession } from "../controllers/session";
 
 const taskInfo = (task: WithID<Task>, config: CliArgs): messages.TaskInfo => ({
   id: task.id,
@@ -399,6 +400,30 @@ export class TaskScheduler {
           task: taskInfo(task, this.config),
         },
       });
+    }
+    if (task.status.phase === "completed" && task.outputAssetId) {
+      const asset = await db.asset.get(task.outputAssetId);
+      if (asset && asset.source.type == "recording" && asset.source.sessionId) {
+        const session = await db.session.get(asset.source.sessionId);
+        if (session) {
+          await this.queue.publishWebhook("events.recording.ready", {
+            type: "webhook_event",
+            id: uuid(),
+            timestamp: Date.now(),
+            streamId: session.parentId,
+            event: "recording.ready",
+            userId: session.userId,
+            sessionId: session.id,
+            payload: {
+              session: {
+                ...(await toExternalSession(this.config, session, null, true)),
+                recordingStatus: "ready",
+                assetId: session.id,
+              },
+            },
+          });
+        }
+      }
     }
     return task;
   }

@@ -21,7 +21,6 @@ import { db } from "../store";
 import { DBSession } from "../store/db";
 import {
   BadRequestError,
-  InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
 } from "../store/errors";
@@ -40,6 +39,7 @@ import {
   pathJoin,
   FieldsMap,
   toStringValues,
+  getIngestBase,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -253,7 +253,7 @@ function activeCleanupOne(
   setImmediate(async () => {
     try {
       if (stream.parentId) {
-        // this is a session so trigger the recording.ready logic to clean-up the isActive field
+        // this is a session so trigger the recording.waiting logic to clean-up the isActive field
         await triggerSessionRecordingHooks(config, stream, queue, ingest);
       } else {
         const patch = { isActive: false };
@@ -283,14 +283,6 @@ function activeCleanup(
     return streams.filter((s) => !isActuallyNotActive(s));
   }
   return streams;
-}
-
-async function getIngestBase(req: Request) {
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    throw new InternalServerError("ingest not configured");
-  }
-  return ingests[0].base;
 }
 
 const fieldsMap: FieldsMap = {
@@ -1066,7 +1058,7 @@ app.put(
  * webhooks if appropriate.
  *
  * @param stream The stream to update which MUST be a parent stream (no
- * parentId). Child streams are processed through the delayed `recording.ready`
+ * parentId). Child streams are processed through the delayed `recording.waiting`
  * events from {@link triggerSessionRecordingHooks}.
  */
 async function setStreamActiveWithHooks(
@@ -1109,7 +1101,7 @@ async function setStreamActiveWithHooks(
       });
   }
 
-  // opportunistically trigger recording.ready logic for this stream's sessions
+  // opportunistically trigger recording.waiting logic for this stream's sessions
   triggerSessionRecordingHooks(config, stream, queue, ingest).catch((err) => {
     logger.error(
       `Error triggering session recording hooks stream_id=${stream.id} err=`,
@@ -1119,8 +1111,8 @@ async function setStreamActiveWithHooks(
 }
 
 /**
- * Trigger delayed recording.ready events for each active session in the stream.
- * These recording.ready events aren't sent directly to the user, but instead
+ * Trigger delayed recording.waiting events for each active session in the stream.
+ * These recording.waiting events aren't sent directly to the user, but instead
  * the handler will check if the session is actually inactive to fire the hook.
  */
 async function triggerSessionRecordingHooks(
@@ -1140,7 +1132,7 @@ async function triggerSessionRecordingHooks(
     await publishSingleRecordingReadyHook(config, session, queue, ingest).catch(
       (err) => {
         logger.error(
-          `Error sending recording.ready hook for session_id=${session.id} err=`,
+          `Error sending recording.waiting hook for session_id=${session.id} err=`,
           err
         );
       }
@@ -1195,13 +1187,13 @@ async function publishDelayedRecordingReadyHook(
   ingest: string
 ) {
   return await queue.delayedPublishWebhook(
-    "events.recording.ready",
+    "events.recording.waiting",
     {
       type: "webhook_event",
       id: uuid(),
       timestamp: Date.now(),
       streamId: session.parentId,
-      event: "recording.ready",
+      event: "recording.waiting",
       userId: session.userId,
       sessionId: session.id,
       payload: {

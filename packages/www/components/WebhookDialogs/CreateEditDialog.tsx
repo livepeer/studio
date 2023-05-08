@@ -33,6 +33,7 @@ const eventOptions: Webhook["events"] = [
   "stream.idle",
   "recording.ready",
   "recording.started",
+  "recording.waiting",
   "multistream.connected",
   "multistream.error",
   "multistream.disconnected",
