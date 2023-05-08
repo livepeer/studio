@@ -988,6 +988,23 @@ components:
               enum:
                 - aes-cbc
               default: aes-cbc
+    room-user-payload:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+    room-egress-payload:
+      type: object
+      required:
+        - streamId
+      additionalProperties: false
+      properties:
+        streamId:
+          type: string
+          description: The ID of the Livepeer Stream to stream to
     transcode-payload:
       additionalProperties: false
       required:
@@ -1636,6 +1653,86 @@ components:
           type: object
           description: User-defined webhook context
           additionalProperties: true
+    room:
+      type: object
+      table: room
+      required:
+        - id
+        - participants
+        - events
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: room ID
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the room
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which the room was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which room was updated
+          example: 1587667174725
+        deleted:
+          type: boolean
+          description: Set to true when the room is deleted
+        deletedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the room was deleted
+          example: 1587667174725
+        egressId:
+          type: string
+          description: internal ID for egress output
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+              timestamp:
+                type: integer
+        participants:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              identity:
+                type: string
+                description: participant ID
+              name:
+                type: string
+                description: user defined participant name
+              joinedAt:
+                type: integer
+                description: the time the participant joined
+              leftAt:
+                type: integer
+                description: the time the participant left
+              tracksPublished:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    sid:
+                      type: string
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    mimeType:
+                      type: string
+                    timestamp:
+                      type: integer
 paths:
   /stream:
     post:
@@ -1930,6 +2027,138 @@ paths:
     post:
       description: create a new room
       responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              additionalProperties: false
+              properties:
+                id:
+                  type: string
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: get room details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              $ref: "#/components/schemas/room"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: delete a room
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}/egress:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-egress-payload"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: start room RTMP egress
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: stop room RTMP egress
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}/user:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-user-payload"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: create a new room
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /room/{id}/user/{userId}:
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      description: removes a specific user
+      responses:
+        204:
+          description: Success
         default:
           description: Error
           content:
