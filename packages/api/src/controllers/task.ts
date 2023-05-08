@@ -12,7 +12,6 @@ import {
   FieldsMap,
   reqUseReplica,
   deleteCredentials,
-  getIngestBase,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -22,7 +21,6 @@ import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
-import { toExternalSession } from "./session";
 
 const app = Router();
 

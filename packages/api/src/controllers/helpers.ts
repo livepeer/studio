@@ -11,9 +11,9 @@ import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
-import { InternalServerError } from "../store/errors";
 
-import { ObjectStore } from "../schema/types";
+import { WithID } from "../store/types";
+import { ObjectStore, Task } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -499,12 +499,4 @@ export async function recaptchaVerify(token: string, secretKey: string) {
   })
     .then((res) => res.json())
     .then((res) => res.score);
-}
-
-export async function getIngestBase(req: Request) {
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    throw new InternalServerError("ingest not configured");
-  }
-  return ingests[0].base;
 }

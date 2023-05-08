@@ -21,6 +21,7 @@ import { db } from "../store";
 import { DBSession } from "../store/db";
 import {
   BadRequestError,
+  InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
 } from "../store/errors";
@@ -39,7 +40,6 @@ import {
   pathJoin,
   FieldsMap,
   toStringValues,
-  getIngestBase,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -283,6 +283,14 @@ function activeCleanup(
     return streams.filter((s) => !isActuallyNotActive(s));
   }
   return streams;
+}
+
+async function getIngestBase(req: Request) {
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    throw new InternalServerError("ingest not configured");
+  }
+  return ingests[0].base;
 }
 
 const fieldsMap: FieldsMap = {
