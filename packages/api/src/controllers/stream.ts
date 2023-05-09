@@ -194,7 +194,7 @@ export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
 }
 
 export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
-  return pathJoin(ingest, `${stream.playbackId}.sdp`);
+  return pathJoin(ingest, `webrtc`, `${stream.playbackId}`);
 }
 
 function getRecordingUrl(ingest: string, session: DBSession, mp4 = false) {
