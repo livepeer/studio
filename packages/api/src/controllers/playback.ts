@@ -3,6 +3,7 @@ import { db } from "../store";
 import {
   getPlaybackUrl as streamPlaybackUrl,
   getRecordingFields,
+  USER_SESSION_TIMEOUT,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
@@ -10,11 +11,22 @@ import {
   StaticPlaybackInfo,
 } from "./asset";
 import { CliArgs } from "../parse-cli";
-import { NotFoundError } from "@cloudflare/kv-asset-handler";
 import { DBSession } from "../store/db";
 import { Asset, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
+import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+
+/**
+ * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
+ * asset playback. Assets created before this date can still be played by other
+ * accounts by dStorage ID. Assets created after this date will not have
+ * cross-account playback enabled, ensuring users are billed appropriately. This
+ * was made for backward compatibiltiy during the Viewership V2 deploy.
+ */
+export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
+
+var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv$/;
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -97,15 +109,27 @@ const getAssetPlaybackInfo = async (
 
 export async function getResourceByPlaybackId(
   id: string,
-  user: User
+  user?: User,
+  isCrossUserQuery?: boolean
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
+  const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let asset =
     (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id, user)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
-    (await db.asset.getBySourceURL("ar://" + id, user));
+    (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
 
   if (asset && !asset.deleted) {
+    if (asset.status.phase !== "ready") {
+      throw new UnprocessableEntityError("asset is not ready for playback");
+    }
+    if (asset.userId !== user?.id && !isCrossUserQuery) {
+      console.log(
+        `Returning cross-user asset for playback. ` +
+          `userId=${user?.id} userEmail=${user?.email} ` +
+          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
+      );
+    }
     return { asset };
   }
 
@@ -132,9 +156,14 @@ export async function getResourceByPlaybackId(
 async function getPlaybackInfo(
   { config, user }: Request,
   ingest: string,
-  id: string
+  id: string,
+  isCrossUserQuery: boolean
 ): Promise<PlaybackInfo> {
-  let { stream, asset, session } = await getResourceByPlaybackId(id, user);
+  let { stream, asset, session } = await getResourceByPlaybackId(
+    id,
+    user,
+    isCrossUserQuery
+  );
 
   if (asset) {
     return await getAssetPlaybackInfo(config, ingest, asset);
@@ -184,7 +213,10 @@ app.get("/:id", async (req, res) => {
   const ingest = ingests[0].base;
 
   let { id } = req.params;
-  const info = await getPlaybackInfo(req, ingest, id);
+  const isEmbeddablePlayer = embeddablePlayerOrigin.test(
+    req.headers["origin"] ?? ""
+  );
+  const info = await getPlaybackInfo(req, ingest, id, isEmbeddablePlayer);
   if (!info) {
     throw new NotFoundError(`No playback URL found for ${id}`);
   }
