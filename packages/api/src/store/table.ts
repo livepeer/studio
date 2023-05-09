@@ -349,9 +349,11 @@ export default class Table<T extends DBObject> {
   async ensureIndex(propName: string, prop: FieldSpec, parents: string[] = []) {
     if (
       process.env.NODE_ENV !== "test" &&
-      !["asset", "experiment", "room"].includes(this.name)
+      ["stream", "session"].includes(this.name)
     ) {
-      // avoid creating indexes in production right now...
+      // avoid creating stream indexes in production right now. since the tables
+      // are large they can take 15+ minutes to index which hangs deployments.
+      // TODO: create an init container to create indexes before the server.
       return;
     }
     if (prop.oneOf?.length) {
