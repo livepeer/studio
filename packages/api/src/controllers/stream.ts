@@ -202,7 +202,7 @@ export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
 }
 
 export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
-  return pathJoin(ingest, `webrtc`, `${stream.playbackId}`);
+  return pathJoin(ingest, `webrtc`, stream.playbackId);
 }
 
 async function getRecordingUrls(
