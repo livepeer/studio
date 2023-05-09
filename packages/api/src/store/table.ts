@@ -387,7 +387,7 @@ export default class Table<T extends DBObject> {
     const propAccessor = `data${parentsAcc}${propAccessOp}'${propName}'`;
     try {
       await this.db.query(`
-          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING ${indexType} ((${propAccessor}));
+          CREATE ${unique} INDEX CONCURRENTLY "${indexName}" ON "${this.name}" USING ${indexType} ((${propAccessor}));
         `);
     } catch (e) {
       if (!e.message.includes("already exists")) {
