@@ -1137,18 +1137,21 @@ async function triggerSessionRecordingHooks(
   for (const childStream of childStreams) {
     const sessionId = childStream.sessionId ?? childStream.id;
     const session = await db.session.get(sessionId);
-    await publishSingleRecordingReadyHook(config, session, queue, ingest).catch(
-      (err) => {
-        logger.error(
-          `Error sending recording.waiting hook for session_id=${session.id} err=`,
-          err
-        );
-      }
-    );
+    await publishSingleRecordingWaitingHook(
+      config,
+      session,
+      queue,
+      ingest
+    ).catch((err) => {
+      logger.error(
+        `Error sending recording.waiting hook for session_id=${session.id} err=`,
+        err
+      );
+    });
   }
 }
 
-async function publishSingleRecordingReadyHook(
+async function publishSingleRecordingWaitingHook(
   config: CliArgs,
   session: DBSession,
   queue: Queue,
@@ -1165,7 +1168,7 @@ async function publishSingleRecordingReadyHook(
     return;
   }
 
-  await publishDelayedRecordingReadyHook(config, session, queue, ingest);
+  await publishDelayedRecordingWaitingHook(config, session, queue, ingest);
 }
 
 async function publishRecordingStartedHook(
@@ -1188,7 +1191,7 @@ async function publishRecordingStartedHook(
 /**
  * We don't actually send the webhook here, but schedule an event after a timeout.
  */
-async function publishDelayedRecordingReadyHook(
+async function publishDelayedRecordingWaitingHook(
   config: CliArgs,
   session: DBSession,
   queue: Queue,
