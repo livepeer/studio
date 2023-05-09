@@ -632,11 +632,6 @@ components:
         createdByTokenId:
           readOnly: true
           type: string
-        recordObjectStoreId:
-          type: string
-          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
-          description:
-            ID of object store where to which this stream was recorded
         objectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
@@ -788,11 +783,6 @@ components:
         deleted:
           type: boolean
           description: Set to true when stream deleted
-        recordObjectStoreId:
-          type: string
-          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
-          description:
-            ID of object store where to which this stream was recorded
         broadcasterHost:
           type: string
           description: Hostname of the broadcaster that transcodes that stream
