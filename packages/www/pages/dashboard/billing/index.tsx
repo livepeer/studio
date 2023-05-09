@@ -12,10 +12,10 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { products } from "@livepeer.studio/api/src/config";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import PaymentMethodDialog from "components/Dashboard/PaymentMethodDialog";
-import PaymentMethod from "components/Dashboard/PaymentMethod";
-import UpcomingInvoiceTable from "components/Dashboard/UpcomingInvoiceTable";
-import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
+import PaymentMethodDialog from "components/PaymentMethodDialog";
+import PaymentMethod from "components/PaymentMethod";
+import UpcomingInvoiceTable from "components/UpcomingInvoiceTable";
+import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 
@@ -163,7 +163,7 @@ const Billing = () => {
             justify="between"
             align="center"
             css={{ fontSize: "$3", color: "$hiContrast" }}>
-            <Text variant="gray">
+            <Text variant="neutral">
               You are currently on the
               <Badge
                 size="1"
@@ -213,7 +213,7 @@ const Billing = () => {
             css={{
               ".rccs__card__background": {
                 background:
-                  "linear-gradient(to right, $colors$blue11, $colors$blue11) !important",
+                  "linear-gradient(to right, $colors$green11, $colors$green11) !important",
               },
               ".rccs__card--front": {
                 color: "white !important",
@@ -250,7 +250,7 @@ const Billing = () => {
             </Heading>
           </Flex>
           {!products[user.stripeProductId].order ? (
-            <Text variant="gray">
+            <Text variant="neutral">
               The Personal plan is free of charge up to 1000 minutes per month
               and limited to 10 concurrent viewers per account.
             </Text>

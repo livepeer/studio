@@ -2,7 +2,6 @@
 import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
-import { DefaultNav } from "components/Site/Navigation";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
@@ -71,7 +70,7 @@ const Layout = ({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          url: image ? image.url : "https://assets.livepeer.studio/api/og",
           alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,
@@ -119,11 +118,6 @@ const Layout = ({
                   }}>
                   Preview Mode
                 </Box>
-              )}
-              {customNav ? (
-                customNav
-              ) : (
-                <DefaultNav navBackgroundColor={backgroundColor} />
               )}
               <Box css={{ position: "relative" }}>{children}</Box>
             </Flex>

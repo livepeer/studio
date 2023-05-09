@@ -1,53 +1,118 @@
 import Layout from "layouts/main";
+import Login from "components/Login";
+import {
+  Flex,
+  Box,
+  Button,
+  Container,
+  Text,
+  Link as A,
+} from "@livepeer/design-system";
+import { useState } from "react";
+import { useApi } from "../hooks";
+import Link from "next/link";
 import { Home as Content } from "content";
-import HomeHero from "components/Site/HomeHero";
-import ToolkitSection from "components/Site/ToolkitSection";
-import GuideSection from "components/Site/GuideSection";
-import FeaturedAppsSection from "components/Site/FeaturedAppsSection";
-import PrinciplesSection from "components/Site/PrinciplesSection";
-import { client } from "lib/client";
 
-const HomePage = (props) => {
+const LoginPage = () => {
+  const [errors, setErrors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { login } = useApi();
+
+  const onSubmit = async ({ email, password }) => {
+    setLoading(true);
+    setErrors([]);
+    const res = await login(email, password);
+    // Don't need to worry about the success case, we'll redirect
+    if (res.errors) {
+      setErrors(res.errors);
+      setLoading(false);
+    }
+  };
+
   return (
-    <Layout navBackgroundColor="$hiContrast" {...Content.metaData}>
-      <HomeHero content={props.heroSection} />
-      <ToolkitSection content={props.toolkitSection} />
-      <GuideSection content={props.guideSection} />
-      <FeaturedAppsSection content={props.featuredAppSection} />
-      <PrinciplesSection content={props.principlesSection} />
+    <Layout {...Content.metaData}>
+      <Box
+        css={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+        }}>
+        <Container
+          size="3"
+          css={{
+            px: "$3",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              px: "$4",
+            },
+          }}>
+          <Flex
+            css={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexGrow: 1,
+              flexDirection: "column",
+            }}>
+            <Text
+              size="8"
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                mb: "$5",
+                fontWeight: 700,
+                width: 150,
+                lineHeight: "30px",
+                textAlign: "center",
+              }}>
+              Livepeer Studio
+            </Text>
+
+            <Login
+              id="login"
+              onSubmit={onSubmit}
+              buttonText="Sign in"
+              errors={errors}
+              loading={loading}
+            />
+            <Box css={{ maxWidth: 450, width: "100%" }}>
+              <Box
+                css={{
+                  width: "100%",
+                  height: "1px",
+                  mb: "$3",
+                  background:
+                    "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
+                }}
+              />
+              <Link href="/register" passHref legacyBehavior>
+                <A
+                  css={{
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                  }}>
+                  <Button
+                    size="4"
+                    css={{
+                      width: "100%",
+                      fontSize: "$3",
+                      "&:hover": {
+                        textDecoration: "none",
+                      },
+                    }}>
+                    Create new account
+                  </Button>
+                </A>
+              </Link>
+            </Box>
+          </Flex>
+        </Container>
+      </Box>
     </Layout>
   );
 };
 
-export async function getStaticProps({ locale }) {
-  const queryParams = {};
-  const query = `*[_type=="home" && __i18n_lang =='en-US'][0]`;
-  const pageData = await client.fetch(query, queryParams);
-  console.log("data: ", pageData);
-  // const graphQLClient = new GraphQLClient(
-  //   "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  // );
-
-  // const id = {
-  //   en: "",
-  //   es: "i18n_es-ES",
-  // };
-
-  // const variables = {
-  //   where: { _id: { matches: id[locale] } },
-  // };
-
-  // let data: any = await graphQLClient.request(print(allHome), variables);
-  // console.log("gql data: ", data);
-  return {
-    props: {
-      // ...data.allHome[0],
-      ...pageData,
-      preview: false,
-    },
-    revalidate: 1,
-  };
-}
-
-HomePage.theme = "dark-theme-blue";
-export default HomePage;
+LoginPage.theme = "dark-theme-green";
+export default LoginPage;

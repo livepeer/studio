@@ -12,7 +12,7 @@ import {
   useSnackbar,
 } from "@livepeer/design-system";
 
-import Spinner from "components/Dashboard/Spinner";
+import Spinner from "components/Spinner";
 
 const VerifyPage = () => {
   const router = useRouter();
@@ -52,7 +52,7 @@ const VerifyPage = () => {
   );
 };
 
-VerifyPage.theme = "dark-theme-blue";
+VerifyPage.theme = "dark-theme-green";
 export default VerifyPage;
 
 const Verify = ({
@@ -110,6 +110,19 @@ const Verify = ({
               height: "calc(100vh - 280px)",
               mb: 65,
             }}>
+            <Text
+              size="8"
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                mb: "$5",
+                fontWeight: 700,
+                width: 150,
+                lineHeight: "30px",
+                textAlign: "center",
+              }}>
+              Livepeer Studio
+            </Text>
             {email && emailValidToken ? (
               <>
                 {errors ? (
@@ -148,18 +161,18 @@ const Verify = ({
               </>
             ) : (
               <>
-                <Heading size="2" css={{ my: "$3", fontWeight: 600 }}>
+                <Heading size="2" css={{ my: "$3" }}>
                   Check your email
                 </Heading>
                 <Box css={{ fontSize: "$2" }}>
-                  <Text variant="gray" size="3">
+                  <Text variant="neutral" size="3">
                     We've sent you a link to verify your email.
                   </Text>
-                  <Text variant="gray" size="3">
+                  <Text variant="neutral" size="3">
                     Please check your inbox at
                     <Box
                       as="span"
-                      css={{ color: "$hiContrast", fontWeight: 600 }}>
+                      css={{ color: "$hiContrast", fontWeight: 500 }}>
                       {" "}
                       {user?.email}.
                     </Box>

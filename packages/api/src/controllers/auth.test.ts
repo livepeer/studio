@@ -11,6 +11,7 @@ import {
 import serverPromise, { TestServer } from "../test-server";
 import { pathJoin2 } from "./helpers";
 import { v4 as uuid } from "uuid";
+import { generateUniquePlaybackId } from "./generate-keys";
 
 let server: TestServer;
 let mockAdminUserInput: User;
@@ -465,29 +466,40 @@ describe("controller/auth", () => {
 
       nonAdminStream = await db.stream.create({
         id: uuid(),
+        playbackId: await generateUniquePlaybackId(uuid()),
         userId: nonAdminUser.id,
       } as any);
       nonAdminAsset = await db.asset.create({
         id: uuid(),
+        playbackId: await generateUniquePlaybackId(uuid()),
         userId: nonAdminUser.id,
+        status: { phase: "ready" },
       } as any);
       adminStream = await db.stream.create({
         id: uuid(),
+        playbackId: await generateUniquePlaybackId(uuid()),
         userId: adminUser.id,
       } as any);
       adminAsset = await db.asset.create({
         id: uuid(),
+        playbackId: await generateUniquePlaybackId(uuid()),
         userId: adminUser.id,
+        status: { phase: "ready" },
       } as any);
     });
 
-    const fetchAuth = async (ids: { streamId?: string; assetId?: string }) => {
+    const fetchAuth = async (ids: {
+      streamId?: string;
+      assetId?: string;
+      pid?: string;
+    }) => {
       const res = await client.fetch("/auth", {
         method: "GET",
         headers: {
           "x-original-uri": "https://livepeer.studio/api/data/views/1234/total",
           ...(ids.streamId ? { "x-livepeer-stream-id": ids.streamId } : null),
           ...(ids.assetId ? { "x-livepeer-asset-id": ids.assetId } : null),
+          ...(ids.pid ? { "x-livepeer-playback-id": ids.pid } : null),
         },
       });
       return res.status;
@@ -496,27 +508,46 @@ describe("controller/auth", () => {
     it("should disallow access to non-existent resources", async () => {
       await expect(fetchAuth({ streamId: "1234" })).resolves.toBe(404);
       await expect(fetchAuth({ assetId: "1234" })).resolves.toBe(404);
+      await expect(fetchAuth({ pid: "1234" })).resolves.toBe(404);
     });
 
     it("should disallow access to deleted resources", async () => {
       await db.stream.markDeleted(nonAdminStream.id);
       await db.asset.markDeleted(nonAdminAsset.id);
+
       await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
         404
       );
+      await expect(fetchAuth({ pid: nonAdminStream.playbackId })).resolves.toBe(
+        404
+      );
+
       await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(404);
+      await expect(fetchAuth({ pid: nonAdminAsset.playbackId })).resolves.toBe(
+        404
+      );
     });
 
     it("should disallow access to other users resources", async () => {
       await expect(fetchAuth({ streamId: adminStream.id })).resolves.toBe(403);
       await expect(fetchAuth({ assetId: adminAsset.id })).resolves.toBe(403);
+      await expect(fetchAuth({ pid: adminAsset.playbackId })).resolves.toBe(
+        403
+      );
     });
 
     it("should allow access to own resources", async () => {
       await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
         204
       );
+      await expect(fetchAuth({ pid: nonAdminStream.playbackId })).resolves.toBe(
+        204
+      );
+
       await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
+      await expect(fetchAuth({ pid: nonAdminAsset.playbackId })).resolves.toBe(
+        204
+      );
     });
 
     it("should allow admins to access to other users resources", async () => {
@@ -524,7 +555,14 @@ describe("controller/auth", () => {
       await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
         204
       );
+      await expect(fetchAuth({ pid: nonAdminStream.playbackId })).resolves.toBe(
+        204
+      );
+
       await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
+      await expect(fetchAuth({ pid: nonAdminAsset.playbackId })).resolves.toBe(
+        204
+      );
     });
   });
 });

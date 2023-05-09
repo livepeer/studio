@@ -6,7 +6,7 @@
 
 const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
 const defaultDescription =
-  "Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.";
+  "Your home for building onchain and open social video experiences with Livepeer, the world's open video infrastructure.";
 const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
 
 // Main website
@@ -102,7 +102,7 @@ export const Jobs = {
 
 export const Dashboard = {
   metaData: {
-    title: makeCompleteTitle("Dashboard"),
+    title: makeCompleteTitle("Home"),
     description: defaultDescription,
     url: makeCompleteUrl("dashboard"),
   },
@@ -113,6 +113,14 @@ export const DashboardStreams = {
     title: makeCompleteTitle("Streams"),
     description: defaultDescription,
     url: makeCompleteUrl("streams"),
+  },
+};
+
+export const DashboardSessions = {
+  metaData: {
+    title: makeCompleteTitle("Sessions"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
   },
 };
 
@@ -143,6 +151,14 @@ export const DashboardAPIKeys = {
 export const DashboardSigningKeys = {
   metaData: {
     title: makeCompleteTitle("Signing Keys"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardWebhooks = {
+  metaData: {
+    title: makeCompleteTitle("Webhooks"),
     description: defaultDescription,
     url: makeCompleteUrl(),
   },

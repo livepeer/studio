@@ -8,6 +8,7 @@ import {
   StreamPatchPayload,
   User,
   StreamSetActivePayload,
+  StreamHealthPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
@@ -21,6 +22,7 @@ import {
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
+import { generateUniquePlaybackId } from "./generate-keys";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -76,6 +78,7 @@ beforeAll(async () => {
   mockStore = {
     id: "mock_store",
     url: "https+s3://example.com/bucket-name",
+    publicUrl: "http://example-public",
     userId: mockAdminUser.id,
     kind: "object-store",
   };
@@ -882,8 +885,10 @@ describe("controllers/stream", () => {
     let res;
 
     beforeEach(async () => {
+      const id = uuid();
       stream = {
-        id: uuid(),
+        id,
+        playbackId: await generateUniquePlaybackId(id),
         kind: "stream",
         name: "the-stream",
         userId: nonAdminUser.id,
@@ -988,6 +993,126 @@ describe("controllers/stream", () => {
             403,
             expect.stringContaining("admin")
           );
+        });
+      });
+    });
+
+    describe("stream health hook", () => {
+      let stream: Stream;
+
+      const samplePayload = (isActive: boolean, isHealthy: boolean) => ({
+        stream_name: "video+" + stream.playbackId,
+        session_id: "sampleSessionId",
+        is_active: isActive,
+        is_healthy: isHealthy,
+        tracks: {
+          track1: {
+            codec: "h264",
+            kbits: 1000,
+            keys: { frames_min: 142, frames_max: 420 },
+            fpks: 30,
+            height: 720,
+            width: 1280,
+          },
+        },
+        extra: { jitter: 123 },
+        issues: isHealthy ? undefined : "Some complex error message",
+        human_issues: isHealthy ? undefined : ["Under the weather"],
+      });
+
+      const sendStreamHealthHook = async (payload: StreamHealthPayload) => {
+        const res = await client.post("/stream/hook/health", payload);
+        expect(res.status).toBe(204);
+        const stream = await server.db.stream.getByPlaybackId(
+          payload.stream_name.split("+", 2)[1]
+        );
+        return stream;
+      };
+
+      beforeEach(async () => {
+        // Create a sample stream
+        client.jwtAuth = null;
+        client.apiKey = adminApiKey;
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          name: "videorec+samplePlaybackId",
+        });
+        expect(res.status).toBe(201);
+        stream = await res.json();
+        expect(stream.id).toBeDefined();
+      });
+
+      it("updates the stream's isHealthy and issues fields", async () => {
+        const payload = samplePayload(true, false);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.isHealthy).toBe(false);
+        // it should send the human issues to the stream issues field
+        expect(updatedStream.issues).toEqual(["Under the weather"]);
+      });
+
+      it("resets the issues field when the stream becomes healthy", async () => {
+        let payload = samplePayload(true, false);
+        await sendStreamHealthHook(payload);
+
+        payload = samplePayload(true, true);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.isHealthy).toBe(true);
+        expect(updatedStream.issues).toBeUndefined();
+      });
+
+      it("clears stream's isHealthy and issues fields when is_active is false", async () => {
+        let payload = samplePayload(true, false);
+        await sendStreamHealthHook(payload);
+
+        payload = samplePayload(false, false);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.isHealthy).toBeUndefined();
+        expect(updatedStream.issues).toBeUndefined();
+      });
+
+      it("updates the stream's lastSeen field", async () => {
+        const timeBeforeUpdate = Date.now();
+        const payload = samplePayload(true, true);
+        const updatedStream = await sendStreamHealthHook(payload);
+
+        expect(updatedStream.lastSeen).toBeGreaterThan(timeBeforeUpdate);
+      });
+
+      it("updates the session as well when it exists", async () => {
+        const payload = samplePayload(true, false);
+
+        // Create a sample session associated with the stream
+        const session = {
+          id: payload.session_id,
+          name: payload.stream_name,
+          streamId: stream.id,
+          lastSeen: Date.now(),
+        };
+        await db.session.create(session);
+
+        // Send a stream health hook payload
+        await sendStreamHealthHook(payload);
+
+        // Check if the session is updated as well
+        const updatedSession = await db.session.get("sampleSessionId");
+        expect(updatedSession.isHealthy).toBe(false);
+        expect(updatedSession.issues).toEqual(["Under the weather"]);
+        expect(updatedSession.lastSeen).toBeGreaterThan(session.lastSeen);
+      });
+
+      it("throws a NotFoundError when the stream is not found", async () => {
+        const payload = {
+          ...samplePayload(true, true),
+          stream_name: "videorec+nonexistentPlaybackId",
+        };
+        const res = await client.post("/stream/hook/health", payload);
+
+        expect(res.status).toBe(404);
+        await expect(res.json()).resolves.toMatchObject({
+          errors: [expect.stringContaining("stream not found")],
         });
       });
     });
@@ -1254,25 +1379,29 @@ describe("controllers/stream", () => {
   });
 
   describe("user sessions", () => {
-    it("should not join sessions", async () => {
+    it("should join sessions", async () => {
       // create parent stream
-      let res = await client.post("/stream", smallStream);
+      let res = await client.post(`/stream`, smallStream);
       expect(res.status).toBe(201);
       const parent = await res.json();
       expect(parent.record).toEqual(true);
-      // create session
-      res = await client.post(`/stream/${parent.id}/stream`, {
-        ...smallStream,
-        name: "sess1",
-      });
+      // create child stream
+      const sessionId = "181cb15c-7c4c-424c-9216-eb94f6870325";
+      res = await client.post(
+        `/stream/${parent.id}/stream?sessionId=${sessionId}`,
+        {
+          ...smallStream,
+          name: "stream1",
+        }
+      );
       expect(res.status).toBe(201);
-      let sess1 = await res.json();
-      expect(sess1.record).toEqual(true);
-      expect(sess1.parentId).toEqual(parent.id);
+      let stream1 = await res.json();
+      expect(stream1.record).toEqual(true);
+      expect(stream1.parentId).toEqual(parent.id);
+      expect(stream1.sessionId).toEqual(sessionId);
       // add some usage and lastSeen
-      let now = Date.now();
-      await server.db.stream.update(sess1.id, {
-        lastSeen: now,
+      const data = {
+        lastSeen: Date.now(),
         sourceBytes: 1,
         transcodedBytes: 2,
         sourceSegments: 3,
@@ -1280,38 +1409,61 @@ describe("controllers/stream", () => {
         sourceSegmentsDuration: 1.5,
         transcodedSegmentsDuration: 2.5,
         recordObjectStoreId: "mock_store",
+      };
+      await server.db.stream.update(stream1.id, data);
+      await server.db.session.update(sessionId, data);
+      await db.asset.create({
+        id: sessionId,
+        playbackId: "playback_id",
+        source: { type: "recording", sessionId: sessionId },
+        status: { phase: "ready", updatedAt: Date.now() },
+        name: `live-12345`,
+        objectStoreId: "mock_store",
+        files: [
+          {
+            type: "static_transcoded_mp4",
+            path: "output.mp4",
+          },
+          {
+            type: "catalyst_hls_manifest",
+            path: "output.m3u8",
+          },
+        ],
       });
-      res = await client.get(`/stream/${sess1.id}`);
+
+      res = await client.get(`/stream/${stream1.id}`);
       expect(res.status).toBe(200);
-      sess1 = await res.json();
-      expect(sess1.parentId).toEqual(parent.id);
-      expect(sess1.name).toEqual("sess1");
-      expect(sess1.transcodedSegments).toEqual(4);
+      stream1 = await res.json();
+      expect(stream1.parentId).toEqual(parent.id);
+      expect(stream1.name).toEqual("stream1");
+      expect(stream1.transcodedSegments).toEqual(4);
 
       // get user sessions
       res = await client.get(`/stream/${parent.id}/sessions`);
       expect(res.status).toBe(200);
       let sessions = await res.json();
       expect(sessions).toHaveLength(1);
-      expect(sessions[0].id).toEqual(sess1.id);
+      expect(sessions[0].id).toEqual(sessionId);
       expect(sessions[0].transcodedSegments).toEqual(4);
-      expect(sessions[0].createdAt).toEqual(sess1.createdAt);
 
-      // create second session
-      res = await client.post(`/stream/${parent.id}/stream`, {
-        ...smallStream,
-        name: "sess2",
-      });
+      // create second stream re-using the same session
+      res = await client.post(
+        `/stream/${parent.id}/stream?sessionId=${sessionId}`,
+        {
+          ...smallStream,
+          name: "stream2",
+        }
+      );
       expect(res.status).toBe(201);
-      let sess2 = await res.json();
-      expect(sess2.record).toEqual(true);
-      expect(sess2.parentId).toEqual(parent.id);
-      expect(sess2.partialSession).toBeUndefined();
-      expect(sess2.previousSessions).toBeUndefined();
+      let stream2 = await res.json();
+      expect(stream2.record).toEqual(true);
+      expect(stream2.parentId).toEqual(parent.id);
+      expect(stream2.partialSession).toBeUndefined();
+      expect(stream2.previousSessions).toBeUndefined();
+      expect(stream2.sessionId).toEqual(sessionId);
       // add some usage and lastSeen
-      now = Date.now();
-      await server.db.stream.update(sess2.id, {
-        lastSeen: now,
+      const data2 = {
+        lastSeen: Date.now(),
         sourceBytes: 5,
         transcodedBytes: 6,
         sourceSegments: 7,
@@ -1319,55 +1471,58 @@ describe("controllers/stream", () => {
         sourceSegmentsDuration: 8.5,
         transcodedSegmentsDuration: 9.5,
         recordObjectStoreId: "mock_store",
-      });
-      res = await client.get(`/stream/${sess2.id}`);
-      expect(res.status).toBe(200);
-      sess2 = await res.json();
-      expect(sess2.name).toEqual("sess2");
-      expect(sess2.parentId).toEqual(parent.id);
-      expect(sess2.transcodedSegments).toEqual(8);
-      expect(sess2.partialSession).toBeUndefined();
-      expect(sess2.previousSessions).toBeUndefined();
-      expect(sess2.previousStats).toBeUndefined();
+      };
+      await server.db.stream.update(stream2.id, data2);
+      await server.db.session.update(sessionId, data2);
 
-      // get raw second session, which should also not show any join
-      res = await client.get(`/stream/${sess2.id}?raw=1`);
+      res = await client.get(`/stream/${stream2.id}`);
       expect(res.status).toBe(200);
-      let sess2r = await res.json();
-      expect(sess2r.record).toEqual(true);
-      expect(sess2r.parentId).toEqual(parent.id);
-      expect(sess2r.previousStats).toBeUndefined();
+      stream2 = await res.json();
+      expect(stream2.name).toEqual("stream2");
+      expect(stream2.parentId).toEqual(parent.id);
+      expect(stream2.transcodedSegments).toEqual(8);
+      expect(stream2.partialSession).toBeUndefined();
+      expect(stream2.previousSessions).toBeUndefined();
+      expect(stream2.previousStats).toBeUndefined();
+
+      // get raw second stream, which should also not show any join
+      res = await client.get(`/stream/${stream2.id}?raw=1`);
+      expect(res.status).toBe(200);
+      let stream2r = await res.json();
+      expect(stream2r.record).toEqual(true);
+      expect(stream2r.parentId).toEqual(parent.id);
+      expect(stream2r.previousStats).toBeUndefined();
 
       await sleep(20);
 
-      res = await client.get(`/stream/${sess1.id}?raw=1`);
+      res = await client.get(`/stream/${stream1.id}?raw=1`);
       expect(res.status).toBe(200);
-      let sess1r = await res.json();
-      expect(sess1r.lastSeen).toEqual(sess1.lastSeen);
-      expect(sess1r.lastSessionId).toBeUndefined();
-      expect(sess1r.partialSession).toBeUndefined();
+      let stream1r = await res.json();
+      expect(stream1r.lastSeen).toEqual(stream1.lastSeen);
+      expect(stream1r.lastSessionId).toBeUndefined();
+      expect(stream1r.partialSession).toBeUndefined();
 
-      res = await client.get(`/stream/${sess1.id}`);
+      res = await client.get(`/stream/${stream1.id}`);
       expect(res.status).toBe(200);
-      let sess1n = await res.json();
-      expect(sess1n.lastSessionId).toBeUndefined();
-      expect(sess1n.createdAt).toEqual(sess1r.createdAt);
-      expect(sess1n.lastSeen).toEqual(sess1r.lastSeen);
-      expect(sess1n.previousStats).toBeUndefined();
+      let stream1n = await res.json();
+      expect(stream1n.lastSessionId).toBeUndefined();
+      expect(stream1n.createdAt).toEqual(stream1r.createdAt);
+      expect(stream1n.lastSeen).toEqual(stream1r.lastSeen);
+      expect(stream1n.previousStats).toBeUndefined();
       // sourceSegments should equal to only the first session data
-      expect(sess1n.sourceSegments).toEqual(3);
+      expect(stream1n.sourceSegments).toEqual(3);
 
       // get user sessions
       res = await client.get(`/stream/${parent.id}/sessions?forceUrl=1`);
       expect(res.status).toBe(200);
       sessions = await res.json();
-      expect(sessions).toHaveLength(2);
-      expect(sessions).toMatchObject(
-        [sess2, sess1].map((s) => ({
-          ...s,
-          recordingUrl: `https://test/recordings/${s.id}/index.m3u8`,
-          mp4Url: `https://test/recordings/${s.id}/source.mp4`,
-        }))
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0].id).toEqual(sessionId);
+      expect(sessions[0].recordingUrl).toEqual(
+        "http://example-public/playback_id/output.m3u8"
+      );
+      expect(sessions[0].mp4Url).toEqual(
+        "http://example-public/playback_id/output.mp4"
       );
     });
   });

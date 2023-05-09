@@ -1,9 +1,10 @@
 import Layout from "layouts/main";
-import Login from "components/Site/Login";
+import ForgotPassword from "components/ForgotPassword";
 import {
+  Button,
   Flex,
   Box,
-  Heading,
+  Text,
   Container,
   Link as A,
 } from "@livepeer/design-system";
@@ -35,24 +36,28 @@ const ForgotPasswordPage = () => {
       {success ? (
         <Box
           css={{
-            minHeight: "calc(100vh - 510px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            height: "100vh",
             zIndex: 1,
           }}>
           Password reset link sent to your email.
         </Box>
       ) : (
-        <Box css={{ position: "relative" }}>
+        <Box
+          css={{
+            position: "relative",
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+          }}>
           <Container
             size="3"
             css={{
-              px: "$6",
-              py: "$7",
+              px: "$3",
               width: "100%",
               "@bp3": {
-                py: "$8",
                 px: "$4",
               },
             }}>
@@ -63,22 +68,55 @@ const ForgotPasswordPage = () => {
                 flexGrow: 1,
                 flexDirection: "column",
               }}>
-              <Heading size="3" as="h1" css={{ mb: "$5" }}>
-                Reset your password
-              </Heading>
-              <Login
+              <Text
+                size="8"
+                as="h1"
+                css={{
+                  textTransform: "uppercase",
+                  mb: "$6",
+                  fontWeight: 700,
+                  width: 150,
+                  lineHeight: "30px",
+                  textAlign: "center",
+                }}>
+                Livepeer Studio
+              </Text>
+              <ForgotPassword
                 id="forgot-password"
-                showEmail={true}
-                showPassword={false}
-                buttonText="Get reset link"
+                buttonText="Email reset link"
                 onSubmit={onSubmit}
                 errors={errors}
                 loading={loading}
               />
-              <Box>
-                Nevermind!&nbsp;
-                <Link href="/login" passHref legacyBehavior>
-                  <A>Take me back to log in</A>
+              <Box css={{ maxWidth: 450, width: "100%" }}>
+                <Box
+                  css={{
+                    width: "100%",
+                    height: "1px",
+                    mb: "$3",
+                    background:
+                      "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
+                  }}
+                />
+                <Link href="/" passHref legacyBehavior>
+                  <A
+                    css={{
+                      "&:hover": {
+                        textDecoration: "none",
+                      },
+                    }}>
+                    <Button
+                      size="4"
+                      css={{
+                        width: "100%",
+                        fontSize: "$3",
+                        "&:hover": {
+                          textDecoration: "none",
+                        },
+                      }}>
+                      Nevermind! Take me back to sign in
+                    </Button>
+                  </A>
                 </Link>
               </Box>
             </Flex>
@@ -89,5 +127,5 @@ const ForgotPasswordPage = () => {
   );
 };
 
-ForgotPasswordPage.theme = "dark-theme-blue";
+ForgotPasswordPage.theme = "dark-theme-green";
 export default ForgotPasswordPage;

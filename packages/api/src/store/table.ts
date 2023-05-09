@@ -349,7 +349,7 @@ export default class Table<T extends DBObject> {
   async ensureIndex(propName: string, prop: FieldSpec, parents: string[] = []) {
     if (
       process.env.NODE_ENV !== "test" &&
-      !["asset", "experiment"].includes(this.name)
+      !["asset", "experiment", "room"].includes(this.name)
     ) {
       // avoid creating indexes in production right now...
       return;

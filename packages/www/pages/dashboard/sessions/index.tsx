@@ -1,7 +1,8 @@
 import Layout from "layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import StreamSessionsTable from "components/Dashboard/StreamSessionsTable";
+import StreamSessionsTable from "components/StreamSessionsTable";
+import { DashboardSessions as Content } from "content";
 
 const Sessions = () => {
   useLoggedIn();
@@ -12,7 +13,10 @@ const Sessions = () => {
   }
 
   return (
-    <Layout id="streams/sessions" breadcrumbs={[{ title: "Sessions" }]}>
+    <Layout
+      id="streams/sessions"
+      breadcrumbs={[{ title: "Sessions" }]}
+      {...Content.metaData}>
       <Box
         css={{
           pb: "$9",

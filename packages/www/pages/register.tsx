@@ -1,10 +1,11 @@
 import Layout from "layouts/main";
 import { withRecaptcha } from "layouts/withRecaptcha";
-import Login from "../components/Site/Login";
+import Login from "../components/Login";
+import Register from "../components/Register";
 import {
   Flex,
   Box,
-  Heading,
+  Button,
   Text,
   Container,
   Link as A,
@@ -92,15 +93,19 @@ const RegisterPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Box css={{ position: "relative" }}>
+      <Box
+        css={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+        }}>
         <Container
           size="3"
           css={{
-            px: "$6",
-            py: "$7",
+            px: "$3",
             width: "100%",
             "@bp3": {
-              py: "$8",
               px: "$4",
             },
           }}>
@@ -110,29 +115,57 @@ const RegisterPage = () => {
               justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
-              py: "$5",
+              py: "$3",
             }}>
-            <Heading size="4" as="h1" css={{ mb: "$4" }}>
-              Create an account
-            </Heading>
-            <Login
+            <Text
+              size="8"
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                mb: "$5",
+                fontWeight: 700,
+                width: 150,
+                lineHeight: "30px",
+                textAlign: "center",
+              }}>
+              Livepeer Studio
+            </Text>
+            <Register
               id="register"
               onSubmit={onSubmit}
-              showName={true}
-              showOrganization={true}
-              showPhone={true}
-              showEmail={true}
-              showPassword={true}
-              buttonText="Register"
+              buttonText="Create account with Livepeer Inc"
               loading={loading}
               errors={errors}
             />
-            <Flex align="center" css={{ color: "$hiContrast" }}>
-              Already have an account?&nbsp;
-              <Link href="/login" passHref legacyBehavior>
-                <A>Log in</A>
+            <Box css={{ maxWidth: 450, width: "100%" }}>
+              <Box
+                css={{
+                  width: "100%",
+                  height: "1px",
+                  mb: "$3",
+                  background:
+                    "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
+                }}
+              />
+              <Link href="/" passHref legacyBehavior>
+                <A
+                  css={{
+                    cursor: "default",
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                  }}>
+                  <Button
+                    size="4"
+                    css={{
+                      width: "100%",
+                      fontSize: "$3",
+                    }}>
+                    Sign in instead
+                  </Button>
+                </A>
               </Link>
-            </Flex>
+            </Box>
           </Flex>
         </Container>
       </Box>
@@ -141,6 +174,6 @@ const RegisterPage = () => {
 };
 
 const RegisterPageWithRecaptcha: any = withRecaptcha(RegisterPage);
-RegisterPageWithRecaptcha.theme = "dark-theme-blue";
+RegisterPageWithRecaptcha.theme = "dark-theme-green";
 
 export default RegisterPageWithRecaptcha;

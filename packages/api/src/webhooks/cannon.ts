@@ -10,13 +10,13 @@ import Queue from "../store/queue";
 import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout, sleep } from "../util";
 import logger from "../logger";
-import { sign, sendgridEmail } from "../controllers/helpers";
+import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { UnprocessableEntityError } from "../store/errors";
+import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import sql from "sql-template-strings";
 import { db } from "../store";
 
@@ -45,7 +45,8 @@ export default class WebhookCannon {
   sendgridTemplateId: string;
   sendgridApiKey: string;
   supportAddr: [string, string];
-  vodObjectStoreId: string;
+  vodCatalystObjectStoreId: string;
+  recordCatalystObjectStoreId: string;
   resolver: any;
   queue: Queue;
   constructor({
@@ -54,7 +55,8 @@ export default class WebhookCannon {
     sendgridTemplateId,
     sendgridApiKey,
     supportAddr,
-    vodObjectStoreId,
+    vodCatalystObjectStoreId,
+    recordCatalystObjectStoreId,
     verifyUrls,
     queue,
   }) {
@@ -65,7 +67,8 @@ export default class WebhookCannon {
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
-    this.vodObjectStoreId = vodObjectStoreId;
+    this.vodCatalystObjectStoreId = vodCatalystObjectStoreId;
+    this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
@@ -105,16 +108,15 @@ export default class WebhookCannon {
 
   async processWebhookEvent(msg: messages.WebhookEvent): Promise<boolean> {
     const { event, streamId, sessionId, userId } = msg;
-    const { mp4Url } = msg.payload ?? {};
 
     if (event === "playback.accessControl") {
       // Cannot fire this event as a webhook, this is specific to access control and fired there
       return true;
     }
 
-    if (event === "recording.ready" && sessionId && mp4Url) {
+    if (event === "recording.ready" && sessionId) {
       try {
-        await this.handleRecordingReadyChecks(sessionId, mp4Url);
+        await this.handleRecordingReadyChecks(sessionId);
       } catch (e) {
         console.log(
           `Error handling recording.ready event sessionId=${sessionId} err=`,
@@ -492,10 +494,9 @@ export default class WebhookCannon {
 
   async handleRecordingReadyChecks(
     sessionId: string,
-    mp4Url: string,
     isRetry = false
-  ) {
-    const session = await this.db.stream.get(sessionId, {
+  ): Promise<string> {
+    const session = await this.db.session.get(sessionId, {
       useReplica: false,
     });
     if (!session) {
@@ -514,54 +515,66 @@ export default class WebhookCannon {
       // there was an update after the delayed event was sent, so sleep a few
       // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
       await sleep(5000 + (lastSeen - activeThreshold));
-      return this.handleRecordingReadyChecks(sessionId, mp4Url, true);
+      return this.handleRecordingReadyChecks(sessionId, true);
     }
 
-    const res = await this.db.stream.update(
-      [sql`id = ${sessionId}`, sql`data->>'isActive' != 'false'`],
-      { isActive: false },
-      { throwIfEmpty: false }
-    );
-    if (res.rowCount < 1) {
+    const res = await this.db.asset.get(sessionId);
+    if (res) {
       throw new UnprocessableEntityError("Session recording already handled");
     }
 
-    await this.recordingToVodAsset(session, mp4Url);
+    await this.recordingToVodAsset(session);
   }
 
-  async recordingToVodAsset(session: DBSession, mp4RecordingUrl: string) {
-    const id = uuid();
+  async recordingToVodAsset(session: DBSession) {
+    const id = session.id;
     const playbackId = await generateUniquePlaybackId(id);
 
     // trim the second precision from the time string
     var startedAt = new Date(session.createdAt).toISOString();
     startedAt = startedAt.substring(0, startedAt.length - 8) + "Z";
 
-    const asset = await createAsset(
-      {
-        id,
-        playbackId,
-        userId: session.userId,
-        createdAt: session.createdAt,
-        source: { type: "recording", sessionId: session.id },
-        status: { phase: "waiting", updatedAt: Date.now() },
-        name: `live-${startedAt}`,
-        objectStoreId: this.vodObjectStoreId,
-      },
-      this.queue
-    );
-    // we can't rate limit this task because it's not a user action
-    await taskScheduler.createAndScheduleTask(
-      "import",
-      {
-        import: {
-          url: mp4RecordingUrl,
-          recordedSessionId: session.id,
+    try {
+      const asset = await createAsset(
+        {
+          id,
+          playbackId,
+          userId: session.userId,
+          createdAt: session.createdAt,
+          source: { type: "recording", sessionId: session.id },
+          status: { phase: "waiting", updatedAt: Date.now() },
+          name: `live-${startedAt}`,
+          objectStoreId: this.vodCatalystObjectStoreId,
         },
-      },
-      undefined,
-      asset
-    );
+        this.queue
+      );
+
+      const os = await db.objectStore.get(this.recordCatalystObjectStoreId);
+      // we can't rate limit this task because it's not a user action
+      await taskScheduler.createAndScheduleTask(
+        "upload",
+        {
+          upload: {
+            url: pathJoin(
+              os.publicUrl,
+              session.playbackId,
+              session.id,
+              "output.m3u8"
+            ),
+          },
+        },
+        undefined,
+        asset
+      );
+    } catch (e) {
+      if (e instanceof BadRequestError) {
+        throw new UnprocessableEntityError(
+          "Asset for the recording session already added"
+        );
+      } else {
+        throw e;
+      }
+    }
   }
 }
 

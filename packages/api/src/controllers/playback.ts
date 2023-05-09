@@ -4,17 +4,30 @@ import {
   getHLSPlaybackUrl as getHLSPlaybackUrl,
   getWebRTCPlaybackUrl as getWebRTCPlaybackUrl,
   getRecordingFields,
+  USER_SESSION_TIMEOUT,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
   getStaticPlaybackInfo,
   StaticPlaybackInfo,
 } from "./asset";
-import { NotFoundError } from "@cloudflare/kv-asset-handler";
+import { CliArgs } from "../parse-cli";
 import { DBSession } from "../store/db";
-import Table from "../store/table";
 import { Asset, Stream, User } from "../schema/types";
-import { isExperimentSubject } from "../store/experiment-table";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
+import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+
+/**
+ * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
+ * asset playback. Assets created before this date can still be played by other
+ * accounts by dStorage ID. Assets created after this date will not have
+ * cross-account playback enabled, ensuring users are billed appropriately. This
+ * was made for backward compatibiltiy during the Viewership V2 deploy.
+ */
+export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
+
+var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv$/;
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -80,56 +93,103 @@ function newPlaybackInfo(
   }
   return playbackInfo;
 }
-const getAssetPlaybackUrl = async (
-  config: Request["config"],
+
+const getAssetPlaybackInfo = async (
+  config: CliArgs,
   ingest: string,
-  id: string,
-  user?: User
+  asset: WithID<Asset>
 ) => {
-  const asset =
-    (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id, user)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id, user)) ??
-    (await db.asset.getBySourceURL("ar://" + id, user));
-  if (!asset || asset.deleted) {
-    return null;
-  }
   const os = await db.objectStore.get(asset.objectStoreId);
   if (!os || os.deleted || os.disabled) {
     return null;
   }
+
   const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
-  const staticFilesPlaybackInfo = getStaticPlaybackInfo(asset, os);
 
-  return !playbackUrl
-    ? null
-    : {
-        staticFilesPlaybackInfo,
-        playbackUrl,
-        playbackPolicy: asset.playbackPolicy || null,
-      };
-};
-
-const getRecordingPlaybackUrl = async (
-  ingest: string,
-  id: string,
-  table: Table<DBSession>
-) => {
-  const session = await table.get(id);
-  if (!session || session.deleted) {
+  if (!playbackUrl) {
     return null;
   }
-  const { recordingUrl } = getRecordingFields(ingest, session, false);
-  return recordingUrl;
+
+  return newPlaybackInfo(
+    "vod",
+    playbackUrl,
+    null,
+    asset.playbackPolicy || null,
+    getStaticPlaybackInfo(asset, os)
+  );
 };
+
+export async function getResourceByPlaybackId(
+  id: string,
+  user?: User,
+  isCrossUserQuery?: boolean
+): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
+  const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
+  let asset =
+    (await db.asset.getByPlaybackId(id)) ??
+    (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
+
+  if (asset && !asset.deleted) {
+    if (asset.status.phase !== "ready") {
+      throw new UnprocessableEntityError("asset is not ready for playback");
+    }
+    if (asset.userId !== user?.id && !isCrossUserQuery) {
+      console.log(
+        `Returning cross-user asset for playback. ` +
+          `userId=${user?.id} userEmail=${user?.email} ` +
+          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
+      );
+    }
+    return { asset };
+  }
+
+  let stream = await db.stream.getByPlaybackId(id);
+  if (!stream) {
+    const streamById = await db.stream.get(id);
+    // only allow retrieving child streams by ID
+    if (streamById?.parentId) {
+      stream = streamById;
+    }
+  }
+  if (stream && !stream.deleted && !stream.suspended) {
+    return { stream };
+  }
+
+  const session = await db.session.get(id);
+  if (session && !session.deleted) {
+    return { session };
+  }
+
+  return {};
+}
 
 async function getPlaybackInfo(
   { config, user }: Request,
   ingest: string,
-  id: string
+  id: string,
+  isCrossUserQuery: boolean
 ): Promise<PlaybackInfo> {
-  const stream = await db.stream.getByPlaybackId(id);
-  if (stream && !stream.deleted) {
+  let { stream, asset, session } = await getResourceByPlaybackId(
+    id,
+    user,
+    isCrossUserQuery
+  );
+
+  if (asset) {
+    return await getAssetPlaybackInfo(config, ingest, asset);
+  }
+
+  // Streams represent "transcoding sessions" when they are a child stream, in
+  // which case they are used to playback old recordings and not the livestream.
+  const isChildStream = stream && (stream.parentId || !stream.playbackId);
+  if (isChildStream) {
+    session = stream;
+    stream = null;
+  }
+
+  if (stream) {
     return newPlaybackInfo(
       "live",
       getHLSPlaybackUrl(ingest, stream),
@@ -139,24 +199,20 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0
     );
   }
-  const asset = await getAssetPlaybackUrl(config, ingest, id);
-  if (asset) {
-    return newPlaybackInfo(
-      "vod",
-      asset.playbackUrl,
-      null,
-      asset.playbackPolicy,
-      asset.staticFilesPlaybackInfo
+
+  if (session) {
+    const { recordingUrl } = await getRecordingFields(
+      config,
+      ingest,
+      session,
+      false
     );
+    if (recordingUrl) {
+      return newPlaybackInfo("recording", recordingUrl);
+    }
   }
 
-  const recordingUrl =
-    (await getRecordingPlaybackUrl(ingest, id, db.session)) ??
-    (await getRecordingPlaybackUrl(ingest, id, db.stream));
-  if (recordingUrl) {
-    return newPlaybackInfo("recording", recordingUrl);
-  }
-  throw new NotFoundError(`No playback URL found for ${id}`);
+  return null;
 }
 
 const app = Router();
@@ -170,7 +226,13 @@ app.get("/:id", async (req, res) => {
   const ingest = ingests[0].base;
 
   let { id } = req.params;
-  const info = await getPlaybackInfo(req, ingest, id);
+  const isEmbeddablePlayer = embeddablePlayerOrigin.test(
+    req.headers["origin"] ?? ""
+  );
+  const info = await getPlaybackInfo(req, ingest, id, isEmbeddablePlayer);
+  if (!info) {
+    throw new NotFoundError(`No playback URL found for ${id}`);
+  }
   res.status(200).json(info);
 });
 

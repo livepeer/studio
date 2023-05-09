@@ -140,8 +140,8 @@ export class TestClient {
     return res;
   }
 
-  async get(path: string) {
-    return await this.fetch(path, { method: "GET" });
+  async get(path: string, args?: RequestInit) {
+    return await this.fetch(path, { method: "GET", ...args });
   }
 
   async delete(path: string, data?: any) {
