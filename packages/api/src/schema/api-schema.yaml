@@ -2361,17 +2361,17 @@ paths:
             items:
               type: string
               enum:
-                - device_type
+                - deviceType
                 - device
                 - cpu
                 - os
                 - browser
-                - browser_engine
+                - browserEngine
                 - continent
                 - country
                 - subdivision
                 - timezone
-                - viewer_id
+                - viewerId
       responses:
         "200":
           description: A list of Metric objects
@@ -2450,17 +2450,17 @@ paths:
             items:
               type: string
               enum:
-                - device_type
+                - deviceType
                 - device
                 - cpu
                 - os
                 - browser
-                - browser_engine
+                - browserEngine
                 - continent
                 - country
                 - subdivision
                 - timezone
-                - viewer_id
+                - viewerId
       responses:
         "200":
           description: A list of Metric objects
