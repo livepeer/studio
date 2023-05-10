@@ -152,7 +152,7 @@ describe("controllers/playback", () => {
               {
                 hrn: "WebRTC (H264)",
                 type: "html5/video/h264",
-                url: "https://test/webrtc/d5e7aimyd74by2ph",
+                url: `${ingest}/webrtc/${stream.playbackId}`,
               },
             ],
           },
