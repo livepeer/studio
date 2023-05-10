@@ -338,11 +338,9 @@ export default class Table<T extends DBObject> {
         `);
       logger.info(`Created table ${this.name}`);
     }
-    await Promise.all(
-      Object.entries(this.schema.properties).map(([propName, prop]) =>
-        this.ensureIndex(propName, prop)
-      )
-    );
+    for (const [propName, prop] of Object.entries(this.schema.properties)) {
+      await this.ensureIndex(propName, prop);
+    }
   }
 
   // on startup: auto-create indices if they don't exist
@@ -357,20 +355,19 @@ export default class Table<T extends DBObject> {
       return;
     }
     if (prop.oneOf?.length) {
-      return Promise.all(
-        prop.oneOf.map((oneSchema) =>
-          this.ensureIndex(propName, oneSchema, parents)
-        )
-      );
+      for (const oneSchema of prop.oneOf) {
+        await this.ensureIndex(propName, oneSchema, parents);
+      }
+      return;
     }
 
     if (!prop.index && !prop.unique) {
       if (prop.properties && this.name === "asset") {
-        return Promise.all(
-          Object.entries(prop.properties).map(([childName, childProp]) =>
-            this.ensureIndex(childName, childProp, [...parents, propName])
-          )
-        );
+        const childProps = Object.entries(prop.properties);
+        for (const [childName, childProp] of childProps) {
+          await this.ensureIndex(childName, childProp, [...parents, propName]);
+        }
+        return;
       }
       return;
     }
