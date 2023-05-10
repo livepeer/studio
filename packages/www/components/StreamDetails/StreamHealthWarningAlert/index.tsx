@@ -30,7 +30,7 @@ const StreamHealthWarningAlert = ({
     <>
       {!stream.isHealthy && (
         <>
-          {stream.issues.map((issue) => (
+          {stream?.issues?.map((issue) => (
             <Banner
               title="Ingest error"
               description={turcate(issue, 100)}
