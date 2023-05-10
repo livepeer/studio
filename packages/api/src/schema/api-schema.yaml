@@ -246,6 +246,16 @@ components:
           $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
         issues:
           $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
+        hlsPlaybackLatencyMs:
+          type: number
+          description:
+            Estimated end-to-end latency with the current stream configuration
+            for HLS playback.
+        webrtcPlaybackLatencyMs:
+          type: number
+          description:
+            Estimated end-to-end latency with the current stream configuration
+            for WebRTC playback.
         createdByTokenName:
           type: string
           readOnly: true
@@ -563,6 +573,10 @@ components:
           $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
         issues:
           $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
+        hlsPlaybackLatencyMs:
+          $ref: "#/components/schemas/stream/properties/hlsPlaybackLatencyMs"
+        webrtcPlaybackLatencyMs:
+          $ref: "#/components/schemas/stream/properties/webrtcPlaybackLatencyMs"
         createdAt:
           readOnly: true
           type: number
