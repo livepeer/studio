@@ -317,6 +317,12 @@ const config = {
         destination: "https://livepeer.org/pricing",
         permanent: false,
       },
+      {
+        source: "/team",
+        destination:
+          "https://livepeer.notion.site/livepeer/1d1de6b832f84be18394e9a47a9fc5ae?v=3d54bdcd8c50449fb0a88fc24d41afca",
+        permanent: false,
+      },
     ];
   },
 };
