@@ -869,16 +869,19 @@ app.post(
 
     // TODO: set the isActive field based on the payload as well (need
     // compatibility with /setactive recordging/webhooks handling)
+    const { is_active, is_healthy } = payload;
     const issues =
-      payload.is_active && !payload.is_healthy
+      is_active && !is_healthy
         ? payload.human_issues ||
           (payload.issues ? [payload.issues] : undefined)
         : undefined;
     const patch: Partial<DBSession & DBStream> = {
-      isHealthy: payload.is_active ? payload.is_healthy : undefined,
+      isHealthy: is_active ? is_healthy : undefined,
       issues,
       // do not clear the `lastSeen` field when the stream is not active
-      ...(payload.is_active ? { lastSeen: Date.now() } : null),
+      ...(!is_active
+        ? null
+        : { lastSeen: Date.now(), ...streamPlaybackLatencies(payload) }),
     };
 
     // Since we might need to delete some fields, use replace instead of update
@@ -901,7 +904,7 @@ app.post(
     // the info on the stream object for now).
     console.log(
       `stream-health: processed stream health hook for ` +
-        `stream_id=${stream.id} elapsed=${Date.now() - start}ms` +
+        `stream_id=${stream.id} elapsed=${Date.now() - start}ms ` +
         `stream_name=${stream.name} session_id=${payload.session_id} ` +
         `is_active=${payload.is_active} is_healthy=${payload.is_healthy} ` +
         `issues=${payload.issues} human_issues=${payload.human_issues} ` +
@@ -912,6 +915,28 @@ app.post(
     res.status(204).end();
   }
 );
+
+const currMultiNodeHopCount = 2;
+
+function streamPlaybackLatencies(
+  health: StreamHealthPayload
+): Pick<DBStream, "hlsPlaybackLatency" | "webrtcPlaybackLatency"> {
+  const jitter = health.extra?.jitter as number;
+
+  const maxGopMs = Object.values(health.tracks ?? [])
+    .map((t) => t.keys?.ms_max ?? 0)
+    .reduce((a, b) => Math.max(a, b), 0);
+
+  if (!jitter || !maxGopMs) {
+    return {};
+  }
+
+  // 100 and 50 below are guesstimations of the average ping between regions
+  return {
+    hlsPlaybackLatency: jitter + 100 * currMultiNodeHopCount + 7 * maxGopMs,
+    webrtcPlaybackLatency: jitter + 50 * currMultiNodeHopCount,
+  };
+}
 
 app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
   if (!req.body || !req.body.name) {
