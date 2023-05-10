@@ -320,7 +320,7 @@ const config = {
       {
         source: "/team",
         destination:
-          "https://livepeer.notion.site/livepeer/1d1de6b832f84be18394e9a47a9fc5ae?v=3d54bdcd8c50449fb0a88fc24d41afca",
+          "https://livepeer.notion.site/livepeer/Livepeer-Inc-6898d5451e2b40e79b1225812f4f1705",
         permanent: false,
       },
     ];
