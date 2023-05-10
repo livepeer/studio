@@ -136,7 +136,7 @@ describe("controllers/playback", () => {
     });
 
     describe("for streams", () => {
-      it("should return playback URL for streams", async () => {
+      it("should return playback URLs for streams", async () => {
         const res = await client.get(`/playback/${stream.playbackId}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
@@ -148,6 +148,11 @@ describe("controllers/playback", () => {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
                 url: `${ingest}/hls/${stream.playbackId}/index.m3u8`,
+              },
+              {
+                hrn: "WebRTC (H264)",
+                type: "html5/video/h264",
+                url: "https://test/webrtc/d5e7aimyd74by2ph",
               },
             ],
           },
