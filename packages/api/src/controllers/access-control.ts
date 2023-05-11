@@ -127,6 +127,7 @@ app.post(
     }
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
+    const allowedOrigins = content.playbackPolicy?.allowedOrigins ?? [];
 
     if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
       let limitReached = await freeTierLimitReached(content, user, req);
@@ -209,6 +210,15 @@ app.post(
           throw new ForbiddenError(
             "Content is gated and requires an access key"
           );
+        }
+        if (req.body.origin) {
+          if (allowedOrigins.length > 0) {
+            if (!allowedOrigins.includes(req.body.origin)) {
+              throw new ForbiddenError(
+                "Content is gated and origin not in allowed origins"
+              );
+            }
+          }
         }
         const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
         if (!webhook) {
