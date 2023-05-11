@@ -920,7 +920,7 @@ const currMultiNodeHopCount = 2;
 
 function streamPlaybackLatencies(
   health: StreamHealthPayload
-): Pick<DBStream, "hlsPlaybackLatency" | "webrtcPlaybackLatency"> {
+): Pick<DBStream, "hlsPlaybackLatencyMs" | "webrtcPlaybackLatencyMs"> {
   const jitter = health.extra?.jitter as number;
 
   const maxGopMs = Object.values(health.tracks ?? [])
@@ -933,8 +933,8 @@ function streamPlaybackLatencies(
 
   // 100 and 50 below are guesstimations of the average ping between regions
   return {
-    hlsPlaybackLatency: jitter + 100 * currMultiNodeHopCount + 7 * maxGopMs,
-    webrtcPlaybackLatency: jitter + 50 * currMultiNodeHopCount,
+    hlsPlaybackLatencyMs: jitter + 100 * currMultiNodeHopCount + 7 * maxGopMs,
+    webrtcPlaybackLatencyMs: jitter + 50 * currMultiNodeHopCount,
   };
 }
 
