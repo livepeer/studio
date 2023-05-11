@@ -727,20 +727,6 @@ components:
                     - directUpload
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
-            - additionalProperties: false
-              required:
-                - type
-                - inputAssetId
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - transcode
-                inputAssetId:
-                  type: string
-                  description: >-
-                    ID of the source asset that was processed by a transcode
-                    task to create this asset
         creatorId:
           oneOf:
             - type: object

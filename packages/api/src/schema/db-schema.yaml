@@ -825,6 +825,21 @@ components:
             - properties:
                 sessionId:
                   index: true
+            - {}
+            - additionalProperties: false
+              required:
+                - type
+                - inputAssetId
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - transcode
+                inputAssetId:
+                  type: string
+                  description: >-
+                    ID of the source asset that was processed by a transcode
+                    task to create this asset
         deleted:
           type: boolean
           description: Set to true when the asset is deleted
