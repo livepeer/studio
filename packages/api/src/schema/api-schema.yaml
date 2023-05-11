@@ -707,16 +707,6 @@ components:
             - additionalProperties: false
               required:
                 - type
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - directUpload
-                encryption:
-                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
-            - additionalProperties: false
-              required:
-                - type
                 - sessionId
               properties:
                 type:
@@ -727,6 +717,16 @@ components:
                   type: string
                   description:
                     ID of the session from which this asset was created
+            - additionalProperties: false
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - directUpload
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required:
                 - type

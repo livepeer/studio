@@ -819,9 +819,11 @@ components:
           description: owner of the asset
         source:
           oneOf:
-            - additionalProperties: false
-              properties:
+            - properties:
                 url:
+                  index: true
+            - properties:
+                sessionId:
                   index: true
         deleted:
           type: boolean
