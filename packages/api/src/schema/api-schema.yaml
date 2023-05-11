@@ -2501,19 +2501,19 @@ paths:
             application/json:
               schema:
                 type: object
-              description:
-                A simplified metric object about aggregate viewership of an
-                asset. Either playbackId or dStorageUrl will be set.
-              required: [viewCount, playtimeMins]
-              properties:
-                playbackId:
-                  $ref: "#/components/schemas/viewership-metric/properties/playbackId"
-                dStorageUrl:
-                  $ref: "#/components/schemas/viewership-metric/properties/dStorageUrl"
-                viewCount:
-                  $ref: "#/components/schemas/viewership-metric/properties/viewCount"
-                playtimeMins:
-                  $ref: "#/components/schemas/viewership-metric/properties/playtimeMins"
+                description:
+                  A simplified metric object about aggregate viewership of an
+                  asset. Either playbackId or dStorageUrl will be set.
+                required: [viewCount, playtimeMins]
+                properties:
+                  playbackId:
+                    $ref: "#/components/schemas/viewership-metric/properties/playbackId"
+                  dStorageUrl:
+                    $ref: "#/components/schemas/viewership-metric/properties/dStorageUrl"
+                  viewCount:
+                    $ref: "#/components/schemas/viewership-metric/properties/viewCount"
+                  playtimeMins:
+                    $ref: "#/components/schemas/viewership-metric/properties/playtimeMins"
         default:
           description: Error
           content:
