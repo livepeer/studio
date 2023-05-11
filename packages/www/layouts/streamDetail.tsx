@@ -10,6 +10,7 @@ import StreamDetailsBox from "components/StreamDetails/StreamDetailsBox";
 import StreamHeadingBox from "components/StreamDetails/StreamHeadingBox";
 import StreamChildrenHeadingBox from "components/StreamDetails/StreamChildrenHeadingBox";
 import EmbedVideoDialog from "components/AssetDetails/EmbedVideoDialog";
+import StreamHealthWarningAlert from "components/StreamDetails/StreamHealthWarningAlert";
 
 const StreamDetail = ({
   breadcrumbs,
@@ -131,6 +132,7 @@ const StreamDetail = ({
         <Box css={{ px: "$6", py: "$7" }}>
           {stream ? (
             <>
+              <StreamHealthWarningAlert stream={stream} />
               <Flex>
                 <Box
                   css={{

@@ -6,12 +6,16 @@ const Banner = ({
   button,
   link,
   css,
+  titleCss,
+  descriptionCss,
 }: {
   title: string;
   description: string;
   button?: any;
   link?: any;
   css?: any;
+  titleCss?: any;
+  descriptionCss?: any;
 }) => {
   return (
     <Promo
@@ -24,10 +28,20 @@ const Banner = ({
       }}>
       <Flex>
         <Box>
-          <Text size="2" css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
+          <Text
+            size="2"
+            css={{
+              fontSize: "14px",
+              mb: "$1",
+              fontWeight: 500,
+              ...titleCss,
+            }}>
             {title}
           </Text>
-          <Text variant="neutral" size="2" css={{ lineHeight: 1.4 }}>
+          <Text
+            variant="neutral"
+            size="2"
+            css={{ lineHeight: 1.4, ...descriptionCss }}>
             {description}
           </Text>
         </Box>
