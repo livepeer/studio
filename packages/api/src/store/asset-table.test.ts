@@ -16,6 +16,7 @@ describe("assets table", () => {
       "asset_playbackId",
       "asset_playbackRecordingId",
       "asset_sourceAssetId",
+      "asset_source_sessionId",
       "asset_source_url",
       "asset_storage_ipfs_cid",
       "asset_storage_ipfs_nftMetadata_cid",

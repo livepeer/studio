@@ -707,16 +707,6 @@ components:
             - additionalProperties: false
               required:
                 - type
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - directUpload
-                encryption:
-                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
-            - additionalProperties: false
-              required:
-                - type
                 - sessionId
               properties:
                 type:
@@ -730,17 +720,13 @@ components:
             - additionalProperties: false
               required:
                 - type
-                - inputAssetId
               properties:
                 type:
                   type: string
                   enum:
-                    - transcode
-                inputAssetId:
-                  type: string
-                  description: >-
-                    ID of the source asset that was processed by a transcode
-                    task to create this asset
+                    - directUpload
+                encryption:
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         creatorId:
           oneOf:
             - type: object
