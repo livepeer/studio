@@ -1,11 +1,8 @@
 openapi: 3.0.1
 info:
   title: Livepeer API Reference
-  description: >-
-    This API reference provides documentation for the Livepeer API - the world's
-    open video infrastructure
+  description: Welcome to the Livepeer API reference docs. Here you will find all the endpoints exposed on the standard Livepeer API, learn how to use them and what they return.
   version: 1.0.0
-  termsOfService: "https://livepeer.org/terms-of-service"
 servers:
   - url: "https://livepeer.studio/api"
 components:
