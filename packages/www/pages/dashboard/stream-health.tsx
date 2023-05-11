@@ -175,7 +175,7 @@ const Health = () => {
                 borderRadius: "$3",
                 overflow: "hidden",
               }}>
-              <AppPlayer playbackUrl={playbackUrl} type="stream" />
+              <AppPlayer playbackUrl={playbackUrl} type="stream" autoPlay />
             </Box>
           </Box>
           <Arrow active />
@@ -196,7 +196,7 @@ const Health = () => {
                 borderRadius: "$3",
                 overflow: "hidden",
               }}>
-              <AppPlayer playbackUrl={playbackUrl} type="stream" />
+              <AppPlayer playbackUrl={playbackUrl} type="stream" autoPlay />
             </Box>
           </Box>
         </Box>
