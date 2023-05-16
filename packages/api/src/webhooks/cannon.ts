@@ -17,7 +17,6 @@ import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { BadRequestError, UnprocessableEntityError } from "../store/errors";
-import sql from "sql-template-strings";
 import { db } from "../store";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
@@ -114,12 +113,12 @@ export default class WebhookCannon {
       return true;
     }
 
-    if (event === "recording.ready" && sessionId) {
+    if (event === "recording.waiting" && sessionId) {
       try {
-        await this.handleRecordingReadyChecks(sessionId);
+        await this.handleRecordingWaitingChecks(sessionId);
       } catch (e) {
         console.log(
-          `Error handling recording.ready event sessionId=${sessionId} err=`,
+          `Error handling recording.waiting event sessionId=${sessionId} err=`,
           e
         );
         // only ack the event if it's an explicit unprocessable entity error
@@ -492,7 +491,7 @@ export default class WebhookCannon {
     }
   }
 
-  async handleRecordingReadyChecks(
+  async handleRecordingWaitingChecks(
     sessionId: string,
     isRetry = false
   ): Promise<string> {
@@ -515,7 +514,7 @@ export default class WebhookCannon {
       // there was an update after the delayed event was sent, so sleep a few
       // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
       await sleep(5000 + (lastSeen - activeThreshold));
-      return this.handleRecordingReadyChecks(sessionId, true);
+      return this.handleRecordingWaitingChecks(sessionId, true);
     }
 
     const res = await this.db.asset.get(sessionId);

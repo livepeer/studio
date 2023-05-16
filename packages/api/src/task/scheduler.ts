@@ -17,6 +17,7 @@ import {
   toExternalTask,
 } from "../controllers/task";
 import { toExternalAsset } from "../controllers/asset";
+import { toExternalSession } from "../controllers/session";
 
 const taskInfo = (task: WithID<Task>, config: CliArgs): messages.TaskInfo => ({
   id: task.id,
@@ -153,6 +154,7 @@ export class TaskScheduler {
             updatedAt: Date.now(),
           },
         });
+        await this.triggerRecordingReadyWebhook(task);
         break;
       case "transcode":
         assetSpec = event.output?.transcode?.asset?.assetSpec;
@@ -203,6 +205,33 @@ export class TaskScheduler {
       output: event.output,
     });
     return true;
+  }
+
+  async triggerRecordingReadyWebhook(task: Task) {
+    if (task.outputAssetId) {
+      const asset = await db.asset.get(task.outputAssetId);
+      if (asset && asset.source.type == "recording" && asset.source.sessionId) {
+        const session = await db.session.get(asset.source.sessionId);
+        if (session) {
+          await this.queue.publishWebhook("events.recording.ready", {
+            type: "webhook_event",
+            id: uuid(),
+            timestamp: Date.now(),
+            streamId: session.parentId,
+            event: "recording.ready",
+            userId: session.userId,
+            sessionId: session.id,
+            payload: {
+              session: {
+                ...(await toExternalSession(this.config, session, null, true)),
+                recordingStatus: "ready",
+                assetId: session.id,
+              },
+            },
+          });
+        }
+      }
+    }
   }
 
   public async failTask(
