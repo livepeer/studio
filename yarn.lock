@@ -4153,12 +4153,12 @@
     tweetnacl-util "^0.15.1"
     utf-8-validate "^5.0.8"
 
-"@livepeer/core-react@^1.5.0-next.2":
-  version "1.5.0-next.2"
-  resolved "https://registry.yarnpkg.com/@livepeer/core-react/-/core-react-1.5.0-next.2.tgz#a40253c20504299726b2e59e15c7a4943715d3f5"
-  integrity sha512-dlwmjdGodNYCPm80QWwH91usEYP3+9Gq0MRCau8h5dHE+W5iWFgIz/XNrBebvKaZxz6+jrnjZpXlK6mukAUxLA==
+"@livepeer/core-react@^1.5.0-next.3":
+  version "1.5.0-next.3"
+  resolved "https://registry.yarnpkg.com/@livepeer/core-react/-/core-react-1.5.0-next.3.tgz#c8c48c7bdbb00b23f30eb7e4a9321667561fac3c"
+  integrity sha512-pH2RXntpaceUcRrCsqH8Lni4F+ddqZKQDTUEwLA5g2IKr7fNtFTuMuq0vOO6eZxtm/uaNTBUtrxcwfhvVVvkZg==
   dependencies:
-    "@livepeer/core" "^1.5.0-next.2"
+    "@livepeer/core" "^1.5.0-next.3"
     "@tanstack/query-async-storage-persister" "4.22.4"
     "@tanstack/query-core" "4.22.4"
     "@tanstack/react-query" "4.22.4"
@@ -4166,10 +4166,10 @@
     use-sync-external-store "^1.2.0"
     zustand "^4.3.2"
 
-"@livepeer/core@^1.5.0-next.2":
-  version "1.5.0-next.2"
-  resolved "https://registry.yarnpkg.com/@livepeer/core/-/core-1.5.0-next.2.tgz#16e796941ed8145fb168bc5c4cdfb507cc3972b2"
-  integrity sha512-vKQz+U7T2w2+lr1NxR8sy6MygmNdgiaKbL3i0ovVwsdMhqtwaOA/QDF2OgHEpxM3WOJlSrVot72yIRwZ57UFTg==
+"@livepeer/core@^1.5.0-next.3":
+  version "1.5.0-next.3"
+  resolved "https://registry.yarnpkg.com/@livepeer/core/-/core-1.5.0-next.3.tgz#2975dbd2298b67439c4b1f55589e04b723efd218"
+  integrity sha512-Nns2Bq9eCu5agz7meM6sY+HDrROPbxVwIDyZjmQq9P0QMXeBI7o18O+kEO3CzQMRFJMCHLsfuU1HHkFNfu8KeQ==
   dependencies:
     cross-fetch "^3.1.5"
     ms "^3.0.0-canary.1"
@@ -4224,15 +4224,15 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^2.5.0-next.3":
-  version "2.5.0-next.3"
-  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-2.5.0-next.3.tgz#a04101cea4e08fe6f5dba99e326f317994cfb36b"
-  integrity sha512-bIQlSj2w2XdZ6YMtGZRqWh45QDVoVBsKI+hneR51pJvn4Tzj6+PY6Ub7SSZFVHPACCisp4/YF40JfMvNEBrulg==
+"@livepeer/react@^2.5.0-next.4":
+  version "2.5.0-next.4"
+  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-2.5.0-next.4.tgz#8c08278c3551437004d95707214a78922b499f71"
+  integrity sha512-ugADxLmeYzOkcCjRK2xgEGrGj7XzpmBEKBhHtOMHtsOaOEhzIwKtsrXkUJgiw69ueAvI59YoFcMr8y2RVrsI7g==
   dependencies:
-    "@livepeer/core-react" "^1.5.0-next.2"
+    "@livepeer/core-react" "^1.5.0-next.3"
     "@stitches/react" "^1.2.8"
     core-js "^3.27.2"
-    livepeer "2.5.0-next.3"
+    livepeer "2.5.0-next.4"
     zustand "^4.3.2"
 
 "@livepeer/sdk@1.0.0-alpha.7":
@@ -17521,12 +17521,12 @@ livekit-server-sdk@^1.1.4:
     jsonwebtoken "^8.5.1"
     protobufjs "^6.10.2"
 
-livepeer@2.5.0-next.3:
-  version "2.5.0-next.3"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-2.5.0-next.3.tgz#f76bc65a3bdbf1f4b94111b72061fa957ddafcbb"
-  integrity sha512-AmTucKF1TgcuJ3IeT0V4TH33k73ery48fTXwE1aF/DSo+Q5aanW14PLCKlpUEY3jw+B1Y1hyD2n5pmn3SC/5iA==
+livepeer@2.5.0-next.4:
+  version "2.5.0-next.4"
+  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-2.5.0-next.4.tgz#805fcf410a36ae013fd08fd36f98787e56422b7a"
+  integrity sha512-WilVUR9UVDYOFiLOxd7TCJSj0dtjta7bkjdmTolCOW7WPcOeIRHBz43veWhNcPaxDgoYh4LCAGwd97gMj1uR8g==
   dependencies:
-    "@livepeer/core" "^1.5.0-next.2"
+    "@livepeer/core" "^1.5.0-next.3"
     "@stitches/core" "^1.2.8"
     core-js "^3.27.2"
     cross-fetch "^3.1.5"
