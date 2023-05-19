@@ -3184,7 +3184,7 @@ paths:
           schema:
             type: integer
             example: 1
-          description: Flag indicating if the session should be recorded
+          description: Flag indicating if the response should only include recorded sessions
       responses:
         "200":
           description: Success
