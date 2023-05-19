@@ -2844,7 +2844,7 @@ paths:
           required: true
           schema:
             type: string
-      summary: Create a room
+      summary: Create a room user
       responses:
         default:
           description: Error
