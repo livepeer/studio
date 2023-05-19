@@ -1999,14 +1999,13 @@ paths:
 
 
         The only parameter you are required to set is the name of your stream,
-        but we also highly recommend that you define the profiles parameter with
-        720p, 480p and 360p renditions.
+        but we also highly recommend that you define transcoding profiles
+        parameter that suits your specific broadcasting configuration.
 
 
         If you do not define transcoding rendition profiles when creating the
-        stream, no transcoding will happen. Your playback video will have the
-        attributes of the source stream only, will not take advantage of
-        adaptive bitrate streaming and will likely buffer.
+        stream, a default set of profiles will be used. These profiles include 240p, 
+        360p, 480p and 720p.
 
 
         The playback policy is set to public by default for new streams. It can
