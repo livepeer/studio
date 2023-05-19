@@ -31,6 +31,7 @@ import { CdnUsageTable } from "./cdn-usage-table";
 import AssetTable from "./asset-table";
 import TaskTable from "./task-table";
 import ExperimentTable from "./experiment-table";
+import { BillingTable } from "./billing-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -79,6 +80,7 @@ export class DB {
   session: Table<DBSession>;
   cdnUsageLast: Table<CdnUsageLast>;
   cdnUsageTable: CdnUsageTable;
+  billingTable: BillingTable;
   room: Table<Room>;
 
   postgresUrl: string;
@@ -199,6 +201,8 @@ export class DB {
 
     this.cdnUsageTable = new CdnUsageTable(this);
     await this.cdnUsageTable.makeTable();
+    this.billingTable = new BillingTable(this);
+    await this.billingTable.makeTable();
   }
 
   queryWithOpts<T, I extends any[] = any[]>(

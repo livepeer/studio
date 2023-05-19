@@ -5,6 +5,7 @@ import experiment from "./experiment";
 import ingest from "./ingest";
 import objectStore from "./object-store";
 import accessControl from "./access-control";
+import billing from "./billing";
 import multistream from "./multistream";
 import orchestrator from "./orchestrator";
 import stream from "./stream";
@@ -43,6 +44,7 @@ export default {
   task,
   transcode,
   "access-control": accessControl,
+  billing,
   region,
   stripe,
   version,
