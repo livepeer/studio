@@ -680,7 +680,6 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     });
   }
   if (encryption) {
-    //await ensureExperimentSubject("vod-encrypted-input", req.user.id);
     if (encryption.encryptedKey) {
       if (!isValidBase64(encryption.encryptedKey)) {
         return res.status(422).json({
@@ -826,7 +825,6 @@ app.post(
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     const { encryption } = req.body as NewAssetPayload;
     if (encryption) {
-      //await ensureExperimentSubject("vod-encrypted-input", req.user.id);
       if (encryption.encryptedKey) {
         if (!isValidBase64(encryption.encryptedKey)) {
           return res.status(422).json({
