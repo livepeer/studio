@@ -1982,20 +1982,14 @@ paths:
         - Stream
       summary: Create a stream
       description: >
-        POST /stream creates a stream object. The configuration on this parent
-        stream object is inherited by all future child session objects.
+        POST /stream creates a stream object. The configuration on this stream object
+        is inherited by all live sessions using this stream's streamKey.
 
 
         It is important to note, that the stream object is the core building
         block of the Livepeer Studio platform. In Livepeer Studio, the stream
         object has unique configuration data and metadata about all livestream
         sessions that are associated with the stream.
-
-
-        Historically, a stream object with a parentId represented a single
-        livestream session. This type of "child-session" stream object will be
-        deprecated in an upcoming version of the API in favor of the session
-        object.
 
 
         The only parameter you are required to set is the name of your stream,
