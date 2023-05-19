@@ -2546,12 +2546,6 @@ paths:
         and only then actually upload the contents of the asset.
 
 
-        This also allows your users to upload files since the upload URL is
-        pre-signed with your credentials and is accessible from the browser. The
-        initial API call to get the upload URL must be done from a backend
-        though, from which an API token is available.
-
-
         Once you created a upload link, you have 2 options, resumable or direct
         upload. For a more reliable experience, you should use resumable uploads
         which will work better for users with unreliable or slow network
