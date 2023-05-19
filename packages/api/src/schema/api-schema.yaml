@@ -3644,8 +3644,9 @@ paths:
         - Misc
       summary: Retrieve Playback Info
       description: >-
-        You can retrieve the playback information by calling the GET playback
-        endpoint with the playbackId.
+        You can retrieve the playback information about any playback identifier by
+        calling this endpoint. It accepts playbackIds from any resource in the API
+        as well as dStorage IDs for assets.
       parameters:
         - in: path
           name: id
