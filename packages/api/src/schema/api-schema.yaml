@@ -2568,7 +2568,7 @@ paths:
 
         ## Resumable Upload
 
-        Livepeer supports resumable uploads via Tus(opens in a new tab). This
+        Livepeer supports resumable uploads via Tus. This
         section provides a simple example of how to use tus-js-client to upload
         a video file.
 
