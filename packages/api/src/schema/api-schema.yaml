@@ -2867,7 +2867,7 @@ paths:
           required: true
           schema:
             type: string
-      summary: Remove a user
+      summary: Remove a user from the room
       responses:
         "204":
           description: Success
