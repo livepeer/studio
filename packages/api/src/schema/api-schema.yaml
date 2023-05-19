@@ -2270,8 +2270,7 @@ paths:
         - Multistream
       summary: Retrieve a multistream target
       description: >-
-        You can retrieve a multistream target with its ID on
-        /multistream/target{id}.
+        You can retrieve a multistream target from its ID with this API.
       responses:
         "200":
           description: Success
