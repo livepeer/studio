@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Livepeer API Reference
-  description: >-
+  description: |
     Welcome to the Livepeer API reference docs. Here you will find all the
     endpoints exposed on the standard Livepeer API, learn how to use them and
     what they return.
@@ -197,7 +197,7 @@ components:
                   example: 500
             lastTriggeredAt:
               type: number
-              description: >-
+              description: |
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
@@ -221,7 +221,7 @@ components:
         createdAt:
           readOnly: true
           type: number
-          description: >-
+          description: |
             Timestamp (in milliseconds) at which webhook response object was
             created
           example: 1587667174725
@@ -349,7 +349,7 @@ components:
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
         record:
-          description: >-
+          description: |
             Should this stream be recorded? Uses default settings. For more
             customization, create and configure an object store.
           type: boolean
@@ -363,7 +363,7 @@ components:
               example:
                 - id: PUSH123
                   profile: 720p
-              description: >-
+              description: |
                 References to targets where this stream will be simultaneously
                 streamed to
               items:
@@ -374,7 +374,7 @@ components:
                 properties:
                   profile:
                     type: string
-                    description: >-
+                    description: |
                       Name of transcoding profile that should be sent. Use
                       "source" for pushing source stream data
                     minLength: 1
@@ -382,7 +382,7 @@ components:
                     example: 720p
                   videoOnly:
                     type: boolean
-                    description: >-
+                    description: |
                       If true, the stream audio will be muted and only silent
                       video will be pushed to the target.
                     default: false
@@ -393,7 +393,7 @@ components:
                   spec:
                     type: object
                     writeOnly: true
-                    description: >-
+                    description: |
                       Inline multistream target object. Will automatically
                       create the target resource to be used by the created
                       stream.
@@ -454,7 +454,7 @@ components:
           $ref: "#/components/schemas/playback-policy"
     stream-health-payload:
       type: object
-      description: >-
+      description: |
         Payload received from Catalyst about the health of livestreams currently
         or recently active on Mist.
       required:
@@ -464,12 +464,12 @@ components:
       properties:
         stream_name:
           type: string
-          description: >-
+          description: |
             The name of the stream within Catalyst/Mist, normally comprised of
             the base stream name with the playback ID after the + sign.
           example: videorec+eaw4nk06ts2d0mzb
         session_id:
-          description: >-
+          description: |
             The unique identifier for the specific session, created by Mist and
             used for creating the session object in the DB.
           type: string
@@ -481,20 +481,20 @@ components:
           description: Indicates whether the stream is healthy or not.
         issues:
           type: string
-          description: >-
+          description: |
             Raw issues affecting the stream as described by Mist, if any. We
             don't expose those to the end-user, showing only human_issues
             instead.
         human_issues:
           type: array
-          description: >-
+          description: |
             A string array of human-readable errors describing issues affecting
             the stream, if any.
           items:
             type: string
         tracks:
           type: object
-          description: >-
+          description: |
             A map of track objects containing information about the stream's
             tracks. The keys are the unique track ID from Mist.
           additionalProperties:
@@ -514,7 +514,7 @@ components:
                   type: number
               fpks:
                 type: number
-                description: >-
+                description: |
                   The framerate of the track, in frames per thousand seconds
                   (kilo-second).
               height:
@@ -525,7 +525,7 @@ components:
                 description: The width of the track's video resolution.
         extra:
           type: object
-          description: >-
+          description: |
             An object containing any additional fields sent by mist in the
             health (STREAM_BUFFER) payload.
           additionalProperties: true
@@ -627,7 +627,7 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
         record:
-          description: >-
+          description: |
             Should this stream be recorded? Uses default settings. For more
             customization, create and configure an object store.
           type: boolean
@@ -691,13 +691,13 @@ components:
           pattern: "^(srt|rtmps?)://"
         disabled:
           type: boolean
-          description: >-
+          description: |
             If true then this multistream target will not be used for pushing
             even if it is configured in a stream object.
         createdAt:
           type: number
           readOnly: true
-          description: >-
+          description: |
             Timestamp (in milliseconds) at which multistream target object was
             created
           example: 1587667174725
@@ -814,13 +814,13 @@ components:
                         - file
                         - player
                       default: file
-                      description: >-
+                      description: |
                         Name of the NFT metadata template to export. 'player'
                         will embed the Livepeer Player on the NFT while 'file'
                         will reference only the immutable MP4 files.
                     nftMetadata:
                       type: object
-                      description: >-
+                      description: |
                         Additional data to add to the NFT metadata exported to
                         IPFS. Will be deep merged with the default metadata
                         exported.
@@ -830,7 +830,7 @@ components:
                 updatedAt:
                   readOnly: true
                   type: number
-                  description: >-
+                  description: |
                     Timestamp (in milliseconds) at which IPFS export task was
                     updated
                   example: 1587667174725
@@ -863,12 +863,12 @@ components:
                   properties:
                     pending:
                       type: string
-                      description: >-
+                      description: |
                         ID of any currently running task that is exporting this
                         asset to IPFS.
                     last:
                       type: string
-                      description: >-
+                      description: |
                         ID of the last task to run successfully, that created
                         the currently saved data.
                     failed:
@@ -905,7 +905,7 @@ components:
               description: Error message if the asset creation failed.
         name:
           type: string
-          description: >-
+          description: |
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
@@ -955,7 +955,7 @@ components:
               example: 1000000
             tracks:
               type: array
-              description: >-
+              description: |
                 List of tracks associated with the asset when the format
                 contemplates them (e.g. mp4)
               items:
@@ -1011,7 +1011,7 @@ components:
                     example: 2
                   sampleRate:
                     type: number
-                    description: >-
+                    description: |
                       Sample rate of the track in samples per second - only for
                       audio tracks
                     example: 44100
@@ -1049,7 +1049,7 @@ components:
       properties:
         name:
           type: string
-          description: >-
+          description: |
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
@@ -1063,14 +1063,14 @@ components:
           oneOf:
             - $ref: "#/components/schemas/asset/properties/creatorId"
             - type: string
-              description: >-
+              description: |
                 Helper syntax to specify an unverified creator ID, fully managed
                 by the developer.
         storage:
           additionalProperties: false
           properties:
             ipfs:
-              description: >-
+              description: |
                 Set to true to make default export to IPFS. To customize the
                 pinned files, specify an object with a spec field. False or null
                 means to unpin from IPFS, but it's unsupported right now.
@@ -1089,7 +1089,7 @@ components:
           type: string
           format: uri
           pattern: "^(https?|ipfs|ar)://"
-          description: >-
+          description: |
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
@@ -1102,14 +1102,14 @@ components:
             key:
               type: string
               writeOnly: true
-              description: >-
+              description: |
                 Encryption key used to encrypt the asset encoded in base16. Only
                 writable in the upload asset endpoints and cannot be retrieved
                 back.
               example: 74686973206d65616e73206e6f7468696e672120676f2061776179206672656e
             algorithm:
               type: string
-              description: >-
+              description: |
                 Encryption algorithm used to encrypt the asset, defaults to AES
                 in CBC block cipher mode.
               enum:
@@ -1167,7 +1167,7 @@ components:
                   type: string
                   enum:
                     - s3
-                  description: >-
+                  description: |
                     Type of service. This is optional and defaults to `url` if
                     ŚURL field is provided.
                 endpoint:
@@ -1259,7 +1259,7 @@ components:
                   additionalProperties: false
                   required:
                     - proof
-                  description: >-
+                  description: |
                     Delegation proof for Livepeer to be able to upload to
                     web3.storage
                   properties:
@@ -1359,7 +1359,7 @@ components:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
                 recordedSessionId:
                   type: string
-                  description: >-
+                  description: |
                     ID of the original recorded session to avoid re-transcoding
                     of the same content. Only used for import task.
                   example: 78df0075-b5f3-4683-a618-1086faca35dc
@@ -1386,7 +1386,7 @@ components:
                   properties:
                     url:
                       type: string
-                      description: >-
+                      description: |
                         URL of a video to transcode, accepts object-store format
                         "s3+https"
                       example: "https://cdn.livepeer.com/ABC123/filename.mp4"
@@ -1397,7 +1397,7 @@ components:
                   properties:
                     url:
                       type: string
-                      description: >-
+                      description: |
                         URL of the output storage, accepts object-store format
                         "s3+https"
                       example: "s3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket"
@@ -1430,7 +1430,7 @@ components:
                     $ref: "#/components/schemas/ffmpeg-profile"
                 targetSegmentSizeSecs:
                   type: number
-                  description: >-
+                  description: |
                     How many seconds the duration of each output segment should
                     be
         status:
@@ -1524,7 +1524,7 @@ components:
                     nftMetadataGatewayUrl:
                       readOnly: true
                       type: string
-                      description: >-
+                      description: |
                         URL to access metadata file via HTTP through an IPFS
                         gateway
             transcode:
@@ -1585,7 +1585,7 @@ components:
                 $ref: >-
                   #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties
                 pinata:
-                  description: >-
+                  description: |
                     Custom credentials for the Piñata service. Must have either
                     a JWT or an API key and an API secret.
                   oneOf:
@@ -1597,7 +1597,7 @@ components:
                         jwt:
                           type: string
                           writeOnly: true
-                          description: >-
+                          description: |
                             Will be added to the Authorization header as a
                             Bearer token.
                     - type: object
@@ -1723,7 +1723,7 @@ components:
           example: 1587667174725
         lastStreamedAt:
           type: number
-          description: >-
+          description: |
             Timestamp (in milliseconds) at which user streamed RTMP stream last
             time
           example: 1587667174725
@@ -1833,7 +1833,7 @@ components:
                 description: the time the participant left
     viewership-metric:
       type: object
-      description: >-
+      description: |
         An individual metric about viewership of an asset. Necessarily, at least
         1 of playbackId and dStorageUrl will be present, depending on the query.
       required:
@@ -1849,7 +1849,7 @@ components:
         timestamp:
           type: number
           example: 1587667174725
-          description: >-
+          description: |
             Timestamp (in milliseconds) when the metric was recorded. If the
             query contains a time step, this timestamp will point to the
             beginning of the time step period.
@@ -1879,7 +1879,7 @@ components:
           description: The country where the viewer is located
         subdivision:
           type: string
-          description: >-
+          description: |
             The subdivision (e.g., state or province) where the viewer is
             located
         timezone:
@@ -1902,7 +1902,7 @@ components:
           description: The error rate for the asset
         existsBeforeStart:
           type: number
-          description: >-
+          description: |
             The percentage of sessions that existed before the asset started
             playing
     create-asset-url:
@@ -2147,7 +2147,7 @@ paths:
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
-      description: >-
+      description: |
         Use /multistream/target to a return a list of your existing multistream
         targets.
       responses:
@@ -2250,7 +2250,7 @@ paths:
                 $ref: "#/components/schemas/error"
     delete:
       summary: Delete a multistream target
-      description: >-
+      description: |
         DELETE /multistream/target/{id} deletes an existing multistream target
         object. Make sure to remove any references to the target on existing
         streams before actually deleting it from the API.
@@ -2779,13 +2779,13 @@ paths:
   /data/views/query:
     get:
       summary: Query viewership metrics
-      description: >-
+      description: |
         Allows querying any metric in its raw form. Requires a private
         (non-CORS) API key to be used.
       parameters:
         - name: playbackId
           in: query
-          description: >-
+          description: |
             The playback ID to filter the query results. This can be a canonical
             playback ID from Livepeer assets or streams, or dStorage identifiers
             for assets
@@ -2835,7 +2835,7 @@ paths:
             type: string
         - name: "breakdownBy[]"
           in: query
-          description: >-
+          description: |
             The list of fields to break down the query results. Specify this
             query-string multiple times to break down by multiple fields.
           schema:
@@ -2872,7 +2872,7 @@ paths:
   /data/views/query/creator:
     get:
       summary: Query creator viewership metrics
-      description: >-
+      description: |
         Allows querying creator-specific metrics. Requires a proof of ownership
         to be sent in the request, which for now is just the assetId or streamId
         parameters (1 of those must be in the query-string). Returns only the
@@ -2923,7 +2923,7 @@ paths:
             type: string
         - name: "breakdownBy[]"
           in: query
-          description: >-
+          description: |
             The list of fields to break down the query results. Specify this
             query-string multiple times to break down by multiple fields.
           schema:
@@ -2960,7 +2960,7 @@ paths:
   "/data/views/query/total/{playbackid}":
     get:
       summary: Query public total views metrics
-      description: >-
+      description: |
         Allows querying for the public metrics for viewership about a video.
         This can be called from the frontend with a CORS key, or even
         unauthenticated.
@@ -2968,7 +2968,7 @@ paths:
         - name: playbackId
           in: path
           required: true
-          description: >-
+          description: |
             The playback ID to filter the query results. This can be a canonical
             playback ID from Livepeer assets or streams, or dStorage identifiers
             for assets
@@ -2982,7 +2982,7 @@ paths:
             application/json:
               schema:
                 type: object
-                description: >-
+                description: |
                   A simplified metric object about aggregate viewership of an
                   asset. Either playbackId or dStorageUrl will be set.
                 required:
@@ -3063,7 +3063,7 @@ paths:
           schema:
             type: integer
             example: 1
-          description: >-
+          description: |
             Flag indicating if the response should only include recorded
             sessions
       responses:
@@ -3118,7 +3118,7 @@ paths:
                 $ref: "#/components/schemas/error"
     get:
       summary: Retrieves signing keys
-      description: >-
+      description: |
         You can list all the signing keys in your account by making a GET
         request on /api/access-control/signing-key.
       responses:
@@ -3240,7 +3240,7 @@ paths:
   "/task/{taskId}":
     get:
       summary: Retrieve a Task
-      description: >-
+      description: |
         Retrieves the details of a Task, including progress updates and status.
         Supply the unique Task ID that was returned from your previous request
         or from an Asset import or export.
@@ -3506,7 +3506,7 @@ paths:
   "/playback/{id}":
     get:
       summary: Retrieve Playback Info
-      description: >-
+      description: |
         You can retrieve the playback information about any playback identifier
         by calling this endpoint. It accepts playbackIds from any resource in
         the API as well as dStorage IDs for assets.
