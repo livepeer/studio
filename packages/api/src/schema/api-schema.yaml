@@ -18,7 +18,8 @@ tags:
   - name: Session
   - name: Task
   - name: Viewership
-  - name: Misc
+  - name: Transcode API
+  - name: Playback
 components:
   schemas:
     request-upload:
@@ -3382,7 +3383,7 @@ paths:
   /transcode:
     post:
       tags:
-        - Misc
+        - Transcode API
       summary: Transcode a video
       description: >
         `POST /transcode` transcodes a video file and uploads the results to the
@@ -3627,7 +3628,7 @@ paths:
   "/playback/{id}":
     get:
       tags:
-        - Misc
+        - Playback
       summary: Retrieve Playback Info
       description: >-
         You can retrieve the playback information about any playback identifier by
