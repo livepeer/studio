@@ -939,11 +939,17 @@ app.post(
       }
     }
 
-    const doc: DBStream = wowzaHydrate({
+    const creatorId =
+      typeof payload.creatorId === "string"
+        ? ({ type: "unverified", value: payload.creatorId } as const)
+        : payload.creatorId;
+
+    let doc: DBStream = {
       ...DEFAULT_STREAM_FIELDS,
       ...payload,
       kind: "stream",
       userId: req.user.id,
+      creatorId,
       renditions: {},
       objectStoreId,
       id,
@@ -954,7 +960,9 @@ app.post(
       createdByTokenId: req.token?.id,
       isActive: false,
       lastSeen: 0,
-    });
+    };
+    doc = wowzaHydrate(doc);
+
     await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
 
     doc.profiles = hackMistSettings(req, doc.profiles);

@@ -367,7 +367,12 @@ components:
         name:
           $ref: "#/components/schemas/stream/properties/name"
         creatorId:
-          $ref: "#/components/schemas/creator-id"
+          oneOf:
+            - $ref: "#/components/schemas/creator-id"
+            - type: string
+              description:
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
