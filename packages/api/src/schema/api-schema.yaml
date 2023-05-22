@@ -209,6 +209,8 @@ components:
         name:
           type: string
           example: test_stream
+        creatorId:
+          $ref: "#/components/schemas/creator-id"
         lastSeen:
           type: number
           example: 1587667174725
@@ -729,18 +731,7 @@ components:
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         creatorId:
-          oneOf:
-            - type: object
-              additionalProperties: false
-              required: [type, value]
-              properties:
-                type:
-                  type: string
-                  enum: [unverified]
-                value:
-                  type: string
-                  description:
-                    Developer-managed ID of the user who created the asset.
+          $ref: "#/components/schemas/creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -1006,7 +997,7 @@ components:
           $ref: "#/components/schemas/playback-policy"
         creatorId:
           oneOf:
-            - $ref: "#/components/schemas/asset/properties/creatorId"
+            - $ref: "#/components/schemas/creator-id"
             - type: string
               description:
                 Helper syntax to specify an unverified creator ID, fully managed
@@ -1487,6 +1478,20 @@ components:
                     assetSpec:
                       type: object
                       $ref: "#/components/schemas/asset"
+    creator-id:
+      type: object
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [type, value]
+          properties:
+            type:
+              type: string
+              enum: [unverified]
+            value:
+              type: string
+              description:
+                Developer-managed ID of the user who created the resource.
     export-task-params:
       description: Parameters for the export task
       oneOf:
