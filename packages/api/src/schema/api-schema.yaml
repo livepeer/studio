@@ -2639,14 +2639,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-  /asset/import:
+  /asset/upload/url:
     post:
       tags:
         - Asset
       summary: Upload asset via URL
       description: >
         Import a video Asset from an external URL through the POST
-        /api/asset/import API.
+        /api/asset/upload/url API.
 
 
         For IPFS HTTP gateway URLs, the API currently only supports “path style”
