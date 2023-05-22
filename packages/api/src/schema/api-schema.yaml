@@ -210,7 +210,13 @@ components:
           type: string
           example: test_stream
         creatorId:
-          $ref: "#/components/schemas/creator-id"
+          oneOf:
+            - $ref: "#/components/schemas/creator-id"
+            - type: string
+              writeOnly: true
+              description:
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
         lastSeen:
           type: number
           example: 1587667174725
