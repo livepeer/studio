@@ -1122,7 +1122,8 @@ components:
                   description:
                     "Service endpoint URL (AWS S3 endpoint list:
                     https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
-                    S3 endpoint: https://storage.googleapis.com)"
+                    S3 endpoint: https://storage.googleapis.com, Storj:
+                    https://gateway.storjshare.io)"
                   example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
@@ -1171,7 +1172,8 @@ components:
                   description:
                     "Service endpoint URL (AWS S3 endpoint list:
                     https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
-                    S3 endpoint: https://storage.googleapis.com)"
+                    S3 endpoint: https://storage.googleapis.com, Storj:
+                    https://gateway.storjshare.io)"
                   example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
