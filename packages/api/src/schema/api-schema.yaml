@@ -8,7 +8,6 @@ info:
   version: 1.0.0
 servers:
   - url: "https://livepeer.studio/api"
-
 components:
   schemas:
     request-upload:
@@ -2168,7 +2167,6 @@ paths:
                 $ref: "#/components/schemas/error"
     post:
       summary: Create a multistream target
-
       requestBody:
         required: true
         content:
@@ -2200,7 +2198,7 @@ paths:
           type: string
     get:
       summary: Retrieve a multistream target
-      description: >-
+      description:
         You can retrieve a multistream target from its ID with this API.
       responses:
         "200":
@@ -2256,7 +2254,6 @@ paths:
         DELETE /multistream/target/{id} deletes an existing multistream target
         object. Make sure to remove any references to the target on existing
         streams before actually deleting it from the API.
-
       responses:
         "204":
           description: Success
@@ -2294,55 +2291,70 @@ paths:
          ## Types of Events
 
          | Name                       |
-        Description                                                                                                                                                            |
+        Description                                                                                                                                                           
+        |
          | -------------------------- |
         ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
         |
          | `stream.started`           | The parent stream object's isActive
         value is marked as true and the .m3u8 HLS URL
-        works                                                                                |
+        works                                                                               
+        |
          | `stream.idle`              | The parent stream object's isActive
         value should be marked as false and the .m3u8 HLS URL no longer
         works                                                              |
          | `recording.ready`          | This fires when a recording is ready to
         be
-        downloaded                                                                                                                  |
+        downloaded                                                                                                                 
+        |
          | `recording.started`        | This fires when recording has started on
         an active
-        stream                                                                                                              |
+        stream                                                                                                             
+        |
          | `recording.waiting`        | This fires after a stream with recording
         on has concluded and is not yet ready to be downloaded. Typically it
         takes 5 minutes for recordings to be ready for download. |
          | `multistream.connected`    | This fires when we've successfully
         connected to the multistream
-        target                                                                                                 |
+        target                                                                                                
+        |
          | `multistream.error`        | This fires when we've encountered an
         error either while attempting to connect to the third party streaming
         service or while broadcasting.                              |
          | `multistream.disconnected` | This fires when we are no longer sending
         video to the multistream
-        target.                                                                                              |
+        target.                                                                                             
+        |
          | `asset.created`            | This fires when a On Demand asset is
-        created.                                                                                                                          |
+        created.                                                                                                                         
+        |
          | `asset.updated`            | This fires when a On Demand asset is
-        updated.                                                                                                                          |
+        updated.                                                                                                                         
+        |
          | `asset.ready`              | This fires when a On Demand asset is
-        ready.                                                                                                                            |
+        ready.                                                                                                                           
+        |
          | `asset.failed`             | This fires when a On Demand asset fails
         during the upload or during
-        processing.                                                                                        |
+        processing.                                                                                       
+        |
          | `asset.deleted`            | This fires when a On Demand asset is
-        deleted.                                                                                                                          |
+        deleted.                                                                                                                         
+        |
          | `task.spawned`             | This fires when a task is spawned. (For
         example, an On Demand
-        upload)                                                                                                  |
+        upload)                                                                                                 
+        |
          | `task.updated`             | This fires when a task is
-        updated.                                                                                                                                     |
+        updated.                                                                                                                                    
+        |
          | `task.completed`           | This fires when a task completes its
         execution
-        successfully.                                                                                                           |
+        successfully.                                                                                                          
+        |
          | `task.failed`              | This fires when a task has
-        failed.                                                                                                                                     |
+        failed.                                                                                                                                    
+        |
          | `playback.accessControl`   | A specialized webhook for playback
         access control. Unlike other events, this is only used for assets and
         streams that reference its ID on their playback policy.       |
@@ -2625,7 +2637,6 @@ paths:
   /room:
     post:
       summary: Create a room
-
       responses:
         "200":
           description: Success
@@ -3052,7 +3063,7 @@ paths:
           schema:
             type: integer
             example: 1
-          description:
+          description: >-
             Flag indicating if the response should only include recorded
             sessions
       responses:
