@@ -358,6 +358,24 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
+    new-stream-payload:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/stream/properties/name"
+        creatorId:
+          $ref: "#/components/schemas/creator-id"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
+        profiles:
+          $ref: "#/components/schemas/stream/properties/profiles"
+        record:
+          $ref: "#/components/schemas/stream/properties/record"
+        multistream:
+          $ref: "#/components/schemas/stream/properties/multistream"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -1863,7 +1881,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: "#/components/schemas/stream"
+              $ref: "#/components/schemas/new-stream-payload"
       responses:
         "200":
           description: Success

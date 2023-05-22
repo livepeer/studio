@@ -729,6 +729,12 @@ components:
         deleted:
           type: boolean
           description: Set to true when stream deleted
+    new-stream-payload:
+      properties:
+        recordObjectStoreId:
+          $ref: "#/components/schemas/stream/properties/recordObjectStoreId"
+        objectStoreId:
+          $ref: "#/components/schemas/stream/properties/objectStoreId"
     playback-policy:
       properties:
         type:
