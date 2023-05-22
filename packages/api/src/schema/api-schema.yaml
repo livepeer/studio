@@ -8,18 +8,7 @@ info:
   version: 1.0.0
 servers:
   - url: "https://livepeer.studio/api"
-tags:
-  - name: Asset
-  - name: Stream
-  - name: Webhook
-  - name: Room
-  - name: Signing Key
-  - name: Multistream
-  - name: Session
-  - name: Task
-  - name: Viewership
-  - name: Transcode API
-  - name: Playback
+
 components:
   schemas:
     request-upload:
@@ -1971,12 +1960,10 @@ components:
 paths:
   /stream:
     post:
-      tags:
-        - Stream
       summary: Create a stream
       description: >
-        POST /stream creates a stream object. The configuration on this stream object
-        is inherited by all live sessions using this stream's streamKey.
+        POST /stream creates a stream object. The configuration on this stream
+        object is inherited by all live sessions using this stream's streamKey.
 
 
         It is important to note, that the stream object is the core building
@@ -1991,8 +1978,8 @@ paths:
 
 
         If you do not define transcoding rendition profiles when creating the
-        stream, a default set of profiles will be used. These profiles include 240p, 
-        360p, 480p and 720p.
+        stream, a default set of profiles will be used. These profiles include
+        240p,  360p, 480p and 720p.
 
 
         The playback policy is set to public by default for new streams. It can
@@ -2021,8 +2008,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
-      tags:
-        - Stream
       summary: Retrieve streams
       description:
         "GET /stream to retrieve all stream objects with the same userId. The
@@ -2082,8 +2067,6 @@ paths:
         schema:
           type: string
     get:
-      tags:
-        - Stream
       summary: Retrieve a stream
       description: >
         In order to retrieve a specific stream, you can just pass the stream id
@@ -2102,8 +2085,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
-      tags:
-        - Stream
       summary: update a stream
       description: >
         PATCH /stream/{id} can be used to modify a stream object. It is a single
@@ -2139,8 +2120,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
-      tags:
-        - Stream
       summary: Delete a stream
       description: >
         DELETE /stream/{id} deletes an existing stream object.
@@ -2168,8 +2147,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /multistream/target:
     get:
-      tags:
-        - Multistream
       summary: Retrieve Multistream Targets
       description: >-
         Use /multistream/target to a return a list of your existing multistream
@@ -2191,8 +2168,7 @@ paths:
                 $ref: "#/components/schemas/error"
     post:
       summary: Create a multistream target
-      tags:
-        - Multistream
+
       requestBody:
         required: true
         content:
@@ -2223,8 +2199,6 @@ paths:
         schema:
           type: string
     get:
-      tags:
-        - Multistream
       summary: Retrieve a multistream target
       description: >-
         You can retrieve a multistream target from its ID with this API.
@@ -2242,8 +2216,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
-      tags:
-        - Multistream
       summary: Update Multistream Target
       description: >
         PATCH /multistream/target/{id} updates an existing multistream target
@@ -2284,8 +2256,7 @@ paths:
         DELETE /multistream/target/{id} deletes an existing multistream target
         object. Make sure to remove any references to the target on existing
         streams before actually deleting it from the API.
-      tags:
-        - Multistream
+
       responses:
         "204":
           description: Success
@@ -2297,8 +2268,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /webhook:
     get:
-      tags:
-        - Webhook
       summary: Retrieve a Webhook
       responses:
         "200":
@@ -2316,8 +2285,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     post:
-      tags:
-        - Webhook
       summary: Create a webhook
       description: >
         To create a new webhook, you need to make an API call with the events
@@ -2394,8 +2361,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/webhook/{id}":
     get:
-      tags:
-        - Webhook
       summary: Retrieve a webhook
       parameters:
         - name: id
@@ -2417,8 +2382,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     put:
-      tags:
-        - Webhook
       parameters:
         - name: id
           in: path
@@ -2451,8 +2414,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
-      tags:
-        - Webhook
       parameters:
         - name: id
           in: path
@@ -2475,8 +2436,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /asset:
     get:
-      tags:
-        - Asset
       summary: Retrieve assets
       responses:
         "200":
@@ -2495,8 +2454,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /asset/request-upload:
     post:
-      tags:
-        - Asset
       summary: Upload an asset
       description: >
         To upload an asset, your first need to request for a direct upload URL
@@ -2519,9 +2476,8 @@ paths:
 
         ## Resumable Upload
 
-        Livepeer supports resumable uploads via Tus. This
-        section provides a simple example of how to use tus-js-client to upload
-        a video file.
+        Livepeer supports resumable uploads via Tus. This section provides a
+        simple example of how to use tus-js-client to upload a video file.
 
 
         From the previous section, we generated a URL to upload a video file to
@@ -2597,8 +2553,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /asset/upload/url:
     post:
-      tags:
-        - Asset
       summary: Upload asset via URL
       description: >
         Import a video Asset from an external URL through the POST
@@ -2629,8 +2583,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/asset/{assetId}":
     get:
-      tags:
-        - Asset
       summary: Retrieves an asset
       parameters:
         - in: path
@@ -2653,8 +2605,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
-      tags:
-        - Asset
       summary: Delete an asset
       parameters:
         - in: path
@@ -2675,8 +2625,7 @@ paths:
   /room:
     post:
       summary: Create a room
-      tags:
-        - Room
+
       responses:
         "200":
           description: Success
@@ -2694,8 +2643,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}":
     get:
-      tags:
-        - Room
       parameters:
         - name: id
           in: path
@@ -2716,8 +2663,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
-      tags:
-        - Room
       parameters:
         - name: id
           in: path
@@ -2736,8 +2681,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}/egress":
     post:
-      tags:
-        - Room
       requestBody:
         required: true
         content:
@@ -2761,8 +2704,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
-      tags:
-        - Room
       parameters:
         - name: id
           in: path
@@ -2781,8 +2722,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}/user":
     post:
-      tags:
-        - Room
       requestBody:
         required: true
         content:
@@ -2805,8 +2744,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}/user/{userId}":
     delete:
-      tags:
-        - Room
       parameters:
         - name: id
           in: path
@@ -2830,8 +2767,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /data/views/query:
     get:
-      tags:
-        - Viewership
       summary: Query viewership metrics
       description: >-
         Allows querying any metric in its raw form. Requires a private
@@ -2925,8 +2860,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /data/views/query/creator:
     get:
-      tags:
-        - Viewership
       summary: Query creator viewership metrics
       description: >-
         Allows querying creator-specific metrics. Requires a proof of ownership
@@ -3015,8 +2948,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/data/views/query/total/{playbackid}":
     get:
-      tags:
-        - Viewership
       summary: Query public total views metrics
       description: >-
         Allows querying for the public metrics for viewership about a video.
@@ -3067,8 +2998,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /session:
     get:
-      tags:
-        - Session
       summary: Retrieve sessions
       responses:
         "200":
@@ -3087,8 +3016,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/session/{id}":
     get:
-      tags:
-        - Session
       summary: Retrieve a session
       parameters:
         - in: path
@@ -3112,8 +3039,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/stream/{parentId}/sessions":
     get:
-      tags:
-        - Session
       summary: Retrieve Recorded Sessions
       parameters:
         - in: path
@@ -3127,7 +3052,9 @@ paths:
           schema:
             type: integer
             example: 1
-          description: Flag indicating if the response should only include recorded sessions
+          description:
+            Flag indicating if the response should only include recorded
+            sessions
       responses:
         "200":
           description: Success
@@ -3145,8 +3072,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /access-control/signing-key:
     post:
-      tags:
-        - Signing Key
       summary: Create a signing key
       description: >
         A signing key is used to sign JWTs and are necessary to make a stream
@@ -3181,8 +3106,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
-      tags:
-        - Signing Key
       summary: Retrieves signing keys
       description: >-
         You can list all the signing keys in your account by making a GET
@@ -3204,8 +3127,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/access-control/signing-key/{keyId}":
     delete:
-      tags:
-        - Signing Key
       summary: Delete Signing Key
       parameters:
         - in: path
@@ -3224,8 +3145,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
-      tags:
-        - Signing Key
       summary: Retrieves a signing key
       parameters:
         - in: path
@@ -3248,8 +3167,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
-      tags:
-        - Signing Key
       summary: Update a signing key
       description: >
         PATCH /access-control/signing-key/{KEY_ID} updates an existing signing
@@ -3293,8 +3210,6 @@ paths:
                 $ref: "#/components/schemas/error"
   /task:
     get:
-      tags:
-        - Task
       summary: Retrieve Tasks
       responses:
         "200":
@@ -3313,8 +3228,6 @@ paths:
                 $ref: "#/components/schemas/error"
   "/task/{taskId}":
     get:
-      tags:
-        - Task
       summary: Retrieve a Task
       description: >-
         Retrieves the details of a Task, including progress updates and status.
@@ -3338,8 +3251,6 @@ paths:
           description: Error
   /transcode:
     post:
-      tags:
-        - Transcode API
       summary: Transcode a video
       description: >
         `POST /transcode` transcodes a video file and uploads the results to the
@@ -3583,13 +3494,11 @@ paths:
                 $ref: "#/components/schemas/error"
   "/playback/{id}":
     get:
-      tags:
-        - Playback
       summary: Retrieve Playback Info
       description: >-
-        You can retrieve the playback information about any playback identifier by
-        calling this endpoint. It accepts playbackIds from any resource in the API
-        as well as dStorage IDs for assets.
+        You can retrieve the playback information about any playback identifier
+        by calling this endpoint. It accepts playbackIds from any resource in
+        the API as well as dStorage IDs for assets.
       parameters:
         - in: path
           name: id
