@@ -1960,7 +1960,7 @@ paths:
   /stream:
     post:
       summary: Create a stream
-      description: >
+      description: |
         POST /stream creates a stream object. The configuration on this stream
         object is inherited by all live sessions using this stream's streamKey.
 
@@ -2067,7 +2067,7 @@ paths:
           type: string
     get:
       summary: Retrieve a stream
-      description: >
+      description: |
         In order to retrieve a specific stream, you can just pass the stream id
         to this API
       responses:
@@ -2085,7 +2085,7 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: update a stream
-      description: >
+      description: |
         PATCH /stream/{id} can be used to modify a stream object. It is a single
         endpoint that can update any of the mutable properties of a stream.
         Specifically:
@@ -2120,7 +2120,7 @@ paths:
                 $ref: "#/components/schemas/error"
     delete:
       summary: Delete a stream
-      description: >
+      description: |
         DELETE /stream/{id} deletes an existing stream object.
 
 
@@ -2215,7 +2215,7 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update Multistream Target
-      description: >
+      description: |
         PATCH /multistream/target/{id} updates an existing multistream target
         object. You can change any user-defined field in the current object,
         specifically name, url and disabled.
@@ -2283,7 +2283,7 @@ paths:
                 $ref: "#/components/schemas/error"
     post:
       summary: Create a webhook
-      description: >
+      description: |
         To create a new webhook, you need to make an API call with the events
         you want to listen for and the URL that will be called when those events
         occur.
@@ -2401,7 +2401,7 @@ paths:
           schema:
             type: string
       summary: Update a webhook
-      description: >
+      description: |
         You can update a webhook by calling the PATCH webhook endpoint with the
         webhookId. It is a single endpoint that can update any of the mutable
         properties of a webhook. Specifically:
@@ -2467,7 +2467,7 @@ paths:
   /asset/request-upload:
     post:
       summary: Upload an asset
-      description: >
+      description: |
         To upload an asset, your first need to request for a direct upload URL
         and only then actually upload the contents of the asset.
 
@@ -2566,7 +2566,7 @@ paths:
   /asset/upload/url:
     post:
       summary: Upload asset via URL
-      description: >
+      description: |
         Import a video Asset from an external URL through the POST
         /api/asset/upload/url API.
 
@@ -3084,7 +3084,7 @@ paths:
   /access-control/signing-key:
     post:
       summary: Create a signing key
-      description: >
+      description: |
         A signing key is used to sign JWTs and are necessary to make a stream
         private.
 
@@ -3179,7 +3179,7 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update a signing key
-      description: >
+      description: |
         PATCH /access-control/signing-key/{KEY_ID} updates an existing signing
         key. It is a single endpoint that can update any of the mutable
         properties of a stream. Specifically:
@@ -3263,7 +3263,7 @@ paths:
   /transcode:
     post:
       summary: Transcode a video
-      description: >
+      description: |
         `POST /transcode` transcodes a video file and uploads the results to the
         specified storage service. 
 
