@@ -64,7 +64,7 @@ export class TaskScheduler {
   }
 
   async handleTaskQueue(data: ConsumeMessage) {
-    let event: messages.TaskResult;
+    let event: messages.TaskResult | messages.TaskPlayback;
     try {
       event = JSON.parse(data.content.toString());
       console.log(
@@ -79,7 +79,13 @@ export class TaskScheduler {
 
     let ack: boolean;
     try {
-      ack = await this.processTaskEvent(event);
+      if (event.type === "task_result") {
+        ack = await this.processTaskEvent(event);
+      } else if (event.type === "task_playback_source") {
+        ack = await this.processTaskPlayback(event);
+      } else {
+        throw new Error("unknown event type: " + (event as any).type);
+      }
     } catch (err) {
       ack = true;
       console.log("handleTaskQueue Error ", err);
