@@ -28,6 +28,12 @@ export interface UsageData {
   transcodedSegmentsDuration: number;
 }
 
+export interface BillingUsageData {
+  DeliveryUsageGbs: number;
+  TotalUsageMins: number;
+  StorageUsageMins: number;
+}
+
 export interface StreamInfo {
   stream: Stream;
   session?: Stream;

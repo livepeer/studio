@@ -21,9 +21,16 @@ import { DashboardBilling as Content } from "content";
 
 const Billing = () => {
   useLoggedIn();
-  const { user, getUsage, getSubscription, getInvoices, getPaymentMethod } =
-    useApi();
+  const {
+    user,
+    getUsage,
+    getBillingUsage,
+    getSubscription,
+    getInvoices,
+    getPaymentMethod,
+  } = useApi();
   const [usage, setUsage] = useState(null);
+  const [billingUsage, setBillingUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
 
@@ -62,6 +69,14 @@ const Billing = () => {
         setUsage(usage);
       }
     };
+
+    const doGetBillingUsage = async (fromTime, toTime) => {
+      const [res, usage] = await getBillingUsage(fromTime, toTime);
+      if (res.status == 200) {
+        setBillingUsage(usage);
+      }
+    };
+
     const getSubscriptionAndUsage = async (subscriptionId) => {
       const [res, subscription] = await getSubscription(subscriptionId);
       if (res.status == 200) {
@@ -71,6 +86,10 @@ const Billing = () => {
         subscription?.current_period_start,
         subscription?.current_period_end,
         user.id
+      );
+      doGetBillingUsage(
+        subscription?.current_period_start,
+        subscription?.current_period_end
       );
     };
 
@@ -227,6 +246,29 @@ const Billing = () => {
               "No payment method on file."
             )}
           </Flex>
+        </Box>
+        <Box css={{ mb: "$9" }}>
+          <Flex
+            justify="between"
+            align="end"
+            css={{
+              mb: "$4",
+              width: "100%",
+            }}>
+            <Heading size="1">
+              <Flex align="center">
+                <Box
+                  css={{
+                    mr: "$3",
+                    fontWeight: 600,
+                    letterSpacing: "0",
+                  }}>
+                  Usage
+                </Box>
+              </Flex>
+            </Heading>
+          </Flex>
+          <Text variant="neutral">Usage in the last month</Text>
         </Box>
         <Box css={{ mb: "$9" }}>
           <Flex
