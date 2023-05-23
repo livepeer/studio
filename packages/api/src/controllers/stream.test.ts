@@ -409,6 +409,18 @@ describe("controllers/stream", () => {
         expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
       });
 
+      it("should create a stream with creator ID", async () => {
+        const now = Date.now();
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          creatorId: "jest",
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBeDefined();
+        expect(stream.creatorId).toEqual({ type: "unverified", value: "jest" });
+      });
+
       it("should create stream with valid multistream target ID", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,

@@ -209,6 +209,8 @@ components:
         name:
           type: string
           example: test_stream
+        creatorId:
+          $ref: "#/components/schemas/creator-id"
         lastSeen:
           type: number
           example: 1587667174725
@@ -356,6 +358,29 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
+    new-stream-payload:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/stream/properties/name"
+        creatorId:
+          oneOf:
+            - $ref: "#/components/schemas/creator-id"
+            - type: string
+              description:
+                Helper syntax to specify an unverified creator ID, fully managed
+                by the developer.
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
+        profiles:
+          $ref: "#/components/schemas/stream/properties/profiles"
+        record:
+          $ref: "#/components/schemas/stream/properties/record"
+        multistream:
+          $ref: "#/components/schemas/stream/properties/multistream"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -729,18 +754,7 @@ components:
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         creatorId:
-          oneOf:
-            - type: object
-              additionalProperties: false
-              required: [type, value]
-              properties:
-                type:
-                  type: string
-                  enum: [unverified]
-                value:
-                  type: string
-                  description:
-                    Developer-managed ID of the user who created the asset.
+          $ref: "#/components/schemas/creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -1006,7 +1020,7 @@ components:
           $ref: "#/components/schemas/playback-policy"
         creatorId:
           oneOf:
-            - $ref: "#/components/schemas/asset/properties/creatorId"
+            - $ref: "#/components/schemas/creator-id"
             - type: string
               description:
                 Helper syntax to specify an unverified creator ID, fully managed
@@ -1495,6 +1509,20 @@ components:
                     assetSpec:
                       type: object
                       $ref: "#/components/schemas/asset"
+    creator-id:
+      type: object
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [type, value]
+          properties:
+            type:
+              type: string
+              enum: [unverified]
+            value:
+              type: string
+              description:
+                Developer-managed ID of the user who created the resource.
     export-task-params:
       description: Parameters for the export task
       oneOf:
@@ -1866,7 +1894,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: "#/components/schemas/stream"
+              $ref: "#/components/schemas/new-stream-payload"
       responses:
         "200":
           description: Success
