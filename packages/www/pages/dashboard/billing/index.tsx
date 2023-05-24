@@ -286,7 +286,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    DeliveryUsageGbs
+                    Delivery (GB)
                   </th>
                   <th
                     style={{
@@ -294,7 +294,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    TotalUsageMins
+                    Total Usage (Minutes)
                   </th>
                   <th
                     style={{
@@ -302,7 +302,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    StorageUsageMins
+                    Storage Usage (Minutes)
                   </th>
                 </tr>
               </thead>
