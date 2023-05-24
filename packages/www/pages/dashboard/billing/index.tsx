@@ -18,6 +18,7 @@ import UpcomingInvoiceTable from "components/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
+import { Table, TableRow, TableRowVariant } from "components/Admin/Table";
 
 const Billing = () => {
   useLoggedIn();
@@ -270,24 +271,30 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Text variant="neutral">Usage MTD</Text>
+          <Text variant="neutral">Usage Month to date</Text>
           {billingUsage && (
-            <table>
-              <thead>
-                <tr>
-                  <th>DeliveryUsageGbs</th>
-                  <th>TotalUsageMins</th>
-                  <th>StorageUsageMins</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{billingUsage.deliveryUsageGbs}</td>
-                  <td>{billingUsage.totalUsageMins}</td>
-                  <td>{billingUsage.storageUsageMins}</td>
-                </tr>
-              </tbody>
-            </table>
+            <Table sx={{ gridTemplateColumns: "auto auto auto auto" }}>
+              <>
+                <TableRow variant={TableRowVariant.Header} key="usage header">
+                  <>
+                    <Box></Box>
+                    <Box>DeliveryUsageGbs</Box>
+                    <Box>TotalUsageMins</Box>
+                    <Box>StorageUsageMins</Box>
+                  </>
+                </TableRow>
+                <TableRow
+                  key="just one row for now"
+                  variant={TableRowVariant.Normal}>
+                  <>
+                    <Box></Box>
+                    <Box>{billingUsage && billingUsage.DeliveryUsageGbs}</Box>
+                    <Box>{billingUsage && billingUsage.TotalUsageMins}</Box>
+                    <Box>{billingUsage && billingUsage.StorageUsageMins}</Box>
+                  </>
+                </TableRow>
+              </>
+            </Table>
           )}
         </Box>
         <Box css={{ mb: "$9" }}>
