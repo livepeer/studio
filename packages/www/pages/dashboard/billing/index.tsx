@@ -70,7 +70,12 @@ const Billing = () => {
       }
     };
 
-    const doGetBillingUsage = async (fromTime, toTime) => {
+    const doGetBillingUsage = async () => {
+      // Gather current month data
+      const now = new Date();
+      const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      const toTime = now.getTime();
+
       const [res, usage] = await getBillingUsage(fromTime, toTime);
       if (res.status == 200) {
         setBillingUsage(usage);
@@ -87,10 +92,7 @@ const Billing = () => {
         subscription?.current_period_end,
         user.id
       );
-      doGetBillingUsage(
-        subscription?.current_period_start,
-        subscription?.current_period_end
-      );
+      doGetBillingUsage();
     };
 
     if (user) {
@@ -268,7 +270,25 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Text variant="neutral">Usage in the last month</Text>
+          <Text variant="neutral">Usage MTD</Text>
+          {billingUsage && (
+            <table>
+              <thead>
+                <tr>
+                  <th>DeliveryUsageGbs</th>
+                  <th>TotalUsageMins</th>
+                  <th>StorageUsageMins</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{billingUsage.deliveryUsageGbs}</td>
+                  <td>{billingUsage.totalUsageMins}</td>
+                  <td>{billingUsage.storageUsageMins}</td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </Box>
         <Box css={{ mb: "$9" }}>
           <Flex
