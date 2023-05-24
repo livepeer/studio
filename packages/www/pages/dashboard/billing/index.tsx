@@ -314,7 +314,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    {billingUsage.DeliveryUsageGbs}
+                    {Number(billingUsage.DeliveryUsageGbs).toFixed(2)}
                   </td>
                   <td
                     style={{
@@ -322,7 +322,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    {billingUsage.TotalUsageMins}
+                    {Number(billingUsage.TotalUsageMins).toFixed(2)}
                   </td>
                   <td
                     style={{
@@ -330,7 +330,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    {billingUsage.StorageUsageMins}
+                    {Number(billingUsage.StorageUsageMins).toFixed(2)}
                   </td>
                 </tr>
               </tbody>
