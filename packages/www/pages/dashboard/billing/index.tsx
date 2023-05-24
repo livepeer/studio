@@ -18,7 +18,6 @@ import UpcomingInvoiceTable from "components/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
-import { Table, TableRow, TableRowVariant } from "components/Admin/Table";
 
 const Billing = () => {
   useLoggedIn();
@@ -273,28 +272,69 @@ const Billing = () => {
           </Flex>
           <Text variant="neutral">Usage Month to date</Text>
           {billingUsage && (
-            <Table sx={{ gridTemplateColumns: "auto auto auto auto" }}>
-              <>
-                <TableRow variant={TableRowVariant.Header} key="usage header">
-                  <>
-                    <Box></Box>
-                    <Box>DeliveryUsageGbs</Box>
-                    <Box>TotalUsageMins</Box>
-                    <Box>StorageUsageMins</Box>
-                  </>
-                </TableRow>
-                <TableRow
-                  key="just one row for now"
-                  variant={TableRowVariant.Normal}>
-                  <>
-                    <Box></Box>
-                    <Box>{billingUsage && billingUsage.DeliveryUsageGbs}</Box>
-                    <Box>{billingUsage && billingUsage.TotalUsageMins}</Box>
-                    <Box>{billingUsage && billingUsage.StorageUsageMins}</Box>
-                  </>
-                </TableRow>
-              </>
-            </Table>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontFamily: "Arial, sans-serif",
+              }}>
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}>
+                    DeliveryUsageGbs
+                  </th>
+                  <th
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}>
+                    TotalUsageMins
+                  </th>
+                  <th
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}>
+                    StorageUsageMins
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}>
+                    {billingUsage.DeliveryUsageGbs}
+                  </td>
+                  <td
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}>
+                    {billingUsage.TotalUsageMins}
+                  </td>
+                  <td
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      textAlign: "center",
+                    }}>
+                    {billingUsage.StorageUsageMins}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           )}
         </Box>
         <Box css={{ mb: "$9" }}>
