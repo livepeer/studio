@@ -34,6 +34,11 @@ export interface BillingUsageData {
   StorageUsageMins: number;
 }
 
+export interface BillingUsageDataWithTimestamp {
+  timestamp: number;
+  data: BillingUsageData;
+}
+
 export interface StreamInfo {
   stream: Stream;
   session?: Stream;

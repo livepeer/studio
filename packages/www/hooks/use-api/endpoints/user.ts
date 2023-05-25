@@ -228,6 +228,47 @@ export const getBillingUsage = async (
   return [res, usage as BillingUsageData | ApiError];
 };
 
+export const getBillingUsageByDay = async (
+  fromTime: number,
+  toTime: number,
+  creatorId?: number
+): Promise<[Response, BillingUsageData[] | ApiError]> => {
+  const days = Math.ceil((toTime - fromTime) / (1000 * 60 * 60 * 24));
+
+  const promises = [];
+  for (let i = 0; i < days; i++) {
+    const dayFromTime = fromTime + i * (1000 * 60 * 60 * 24);
+    const dayToTime = dayFromTime + 1000 * 60 * 60 * 24;
+    promises.push(getBillingUsage(dayFromTime, dayToTime, creatorId));
+  }
+
+  // Wait for all promises to resolve
+  const results = await Promise.all(promises);
+
+  return [
+    results[0][0],
+    results.map((result) => result[1] as BillingUsageData),
+  ];
+};
+
+export const getBillingUsageWithTimeStep = async (
+  fromTime: number,
+  toTime: number,
+  creatorId?: number
+): Promise<[Response, BillingUsageData | ApiError]> => {
+  let [res, usage] = await context.fetch(
+    `/data/usage/query?${qs.stringify({
+      from: fromTime,
+      to: toTime,
+      creatorId,
+      timeStep: "day",
+    })}`,
+    {}
+  );
+
+  return [res, usage as BillingUsageData | ApiError];
+};
+
 export const makeUserAdmin = async (
   email,
   admin

@@ -25,6 +25,7 @@ const Billing = () => {
     user,
     getUsage,
     getBillingUsage,
+    getBillingUsageByDay,
     getSubscription,
     getInvoices,
     getPaymentMethod,
@@ -80,6 +81,8 @@ const Billing = () => {
       if (res.status == 200) {
         setBillingUsage(usage);
       }
+      const [res2, usageByDay] = await getBillingUsageByDay(fromTime, toTime);
+      // Todo: display chart
     };
 
     const getSubscriptionAndUsage = async (subscriptionId) => {
