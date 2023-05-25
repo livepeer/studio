@@ -2775,6 +2775,10 @@ paths:
             for assets
           schema:
             type: string
+        - name: streamsonly
+          in: query
+          schema:
+            type: string
         - name: from
           in: query
           description: Start timestamp for the query range (inclusive)
