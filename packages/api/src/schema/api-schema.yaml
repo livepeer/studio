@@ -1923,20 +1923,28 @@ components:
         type:
           type: string
           example: vod
+          enum: [live, vod, recording]
         meta:
           type: object
+          required: [source]
           properties:
             source:
               type: array
               items:
                 type: object
+                required: [hrn, type, url]
                 properties:
                   hrn:
                     type: string
                     example: MP4
+                    enum: ["HLS (TS)", "MP4", "WebRTC (H264)"];
                   type:
                     type: string
                     example: html5/video/mp4
+                    enum:
+                     - html5/application/vnd.apple.mpegurl
+                     - html5/video/mp4
+                     - html5/video/h264
                   url:
                     type: string
                     example: >-
