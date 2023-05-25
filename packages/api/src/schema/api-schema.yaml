@@ -30,32 +30,7 @@ components:
           example: >-
             https://origin.livepeer.com/api/asset/upload/tus?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
         asset:
-          type: object
-          properties:
-            id:
-              type: string
-              example: eeb9e573-ebc2-4236-952a-2a09eba70c41
-            playbackId:
-              type: string
-              example: eeb9ilj0f84g34ny
-            userId:
-              type: string
-              example: 80dc8f6e-69d5-401f-bbd7-bfc09a2a5320
-            createdAt:
-              type: integer
-              example: 1659715372244
-            status:
-              type: object
-              properties:
-                phase:
-                  type: string
-                  example: waiting
-                updatedAt:
-                  type: integer
-                  example: 1659715372244
-            name:
-              type: string
-              example: Example name
+         $ref: "#/components/schemas/asset"
         task:
           type: object
           properties:
