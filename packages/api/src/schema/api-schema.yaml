@@ -2012,9 +2012,10 @@ paths:
         "GET /stream to retrieve all stream objects with the same userId. The
         response will include both parent stream objects and the historic stream
         objects with a parentId (stream objects representing a single live
-        stream session). This historic type of \"child-session\" stream object
-        will be deprecated in an upcoming version of the API in favor of the
-        session object.\n\nGET /stream?streamsonly=1 to retrieve all stream
+        stream session). The usage of these \"child-session\" stream objects
+        is deprecated, use the session endpoints instead. To filter this API not
+        to return these child sessions add a `?streamsonly=true` query-string\n\n
+        GET /stream?streamsonly=1 to retrieve all stream
         objects with the same userId and exclude the historic stream objects
         with a parentId (stream objects representing a single live stream
         session).\n\n ### Quick filters\n\n|
