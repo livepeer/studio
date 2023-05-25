@@ -359,7 +359,7 @@ export async function withPlaybackUrls(
   asset: WithID<Asset>,
   os?: ObjectStore
 ): Promise<WithID<Asset>> {
-  if (asset.status.phase !== "ready") {
+  if (asset.status.phase !== "ready" && !asset.sourcePlaybackReady) {
     return asset;
   }
   try {
@@ -367,6 +367,12 @@ export async function withPlaybackUrls(
   } catch (err) {
     console.error("Error getting asset object store", err);
     return asset;
+  }
+  if (asset.sourcePlaybackReady) {
+    return {
+      ...asset,
+      playbackUrl: getPlaybackUrl(config, ingest, asset, os),
+    };
   }
   return {
     ...asset,

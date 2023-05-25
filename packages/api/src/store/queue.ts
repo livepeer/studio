@@ -143,6 +143,11 @@ export class RabbitQueue implements Queue {
             this.exchanges.task,
             "task.result.#"
           ),
+          channel.bindQueue(
+            this.queues.task,
+            this.exchanges.task,
+            "task.resultPartial.#"
+          ),
         ]);
         await channel.prefetch(10);
       },
