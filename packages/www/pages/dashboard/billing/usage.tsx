@@ -16,7 +16,7 @@ import { BarChart, Bar, ResponsiveContainer, LineChart, Line } from "recharts";
 const Billing = () => {
   useLoggedIn();
   const { user, getUsage, getBillingUsage } = useApi();
-  const [usage, setUsage] = useState(null);
+  const [_usage, setUsage] = useState(null);
   const [billingUsage, setBillingUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [timestep, setTimestep] = useState("day");
@@ -29,6 +29,7 @@ const Billing = () => {
     const [res, usage] = await getBillingUsage(from, to, null, ts);
     if (res.status == 200 && Array.isArray(usage)) {
       setUsageData(usage);
+      console.log(usage);
     }
   };
 

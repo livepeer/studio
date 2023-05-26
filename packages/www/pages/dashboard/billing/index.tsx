@@ -287,7 +287,13 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Text variant="neutral">Usage Month to date</Text>
+          <Link href="/dashboard/billing/usage" passHref legacyBehavior>
+            <A
+              variant="primary"
+              css={{ display: "flex", alignItems: "center" }}>
+              View Usage Details <ArrowRightIcon />
+            </A>
+          </Link>
           {billingUsage && (
             <table
               style={{
@@ -353,15 +359,6 @@ const Billing = () => {
               </tbody>
             </table>
           )}
-        </Box>
-        <Box>
-          <Link href="/dashboard/billing/usage" passHref legacyBehavior>
-            <A
-              variant="primary"
-              css={{ display: "flex", alignItems: "center" }}>
-              View Usage Analytics <ArrowRightIcon />
-            </A>
-          </Link>
         </Box>
         <Box css={{ mb: "$9" }}>
           <Flex
