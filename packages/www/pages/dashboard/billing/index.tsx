@@ -38,6 +38,8 @@ const Billing = () => {
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
   const [timestep, setTimestep] = useState("day");
+  const [from, setFrom] = useState(0);
+  const [to, setTo] = useState(0);
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -60,9 +62,20 @@ const Billing = () => {
     return queryClient.invalidateQueries(queryKey);
   }, [queryClient, queryKey]);
 
-  const doSetTimeStep = async (timestep) => {
-    setTimestep(timestep);
-    doGetBillingUsage();
+  const doSetTimeStep = async (ts: string) => {
+    setTimestep(ts);
+    const [res, usage] = await getBillingUsage(from, to, null, ts);
+    if (res.status == 200) {
+      setBillingUsage(usage);
+    }
+  };
+
+  const doSetFrom = async (from: number) => {
+    setFrom(from);
+  };
+
+  const doSetTo = async (to: number) => {
+    setTo(to);
   };
 
   useEffect(() => {
@@ -85,6 +98,9 @@ const Billing = () => {
       const now = new Date();
       const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
       const toTime = now.getTime();
+
+      doSetFrom(fromTime);
+      doSetTo(toTime);
 
       const [res, usage] = await getBillingUsage(fromTime, toTime);
       if (res.status == 200) {
