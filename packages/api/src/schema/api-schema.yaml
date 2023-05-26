@@ -1497,8 +1497,8 @@ components:
         - $ref: "#/components/schemas/creator-id"
         - type: string
           description:
-            Helper syntax to specify an unverified creator ID, fully managed
-            by the developer.
+            Helper syntax to specify an unverified creator ID, fully managed by
+            the developer.
     creator-id:
       type: object
       oneOf:
