@@ -11,7 +11,17 @@ import {
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
-import { BarChart, Bar, ResponsiveContainer, LineChart, Line } from "recharts";
+import {
+  BarChart,
+  Bar,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from "recharts";
 
 const Billing = () => {
   useLoggedIn();
@@ -35,7 +45,7 @@ const Billing = () => {
       for (let i = 0; i < usage.length; i++) {
         const item = usage[i];
         if (ts == "day") {
-          item.name = `${dayCounter} ${currentMonth}`;
+          item.name = `${currentMonth} ${dayCounter}`;
           dayCounter++;
         } else {
           item.name = "";
@@ -256,23 +266,31 @@ const Billing = () => {
         </Box>
         <Box>
           <Text>Total Usage</Text>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
               <Bar dataKey="TotalUsageMins" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
         </Box>
         <Box>
           <Text>Delivery Usage</Text>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
               <Bar dataKey="DeliveryUsageGbs" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
         </Box>
         <Box>
           <Text>Average Storage Usage</Text>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={300}>
             <LineChart width={150} height={40} data={usageData}>
               <Line
                 type="monotone"
