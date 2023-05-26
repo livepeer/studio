@@ -1043,8 +1043,8 @@ components:
           format: uri
           pattern: "^(https?|ipfs|ar)://"
           description: |
-            URL where the asset contents can be retrieved. Only valid for the
-            import task endpoint.
+            URL where the asset contents can be retrieved. Only allowed (and
+            also required) in the upload asset via URL endpoint.
           example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
           type: object
