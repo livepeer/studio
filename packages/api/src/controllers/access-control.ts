@@ -238,7 +238,9 @@ app.get("/public-key", async (req, res) => {
       if (response.status === 200) {
         return response.json();
       } else {
-        throw new Error("Something went wrong");
+        throw new Error(
+          `access-control: error retrieving public key from catalyst statusCode=${response.status} catalystUrl=${url}`
+        );
       }
     })
     .then((responseJson) => {
