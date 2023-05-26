@@ -4,7 +4,6 @@ import {
   getHLSPlaybackUrl,
   getWebRTCPlaybackUrl,
   getRecordingFields,
-  USER_SESSION_TIMEOUT,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
@@ -13,7 +12,7 @@ import {
 } from "./asset";
 import { CliArgs } from "../parse-cli";
 import { DBSession } from "../store/db";
-import { Asset, Stream, User } from "../schema/types";
+import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { NotFoundError, UnprocessableEntityError } from "../store/errors";
@@ -28,27 +27,6 @@ import { NotFoundError, UnprocessableEntityError } from "../store/errors";
 export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
 
 var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv$/;
-
-// This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
-type PlaybackInfo = {
-  type: "live" | "vod" | "recording";
-  meta: {
-    live?: 0 | 1;
-    playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
-    source: {
-      hrn: "HLS (TS)" | "MP4" | "WebRTC (H264)";
-      type:
-        | "html5/application/vnd.apple.mpegurl"
-        | "html5/video/mp4"
-        | "html5/video/h264";
-      url: string;
-      size?: number;
-      width?: number;
-      height?: number;
-      bitrate?: number;
-    }[];
-  };
-};
 
 function newPlaybackInfo(
   type: PlaybackInfo["type"],

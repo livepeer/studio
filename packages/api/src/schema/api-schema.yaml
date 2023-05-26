@@ -1917,6 +1917,7 @@ components:
           example: Example name
     playback-info:
       type: object
+      additionalProperties: false
       properties:
         type:
           type: string
@@ -1924,12 +1925,19 @@ components:
           enum: [live, vod, recording]
         meta:
           type: object
+          additionalProperties: false
           required: [source]
           properties:
+            live:
+              type: number
+              enum: [0, 1]
+            playbackPolicy:
+              $ref: '#/components/schemas/playback-policy'
             source:
               type: array
               items:
                 type: object
+                additionalProperties: false
                 required: [hrn, type, url]
                 properties:
                   hrn:
