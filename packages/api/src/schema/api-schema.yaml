@@ -367,12 +367,7 @@ components:
         name:
           $ref: "#/components/schemas/stream/properties/name"
         creatorId:
-          oneOf:
-            - $ref: "#/components/schemas/creator-id"
-            - type: string
-              description:
-                Helper syntax to specify an unverified creator ID, fully managed
-                by the developer.
+          $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
@@ -409,6 +404,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/asset/properties/name"
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         storage:
@@ -417,6 +414,8 @@ components:
       type: object
       additionalProperties: false
       properties:
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
         record:
           $ref: "#/components/schemas/stream/properties/record"
         suspended:
@@ -1019,12 +1018,7 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         creatorId:
-          oneOf:
-            - $ref: "#/components/schemas/creator-id"
-            - type: string
-              description:
-                Helper syntax to specify an unverified creator ID, fully managed
-                by the developer.
+          $ref: "#/components/schemas/input-creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -1498,6 +1492,13 @@ components:
                     assetSpec:
                       type: object
                       $ref: "#/components/schemas/asset"
+    input-creator-id:
+      oneOf:
+        - $ref: "#/components/schemas/creator-id"
+        - type: string
+          description:
+            Helper syntax to specify an unverified creator ID, fully managed
+            by the developer.
     creator-id:
       type: object
       oneOf:
