@@ -10,33 +10,6 @@ servers:
   - url: "https://livepeer.studio/api"
 components:
   schemas:
-    request-upload:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          example: Example name
-    upload-response:
-      type: object
-      properties:
-        url:
-          type: string
-          example: >-
-            https://origin.livepeer.com/api/asset/upload/direct?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
-        tusEndpoint:
-          type: string
-          example: >-
-            https://origin.livepeer.com/api/asset/upload/tus?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
-        asset:
-          $ref: "#/components/schemas/asset"
-        task:
-          type: object
-          properties:
-            id:
-              type: string
-              example: 34d7618e-fd42-4798-acf5-19504616a11e
     ffmpeg-profile:
       type: object
       description: LMPS ffmpeg profile
@@ -1903,18 +1876,6 @@ components:
           description: |
             The percentage of sessions that existed before the asset started
             playing
-    create-asset-url:
-      type: object
-      required:
-        - url
-        - name
-      properties:
-        url:
-          type: string
-          example: $EXTERNAL_URL
-        name:
-          type: string
-          example: Example name
     playback-info:
       type: object
       additionalProperties: false
@@ -2563,14 +2524,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/request-upload"
+              $ref: "#/components/schemas/new-asset-payload"
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/upload-response"
+                type: object
+                additionalProperties: false
+                required: [url, tusEndpoint, asset, task]
+                properties:
+                  url:
+                    type: string
+                    example: >-
+                      https://origin.livepeer.com/api/asset/upload/direct?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
+                  tusEndpoint:
+                    type: string
+                    example: >-
+                      https://origin.livepeer.com/api/asset/upload/tus?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
+                  asset:
+                    $ref: "#/components/schemas/asset"
+                  task:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 34d7618e-fd42-4798-acf5-19504616a11e
         default:
           description: Error
           content:
@@ -2593,14 +2573,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/create-asset-url"
+              $ref: "#/components/schemas/new-asset-payload"
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/upload-response"
+                type: object
+                additionalProperties: false
+                required: [asset, task]
+                properties:
+                  asset:
+                    $ref: "#/components/schemas/asset"
+                  task:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 34d7618e-fd42-4798-acf5-19504616a11e
         default:
           description: Error
           content:
