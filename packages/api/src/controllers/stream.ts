@@ -41,6 +41,7 @@ import {
   pathJoin,
   FieldsMap,
   toStringValues,
+  mapInputCreatorId,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -939,17 +940,12 @@ app.post(
       }
     }
 
-    const creatorId =
-      typeof payload.creatorId === "string"
-        ? ({ type: "unverified", value: payload.creatorId } as const)
-        : payload.creatorId;
-
     let doc: DBStream = {
       ...DEFAULT_STREAM_FIELDS,
       ...payload,
       kind: "stream",
       userId: req.user.id,
-      creatorId,
+      creatorId: mapInputCreatorId(payload.creatorId),
       renditions: {},
       objectStoreId,
       id,
@@ -1297,14 +1293,13 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, multistream, playbackPolicy } = payload;
-    let patch: StreamPatchPayload = {};
-    if (typeof record === "boolean") {
-      patch = { ...patch, record };
-    }
-    if (typeof suspended === "boolean") {
-      patch = { ...patch, suspended };
-    }
+    let { record, suspended, multistream, playbackPolicy, creatorId } = payload;
+    let patch: StreamPatchPayload & Partial<DBStream> = {
+      record,
+      suspended,
+      creatorId: mapInputCreatorId(creatorId),
+    };
+
     if (multistream) {
       multistream = await validateMultistreamOpts(
         req.user.id,
@@ -1313,10 +1308,15 @@ app.patch(
       );
       patch = { ...patch, multistream };
     }
-    await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+
     if (playbackPolicy) {
+      await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+
       patch = { ...patch, playbackPolicy };
     }
+
+    // remove undefined fields to check below
+    patch = JSON.parse(JSON.stringify(patch));
     if (Object.keys(patch).length === 0) {
       return res.status(204).end();
     }

@@ -739,10 +739,18 @@ components:
           description: Set to true when stream deleted
     new-stream-payload:
       properties:
+        wowza:
+          $ref: "#/components/schemas/stream/properties/wowza"
+        presets:
+          $ref: "#/components/schemas/stream/properties/presets"
+        renditions:
+          $ref: "#/components/schemas/stream/properties/renditions"
         recordObjectStoreId:
           $ref: "#/components/schemas/stream/properties/recordObjectStoreId"
         objectStoreId:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
+        detection:
+          $ref: "#/components/schemas/stream/properties/detection"
     playback-policy:
       properties:
         type:
