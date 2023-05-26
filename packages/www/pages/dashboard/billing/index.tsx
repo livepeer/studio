@@ -7,7 +7,6 @@ import {
   Flex,
   Text,
   Link as A,
-  Select,
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -20,7 +19,6 @@ import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
-import { BarChart, Bar, ResponsiveContainer, LineChart, Line } from "recharts";
 
 const Billing = () => {
   useLoggedIn();
@@ -33,12 +31,8 @@ const Billing = () => {
     getPaymentMethod,
   } = useApi();
   const [usage, setUsage] = useState(null);
-  const [billingUsage, setBillingUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
-  const [timestep, setTimestep] = useState("day");
-  const [from, setFrom] = useState(0);
-  const [to, setTo] = useState(0);
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -61,14 +55,6 @@ const Billing = () => {
     return queryClient.invalidateQueries(queryKey);
   }, [queryClient, queryKey]);
 
-  const doSetFrom = async (from: number) => {
-    setFrom(from);
-  };
-
-  const doSetTo = async (to: number) => {
-    setTo(to);
-  };
-
   useEffect(() => {
     const doGetInvoices = async (stripeCustomerId) => {
       const [res, invoices] = await getInvoices(stripeCustomerId);
@@ -83,22 +69,6 @@ const Billing = () => {
         setUsage(usage);
       }
     };
-
-    const doGetBillingUsage = async () => {
-      // Gather current month data
-      const now = new Date();
-      const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-      const toTime = now.getTime();
-
-      doSetFrom(fromTime);
-      doSetTo(toTime);
-
-      const [res, usage] = await getBillingUsage(fromTime, toTime);
-      if (res.status == 200) {
-        setBillingUsage(usage);
-      }
-    };
-
     const getSubscriptionAndUsage = async (subscriptionId) => {
       const [res, subscription] = await getSubscription(subscriptionId);
       if (res.status == 200) {
@@ -109,7 +79,6 @@ const Billing = () => {
         subscription?.current_period_end,
         user.id
       );
-      doGetBillingUsage();
     };
 
     if (user) {
@@ -294,71 +263,6 @@ const Billing = () => {
               View Usage Details <ArrowRightIcon />
             </A>
           </Link>
-          {billingUsage && (
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontFamily: "Arial, sans-serif",
-              }}>
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    Delivery (Minutes)
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    Total Transcode Usage (Minutes)
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    Storage Usage (Minutes)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    {Number(billingUsage.DeliveryUsageGbs).toFixed(2)}
-                  </td>
-                  <td
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    {Number(billingUsage.TotalUsageMins).toFixed(2)}
-                  </td>
-                  <td
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    {Number(billingUsage.StorageUsageMins).toFixed(2)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          )}
         </Box>
         <Box css={{ mb: "$9" }}>
           <Flex

@@ -144,25 +144,7 @@ const Billing = () => {
               </Flex>
             </Heading>
             <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
-              Current billing period (
-              {subscription && (
-                <Flex>
-                  {new Date(
-                    subscription.current_period_start * 1000
-                  ).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}{" "}
-                  to{" "}
-                  {new Date(
-                    subscription.current_period_end * 1000
-                  ).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}{" "}
-                </Flex>
-              )}
-              )
+              Current billing period
             </Flex>
           </Flex>
         </Box>
@@ -275,7 +257,7 @@ const Billing = () => {
             </Flex>
           </Heading>
         </Flex>
-        <Box>
+        <Box css={{ mb: "$4" }}>
           <Select
             css={{ fontSize: "$3", px: "$2", mb: "$4" }}
             defaultValue="day"
@@ -285,31 +267,28 @@ const Billing = () => {
           </Select>
         </Box>
         <Box>
-          <Text>Total Usage</Text>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="TotalUsageMins" fill="#8884d8" />
+              <Bar dataKey="TotalUsageMins" fill="#30a46c" />
             </BarChart>
           </ResponsiveContainer>
         </Box>
         <Box>
-          <Text>Delivery Usage</Text>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="DeliveryUsageGbs" fill="#8884d8" />
+              <Bar dataKey="DeliveryUsageGbs" fill="#30a46c" />
             </BarChart>
           </ResponsiveContainer>
         </Box>
         <Box>
-          <Text>Average Storage Usage</Text>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -319,7 +298,7 @@ const Billing = () => {
               <Line
                 type="monotone"
                 dataKey="StorageUsageMins"
-                stroke="#8884d8"
+                stroke="#30a46c"
                 strokeWidth={2}
               />
             </LineChart>
