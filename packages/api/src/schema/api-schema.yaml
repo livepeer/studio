@@ -1879,6 +1879,7 @@ components:
     playback-info:
       type: object
       additionalProperties: false
+      required: [type, meta]
       properties:
         type:
           type: string
@@ -1928,9 +1929,6 @@ components:
                   bitrate:
                     type: number
                     example: 449890
-      required:
-        - type
-        - meta
 paths:
   /stream:
     post:
