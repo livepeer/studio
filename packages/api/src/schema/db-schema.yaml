@@ -368,6 +368,68 @@ components:
             properties:
               address:
                 type: string
+    verifiable:
+      type: object
+      table: verifiable
+      additionalProperties: false
+      required:
+        - primaryType
+        - domain
+        - message
+        - signature
+      properties:
+        primaryType:
+          type: string
+          description: Video Metadata EIP-712 primaryType
+        domain:
+          type: object
+          description: Video Metadata EIP-712 domain
+          additionalProperties: false
+          required:
+            - name
+            - version
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+        message:
+          type: object
+          additionalProperties: false
+          description: Video Metadata EIP-712 message content
+          required:
+            - video
+            - attestations
+            - signer
+            - timestamp
+          properties:
+            video:
+              type: string
+            attestations:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required:
+                  - role
+                  - address
+                properties:
+                  role:
+                    type: string
+                  address:
+                    type: string
+            signer:
+              type: string
+            timestamp:
+              type: number
+        signature:
+          type: string
+          description: Video Metadata EIP-712 message signature
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the object was created
     experiment:
       type: object
       table: experiment
