@@ -7,6 +7,10 @@ import {
   Flex,
   Text,
   Link as A,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  Select,
+  DropdownMenuContent,
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -33,6 +37,7 @@ const Billing = () => {
   const [billingUsage, setBillingUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
+  const [timestep, setTimestep] = useState("day");
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -54,6 +59,11 @@ const Billing = () => {
   const invalidateQuery = useCallback(() => {
     return queryClient.invalidateQueries(queryKey);
   }, [queryClient, queryKey]);
+
+  const doSetTimeStep = async (timestep) => {
+    setTimestep(timestep);
+    doGetBillingUsage();
+  };
 
   useEffect(() => {
     const doGetInvoices = async (stripeCustomerId) => {
@@ -84,7 +94,7 @@ const Billing = () => {
         fromTime,
         toTime,
         null,
-        "day"
+        timestep
       );
       // Todo: display chart
     };
@@ -278,6 +288,37 @@ const Billing = () => {
             </Heading>
           </Flex>
           <Text variant="neutral">Usage Month to date</Text>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Box>
+                <Select
+                  css={{ fontSize: "$3", px: "$2", mb: "$4" }}
+                  defaultValue="day"
+                  onChange={(e) => doSetTimeStep(e.target.value)}>
+                  <option value="hour">Hourly</option>
+                  <option value="day">Daily</option>
+                </Select>
+              </Box>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent css={{ mt: "$1" }}>
+              <Box
+                css={{
+                  position: "relative",
+                  minWidth: 450,
+                  top: -10,
+                  borderLeft: "1px solid $colors$neutral7",
+                  borderRight: "1px solid $colors$neutral7",
+                  borderBottom: "1px solid $colors$neutral7",
+                  backgroundColor: "$loContrast",
+                  borderBottomLeftRadius: 6,
+                  borderBottomRightRadius: 6,
+                  borderTopRightRadius: 0,
+                  borderTopLeftRadius: 0,
+                  boxShadow:
+                    "0 7px 14px 0 rgb(60 66 87 / 8%), 0 0 0 0 rgb(0 0 0 / 12%)",
+                }}></Box>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {billingUsage && (
             <table
               style={{
