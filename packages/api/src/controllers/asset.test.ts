@@ -226,6 +226,20 @@ describe("controllers/asset", () => {
       });
     });
 
+    it("should allow editing asset creator ID", async () => {
+      const res = await client.patch(`/asset/${asset.id}`, {
+        creatorId: "0xjest",
+      });
+      expect(res.status).toBe(200);
+
+      const body = await res.json();
+      expect(body).toMatchObject({
+        ...asset,
+        creatorId: { type: "unverified", value: "0xjest" },
+        status: { ...asset.status, updatedAt: expect.any(Number) },
+      });
+    });
+
     it("should allow editing asset playback policy", async () => {
       let playbackPolicy = {
         type: "public",
