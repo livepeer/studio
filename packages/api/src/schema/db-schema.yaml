@@ -749,6 +749,8 @@ components:
           $ref: "#/components/schemas/stream/properties/recordObjectStoreId"
         objectStoreId:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
+        detection:
+          $ref: "#/components/schemas/stream/properties/detection"
     playback-policy:
       properties:
         type:

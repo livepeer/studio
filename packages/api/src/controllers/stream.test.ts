@@ -548,14 +548,14 @@ describe("controllers/stream", () => {
 
       it("should disallow setting suspended streams or users", async () => {
         client.jwtAuth = nonAdminToken;
-        let res = await client.post("/stream", {
-          ...postMockStream,
-          suspended: true,
-        });
+        let res = await client.post("/stream", postMockStream);
         expect(res.status).toBe(201);
         const stream = await res.json();
-        client.jwtAuth = adminToken;
 
+        res = await client.patch(`/stream/${stream.id}`, { suspended: true });
+        expect(res.status).toBe(204);
+
+        client.jwtAuth = adminToken;
         await expectError(stream.id, "stream is suspended");
 
         await db.stream.update(stream.id, { suspended: false });
@@ -1263,7 +1263,6 @@ describe("controllers/stream", () => {
       client.jwtAuth = nonAdminToken;
 
       stream = {
-        kind: "stream",
         name: "test stream",
         profiles: [
           {
@@ -1541,7 +1540,6 @@ describe("controllers/stream", () => {
 });
 
 const smallStream = {
-  id: "231e7a49-8351-400b-a3df-0bcde13754e4",
   name: "small01",
   record: true,
   profiles: [
