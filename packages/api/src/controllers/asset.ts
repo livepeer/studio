@@ -1069,6 +1069,7 @@ app.patch(
       name,
       playbackPolicy,
       storage: storageInput,
+      creatorId,
     } = req.body as AssetPatchPayload;
 
     // update a specific asset
@@ -1122,6 +1123,7 @@ app.patch(
       name,
       storage,
       playbackPolicy,
+      creatorId: mapInputCreatorId(creatorId),
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
