@@ -30,7 +30,7 @@ components:
           example: >-
             https://origin.livepeer.com/api/asset/upload/tus?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
         asset:
-         $ref: "#/components/schemas/asset"
+          $ref: "#/components/schemas/asset"
         task:
           type: object
           properties:
@@ -1932,7 +1932,7 @@ components:
               type: number
               enum: [0, 1]
             playbackPolicy:
-              $ref: '#/components/schemas/playback-policy'
+              $ref: "#/components/schemas/playback-policy"
             source:
               type: array
               items:
@@ -1948,9 +1948,9 @@ components:
                     type: string
                     example: html5/video/mp4
                     enum:
-                     - html5/application/vnd.apple.mpegurl
-                     - html5/video/mp4
-                     - html5/video/h264
+                      - html5/application/vnd.apple.mpegurl
+                      - html5/video/mp4
+                      - html5/video/h264
                   url:
                     type: string
                     example: >-
@@ -2026,14 +2026,13 @@ paths:
         "GET /stream to retrieve all stream objects with the same userId. The
         response will include both parent stream objects and the historic stream
         objects with a parentId (stream objects representing a single live
-        stream session). The usage of these \"child-session\" stream objects
-        is deprecated, use the session endpoints instead. To filter this API not
-        to return these child sessions add a `?streamsonly=true` query-string\n\n
-        GET /stream?streamsonly=1 to retrieve all stream
-        objects with the same userId and exclude the historic stream objects
-        with a parentId (stream objects representing a single live stream
-        session).\n\n ### Quick filters\n\n|
-        Filter\t                                      |
+        stream session). The usage of these \"child-session\" stream objects is
+        deprecated, use the session endpoints instead. To filter this API not to
+        return these child sessions add a `?streamsonly=true` query-string\n\n
+        GET /stream?streamsonly=1 to retrieve all stream objects with the same
+        userId and exclude the historic stream objects with a parentId (stream
+        objects representing a single live stream session).\n\n ### Quick
+        filters\n\n| Filter\t                                      |
         Example\t                                      \t                      |
         Description                             |\n|
         --------------------------------------------- |
