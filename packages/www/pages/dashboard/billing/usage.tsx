@@ -312,6 +312,10 @@ const Billing = () => {
           <Text>Average Storage Usage</Text>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart width={150} height={40} data={usageData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
               <Line
                 type="monotone"
                 dataKey="StorageUsageMins"
