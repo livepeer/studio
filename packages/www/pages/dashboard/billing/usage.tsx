@@ -183,7 +183,7 @@ const Billing = () => {
                     fontWeight: 600,
                     letterSpacing: "0",
                   }}>
-                  Usage
+                  Summary
                 </Box>
               </Flex>
             </Heading>
@@ -255,6 +255,26 @@ const Billing = () => {
             </table>
           )}
         </Box>
+        <Flex
+          justify="between"
+          align="end"
+          css={{
+            mb: "$4",
+            width: "100%",
+          }}>
+          <Heading size="1">
+            <Flex align="center">
+              <Box
+                css={{
+                  mr: "$3",
+                  fontWeight: 600,
+                  letterSpacing: "0",
+                }}>
+                Charts
+              </Box>
+            </Flex>
+          </Heading>
+        </Flex>
         <Box>
           <Select
             css={{ fontSize: "$3", px: "$2", mb: "$4" }}
