@@ -7,10 +7,7 @@ import {
   Flex,
   Text,
   Link as A,
-  DropdownMenu,
-  DropdownMenuTrigger,
   Select,
-  DropdownMenuContent,
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -23,19 +20,7 @@ import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
-import {
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from "recharts";
+import { BarChart, Bar, ResponsiveContainer, LineChart, Line } from "recharts";
 
 const Billing = () => {
   useLoggedIn();
@@ -54,7 +39,6 @@ const Billing = () => {
   const [timestep, setTimestep] = useState("day");
   const [from, setFrom] = useState(0);
   const [to, setTo] = useState(0);
-  const [usageData, setUsageData] = useState([]);
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -76,14 +60,6 @@ const Billing = () => {
   const invalidateQuery = useCallback(() => {
     return queryClient.invalidateQueries(queryKey);
   }, [queryClient, queryKey]);
-
-  const doSetTimeStep = async (ts: string) => {
-    setTimestep(ts);
-    const [res, usage] = await getBillingUsage(from, to, null, ts);
-    if (res.status == 200 && Array.isArray(usage)) {
-      setUsageData(usage);
-    }
-  };
 
   const doSetFrom = async (from: number) => {
     setFrom(from);
@@ -120,15 +96,6 @@ const Billing = () => {
       const [res, usage] = await getBillingUsage(fromTime, toTime);
       if (res.status == 200) {
         setBillingUsage(usage);
-      }
-      const [res2, usageByDay] = await getBillingUsage(
-        fromTime,
-        toTime,
-        null,
-        timestep
-      );
-      if (res2.status == 200 && Array.isArray(usageByDay)) {
-        setUsageData(usageByDay);
       }
     };
 
@@ -388,42 +355,13 @@ const Billing = () => {
           )}
         </Box>
         <Box>
-          <Select
-            css={{ fontSize: "$3", px: "$2", mb: "$4" }}
-            defaultValue="day"
-            onChange={(e) => doSetTimeStep(e.target.value)}>
-            <option value="hour">Hourly</option>
-            <option value="day">Daily</option>
-          </Select>
-        </Box>
-        <Box>
-          <Text>Total Usage</Text>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart width={150} height={40} data={usageData}>
-              <Bar dataKey="TotalUsageMins" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-        <Box>
-          <Text>Delivery Usage</Text>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart width={150} height={40} data={usageData}>
-              <Bar dataKey="DeliveryUsageGbs" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-        <Box>
-          <Text>Average Storage Usage</Text>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart width={150} height={40} data={usageData}>
-              <Line
-                type="monotone"
-                dataKey="StorageUsageMins"
-                stroke="#8884d8"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <Link href="/dashboard/billing/usage" passHref legacyBehavior>
+            <A
+              variant="primary"
+              css={{ display: "flex", alignItems: "center" }}>
+              View Usage Analytics <ArrowRightIcon />
+            </A>
+          </Link>
         </Box>
         <Box css={{ mb: "$9" }}>
           <Flex
