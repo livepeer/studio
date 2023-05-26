@@ -11,9 +11,7 @@ import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
-
-import { WithID } from "../store/types";
-import { ObjectStore, Task } from "../schema/types";
+import { CreatorId, ObjectStore } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -511,4 +509,10 @@ export function isValidBase64(str: string) {
     // If there's an error during decoding, it's not a valid base64 string
     return false;
   }
+}
+
+export function mapInputCreatorId(inputId: string | CreatorId): CreatorId {
+  return typeof inputId === "string"
+    ? { type: "unverified", value: inputId }
+    : inputId;
 }

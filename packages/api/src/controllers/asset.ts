@@ -16,6 +16,7 @@ import {
   getObjectStoreS3Config,
   reqUseReplica,
   isValidBase64,
+  mapInputCreatorId,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -131,11 +132,6 @@ async function validateAssetPayload(
     createdAt
   );
 
-  const creatorId =
-    typeof payload.creatorId === "string"
-      ? ({ type: "unverified", value: payload.creatorId } as const)
-      : payload.creatorId;
-
   return {
     id,
     playbackId,
@@ -148,7 +144,7 @@ async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    creatorId,
+    creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
     storage: storageInputToState(payload.storage),

@@ -41,6 +41,7 @@ import {
   pathJoin,
   FieldsMap,
   toStringValues,
+  mapInputCreatorId,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -939,17 +940,12 @@ app.post(
       }
     }
 
-    const creatorId =
-      typeof payload.creatorId === "string"
-        ? ({ type: "unverified", value: payload.creatorId } as const)
-        : payload.creatorId;
-
     let doc: DBStream = {
       ...DEFAULT_STREAM_FIELDS,
       ...payload,
       kind: "stream",
       userId: req.user.id,
-      creatorId,
+      creatorId: mapInputCreatorId(payload.creatorId),
       renditions: {},
       objectStoreId,
       id,
