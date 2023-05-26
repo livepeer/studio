@@ -15,6 +15,7 @@ import {
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
+  isValidBase64,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -679,7 +680,13 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     });
   }
   if (encryption) {
-    await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+    if (encryption.encryptedKey) {
+      if (!isValidBase64(encryption.encryptedKey)) {
+        return res.status(422).json({
+          errors: [`"encryptedKey" must be valid base64`],
+        });
+      }
+    }
   }
 
   const id = uuid();
@@ -818,7 +825,13 @@ app.post(
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     const { encryption } = req.body as NewAssetPayload;
     if (encryption) {
-      await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+      if (encryption.encryptedKey) {
+        if (!isValidBase64(encryption.encryptedKey)) {
+          return res.status(422).json({
+            errors: [`encryptedKey must be valid base64`],
+          });
+        }
+      }
     }
 
     let asset = await validateAssetPayload(
