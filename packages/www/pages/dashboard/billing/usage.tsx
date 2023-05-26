@@ -28,6 +28,20 @@ const Billing = () => {
     setTimestep(ts);
     const [res, usage] = await getBillingUsage(from, to, null, ts);
     if (res.status == 200 && Array.isArray(usage)) {
+      const now = new Date();
+      const currentMonth = now.toLocaleString("default", { month: "short" });
+      let dayCounter = 1;
+
+      for (let i = 0; i < usage.length; i++) {
+        const item = usage[i];
+        if (ts == "day") {
+          item.name = `${dayCounter} ${currentMonth}`;
+          dayCounter++;
+        } else {
+          item.name = "";
+        }
+      }
+
       setUsageData(usage);
       console.log(usage);
     }
