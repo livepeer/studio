@@ -249,6 +249,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 <Link href="/dashboard/billing/plans" passHref legacyBehavior>
                   <NavLink active={id === "billing/plans"}>Plans</NavLink>
                 </Link>
+                <Link href="/dashboard/billing/usage" passHref legacyBehavior>
+                  <NavLink active={id === "billing/usage"}>Usage</NavLink>
+                </Link>
               </Box>
             )}
           </Box>
