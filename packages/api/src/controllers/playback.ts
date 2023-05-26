@@ -122,7 +122,8 @@ const getAssetPlaybackInfo = async (
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
-  isCrossUserQuery?: boolean
+  isCrossUserQuery?: boolean,
+  origin?: string
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let asset =
@@ -138,7 +139,7 @@ export async function getResourceByPlaybackId(
     if (asset.userId !== user?.id && !isCrossUserQuery) {
       console.log(
         `Returning cross-user asset for playback. ` +
-          `userId=${user?.id} userEmail=${user?.email} ` +
+          `userId=${user?.id} userEmail=${user?.email} origin=${origin} ` +
           `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
       );
     }
@@ -169,12 +170,14 @@ async function getPlaybackInfo(
   { config, user }: Request,
   ingest: string,
   id: string,
-  isCrossUserQuery: boolean
+  isCrossUserQuery: boolean,
+  origin: string
 ): Promise<PlaybackInfo> {
   let { stream, asset, session } = await getResourceByPlaybackId(
     id,
     user,
-    isCrossUserQuery
+    isCrossUserQuery,
+    origin
   );
 
   if (asset) {
@@ -226,10 +229,16 @@ app.get("/:id", async (req, res) => {
   const ingest = ingests[0].base;
 
   let { id } = req.params;
-  const isEmbeddablePlayer = embeddablePlayerOrigin.test(
-    req.headers["origin"] ?? ""
+  const origin = req.headers["origin"] ?? "";
+  const isEmbeddablePlayer = embeddablePlayerOrigin.test(origin);
+
+  const info = await getPlaybackInfo(
+    req,
+    ingest,
+    id,
+    isEmbeddablePlayer,
+    origin
   );
-  const info = await getPlaybackInfo(req, ingest, id, isEmbeddablePlayer);
   if (!info) {
     throw new NotFoundError(`No playback URL found for ${id}`);
   }

@@ -15,6 +15,8 @@ import {
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
+  isValidBase64,
+  mapInputCreatorId,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -130,11 +132,6 @@ async function validateAssetPayload(
     createdAt
   );
 
-  const creatorId =
-    typeof payload.creatorId === "string"
-      ? ({ type: "unverified", value: payload.creatorId } as const)
-      : payload.creatorId;
-
   return {
     id,
     playbackId,
@@ -147,7 +144,7 @@ async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    creatorId,
+    creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
     storage: storageInputToState(payload.storage),
@@ -679,7 +676,13 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     });
   }
   if (encryption) {
-    await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+    if (encryption.encryptedKey) {
+      if (!isValidBase64(encryption.encryptedKey)) {
+        return res.status(422).json({
+          errors: [`"encryptedKey" must be valid base64`],
+        });
+      }
+    }
   }
 
   const id = uuid();
@@ -818,7 +821,13 @@ app.post(
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     const { encryption } = req.body as NewAssetPayload;
     if (encryption) {
-      await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+      if (encryption.encryptedKey) {
+        if (!isValidBase64(encryption.encryptedKey)) {
+          return res.status(422).json({
+            errors: [`encryptedKey must be valid base64`],
+          });
+        }
+      }
     }
 
     let asset = await validateAssetPayload(
@@ -1060,6 +1069,7 @@ app.patch(
       name,
       playbackPolicy,
       storage: storageInput,
+      creatorId,
     } = req.body as AssetPatchPayload;
 
     // update a specific asset
@@ -1113,6 +1123,7 @@ app.patch(
       name,
       storage,
       playbackPolicy,
+      creatorId: mapInputCreatorId(creatorId),
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);

@@ -29,6 +29,7 @@ const AppPlayer = ({ playbackUrl, autoPlay = true, type }: AppPlayerProps) => {
       objectFit="contain"
       mediaElementRef={mediaElementRef}
       priority
+      muted
     />
   );
 };

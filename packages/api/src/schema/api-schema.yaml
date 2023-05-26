@@ -236,6 +236,8 @@ components:
         name:
           type: string
           example: test_stream
+        creatorId:
+          $ref: "#/components/schemas/creator-id"
         lastSeen:
           type: number
           example: 1587667174725
@@ -383,6 +385,24 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
+    new-stream-payload:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/stream/properties/name"
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
+        profiles:
+          $ref: "#/components/schemas/stream/properties/profiles"
+        record:
+          $ref: "#/components/schemas/stream/properties/record"
+        multistream:
+          $ref: "#/components/schemas/stream/properties/multistream"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -411,6 +431,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/asset/properties/name"
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         storage:
@@ -419,6 +441,8 @@ components:
       type: object
       additionalProperties: false
       properties:
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
         record:
           $ref: "#/components/schemas/stream/properties/record"
         suspended:
@@ -756,21 +780,7 @@ components:
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         creatorId:
-          oneOf:
-            - type: object
-              additionalProperties: false
-              required:
-                - type
-                - value
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - unverified
-                value:
-                  type: string
-                  description:
-                    Developer-managed ID of the user who created the asset.
+          $ref: "#/components/schemas/creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -1035,12 +1045,7 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         creatorId:
-          oneOf:
-            - $ref: "#/components/schemas/asset/properties/creatorId"
-            - type: string
-              description: |
-                Helper syntax to specify an unverified creator ID, fully managed
-                by the developer.
+          $ref: "#/components/schemas/input-creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -1071,25 +1076,14 @@ components:
         encryption:
           type: object
           additionalProperties: false
-          required:
-            - key
+          required: [encryptedKey]
           properties:
-            key:
+            encryptedKey:
               type: string
               writeOnly: true
-              description: |
-                Encryption key used to encrypt the asset encoded in base16. Only
-                writable in the upload asset endpoints and cannot be retrieved
-                back.
-              example: 74686973206d65616e73206e6f7468696e672120676f2061776179206672656e
-            algorithm:
-              type: string
-              description: |
-                Encryption algorithm used to encrypt the asset, defaults to AES
-                in CBC block cipher mode.
-              enum:
-                - aes-cbc
-              default: aes-cbc
+              description:
+                Encryption key used to encrypt the asset. Only writable in the
+                upload asset endpoints and cannot be retrieved back.
     room-user-payload:
       type: object
       required:
@@ -1149,7 +1143,11 @@ components:
                   type: string
                   format: uri
                   pattern: "^http(s)?://"
-                  description: Service endpoint URL
+                  description:
+                    "Service endpoint URL (AWS S3 endpoint list:
+                    https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
+                    S3 endpoint: https://storage.googleapis.com, Storj:
+                    https://gateway.storjshare.io)"
                   example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
@@ -1195,7 +1193,11 @@ components:
                   type: string
                   format: uri
                   pattern: "^http(s)?://"
-                  description: Service endpoint URL
+                  description:
+                    "Service endpoint URL (AWS S3 endpoint list:
+                    https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
+                    S3 endpoint: https://storage.googleapis.com, Storj:
+                    https://gateway.storjshare.io)"
                   example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
@@ -1517,6 +1519,27 @@ components:
                     assetSpec:
                       type: object
                       $ref: "#/components/schemas/asset"
+    input-creator-id:
+      oneOf:
+        - $ref: "#/components/schemas/creator-id"
+        - type: string
+          description:
+            Helper syntax to specify an unverified creator ID, fully managed by
+            the developer.
+    creator-id:
+      type: object
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [type, value]
+          properties:
+            type:
+              type: string
+              enum: [unverified]
+            value:
+              type: string
+              description:
+                Developer-managed ID of the user who created the resource.
     export-task-params:
       description: Parameters for the export task
       oneOf:
@@ -1973,7 +1996,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: "#/components/schemas/stream"
+              $ref: "#/components/schemas/new-stream-payload"
       responses:
         "200":
           description: Success

@@ -267,7 +267,11 @@ export default function parseCli(argv?: string | readonly string[]) {
       },
       recordCatalystObjectStoreId: {
         describe: "object store ID used by Catalyst to store recordings",
+      },
+      catalystBaseUrl: {
+        describe: "base URL of Catalyst",
         type: "string",
+        default: "http://localhost:7979",
       },
       googleCloudUrlSigningKeyName: {
         describe:

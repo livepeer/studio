@@ -12,6 +12,7 @@ import { geolocateMiddleware } from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
+  NewStreamPayload,
   StreamHealthPayload,
   StreamPatchPayload,
   StreamSetActivePayload,
@@ -40,6 +41,7 @@ import {
   pathJoin,
   FieldsMap,
   toStringValues,
+  mapInputCreatorId,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -913,67 +915,69 @@ app.post(
   }
 );
 
-app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
-  if (!req.body || !req.body.name) {
-    res.status(422);
-    return res.json({
-      errors: ["missing name"],
-    });
-  }
-  const id = uuid();
-  const createdAt = Date.now();
-  const streamKey = await generateUniqueStreamKey(id);
-  let playbackId = await generateUniquePlaybackId(id, [streamKey]);
-  if (req.user.isTestUser) {
-    playbackId += "-test";
-  }
+app.post(
+  "/",
+  authorizer({}),
+  validatePost("new-stream-payload"),
+  async (req, res) => {
+    const payload = req.body as NewStreamPayload;
 
-  let objectStoreId;
-  if (req.body.objectStoreId) {
-    const store = await db.objectStore.get(req.body.objectStoreId);
-    if (!store || store.deleted || store.disabled) {
-      return res.status(400).json({
-        errors: [
-          `object store ${req.body.objectStoreId} not found or disabled`,
-        ],
-      });
+    const id = uuid();
+    const createdAt = Date.now();
+    const streamKey = await generateUniqueStreamKey(id);
+    let playbackId = await generateUniquePlaybackId(id, [streamKey]);
+    if (req.user.isTestUser) {
+      playbackId += "-test";
     }
+
+    const { objectStoreId } = payload;
+    if (objectStoreId) {
+      const store = await db.objectStore.get(objectStoreId);
+      if (!store || store.deleted || store.disabled) {
+        return res.status(400).json({
+          errors: [`object store ${objectStoreId} not found or disabled`],
+        });
+      }
+    }
+
+    let doc: DBStream = {
+      ...DEFAULT_STREAM_FIELDS,
+      ...payload,
+      kind: "stream",
+      userId: req.user.id,
+      creatorId: mapInputCreatorId(payload.creatorId),
+      renditions: {},
+      objectStoreId,
+      id,
+      createdAt,
+      streamKey,
+      playbackId,
+      createdByTokenName: req.token?.name,
+      createdByTokenId: req.token?.id,
+      isActive: false,
+      lastSeen: 0,
+    };
+    doc = wowzaHydrate(doc);
+
+    await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+
+    doc.profiles = hackMistSettings(req, doc.profiles);
+    doc.multistream = await validateMultistreamOpts(
+      req.user.id,
+      doc.profiles,
+      doc.multistream
+    );
+
+    await db.stream.create(doc);
+
+    res.status(201);
+    res.json(
+      db.stream.addDefaultFields(
+        db.stream.removePrivateFields(doc, req.user.admin)
+      )
+    );
   }
-
-  const doc: DBStream = wowzaHydrate({
-    ...DEFAULT_STREAM_FIELDS,
-    ...req.body,
-    kind: "stream",
-    userId: req.user.id,
-    renditions: {},
-    objectStoreId,
-    id,
-    createdAt,
-    streamKey,
-    playbackId,
-    createdByTokenName: req.token?.name,
-    createdByTokenId: req.token?.id,
-    isActive: false,
-    lastSeen: 0,
-  });
-  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
-
-  doc.profiles = hackMistSettings(req, doc.profiles);
-  doc.multistream = await validateMultistreamOpts(
-    req.user.id,
-    doc.profiles,
-    doc.multistream
-  );
-
-  await req.store.create(doc);
-
-  res.status(201);
-  res.json(
-    db.stream.addDefaultFields(
-      db.stream.removePrivateFields(doc, req.user.admin)
-    )
-  );
-});
+);
 
 app.put(
   "/:id/setactive",
@@ -1289,14 +1293,13 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, multistream, playbackPolicy } = payload;
-    let patch: StreamPatchPayload = {};
-    if (typeof record === "boolean") {
-      patch = { ...patch, record };
-    }
-    if (typeof suspended === "boolean") {
-      patch = { ...patch, suspended };
-    }
+    let { record, suspended, multistream, playbackPolicy, creatorId } = payload;
+    let patch: StreamPatchPayload & Partial<DBStream> = {
+      record,
+      suspended,
+      creatorId: mapInputCreatorId(creatorId),
+    };
+
     if (multistream) {
       multistream = await validateMultistreamOpts(
         req.user.id,
@@ -1305,10 +1308,15 @@ app.patch(
       );
       patch = { ...patch, multistream };
     }
-    await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+
     if (playbackPolicy) {
+      await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+
       patch = { ...patch, playbackPolicy };
     }
+
+    // remove undefined fields to check below
+    patch = JSON.parse(JSON.stringify(patch));
     if (Object.keys(patch).length === 0) {
       return res.status(204).end();
     }

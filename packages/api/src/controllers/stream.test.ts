@@ -409,6 +409,18 @@ describe("controllers/stream", () => {
         expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
       });
 
+      it("should create a stream with creator ID", async () => {
+        const now = Date.now();
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          creatorId: "jest",
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBeDefined();
+        expect(stream.creatorId).toEqual({ type: "unverified", value: "jest" });
+      });
+
       it("should create stream with valid multistream target ID", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
@@ -536,14 +548,14 @@ describe("controllers/stream", () => {
 
       it("should disallow setting suspended streams or users", async () => {
         client.jwtAuth = nonAdminToken;
-        let res = await client.post("/stream", {
-          ...postMockStream,
-          suspended: true,
-        });
+        let res = await client.post("/stream", postMockStream);
         expect(res.status).toBe(201);
         const stream = await res.json();
-        client.jwtAuth = adminToken;
 
+        res = await client.patch(`/stream/${stream.id}`, { suspended: true });
+        expect(res.status).toBe(204);
+
+        client.jwtAuth = adminToken;
         await expectError(stream.id, "stream is suspended");
 
         await db.stream.update(stream.id, { suspended: false });
@@ -643,6 +655,17 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(204);
       });
 
+      it("should allow patch of creator ID", async () => {
+        const res = await client.patch(patchPath, {
+          creatorId: "0xjest",
+        });
+        expect(res.status).toBe(204);
+
+        await expect(db.stream.get(stream.id)).resolves.toMatchObject({
+          creatorId: { type: "unverified", value: "0xjest" },
+        });
+      });
+
       it("should allow patch of playbackPolicy", async () => {
         const res = await client.patch(patchPath, {
           playbackPolicy: {
@@ -659,6 +682,7 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(400);
       });
+
       it("should disallow additional fields", async () => {
         const res = await client.patch(patchPath, {
           name: "the stream name is immutable",
@@ -1251,7 +1275,6 @@ describe("controllers/stream", () => {
       client.jwtAuth = nonAdminToken;
 
       stream = {
-        kind: "stream",
         name: "test stream",
         profiles: [
           {
@@ -1529,7 +1552,6 @@ describe("controllers/stream", () => {
 });
 
 const smallStream = {
-  id: "231e7a49-8351-400b-a3df-0bcde13754e4",
   name: "small01",
   record: true,
   profiles: [

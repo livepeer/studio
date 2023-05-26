@@ -11,9 +11,7 @@ import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
-
-import { WithID } from "../store/types";
-import { ObjectStore, Task } from "../schema/types";
+import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -499,4 +497,22 @@ export async function recaptchaVerify(token: string, secretKey: string) {
   })
     .then((res) => res.json())
     .then((res) => res.score);
+}
+
+export function isValidBase64(str: string) {
+  try {
+    // Decode the string and re-encode it
+    const decoded = Buffer.from(str, "base64").toString("base64");
+    // If the re-encoded string matches the original input, it's a valid base64 string
+    return decoded === str;
+  } catch (err) {
+    // If there's an error during decoding, it's not a valid base64 string
+    return false;
+  }
+}
+
+export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
+  return typeof inputId === "string"
+    ? { type: "unverified", value: inputId }
+    : inputId;
 }
