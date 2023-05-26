@@ -22,6 +22,18 @@ import UpcomingInvoiceTable from "components/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
+import React, { PureComponent } from "react";
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const Billing = () => {
   useLoggedIn();
@@ -40,6 +52,7 @@ const Billing = () => {
   const [timestep, setTimestep] = useState("day");
   const [from, setFrom] = useState(0);
   const [to, setTo] = useState(0);
+  const [usageData, setUsageData] = useState([]);
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -112,7 +125,9 @@ const Billing = () => {
         null,
         timestep
       );
-      // Todo: display chart
+      if (res2.status == 200 && Array.isArray(usageByDay)) {
+        setUsageData(usageByDay);
+      }
     };
 
     const getSubscriptionAndUsage = async (subscriptionId) => {
@@ -304,37 +319,15 @@ const Billing = () => {
             </Heading>
           </Flex>
           <Text variant="neutral">Usage Month to date</Text>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Box>
-                <Select
-                  css={{ fontSize: "$3", px: "$2", mb: "$4" }}
-                  defaultValue="day"
-                  onChange={(e) => doSetTimeStep(e.target.value)}>
-                  <option value="hour">Hourly</option>
-                  <option value="day">Daily</option>
-                </Select>
-              </Box>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent css={{ mt: "$1" }}>
-              <Box
-                css={{
-                  position: "relative",
-                  minWidth: 450,
-                  top: -10,
-                  borderLeft: "1px solid $colors$neutral7",
-                  borderRight: "1px solid $colors$neutral7",
-                  borderBottom: "1px solid $colors$neutral7",
-                  backgroundColor: "$loContrast",
-                  borderBottomLeftRadius: 6,
-                  borderBottomRightRadius: 6,
-                  borderTopRightRadius: 0,
-                  borderTopLeftRadius: 0,
-                  boxShadow:
-                    "0 7px 14px 0 rgb(60 66 87 / 8%), 0 0 0 0 rgb(0 0 0 / 12%)",
-                }}></Box>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Box>
+            <Select
+              css={{ fontSize: "$3", px: "$2", mb: "$4" }}
+              defaultValue="day"
+              onChange={(e) => doSetTimeStep(e.target.value)}>
+              <option value="hour">Hourly</option>
+              <option value="day">Daily</option>
+            </Select>
+          </Box>
           {billingUsage && (
             <table
               style={{
@@ -400,6 +393,13 @@ const Billing = () => {
               </tbody>
             </table>
           )}
+        </Box>
+        <Box>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart width={150} height={40} data={usageData}>
+              <Bar dataKey="uv" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </Box>
         <Box css={{ mb: "$9" }}>
           <Flex
