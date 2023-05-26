@@ -78,8 +78,8 @@ const Billing = () => {
   const doSetTimeStep = async (ts: string) => {
     setTimestep(ts);
     const [res, usage] = await getBillingUsage(from, to, null, ts);
-    if (res.status == 200) {
-      setBillingUsage(usage);
+    if (res.status == 200 && Array.isArray(usage)) {
+      setUsageData(usage);
     }
   };
 
@@ -319,15 +319,6 @@ const Billing = () => {
             </Heading>
           </Flex>
           <Text variant="neutral">Usage Month to date</Text>
-          <Box>
-            <Select
-              css={{ fontSize: "$3", px: "$2", mb: "$4" }}
-              defaultValue="day"
-              onChange={(e) => doSetTimeStep(e.target.value)}>
-              <option value="hour">Hourly</option>
-              <option value="day">Daily</option>
-            </Select>
-          </Box>
           {billingUsage && (
             <table
               style={{
@@ -393,6 +384,15 @@ const Billing = () => {
               </tbody>
             </table>
           )}
+        </Box>
+        <Box>
+          <Select
+            css={{ fontSize: "$3", px: "$2", mb: "$4" }}
+            defaultValue="day"
+            onChange={(e) => doSetTimeStep(e.target.value)}>
+            <option value="hour">Hourly</option>
+            <option value="day">Daily</option>
+          </Select>
         </Box>
         <Box>
           <ResponsiveContainer width="100%" height="100%">
