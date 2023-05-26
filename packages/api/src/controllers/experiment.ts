@@ -78,7 +78,8 @@ app.post(
   validatePost("experiment-audience-payload"),
   async (req, res) => {
     const { experiment: experimentQuery } = req.params;
-    const { addUsers, removeUsers } = req.body as ExperimentAudiencePayload;
+    const { addUsers, removeUsers, allowAll } =
+      req.body as ExperimentAudiencePayload;
 
     const [experiment, addUserIds, removeUserIds] = await Promise.all([
       db.experiment.getByNameOrId(experimentQuery),
@@ -94,6 +95,7 @@ app.post(
     await db.experiment.update(experiment.id, {
       updatedAt: Date.now(),
       audienceUserIds,
+      audienceAllowAll: allowAll,
     });
 
     res.status(204).end();

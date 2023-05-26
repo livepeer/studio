@@ -99,6 +99,9 @@ components:
       type: object
       additionalProperties: false
       properties:
+        allowAll:
+          type: boolean
+          description: Allow all users for the experiment
         addUsers:
           type: array
           items:
@@ -396,6 +399,11 @@ components:
           description:
             Timestamp (in milliseconds) at which experiment was updated
           example: 1587667174725
+        audienceAllowAll:
+          type: boolean
+          description:
+            Allow all users for the experiment; if true, the field
+            'audienceUserIds' is ignored
         audienceUserIds:
           type: array
           index: true

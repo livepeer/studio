@@ -1,35 +1,12 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
-import { Asset, Task, User } from "../schema/types";
+import { User } from "../schema/types";
 import { db } from "../store";
-import { WithID } from "../store/types";
-
-// repeat the type here so we don't need to export it from store/asset-table.ts
-type DBAsset =
-  | WithID<Asset>
-  | (Omit<Asset, "status" | "storage"> & {
-      id: string;
-
-      // These are deprecated fields from when we had a separate status.storage field.
-      status: Asset["status"] & {
-        storage: {
-          ipfs: {
-            taskIds: Asset["storage"]["status"]["tasks"];
-            data?: Task["output"]["export"]["ipfs"];
-          };
-        };
-      };
-      storage: {
-        ipfs: Asset["storage"]["ipfs"]["spec"];
-      };
-    });
 
 let server: TestServer;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
-
-// jest.setTimeout(70000)
 
 beforeAll(async () => {
   server = await serverPromise;
@@ -49,21 +26,18 @@ afterEach(async () => {
   await clearDatabase(server);
 });
 
-describe("controllers/asset", () => {
+describe("controllers/experiment", () => {
   let client: TestClient;
-  let adminUser: User;
   let adminApiKey: string;
   let nonAdminUser: User;
   let nonAdminApiKey: string;
 
   beforeEach(async () => {
-    // await db.objectStore.create({
-    //   id: "mock_vod_store",
-    //   url: "s3+http://user:password@localhost:8080/us-east-1/vod",
-    //   publicUrl: "http://localhost/bucket/vod",
-    // });
-    ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
-      await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+    ({ client, adminApiKey, nonAdminUser, nonAdminApiKey } = await setupUsers(
+      server,
+      mockAdminUserInput,
+      mockNonAdminUserInput
+    ));
     client.apiKey = adminApiKey;
 
     const res = await client.post(`/experiment`, {
@@ -98,6 +72,19 @@ describe("controllers/asset", () => {
 
     it("returns 204 for user in experiment", async () => {
       client.apiKey = nonAdminApiKey;
+
+      const res = await client.get(`/experiment/check/lit-signing-condition`);
+      expect(res.status).toBe(204);
+    });
+
+    it("returns 204 for user not in experiment if all users are allowed", async () => {
+      const resAudience = await client.post(
+        `/experiment/lit-signing-condition/audience`,
+        {
+          allowAll: true,
+        }
+      );
+      expect(resAudience.status).toBe(204);
 
       const res = await client.get(`/experiment/check/lit-signing-condition`);
       expect(res.status).toBe(204);
