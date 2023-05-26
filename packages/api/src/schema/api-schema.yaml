@@ -1935,7 +1935,7 @@ components:
                   hrn:
                     type: string
                     example: MP4
-                    enum: ["HLS (TS)", "MP4", "WebRTC (H264)"];
+                    enum: ["HLS (TS)", "MP4", "WebRTC (H264)"]
                   type:
                     type: string
                     example: html5/video/mp4
