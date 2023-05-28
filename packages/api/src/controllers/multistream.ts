@@ -185,6 +185,10 @@ target.patch(
     if (Object.keys(patch).length > 0) {
       await db.multistreamTarget.update(id, patch);
     }
+    const streamIds = await db.multistreamTarget.getStreamIds(id);
+    await Promise.all(
+      streamIds.map((id) => req.signer.updateMultistreamTargets(id))
+    );
     res.status(204);
     res.end();
   }

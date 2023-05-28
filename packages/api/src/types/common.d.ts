@@ -5,6 +5,7 @@ import Queue from "../store/queue";
 import { TaskScheduler } from "../task/scheduler";
 import { CliArgs } from "../parse-cli";
 import Stripe from "stripe";
+import { Signer } from "./signer";
 
 export interface NodeAddress {
   address: string;
@@ -44,6 +45,7 @@ declare global {
       user?: User;
       isUIAdmin?: boolean;
       token?: WithID<ApiToken>;
+      signer?: Signer;
 
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;

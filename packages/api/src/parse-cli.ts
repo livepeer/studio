@@ -8,6 +8,8 @@ import {
   Price,
 } from "./types/common";
 import { defaultTaskExchange } from "./store/queue";
+import path from "path";
+import os from "os";
 
 function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
@@ -400,6 +402,30 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "Livekit Meet Webapp URL",
         type: "string",
         default: "https://meet.livekit.io/custom",
+      },
+      keystoreDir: {
+        describe: "directory to an ethereum keystore",
+        type: "string",
+        default: (() => {
+          if (os.platform() === "darwin") {
+            return path.resolve(
+              os.homedir(),
+              "Library",
+              "Ethereum",
+              "keystore"
+            );
+          }
+          return path.resolve(os.homedir(), ".ethereum", "keystore");
+        })(),
+      },
+      keystorePassword: {
+        describe: "password of keystore",
+        type: "string",
+      },
+      catalystAddr: {
+        describe: "address of Catalyst node to send events",
+        type: "string",
+        default: "http://127.0.0.1:8989",
       },
     })
     .usage(
