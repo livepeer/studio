@@ -1,7 +1,7 @@
 import litSigningCondition from "./lit-signing-condition";
-import verifiable from "./verifiable";
+import attestation from "./attestation";
 
 export default {
   "lit-signing-condition": litSigningCondition,
-  verifiable,
+  attestation,
 };

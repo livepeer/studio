@@ -17,7 +17,7 @@ import {
   CdnUsageLast,
   SigningKey,
   Room,
-  Verifiable,
+  Attestation,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, {
@@ -72,7 +72,7 @@ export class DB {
   apiToken: Table<ApiToken>;
   user: Table<User>;
   experiment: ExperimentTable;
-  verifiable: Table<Verifiable>;
+  attestation: Table<Attestation>;
   usage: Table<Usage>;
   webhook: WebhookTable;
   webhookResponse: Table<WebhookResponse>;
@@ -170,9 +170,9 @@ export class DB {
       db: this,
       schema: schemas["experiment"],
     });
-    this.verifiable = makeTable<Verifiable>({
+    this.attestation = makeTable<Attestation>({
       db: this,
-      schema: schemas["verifiable"],
+      schema: schemas["attestation"],
     });
     this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
     this.webhook = new WebhookTable({ db: this, schema: schemas["webhook"] });

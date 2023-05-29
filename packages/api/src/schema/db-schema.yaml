@@ -368,9 +368,9 @@ components:
             properties:
               address:
                 type: string
-    verifiable:
+    attestation:
       type: object
-      table: verifiable
+      table: attestation
       additionalProperties: false
       required:
         - primaryType

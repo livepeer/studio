@@ -13,10 +13,10 @@ const DOMAIN = {
   version: "1",
 };
 
-app.post("/", validatePost("verifiable"), async (req, res) => {
+app.post("/", validatePost("attestation"), async (req, res) => {
   const { primaryType, domain, message, signature } = req.body;
 
-  if (primaryType !== "Video") {
+  if (primaryType !== "VideoAttestation") {
     return res.status(400).json({ errors: ["invalid primaryType"] });
   }
   if (!_.isEqual(domain, DOMAIN)) {
@@ -28,14 +28,14 @@ app.post("/", validatePost("verifiable"), async (req, res) => {
     return res.status(400).json({ errors: ["invalid signature"] });
   }
 
-  const verifiableMetadata = await db.verifiable.create({
+  const attestationMetadata = await db.attestation.create({
     id: uuid(),
     createdAt: Date.now(),
     ...req.body,
   });
 
   // TODO: VID-214, pin to IPFS and add CID to Video Metadata
-  return res.status(201).json(verifiableMetadata);
+  return res.status(201).json(attestationMetadata);
 });
 
 function verifySigner(message, signature) {
@@ -62,12 +62,12 @@ function verifySigner(message, signature) {
 }
 
 app.get("/:id", async (req, res) => {
-  const verifiableMetadata = await db.verifiable.get(req.params.id);
-  if (!verifiableMetadata) {
+  const attestationMetadata = await db.attestation.get(req.params.id);
+  if (!attestationMetadata) {
     res.status(404);
     return res.status(404).json({ errors: ["not found"] });
   }
-  return res.status(200).json(verifiableMetadata);
+  return res.status(200).json(attestationMetadata);
 });
 
 app.get("/", async (req, res) => {
@@ -78,10 +78,10 @@ app.get("/", async (req, res) => {
   const query = [];
   if (creator) {
     query.push(
-      `verifiable.data->'message'->'attestations' @> '[{"role":"creator","address":"${creator}"}]'`
+      `attestation.data->'message'->'attestations' @> '[{"role":"creator","address":"${creator}"}]'`
     );
   }
-  const [output, newCursor] = await db.verifiable.find(query, {
+  const [output, newCursor] = await db.attestation.find(query, {
     limit,
     cursor,
     order: "data->>'createdAt' DESC",
