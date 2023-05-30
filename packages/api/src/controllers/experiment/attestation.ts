@@ -66,7 +66,7 @@ function verifyTimestamp(timestamp: number): boolean {
 }
 
 app.get("/:id", async (req, res) => {
-  const attestationMetadata = await db.attestation.get(req.params.id);
+  const attestationMetadata = await db.attestation.getByIdOrCid(req.params.id);
   if (!attestationMetadata) {
     res.status(404);
     return res.status(404).json({ errors: ["not found"] });

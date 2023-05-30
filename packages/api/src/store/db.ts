@@ -32,6 +32,7 @@ import { CdnUsageTable } from "./cdn-usage-table";
 import AssetTable from "./asset-table";
 import TaskTable from "./task-table";
 import ExperimentTable from "./experiment-table";
+import AttestationTable from "./attestation-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -72,7 +73,7 @@ export class DB {
   apiToken: Table<ApiToken>;
   user: Table<User>;
   experiment: ExperimentTable;
-  attestation: Table<Attestation>;
+  attestation: AttestationTable;
   usage: Table<Usage>;
   webhook: WebhookTable;
   webhookResponse: Table<WebhookResponse>;
@@ -170,7 +171,7 @@ export class DB {
       db: this,
       schema: schemas["experiment"],
     });
-    this.attestation = makeTable<Attestation>({
+    this.attestation = new AttestationTable({
       db: this,
       schema: schemas["attestation"],
     });

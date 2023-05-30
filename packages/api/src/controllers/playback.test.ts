@@ -327,6 +327,55 @@ describe("controllers/playback", () => {
       });
     });
 
+    describe("for attestations", () => {
+      it("should return playback URL with the attestation metadata using the exported CID", async () => {
+        const attestation = {
+          id: "mock_attestation_id",
+          createdAt: Date.now(),
+          primaryType: "VideoAttestation",
+          domain: {
+            name: "Verifiable Video",
+            version: "1",
+          },
+          message: {
+            video: `ipfs://${cid}`,
+            attestations: [
+              {
+                role: "creator",
+                address: "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC",
+              },
+            ],
+            signer: "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC",
+            timestamp: 1684241365,
+          },
+          signature:
+            "0xb5e2ba76cae6b23ad6613753f701f9b8bb696d58cad9c7c11ca0fa10ad5a6b123fef9f6639e317f1d3f1a3131e50bfeb83dc02dd69a6b12cb7db665d19a9a49b1b",
+        };
+
+        await db.attestation.create(attestation);
+        await db.asset.update(asset.id, {
+          source: { type: "directUpload" },
+          storage: { ipfs: { cid } },
+        });
+
+        const res = await client.get(`/playback/mock_attestation_id`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+              },
+            ],
+            attestation,
+          },
+        });
+      });
+    });
+
     describe("for unauthenticated requests", () => {
       beforeEach(() => {
         client.jwtAuth = null;
