@@ -214,7 +214,7 @@ const Billing = () => {
                       borderBottom: "1px solid #ddd",
                       textAlign: "center",
                     }}>
-                    {Number(billingUsage.DeliveryUsageGbs).toFixed(2)}
+                    {Number(billingUsage.DeliveryUsageMins).toFixed(2)}
                   </td>
                   <td
                     style={{
@@ -284,7 +284,7 @@ const Billing = () => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="DeliveryUsageGbs" fill="#30a46c" />
+              <Bar dataKey="DeliveryUsageMins" fill="#30a46c" />
             </BarChart>
           </ResponsiveContainer>
         </Box>

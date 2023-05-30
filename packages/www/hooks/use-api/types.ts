@@ -29,7 +29,7 @@ export interface UsageData {
 }
 
 export interface BillingUsageData {
-  DeliveryUsageGbs: number;
+  DeliveryUsageMins: number;
   TotalUsageMins: number;
   StorageUsageMins: number;
 }
