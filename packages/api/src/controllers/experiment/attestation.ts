@@ -20,8 +20,6 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     return res.status(400).json({ errors: ["invalid primaryType"] });
   }
   if (!_.isEqual(domain, DOMAIN)) {
-    console.log(domain);
-    console.log(DOMAIN);
     return res.status(400).json({ errors: ["invalid domain"] });
   }
   if (!verifySigner(message, signature)) {
