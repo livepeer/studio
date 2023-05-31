@@ -294,6 +294,8 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - prod_3
+            - prod_4
     update-subscription:
       type: object
       required:
@@ -320,6 +322,8 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - prod_3
+            - prod_4
     update-customer-payment-method:
       type: object
       required:
@@ -1098,6 +1102,8 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - prod_3
+            - prod_4
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU
