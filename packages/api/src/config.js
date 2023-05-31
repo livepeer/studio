@@ -27,36 +27,72 @@ exports.products = {
     order: 2,
     name: "Business",
     lookupKeys: ["price_2"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0.0,
+      },
+    ],
   },
   hacker_1: {
     order: 0,
     name: "Hacker",
     lookupKeys: ["hacker_1"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0.0,
+      },
+    ],
   },
   growth_1: {
     order: 1,
     name: "Growth",
     lookupKeys: ["growth_1"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0.0,
+      },
+    ],
   },
   scale_1: {
     order: 2,
     name: "Scale",
     lookupKeys: ["scale_1"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0.0,
+      },
+    ],
   },
   pay_as_you_go_1: {
     order: 3,
     name: "Pay-As-You-Go",
     lookupKeys: ["transcoding_usage", "tstreaming_usage", "tstorage_usage"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0.0,
+      },
+    ],
   },
   prod_4: {
     order: 4,
     name: "Enterprise",
-    lookupKeys: [],
-    usage: [],
+    lookupKeys: ["enterprise_1"],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0.0,
+      },
+    ],
   },
 };
