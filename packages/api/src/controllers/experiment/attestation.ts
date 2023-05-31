@@ -32,9 +32,11 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     return res.status(400).json({ errors: ["invalid signature"] });
   }
   if (!verifyTimestamp(message.timestamp)) {
-    return res
-      .status(400)
-      .json({ errors: ["message timestamp should be within the last 1h"] });
+    return res.status(400).json({
+      errors: [
+        "message timestamp must be in the present or past, not in the future",
+      ],
+    });
   }
 
   const id = ethers.TypedDataEncoder.hash(DOMAIN, TYPES, message);
@@ -60,9 +62,7 @@ function verifySigner(message, signature): boolean {
 }
 
 function verifyTimestamp(timestamp: number): boolean {
-  const now = Date.now();
-  // must be signed within the last 1h
-  return now - timestamp >= 0 && now - timestamp <= 3600000;
+  return Date.now() - timestamp >= 0;
 }
 
 app.get("/:id", async (req, res) => {
