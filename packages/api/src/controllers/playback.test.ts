@@ -1,9 +1,9 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
-import { Asset, User } from "../schema/types";
+import { Attestation, Experiment, Asset, User } from "../schema/types";
+import { WithID } from "../store/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
-import { WithID } from "../store/types";
 import { DBSession } from "../store/db";
 import { CROSS_USER_ASSETS_CUTOFF_DATE } from "./playback";
 
@@ -329,7 +329,7 @@ describe("controllers/playback", () => {
 
     describe("for attestations", () => {
       it("should return playback URL with the attestation metadata using the exported CID", async () => {
-        const attestation = {
+        const attestation: WithID<Attestation> = {
           id: "mock_attestation_id",
           createdAt: Date.now(),
           primaryType: "VideoAttestation",
