@@ -236,7 +236,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             <List>
               <Item title={<span>1,000 minutes / month</span>} />
               <Item
-                title={<span>10,000 minutes / month</span>}
+                title={<span>1,000 minutes / month</span>}
                 displayX={false}
                 displayCheck={true}
               />
@@ -520,7 +520,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   if (dashboard) {
                     setIsTourOpen(false);
                   } else {
-                    router.push("/register?selectedPlan=2");
+                    router.push("/register?selectedPlan=3");
                   }
                 }}
               />
@@ -655,6 +655,19 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </List>
           </Box>
         </Flex>
+        <Container
+          css={{
+            fontSize: "$1",
+            textAlign: "center",
+            maxWidth: 800,
+            mt: "$8",
+            mx: "auto",
+            fontStyle: "italic",
+            color: "$hiContrast",
+          }}>
+          The Pay-as-you-go plan applies to minutes that go over the Hacker,
+          Growth, and Scale plans.
+        </Container>
         <Container
           css={{
             fontSize: "$1",
