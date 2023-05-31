@@ -291,6 +291,9 @@ components:
           type: string
           description: stripe product id
           enum:
+            - prod_0
+            - prod_1
+            - prod_2
             - hacker_1
             - growth_1
             - scale_1
@@ -319,6 +322,9 @@ components:
           type: string
           description: stripe product id
           enum:
+            - prod_0
+            - prod_1
+            - prod_2
             - hacker_1
             - growth_1
             - scale_1
@@ -1099,6 +1105,9 @@ components:
         stripeProductId:
           type: string
           enum:
+            - prod_0
+            - prod_1
+            - prod_2
             - hacker_1
             - growth_1
             - scale_1

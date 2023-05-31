@@ -1,4 +1,22 @@
 exports.products = {
+  prod_0: {
+    order: 0,
+    name: "Free",
+    lookupKeys: ["price_0"],
+    usage: [],
+  },
+  prod_1: {
+    order: 0,
+    name: "Pro",
+    lookupKeys: ["price_1"],
+    usage: [],
+  },
+  prod_2: {
+    order: 0,
+    name: "Business",
+    lookupKeys: ["price_2"],
+    usage: [],
+  },
   hacker_1: {
     order: 0,
     name: "Hacker",
