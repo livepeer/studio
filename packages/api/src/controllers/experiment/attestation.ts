@@ -14,14 +14,8 @@ const DOMAIN = {
 };
 
 app.post("/", validatePost("attestation"), async (req, res) => {
-  const { primaryType, domain, message, signature } = req.body;
+  const { message, signature } = req.body;
 
-  if (primaryType !== "VideoAttestation") {
-    return res.status(400).json({ errors: ["invalid primaryType"] });
-  }
-  if (!_.isEqual(domain, DOMAIN)) {
-    return res.status(400).json({ errors: ["invalid domain"] });
-  }
   if (!verifySigner(message, signature)) {
     return res.status(400).json({ errors: ["invalid signature"] });
   }

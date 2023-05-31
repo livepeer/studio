@@ -381,6 +381,8 @@ components:
         primaryType:
           type: string
           description: Video Metadata EIP-712 primaryType
+          enum:
+            - VideoAttestation
         domain:
           type: object
           description: Video Metadata EIP-712 domain
@@ -391,8 +393,12 @@ components:
           properties:
             name:
               type: string
+              enum:
+                - "Verifiable Video"
             version:
               type: string
+              enum:
+                - "1"
         message:
           type: object
           additionalProperties: false

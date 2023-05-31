@@ -93,7 +93,7 @@ describe("Attestation API", () => {
       let request = JSON.parse(JSON.stringify(REQUEST));
       request.primaryType = "InvalidType";
       const res = await client.post("/experiment/-/attestation", request);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it("should return an error for invalid domain", async () => {
@@ -103,7 +103,7 @@ describe("Attestation API", () => {
         version: "1",
       };
       const res = await client.post("/experiment/-/attestation", request);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
     it("should return an error for invalid signature", async () => {
       let request = JSON.parse(JSON.stringify(REQUEST));
