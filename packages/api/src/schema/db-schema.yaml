@@ -294,7 +294,7 @@ components:
             - prod_0
             - prod_1
             - prod_2
-            - prod_3
+            - pay_as_you_go_1
             - prod_4
     update-subscription:
       type: object
@@ -322,7 +322,7 @@ components:
             - prod_0
             - prod_1
             - prod_2
-            - prod_3
+            - pay_as_you_go_1
             - prod_4
     update-customer-payment-method:
       type: object
@@ -1102,7 +1102,7 @@ components:
             - prod_0
             - prod_1
             - prod_2
-            - prod_3
+            - pay_as_you_go_1
             - prod_4
         stripeCustomerId:
           type: string

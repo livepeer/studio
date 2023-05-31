@@ -498,24 +498,26 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_3"].name}
+                {products["pay_as_you_go_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Pay for what you use</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_3"
+                    ? stripeProductId === "pay_as_you_go_1"
                       ? "Current plan"
-                      : stripeProductId === "prod_3"
+                      : stripeProductId === "pay_as_you_go_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_3" ? true : false
+                  dashboard && stripeProductId === "pay_as_you_go_1"
+                    ? true
+                    : false
                 }
                 variant="primary"
-                stripeProductId="prod_3"
+                stripeProductId="pay_as_you_go_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);

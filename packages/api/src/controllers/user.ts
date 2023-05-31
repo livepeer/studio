@@ -897,6 +897,8 @@ app.post(
       subscription: payload.stripeCustomerSubscriptionId,
     });
 
+    // Temporarily commenting out usage - TODO june new billing
+    /*
     // Get the customer's usage
     const usageRes = await db.stream.usage(
       user.id,
@@ -928,6 +930,8 @@ app.post(
         }
       })
     );
+
+    */
 
     // Update the customer's subscription plan.
     // Stripe will automatically invoice the customer based on its usage up until this point
