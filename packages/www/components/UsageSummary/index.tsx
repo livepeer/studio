@@ -127,7 +127,7 @@ const UsageSummary = () => {
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
                 ? products[user.stripeProductId].name
-                : products["hacker_1"].name}{" "}
+                : products["prod_0"].name}{" "}
               Plan
             </Badge>
           </Flex>
