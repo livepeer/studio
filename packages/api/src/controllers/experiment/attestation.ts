@@ -31,6 +31,11 @@ app.post("/", validatePost("attestation"), async (req, res) => {
   if (!verifySigner(message, signature)) {
     return res.status(400).json({ errors: ["invalid signature"] });
   }
+  if (!verifyTimestamp(message.timestamp)) {
+    return res
+      .status(400)
+      .json({ errors: ["message timestamp should be within the last 1h"] });
+  }
 
   const id = ethers.TypedDataEncoder.hash(DOMAIN, TYPES, message);
   const attestationMetadata = await db.attestation.create({
@@ -43,7 +48,7 @@ app.post("/", validatePost("attestation"), async (req, res) => {
   return res.status(201).json(attestationMetadata);
 });
 
-function verifySigner(message, signature) {
+function verifySigner(message, signature): boolean {
   const verifiedSigner = ethers.verifyTypedData(
     DOMAIN,
     TYPES,
@@ -52,6 +57,12 @@ function verifySigner(message, signature) {
   );
 
   return verifiedSigner === message.signer;
+}
+
+function verifyTimestamp(timestamp: number): boolean {
+  const now = Date.now();
+  // must be signed within the last 1h
+  return now - timestamp >= 0 && now - timestamp <= 3600000;
 }
 
 app.get("/:id", async (req, res) => {

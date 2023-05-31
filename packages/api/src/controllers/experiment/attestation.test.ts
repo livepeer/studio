@@ -17,16 +17,20 @@ const REQUEST = {
       },
     ],
     signer: CREATOR_PUBLIC_KEY,
-    timestamp: 1684241365,
+    timestamp: 1685524255812,
   },
   signature:
-    "0xb5e2ba76cae6b23ad6613753f701f9b8bb696d58cad9c7c11ca0fa10ad5a6b123fef9f6639e317f1d3f1a3131e50bfeb83dc02dd69a6b12cb7db665d19a9a49b1b",
+    "0x8d5dc1ba0787fe1208d88cde8af00dfaded3979f6a03526579ffef2594dfb6f82ecc1120ceb55ab1500aae045e1bd6115995f9433c278dad6eabc094a31fcb051c",
 };
 
 let server: TestServer;
 let id: string;
 
+let dateNowSpy;
+
 beforeAll(async () => {
+  dateNowSpy = jest.spyOn(Date, "now").mockImplementation(() => 1685524255812);
+
   server = await serverPromise;
   let client: TestClient;
   let adminApiKey: string;
@@ -74,12 +78,17 @@ beforeAll(async () => {
         },
       ],
       signer: "0xED0B4b69e7199C18A9674e8678B708Cd371a638A",
-      timestamp: 1684241365,
+      timestamp: 1685524255812,
     },
     signature:
-      "0x1aeacd344dc66943a5261f5d0e488adb5a07b684acc91b445f24674c678ad35b681eefd10ac89a5350534632cba8052cb2d763ae7c3b65b3d80bbf298673de6a1c",
+      "0xdb7057384dde4a98ce7dd73b56e231a7d11dbad0bae41e6d4891c491527e3af32e2516fb50320b16f0074c4dfb94c2448243db2bec2a50e0aea42749aac648291b",
   });
   expect(res.status).toBe(201);
+  jest.useRealTimers();
+});
+
+afterAll(() => {
+  dateNowSpy.mockRestore();
 });
 
 describe("Attestation API", () => {
