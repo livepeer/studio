@@ -48,7 +48,7 @@ const PlansPage = () => {
         <Plans
           dashboard={true}
           stripeProductId={
-            user?.stripeProductId ? user.stripeProductId : "hacker_1"
+            user?.stripeProductId ? user.stripeProductId : "prod_0"
           }
         />
       </Box>
