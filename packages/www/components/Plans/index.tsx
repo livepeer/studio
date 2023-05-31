@@ -196,6 +196,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               p: "$4",
               borderRadius: 16,
               width: "25%",
+              background: "$panel",
               minWidth: 250,
             }}>
             <Flex
@@ -287,7 +288,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "hsl(139 55.2% 94.5%)",
+              background: "$panel",
               p: "$4",
               mr: "$4",
               minWidth: 250,
@@ -385,7 +386,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "hsl(140 48.7% 91.0%)",
+              background: "$panel",
               p: "$4",
               mr: "$4",
               minWidth: 250,
@@ -483,7 +484,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "hsl(141 43.7% 86.0%)",
+              background: "$panel",
               p: "$4",
               mr: "$4",
               minWidth: 250,
@@ -581,7 +582,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               width: "25%",
               minWidth: 250,
               mr: "$4",
-              background: "hsl(143 40.3% 79.0%)",
+              background: "$panel",
             }}>
             <Flex
               css={{
