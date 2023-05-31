@@ -287,8 +287,9 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "$panel",
+              background: "hsl(139 55.2% 94.5%)",
               p: "$4",
+              mr: "$4",
               minWidth: 250,
             }}>
             <Flex
@@ -301,7 +302,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
                 {products["prod_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$100/month</Box>
               <PlanForm
                 text={
                   dashboard
@@ -384,8 +385,9 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "$panel",
+              background: "hsl(140 48.7% 91.0%)",
               p: "$4",
+              mr: "$4",
               minWidth: 250,
             }}>
             <Flex
@@ -398,7 +400,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
                 {products["prod_2"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$500/month</Box>
               <PlanForm
                 text={
                   dashboard
@@ -481,8 +483,9 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "$panel",
+              background: "hsl(141 43.7% 86.0%)",
               p: "$4",
+              mr: "$4",
               minWidth: 250,
             }}>
             <Flex
@@ -495,7 +498,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
                 {products["prod_3"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay for what you use</Box>
               <PlanForm
                 text={
                   dashboard
@@ -577,6 +580,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               p: "$4",
               width: "25%",
               minWidth: 250,
+              mr: "$4",
+              background: "hsl(143 40.3% 79.0%)",
             }}>
             <Flex
               css={{
