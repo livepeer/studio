@@ -13,6 +13,18 @@ const DOMAIN = {
   version: "1",
 };
 
+const TYPES = {
+  Video: [
+    { name: "video", type: "string" },
+    { name: "attestations", type: "Attestation[]" },
+    { name: "timestamp", type: "uint256" },
+  ],
+  Attestation: [
+    { name: "role", type: "string" },
+    { name: "address", type: "address" },
+  ],
+};
+
 app.post("/", validatePost("attestation"), async (req, res) => {
   const { message, signature } = req.body;
 
@@ -20,8 +32,9 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     return res.status(400).json({ errors: ["invalid signature"] });
   }
 
+  const id = ethers.TypedDataEncoder.hash(DOMAIN, TYPES, message);
   const attestationMetadata = await db.attestation.create({
-    id: uuid(),
+    id,
     createdAt: Date.now(),
     ...req.body,
   });
@@ -31,21 +44,9 @@ app.post("/", validatePost("attestation"), async (req, res) => {
 });
 
 function verifySigner(message, signature) {
-  const types = {
-    Video: [
-      { name: "video", type: "string" },
-      { name: "attestations", type: "Attestation[]" },
-      { name: "timestamp", type: "uint256" },
-    ],
-    Attestation: [
-      { name: "role", type: "string" },
-      { name: "address", type: "address" },
-    ],
-  };
-
   const verifiedSigner = ethers.verifyTypedData(
     DOMAIN,
-    types,
+    TYPES,
     message,
     signature
   );
