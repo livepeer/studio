@@ -36,7 +36,7 @@ exports.products = {
     ],
   },
   hacker_1: {
-    order: 0,
+    order: 3,
     name: "Hacker",
     lookupKeys: ["hacker_1"],
     usage: [
@@ -48,7 +48,7 @@ exports.products = {
     ],
   },
   growth_1: {
-    order: 1,
+    order: 4,
     name: "Growth",
     lookupKeys: ["growth_1"],
     usage: [
@@ -60,7 +60,7 @@ exports.products = {
     ],
   },
   scale_1: {
-    order: 2,
+    order: 5,
     name: "Scale",
     lookupKeys: ["scale_1"],
     usage: [
@@ -72,7 +72,7 @@ exports.products = {
     ],
   },
   pay_as_you_go_1: {
-    order: 3,
+    order: 6,
     name: "Pay-As-You-Go",
     lookupKeys: ["transcoding_usage", "tstreaming_usage", "tstorage_usage"],
     usage: [
@@ -84,7 +84,7 @@ exports.products = {
     ],
   },
   prod_4: {
-    order: 4,
+    order: 7,
     name: "Enterprise",
     lookupKeys: ["enterprise_1"],
     usage: [
