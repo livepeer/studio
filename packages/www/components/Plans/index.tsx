@@ -208,24 +208,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_0"].name}
+                {products["hacker_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>
-                {products["prod_0"].name}
+                {products["hacker_1"].name}
               </Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_0"
+                    ? stripeProductId === "hacker_1"
                       ? "Current plan"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_0" ? true : false
+                  dashboard && stripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_0"
+                stripeProductId="hacker_1"
                 onClick={() => {
                   if (!dashboard) {
                     router.push("/register");
@@ -302,24 +302,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_1"].name}
+                {products["growth_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$100/month</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_1"
+                    ? stripeProductId === "growth_1"
                       ? "Current plan"
-                      : stripeProductId === "prod_2"
+                      : stripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_1" ? true : false
+                  dashboard && stripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_1"
+                stripeProductId="growth_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -400,24 +400,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_2"].name}
+                {products["scale_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$500/month</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_2"
+                    ? stripeProductId === "scale_1"
                       ? "Current plan"
-                      : stripeProductId === "prod_2"
+                      : stripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_2" ? true : false
+                  dashboard && stripeProductId === "scale_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_2"
+                stripeProductId="scale_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);

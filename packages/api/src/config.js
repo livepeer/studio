@@ -1,20 +1,20 @@
 exports.products = {
-  prod_0: {
+  hacker_1: {
     order: 0,
     name: "Hacker",
-    lookupKeys: ["hacker_price"],
+    lookupKeys: ["hacker_1"],
     usage: [],
   },
-  prod_1: {
+  growth_1: {
     order: 1,
     name: "Growth",
-    lookupKeys: ["growth_price"],
+    lookupKeys: ["growth_1"],
     usage: [],
   },
-  prod_2: {
+  scale_1: {
     order: 2,
     name: "Scale",
-    lookupKeys: ["scale_price"],
+    lookupKeys: ["scale_1"],
     usage: [],
   },
   pay_as_you_go_1: {

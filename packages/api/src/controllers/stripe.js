@@ -108,7 +108,7 @@ app.post("/migrate-users-to-stripe", async (req, res) => {
 
       // fetch prices associated with free plan
       const items = await req.stripe.prices.list({
-        lookup_keys: products["prod_0"].lookupKeys,
+        lookup_keys: products["hacker_1"].lookupKeys,
       });
 
       // Subscribe the user to the free plan
@@ -121,7 +121,7 @@ app.post("/migrate-users-to-stripe", async (req, res) => {
       // Update user's customer, product, subscription, and payment id in our db
       await db.user.update(user.id, {
         stripeCustomerId: customer.id,
-        stripeProductId: "prod_0",
+        stripeProductId: "hacker_1",
         stripeCustomerSubscriptionId: subscription.id,
         stripeCustomerPaymentMethodId: null,
       });

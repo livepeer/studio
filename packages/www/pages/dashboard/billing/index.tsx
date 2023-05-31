@@ -178,7 +178,7 @@ const Billing = () => {
                 css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
                 {user?.stripeProductId
                   ? products[user.stripeProductId]?.name
-                  : products["prod_0"]?.name}
+                  : products["hacker_1"]?.name}
               </Badge>
               plan.
             </Text>

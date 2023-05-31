@@ -121,7 +121,7 @@ export async function terminateUserStreams(
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
 
-const defaultProductId: StripeProductIDs = "prod_0";
+const defaultProductId: StripeProductIDs = "hacker_1";
 
 async function getOrCreateCustomer(stripe: Stripe, email: string) {
   const existing = await stripe.customers.list({ email });
