@@ -1929,6 +1929,9 @@ components:
                   bitrate:
                     type: number
                     example: 449890
+            attestation:
+              $ref: "#/components/schemas/attestation"
+
 paths:
   /stream:
     post:

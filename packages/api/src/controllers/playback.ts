@@ -16,6 +16,8 @@ import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+import { isExperimentSubject } from "../store/experiment-table";
+import logger from "../logger";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -100,10 +102,9 @@ const getAssetPlaybackInfo = async (
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
-  isCrossUserQuery?: boolean,
+  cutoffDate?: number,
   origin?: string
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
-  const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let asset =
     (await db.asset.getByPlaybackId(id)) ??
     (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
@@ -114,7 +115,7 @@ export async function getResourceByPlaybackId(
     if (asset.status.phase !== "ready") {
       throw new UnprocessableEntityError("asset is not ready for playback");
     }
-    if (asset.userId !== user?.id && !isCrossUserQuery) {
+    if (asset.userId !== user?.id && cutoffDate) {
       console.log(
         `Returning cross-user asset for playback. ` +
           `userId=${user?.id} userEmail=${user?.email} origin=${origin} ` +
@@ -143,6 +144,39 @@ export async function getResourceByPlaybackId(
 
   return {};
 }
+async function getAttestationPlaybackInfo(
+  config: CliArgs,
+  ingest: string,
+  id: string,
+  user?: User,
+  cutoffDate?: number
+): Promise<PlaybackInfo> {
+  try {
+    if (!isExperimentSubject("attestation", user?.id)) {
+      return null;
+    }
+
+    const attestation = await db.attestation.getByIdOrCid(id);
+    const videoUrl = attestation?.message?.video;
+
+    // Currently we only support attestations for videos stored in IPFS
+    if (!videoUrl?.startsWith("ipfs://")) {
+      return null;
+    }
+    const videoCid = videoUrl.slice("ipfs://".length);
+    const asset = await db.asset.getByIpfsCid(videoCid, user, cutoffDate);
+    if (!asset) {
+      return null;
+    }
+
+    const assetPlaybackInfo = await getAssetPlaybackInfo(config, ingest, asset);
+    assetPlaybackInfo.meta.attestation = attestation;
+    return assetPlaybackInfo;
+  } catch (e) {
+    logger.warn("Error while resolving playback from video attestation", e);
+    return null;
+  }
+}
 
 async function getPlaybackInfo(
   { config, user }: Request,
@@ -151,10 +185,11 @@ async function getPlaybackInfo(
   isCrossUserQuery: boolean,
   origin: string
 ): Promise<PlaybackInfo> {
+  const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let { stream, asset, session } = await getResourceByPlaybackId(
     id,
     user,
-    isCrossUserQuery,
+    cutoffDate,
     origin
   );
 
@@ -193,7 +228,7 @@ async function getPlaybackInfo(
     }
   }
 
-  return null;
+  return await getAttestationPlaybackInfo(config, ingest, id, user, cutoffDate);
 }
 
 const app = Router();
