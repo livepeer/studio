@@ -126,6 +126,32 @@ describe("Attestation API", () => {
   });
 
   describe("POST /", () => {
+    it("should support Flow Wallet signatures", async () => {
+      const flowRequest = {
+        primaryType: "VideoAttestation",
+        domain: {
+          name: "Verifiable Video",
+          version: "1",
+        },
+        message: {
+          video:
+            "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
+          attestations: [
+            {
+              role: "creator",
+              address: "0xd10f88cea4ef9a06",
+            },
+          ],
+          signer: "0xd10f88cea4ef9a06",
+          timestamp: NOW - HOUR,
+        },
+        signature:
+          "5a8a93d3c0abbfc93ab111c67dcd41f521e826c9cc67fa0cbe5870428aec819463be0064e52d31c2041b6ea21bef0f5305d077583f8cc5d401d12ffd8b84d67c",
+      };
+      const res = await client.post("/experiment/-/attestation", flowRequest);
+      expect(res.status).toBe(201);
+    });
+
     it("should return an error for invalid primaryType", async () => {
       let request = JSON.parse(JSON.stringify(REQUEST));
       request.primaryType = "InvalidType";

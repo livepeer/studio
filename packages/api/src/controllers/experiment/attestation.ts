@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { v4 as uuid } from "uuid";
 import { db } from "../../store";
 import { validatePost } from "../../middleware";
 import { ethers } from "ethers";
 import { makeNextHREF, toStringValues } from "../helpers";
 import _ from "lodash";
+import * as fcl from "@onflow/fcl";
+import stringify from "fast-stable-stringify";
+import { v4 as uuid } from "uuid";
 
 const app = Router();
 
@@ -26,11 +28,8 @@ const TYPES = {
 };
 
 app.post("/", validatePost("attestation"), async (req, res) => {
-  const { message, signature } = req.body;
+  const { message, signature, signatureType } = req.body;
 
-  if (!verifySigner(message, signature)) {
-    return res.status(400).json({ errors: ["invalid signature"] });
-  }
   if (!verifyTimestamp(message.timestamp)) {
     return res.status(400).json({
       errors: [
@@ -38,10 +37,19 @@ app.post("/", validatePost("attestation"), async (req, res) => {
       ],
     });
   }
+  const verfiedSignatureType = await verifySignature(
+    message,
+    signature,
+    signatureType
+  );
+  if (!verfiedSignatureType) {
+    return res.status(400).json({ errors: ["invalid signature"] });
+  }
 
-  const id = ethers.TypedDataEncoder.hash(DOMAIN, TYPES, message);
+  const id = uuid();
   const attestationMetadata = await db.attestation.create({
     id,
+    signatureType: verfiedSignatureType,
     createdAt: Date.now(),
     ...req.body,
   });
@@ -50,15 +58,64 @@ app.post("/", validatePost("attestation"), async (req, res) => {
   return res.status(201).json(attestationMetadata);
 });
 
-function verifySigner(message, signature): boolean {
-  const verifiedSigner = ethers.verifyTypedData(
-    DOMAIN,
-    TYPES,
-    message,
-    signature
-  );
+async function verifySignature(
+  message: any,
+  signature: string,
+  signatureType?: string
+): Promise<string> {
+  const verifiedEIP712 =
+    (signatureType === "eip712" || !signatureType) &&
+    verifyEIP712Signature(message, signature);
+  const verifiedFlow =
+    (signatureType === "flow" || !signatureType) &&
+    (await verifyFlowSignature(message, signature));
 
-  return verifiedSigner === message.signer;
+  return verifiedEIP712 ? "eip712" : verifiedFlow ? "flow" : null;
+}
+
+function verifyEIP712Signature(message: any, signature: string): boolean {
+  try {
+    const verifiedSigner = ethers.verifyTypedData(
+      DOMAIN,
+      TYPES,
+      message,
+      signature
+    );
+
+    return verifiedSigner === message.signer;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function verifyFlowSignature(
+  message: any,
+  signature: string
+): Promise<boolean> {
+  try {
+    // These parameters are required to use the fcl library, even though we don't use on-chain verification
+    await fcl.config({
+      "flow.network": "testnet",
+      "accessNode.api": "https://access-testnet.onflow.org",
+    });
+
+    const compSig = [
+      {
+        f_type: "CompositeSignature",
+        f_vsn: "1.0.0",
+        addr: message.signer,
+        keyId: 0,
+        signature: signature,
+      },
+    ];
+
+    return await fcl.AppUtils.verifyUserSignatures(
+      Buffer.from(stringify(message)).toString("hex"),
+      compSig
+    );
+  } catch (e) {
+    return false;
+  }
 }
 
 function verifyTimestamp(timestamp: number): boolean {

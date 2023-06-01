@@ -2112,6 +2112,13 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
+"@babel/runtime@^7.18.6":
+  version "7.22.3"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.3.tgz#0a7fce51d43adbf0f7b517a71f4c3aaca92ebcbb"
+  integrity sha512-XsDuspWKLUsxwCp6r7EhsExHtYfbe5oAGQ19kqngTdCPUoPQzOPdUbD/pB9PJiwb2ptYKQDjSJT3R6dC+EPqfQ==
+  dependencies:
+    regenerator-runtime "^0.13.11"
+
 "@babel/template@^7.12.7", "@babel/template@^7.18.10", "@babel/template@^7.20.7", "@babel/template@^7.3.3", "@babel/template@^7.4.0", "@babel/template@^7.4.4":
   version "7.20.7"
   resolved "https://registry.npmjs.org/@babel/template/-/template-7.20.7.tgz"
@@ -4585,6 +4592,126 @@
   integrity sha512-eJ2jbzjdijiL3B4PrSQaSjuF2sPEQPVCPzBvTHJD9Nz+9dw2SGH4K4xeQJ77YfTq5bRQ+bD8wT11JbeDPmxmGg==
   dependencies:
     "@octokit/openapi-types" "^12.11.0"
+
+"@onflow/config@^1.0.3", "@onflow/config@^1.0.4", "@onflow/config@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@onflow/config/-/config-1.0.5.tgz#7fb476c64eb6932420323a5bdd70b1c63dea6973"
+  integrity sha512-r2IUyY4SJgAY6YCzKL0cOOertHETp9BgVfCjTIq236WAHr7aMS1oNyqcVPPR++zjDK8n64lRgrxlcYSZB/LrFg==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    "@onflow/util-actor" "^1.1.2"
+
+"@onflow/fcl@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@onflow/fcl/-/fcl-1.3.2.tgz#8ba7a91b9d80e1179832d2eac702e1b885a098f8"
+  integrity sha512-H2YduE8JUMqjUBR9R3YOFgWrT/yMg+aE5w8uwrMD3YJ/wGpF6iKo0XJGRa7kPVn5pP0HjKQnOlmCLvHwEGEhQQ==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    "@onflow/config" "^1.0.5"
+    "@onflow/interaction" "0.0.11"
+    "@onflow/rlp" "^1.0.2"
+    "@onflow/sdk" "^1.1.2"
+    "@onflow/types" "^1.0.5"
+    "@onflow/util-actor" "^1.1.1"
+    "@onflow/util-address" "^1.0.2"
+    "@onflow/util-invariant" "^1.0.2"
+    "@onflow/util-logger" "^1.1.1"
+    "@onflow/util-template" "^1.0.3"
+    "@onflow/util-uid" "^1.0.2"
+    node-fetch "^2.6.7"
+
+"@onflow/interaction@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@onflow/interaction/-/interaction-0.0.11.tgz#4db8f4304039e33d6fc3b14c38b392d724113374"
+  integrity sha512-Xuq1Mmx6Wyba/F/L+QLQs0yJeQDsIDwy5SKk5vrCuVgIj0yD8k506g5L8ODrbM1LWll8i0tQsoOi0F85vNl5sA==
+
+"@onflow/rlp@^1.0.2":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@onflow/rlp/-/rlp-1.0.4.tgz#9db83571d7212294e79c8416ce269c919ae982ab"
+  integrity sha512-/4jSoh9eXPoN9iUCsbI+PAuTRJyYgT+XR4NdZYmxILRwOtIsSd2I9XatA4rrSzk9DJ0h8l9SmYx1y0XLnD+ohQ==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    buffer "^6.0.3"
+
+"@onflow/sdk@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@onflow/sdk/-/sdk-1.1.2.tgz#3aa8b63395a44ac0be45d1081785ebaf64993ada"
+  integrity sha512-HNfQ6Q91FfFwd2g1wa/YHvmv6BYeXGONkEJyfOaoPRIbp3lG9W35HYX7Yvgtn7fvcQG+TRL8n386mzJ6Vn4dmA==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    "@onflow/config" "^1.0.3"
+    "@onflow/rlp" "^1.0.2"
+    "@onflow/transport-http" "^1.5.0"
+    "@onflow/util-actor" "^1.1.1"
+    "@onflow/util-address" "^1.0.2"
+    "@onflow/util-invariant" "^1.0.2"
+    "@onflow/util-logger" "^1.1.1"
+    "@onflow/util-template" "^1.0.3"
+    deepmerge "^4.2.2"
+    sha3 "^2.1.4"
+
+"@onflow/transport-http@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@onflow/transport-http/-/transport-http-1.5.0.tgz#eda720107d9d073b849a924a1444bed9c579b41a"
+  integrity sha512-CGgfPC1kI+ssqDgFXxGgKHLVtu1tCGtyGJiS/fplyVun9RC7AwEp2KkjTP2dxRlto3HmntoaBkOw7z38UCxRZw==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    "@onflow/util-address" "^1.0.2"
+    "@onflow/util-invariant" "^1.0.2"
+    "@onflow/util-logger" "^1.1.1"
+    "@onflow/util-template" "^1.0.3"
+    node-fetch "^2.6.7"
+
+"@onflow/types@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@onflow/types/-/types-1.0.5.tgz#beaaed646a21d2e4e95939932033dc9a5a0609e8"
+  integrity sha512-Uf6APOwgkxPwgonQ8JRrOB0KZ5eJpNBVXlEiZIv5ddzsfM6qd9p3csEE5YmuLhAooAcisG3ROTzw2hT/zUNGbw==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+
+"@onflow/util-actor@^1.1.1", "@onflow/util-actor@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@onflow/util-actor/-/util-actor-1.1.2.tgz#d7c4939a54fd2d4b60ee1a0748b98e071fb208ad"
+  integrity sha512-fsRGw5c2idlG5T0u48tzah1iE0OIc4WmgrNYN0gQ1NHX+Ue8iySoQdCIcdSxJCHOXwpHWe68fWTonCzbRJOssQ==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    queue-microtask "1.1.2"
+
+"@onflow/util-address@^1.0.2":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@onflow/util-address/-/util-address-1.0.3.tgz#7ffe0ed1c5544a60660ef45033aca78ad093e475"
+  integrity sha512-w8DPYSvYm5h0hhZ0hZwiCwu9UgJBtIv2KyhDiH3TZG8srT+9GxtTPX4NzZtAVuxqWTNVlTGePD/Upxusiwnk6g==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+
+"@onflow/util-invariant@^1.0.2":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@onflow/util-invariant/-/util-invariant-1.0.3.tgz#5c45e3281982e20021799304fef480fae502fbb1"
+  integrity sha512-+Hk93W9JwACLkM5/oOILqI9L55o5QxETBV5Du/2dLgNbjXDElMmQzURFXx6fTmODTLZ6Ri+d1nvb7AxapYFe0Q==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+
+"@onflow/util-logger@^1.1.1":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@onflow/util-logger/-/util-logger-1.1.2.tgz#ca19fb1f9846ec139ac8bf03f0df482bde245293"
+  integrity sha512-BcVDzKNGv/j3gqnq1lc0fpJV7LCHWPJyzYR588/keiY90mFHwLe8ahXYG1UYPu02KymlVqlInfISKWlNwk4aug==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    "@onflow/config" "^1.0.4"
+
+"@onflow/util-template@^1.0.3":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@onflow/util-template/-/util-template-1.0.4.tgz#5affdb46713b5aa4c64d133788a996f02bc56c37"
+  integrity sha512-syTJzhFn+CaW/FAqVLJJ3Oq9pTuxS5Wk0+g9AkSKWJ8PCY+FLr7UC2mGr/5pO//L13Elz7cv/djXVxNA1ULQmw==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+
+"@onflow/util-uid@^1.0.2":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@onflow/util-uid/-/util-uid-1.0.3.tgz#8c1035106fcb0a6cf04728e3412ed3fecaf760fc"
+  integrity sha512-hBdfV+0BSDphcvLvL8KFivyV5ZhpVyRcrOn0fuSD4is/hN5d1mLFBev9gur9gdmQUUwgFt0v+aA/Tc/7mRDctQ==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
 
 "@parcel/fs@^1.11.0":
   version "1.11.0"
@@ -9273,6 +9400,14 @@ buffer@6.0.1:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
 
+buffer@6.0.3, buffer@^6.0.3, buffer@~6.0.3:
+  version "6.0.3"
+  resolved "https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz"
+  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.2.1"
+
 buffer@^5.4.3, buffer@^5.5.0:
   version "5.7.1"
   resolved "https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz"
@@ -9280,14 +9415,6 @@ buffer@^5.4.3, buffer@^5.5.0:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
-
-buffer@^6.0.3, buffer@~6.0.3:
-  version "6.0.3"
-  resolved "https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz"
-  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.2.1"
 
 bufferutil@^4.0.1, bufferutil@^4.0.6:
   version "4.0.7"
@@ -13158,7 +13285,7 @@ fast-safe-stringify@^2.0.6, fast-safe-stringify@^2.0.7:
 
 fast-stable-stringify@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.npmjs.org/fast-stable-stringify/-/fast-stable-stringify-1.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/fast-stable-stringify/-/fast-stable-stringify-1.0.0.tgz#5c5543462b22aeeefd36d05b34e51c78cb86d313"
   integrity sha512-wpYMUmFu5f00Sm0cj2pfivpmawLZ0NKdviQ4w9zJeR8JVtOpOxHmLaJuj0vxvGqMJQWyP/COUkF75/57OKyRag==
 
 fast-text-encoding@^1.0.0:
@@ -21700,6 +21827,11 @@ querystringify@^2.1.1:
   resolved "https://registry.npmjs.org/querystringify/-/querystringify-2.2.0.tgz"
   integrity sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==
 
+queue-microtask@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.1.2.tgz#139bf8186db0c545017ec66c2664ac646d5c571e"
+  integrity sha512-F9wwNePtXrzZenAB3ax0Y8TSKGvuB7Qw16J30hspEUTbfUM+H827XyN3rlpwhVmtm5wuZtbKIHjOnwDn7MUxWQ==
+
 queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz"
@@ -23454,6 +23586,13 @@ sha.js@^2.4.0, sha.js@^2.4.11, sha.js@^2.4.8:
   dependencies:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
+
+sha3@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/sha3/-/sha3-2.1.4.tgz#000fac0fe7c2feac1f48a25e7a31b52a6492cc8f"
+  integrity sha512-S8cNxbyb0UGUM2VhRD4Poe5N58gJnJsLJ5vC7FYWGUmGhcsj4++WaIOBFVDxlG0W3To6xBuiRh+i0Qp2oNCOtg==
+  dependencies:
+    buffer "6.0.3"
 
 shallow-clone@^3.0.0:
   version "3.0.1"
