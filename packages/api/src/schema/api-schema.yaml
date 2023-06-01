@@ -2299,8 +2299,7 @@ paths:
 
         occur.
         
-        \
-        \
+
 
          ## Types of Events
         | Name                       |
@@ -2506,16 +2505,12 @@ paths:
         connections. If you want a simpler implementation though, you should
         just use a direct upload.
         
-        \
-        \
         
         ## Direct Upload
         For a direct upload, make a PUT request to the URL received in the url
         field of the response above, with the raw video file as the request
         body. response above:
         
-        \
-        \
         
         ## Resumable Upload
         Livepeer supports resumable uploads via Tus. This section provides a
