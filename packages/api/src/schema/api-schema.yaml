@@ -1990,7 +1990,7 @@ paths:
         \
         **GET `/stream?streamsonly=1`**
         This endpoint retrieves all stream objects with the same userId and excludes the historic stream objects with a parentId, which represent a single live stream session.
-        \
+
         ## Quick Filters
         | Filter                                     | Example                                             | Description                                                                                                                                                                                         |
         |--------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -2044,7 +2044,6 @@ paths:
         PATCH /stream/{id} can be used to modify a stream object. It is a single
         endpoint that can update any of the mutable properties of a stream.
         Specifically:
-        \
         - record
         - suspended
         - multistream.targets
@@ -2240,7 +2239,8 @@ paths:
         To create a new webhook, you need to make an API call with the events
         you want to listen for and the URL that will be called when those events
         occur.
-        \
+        
+        
          ## Types of Events
         | Name                       | Description                                                                                                                                                           |
         | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -2309,7 +2309,6 @@ paths:
         You can update a webhook by calling the PATCH webhook endpoint with the
         webhookId. It is a single endpoint that can update any of the mutable
         properties of a webhook. Specifically:
-        \
         - name
         - url
         - events
@@ -2378,13 +2377,13 @@ paths:
         which will work better for users with unreliable or slow network
         connections. If you want a simpler implementation though, you should
         just use a direct upload.
-        \
+        
         ## Direct Upload
         \
         For a direct upload, make a PUT request to the URL received in the url
         field of the response above, with the raw video file as the request
         body. response above:
-        \
+        
         ## Resumable Upload
         \
         Livepeer supports resumable uploads via Tus. This section provides a
@@ -2395,7 +2394,6 @@ paths:
         Livepeer on POST /api/asset/request-upload. You should use the
         tusEndpoint field of the response to upload the video file and track the
         progress:
-        \
 
         ``` 
         # This assumes there is an `input` element of `type="file"` with id
@@ -2436,7 +2434,6 @@ paths:
 
         ```
         
-        \
         > Note: If you are using tus from node.js, you need to add a custom URL
         storage to enable resuming from previous uploads. On the browser, this
         is enabled by default using local storage. In node.js, add urlStorage:
@@ -3113,7 +3110,6 @@ paths:
         PATCH /access-control/signing-key/{KEY_ID} updates an existing signing
         key. It is a single endpoint that can update any of the mutable
         properties of a stream. Specifically:
-        \
         - name
         - disabled
         \
@@ -3211,7 +3207,6 @@ paths:
         \
         The results will be available under `params.outputs.hls.path` and
         `params.outputs.mp4.path` in the specified storage service.
-        \
         ## Input
         \
         This endpoint currently supports the following inputs:
@@ -3241,8 +3236,7 @@ paths:
         \
         S3 credentials can be used to authenticate with a S3 API compatible
         service to read a video file.
-        \
-        \
+
         ```json
         {
             "type": "s3",
@@ -3264,8 +3258,7 @@ paths:
         | bucket                     | string | The name of the S3 bucket.                    |
         | path                       | string | The path within the S3 bucket of the video file. |
       
-        \
-        \
+      
         ## Storage
         \
         This endpoint currently supports the following storage services:
@@ -3317,8 +3310,6 @@ paths:
         - HLS
         - MP4
       
-        \
-        \
         **HLS**
 
         ```json
@@ -3332,8 +3323,6 @@ paths:
         | ---- | ------ | ------------------------------------------------------------------------------------------------- |
         | path | string | The path of the directory that HLS playlists and mpegts segments will be stored in.                |
 
-        \
-        \
         **MP4**
 
         ```json
