@@ -7,7 +7,7 @@ info:
     what they return.
   version: 1.0.0
 servers:
-  - url: 'https://livepeer.studio/api'
+  - url: "https://livepeer.studio/api"
 components:
   schemas:
     ffmpeg-profile:
@@ -103,7 +103,7 @@ components:
         url:
           type: string
           format: uri
-          pattern: '^http(s)?://'
+          pattern: "^http(s)?://"
         sharedSecret:
           type: string
           writeOnly: true
@@ -208,7 +208,7 @@ components:
           type: string
           example: test_stream
         creatorId:
-          $ref: '#/components/schemas/creator-id'
+          $ref: "#/components/schemas/creator-id"
         lastSeen:
           type: number
           example: 1587667174725
@@ -221,11 +221,11 @@ components:
         sourceSegmentsDuration:
           type: number
           example: 1
-          description: 'Duration of all the source segments, sec'
+          description: "Duration of all the source segments, sec"
         transcodedSegmentsDuration:
           type: number
           example: 2
-          description: 'Duration of all the transcoded segments, sec'
+          description: "Duration of all the transcoded segments, sec"
         sourceBytes:
           type: number
           example: 1
@@ -244,9 +244,9 @@ components:
           type: boolean
           description: If currently active
         isHealthy:
-          $ref: '#/components/schemas/stream-health-payload/properties/is_healthy'
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
         issues:
-          $ref: '#/components/schemas/stream-health-payload/properties/human_issues'
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdByTokenName:
           type: string
           readOnly: true
@@ -269,7 +269,7 @@ components:
           example: eaw4nk06ts2d0mzb
           description: Used to form playback URL
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
           default:
@@ -294,7 +294,7 @@ components:
               width: 1280
               height: 720
           items:
-            $ref: '#/components/schemas/ffmpeg-profile'
+            $ref: "#/components/schemas/ffmpeg-profile"
         record:
           description: |
             Should this stream be recorded? Uses default settings. For more
@@ -350,7 +350,7 @@ components:
                       name:
                         type: string
                       url:
-                        $ref: '#/components/schemas/multistream-target/properties/url'
+                        $ref: "#/components/schemas/multistream-target/properties/url"
         suspended:
           type: boolean
           description: If currently suspended
@@ -361,17 +361,17 @@ components:
       additionalProperties: false
       properties:
         name:
-          $ref: '#/components/schemas/stream/properties/name'
+          $ref: "#/components/schemas/stream/properties/name"
         creatorId:
-          $ref: '#/components/schemas/input-creator-id'
+          $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: '#/components/schemas/stream/properties/profiles'
+          $ref: "#/components/schemas/stream/properties/profiles"
         record:
-          $ref: '#/components/schemas/stream/properties/record'
+          $ref: "#/components/schemas/stream/properties/record"
         multistream:
-          $ref: '#/components/schemas/stream/properties/multistream'
+          $ref: "#/components/schemas/stream/properties/multistream"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -387,9 +387,9 @@ components:
         - active
       properties:
         active:
-          $ref: '#/components/schemas/stream/properties/isActive'
+          $ref: "#/components/schemas/stream/properties/isActive"
         hostName:
-          $ref: '#/components/schemas/stream/properties/mistHost'
+          $ref: "#/components/schemas/stream/properties/mistHost"
         startedAt:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
@@ -399,27 +399,27 @@ components:
       additionalProperties: false
       properties:
         name:
-          $ref: '#/components/schemas/asset/properties/name'
+          $ref: "#/components/schemas/asset/properties/name"
         creatorId:
-          $ref: '#/components/schemas/input-creator-id'
+          $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
         storage:
-          $ref: '#/components/schemas/new-asset-payload/properties/storage'
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
     stream-patch-payload:
       type: object
       additionalProperties: false
       properties:
         creatorId:
-          $ref: '#/components/schemas/input-creator-id'
+          $ref: "#/components/schemas/input-creator-id"
         record:
-          $ref: '#/components/schemas/stream/properties/record'
+          $ref: "#/components/schemas/stream/properties/record"
         suspended:
-          $ref: '#/components/schemas/stream/properties/suspended'
+          $ref: "#/components/schemas/stream/properties/suspended"
         multistream:
-          $ref: '#/components/schemas/stream/properties/multistream'
+          $ref: "#/components/schemas/stream/properties/multistream"
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
     stream-health-payload:
       type: object
       description: |
@@ -473,7 +473,7 @@ components:
                 description: The codec being used for the track.
               kbits:
                 type: number
-                description: 'The bitrate of the track, in kilobits per second.'
+                description: "The bitrate of the track, in kilobits per second."
               keys:
                 type: object
                 description: An object containing additional track-specific metrics.
@@ -501,30 +501,30 @@ components:
       additionalProperties: false
       properties:
         name:
-          $ref: '#/components/schemas/object-store/properties/name'
+          $ref: "#/components/schemas/object-store/properties/name"
         disabled:
-          $ref: '#/components/schemas/object-store/properties/disabled'
+          $ref: "#/components/schemas/object-store/properties/disabled"
         url:
-          $ref: '#/components/schemas/object-store/properties/url'
+          $ref: "#/components/schemas/object-store/properties/url"
         publicUrl:
-          $ref: '#/components/schemas/object-store/properties/publicUrl'
+          $ref: "#/components/schemas/object-store/properties/publicUrl"
     multistream-target-patch-payload:
-      $ref: '#/components/schemas/multistream-target'
+      $ref: "#/components/schemas/multistream-target"
       required: []
     webhook-patch-payload:
       type: object
       additionalProperties: false
       properties:
         name:
-          $ref: '#/components/schemas/webhook/properties/name'
+          $ref: "#/components/schemas/webhook/properties/name"
         url:
-          $ref: '#/components/schemas/webhook/properties/url'
+          $ref: "#/components/schemas/webhook/properties/url"
         events:
-          $ref: '#/components/schemas/webhook/properties/events'
+          $ref: "#/components/schemas/webhook/properties/events"
         sharedSecret:
-          $ref: '#/components/schemas/webhook/properties/sharedSecret'
+          $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
-          $ref: '#/components/schemas/webhook/properties/streamId'
+          $ref: "#/components/schemas/webhook/properties/streamId"
     webhook-status-payload:
       type: object
       additionalProperties: false
@@ -533,7 +533,7 @@ components:
           type: string
           description: Error message if the webhook failed to process the event
         response:
-          $ref: '#/components/schemas/webhook-response'
+          $ref: "#/components/schemas/webhook-response"
     session:
       type: object
       required:
@@ -560,11 +560,11 @@ components:
         sourceSegmentsDuration:
           type: number
           example: 1
-          description: 'Duration of all the source segments, sec'
+          description: "Duration of all the source segments, sec"
         transcodedSegmentsDuration:
           type: number
           example: 2
-          description: 'Duration of all the transcoded segments, sec'
+          description: "Duration of all the transcoded segments, sec"
         sourceBytes:
           type: number
           example: 1
@@ -580,9 +580,9 @@ components:
           example: 2
           description: Rate at which transcodedBytes increases (bytes/second)
         isHealthy:
-          $ref: '#/components/schemas/stream-health-payload/properties/is_healthy'
+          $ref: "#/components/schemas/stream-health-payload/properties/is_healthy"
         issues:
-          $ref: '#/components/schemas/stream-health-payload/properties/human_issues'
+          $ref: "#/components/schemas/stream-health-payload/properties/human_issues"
         createdAt:
           readOnly: true
           type: number
@@ -621,7 +621,7 @@ components:
         profiles:
           type: array
           items:
-            $ref: '#/components/schemas/ffmpeg-profile'
+            $ref: "#/components/schemas/ffmpeg-profile"
     error:
       required:
         - errors
@@ -651,9 +651,9 @@ components:
           type: string
           writeOnly: true
           description: Livepeer-compatible multistream target URL (RTMP(S) or SRT)
-          example: 'rtmps://live.my-service.tv/channel/secretKey'
+          example: "rtmps://live.my-service.tv/channel/secretKey"
           format: uri
-          pattern: '^(srt|rtmps?)://'
+          pattern: "^(srt|rtmps?)://"
         disabled:
           type: boolean
           description: |
@@ -702,10 +702,10 @@ components:
         downloadUrl:
           readOnly: true
           type: string
-          example: 'https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video'
+          example: "https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video"
           description: URL to manually download the asset if desired
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
         source:
           oneOf:
             - additionalProperties: false
@@ -721,7 +721,7 @@ components:
                   type: string
                   description: URL from which the asset was uploaded
                 encryption:
-                  $ref: '#/components/schemas/new-asset-payload/properties/encryption'
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
               required:
                 - type
@@ -743,9 +743,9 @@ components:
                   enum:
                     - directUpload
                 encryption:
-                  $ref: '#/components/schemas/new-asset-payload/properties/encryption'
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         creatorId:
-          $ref: '#/components/schemas/creator-id'
+          $ref: "#/components/schemas/creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -774,9 +774,9 @@ components:
                         Additional data to add to the NFT metadata exported to
                         IPFS. Will be deep merged with the default metadata
                         exported.
-                $ref: '#/components/schemas/ipfs-file-info/properties'
+                $ref: "#/components/schemas/ipfs-file-info/properties"
                 nftMetadata:
-                  $ref: '#/components/schemas/ipfs-file-info'
+                  $ref: "#/components/schemas/ipfs-file-info"
                 updatedAt:
                   readOnly: true
                   type: number
@@ -1005,9 +1005,9 @@ components:
           description: Whether to generate MP4s for the asset.
           example: true
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
         creatorId:
-          $ref: '#/components/schemas/input-creator-id'
+          $ref: "#/components/schemas/input-creator-id"
         storage:
           additionalProperties: false
           properties:
@@ -1022,19 +1022,19 @@ components:
                   properties:
                     spec:
                       oneOf:
-                        - type: 'null'
+                        - type: "null"
                         - $ref: >-
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
                 - type: boolean
-                - type: 'null'
+                - type: "null"
         url:
           type: string
           format: uri
-          pattern: '^(https?|ipfs|ar)://'
+          pattern: "^(https?|ipfs|ar)://"
           description: |
             URL where the asset contents can be retrieved. Only allowed (and
             also required) in the upload asset via URL endpoint.
-          example: 'https://s3.amazonaws.com/my-bucket/path/filename.mp4'
+          example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
           type: object
           additionalProperties: false
@@ -1082,9 +1082,9 @@ components:
                 url:
                   type: string
                   format: uri
-                  pattern: '^(https?|ipfs|ar)://'
+                  pattern: "^(https?|ipfs|ar)://"
                   description: URL of the video to transcode
-                  example: 'https://s3.amazonaws.com/bucket/file.mp4'
+                  example: "https://s3.amazonaws.com/bucket/file.mp4"
             - type: object
               additionalProperties: false
               description: S3-like storage input video
@@ -1105,13 +1105,13 @@ components:
                 endpoint:
                   type: string
                   format: uri
-                  pattern: '^http(s)?://'
+                  pattern: "^http(s)?://"
                   description: >-
                     Service endpoint URL (AWS S3 endpoint list:
                     https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
                     S3 endpoint: https://storage.googleapis.com, Storj:
                     https://gateway.storjshare.io)
-                  example: 'https://gateway.storjshare.io'
+                  example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
                   description: Bucket with input file
@@ -1155,13 +1155,13 @@ components:
                 endpoint:
                   type: string
                   format: uri
-                  pattern: '^http(s)?://'
+                  pattern: "^http(s)?://"
                   description: >-
                     Service endpoint URL (AWS S3 endpoint list:
                     https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
                     S3 endpoint: https://storage.googleapis.com, Storj:
                     https://gateway.storjshare.io)
-                  example: 'https://gateway.storjshare.io'
+                  example: "https://gateway.storjshare.io"
                 bucket:
                   type: string
                   description: Bucket with output files
@@ -1238,7 +1238,7 @@ components:
         profiles:
           type: array
           items:
-            $ref: '#/components/schemas/ffmpeg-profile'
+            $ref: "#/components/schemas/ffmpeg-profile"
         targetSegmentSizeSecs:
           type: number
           description: How many seconds the duration of each output segment should be
@@ -1293,9 +1293,9 @@ components:
                 url:
                   type: string
                   description: URL of the asset to "upload"
-                  example: 'https://cdn.livepeer.com/ABC123/filename.mp4'
+                  example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 encryption:
-                  $ref: '#/components/schemas/new-asset-payload/properties/encryption'
+                  $ref: "#/components/schemas/new-asset-payload/properties/encryption"
                 recordedSessionId:
                   type: string
                   description: |
@@ -1303,16 +1303,16 @@ components:
                     of the same content. Only used for import task.
                   example: 78df0075-b5f3-4683-a618-1086faca35dc
             import:
-              $ref: '#/components/schemas/task/properties/params/properties/upload'
+              $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:
-              $ref: '#/components/schemas/export-task-params'
+              $ref: "#/components/schemas/export-task-params"
             transcode:
               type: object
               additionalProperties: false
               description: Parameters for the transcode task
               properties:
                 profile:
-                  $ref: '#/components/schemas/ffmpeg-profile'
+                  $ref: "#/components/schemas/ffmpeg-profile"
             transcode-file:
               type: object
               additionalProperties: false
@@ -1328,7 +1328,7 @@ components:
                       description: |
                         URL of a video to transcode, accepts object-store format
                         "s3+https"
-                      example: 'https://cdn.livepeer.com/ABC123/filename.mp4'
+                      example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 storage:
                   type: object
                   additionalProperties: false
@@ -1339,7 +1339,7 @@ components:
                       description: |
                         URL of the output storage, accepts object-store format
                         "s3+https"
-                      example: 's3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket'
+                      example: "s3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket"
                 outputs:
                   type: object
                   additionalProperties: false
@@ -1366,7 +1366,7 @@ components:
                 profiles:
                   type: array
                   items:
-                    $ref: '#/components/schemas/ffmpeg-profile'
+                    $ref: "#/components/schemas/ffmpeg-profile"
                 targetSegmentSizeSecs:
                   type: number
                   description: |
@@ -1425,9 +1425,9 @@ components:
                   type: string
                   writeOnly: true
                 assetSpec:
-                  $ref: '#/components/schemas/asset'
+                  $ref: "#/components/schemas/asset"
             import:
-              $ref: '#/components/schemas/task/properties/output/properties/upload'
+              $ref: "#/components/schemas/task/properties/output/properties/upload"
             export:
               type: object
               additionalProperties: false
@@ -1477,10 +1477,10 @@ components:
                       type: string
                     assetSpec:
                       type: object
-                      $ref: '#/components/schemas/asset'
+                      $ref: "#/components/schemas/asset"
     input-creator-id:
       oneOf:
-        - $ref: '#/components/schemas/creator-id'
+        - $ref: "#/components/schemas/creator-id"
         - type: string
           description: >-
             Helper syntax to specify an unverified creator ID, fully managed by
@@ -1519,7 +1519,7 @@ components:
                 url:
                   type: string
                   format: uri
-                  pattern: '^http(s)?://'
+                  pattern: "^http(s)?://"
                   description: URL where to export the asset
                   example: >-
                     https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
@@ -1606,7 +1606,7 @@ components:
         - publicKey
         - privateKey
       properties:
-        $ref: '#/components/schemas/signing-key/properties'
+        $ref: "#/components/schemas/signing-key/properties"
         privateKey:
           type: string
     user:
@@ -1881,7 +1881,7 @@ components:
                 - 0
                 - 1
             playbackPolicy:
-              $ref: '#/components/schemas/playback-policy'
+              $ref: "#/components/schemas/playback-policy"
             source:
               type: array
               items:
@@ -1956,22 +1956,22 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/new-stream-payload'
+              $ref: "#/components/schemas/new-stream-payload"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/stream'
+                  $ref: "#/components/schemas/stream"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     get:
       summary: Retrieve streams
       description: >
@@ -2030,21 +2030,21 @@ paths:
         shows a decoded JSON object, but in a URL, it should be
         URL-encoded.                                           |
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/stream'
+                  $ref: "#/components/schemas/stream"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/stream/{id}':
+                $ref: "#/components/schemas/error"
+  "/stream/{id}":
     parameters:
       - name: id
         description: ID of the stream
@@ -2058,18 +2058,18 @@ paths:
         In order to retrieve a specific stream, you can just pass the stream id
         to this API
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/stream'
+                $ref: "#/components/schemas/stream"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     patch:
       summary: update a stream
       description: |
@@ -2092,16 +2092,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/stream-patch-payload'
+              $ref: "#/components/schemas/stream-patch-payload"
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       summary: Delete a stream
       description: |
@@ -2120,14 +2120,14 @@ paths:
           description: ID of the stream
           required: true
       responses:
-        '204':
+        "204":
           description: Success (No content)
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
@@ -2135,20 +2135,20 @@ paths:
         Use /multistream/target to a return a list of your existing multistream
         targets.
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/multistream-target'
+                  $ref: "#/components/schemas/multistream-target"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     post:
       summary: Create a multistream target
       requestBody:
@@ -2156,23 +2156,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/multistream-target'
+              $ref: "#/components/schemas/multistream-target"
       responses:
-        '201':
+        "201":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/multistream-target'
+                  $ref: "#/components/schemas/multistream-target"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/multistream/target/{id}':
+                $ref: "#/components/schemas/error"
+  "/multistream/target/{id}":
     parameters:
       - name: id
         description: ID of the multistream target
@@ -2184,18 +2184,18 @@ paths:
       summary: Retrieve a multistream target
       description: You can retrieve a multistream target from its ID with this API.
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/multistream-target'
+                $ref: "#/components/schemas/multistream-target"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     patch:
       summary: Update Multistream Target
       description: |
@@ -2221,16 +2221,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/multistream-target-patch-payload'
+              $ref: "#/components/schemas/multistream-target-patch-payload"
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       summary: Delete a multistream target
       description: |
@@ -2238,32 +2238,32 @@ paths:
         object. Make sure to remove any references to the target on existing
         streams before actually deleting it from the API.
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /webhook:
     get:
       summary: Retrieve a Webhook
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/webhook'
+                  $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     post:
       summary: Create a webhook
       description: >
@@ -2363,19 +2363,19 @@ paths:
         control. Unlike other events, this is only used for assets and streams
         that reference its ID on their playback policy       |
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/webhook/{id}':
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}":
     get:
       summary: Retrieve a webhook
       parameters:
@@ -2385,18 +2385,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     put:
       parameters:
         - name: id
@@ -2413,18 +2413,18 @@ paths:
         - url
         - events
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: id
@@ -2434,36 +2434,36 @@ paths:
             type: string
       summary: Delete a webhook
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /asset:
     get:
       summary: Retrieve assets
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/asset'
+                  $ref: "#/components/schemas/asset"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /asset/request-upload:
     post:
       summary: Upload an asset
@@ -2544,9 +2544,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/new-asset-payload'
+              $ref: "#/components/schemas/new-asset-payload"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -2568,7 +2568,7 @@ paths:
                     example: >-
                       https://origin.livepeer.com/api/asset/upload/tus?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
                   asset:
-                    $ref: '#/components/schemas/asset'
+                    $ref: "#/components/schemas/asset"
                   task:
                     type: object
                     properties:
@@ -2580,7 +2580,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /asset/upload/url:
     post:
       summary: Upload asset via URL
@@ -2597,9 +2597,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/new-asset-payload'
+              $ref: "#/components/schemas/new-asset-payload"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -2611,7 +2611,7 @@ paths:
                   - task
                 properties:
                   asset:
-                    $ref: '#/components/schemas/asset'
+                    $ref: "#/components/schemas/asset"
                   task:
                     type: object
                     properties:
@@ -2623,8 +2623,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/asset/{assetId}':
+                $ref: "#/components/schemas/error"
+  "/asset/{assetId}":
     get:
       summary: Retrieves an asset
       parameters:
@@ -2635,18 +2635,18 @@ paths:
           description: ID of the asset
           required: true
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/asset'
+                $ref: "#/components/schemas/asset"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       summary: Delete an asset
       parameters:
@@ -2657,19 +2657,19 @@ paths:
           description: ID of the asset
           required: true
       responses:
-        '204':
+        "204":
           description: Success (No content)
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /room:
     post:
       summary: Create a room
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -2682,8 +2682,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/room/{id}':
+                $ref: "#/components/schemas/error"
+  "/room/{id}":
     get:
       parameters:
         - name: id
@@ -2693,17 +2693,17 @@ paths:
             type: string
       summary: Retrieve a room
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
-              $ref: '#/components/schemas/room'
+              $ref: "#/components/schemas/room"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: id
@@ -2713,22 +2713,22 @@ paths:
             type: string
       summary: Delete a room
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/room/{id}/egress':
+                $ref: "#/components/schemas/error"
+  "/room/{id}/egress":
     post:
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/room-egress-payload'
+              $ref: "#/components/schemas/room-egress-payload"
       parameters:
         - name: id
           in: path
@@ -2737,14 +2737,14 @@ paths:
             type: string
       summary: Start room RTMP egress
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: id
@@ -2754,22 +2754,22 @@ paths:
             type: string
       summary: Stop room RTMP egress
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/room/{id}/user':
+                $ref: "#/components/schemas/error"
+  "/room/{id}/user":
     post:
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/room-user-payload'
+              $ref: "#/components/schemas/room-user-payload"
       parameters:
         - name: id
           in: path
@@ -2783,8 +2783,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/room/{id}/user/{userId}':
+                $ref: "#/components/schemas/error"
+  "/room/{id}/user/{userId}":
     delete:
       parameters:
         - name: id
@@ -2799,14 +2799,14 @@ paths:
             type: string
       summary: Remove a user from the room
       responses:
-        '204':
+        "204":
           description: Success
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /data/views/query:
     get:
       summary: Query viewership metrics
@@ -2868,7 +2868,7 @@ paths:
           description: The creator ID to filter the query results
           schema:
             type: string
-        - name: 'breakdownBy[]'
+        - name: "breakdownBy[]"
           in: query
           description: |
             The list of fields to break down the query results. Specify this
@@ -2890,20 +2890,20 @@ paths:
                 - timezone
                 - viewerId
       responses:
-        '200':
+        "200":
           description: A list of Metric objects
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/viewership-metric'
+                  $ref: "#/components/schemas/viewership-metric"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /data/views/query/creator:
     get:
       summary: Query creator viewership metrics
@@ -2956,7 +2956,7 @@ paths:
           description: The creator ID to filter the query results
           schema:
             type: string
-        - name: 'breakdownBy[]'
+        - name: "breakdownBy[]"
           in: query
           description: |
             The list of fields to break down the query results. Specify this
@@ -2978,21 +2978,21 @@ paths:
                 - timezone
                 - viewerId
       responses:
-        '200':
+        "200":
           description: A list of Metric objects
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/viewership-metric'
+                  $ref: "#/components/schemas/viewership-metric"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/data/views/query/total/{playbackid}':
+                $ref: "#/components/schemas/error"
+  "/data/views/query/total/{playbackid}":
     get:
       summary: Query public total views metrics
       description: |
@@ -3010,7 +3010,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: A single Metric object with the viewCount and playtimeMins metrics.
           content:
             application/json:
@@ -3040,26 +3040,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /session:
     get:
       summary: Retrieve sessions
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/session'
+                  $ref: "#/components/schemas/session"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/session/{id}':
+                $ref: "#/components/schemas/error"
+  "/session/{id}":
     get:
       summary: Retrieve a session
       parameters:
@@ -3070,19 +3070,19 @@ paths:
           description: ID of the session
           required: true
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/session'
+                $ref: "#/components/schemas/session"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/stream/{parentId}/sessions':
+                $ref: "#/components/schemas/error"
+  "/stream/{parentId}/sessions":
     get:
       summary: Retrieve Recorded Sessions
       parameters:
@@ -3101,20 +3101,20 @@ paths:
             Flag indicating if the response should only include recorded
             sessions
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/session'
+                  $ref: "#/components/schemas/session"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /access-control/signing-key:
     post:
       summary: Create a signing key
@@ -3136,39 +3136,39 @@ paths:
         Up to 10 signing keys can be generated, after that you must delete at
         least one signing key to create a new one.
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/signing-key'
+                $ref: "#/components/schemas/signing-key"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     get:
       summary: Retrieves signing keys
       description: |
         You can list all the signing keys in your account by making a GET
         request on /api/access-control/signing-key.
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/signing-key'
+                  $ref: "#/components/schemas/signing-key"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/access-control/signing-key/{keyId}':
+                $ref: "#/components/schemas/error"
+  "/access-control/signing-key/{keyId}":
     delete:
       summary: Delete Signing Key
       parameters:
@@ -3179,14 +3179,14 @@ paths:
           description: ID of the signing key
           required: true
       responses:
-        '204':
+        "204":
           description: Success (No content)
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     get:
       summary: Retrieves a signing key
       parameters:
@@ -3197,18 +3197,18 @@ paths:
           description: ID of the signing key
           required: true
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/signing-key'
+                $ref: "#/components/schemas/signing-key"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     patch:
       summary: Update a signing key
       description: |
@@ -3241,33 +3241,33 @@ paths:
                   type: string
               additionalProperties: false
       responses:
-        '204':
+        "204":
           description: Success (No content)
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
   /task:
     get:
       summary: Retrieve Tasks
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/task'
+                  $ref: "#/components/schemas/task"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/task/{taskId}':
+                $ref: "#/components/schemas/error"
+  "/task/{taskId}":
     get:
       summary: Retrieve a Task
       description: |
@@ -3282,12 +3282,12 @@ paths:
           description: ID of the task
           required: true
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/task'
+                $ref: "#/components/schemas/task"
         default:
           description: Error
   /transcode:
@@ -3574,21 +3574,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/task'
+              $ref: "#/components/schemas/task"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/task'
+                $ref: "#/components/schemas/task"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-  '/playback/{id}':
+                $ref: "#/components/schemas/error"
+  "/playback/{id}":
     get:
       summary: Retrieve Playback Info
       description: |
@@ -3603,15 +3603,15 @@ paths:
             type: string
           description: The ID of the playback
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/playback-info'
-        '404':
+                $ref: "#/components/schemas/playback-info"
+        "404":
           description: Playback not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
