@@ -115,7 +115,7 @@ export async function getResourceByPlaybackId(
     if (asset.status.phase !== "ready") {
       throw new UnprocessableEntityError("asset is not ready for playback");
     }
-    if (asset.userId !== user?.id && !cutoffDate) {
+    if (asset.userId !== user?.id && cutoffDate) {
       console.log(
         `Returning cross-user asset for playback. ` +
           `userId=${user?.id} userEmail=${user?.email} origin=${origin} ` +
