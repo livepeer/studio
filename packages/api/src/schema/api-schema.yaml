@@ -2096,7 +2096,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
-      summary: update a stream
+      summary: Update a stream
       description: |
         PATCH /stream/{id} can be used to modify a stream object. It is a single
         endpoint that can update any of the mutable properties of a stream.
