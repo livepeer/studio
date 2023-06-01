@@ -73,7 +73,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which stream object was created
+          description:
+            Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
         events:
           type: array
@@ -125,7 +126,8 @@ components:
                   type: number
                   readOnly: true
                   example: 1587667174725
-                  description: Timestamp (in milliseconds) at which the webhook last failed
+                  description:
+                    Timestamp (in milliseconds) at which the webhook last failed
                 error:
                   readOnly: true
                   type: string
@@ -254,7 +256,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which stream object was created
+          description:
+            Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
         parentId:
           type: string
@@ -335,7 +338,8 @@ components:
                     default: false
                   id:
                     type: string
-                    description: ID of multistream target object where to push this stream
+                    description:
+                      ID of multistream target object where to push this stream
                   spec:
                     type: object
                     writeOnly: true
@@ -476,7 +480,8 @@ components:
                 description: "The bitrate of the track, in kilobits per second."
               keys:
                 type: object
-                description: An object containing additional track-specific metrics.
+                description:
+                  An object containing additional track-specific metrics.
                 additionalProperties:
                   type: number
               fpks:
@@ -586,7 +591,8 @@ components:
         createdAt:
           readOnly: true
           type: number
-          description: Timestamp (in milliseconds) at which stream object was created
+          description:
+            Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
         parentId:
           type: string
@@ -650,7 +656,8 @@ components:
         url:
           type: string
           writeOnly: true
-          description: Livepeer-compatible multistream target URL (RTMP(S) or SRT)
+          description:
+            Livepeer-compatible multistream target URL (RTMP(S) or SRT)
           example: "rtmps://live.my-service.tv/channel/secretKey"
           format: uri
           pattern: "^(srt|rtmps?)://"
@@ -733,7 +740,8 @@ components:
                     - recording
                 sessionId:
                   type: string
-                  description: ID of the session from which this asset was created
+                  description:
+                    ID of the session from which this asset was created
             - additionalProperties: false
               required:
                 - type
@@ -802,7 +810,8 @@ components:
                     - reverted
                 progress:
                   type: number
-                  description: Current progress of the task updating the storage.
+                  description:
+                    Current progress of the task updating the storage.
                 errorMessage:
                   type: string
                   description: Error message if the last storage changed failed.
@@ -843,7 +852,8 @@ components:
                 - failed
             updatedAt:
               type: number
-              description: Timestamp (in milliseconds) at which the asset was last updated
+              description:
+                Timestamp (in milliseconds) at which the asset was last updated
               example: 1587667174725
             progress:
               type: number
@@ -946,7 +956,8 @@ components:
                     example: 1080
                   pixelFormat:
                     type: string
-                    description: Pixel format of the track - only for video tracks
+                    description:
+                      Pixel format of the track - only for video tracks
                     example: yuv420p
                   fps:
                     type: number
@@ -1241,7 +1252,8 @@ components:
             $ref: "#/components/schemas/ffmpeg-profile"
         targetSegmentSizeSecs:
           type: number
-          description: How many seconds the duration of each output segment should be
+          description:
+            How many seconds the duration of each output segment should be
     task:
       type: object
       additionalProperties: false
@@ -1449,14 +1461,17 @@ components:
                     videoFileGatewayUrl:
                       readOnly: true
                       type: string
-                      description: URL to access file via HTTP through an IPFS gateway
+                      description:
+                        URL to access file via HTTP through an IPFS gateway
                     nftMetadataCid:
                       type: string
-                      description: IPFS CID of the default metadata exported for the video
+                      description:
+                        IPFS CID of the default metadata exported for the video
                     nftMetadataUrl:
                       readOnly: true
                       type: string
-                      description: URL for the metadata file with the IPFS protocol
+                      description:
+                        URL for the metadata file with the IPFS protocol
                     nftMetadataGatewayUrl:
                       readOnly: true
                       type: string
@@ -1500,7 +1515,8 @@ components:
                 - unverified
             value:
               type: string
-              description: Developer-managed ID of the user who created the resource.
+              description:
+                Developer-managed ID of the user who created the resource.
     export-task-params:
       description: Parameters for the export task
       oneOf:
@@ -1567,11 +1583,13 @@ components:
                       properties:
                         apiKey:
                           type: string
-                          description: Will be added to the pinata_api_key header.
+                          description:
+                            Will be added to the pinata_api_key header.
                         apiSecret:
                           type: string
                           writeOnly: true
-                          description: Will be added to the pinata_secret_api_key header.
+                          description:
+                            Will be added to the pinata_secret_api_key header.
     signing-key:
       type: object
       additionalProperties: false
@@ -1588,12 +1606,14 @@ components:
         createdAt:
           readOnly: true
           type: number
-          description: Timestamp (in milliseconds) at which the signing-key was created
+          description:
+            Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
         lastSeen:
           readOnly: true
           type: number
-          description: Timestamp (in milliseconds) at which the signing-key was last used
+          description:
+            Timestamp (in milliseconds) at which the signing-key was last used
           example: 1587667174725
         publicKey:
           type: string
@@ -1663,15 +1683,18 @@ components:
           example: 1234
         createdAt:
           type: number
-          description: Timestamp (in milliseconds) at which user object was created
+          description:
+            Timestamp (in milliseconds) at which user object was created
           example: 1587667174725
         verifiedAt:
           type: number
-          description: Timestamp (in milliseconds) at which user object was verified
+          description:
+            Timestamp (in milliseconds) at which user object was verified
           example: 1587667174725
         planChangedAt:
           type: number
-          description: Timestamp (in milliseconds) at which user object was verified
+          description:
+            Timestamp (in milliseconds) at which user object was verified
           example: 1587667174725
         lastStreamedAt:
           type: number
@@ -1681,7 +1704,8 @@ components:
           example: 1587667174725
         lastSeen:
           type: number
-          description: Timestamp (in milliseconds) at which user's password was used
+          description:
+            Timestamp (in milliseconds) at which user's password was used
           example: 1587667174725
     usage:
       type: object
@@ -1712,7 +1736,8 @@ components:
           example: 200000
     playback-policy:
       type: object
-      description: Whether the playback policy for a asset or stream is public or signed
+      description:
+        Whether the playback policy for a asset or stream is public or signed
       additionalProperties: false
       required:
         - type
@@ -2017,7 +2042,7 @@ paths:
         |
 
         | All active stream objects                   |
-        `/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]` 
+        `/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]`
         | This filter returns active stream objects. Setting the value to
         `false` returns idle stream objects. The default value for new stream
         objects is `false`. Note that the example shows a decoded JSON object,
@@ -2182,7 +2207,8 @@ paths:
           type: string
     get:
       summary: Retrieve a multistream target
-      description: You can retrieve a multistream target from its ID with this API.
+      description:
+        You can retrieve a multistream target from its ID with this API.
       responses:
         "200":
           description: Success
@@ -3011,7 +3037,8 @@ paths:
             type: string
       responses:
         "200":
-          description: A single Metric object with the viewCount and playtimeMins metrics.
+          description:
+            A single Metric object with the viewCount and playtimeMins metrics.
           content:
             application/json:
               schema:
