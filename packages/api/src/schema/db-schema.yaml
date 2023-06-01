@@ -1113,6 +1113,14 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+        newStripeProductId:
+          type: string
+          enum:
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU

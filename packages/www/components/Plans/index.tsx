@@ -84,9 +84,14 @@ const List = ({ children, ...props }) => (
 type PlanProps = {
   dashboard?: boolean;
   stripeProductId?: string;
+  newStripeProductId?: string;
 };
 
-const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
+const Plans = ({
+  dashboard = false,
+  stripeProductId,
+  newStripeProductId,
+}: PlanProps) => {
   const router = useRouter();
   const [isTourOpen, setIsTourOpen] = useState(false);
   const promptUpgrade = router.query?.promptUpgrade;
@@ -216,13 +221,13 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "hacker_1"
+                    ? newStripeProductId === "hacker_1"
                       ? "Current plan"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "hacker_1" ? true : false
+                  dashboard && newStripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
                 stripeProductId="hacker_1"
@@ -308,15 +313,15 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "growth_1"
+                    ? newStripeProductId === "growth_1"
                       ? "Current plan"
-                      : stripeProductId === "scale_1"
+                      : newStripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "growth_1" ? true : false
+                  dashboard && newStripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
                 stripeProductId="growth_1"
@@ -406,15 +411,15 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "scale_1"
+                    ? newStripeProductId === "scale_1"
                       ? "Current plan"
-                      : stripeProductId === "scale_1"
+                      : newStripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "scale_1" ? true : false
+                  dashboard && newStripeProductId === "scale_1" ? true : false
                 }
                 variant="primary"
                 stripeProductId="scale_1"
@@ -504,15 +509,15 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "pay_as_you_go_1"
+                    ? newStripeProductId === "pay_as_you_go_1"
                       ? "Current plan"
-                      : stripeProductId === "pay_as_you_go_1"
+                      : newStripeProductId === "pay_as_you_go_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "pay_as_you_go_1"
+                  dashboard && newStripeProductId === "pay_as_you_go_1"
                     ? true
                     : false
                 }

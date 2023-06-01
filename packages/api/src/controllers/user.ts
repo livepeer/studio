@@ -892,6 +892,20 @@ app.post(
       payload.stripeCustomerSubscriptionId
     );
 
+    // Temporarily skip updating the subscription if user is selecting a new plan
+    if (
+      payload.stripeProductId !== "prod_0" &&
+      payload.stripeProductId !== "prod_1" &&
+      payload.stripeProductId !== "prod_2"
+    ) {
+      // Update user's product subscription in our db
+      await db.user.update(user.id, {
+        newStripeProductId: payload.stripeProductId,
+        planChangedAt: Date.now(),
+      });
+      res.send(subscription);
+    }
+
     // Get the prices associated with the subscription
     const subscriptionItems = await req.stripe.subscriptionItems.list({
       subscription: payload.stripeCustomerSubscriptionId,
