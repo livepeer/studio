@@ -1991,9 +1991,7 @@ paths:
         **GET `/stream?streamsonly=1`**
         This endpoint retrieves all stream objects with the same userId and excludes the historic stream objects with a parentId, which represent a single live stream session.
         \
-        \
         ## Quick Filters
-        \
         | Filter                                     | Example                                             | Description                                                                                                                                                                                         |
         |--------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
         | All stream objects with the same userId     | `/api/stream?streamsonly=1`                         | This filter excludes the historic stream objects with a parentId, which represent a single live stream session.                                                                                     |
@@ -2047,11 +2045,8 @@ paths:
         endpoint that can update any of the mutable properties of a stream.
         Specifically:
         \
-        \
         - record
-        \
         - suspended
-        \
         - multistream.targets
         \
         \
@@ -2246,9 +2241,7 @@ paths:
         you want to listen for and the URL that will be called when those events
         occur.
         \
-        \
          ## Types of Events
-        \
         | Name                       | Description                                                                                                                                                           |
         | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
         | `stream.started`           | The parent stream object's isActive value is marked as true and the .m3u8 HLS URL works                                                                                |
@@ -2317,11 +2310,8 @@ paths:
         webhookId. It is a single endpoint that can update any of the mutable
         properties of a webhook. Specifically:
         \
-        \
         - name
-        \
         - url
-        \
         - events
       responses:
         "200":
@@ -2389,13 +2379,11 @@ paths:
         connections. If you want a simpler implementation though, you should
         just use a direct upload.
         \
-        \
         ## Direct Upload
         \
         For a direct upload, make a PUT request to the URL received in the url
         field of the response above, with the raw video file as the request
         body. response above:
-        \
         \
         ## Resumable Upload
         \
@@ -2408,7 +2396,7 @@ paths:
         tusEndpoint field of the response to upload the video file and track the
         progress:
         \
-        \
+
         ``` 
         # This assumes there is an `input` element of `type="file"` with id
         `fileInput` in the HTML
@@ -2447,7 +2435,7 @@ paths:
         upload.start();
 
         ```
-        \
+        
         \
         > Note: If you are using tus from node.js, you need to add a custom URL
         storage to enable resuming from previous uploads. On the browser, this
@@ -3035,13 +3023,13 @@ paths:
         \
         When you create a signing key, the request returns a base64 encoded pem
         keypair, where
-        \
+
         - The publicKey is a representation of the public key, encoded as base
-        64 and is passed as a string
-        \
+        64 and is passed as a string,
         - The privateKey is displayed only on creation. This is the only moment
         where the client can save the private key, otherwise it will be lost.
-        Remember to decode your string when signing JWTs
+        Remember to decode your string when signing JWTs.
+        \
         \
         Up to 10 signing keys can be generated, after that you must delete at
         least one signing key to create a new one.
@@ -3126,10 +3114,9 @@ paths:
         key. It is a single endpoint that can update any of the mutable
         properties of a stream. Specifically:
         \
-        \
         - name
-        \
         - disabled
+        \
         \
         All fields are optional, and if any field is not included in the request
         payload it will be kept unchanged from the saved object.
@@ -3225,13 +3212,10 @@ paths:
         The results will be available under `params.outputs.hls.path` and
         `params.outputs.mp4.path` in the specified storage service.
         \
-        \
         ## Input
         \
         This endpoint currently supports the following inputs:
-        \
         - HTTP
-        \
         - S3 API Compatible Service
         \
         \
@@ -3246,8 +3230,7 @@ paths:
         | Name | Type   | Description                          |
         | ---- | ------ | ------------------------------------ |
         | url  | string | A public HTTP URL for the video file. |
-        \
-        \
+     
         Note: For IPFS HTTP gateway URLs, the API currently only supports “path
         style” URLs and does not support “subdomain style” URLs. The API will
         support both styles of URLs in a future update.
@@ -3280,20 +3263,17 @@ paths:
         | credentials.secretAccessKey| string | The S3 access key secret.                     |
         | bucket                     | string | The name of the S3 bucket.                    |
         | path                       | string | The path within the S3 bucket of the video file. |
+      
         \
         \
         ## Storage
         \
-        \
         This endpoint currently supports the following storage services:
-        \
         - S3 API Compatible Service
-        \
         - Web3 Storage
         \
         \
         **S3 API Compatible Service**
-        \
         ```json
         {
           "type": "s3",
@@ -3305,7 +3285,7 @@ paths:
             "bucket": "mybucket"
         }
         ```
-        \
+
         | Name                       | Type   | Description                                      |
         | -------------------------- | ------ | ------------------------------------------------ |
         | type                       | string | The type of storage service.                     |
@@ -3313,10 +3293,10 @@ paths:
         | credentials.accessKeyId    | string | The S3 access key ID.                            |
         | credentials.secretAccessKey| string | The S3 access key secret.                        |
         | bucket                     | string | The path within the S3 bucket of the video file. |
-        \
-        \
+     
+
         **Web3 Storage**
-        \
+
         ```json
         {
           "type": "web3.storage",
@@ -3325,24 +3305,21 @@ paths:
             }
         }
         ```
-        \
+
         | Name                   | Type   | Description                               |
         | ---------------------- | ------ | ----------------------------------------- |
         | type                   | string | The type of storage service.              |
         | credentials.proof      | string | Base64-encoded UCAN delegation proof.      |
-        \
-        \
+
         ## Outputs
         \
         This endpoint currently supports the following output types:
-        \
         - HLS
-        \
         - MP4
+      
         \
         \
         **HLS**
-        \
 
         ```json
         {
@@ -3351,14 +3328,13 @@ paths:
             }
         }
         ```
-        \
         | Name | Type   | Description                                                                                       |
         | ---- | ------ | ------------------------------------------------------------------------------------------------- |
         | path | string | The path of the directory that HLS playlists and mpegts segments will be stored in.                |
+
         \
         \
         **MP4**
-        \
 
         ```json
         {
@@ -3367,7 +3343,7 @@ paths:
             }
         }
         ```
-        \
+
         | Name | Type   | Description                                                                                     |
         | ---- | ------ | ----------------------------------------------------------------------------------------------- |
         | path | string | The path of the directory that MP4 output videos will be stored in.                              |
