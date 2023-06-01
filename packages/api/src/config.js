@@ -61,13 +61,45 @@ exports.products = {
     order: 4,
     name: "Growth",
     lookupKeys: ["growth_1"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0,
+      },
+      {
+        name: "Delivery",
+        description: "Delivery (minutes)",
+        price: 0,
+      },
+      {
+        name: "Storage",
+        description: "Storage (minutes)",
+        price: 0,
+      },
+    ],
   },
   scale_1: {
     order: 5,
     name: "Scale",
     lookupKeys: ["scale_1"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0,
+      },
+      {
+        name: "Delivery",
+        description: "Delivery (minutes)",
+        price: 0,
+      },
+      {
+        name: "Storage",
+        description: "Storage (minutes)",
+        price: 0,
+      },
+    ],
   },
   pay_as_you_go_1: {
     order: 6,
@@ -95,6 +127,22 @@ exports.products = {
     order: 7,
     name: "Enterprise",
     lookupKeys: ["enterprise_1"],
-    usage: [],
+    usage: [
+      {
+        name: "Transcoding",
+        description: "Transcoding (minutes)",
+        price: 0,
+      },
+      {
+        name: "Delivery",
+        description: "Delivery (minutes)",
+        price: 0,
+      },
+      {
+        name: "Storage",
+        description: "Storage (minutes)",
+        price: 0,
+      },
+    ],
   },
 };
