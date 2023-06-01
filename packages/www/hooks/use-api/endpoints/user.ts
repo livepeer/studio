@@ -6,7 +6,7 @@ import {
   User,
 } from "@livepeer.studio/api";
 import { isDevelopment } from "../../../lib/utils";
-import { ApiState, UsageData } from "../types";
+import { ApiState, UsageData, BillingUsageData } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
 import { storeToken, clearToken } from "../tokenStorage";
@@ -209,6 +209,25 @@ export const getUsage = async (
   );
 
   return [res, usage as UsageData | ApiError];
+};
+
+export const getBillingUsage = async (
+  fromTime: number,
+  toTime: number,
+  creatorId?: number,
+  timeStep?: string
+): Promise<[Response, BillingUsageData | ApiError]> => {
+  let [res, usage] = await context.fetch(
+    `/data/usage/query?${qs.stringify({
+      from: fromTime,
+      to: toTime,
+      creatorId,
+      timeStep,
+    })}`,
+    {}
+  );
+
+  return [res, usage as BillingUsageData | ApiError];
 };
 
 export const makeUserAdmin = async (
