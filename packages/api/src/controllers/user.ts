@@ -763,6 +763,8 @@ app.post(
   }
 );
 
+const deprecatedProducts = ["prod_0", "prod_1", "prod_2"];
+
 app.post(
   "/create-subscription",
   validatePost("create-subscription"),
@@ -836,6 +838,7 @@ app.post(
         stripeCustomerSubscriptionId: subscription.id,
       });
       res.send(subscription);
+      return;
     }
 
     // Update user's product and subscription id in our db
@@ -916,6 +919,7 @@ app.post(
         planChangedAt: Date.now(),
       });
       res.send(subscription);
+      return;
     }
 
     // Get the prices associated with the subscription
