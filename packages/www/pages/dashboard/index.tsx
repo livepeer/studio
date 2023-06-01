@@ -69,7 +69,7 @@ const Dashboard = () => {
           title="Upgrade to Pro"
           description="Upgrade to the Pro plan and enjoy unlimited transcoding and streaming minutes."
           button={
-            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+            <Link href="/dashboard/billing" passHref legacyBehavior>
               <Button
                 variant="primary"
                 as="a"

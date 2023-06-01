@@ -182,13 +182,6 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
-            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
-              <A
-                variant="primary"
-                css={{ display: "flex", alignItems: "center" }}>
-                View Plans & Upgrade <ArrowRightIcon />
-              </A>
-            </Link>
           </Flex>
         </Box>
         <Box css={{ mb: "$9" }}>
@@ -285,7 +278,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          {!products[user.stripeProductId].order ? (
+          {!products[user.stripeProductId]?.order ? (
             <Text variant="neutral">
               The Personal plan is free of charge up to 1000 minutes per month
               and limited to 10 concurrent viewers per account.
