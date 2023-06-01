@@ -251,13 +251,14 @@ const Billing = () => {
                   mr: "$3",
                   fontWeight: 600,
                   letterSpacing: "0",
+                  display: "none",
                 }}>
                 Charts
               </Box>
             </Flex>
           </Heading>
         </Flex>
-        <Box css={{ mb: "$4" }}>
+        <Box css={{ mb: "$4", display: "none" }}>
           <Select
             css={{ fontSize: "$3", px: "$2", mb: "$4" }}
             defaultValue="day"
@@ -266,7 +267,7 @@ const Billing = () => {
             <option value="day">Daily</option>
           </Select>
         </Box>
-        <Box>
+        <Box css={{ mb: "$4", display: "none" }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -277,7 +278,7 @@ const Billing = () => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
-        <Box>
+        <Box css={{ mb: "$4", display: "none" }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -288,7 +289,7 @@ const Billing = () => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
-        <Box>
+        <Box css={{ mb: "$4", display: "none" }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
