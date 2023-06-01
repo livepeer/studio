@@ -8,6 +8,9 @@ const PlansPage = () => {
   useLoggedIn();
   const { user } = useApi();
 
+  // temporary removal of plan page
+  return <Layout />;
+
   if (!user) {
     return <Layout />;
   }
