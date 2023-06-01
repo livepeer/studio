@@ -826,6 +826,18 @@ app.post(
       stripeCustomerId
     );
 
+    if (
+      stripeProductId !== "prod_0" &&
+      stripeProductId !== "prod_1" &&
+      stripeProductId !== "prod_2"
+    ) {
+      await db.user.update(user.id, {
+        newStripeProductId: stripeProductId,
+        stripeCustomerSubscriptionId: subscription.id,
+      });
+      res.send(subscription);
+    }
+
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {
       stripeProductId,
