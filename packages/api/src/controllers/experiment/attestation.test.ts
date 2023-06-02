@@ -25,6 +25,27 @@ const REQUEST = {
     "0x8d5dc1ba0787fe1208d88cde8af00dfaded3979f6a03526579ffef2594dfb6f82ecc1120ceb55ab1500aae045e1bd6115995f9433c278dad6eabc094a31fcb051c",
 };
 
+const FLOW_REQUEST = {
+  primaryType: "VideoAttestation",
+  domain: {
+    name: "Verifiable Video",
+    version: "1",
+  },
+  message: {
+    video: "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
+    attestations: [
+      {
+        role: "creator",
+        address: "0xd10f88cea4ef9a06",
+      },
+    ],
+    signer: "0xd10f88cea4ef9a06",
+    timestamp: NOW - HOUR,
+  },
+  signature:
+    "5a8a93d3c0abbfc93ab111c67dcd41f521e826c9cc67fa0cbe5870428aec819463be0064e52d31c2041b6ea21bef0f5305d077583f8cc5d401d12ffd8b84d67c",
+};
+
 let server: TestServer;
 let id: string;
 
@@ -127,28 +148,7 @@ describe("Attestation API", () => {
 
   describe("POST /", () => {
     it("should support Flow Wallet signatures", async () => {
-      const flowRequest = {
-        primaryType: "VideoAttestation",
-        domain: {
-          name: "Verifiable Video",
-          version: "1",
-        },
-        message: {
-          video:
-            "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
-          attestations: [
-            {
-              role: "creator",
-              address: "0xd10f88cea4ef9a06",
-            },
-          ],
-          signer: "0xd10f88cea4ef9a06",
-          timestamp: NOW - HOUR,
-        },
-        signature:
-          "5a8a93d3c0abbfc93ab111c67dcd41f521e826c9cc67fa0cbe5870428aec819463be0064e52d31c2041b6ea21bef0f5305d077583f8cc5d401d12ffd8b84d67c",
-      };
-      const res = await client.post("/experiment/-/attestation", flowRequest);
+      const res = await client.post("/experiment/-/attestation", FLOW_REQUEST);
       expect(res.status).toBe(201);
     });
 
@@ -172,6 +172,13 @@ describe("Attestation API", () => {
       let request = JSON.parse(JSON.stringify(REQUEST));
       request.signature =
         "0xb5e2ba76cae6b23ad6613753f701f9b8bb696d58cad9c7c11ca0fa10ad5a6b123fef9f6639e317f1d3f1a3131e50bfeb83dc02dd69a6b12cb7db665d19a9a49b1c";
+      const res = await client.post("/experiment/-/attestation", request);
+      expect(res.status).toBe(400);
+    });
+
+    it("should return an error for invalid Flow Wallet signature", async () => {
+      let request = JSON.parse(JSON.stringify(FLOW_REQUEST));
+      request.message.signer = "0xd10f88cea4ef9a05";
       const res = await client.post("/experiment/-/attestation", request);
       expect(res.status).toBe(400);
     });
