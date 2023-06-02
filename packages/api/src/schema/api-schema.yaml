@@ -2016,6 +2016,11 @@ components:
           readOnly: true
           description:
             Timestamp (in milliseconds) at which the object was created
+        signatureType:
+          type: string
+          enum:
+            - eip712
+            - flow
 
 paths:
   /stream:
