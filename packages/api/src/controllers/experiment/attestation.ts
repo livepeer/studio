@@ -46,7 +46,18 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     return res.status(400).json({ errors: ["invalid signature"] });
   }
 
-  const id = uuid();
+  let id: string;
+  switch (verfiedSignatureType) {
+    case "eip712":
+      id = ethers.TypedDataEncoder.hash(DOMAIN, TYPES, message);
+      break;
+    case "flow":
+      // Flow does not have any 'default' hashing mechanism, just use the standard ethers hashing
+      id = ethers.hashMessage(stringify(message));
+      break;
+    default:
+      throw new Error(`invalid signatureType: ${signatureType}`);
+  }
   const attestationMetadata = await db.attestation.create({
     id,
     signatureType: verfiedSignatureType,
