@@ -71,7 +71,7 @@ app.post("/", validatePost("attestation"), async (req, res) => {
 async function verifySignature(
   message: any,
   signature: string,
-  signatureType?: string
+  signatureType?: Attestation["signatureType"]
 ): Promise<string> {
   const verifiedEIP712 =
     (signatureType === "eip712" || !signatureType) &&
