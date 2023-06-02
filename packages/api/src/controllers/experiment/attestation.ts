@@ -6,6 +6,7 @@ import { makeNextHREF, toStringValues } from "../helpers";
 import _ from "lodash";
 import * as fcl from "@onflow/fcl";
 import stringify from "fast-stable-stringify";
+import { Attestation } from "../../schema/types";
 
 const app = Router();
 
