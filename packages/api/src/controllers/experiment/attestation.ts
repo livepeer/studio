@@ -6,7 +6,6 @@ import { makeNextHREF, toStringValues } from "../helpers";
 import _ from "lodash";
 import * as fcl from "@onflow/fcl";
 import stringify from "fast-stable-stringify";
-import { v4 as uuid } from "uuid";
 
 const app = Router();
 
@@ -104,12 +103,6 @@ async function verifyFlowSignature(
   signature: string
 ): Promise<boolean> {
   try {
-    // These parameters are required to use the fcl library, even though we don't use on-chain verification
-    await fcl.config({
-      "flow.network": "testnet",
-      "accessNode.api": "https://access-testnet.onflow.org",
-    });
-
     const compSig = [
       {
         f_type: "CompositeSignature",
