@@ -294,6 +294,11 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
     update-subscription:
       type: object
       required:
@@ -320,6 +325,11 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
     update-customer-payment-method:
       type: object
       required:
@@ -369,7 +379,6 @@ components:
               address:
                 type: string
     attestation:
-      type: object
       table: attestation
       additionalProperties: false
       required:
@@ -1103,6 +1112,19 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
+        newStripeProductId:
+          type: string
+          enum:
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU

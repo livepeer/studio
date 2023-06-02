@@ -8,6 +8,9 @@ const PlansPage = () => {
   useLoggedIn();
   const { user } = useApi();
 
+  // temporary removal of plan page
+  return <Layout />;
+
   if (!user) {
     return <Layout />;
   }
@@ -49,6 +52,9 @@ const PlansPage = () => {
           dashboard={true}
           stripeProductId={
             user?.stripeProductId ? user.stripeProductId : "prod_0"
+          }
+          newStripeProductId={
+            user?.newStripeProductId ? user.newStripeProductId : "prod_0"
           }
         />
       </Box>

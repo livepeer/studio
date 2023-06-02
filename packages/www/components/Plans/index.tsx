@@ -57,7 +57,7 @@ const Item = ({
 }) => (
   <Flex
     css={{
-      fontSize: "$2",
+      fontSize: "$1",
       height: 50,
       alignItems: "center",
       borderBottom: "1px solid",
@@ -84,9 +84,14 @@ const List = ({ children, ...props }) => (
 type PlanProps = {
   dashboard?: boolean;
   stripeProductId?: string;
+  newStripeProductId?: string;
 };
 
-const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
+const Plans = ({
+  dashboard = false,
+  stripeProductId,
+  newStripeProductId,
+}: PlanProps) => {
   const router = useRouter();
   const [isTourOpen, setIsTourOpen] = useState(false);
   const promptUpgrade = router.query?.promptUpgrade;
@@ -148,15 +153,45 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </Flex>
             <List>
               <Item displayCheck={false} title="Transcoding" />
-              <Item displayCheck={false} title="Recording storage" />
+              <Item displayCheck={false} title="Storage" />
               <Item
                 displayCheck={false}
-                title="Stream Delivery via CDN"
+                title="Streaming"
                 css={{ borderBottom: 0 }}
               />
               <Item
                 displayCheck={false}
-                title="Multistreaming*"
+                title="Multistreaming"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="Recording"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="Engagement analytics"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="Playback policies"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="WebRTC"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="Low Latency livestreaming*"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="Multiparticipant livestreaming**"
                 css={{ borderBottom: 0 }}
               />
             </List>
@@ -166,7 +201,9 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               p: "$4",
               borderRadius: 16,
               width: "25%",
-              minWidth: 300,
+              background: "$panel",
+              minWidth: 250,
+              mr: "$2",
             }}>
             <Flex
               css={{
@@ -176,22 +213,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_0"].name}
+                {products["hacker_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>
+                {products["hacker_1"].name}
+              </Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_0"
+                    ? newStripeProductId === "hacker_1"
                       ? "Current plan"
-                      : "Downgrade"
+                      : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_0" ? true : false
+                  dashboard && newStripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_0"
+                stripeProductId="hacker_1"
                 onClick={() => {
                   if (!dashboard) {
                     router.push("/register");
@@ -200,19 +239,49 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               />
             </Flex>
             <List>
-              <Item title={<span>1000 minutes / month</span>} />
+              <Item title={<span>1,000 minutes / month</span>} />
               <Item
-                title={<span>None</span>}
-                displayX={true}
-                displayCheck={false}
+                title={<span>1,000 minutes / month</span>}
+                displayX={false}
+                displayCheck={true}
               />
               <Item
-                title={<span>10 concurrent viewers / account</span>}
+                title={<span>10,000 minutes / month</span>}
                 displayCheck={true}
                 css={{ borderBottom: 0 }}
               />
               <Item
-                title={<span>3 stream destinations</span>}
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
                 displayCheck={true}
                 css={{ borderBottom: 0 }}
               />
@@ -227,7 +296,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               borderRadius: "16px",
               background: "$panel",
               p: "$4",
-              minWidth: 300,
+              mr: "$2",
+              minWidth: 250,
             }}>
             <Flex
               css={{
@@ -237,24 +307,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_1"].name}
+                {products["growth_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$100/month</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_1"
+                    ? newStripeProductId === "growth_1"
                       ? "Current plan"
-                      : stripeProductId === "prod_2"
-                      ? "Downgrade"
-                      : "Upgrade"
+                      : newStripeProductId === "scale_1"
+                      ? "Select"
+                      : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_1" ? true : false
+                  dashboard && newStripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_1"
+                stripeProductId="growth_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -268,28 +338,64 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             <List>
               <Item
                 css={{ borderColor: "$neutral5" }}
-                title={<span>$0.005 USD / min video ingested</span>}
+                title={<span>3,000 minutes / month</span>}
               />
               <Item
                 css={{ borderColor: "$neutral5" }}
-                title={<span>Coming soon</span>}
+                title={<span>10,000 minutes / month</span>}
               />
               <Item
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.015 USD / gb video streamed</span>}
+                title={<span>100,000 minutes / month</span>}
               />
               <Item
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.002 USD / min per destination</span>}
+                title={<span>Included</span>}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
               />
             </List>
           </Box>
+
           <Box
+            className="upgrade-card"
             css={{
-              borderRadius: 16,
-              p: "$4",
               width: "25%",
-              minWidth: 300,
+              color: "$hiContrast",
+              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
+              borderRadius: "16px",
+              background: "$panel",
+              p: "$4",
+              mr: "$2",
+              minWidth: 250,
             }}>
             <Flex
               css={{
@@ -299,7 +405,202 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 height: 116,
               }}>
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_2"].name}
+                {products["scale_1"].name}
+              </Heading>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$500/month</Box>
+              <PlanForm
+                text={
+                  dashboard
+                    ? newStripeProductId === "scale_1"
+                      ? "Current plan"
+                      : newStripeProductId === "scale_1"
+                      ? "Select"
+                      : "Select"
+                    : "Sign up"
+                }
+                disabled={
+                  dashboard && newStripeProductId === "scale_1" ? true : false
+                }
+                variant="primary"
+                stripeProductId="scale_1"
+                onClick={() => {
+                  if (dashboard) {
+                    setIsTourOpen(false);
+                  } else {
+                    router.push("/register?selectedPlan=2");
+                  }
+                }}
+              />
+            </Flex>
+
+            <List>
+              <Item
+                css={{ borderColor: "$neutral5" }}
+                title={<span>20,000 minutes / month</span>}
+              />
+              <Item
+                css={{ borderColor: "$neutral5" }}
+                title={<span>50,000 minutes / month</span>}
+              />
+              <Item
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={<span>500,000 minutes / month</span>}
+              />
+              <Item
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={<span>Included</span>}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+            </List>
+          </Box>
+
+          <Box
+            className="upgrade-card"
+            css={{
+              width: "25%",
+              color: "$hiContrast",
+              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
+              borderRadius: "16px",
+              background: "$panel",
+              p: "$4",
+              mr: "$2",
+              minWidth: 250,
+            }}>
+            <Flex
+              css={{
+                mb: "$4",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: 116,
+              }}>
+              <Heading as="h3" size="2" css={{ mb: "$3" }}>
+                {products["pay_as_you_go_1"].name}
+              </Heading>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay for what you use</Box>
+              <PlanForm
+                text={
+                  dashboard
+                    ? newStripeProductId === "pay_as_you_go_1"
+                      ? "Current plan"
+                      : newStripeProductId === "pay_as_you_go_1"
+                      ? "Select"
+                      : "Select"
+                    : "Sign up"
+                }
+                disabled={
+                  dashboard && newStripeProductId === "pay_as_you_go_1"
+                    ? true
+                    : false
+                }
+                variant="primary"
+                stripeProductId="pay_as_you_go_1"
+                onClick={() => {
+                  if (dashboard) {
+                    setIsTourOpen(false);
+                  } else {
+                    router.push("/register?selectedPlan=3");
+                  }
+                }}
+              />
+            </Flex>
+
+            <List>
+              <Item
+                css={{ borderColor: "$neutral5" }}
+                title={<span>$5 / 1,000 minutes</span>}
+              />
+              <Item
+                css={{ borderColor: "$neutral5" }}
+                title={<span>$3 / 1,000 minutes</span>}
+              />
+              <Item
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={<span>$0.40 / 1,000 minutes</span>}
+              />
+              <Item
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={<span>Included</span>}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+            </List>
+          </Box>
+
+          <Box
+            css={{
+              borderRadius: 16,
+              p: "$4",
+              width: "25%",
+              minWidth: 250,
+              mr: "$2",
+              background: "$panel",
+            }}>
+            <Flex
+              css={{
+                mb: "$4",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: 116,
+              }}>
+              <Heading as="h3" size="2" css={{ mb: "$3" }}>
+                {products["prod_4"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
               <Link
@@ -321,14 +622,41 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </Flex>
 
             <List>
-              <Item title={<span>Custom pricing available</span>} />
-              <Item title={<span>Coming soon</span>} />
+              <Item title={<span>Custom pricing</span>} />
+              <Item title={<span>Custom pricing</span>} />
               <Item
-                title={<span>Custom pricing available</span>}
+                title={<span>Custom pricing</span>}
+                css={{ borderBottom: 0 }}
+              />
+              <Item title={<span>Included</span>} css={{ borderBottom: 0 }} />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
                 css={{ borderBottom: 0 }}
               />
               <Item
-                title={<span>Custom pricing available</span>}
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>Included</span>}
+                displayCheck={true}
                 css={{ borderBottom: 0 }}
               />
             </List>
@@ -344,8 +672,20 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             fontStyle: "italic",
             color: "$hiContrast",
           }}>
-          *Currently, we are not charging for this feature. We'll be sure to
-          reach out before we do.
+          The Pay-as-you-go plan applies to minutes that go over the Hacker,
+          Growth, and Scale plans.
+        </Container>
+        <Container
+          css={{
+            fontSize: "$1",
+            textAlign: "center",
+            maxWidth: 800,
+            mt: "$8",
+            mx: "auto",
+            fontStyle: "italic",
+            color: "$hiContrast",
+          }}>
+          *Open Beta **Closed beta
         </Container>
       </Box>
     </>

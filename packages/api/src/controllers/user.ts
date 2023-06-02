@@ -763,6 +763,8 @@ app.post(
   }
 );
 
+const deprecatedProducts = ["prod_0", "prod_1", "prod_2"];
+
 app.post(
   "/create-subscription",
   validatePost("create-subscription"),
@@ -825,6 +827,19 @@ app.post(
       stripeProductId,
       stripeCustomerId
     );
+
+    if (
+      stripeProductId !== "prod_0" &&
+      stripeProductId !== "prod_1" &&
+      stripeProductId !== "prod_2"
+    ) {
+      await db.user.update(user.id, {
+        newStripeProductId: stripeProductId,
+        stripeCustomerSubscriptionId: subscription.id,
+      });
+      res.send(subscription);
+      return;
+    }
 
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {
@@ -892,11 +907,28 @@ app.post(
       payload.stripeCustomerSubscriptionId
     );
 
+    // Temporarily skip updating the subscription if user is selecting a new plan
+    if (
+      payload.stripeProductId !== "prod_0" &&
+      payload.stripeProductId !== "prod_1" &&
+      payload.stripeProductId !== "prod_2"
+    ) {
+      // Update user's product subscription in our db
+      await db.user.update(user.id, {
+        newStripeProductId: payload.stripeProductId,
+        planChangedAt: Date.now(),
+      });
+      res.send(subscription);
+      return;
+    }
+
     // Get the prices associated with the subscription
     const subscriptionItems = await req.stripe.subscriptionItems.list({
       subscription: payload.stripeCustomerSubscriptionId,
     });
 
+    // Temporarily commenting out usage - TODO june new billing
+    /*
     // Get the customer's usage
     const usageRes = await db.stream.usage(
       user.id,
@@ -928,6 +960,8 @@ app.post(
         }
       })
     );
+
+    */
 
     // Update the customer's subscription plan.
     // Stripe will automatically invoice the customer based on its usage up until this point
