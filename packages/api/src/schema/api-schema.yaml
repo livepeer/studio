@@ -2129,6 +2129,11 @@ paths:
         default value for new stream objects is `false`. Note that the example
         shows a decoded JSON object, but in a URL, it should be
         URL-encoded.                                           |
+      parameters:
+        - name: streamsonly
+          in: query
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -2922,10 +2927,6 @@ paths:
             The playback ID to filter the query results. This can be a canonical
             playback ID from Livepeer assets or streams, or dStorage identifiers
             for assets
-          schema:
-            type: string
-        - name: streamsonly
-          in: query
           schema:
             type: string
         - name: from
