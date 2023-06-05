@@ -5,7 +5,10 @@ import { WithID } from "../store/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBSession } from "../store/db";
-import { CROSS_USER_ASSETS_CUTOFF_DATE } from "./playback";
+
+const EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE = Date.parse(
+  "2023-06-06T00:00:00.000Z"
+);
 
 let server: TestServer;
 let ingest: string;
@@ -117,12 +120,12 @@ describe("controllers/playback", () => {
       } as const;
       await db.asset.update(asset.id, {
         playbackRecordingId: "mock_asset_1",
-        createdAt: CROSS_USER_ASSETS_CUTOFF_DATE + 1000,
+        createdAt: EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE + 1000,
         ...assetPatch,
       });
       await db.asset.update(asset2.id, {
         playbackRecordingId: "mock_asset_2",
-        createdAt: CROSS_USER_ASSETS_CUTOFF_DATE + 2000,
+        createdAt: EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE + 2000,
         ...assetPatch,
       });
 
@@ -484,10 +487,10 @@ describe("controllers/playback", () => {
     describe("cross-user playback backward compatibility", () => {
       beforeEach(async () => {
         await db.asset.update(asset.id, {
-          createdAt: CROSS_USER_ASSETS_CUTOFF_DATE - 2000,
+          createdAt: EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE - 2000,
         });
         await db.asset.update(asset2.id, {
-          createdAt: CROSS_USER_ASSETS_CUTOFF_DATE - 1000,
+          createdAt: EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE - 1000,
         });
       });
 

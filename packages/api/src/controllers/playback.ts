@@ -24,9 +24,9 @@ import logger from "../logger";
  * asset playback. Assets created before this date can still be played by other
  * accounts by dStorage ID. Assets created after this date will not have
  * cross-account playback enabled, ensuring users are billed appropriately. This
- * was made for backward compatibiltiy during the Viewership V2 deploy.
+ * was made for backward compatibility during the Viewership V2 deploy.
  */
-export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
+const CROSS_USER_ASSETS_CUTOFF_DATE = 1686009600000; // 2023-06-06T00:00:00.000Z
 
 var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv$/;
 
