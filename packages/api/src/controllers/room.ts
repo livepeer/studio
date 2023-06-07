@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import {
   AccessToken,
   EgressClient,
+  EgressInfo,
   RoomServiceClient,
   StreamOutput,
   StreamProtocol,
@@ -17,6 +18,8 @@ import {
   NotFoundError,
 } from "../store/errors";
 import { Room } from "../schema/types";
+import { EgressStatus } from "livekit-server-sdk/dist/proto/livekit_egress";
+import { isInteger } from "lodash";
 
 const app = Router();
 
@@ -110,10 +113,18 @@ app.post(
   authorizer({}),
   validatePost("room-egress-payload"),
   async (req, res) => {
-    const room = await getRoom(req);
+    await getRoom(req);
 
-    if (room.egressId !== undefined && room.egressId != "") {
-      throw new BadRequestError("egress already started");
+    const egressClient = new EgressClient(
+      req.config.livekitHost,
+      req.config.livekitApiKey,
+      req.config.livekitSecret
+    );
+    const currentEgress = await egressClient.listEgress(req.params.roomId);
+    for (const egress of currentEgress) {
+      if (isEgressRunning(egress)) {
+        throw new BadRequestError("egress already running");
+      }
     }
 
     const stream = await db.stream.get(req.body.streamId);
@@ -125,11 +136,6 @@ app.post(
       throw new NotFoundError(`stream not found`);
     }
 
-    const egressClient = new EgressClient(
-      req.config.livekitHost,
-      req.config.livekitApiKey,
-      req.config.livekitSecret
-    );
     const output: StreamOutput = {
       protocol: StreamProtocol.RTMP,
       urls: [req.config.ingest[0].ingest + "/" + stream.streamKey],
@@ -146,32 +152,42 @@ app.post(
       }
     );
     console.log("egress started", info);
-    await db.room.update(room.id, {
-      egressId: info.egressId,
-      updatedAt: Date.now(),
-    });
     res.status(204).end();
   }
 );
 
 app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
-  const room = await getRoom(req);
-
-  if (room.egressId === undefined || room.egressId == "") {
-    throw new BadRequestError("egress has not started");
-  }
+  await getRoom(req);
 
   const egressClient = new EgressClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
     req.config.livekitSecret
   );
+  const currentEgress = await egressClient.listEgress(req.params.roomId);
 
-  const info = await egressClient.stopEgress(room.egressId);
-  console.log("egress stopped", info);
-  await db.room.update(room.id, { egressId: "", updatedAt: Date.now() });
+  let found = false;
+  for (const egress of currentEgress) {
+    if (isEgressRunning(egress)) {
+      found = true;
+      const info = await egressClient.stopEgress(egress.egressId);
+      console.log("egress stopped", info);
+    }
+  }
+  if (!found) {
+    throw new BadRequestError("no egress currently running");
+  }
+
   res.status(204).end();
 });
+
+function isEgressRunning(egress: EgressInfo) {
+  return (
+    egress.status == EgressStatus.EGRESS_ACTIVE ||
+    egress.status == EgressStatus.EGRESS_STARTING ||
+    egress.status == EgressStatus.EGRESS_ENDING
+  );
+}
 
 app.post(
   "/:roomId/user",
