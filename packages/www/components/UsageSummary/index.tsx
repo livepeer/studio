@@ -61,7 +61,7 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
               {title}
             </Box>
-            <Box css={{ verticalAlign: "top" }}>
+            <Box css={{ mb: "$2" }}>
               <Tooltip
                 multiline
                 content={
