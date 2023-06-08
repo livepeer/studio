@@ -81,7 +81,10 @@ const UsageSummary = () => {
     };
 
     const doGetUsage = async (fromTime, toTime, userId) => {
-      const [res, usage] = await getBillingUsage(fromTime, toTime);
+      const [res, usage] = await getBillingUsage(
+        fromTime * 1000,
+        toTime * 1000
+      );
       if (res.status == 200) {
         setUsage(usage);
       }
