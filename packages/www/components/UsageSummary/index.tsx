@@ -62,7 +62,7 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             }>
             <Help />
           </Tooltip>
-          <Box css={{ mb: "$2", color: "$hiContrast" }}>{title}</Box>
+          <Box css={{ mb: "$2", mt: "$2", color: "$hiContrast" }}>{title}</Box>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
             {limit && <Box css={{ mx: "$1" }}>/</Box>}
