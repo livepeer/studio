@@ -43,8 +43,6 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             fd: "column",
             gap: "$3",
           }}>
-          <Skeleton variant="title" css={{ width: "50%" }} />
-          <Skeleton variant="heading" css={{ width: "25%" }} />
           <Tooltip
             multiline
             content={
@@ -52,22 +50,24 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             }>
             <Help />
           </Tooltip>
+          <Skeleton variant="title" css={{ width: "50%" }} />
+          <Skeleton variant="heading" css={{ width: "25%" }} />
         </Box>
       ) : (
         <>
+          <Tooltip
+            multiline
+            content={
+              <Box>Usage minutes may take up to an hour to be reflected.</Box>
+            }>
+            <Help />
+          </Tooltip>
           <Box css={{ mb: "$2", color: "$hiContrast" }}>{title}</Box>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
             {limit && <Box css={{ mx: "$1" }}>/</Box>}
             {limit && <Box>{limit}</Box>}
           </Flex>
-          <Tooltip
-            multiline
-            content={
-              <Box>Usage minutes may take up to an hour to be reflected.</Box>
-            }>
-            <Help />
-          </Tooltip>
         </>
       )}
     </Box>
