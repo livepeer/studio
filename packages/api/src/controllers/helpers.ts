@@ -163,7 +163,9 @@ export function toObjectStoreUrl(storage: ObjectStoreStorage): string {
     throw new Error("undefined property 'credentials'");
   }
   const endpointUrl = new URL(storage.endpoint);
-  return `s3+${endpointUrl.protocol}//${storage.credentials.accessKeyId}:${storage.credentials.secretAccessKey}@${endpointUrl.host}/${storage.bucket}`;
+  const accessKey = encodeURIComponent(storage.credentials.accessKeyId);
+  const secretKey = encodeURIComponent(storage.credentials.secretAccessKey);
+  return `s3+${endpointUrl.protocol}//${accessKey}:${secretKey}@${endpointUrl.host}/${storage.bucket}`;
 }
 
 export function deleteCredentials(objectStoreUrl: string): string {
