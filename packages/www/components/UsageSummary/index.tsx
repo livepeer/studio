@@ -61,13 +61,17 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
               {title}
             </Box>
-            <Tooltip
-              multiline
-              content={
-                <Box>Usage minutes may take up to an hour to be reflected.</Box>
-              }>
-              <Help />
-            </Tooltip>
+            <Box css={{ verticalAlign: "top" }}>
+              <Tooltip
+                multiline
+                content={
+                  <Box>
+                    Usage minutes may take up to an hour to be reflected.
+                  </Box>
+                }>
+                <Help />
+              </Tooltip>
+            </Box>
           </Flex>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
