@@ -441,8 +441,10 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
               case "lte":
                 comparison = "<=";
                 break;
-              default:
+              case "eq":
                 comparison = "=";
+              default:
+                throw new Error(`unknown comparison: "${key}"`);
             }
             q.push(
               sql``
