@@ -59,8 +59,13 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
 };
 
 const UsageSummary = () => {
-  const { user, getUsage, getSubscription, getInvoices, getUserProduct } =
-    useApi();
+  const {
+    user,
+    getBillingUsage,
+    getSubscription,
+    getInvoices,
+    getUserProduct,
+  } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
@@ -76,7 +81,7 @@ const UsageSummary = () => {
     };
 
     const doGetUsage = async (fromTime, toTime, userId) => {
-      const [res, usage] = await getUsage(fromTime, toTime, userId);
+      const [res, usage] = await getBillingUsage(fromTime, toTime);
       if (res.status == 200) {
         setUsage(usage);
       }
@@ -158,17 +163,26 @@ const UsageSummary = () => {
         <UsageCard
           title="Transcoding minutes"
           loading={!usage}
-          usage={
-            usage &&
-            (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
-          }
+          usage={usage && usage.TotalUsageMins.toFixed(2).toLocaleString()}
+          limit={!products[user.stripeProductId]?.order ? 1000 : false}
+        />
+        <UsageCard
+          title="Delivery minutes"
+          loading={!usage}
+          usage={usage && usage.DeliveryUsageMins.toFixed(2).toLocaleString()}
+          limit={!products[user.stripeProductId]?.order ? 1000 : false}
+        />
+        <UsageCard
+          title="Storage minutes"
+          loading={!usage}
+          usage={usage && usage.StorageUsageMins.toFixed(2).toLocaleString()}
           limit={!products[user.stripeProductId]?.order ? 1000 : false}
         />
       </Grid>
       <Flex
         justify="between"
         align="center"
-        css={{ fontSize: "$3", color: "$hiContrast" }}>
+        css={{ fontSize: "$3", color: "$hiContrast", display: "none" }}>
         <Text variant="neutral" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
           Upcoming invoice:{" "}
