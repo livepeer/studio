@@ -43,30 +43,34 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             fd: "column",
             gap: "$3",
           }}>
-          <Tooltip
-            multiline
-            content={
-              <Box>Usage minutes may take up to an hour to be reflected.</Box>
-            }>
-            <Help />
-          </Tooltip>
-          <Skeleton variant="title" css={{ width: "50%" }} />
+          <Flex align="center">
+            <Skeleton variant="title" css={{ width: "50%", mr: "$3" }} />
+            <Tooltip
+              multiline
+              content={
+                <Box>Usage minutes may take up to an hour to be reflected.</Box>
+              }>
+              <Help />
+            </Tooltip>
+          </Flex>
           <Skeleton variant="heading" css={{ width: "25%" }} />
         </Box>
       ) : (
         <>
-          <Tooltip
-            multiline
-            content={
-              <Box>Usage minutes may take up to an hour to be reflected.</Box>
-            }>
-            <Help />
-          </Tooltip>
-          <Box css={{ mb: "$2", mt: "$2", color: "$hiContrast" }}>{title}</Box>
+          <Flex align="center">
+            <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
+              {title}
+            </Box>
+            <Tooltip
+              multiline
+              content={
+                <Box>Usage minutes may take up to an hour to be reflected.</Box>
+              }>
+              <Help />
+            </Tooltip>
+          </Flex>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
-            {limit && <Box css={{ mx: "$1" }}>/</Box>}
-            {limit && <Box>{limit}</Box>}
           </Flex>
         </>
       )}
