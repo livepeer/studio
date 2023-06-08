@@ -152,7 +152,7 @@ async function validateAssetPayload(
 }
 
 async function validateAssetPlaybackPolicy(
-  { playbackPolicy, objectStoreId }: Partial<NewAssetPayload>,
+  { playbackPolicy, objectStoreId, encryption }: Partial<NewAssetPayload>,
   playbackId: string,
   userId: string,
   createdAt: number
@@ -189,6 +189,13 @@ async function validateAssetPlaybackPolicy(
     if (webhook.userId !== userId) {
       throw new BadRequestError(
         `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
+  }
+  if (encryption?.encryptedKey) {
+    if (!playbackPolicy) {
+      throw new BadRequestError(
+        `a playbackPolicy is required when using encryption`
       );
     }
   }
