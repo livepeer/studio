@@ -8,6 +8,7 @@ import {
   Text,
   styled,
   Skeleton,
+  Tooltip,
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
@@ -15,6 +16,7 @@ import UpcomingIcon from "../../public/img/icons/upcoming.svg";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
+import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
@@ -43,6 +45,13 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
           }}>
           <Skeleton variant="title" css={{ width: "50%" }} />
           <Skeleton variant="heading" css={{ width: "25%" }} />
+          <Tooltip
+            multiline
+            content={
+              <Box>Usage minutes may take up to an hour to be reflected.</Box>
+            }>
+            <Help />
+          </Tooltip>
         </Box>
       ) : (
         <>
@@ -52,6 +61,13 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             {limit && <Box css={{ mx: "$1" }}>/</Box>}
             {limit && <Box>{limit}</Box>}
           </Flex>
+          <Tooltip
+            multiline
+            content={
+              <Box>Usage minutes may take up to an hour to be reflected.</Box>
+            }>
+            <Help />
+          </Tooltip>
         </>
       )}
     </Box>
