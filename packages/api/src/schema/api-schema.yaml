@@ -1806,6 +1806,32 @@ components:
               leftAt:
                 type: integer
                 description: the time the participant left
+    usage-metric:
+      type: object
+      description: |
+        An individual metric about usage of a user.
+      required:
+        - UserID
+        - CreatorID
+        - DeliveryUsageMins
+        - TotalUsageMins
+        - StorageUsageMins
+      properties:
+        UserID:
+          type: string
+          description: The user ID associated with the metric
+        CreatorID:
+          type: string
+          description: The creator ID associated with the metric
+        DeliveryUsageMins:
+          type: number
+          description: The number of minutes of delivery usage
+        TotalUsageMins:
+          type: number
+          description: The number of minutes of total usage
+        StorageUsageMins:
+          type: number
+          description: The number of minutes of storage usage
     viewership-metric:
       type: object
       description: |
@@ -3139,6 +3165,72 @@ paths:
                   playtimeMins:
                     $ref: >-
                       #/components/schemas/viewership-metric/properties/playtimeMins
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/data/usage/query":
+    get:
+      summary: Query usage metrics
+      description: |
+        Allows querying any metric in its raw form. 
+        This can be called from the frontend with a CORS key.
+      parameters:
+        - name: from
+          in: query
+          description: |
+            Start millis timestamp for the query range (inclusive)
+          schema:
+            type: integer
+        - name: to
+          in: query
+          description: |
+            End millis timestamp for the query range (exclusive)
+          schema:
+            type: integer
+        - name: timeStep
+          in: query
+          description: |
+            The time step to aggregate viewership metrics by
+          schema:
+            type: string
+            enum:
+              - hour
+              - day
+        - name: creatorId
+          in: query
+          description: |
+            The creator ID to filter the query results
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A Usage Metric object
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |
+                  A simplified metric object about aggregate usage of an
+                  user.
+                properties:
+                  UserID:
+                    $ref: >-
+                      #/components/schemas/usage-metric/properties/UserID
+                  CreatorID:
+                    $ref: >-
+                      #/components/schemas/usage-metric/properties/CreatorID
+                  DeliveryUsageMins:
+                    $ref: >-
+                      #/components/schemas/usage-metric/properties/DeliveryUsageMins
+                  TotalUsageMins:
+                    $ref: >-
+                      #/components/schemas/usage-metric/properties/TotalUsageMins
+                  StorageUsageMins:
+                    $ref: >-
+                      #/components/schemas/usage-metric/properties/StorageUsageMins
         default:
           description: Error
           content:
