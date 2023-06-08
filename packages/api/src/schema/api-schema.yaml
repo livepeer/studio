@@ -3211,26 +3211,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                description: |
-                  A simplified metric object about aggregate usage of an
-                  user.
-                properties:
-                  UserID:
-                    $ref: >-
-                      #/components/schemas/usage-metric/properties/UserID
-                  CreatorID:
-                    $ref: >-
-                      #/components/schemas/usage-metric/properties/CreatorID
-                  DeliveryUsageMins:
-                    $ref: >-
-                      #/components/schemas/usage-metric/properties/DeliveryUsageMins
-                  TotalUsageMins:
-                    $ref: >-
-                      #/components/schemas/usage-metric/properties/TotalUsageMins
-                  StorageUsageMins:
-                    $ref: >-
-                      #/components/schemas/usage-metric/properties/StorageUsageMins
+                $ref: "#/components/schemas/usage-metric"
         default:
           description: Error
           content:
