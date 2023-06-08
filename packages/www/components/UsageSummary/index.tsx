@@ -170,7 +170,7 @@ const UsageSummary = () => {
           title="Delivery minutes"
           loading={!usage}
           usage={usage && usage.DeliveryUsageMins.toFixed(2).toLocaleString()}
-          limit={!products[user.stripeProductId]?.order ? 1000 : false}
+          limit={!products[user.stripeProductId]?.order ? 10000 : false}
         />
         <UsageCard
           title="Storage minutes"
