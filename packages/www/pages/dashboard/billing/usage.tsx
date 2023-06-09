@@ -27,7 +27,14 @@ import { UsageCard } from "components/UsageSummary";
 
 const Billing = () => {
   useLoggedIn();
-  const { user, getUsage, getBillingUsage } = useApi();
+  const {
+    user,
+    getUsage,
+    getBillingUsage,
+    getSubscription,
+    getInvoices,
+    getUserProduct,
+  } = useApi();
   const [_usage, setUsage] = useState(null);
   const [billingUsage, setBillingUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
@@ -103,6 +110,10 @@ const Billing = () => {
     };
 
     const getSubscriptionAndUsage = async (subscriptionId) => {
+      const [res, subscription] = await getSubscription(subscriptionId);
+      if (res.status == 200) {
+        setSubscription(subscription);
+      }
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
