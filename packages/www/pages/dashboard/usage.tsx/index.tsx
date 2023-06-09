@@ -25,7 +25,7 @@ import {
 } from "recharts";
 import { UsageCard } from "components/UsageSummary";
 
-const Billing = () => {
+const Usage = () => {
   useLoggedIn();
   const {
     user,
@@ -307,4 +307,4 @@ const Billing = () => {
   );
 };
 
-export default Billing;
+export default Usage;

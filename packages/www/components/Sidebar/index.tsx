@@ -23,6 +23,7 @@ import {
   StreamIcon,
   TerminalIcon,
   BillingIcon,
+  UsageIcon,
   AssetsIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
@@ -229,6 +230,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           </Box>
 
           <Box>
+            <Link href="/dashboard/usage" passHref legacyBehavior>
+              <NavLink active={id === "usage"}>
+                <UsageIcon active={id === "usage"} />
+                Usage
+              </NavLink>
+            </Link>
+          </Box>
+
+          <Box>
             <Link href="/dashboard/billing" passHref legacyBehavior>
               <NavLink active={id === "billing"}>
                 <BillingIcon active={id === "billing"} />
@@ -251,15 +261,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 </Link>
               </Box>
             )}
-          </Box>
-
-          <Box>
-            <Link href="/dashboard/usage" passHref legacyBehavior>
-              <NavLink active={id === "usage"}>
-                <StreamIcon active={id === "usage"} />
-                Usage
-              </NavLink>
-            </Link>
           </Box>
         </Grid>
         <Flex direction="column" gap={1}>

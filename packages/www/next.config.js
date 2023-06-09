@@ -55,7 +55,7 @@ const config = {
         permanent: false,
       },
       {
-        source: "/app/user/usage",
+        source: "/app/user/billing",
         destination: "/dashboard/billing",
         permanent: false,
       },
@@ -75,7 +75,7 @@ const config = {
         permanent: false,
       },
       {
-        source: "/dashboard/usage",
+        source: "/app/user/usage",
         destination: "/dashboard/usage",
         permanent: false,
       },
