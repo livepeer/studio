@@ -234,7 +234,9 @@ const PlanForm = ({
                 <Box
                   css={{ mt: "$4", lineHeight: "22px", color: "$hiContrast" }}>
                   <Box>
-                    <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
+                    <Label
+                      css={{ mb: "$1", display: "block", textAlign: "left" }}
+                      htmlFor="name">
                       Full name
                     </Label>
                     <TextField
@@ -258,7 +260,7 @@ const PlanForm = ({
                     }}>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="email">
                         Email
                       </Label>
@@ -275,7 +277,7 @@ const PlanForm = ({
                     </Box>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="phone">
                         Phone
                       </Label>
@@ -293,7 +295,7 @@ const PlanForm = ({
                   </Grid>
                   <Box>
                     <Label
-                      css={{ mb: "$1", display: "block" }}
+                      css={{ mb: "$1", display: "block", textAlign: "left" }}
                       htmlFor="address">
                       Address
                     </Label>
@@ -318,7 +320,7 @@ const PlanForm = ({
                     }}>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="city">
                         City
                       </Label>
@@ -335,7 +337,7 @@ const PlanForm = ({
                     </Box>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="State">
                         State
                       </Label>
@@ -352,7 +354,7 @@ const PlanForm = ({
                     </Box>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="postalCode">
                         ZIP
                       </Label>
@@ -375,6 +377,7 @@ const PlanForm = ({
                       color: "$hiContrast",
                       fontWeight: 500,
                       mb: "$1",
+                      textAlign: "left",
                     }}>
                     Card
                   </Box>
