@@ -148,17 +148,38 @@ const Plans = ({
                 flexDirection: "column",
                 justifyContent: "flex-end",
                 height: 116,
-                fontWeight: 500,
+                fontWeight: 600,
+                fontSize: "$4",
               }}>
               Usage
             </Flex>
             <List>
-              <Item displayCheck={false} title="Transcoding" />
-              <Item displayCheck={false} title="Storage" />
+              <Item
+                css={{
+                  borderBottom: 0,
+                  textDecoration: "underline dotted rgb(67, 76, 88)",
+                  fontSize: "$3",
+                }}
+                displayCheck={false}
+                title="Transcoding"
+              />
+              <Item
+                css={{
+                  borderBottom: 0,
+                  textDecoration: "underline dotted rgb(67, 76, 88)",
+                  fontSize: "$3",
+                }}
+                displayCheck={false}
+                title="Storage"
+              />
               <Item
                 displayCheck={false}
                 title="Streaming"
-                css={{ borderBottom: 0 }}
+                css={{
+                  borderBottom: 0,
+                  textDecoration: "underline dotted rgb(67, 76, 88)",
+                  fontSize: "$3",
+                }}
               />
               <Item displayCheck={false} css={{ borderBottom: 0 }} title={""} />
             </List>
@@ -614,10 +635,7 @@ const Plans = ({
             mx: "auto",
             fontStyle: "italic",
             color: "$hiContrast",
-          }}>
-          The Pay-as-you-go plan applies to minutes that go over the Hacker,
-          Growth, and Scale plans.
-        </Container>
+          }}></Container>
       </Box>
     </>
   );
