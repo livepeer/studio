@@ -66,9 +66,9 @@ export type SidebarId =
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
+  | "usage"
   | "billing"
-  | "billing/plans"
-  | "usage";
+  | "billing/plans";
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
