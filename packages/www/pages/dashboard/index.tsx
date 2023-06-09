@@ -66,8 +66,8 @@ const Dashboard = () => {
       )}
       {showPromo && (
         <Banner
-          title="Upgrade to Pro"
-          description="Upgrade to the Pro plan and enjoy unlimited transcoding and streaming minutes."
+          title="Upgrade"
+          description="Upgrade to the Growth plan, Scale plan, or Enterprise plan to suit your needs."
           button={
             <Link href="/dashboard/billing/plans" passHref legacyBehavior>
               <Button
@@ -75,7 +75,7 @@ const Dashboard = () => {
                 as="a"
                 size="2"
                 css={{ cursor: "default" }}>
-                Upgrade to Pro
+                Upgrade
               </Button>
             </Link>
           }
