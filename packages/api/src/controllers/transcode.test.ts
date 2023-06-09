@@ -116,7 +116,7 @@ describe("controllers/transcode", () => {
           endpoint: "https://inendpoint.com",
           credentials: {
             accessKeyId: "IN_USERNAME",
-            secretAccessKey: "IN_PASSWORD",
+            secretAccessKey: "IN_PASS/WORD",
           },
           bucket: "inbucket",
           path: "/input/video.mp4",
@@ -149,7 +149,7 @@ describe("controllers/transcode", () => {
         params: {
           "transcode-file": {
             input: {
-              url: "s3+https://IN_USERNAME:IN_PASSWORD@inendpoint.com/inbucket/input/video.mp4",
+              url: "s3+https://IN_USERNAME:IN_PASS%2FWORD@inendpoint.com/inbucket/input/video.mp4",
             },
             storage: {
               url: "s3+https://USERNAME:PASSWORD@endpoint.com/mybucket",

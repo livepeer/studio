@@ -99,6 +99,9 @@ components:
       type: object
       additionalProperties: false
       properties:
+        allowAll:
+          type: boolean
+          description: Allow all users for the experiment
         addUsers:
           type: array
           items:
@@ -291,6 +294,11 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
     update-subscription:
       type: object
       required:
@@ -317,6 +325,11 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
     update-customer-payment-method:
       type: object
       required:
@@ -365,6 +378,8 @@ components:
             properties:
               address:
                 type: string
+    attestation:
+      table: attestation
     experiment:
       type: object
       table: experiment
@@ -396,6 +411,11 @@ components:
           description:
             Timestamp (in milliseconds) at which experiment was updated
           example: 1587667174725
+        audienceAllowAll:
+          type: boolean
+          description:
+            Allow all users for the experiment; if true, the field
+            'audienceUserIds' is ignored
         audienceUserIds:
           type: array
           index: true
@@ -731,10 +751,18 @@ components:
           description: Set to true when stream deleted
     new-stream-payload:
       properties:
+        wowza:
+          $ref: "#/components/schemas/stream/properties/wowza"
+        presets:
+          $ref: "#/components/schemas/stream/properties/presets"
+        renditions:
+          $ref: "#/components/schemas/stream/properties/renditions"
         recordObjectStoreId:
           $ref: "#/components/schemas/stream/properties/recordObjectStoreId"
         objectStoreId:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
+        detection:
+          $ref: "#/components/schemas/stream/properties/detection"
     playback-policy:
       properties:
         type:
@@ -1014,6 +1042,19 @@ components:
             - prod_0
             - prod_1
             - prod_2
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
+        newStripeProductId:
+          type: string
+          enum:
+            - hacker_1
+            - growth_1
+            - scale_1
+            - pay_as_you_go_1
+            - prod_4
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU

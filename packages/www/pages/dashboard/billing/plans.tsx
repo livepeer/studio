@@ -50,6 +50,9 @@ const PlansPage = () => {
           stripeProductId={
             user?.stripeProductId ? user.stripeProductId : "prod_0"
           }
+          newStripeProductId={
+            user?.newStripeProductId ? user.newStripeProductId : "prod_0"
+          }
         />
       </Box>
     </Layout>

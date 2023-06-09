@@ -4,7 +4,6 @@ import {
   getHLSPlaybackUrl,
   getWebRTCPlaybackUrl,
   getRecordingFields,
-  USER_SESSION_TIMEOUT,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
@@ -13,42 +12,23 @@ import {
 } from "./asset";
 import { CliArgs } from "../parse-cli";
 import { DBSession } from "../store/db";
-import { Asset, Stream, User } from "../schema/types";
+import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+import { isExperimentSubject } from "../store/experiment-table";
+import logger from "../logger";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
  * asset playback. Assets created before this date can still be played by other
  * accounts by dStorage ID. Assets created after this date will not have
  * cross-account playback enabled, ensuring users are billed appropriately. This
- * was made for backward compatibiltiy during the Viewership V2 deploy.
+ * was made for backward compatibility during the Viewership V2 deploy.
  */
-export const CROSS_USER_ASSETS_CUTOFF_DATE = new Date(2023, 5, 10).getTime();
+const CROSS_USER_ASSETS_CUTOFF_DATE = 1686009600000; // 2023-06-06T00:00:00.000Z
 
 var embeddablePlayerOrigin = /^https:\/\/(.+\.)?lvpr.tv$/;
-
-// This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
-type PlaybackInfo = {
-  type: "live" | "vod" | "recording";
-  meta: {
-    live?: 0 | 1;
-    playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"];
-    source: {
-      hrn: "HLS (TS)" | "MP4" | "WebRTC (H264)";
-      type:
-        | "html5/application/vnd.apple.mpegurl"
-        | "html5/video/mp4"
-        | "html5/video/h264";
-      url: string;
-      size?: number;
-      width?: number;
-      height?: number;
-      bitrate?: number;
-    }[];
-  };
-};
 
 function newPlaybackInfo(
   type: PlaybackInfo["type"],
@@ -122,10 +102,9 @@ const getAssetPlaybackInfo = async (
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
-  isCrossUserQuery?: boolean,
+  cutoffDate?: number,
   origin?: string
 ): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
-  const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let asset =
     (await db.asset.getByPlaybackId(id)) ??
     (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
@@ -136,7 +115,7 @@ export async function getResourceByPlaybackId(
     if (asset.status.phase !== "ready") {
       throw new UnprocessableEntityError("asset is not ready for playback");
     }
-    if (asset.userId !== user?.id && !isCrossUserQuery) {
+    if (asset.userId !== user?.id && cutoffDate) {
       console.log(
         `Returning cross-user asset for playback. ` +
           `userId=${user?.id} userEmail=${user?.email} origin=${origin} ` +
@@ -165,6 +144,39 @@ export async function getResourceByPlaybackId(
 
   return {};
 }
+async function getAttestationPlaybackInfo(
+  config: CliArgs,
+  ingest: string,
+  id: string,
+  user?: User,
+  cutoffDate?: number
+): Promise<PlaybackInfo> {
+  try {
+    if (!isExperimentSubject("attestation", user?.id)) {
+      return null;
+    }
+
+    const attestation = await db.attestation.getByIdOrCid(id);
+    const videoUrl = attestation?.message?.video;
+
+    // Currently we only support attestations for videos stored in IPFS
+    if (!videoUrl?.startsWith("ipfs://")) {
+      return null;
+    }
+    const videoCid = videoUrl.slice("ipfs://".length);
+    const asset = await db.asset.getByIpfsCid(videoCid, user, cutoffDate);
+    if (!asset) {
+      return null;
+    }
+
+    const assetPlaybackInfo = await getAssetPlaybackInfo(config, ingest, asset);
+    assetPlaybackInfo.meta.attestation = attestation;
+    return assetPlaybackInfo;
+  } catch (e) {
+    logger.warn("Error while resolving playback from video attestation", e);
+    return null;
+  }
+}
 
 async function getPlaybackInfo(
   { config, user }: Request,
@@ -173,10 +185,11 @@ async function getPlaybackInfo(
   isCrossUserQuery: boolean,
   origin: string
 ): Promise<PlaybackInfo> {
+  const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let { stream, asset, session } = await getResourceByPlaybackId(
     id,
     user,
-    isCrossUserQuery,
+    cutoffDate,
     origin
   );
 
@@ -215,7 +228,7 @@ async function getPlaybackInfo(
     }
   }
 
-  return null;
+  return await getAttestationPlaybackInfo(config, ingest, id, user, cutoffDate);
 }
 
 const app = Router();
