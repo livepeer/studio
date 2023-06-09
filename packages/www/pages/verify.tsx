@@ -27,7 +27,7 @@ const VerifyPage = () => {
       verify(email, emailValidToken)
         .then(() => {
           if (selectedPlan === "1") {
-            router.replace("/dashboard/billing");
+            router.replace("/dashboard/billing/plans?promptUpgrade=true");
           } else {
             router.replace("/dashboard");
           }

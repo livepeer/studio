@@ -6,6 +6,7 @@ import {
   Button,
   Text,
   styled,
+  Tooltip,
 } from "@livepeer/design-system";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/PlanForm";
@@ -63,6 +64,7 @@ const Item = ({
       borderBottom: "1px solid",
       letterSpacing: -0.3,
       borderColor: "$neutral5",
+      textAlign: "center",
       ...css,
     }}>
     {displayCheck && (
@@ -133,13 +135,13 @@ const Plans = ({
           css={{
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
           }}>
           <Box
             css={{
               pl: 4,
               width: "25%",
-              maxWidth: 174,
+              minWidth: 120,
+              maxWidth: 200,
             }}>
             <Flex
               css={{
@@ -147,62 +149,95 @@ const Plans = ({
                 flexDirection: "column",
                 justifyContent: "flex-end",
                 height: 116,
-                fontWeight: 500,
+                fontWeight: 600,
+                fontSize: "$4",
               }}>
               Usage
             </Flex>
             <List>
-              <Item displayCheck={false} title="Transcoding" />
-              <Item displayCheck={false} title="Storage" />
               <Item
+                css={{
+                  borderBottom: 0,
+                  textDecoration: "underline dotted rgb(67, 76, 88)",
+                  fontSize: "$3",
+                }}
                 displayCheck={false}
-                title="Streaming"
-                css={{ borderBottom: 0 }}
+                title={
+                  <Tooltip
+                    multiline
+                    content=" Create multiple versions of your source stream for different
+                    devices in real time.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Transcoding
+                    </Text>
+                  </Tooltip>
+                }
+              />
+              <Item
+                css={{
+                  borderBottom: 0,
+                  fontSize: "$3",
+                }}
+                displayCheck={false}
+                title={
+                  <Tooltip
+                    multiline
+                    content="Store video content reliably on decentralized or traditional cloud
+                    storage providers.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Storage
+                    </Text>
+                  </Tooltip>
+                }
               />
               <Item
                 displayCheck={false}
-                title="Multistreaming"
-                css={{ borderBottom: 0 }}
+                title={
+                  <Tooltip
+                    multiline
+                    content=" Deliver high-quality playback on whatever device or bandwidth the
+                    end viewer is watching.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Delivery
+                    </Text>
+                  </Tooltip>
+                }
+                css={{
+                  borderBottom: 0,
+                  fontSize: "$3",
+                }}
               />
-              <Item
-                displayCheck={false}
-                title="Recording"
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                displayCheck={false}
-                title="Engagement analytics"
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                displayCheck={false}
-                title="Playback policies"
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                displayCheck={false}
-                title="WebRTC"
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                displayCheck={false}
-                title="Low Latency livestreaming*"
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                displayCheck={false}
-                title="Multiparticipant livestreaming**"
-                css={{ borderBottom: 0 }}
-              />
+              <Item displayCheck={false} css={{ borderBottom: 0 }} title={""} />
             </List>
           </Box>
           <Box
             css={{
               p: "$4",
               borderRadius: 16,
-              width: "25%",
-              background: "$panel",
-              minWidth: 250,
+              width: "12%",
+              background: "$green3",
+              minWidth: 230,
               mr: "$2",
             }}>
             <Flex
@@ -211,13 +246,12 @@ const Plans = ({
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["hacker_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>
-                {products["hacker_1"].name}
-              </Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
               <PlanForm
                 text={
                   dashboard
@@ -230,6 +264,8 @@ const Plans = ({
                   dashboard && newStripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
+                bc="$sage12"
+                color="$loContrast"
                 stripeProductId="hacker_1"
                 onClick={() => {
                   if (!dashboard) {
@@ -239,65 +275,46 @@ const Plans = ({
               />
             </Flex>
             <List>
-              <Item title={<span>1,000 minutes / month</span>} />
               <Item
-                title={<span>1,000 minutes / month</span>}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>1,000 minutes</span>
+                  </Flex>
+                }
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>1,000 minutes</span>
+                  </Flex>
+                }
                 displayX={false}
-                displayCheck={true}
               />
               <Item
-                title={<span>10,000 minutes / month</span>}
-                displayCheck={true}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>10,000 minutes</span>
+                  </Flex>
+                }
                 css={{ borderBottom: 0 }}
               />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
+              <Item css={{ borderBottom: 0 }} displayCheck={false} title={""} />
             </List>
           </Box>
           <Box
             className="upgrade-card"
             css={{
-              width: "25%",
+              width: "12%",
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "$panel",
+              background: "$green5",
               p: "$4",
               mr: "$2",
-              minWidth: 250,
+              minWidth: 230,
             }}>
             <Flex
               css={{
@@ -305,11 +322,12 @@ const Plans = ({
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["growth_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>$100/month</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
               <PlanForm
                 text={
                   dashboard
@@ -324,6 +342,8 @@ const Plans = ({
                   dashboard && newStripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
+                bc="$sage12"
+                color="$loContrast"
                 stripeProductId="growth_1"
                 onClick={() => {
                   if (dashboard) {
@@ -337,50 +357,94 @@ const Plans = ({
 
             <List>
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
-                title={<span>3,000 minutes / month</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>3,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $5 per extra 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
-                title={<span>10,000 minutes / month</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>10,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $3 per extra 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>100,000 minutes / month</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>100,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      css={{ float: "right" }}
+                      content="Then $0.40 per extra 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>Included</span>}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
+                css={{ borderBottom: 0, fontSize: "11px" }}
+                displayCheck={false}
+                title={"*Pay as you go past alloted minutes"}
               />
             </List>
           </Box>
@@ -388,14 +452,14 @@ const Plans = ({
           <Box
             className="upgrade-card"
             css={{
-              width: "25%",
+              width: "12%",
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "$panel",
+              background: "$green6",
               p: "$4",
               mr: "$2",
-              minWidth: 250,
+              minWidth: 230,
             }}>
             <Flex
               css={{
@@ -403,11 +467,12 @@ const Plans = ({
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["scale_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>$500/month</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
               <PlanForm
                 text={
                   dashboard
@@ -422,6 +487,8 @@ const Plans = ({
                   dashboard && newStripeProductId === "scale_1" ? true : false
                 }
                 variant="primary"
+                bc="$sage12"
+                color="$loContrast"
                 stripeProductId="scale_1"
                 onClick={() => {
                   if (dashboard) {
@@ -435,150 +502,93 @@ const Plans = ({
 
             <List>
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
-                title={<span>20,000 minutes / month</span>}
-              />
-              <Item
-                css={{ borderColor: "$neutral5" }}
-                title={<span>50,000 minutes / month</span>}
-              />
-              <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>500,000 minutes / month</span>}
-              />
-              <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>Included</span>}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-            </List>
-          </Box>
-
-          <Box
-            className="upgrade-card"
-            css={{
-              width: "25%",
-              color: "$hiContrast",
-              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
-              borderRadius: "16px",
-              background: "$panel",
-              p: "$4",
-              mr: "$2",
-              minWidth: 250,
-            }}>
-            <Flex
-              css={{
-                mb: "$4",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: 116,
-              }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["pay_as_you_go_1"].name}
-              </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay for what you use</Box>
-              <PlanForm
-                text={
-                  dashboard
-                    ? newStripeProductId === "pay_as_you_go_1"
-                      ? "Current plan"
-                      : newStripeProductId === "pay_as_you_go_1"
-                      ? "Select"
-                      : "Select"
-                    : "Sign up"
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>20,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $5 per extra 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
                 }
-                disabled={
-                  dashboard && newStripeProductId === "pay_as_you_go_1"
-                    ? true
-                    : false
+              />
+              <Item
+                displayCheck={false}
+                css={{ borderColor: "$neutral5" }}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>50,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $3 per extra 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
                 }
-                variant="primary"
-                stripeProductId="pay_as_you_go_1"
-                onClick={() => {
-                  if (dashboard) {
-                    setIsTourOpen(false);
-                  } else {
-                    router.push("/register?selectedPlan=3");
-                  }
-                }}
-              />
-            </Flex>
-
-            <List>
-              <Item
-                css={{ borderColor: "$neutral5" }}
-                title={<span>$5 / 1,000 minutes</span>}
               />
               <Item
-                css={{ borderColor: "$neutral5" }}
-                title={<span>$3 / 1,000 minutes</span>}
-              />
-              <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.40 / 1,000 minutes</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>500,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $0.40 per extra 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>Included</span>}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
+                css={{ borderBottom: 0, fontSize: "11px" }}
+                displayCheck={false}
+                title={"*Pay as you go past alloted minutes"}
               />
             </List>
           </Box>
@@ -587,10 +597,10 @@ const Plans = ({
             css={{
               borderRadius: 16,
               p: "$4",
-              width: "25%",
-              minWidth: 250,
+              width: "12%",
+              minWidth: 230,
               mr: "$2",
-              background: "$panel",
+              background: "$green7",
             }}>
             <Flex
               css={{
@@ -598,8 +608,9 @@ const Plans = ({
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["prod_4"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
@@ -615,50 +626,50 @@ const Plans = ({
                       "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
                     );
                   }}
-                  variant="green">
+                  css={{
+                    background: "$sage12",
+                    border: "none",
+                    color: "$loContrast",
+                    cursor: "pointer",
+                    borderRadius: "$3",
+                    "&:hover": {
+                      boxShadow: "none",
+                      background: "$sage12",
+                      color: "$loContrast",
+                    },
+                  }}>
                   Contact Us
                 </Button>
               </Link>
             </Flex>
 
             <List>
-              <Item title={<span>Custom pricing</span>} />
-              <Item title={<span>Custom pricing</span>} />
               <Item
-                title={<span>Custom pricing</span>}
-                css={{ borderBottom: 0 }}
-              />
-              <Item title={<span>Included</span>} css={{ borderBottom: 0 }} />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Custom pricing</span>
+                  </Flex>
+                }
               />
               <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Custom pricing</span>
+                  </Flex>
+                }
               />
               <Item
-                title={<span>Included</span>}
-                displayCheck={true}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Custom pricing</span>
+                  </Flex>
+                }
                 css={{ borderBottom: 0 }}
               />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Included</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
+              <Item css={{ borderBottom: 0 }} displayCheck={false} title={""} />
             </List>
           </Box>
         </Flex>
@@ -671,22 +682,7 @@ const Plans = ({
             mx: "auto",
             fontStyle: "italic",
             color: "$hiContrast",
-          }}>
-          The Pay-as-you-go plan applies to minutes that go over the Hacker,
-          Growth, and Scale plans.
-        </Container>
-        <Container
-          css={{
-            fontSize: "$1",
-            textAlign: "center",
-            maxWidth: 800,
-            mt: "$8",
-            mx: "auto",
-            fontStyle: "italic",
-            color: "$hiContrast",
-          }}>
-          *Open Beta **Closed beta
-        </Container>
+          }}></Container>
       </Box>
     </>
   );

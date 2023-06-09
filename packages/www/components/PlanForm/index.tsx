@@ -22,7 +22,15 @@ import { useForm } from "react-hook-form";
 import Spinner from "components/Spinner";
 import { useTheme } from "next-themes";
 
-const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
+const PlanForm = ({
+  stripeProductId,
+  text,
+  variant,
+  disabled,
+  onClick,
+  bc,
+  color,
+}) => {
   const { user, updateSubscription } = useApi();
   const [status, setStatus] = useState("initial");
   const stripe = useStripe();
@@ -185,9 +193,20 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
         <Flex css={{ ai: "center" }}>
           <Button
             size="3"
-            css={{ width: "100%" }}
+            css={{
+              width: "100%",
+              background: bc,
+              color: color,
+              borderRadius: "$3",
+              cursor: "pointer",
+              "&:hover": {
+                boxShadow: "none",
+                background: bc,
+                color: color,
+              },
+            }}
             disabled={disabled}
-            variant={variant}
+            variant="primary"
             onClick={() => {
               onClick();
               setOpen(true);

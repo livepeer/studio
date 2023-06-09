@@ -182,6 +182,13 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
+            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+              <A
+                variant="primary"
+                css={{ display: "flex", alignItems: "center" }}>
+                View Plans & Upgrade <ArrowRightIcon />
+              </A>
+            </Link>
           </Flex>
         </Box>
         <Box css={{ mb: "$9" }}>

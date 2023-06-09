@@ -60,8 +60,18 @@ const config = {
         permanent: false,
       },
       {
+        source: "/app/user/plans",
+        destination: "/dashboard/billing/plans",
+        permanent: false,
+      },
+      {
         source: "/app/test-player",
         destination: "/dashboard/stream-health",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/plans",
+        destination: "/dashboard/billing/plans",
         permanent: false,
       },
       {
