@@ -163,7 +163,7 @@ const Billing = () => {
               </Flex>
             </Heading>
             <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
-              Current billing period{" "}
+              Current billing period (
               {subscription && (
                 <Flex>
                   {new Date(
@@ -181,6 +181,7 @@ const Billing = () => {
                   })}{" "}
                 </Flex>
               )}
+              )
             </Flex>
           </Flex>
         </Box>
