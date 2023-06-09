@@ -8,9 +8,10 @@ import {
   Link as A,
   Select,
   Grid,
+  Tooltip as LPTooltip,
 } from "@livepeer/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { DashboardBilling as Content } from "content";
+import { DashboardUsage as Content } from "content";
 import React, { PureComponent } from "react";
 import {
   BarChart,
@@ -24,8 +25,9 @@ import {
   Legend,
 } from "recharts";
 import { UsageCard } from "components/UsageSummary";
+import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
-const Billing = () => {
+const Usage = () => {
   useLoggedIn();
   const {
     user,
@@ -134,10 +136,7 @@ const Billing = () => {
     return <Layout />;
   }
   return (
-    <Layout
-      id="billing/usage"
-      breadcrumbs={[{ title: "Usage" }]}
-      {...Content.metaData}>
+    <Layout id="usage" breadcrumbs={[{ title: "Usage" }]} {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
           <Flex
@@ -204,6 +203,17 @@ const Billing = () => {
                   }}>
                   Summary
                 </Box>
+                <Flex align="center">
+                  <LPTooltip
+                    multiline
+                    content={
+                      <Box>
+                        Usage minutes may take up to an hour to be reflected.
+                      </Box>
+                    }>
+                    <Help />
+                  </LPTooltip>
+                </Flex>
               </Flex>
             </Heading>
           </Flex>
@@ -310,4 +320,4 @@ const Billing = () => {
   );
 };
 
-export default Billing;
+export default Usage;

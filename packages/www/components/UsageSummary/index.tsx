@@ -43,34 +43,14 @@ export const UsageCard = ({ title, usage, limit, loading = false }) => {
             fd: "column",
             gap: "$3",
           }}>
-          <Flex align="center">
-            <Skeleton variant="title" css={{ width: "50%", mr: "$3" }} />
-            <Tooltip
-              multiline
-              content={
-                <Box>Usage minutes may take up to an hour to be reflected.</Box>
-              }>
-              <Help />
-            </Tooltip>
-          </Flex>
           <Skeleton variant="heading" css={{ width: "25%" }} />
+          <Skeleton variant="title" css={{ width: "50%", mr: "$3" }} />
         </Box>
       ) : (
         <>
           <Flex align="center">
             <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
               {title}
-            </Box>
-            <Box css={{ mb: "$2" }}>
-              <Tooltip
-                multiline
-                content={
-                  <Box>
-                    Usage minutes may take up to an hour to be reflected.
-                  </Box>
-                }>
-                <Help />
-              </Tooltip>
             </Box>
           </Flex>
           <Flex align="center" css={{ fontSize: "$6" }}>
@@ -153,12 +133,24 @@ const UsageSummary = () => {
               }}>
               Usage
             </Box>
+            <Flex align="center" css={{ mr: "$3" }}>
+              <Tooltip
+                multiline
+                content={
+                  <Box>
+                    Usage minutes may take up to an hour to be reflected.
+                  </Box>
+                }>
+                <Help />
+              </Tooltip>
+            </Flex>
             <Badge
               size="1"
               variant="neutral"
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
-                ? products[user.stripeProductId].name
+                ? products[user.newStripeProductId]?.name ||
+                  products[user.stripeProductId]?.name
                 : products["prod_0"].name}{" "}
               Plan
             </Badge>
