@@ -322,7 +322,7 @@ const Plans = ({
                         css={{
                           borderRadius: 1000,
                           bc: "$sage12",
-                          color: "white",
+                          color: "$loContrast",
                           width: 18,
                           height: 18,
                           fontSize: "$1",
@@ -350,7 +350,7 @@ const Plans = ({
                         css={{
                           borderRadius: 1000,
                           bc: "$sage12",
-                          color: "white",
+                          color: "$loContrast",
                           width: 18,
                           height: 18,
                           fontSize: "$1",
@@ -379,7 +379,7 @@ const Plans = ({
                         css={{
                           borderRadius: 1000,
                           bc: "$sage12",
-                          color: "white",
+                          color: "$loContrast",
                           width: 18,
                           height: 18,
                           fontSize: "$1",
@@ -467,7 +467,7 @@ const Plans = ({
                         css={{
                           borderRadius: 1000,
                           bc: "$sage12",
-                          color: "white",
+                          color: "$loContrast",
                           width: 18,
                           height: 18,
                           fontSize: "$1",
@@ -495,7 +495,7 @@ const Plans = ({
                         css={{
                           borderRadius: 1000,
                           bc: "$sage12",
-                          color: "white",
+                          color: "$loContrast",
                           width: 18,
                           height: 18,
                           fontSize: "$1",
@@ -523,7 +523,7 @@ const Plans = ({
                         css={{
                           borderRadius: 1000,
                           bc: "$sage12",
-                          color: "white",
+                          color: "$loContrast",
                           width: 18,
                           height: 18,
                           fontSize: "$1",
