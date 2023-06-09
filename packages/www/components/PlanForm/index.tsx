@@ -428,9 +428,12 @@ const PlanForm = ({
                 <Box css={{ mt: "$4" }}>
                   <Text variant="neutral">
                     You are currently using the{" "}
-                    {products[user.stripeProductId].name} plan. Do you want to{" "}
+                    {products[user.newStripeProductId].name ||
+                      products[stripeProductId]?.name}{" "}
+                    plan. Do you want to{" "}
                     {products[stripeProductId].order <
-                    products[user.stripeProductId].order
+                      products[user.newStripeProductId]?.order ||
+                    products[stripeProductId]?.order
                       ? "downgrade"
                       : "upgrade"}{" "}
                     to the {products[stripeProductId].name} plan?
