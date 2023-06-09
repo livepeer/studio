@@ -140,6 +140,7 @@ const Plans = ({
             css={{
               pl: 4,
               width: "25%",
+              minWidth: 120,
               maxWidth: 200,
             }}>
             <Flex
@@ -161,23 +162,69 @@ const Plans = ({
                   fontSize: "$3",
                 }}
                 displayCheck={false}
-                title="Transcoding"
+                title={
+                  <Tooltip
+                    multiline
+                    content=" Create multiple versions of your source stream for different
+                    devices in real time.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Transcoding
+                    </Text>
+                  </Tooltip>
+                }
               />
               <Item
                 css={{
                   borderBottom: 0,
-                  textDecoration: "underline dotted rgb(67, 76, 88)",
                   fontSize: "$3",
                 }}
                 displayCheck={false}
-                title="Storage"
+                title={
+                  <Tooltip
+                    multiline
+                    content="Store video content reliably on decentralized or traditional cloud
+                    storage providers.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Storage
+                    </Text>
+                  </Tooltip>
+                }
               />
               <Item
                 displayCheck={false}
-                title="Streaming"
+                title={
+                  <Tooltip
+                    multiline
+                    content=" Deliver high-quality playback on whatever device or bandwidth the
+                    end viewer is watching.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Delivery
+                    </Text>
+                  </Tooltip>
+                }
                 css={{
                   borderBottom: 0,
-                  textDecoration: "underline dotted rgb(67, 76, 88)",
                   fontSize: "$3",
                 }}
               />
@@ -188,9 +235,9 @@ const Plans = ({
             css={{
               p: "$4",
               borderRadius: 16,
-              width: "15%",
+              width: "12%",
               background: "$green3",
-              minWidth: 250,
+              minWidth: 230,
               mr: "$2",
             }}>
             <Flex
@@ -260,14 +307,14 @@ const Plans = ({
           <Box
             className="upgrade-card"
             css={{
-              width: "15%",
+              width: "12%",
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
               background: "$green5",
               p: "$4",
               mr: "$2",
-              minWidth: 250,
+              minWidth: 230,
             }}>
             <Flex
               css={{
@@ -405,14 +452,14 @@ const Plans = ({
           <Box
             className="upgrade-card"
             css={{
-              width: "15%",
+              width: "12%",
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
               background: "$green6",
               p: "$4",
               mr: "$2",
-              minWidth: 250,
+              minWidth: 230,
             }}>
             <Flex
               css={{
@@ -550,8 +597,8 @@ const Plans = ({
             css={{
               borderRadius: 16,
               p: "$4",
-              width: "15%",
-              minWidth: 250,
+              width: "12%",
+              minWidth: 230,
               mr: "$2",
               background: "$green7",
             }}>
