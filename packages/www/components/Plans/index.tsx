@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ContactDialog from "../ContactDialog";
 
 const Tour: any = dynamic(() => import("reactour"), { ssr: false });
 const steps = [
@@ -94,6 +95,7 @@ const Plans = ({
   stripeProductId,
   newStripeProductId,
 }: PlanProps) => {
+  const [open, setOpen] = useState(false);
   const router = useRouter();
   const [isTourOpen, setIsTourOpen] = useState(false);
   const promptUpgrade = router.query?.promptUpgrade;
@@ -614,33 +616,25 @@ const Plans = ({
                 {products["prod_4"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
-              <Link
-                href="/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                passHref
-                legacyBehavior>
-                <Button
-                  as="a"
-                  size="3"
-                  onClick={() => {
-                    router.push(
-                      "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                    );
-                  }}
-                  css={{
+              <Button
+                as="a"
+                size="3"
+                onClick={() => setOpen(true)}
+                css={{
+                  background: "$sage12",
+                  border: "none",
+                  color: "$loContrast",
+                  cursor: "pointer",
+                  borderRadius: "$3",
+                  "&:hover": {
+                    boxShadow: "none",
                     background: "$sage12",
-                    border: "none",
                     color: "$loContrast",
-                    cursor: "pointer",
-                    borderRadius: "$3",
-                    "&:hover": {
-                      boxShadow: "none",
-                      background: "$sage12",
-                      color: "$loContrast",
-                    },
-                  }}>
-                  Contact Us
-                </Button>
-              </Link>
+                  },
+                }}>
+                Contact Us
+              </Button>
+              <ContactDialog open={open} setOpen={setOpen} />
             </Flex>
 
             <List>

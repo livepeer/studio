@@ -76,7 +76,7 @@ const config = {
       },
       {
         source: "/dashboard/usage",
-        destination: "/dashboard/billing/usage",
+        destination: "/dashboard/usage",
         permanent: false,
       },
       {

@@ -256,7 +256,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Link href="/dashboard/billing/usage" passHref legacyBehavior>
+          <Link href="/dashboard/usage" passHref legacyBehavior>
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}>
