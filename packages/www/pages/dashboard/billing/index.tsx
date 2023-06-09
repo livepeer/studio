@@ -285,7 +285,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          {!products[user.stripeProductId].order ? (
+          {!products[user.stripeProductId]?.order ? (
             <Text variant="neutral">
               The Personal plan is free of charge up to 1000 minutes per month
               and limited to 10 concurrent viewers per account.
