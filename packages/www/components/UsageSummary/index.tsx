@@ -149,7 +149,8 @@ const UsageSummary = () => {
               variant="neutral"
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
-                ? products[user.stripeProductId].name
+                ? products[user.newStripeProductId].name ||
+                  products[user.stripeProductId].name
                 : products["prod_0"].name}{" "}
               Plan
             </Badge>
