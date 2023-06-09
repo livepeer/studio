@@ -426,18 +426,6 @@ const Plans = ({
           The Pay-as-you-go plan applies to minutes that go over the Hacker,
           Growth, and Scale plans.
         </Container>
-        <Container
-          css={{
-            fontSize: "$1",
-            textAlign: "center",
-            maxWidth: 800,
-            mt: "$8",
-            mx: "auto",
-            fontStyle: "italic",
-            color: "$hiContrast",
-          }}>
-          *Open Beta **Closed beta
-        </Container>
       </Box>
     </>
   );
