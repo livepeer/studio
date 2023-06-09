@@ -80,6 +80,11 @@ const config = {
         permanent: false,
       },
       {
+        source: "/dashboard/billing/usage",
+        destination: "/dashboard/usage",
+        permanent: false,
+      },
+      {
         source: "/jobs/technical-writer",
         destination: "/jobs/1496366",
         permanent: false,

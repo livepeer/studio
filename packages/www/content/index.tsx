@@ -172,6 +172,14 @@ export const DashboardBilling = {
   },
 };
 
+export const DashboardUsage = {
+  metaData: {
+    title: makeCompleteTitle("Usage"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
 export const DashboardPlans = {
   metaData: {
     title: makeCompleteTitle("Plans"),

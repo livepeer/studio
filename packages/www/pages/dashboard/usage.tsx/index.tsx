@@ -10,7 +10,7 @@ import {
   Grid,
 } from "@livepeer/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { DashboardBilling as Content } from "content";
+import { DashboardUsage as Content } from "content";
 import React, { PureComponent } from "react";
 import {
   BarChart,
