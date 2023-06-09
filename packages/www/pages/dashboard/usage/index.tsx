@@ -8,6 +8,7 @@ import {
   Link as A,
   Select,
   Grid,
+  Tooltip as LPTooltip,
 } from "@livepeer/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { DashboardUsage as Content } from "content";
@@ -24,6 +25,7 @@ import {
   Legend,
 } from "recharts";
 import { UsageCard } from "components/UsageSummary";
+import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
 const Usage = () => {
   useLoggedIn();
@@ -201,6 +203,17 @@ const Usage = () => {
                   }}>
                   Summary
                 </Box>
+                <Flex align="center">
+                  <LPTooltip
+                    multiline
+                    content={
+                      <Box>
+                        Usage minutes may take up to an hour to be reflected.
+                      </Box>
+                    }>
+                    <Help />
+                  </LPTooltip>
+                </Flex>
               </Flex>
             </Heading>
           </Flex>
