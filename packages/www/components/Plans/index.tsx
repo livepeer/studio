@@ -280,7 +280,7 @@ const Plans = ({
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["growth_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>$100/month</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
               <PlanForm
                 text={
                   dashboard
@@ -425,7 +425,7 @@ const Plans = ({
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["scale_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>$500/month</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
               <PlanForm
                 text={
                   dashboard
