@@ -177,7 +177,8 @@ const Billing = () => {
                 variant="neutral"
                 css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
                 {user?.stripeProductId
-                  ? products[user.stripeProductId]?.name
+                  ? products[user.newStripeProductId]?.name ||
+                    products[user.stripeProductId]?.name
                   : products["prod_0"]?.name}
               </Badge>
               plan.
