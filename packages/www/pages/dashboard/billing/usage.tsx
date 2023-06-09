@@ -75,22 +75,25 @@ const Billing = () => {
       }
     };
 
-    const doGetBillingUsage = async () => {
+    const doGetBillingUsage = async (fromTime, toTime) => {
       // Gather current month data
-      const now = new Date();
+      /*const now = new Date();
       const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
       const toTime = now.getTime();
 
       doSetFrom(fromTime);
-      doSetTo(toTime);
+      doSetTo(toTime);*/
 
-      const [res, usage] = await getBillingUsage(fromTime, toTime);
+      const [res, usage] = await getBillingUsage(
+        fromTime * 1000,
+        toTime * 1000
+      );
       if (res.status == 200) {
         setBillingUsage(usage);
       }
       const [res2, usageByDay] = await getBillingUsage(
-        fromTime,
-        toTime,
+        fromTime * 1000,
+        toTime * 1000,
         null,
         timestep
       );
@@ -105,7 +108,10 @@ const Billing = () => {
         subscription?.current_period_end,
         user.id
       );
-      doGetBillingUsage();
+      doGetBillingUsage(
+        subscription?.current_period_start,
+        subscription?.current_period_end
+      );
     };
 
     if (user) {
@@ -146,7 +152,24 @@ const Billing = () => {
               </Flex>
             </Heading>
             <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
-              Current billing period
+              Current billing period{" "}
+              {subscription && (
+                <Flex>
+                  {new Date(
+                    subscription.current_period_start * 1000
+                  ).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  to{" "}
+                  {new Date(
+                    subscription.current_period_end * 1000
+                  ).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                </Flex>
+              )}
             </Flex>
           </Flex>
         </Box>
