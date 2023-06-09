@@ -442,7 +442,7 @@ const Plans = ({
                 }
               />
               <Item
-                css={{ borderBottom: 0 }}
+                css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
                 title={"*Pay as you go past alloted minutes"}
               />
@@ -586,7 +586,7 @@ const Plans = ({
                 }
               />
               <Item
-                css={{ borderBottom: 0 }}
+                css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
                 title={"*Pay as you go past alloted minutes"}
               />
