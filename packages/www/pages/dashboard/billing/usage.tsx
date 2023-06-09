@@ -7,6 +7,7 @@ import {
   Text,
   Link as A,
   Select,
+  Grid,
 } from "@livepeer/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { DashboardBilling as Content } from "content";
@@ -22,6 +23,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { UsageCard } from "components/UsageSummary";
 
 const Billing = () => {
   useLoggedIn();
@@ -170,72 +172,35 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Text variant="neutral">Usage Month to date</Text>
-          {billingUsage && (
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontFamily: "Arial, sans-serif",
-              }}>
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    Delivery (Minutes)
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    Total Transcode Usage (Minutes)
-                  </th>
-                  <th
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    Storage Usage (Minutes)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    {Number(billingUsage.DeliveryUsageMins).toFixed(2)}
-                  </td>
-                  <td
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    {Number(billingUsage.TotalUsageMins).toFixed(2)}
-                  </td>
-                  <td
-                    style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #ddd",
-                      textAlign: "center",
-                    }}>
-                    {Number(billingUsage.StorageUsageMins).toFixed(2)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          )}
+          <Grid gap="4" columns="3">
+            <UsageCard
+              title="Transcoding minutes"
+              loading={!billingUsage}
+              usage={
+                billingUsage &&
+                billingUsage.TotalUsageMins.toFixed(2).toLocaleString()
+              }
+              limit={false}
+            />
+            <UsageCard
+              title="Delivery minutes"
+              loading={!billingUsage}
+              usage={
+                billingUsage &&
+                billingUsage.DeliveryUsageMins.toFixed(2).toLocaleString()
+              }
+              limit={false}
+            />
+            <UsageCard
+              title="Storage minutes"
+              loading={!billingUsage}
+              usage={
+                billingUsage &&
+                billingUsage.StorageUsageMins.toFixed(2).toLocaleString()
+              }
+              limit={false}
+            />
+          </Grid>
         </Box>
         <Flex
           justify="between"

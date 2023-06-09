@@ -23,7 +23,7 @@ const StyledUpcomingIcon = styled(UpcomingIcon, {
   color: "$gray",
 });
 
-const UsageCard = ({ title, usage, limit, loading = false }) => {
+export const UsageCard = ({ title, usage, limit, loading = false }) => {
   return (
     <Box
       css={{
