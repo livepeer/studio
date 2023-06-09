@@ -16,10 +16,10 @@ import { DBWebhook } from "../store/webhook-table";
 import { PlaybackPolicy } from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
-import { fetchWithTimeout } from "../util";
+import { fetchWithTimeoutAndRedirects } from "../util";
 import fetch from "node-fetch";
 
-const WEBHOOK_TIMEOUT = 5 * 1000;
+const WEBHOOK_TIMEOUT = 30 * 1000;
 const app = Router();
 
 async function fireGateWebhook(
@@ -55,8 +55,7 @@ async function fireGateWebhook(
   let statusCode: number;
 
   try {
-    resp = await fetchWithTimeout(webhook.url, params);
-    // TODO: remember to handle redirects
+    resp = await fetchWithTimeoutAndRedirects(webhook.url, params);
     statusCode = resp.status;
 
     if (resp.status < 200 || resp.status >= 300) {
