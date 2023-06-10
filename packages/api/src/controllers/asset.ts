@@ -106,6 +106,27 @@ function cleanAssetTracks(asset: WithID<Asset>) {
       };
 }
 
+function parseUrlToDStorageUrl(url: string): string {
+  const urlObj = new URL(url);
+  const path = urlObj.pathname;
+
+  const pathElements = path.split("/");
+  const isIpfs = pathElements.length < 3 || pathElements[1] !== "ipfs";
+  if (isIpfs) {
+    const cid = pathElements[pathElements.length - 1];
+    return `ipfs://${cid}`;
+  }
+
+  const isArweave =
+    pathElements.length == 1 && url.startsWith("https://arweave.net/");
+  if (isArweave) {
+    const txId = pathElements[0];
+    return `ar://${txId}`;
+  }
+
+  return null;
+}
+
 async function validateAssetPayload(
   id: string,
   playbackId: string,
@@ -131,6 +152,19 @@ async function validateAssetPayload(
     userId,
     createdAt
   );
+
+  // Transform IPFS and Arweave gateway URLs into native protocol URLs
+  if (source.type === "url") {
+    const dStorageUrl = parseUrlToDStorageUrl(source.url);
+
+    if (dStorageUrl) {
+      source = {
+        type: "url",
+        url: dStorageUrl,
+        gatewayUrl: source.url,
+      };
+    }
+  }
 
   return {
     id,
