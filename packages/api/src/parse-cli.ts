@@ -33,7 +33,7 @@ function coerceJsonStrArr(arg: string): string[] {
   return arr;
 }
 
-function coerceCorsList(flagName: string) {
+function coerceRegexList(flagName: string) {
   return (arg: string): (string | RegExp)[] => {
     try {
       const arr = coerceJsonStrArr(arg);
@@ -148,6 +148,13 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://ipfs.livepeer.studio/ipfs/",
       },
+      "trusted-ipfs-gateways": {
+        describe:
+          "comma-separated list of regexes for trusted IPFS gateways to automatically convert to IPFS URLs",
+        type: "string",
+        default: undefined,
+        coerce: coerceRegexList("trusted-ipfs-gateways"),
+      },
       "return-region-in-orchestrator": {
         describe: "return /api/region result also in /api/orchestrator",
         type: "boolean",
@@ -182,7 +189,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           "add a / prefix and suffix to an element to have it parsed as a regex",
         type: "string",
         default: undefined,
-        coerce: coerceCorsList("cors-jwt-allowlist"),
+        coerce: coerceRegexList("cors-jwt-allowlist"),
       },
       broadcasters: {
         describe:

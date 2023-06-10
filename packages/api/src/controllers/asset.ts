@@ -106,7 +106,10 @@ function cleanAssetTracks(asset: WithID<Asset>) {
       };
 }
 
-function parseUrlToDStorageUrl(url: string): string {
+function parseUrlToDStorageUrl(
+  url: string,
+  trustedIpfsGateways: (string | RegExp)[]
+): string {
   const urlObj = new URL(url);
   const path = urlObj.pathname;
 
@@ -114,7 +117,19 @@ function parseUrlToDStorageUrl(url: string): string {
   const isIpfs = pathElements.length < 3 || pathElements[1] !== "ipfs";
   if (isIpfs) {
     const cid = pathElements[pathElements.length - 1];
-    return `ipfs://${cid}`;
+
+    let isTrusted = false;
+    for (const gateway of trustedIpfsGateways) {
+      const isTrusted =
+        (gateway instanceof RegExp && gateway.test(url)) ||
+        (typeof gateway === "string" && url.startsWith(gateway));
+
+      if (isTrusted) {
+        break;
+      }
+    }
+
+    return isTrusted ? `ipfs://${cid}` : null;
   }
 
   const isArweave =
@@ -133,6 +148,7 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
+  trustedIpfsGateways: (string | RegExp)[],
   payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
@@ -155,7 +171,7 @@ async function validateAssetPayload(
 
   // Transform IPFS and Arweave gateway URLs into native protocol URLs
   if (source.type === "url") {
-    const dStorageUrl = parseUrlToDStorageUrl(source.url);
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, trustedIpfsGateways);
 
     if (dStorageUrl) {
       source = {
@@ -734,6 +750,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req),
+    req.config.trustedIpfsGateways,
     req.body,
     { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
   );
@@ -814,6 +831,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req, true), // transcode only in old pipeline for now
+    req.config.trustedIpfsGateways,
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -877,6 +895,7 @@ app.post(
       req.user.id,
       Date.now(),
       defaultObjectStoreId(req),
+      req.config.trustedIpfsGateways,
       req.body,
       {
         type: "directUpload",
