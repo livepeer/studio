@@ -170,6 +170,80 @@ describe("controllers/asset", () => {
     });
   });
 
+  describe("dstorage URLs transformation", () => {
+    const testCases = [
+      { url: "https://arweave.net/faketxid", expected: "ar://faketxid" },
+      {
+        url: "https://ipfs.example.com/ipfs/fakecid",
+        expected: "ipfs://fakecid",
+      },
+      {
+        url: "https://my-gateway.ipfs-provider.io/ipfs/fakecid2",
+        expected: "ipfs://fakecid2",
+      },
+      {
+        url: "https://untrusted-ipfs.example.com/ipfs/fakecid3",
+        expected: null,
+      },
+    ];
+
+    describe("on creation", () => {
+      for (const { url, expected } of testCases) {
+        const expectedSource = {
+          type: "url",
+          ...(expected ? { url: expected, gatewayUrl: url } : { url }),
+        };
+
+        it(`${url} to ${expected}`, async () => {
+          const spec = { name: "test", url };
+          let res = await client.post(`/asset/upload/url`, spec);
+
+          expect(res.status).toBe(201);
+          let {
+            asset: { source },
+          } = await res.json();
+
+          expect(source).toMatchObject(expectedSource);
+        });
+      }
+    });
+
+    describe("on migration", () => {
+      for (const { url, expected } of testCases) {
+        const expectedSource = {
+          type: "url",
+          ...(expected ? { url: expected, gatewayUrl: url } : { url }),
+        };
+
+        it(`${url} to ${expected}`, async () => {
+          client.apiKey = adminApiKey;
+
+          const asset = await db.asset.create({
+            id: uuid(),
+            name: "test",
+            source: {
+              type: "url",
+              url,
+            },
+          });
+
+          const prefix = url.substring(0, url.lastIndexOf("/") + 1);
+
+          let res = await client.post(
+            `/asset/migrate/dstorage-urls?urlPrefix=${prefix}`
+          );
+          expect(res.status).toBe(200);
+
+          await expect(res.json()).resolves.toMatchObject({
+            total: 1,
+            migrated: expected ? 1 : 0,
+            assets: expected ? [{ id: asset.id, source: expectedSource }] : [],
+          });
+        });
+      }
+    });
+  });
+
   it("should store the creator ID as an object", async () => {
     const spec = {
       name: "test",

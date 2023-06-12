@@ -85,7 +85,7 @@ describe("controllers/helpers", () => {
         },
       };
       expect(toObjectStoreUrl(storageObj)).toBe(
-        "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
+        "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI%2FK7MDENG%2FbPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
       );
     });
 

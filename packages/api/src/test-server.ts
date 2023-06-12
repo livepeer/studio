@@ -40,6 +40,10 @@ params.sendgridApiKey = sendgridApiKey;
 params.postgresUrl = `postgresql://postgres@127.0.0.1/${testId}`;
 params.recordObjectStoreId = "mock_store";
 params.vodObjectStoreId = "mock_vod_store";
+params.trustedIpfsGateways = [
+  "https://ipfs.example.com/ipfs/",
+  /https:\/\/.+\.ipfs-provider.io\/ipfs\//,
+];
 params.ingest = [
   {
     ingest: "rtmp://test/live",

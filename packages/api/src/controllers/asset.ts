@@ -48,6 +48,8 @@ import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 
+const ARWEAVE_GATEWAY_PREFIX = "https://arweave.net/";
+
 const app = Router();
 
 function catalystPipelineStrategy(req: Request) {
@@ -106,12 +108,53 @@ function cleanAssetTracks(asset: WithID<Asset>) {
       };
 }
 
+function parseUrlToDStorageUrl(
+  url: string,
+  trustedIpfsGateways: (string | RegExp)[]
+): string {
+  const urlObj = new URL(url);
+  const path = urlObj.pathname;
+
+  let pathElements = path.split("/");
+  if (pathElements.length > 0 && pathElements[0] === "") {
+    pathElements = pathElements.slice(1);
+  }
+
+  const isIpfs = pathElements.length === 2 && pathElements[0] === "ipfs";
+  if (isIpfs) {
+    const cid = pathElements[pathElements.length - 1];
+
+    let isTrusted = false;
+    for (const gateway of trustedIpfsGateways) {
+      isTrusted =
+        (gateway instanceof RegExp && gateway.test(url)) ||
+        (typeof gateway === "string" && url.startsWith(gateway));
+
+      if (isTrusted) {
+        break;
+      }
+    }
+
+    return isTrusted ? `ipfs://${cid}` : null;
+  }
+
+  const isArweave =
+    pathElements.length === 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
+  if (isArweave) {
+    const txId = pathElements[0];
+    return `ar://${txId}`;
+  }
+
+  return null;
+}
+
 async function validateAssetPayload(
   id: string,
   playbackId: string,
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
+  trustedIpfsGateways: (string | RegExp)[],
   payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
@@ -131,6 +174,19 @@ async function validateAssetPayload(
     userId,
     createdAt
   );
+
+  // Transform IPFS and Arweave gateway URLs into native protocol URLs
+  if (source.type === "url") {
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, trustedIpfsGateways);
+
+    if (dStorageUrl) {
+      source = {
+        type: "url",
+        url: dStorageUrl,
+        gatewayUrl: source.url,
+      };
+    }
+  }
 
   return {
     id,
@@ -700,6 +756,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req),
+    req.config.trustedIpfsGateways,
     req.body,
     { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
   );
@@ -780,6 +837,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req, true), // transcode only in old pipeline for now
+    req.config.trustedIpfsGateways,
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -843,6 +901,7 @@ app.post(
       req.user.id,
       Date.now(),
       defaultObjectStoreId(req),
+      req.config.trustedIpfsGateways,
       req.body,
       {
         type: "directUpload",
@@ -1134,6 +1193,71 @@ app.patch(
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
+  }
+);
+
+// TODO: create migration API to parse and migrate gateway URL of existing
+// assets in the DB.
+
+app.post(
+  "/migrate/dstorage-urls",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    // parse limit from querystring
+    const limit = parseInt(req.query.limit?.toString() || "1000");
+    const urlPrefix = req.query.urlPrefix?.toString() || ARWEAVE_GATEWAY_PREFIX;
+
+    const [assets] = await db.asset.find(
+      [sql`data->'source'->>'url' LIKE ${urlPrefix + "%"}`],
+      { limit }
+    );
+
+    let tasks: Promise<WithID<Asset>>[] = [];
+    let results: WithID<Asset>[] = [];
+    for (const asset of assets) {
+      if (asset.source.type !== "url") {
+        continue;
+      }
+
+      // Transform IPFS and Arweave gateway URLs into native protocol URLs
+      const url = asset.source.url;
+      const dStorageUrl = parseUrlToDStorageUrl(
+        url,
+        req.config.trustedIpfsGateways
+      );
+
+      if (dStorageUrl) {
+        const source = {
+          type: "url",
+          url: dStorageUrl,
+          gatewayUrl: url,
+        } as const;
+
+        tasks.push(
+          db.asset
+            .update(asset.id, { source })
+            .then(() => db.asset.get(asset.id))
+        );
+      }
+
+      if (tasks.length >= 3) {
+        results = results.concat(await Promise.all(tasks));
+        tasks = [];
+      }
+    }
+    if (tasks.length > 0) {
+      results = results.concat(await Promise.all(tasks));
+    }
+
+    res.status(200).json({
+      migrated: results.length,
+      total: assets.length,
+      assets: results.map(({ id, playbackId, source }) => ({
+        id,
+        playbackId,
+        source,
+      })),
+    });
   }
 );
 

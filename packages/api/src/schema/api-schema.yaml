@@ -727,6 +727,11 @@ components:
                 url:
                   type: string
                   description: URL from which the asset was uploaded
+                gatewayUrl:
+                  type: string
+                  description:
+                    Gateway URL from asset if parsed from provided URL on
+                    upload.
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
             - additionalProperties: false
