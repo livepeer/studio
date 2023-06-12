@@ -12,6 +12,7 @@ import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
 import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
+import { BadRequestError } from "../store/errors";
 
 const ITERATIONS = 10000;
 
@@ -376,6 +377,14 @@ export function parseFilters(
   fieldsMap: FieldsMap,
   val: string
 ): SQLStatement[] {
+  try {
+    return parseFiltersRaw(fieldsMap, val);
+  } catch (e) {
+    throw new BadRequestError(`error parsing filters: ${e}`);
+  }
+}
+
+function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
   const isObject = function (a) {
     return !!a && a.constructor === Object;
   };
@@ -387,19 +396,18 @@ export function parseFilters(
   if (!fieldsMap || Object.keys(fieldsMap).length === 0) {
     return q;
   }
-  let json;
-  try {
-    json = JSON.parse(decodeURIComponent(val));
-  } catch (e) {
-    console.error("parseFilters: error decoding filters", e);
-    return q;
-  }
+
+  const json = JSON.parse(decodeURIComponent(val));
   if (!Array.isArray(json)) {
-    console.error("parseFilters: filters are not an array");
-    return q;
+    throw new Error(`must be an array`);
   }
+
   for (const filter of json) {
     const fv = fieldsMap[filter.id];
+    if (!filter.value) {
+      throw new Error(`missing filter value for id "${filter.id}"`);
+    }
+
     if (fv) {
       if (typeof fv === "string") {
         q.push(sql``.append(fv).append(sql` = ${filter.value}`));
@@ -433,8 +441,10 @@ export function parseFilters(
               case "lte":
                 comparison = "<=";
                 break;
-              default:
+              case "eq":
                 comparison = "=";
+              default:
+                throw new Error(`unknown comparison: "${key}"`);
             }
             q.push(
               sql``
@@ -448,7 +458,7 @@ export function parseFilters(
         }
       }
     } else {
-      console.error("parseFilters: unknown field: ", filter.id);
+      throw new Error(`unknown field: "${filter.id}"`);
     }
   }
   return q;
