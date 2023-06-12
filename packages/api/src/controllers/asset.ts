@@ -48,6 +48,8 @@ import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 
+const ARWEAVE_GATEWAY_PREFIX = "https://arweave.net/";
+
 const app = Router();
 
 function catalystPipelineStrategy(req: Request) {
@@ -133,7 +135,7 @@ function parseUrlToDStorageUrl(
   }
 
   const isArweave =
-    pathElements.length == 1 && url.startsWith("https://arweave.net/");
+    pathElements.length == 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
   if (isArweave) {
     const txId = pathElements[0];
     return `ar://${txId}`;
@@ -1187,6 +1189,63 @@ app.patch(
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
+  }
+);
+
+// TODO: create migration API to parse and migrate gateway URL of existing
+// assets in the DB.
+
+app.post(
+  "/migrate/dstorage-urls",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    // parse limit from querystring
+    const limit = parseInt(req.query.limit?.toString() || "1000");
+    const urlPrefix = req.query.urlPrefix?.toString() || ARWEAVE_GATEWAY_PREFIX;
+
+    const [assets] = await db.asset.find(
+      [sql`data->'source''->>'url' LIKE ${urlPrefix + "%"}`],
+      { limit }
+    );
+
+    let tasks: Promise<WithID<Asset>>[] = [];
+    let results: WithID<Asset>[] = [];
+    for (const asset of assets) {
+      if (asset.source.type !== "url") {
+        continue;
+      }
+
+      // Transform IPFS and Arweave gateway URLs into native protocol URLs
+      const url = asset.source.url;
+      const dStorageUrl = parseUrlToDStorageUrl(
+        url,
+        req.config.trustedIpfsGateways
+      );
+
+      if (dStorageUrl) {
+        const source = {
+          type: "url",
+          url: dStorageUrl,
+          gatewayUrl: url,
+        } as const;
+
+        tasks.push(
+          db.asset
+            .update(asset.id, { source })
+            .then(() => db.asset.get(asset.id))
+        );
+      }
+
+      if (tasks.length >= 3) {
+        results = results.concat(await Promise.all(tasks));
+        tasks = [];
+      }
+    }
+    if (tasks.length > 0) {
+      results = results.concat(await Promise.all(tasks));
+    }
+
+    res.status(200).json(results);
   }
 );
 
