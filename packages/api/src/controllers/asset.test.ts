@@ -170,6 +170,42 @@ describe("controllers/asset", () => {
     });
   });
 
+  describe("dstorage URLs transformation", () => {
+    const testCases = [
+      { url: "https://arweave.net/faketxid", expected: "ar://faketxid" },
+      {
+        url: "https://ipfs.example.com/ipfs/fakecid",
+        expected: "ipfs://fakecid",
+      },
+      {
+        url: "https://my-gateway.ipfs-provider.io/ipfs/fakecid2",
+        expected: "ipfs://fakecid2",
+      },
+      {
+        url: "https://untrusted-ipfs.example.com/ipfs/fakecid3",
+        expected: null,
+      },
+    ];
+
+    for (const { url, expected } of testCases) {
+      it(`should transform ${url} to ${expected}`, async () => {
+        const spec = { name: "test", url };
+        let res = await client.post(`/asset/upload/url`, spec);
+
+        expect(res.status).toBe(201);
+        let {
+          asset: { source },
+        } = await res.json();
+
+        expect(source).toMatchObject({
+          type: "url",
+          url: expected ?? url,
+          gatewayUrl: expected ? url : undefined,
+        });
+      });
+    }
+  });
+
   it("should store the creator ID as an object", async () => {
     const spec = {
       name: "test",
