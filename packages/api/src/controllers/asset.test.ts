@@ -187,23 +187,61 @@ describe("controllers/asset", () => {
       },
     ];
 
-    for (const { url, expected } of testCases) {
-      it(`should transform ${url} to ${expected}`, async () => {
-        const spec = { name: "test", url };
-        let res = await client.post(`/asset/upload/url`, spec);
-
-        expect(res.status).toBe(201);
-        let {
-          asset: { source },
-        } = await res.json();
-
-        expect(source).toMatchObject({
+    describe("on creation", () => {
+      for (const { url, expected } of testCases) {
+        const expectedSource = {
           type: "url",
-          url: expected ?? url,
-          gatewayUrl: expected ? url : undefined,
+          ...(expected ? { url: expected, gatewayUrl: url } : { url }),
+        };
+
+        it(`${url} to ${expected}`, async () => {
+          const spec = { name: "test", url };
+          let res = await client.post(`/asset/upload/url`, spec);
+
+          expect(res.status).toBe(201);
+          let {
+            asset: { source },
+          } = await res.json();
+
+          expect(source).toMatchObject(expectedSource);
         });
-      });
-    }
+      }
+    });
+
+    describe("on migration", () => {
+      for (const { url, expected } of testCases) {
+        const expectedSource = {
+          type: "url",
+          ...(expected ? { url: expected, gatewayUrl: url } : { url }),
+        };
+
+        it(`${url} to ${expected}`, async () => {
+          client.apiKey = adminApiKey;
+
+          const asset = await db.asset.create({
+            id: uuid(),
+            name: "test",
+            source: {
+              type: "url",
+              url,
+            },
+          });
+
+          const prefix = url.substring(0, url.lastIndexOf("/") + 1);
+
+          let res = await client.post(
+            `/asset/migrate/dstorage-urls?urlPrefix=${prefix}`
+          );
+          expect(res.status).toBe(200);
+
+          await expect(res.json()).resolves.toMatchObject({
+            total: 1,
+            migrated: expected ? 1 : 0,
+            assets: expected ? [{ id: asset.id, source: expectedSource }] : [],
+          });
+        });
+      }
+    });
   });
 
   it("should store the creator ID as an object", async () => {

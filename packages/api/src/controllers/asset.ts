@@ -115,14 +115,18 @@ function parseUrlToDStorageUrl(
   const urlObj = new URL(url);
   const path = urlObj.pathname;
 
-  const pathElements = path.split("/");
-  const isIpfs = pathElements.length < 3 || pathElements[1] !== "ipfs";
+  let pathElements = path.split("/");
+  if (pathElements.length > 0 && pathElements[0] === "") {
+    pathElements = pathElements.slice(1);
+  }
+
+  const isIpfs = pathElements.length === 2 && pathElements[0] === "ipfs";
   if (isIpfs) {
     const cid = pathElements[pathElements.length - 1];
 
     let isTrusted = false;
     for (const gateway of trustedIpfsGateways) {
-      const isTrusted =
+      isTrusted =
         (gateway instanceof RegExp && gateway.test(url)) ||
         (typeof gateway === "string" && url.startsWith(gateway));
 
@@ -135,7 +139,7 @@ function parseUrlToDStorageUrl(
   }
 
   const isArweave =
-    pathElements.length == 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
+    pathElements.length === 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
   if (isArweave) {
     const txId = pathElements[0];
     return `ar://${txId}`;
@@ -1204,7 +1208,7 @@ app.post(
     const urlPrefix = req.query.urlPrefix?.toString() || ARWEAVE_GATEWAY_PREFIX;
 
     const [assets] = await db.asset.find(
-      [sql`data->'source''->>'url' LIKE ${urlPrefix + "%"}`],
+      [sql`data->'source'->>'url' LIKE ${urlPrefix + "%"}`],
       { limit }
     );
 
@@ -1245,7 +1249,15 @@ app.post(
       results = results.concat(await Promise.all(tasks));
     }
 
-    res.status(200).json(results);
+    res.status(200).json({
+      migrated: results.length,
+      total: assets.length,
+      assets: results.map(({ id, playbackId, source }) => ({
+        id,
+        playbackId,
+        source,
+      })),
+    });
   }
 );
 
