@@ -152,7 +152,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "comma-separated list of regexes for trusted IPFS gateways to automatically convert to IPFS URLs",
         type: "string",
-        default: undefined,
+        default: "[]",
         coerce: coerceRegexList("trusted-ipfs-gateways"),
       },
       "return-region-in-orchestrator": {
@@ -188,7 +188,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           "comma-separated list of domains to allow CORS for requests authenticated with a JWT. " +
           "add a / prefix and suffix to an element to have it parsed as a regex",
         type: "string",
-        default: undefined,
+        default: "[]",
         coerce: coerceRegexList("cors-jwt-allowlist"),
       },
       broadcasters: {
