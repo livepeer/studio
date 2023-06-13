@@ -158,7 +158,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "comma-separated list of regexes for trusted IPFS gateways to automatically convert to IPFS URLs",
         type: "string",
-        default: "[]",
+        default: `["https://ipfs.livepeer.studio/ipfs/"]`,
         coerce: coerceRegexList("trusted-ipfs-gateways"),
       },
       "trusted-arweave-gateways": {
