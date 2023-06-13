@@ -1212,22 +1212,28 @@ app.post(
   async (req, res) => {
     // parse limit from querystring
     const limit = parseInt(req.query.limit?.toString() || "1000");
-    const urlPrefix = req.query.urlPrefix?.toString() || ARWEAVE_GATEWAY_PREFIX;
+    const urlPrefix = req.query.urlPrefix?.toString() || "https://arweave.net/";
+    const urlLike = req.query.urlLike?.toString() || urlPrefix + "%";
+    const from = req.query.from?.toString();
 
     const [assets] = await db.asset.find(
-      [sql`data->'source'->>'url' LIKE ${urlPrefix + "%"}`],
-      { limit }
+      [
+        sql`data->'source'->>'url' LIKE ${urlLike}`,
+        ...(!from ? [] : [sql`data->'source'->>'url' > ${from}`]),
+      ],
+      { limit, order: parseOrder(fieldsMap, "sourceUrl-false") }
     );
 
     let tasks: Promise<WithID<Asset>>[] = [];
     let results: WithID<Asset>[] = [];
+    let last: string;
     for (const asset of assets) {
       if (asset.source.type !== "url") {
         continue;
       }
 
       // Transform IPFS and Arweave gateway URLs into native protocol URLs
-      const url = asset.source.url;
+      const url = (last = asset.source.url);
       const dStorageUrl = parseUrlToDStorageUrl(url, req.config);
 
       if (dStorageUrl) {
@@ -1256,6 +1262,7 @@ app.post(
     res.status(200).json({
       migrated: results.length,
       total: assets.length,
+      last,
       assets: results.map(({ id, playbackId, source }) => ({
         id,
         playbackId,
