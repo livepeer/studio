@@ -108,6 +108,21 @@ function cleanAssetTracks(asset: WithID<Asset>) {
       };
 }
 
+function anyMatchesRegexOrPrefix(
+  arr: (string | RegExp)[],
+  value: string
+): boolean {
+  for (const item of arr) {
+    if (item instanceof RegExp && item.test(value)) {
+      return true;
+    }
+    if (typeof item === "string" && value.startsWith(item)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function parseUrlToDStorageUrl(
   url: string,
   trustedIpfsGateways: (string | RegExp)[]
@@ -120,29 +135,22 @@ function parseUrlToDStorageUrl(
     pathElements = pathElements.slice(1);
   }
 
-  const isIpfs = pathElements.length === 2 && pathElements[0] === "ipfs";
+  const isIpfs = pathElements.length >= 2 && pathElements[0] === "ipfs";
   if (isIpfs) {
-    const cid = pathElements[pathElements.length - 1];
-
-    let isTrusted = false;
-    for (const gateway of trustedIpfsGateways) {
-      isTrusted =
-        (gateway instanceof RegExp && gateway.test(url)) ||
-        (typeof gateway === "string" && url.startsWith(gateway));
-
-      if (isTrusted) {
-        break;
-      }
+    const isTrusted = anyMatchesRegexOrPrefix(trustedIpfsGateways, url);
+    if (!isTrusted) {
+      return null;
     }
 
-    return isTrusted ? `ipfs://${cid}` : null;
+    const cidPath = pathElements.slice(1).join("/");
+    return `ipfs://${cidPath}`;
   }
 
   const isArweave =
-    pathElements.length === 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
+    pathElements.length >= 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
   if (isArweave) {
-    const txId = pathElements[0];
-    return `ar://${txId}`;
+    const txIdPath = pathElements.join("/");
+    return `ar://${txIdPath}`;
   }
 
   return null;
