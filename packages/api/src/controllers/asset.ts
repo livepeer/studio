@@ -48,7 +48,10 @@ import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 
-const ARWEAVE_GATEWAY_PREFIX = "https://arweave.net/";
+const ARWEAVE_GATEWAY_PREFIXES = [
+  "https://arweave.net/",
+  "https://gateway.arweave.net/",
+];
 
 const app = Router();
 
@@ -147,7 +150,8 @@ function parseUrlToDStorageUrl(
   }
 
   const isArweave =
-    pathElements.length >= 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
+    pathElements.length >= 1 &&
+    anyMatchesRegexOrPrefix(ARWEAVE_GATEWAY_PREFIXES, url);
   if (isArweave) {
     const txIdPath = pathElements.join("/");
     return `ar://${txIdPath}`;
