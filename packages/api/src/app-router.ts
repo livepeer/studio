@@ -53,10 +53,10 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
 
 export default async function makeApp(params: CliArgs) {
   const {
-    httpPrefix = "/api",
+    httpPrefix,
     postgresUrl,
     postgresReplicaUrl,
-    frontendDomain = "livepeer.studio",
+    frontendDomain,
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
@@ -75,7 +75,7 @@ export default async function makeApp(params: CliArgs) {
     broadcasters = [],
     ingest = [],
     prices = [],
-    corsJwtAllowlist = [`https://${frontendDomain}`],
+    corsJwtAllowlist,
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,

@@ -121,6 +121,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       "frontend-domain": {
         describe: "the domain used in templating urls, example: livepeer.org",
         type: "string",
+        default: "livepeer.studio",
       },
       "kube-namespace": {
         describe:
@@ -200,7 +201,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           "comma-separated list of domains to allow CORS for requests authenticated with a JWT. " +
           "add a / prefix and suffix to an element to have it parsed as a regex",
         type: "string",
-        default: "[]",
+        default: `["https://livepeer.studio"]`,
         coerce: coerceRegexList("cors-jwt-allowlist"),
       },
       broadcasters: {
