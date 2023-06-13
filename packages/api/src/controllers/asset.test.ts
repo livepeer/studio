@@ -174,12 +174,20 @@ describe("controllers/asset", () => {
     const testCases = [
       { url: "https://arweave.net/faketxid", expected: "ar://faketxid" },
       {
+        url: "https://arweave.net/faketxid2/myFile.mp4",
+        expected: "ar://faketxid2/myFile.mp4",
+      },
+      {
         url: "https://ipfs.example.com/ipfs/fakecid",
         expected: "ipfs://fakecid",
       },
       {
         url: "https://my-gateway.ipfs-provider.io/ipfs/fakecid2",
         expected: "ipfs://fakecid2",
+      },
+      {
+        url: "https://my-gateway.ipfs-provider.io/ipfs/fakecid3/filename.mp4",
+        expected: "ipfs://fakecid3/filename.mp4",
       },
       {
         url: "https://untrusted-ipfs.example.com/ipfs/fakecid3",

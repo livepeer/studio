@@ -48,8 +48,6 @@ import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 
-const ARWEAVE_GATEWAY_PREFIX = "https://arweave.net/";
-
 const app = Router();
 
 function catalystPipelineStrategy(req: Request) {
@@ -108,9 +106,24 @@ function cleanAssetTracks(asset: WithID<Asset>) {
       };
 }
 
+function anyMatchesRegexOrPrefix(
+  arr: (string | RegExp)[],
+  value: string
+): boolean {
+  for (const item of arr) {
+    if (item instanceof RegExp && item.test(value)) {
+      return true;
+    }
+    if (typeof item === "string" && value.startsWith(item)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function parseUrlToDStorageUrl(
   url: string,
-  trustedIpfsGateways: (string | RegExp)[]
+  { trustedIpfsGateways, trustedArweaveGateways }: CliArgs
 ): string {
   const urlObj = new URL(url);
   const path = urlObj.pathname;
@@ -120,29 +133,23 @@ function parseUrlToDStorageUrl(
     pathElements = pathElements.slice(1);
   }
 
-  const isIpfs = pathElements.length === 2 && pathElements[0] === "ipfs";
+  const isIpfs = pathElements.length >= 2 && pathElements[0] === "ipfs";
   if (isIpfs) {
-    const cid = pathElements[pathElements.length - 1];
-
-    let isTrusted = false;
-    for (const gateway of trustedIpfsGateways) {
-      isTrusted =
-        (gateway instanceof RegExp && gateway.test(url)) ||
-        (typeof gateway === "string" && url.startsWith(gateway));
-
-      if (isTrusted) {
-        break;
-      }
+    const isTrusted = anyMatchesRegexOrPrefix(trustedIpfsGateways, url);
+    if (!isTrusted) {
+      return null;
     }
 
-    return isTrusted ? `ipfs://${cid}` : null;
+    const cidPath = pathElements.slice(1).join("/");
+    return `ipfs://${cidPath}`;
   }
 
   const isArweave =
-    pathElements.length === 1 && url.startsWith(ARWEAVE_GATEWAY_PREFIX);
+    pathElements.length >= 1 &&
+    anyMatchesRegexOrPrefix(trustedArweaveGateways, url);
   if (isArweave) {
-    const txId = pathElements[0];
-    return `ar://${txId}`;
+    const txIdPath = pathElements.join("/");
+    return `ar://${txIdPath}`;
   }
 
   return null;
@@ -154,7 +161,7 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
-  trustedIpfsGateways: (string | RegExp)[],
+  config: CliArgs,
   payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
@@ -177,7 +184,7 @@ async function validateAssetPayload(
 
   // Transform IPFS and Arweave gateway URLs into native protocol URLs
   if (source.type === "url") {
-    const dStorageUrl = parseUrlToDStorageUrl(source.url, trustedIpfsGateways);
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, config);
 
     if (dStorageUrl) {
       source = {
@@ -756,7 +763,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req),
-    req.config.trustedIpfsGateways,
+    req.config,
     req.body,
     { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
   );
@@ -837,7 +844,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req, true), // transcode only in old pipeline for now
-    req.config.trustedIpfsGateways,
+    req.config,
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -901,7 +908,7 @@ app.post(
       req.user.id,
       Date.now(),
       defaultObjectStoreId(req),
-      req.config.trustedIpfsGateways,
+      req.config,
       req.body,
       {
         type: "directUpload",
@@ -1205,26 +1212,29 @@ app.post(
   async (req, res) => {
     // parse limit from querystring
     const limit = parseInt(req.query.limit?.toString() || "1000");
-    const urlPrefix = req.query.urlPrefix?.toString() || ARWEAVE_GATEWAY_PREFIX;
+    const urlPrefix = req.query.urlPrefix?.toString() || "https://arweave.net/";
+    const urlLike = req.query.urlLike?.toString() || urlPrefix + "%";
+    const from = req.query.from?.toString();
 
     const [assets] = await db.asset.find(
-      [sql`data->'source'->>'url' LIKE ${urlPrefix + "%"}`],
-      { limit }
+      [
+        sql`data->'source'->>'url' LIKE ${urlLike}`,
+        ...(!from ? [] : [sql`data->'source'->>'url' > ${from}`]),
+      ],
+      { limit, order: parseOrder(fieldsMap, "sourceUrl-false") }
     );
 
     let tasks: Promise<WithID<Asset>>[] = [];
     let results: WithID<Asset>[] = [];
+    let last: string;
     for (const asset of assets) {
       if (asset.source.type !== "url") {
         continue;
       }
 
       // Transform IPFS and Arweave gateway URLs into native protocol URLs
-      const url = asset.source.url;
-      const dStorageUrl = parseUrlToDStorageUrl(
-        url,
-        req.config.trustedIpfsGateways
-      );
+      const url = (last = asset.source.url);
+      const dStorageUrl = parseUrlToDStorageUrl(url, req.config);
 
       if (dStorageUrl) {
         const source = {
@@ -1252,6 +1262,7 @@ app.post(
     res.status(200).json({
       migrated: results.length,
       total: assets.length,
+      last,
       assets: results.map(({ id, playbackId, source }) => ({
         id,
         playbackId,

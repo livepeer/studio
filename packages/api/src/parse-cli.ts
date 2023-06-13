@@ -9,6 +9,11 @@ import {
 } from "./types/common";
 import { defaultTaskExchange } from "./store/queue";
 
+const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
+  "https://arweave.net/",
+  "https://gateway.arweave.net/",
+];
+
 function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
     const arr = [];
@@ -116,6 +121,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       "frontend-domain": {
         describe: "the domain used in templating urls, example: livepeer.org",
         type: "string",
+        default: "livepeer.studio",
       },
       "kube-namespace": {
         describe:
@@ -152,8 +158,15 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "comma-separated list of regexes for trusted IPFS gateways to automatically convert to IPFS URLs",
         type: "string",
-        default: "[]",
+        default: `["https://ipfs.livepeer.studio/ipfs/"]`,
         coerce: coerceRegexList("trusted-ipfs-gateways"),
+      },
+      "trusted-arweave-gateways": {
+        describe:
+          "comma-separated list of regexes for trusted Arweave gateways to automatically convert to Arweave URLs",
+        type: "string",
+        default: JSON.stringify(DEFAULT_ARWEAVE_GATEWAY_PREFIXES),
+        coerce: coerceRegexList("trusted-arweave-gateways"),
       },
       "return-region-in-orchestrator": {
         describe: "return /api/region result also in /api/orchestrator",
@@ -188,7 +201,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           "comma-separated list of domains to allow CORS for requests authenticated with a JWT. " +
           "add a / prefix and suffix to an element to have it parsed as a regex",
         type: "string",
-        default: "[]",
+        default: `["https://livepeer.studio"]`,
         coerce: coerceRegexList("cors-jwt-allowlist"),
       },
       broadcasters: {
