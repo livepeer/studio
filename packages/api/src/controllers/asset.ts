@@ -48,11 +48,6 @@ import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 
-const ARWEAVE_GATEWAY_PREFIXES = [
-  "https://arweave.net/",
-  "https://gateway.arweave.net/",
-];
-
 const app = Router();
 
 function catalystPipelineStrategy(req: Request) {
@@ -128,7 +123,7 @@ function anyMatchesRegexOrPrefix(
 
 function parseUrlToDStorageUrl(
   url: string,
-  trustedIpfsGateways: (string | RegExp)[]
+  { trustedIpfsGateways, trustedArweaveGateways }: CliArgs
 ): string {
   const urlObj = new URL(url);
   const path = urlObj.pathname;
@@ -151,7 +146,7 @@ function parseUrlToDStorageUrl(
 
   const isArweave =
     pathElements.length >= 1 &&
-    anyMatchesRegexOrPrefix(ARWEAVE_GATEWAY_PREFIXES, url);
+    anyMatchesRegexOrPrefix(trustedArweaveGateways, url);
   if (isArweave) {
     const txIdPath = pathElements.join("/");
     return `ar://${txIdPath}`;
@@ -166,7 +161,7 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
-  trustedIpfsGateways: (string | RegExp)[],
+  config: CliArgs,
   payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
@@ -189,7 +184,7 @@ async function validateAssetPayload(
 
   // Transform IPFS and Arweave gateway URLs into native protocol URLs
   if (source.type === "url") {
-    const dStorageUrl = parseUrlToDStorageUrl(source.url, trustedIpfsGateways);
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, config);
 
     if (dStorageUrl) {
       source = {
@@ -768,7 +763,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req),
-    req.config.trustedIpfsGateways,
+    req.config,
     req.body,
     { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
   );
@@ -849,7 +844,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req, true), // transcode only in old pipeline for now
-    req.config.trustedIpfsGateways,
+    req.config,
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -913,7 +908,7 @@ app.post(
       req.user.id,
       Date.now(),
       defaultObjectStoreId(req),
-      req.config.trustedIpfsGateways,
+      req.config,
       req.body,
       {
         type: "directUpload",
@@ -1233,10 +1228,7 @@ app.post(
 
       // Transform IPFS and Arweave gateway URLs into native protocol URLs
       const url = asset.source.url;
-      const dStorageUrl = parseUrlToDStorageUrl(
-        url,
-        req.config.trustedIpfsGateways
-      );
+      const dStorageUrl = parseUrlToDStorageUrl(url, req.config);
 
       if (dStorageUrl) {
         const source = {

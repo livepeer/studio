@@ -9,6 +9,11 @@ import {
 } from "./types/common";
 import { defaultTaskExchange } from "./store/queue";
 
+const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
+  "https://arweave.net/",
+  "https://gateway.arweave.net/",
+];
+
 function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
     const arr = [];
@@ -154,6 +159,13 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "[]",
         coerce: coerceRegexList("trusted-ipfs-gateways"),
+      },
+      "trusted-arweave-gateways": {
+        describe:
+          "comma-separated list of regexes for trusted Arweave gateways to automatically convert to Arweave URLs",
+        type: "string",
+        default: JSON.stringify(DEFAULT_ARWEAVE_GATEWAY_PREFIXES),
+        coerce: coerceRegexList("trusted-arweave-gateways"),
       },
       "return-region-in-orchestrator": {
         describe: "return /api/region result also in /api/orchestrator",
