@@ -228,9 +228,7 @@ export class TaskScheduler {
       sourcePlaybackReady: true,
       files: event.output.upload.assetSpec.files,
       status: {
-        phase: asset.status?.phase,
-        progress: asset.status?.progress,
-        errorMessage: asset.status?.errorMessage,
+        ...asset.status,
         updatedAt: Date.now(),
       },
     });
