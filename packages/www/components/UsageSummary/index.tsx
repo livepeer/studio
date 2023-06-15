@@ -69,11 +69,16 @@ const UsageSummary = () => {
     getSubscription,
     getInvoices,
     getUserProduct,
+    calculateOverUsage,
+    calculateOverUsageBill,
   } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
-  const prices = getUserProduct(user).usage;
+  const [overUsage, setOverUsage] = useState(null);
+  const [overUsageBill, setOverUsageBill] = useState(null);
+  const product = getUserProduct(user);
+  const prices = product.usage;
   const transcodingPrice = prices[0].price;
 
   useEffect(() => {
@@ -105,9 +110,19 @@ const UsageSummary = () => {
       );
     };
 
+    const doCaculateOverUsage = async (usage) => {
+      const overusage = await calculateOverUsage(product, usage);
+      if (overusage) {
+        setOverUsage(overusage);
+        const overusageBill = await calculateOverUsageBill(overusage);
+        setOverUsageBill(overusageBill);
+      }
+    };
+
     if (user) {
       doGetInvoices(user.stripeCustomerId);
       getSubscriptionAndUsage(user.stripeCustomerSubscriptionId);
+      doCaculateOverUsage(usage);
     }
   }, [user]);
 
