@@ -84,7 +84,11 @@ const Usage = () => {
       }
     };
 
-    const doGetBillingUsage = async (fromTime: any, toTime: any) => {
+    const doGetBillingUsage = async (
+      fromTime: any,
+      toTime: any,
+      status: any
+    ) => {
       // Gather current month data
       /*const now = new Date();
       const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
@@ -93,8 +97,8 @@ const Usage = () => {
       doSetFrom(fromTime);
       doSetTo(toTime);*/
 
-      // if subscription is cancelled and time frame is in the past, get current month data
-      if (fromTime < new Date().getTime()) {
+      // if subscription is cancelled, get current month data
+      if (status === "canceled") {
         const now = new Date();
         fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
         toTime = now.getTime();
@@ -130,7 +134,8 @@ const Usage = () => {
       );
       doGetBillingUsage(
         subscription?.current_period_start,
-        subscription?.current_period_end
+        subscription?.current_period_end,
+        subscription?.status
       );
     };
 
