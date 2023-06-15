@@ -89,13 +89,8 @@ const Usage = () => {
       toTime: any,
       status: any
     ) => {
-      // Gather current month data
-      /*const now = new Date();
-      const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-      const toTime = now.getTime();
-
-      doSetFrom(fromTime);
-      doSetTo(toTime);*/
+      fromTime = fromTime * 1000;
+      toTime = toTime * 1000;
 
       // if subscription is cancelled, get current month data
       if (status === "canceled") {
@@ -104,16 +99,13 @@ const Usage = () => {
         toTime = now.getTime();
       }
 
-      const [res, usage] = await getBillingUsage(
-        fromTime * 1000,
-        toTime * 1000
-      );
+      const [res, usage] = await getBillingUsage(fromTime, toTime);
       if (res.status == 200) {
         setBillingUsage(usage);
       }
       const [res2, usageByDay] = await getBillingUsage(
-        fromTime * 1000,
-        toTime * 1000,
+        fromTime,
+        toTime,
         null,
         timestep
       );

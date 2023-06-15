@@ -89,11 +89,18 @@ const UsageSummary = () => {
       }
     };
 
-    const doGetUsage = async (fromTime, toTime, userId) => {
-      const [res, usage] = await getBillingUsage(
-        fromTime * 1000,
-        toTime * 1000
-      );
+    const doGetUsage = async (fromTime, toTime, status) => {
+      fromTime = fromTime * 1000;
+      toTime = toTime * 1000;
+
+      if (status === "canceled") {
+        const now = new Date();
+        fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        toTime = now.getTime();
+      }
+
+      const [res, usage] = await getBillingUsage(fromTime, toTime);
+
       if (res.status == 200) {
         setUsage(usage);
       }
@@ -106,7 +113,7 @@ const UsageSummary = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        user.id
+        subscription?.status
       );
     };
 
