@@ -270,7 +270,7 @@ export const getBillingUsage = async (
     {}
   );
 
-  if (usage === null) {
+  if (!usage) {
     usage = {
       TotalUsageMins: 0,
       DeliveryUsageMins: 0,
