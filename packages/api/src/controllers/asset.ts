@@ -359,7 +359,8 @@ export async function withPlaybackUrls(
   asset: WithID<Asset>,
   os?: ObjectStore
 ): Promise<WithID<Asset>> {
-  if (asset.status.phase !== "ready") {
+  if (asset.files?.length < 1) {
+    // files is only set when playback is available
     return asset;
   }
   try {
@@ -370,8 +371,10 @@ export async function withPlaybackUrls(
   }
   return {
     ...asset,
+    ...(asset.status.phase === "ready" && {
+      downloadUrl: getDownloadUrl(config, ingest, asset, os),
+    }),
     playbackUrl: getPlaybackUrl(config, ingest, asset, os),
-    downloadUrl: getDownloadUrl(config, ingest, asset, os),
   };
 }
 

@@ -6,7 +6,7 @@ import { DBWebhook, EventKey } from "./webhook-table";
 namespace messages {
   export type Any = Webhooks | Task;
   export type Webhooks = WebhookEvent | WebhookTrigger;
-  export type Task = TaskTrigger | TaskResult;
+  export type Task = TaskTrigger | TaskResult | TaskResultPartial;
   export type Types = Any["type"];
 
   // This is a global format followed by all messages sent by Livepeer services
@@ -65,6 +65,12 @@ namespace messages {
       message: string;
       unretriable: boolean;
     };
+    output: ApiTask["output"];
+  }
+
+  export interface TaskResultPartial extends Base {
+    type: "task_result_partial";
+    task: TaskInfo;
     output: ApiTask["output"];
   }
 }

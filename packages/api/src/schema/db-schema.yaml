@@ -877,6 +877,9 @@ components:
         deleted:
           type: boolean
           description: Set to true when the asset is deleted
+        sourcePlaybackReady:
+          type: boolean
+          description: Whether source playback is ready
         playbackRecordingId:
           type: string
           writeOnly: true

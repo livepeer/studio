@@ -112,7 +112,7 @@ export async function getResourceByPlaybackId(
     (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
 
   if (asset && !asset.deleted) {
-    if (asset.status.phase !== "ready") {
+    if (asset.status.phase !== "ready" && !asset.sourcePlaybackReady) {
       throw new UnprocessableEntityError("asset is not ready for playback");
     }
     if (asset.userId !== user?.id && cutoffDate) {
