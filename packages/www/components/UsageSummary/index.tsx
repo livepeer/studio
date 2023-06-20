@@ -236,10 +236,13 @@ const UsageSummary = () => {
           Upcoming invoice:{" "}
           <Box css={{ ml: "$1", fontWeight: 600 }}>
             {usage &&
-              `$${(
-                (usage.sourceSegmentsDuration / 60) *
-                transcodingPrice
-              ).toFixed(2)}`}
+              `$${
+                products[user.stripeProductId]?.monthlyPrice.toLocaleString() ||
+                products[
+                  user.newStripeProductId
+                ]?.monthlyPrice.toLocaleString() ||
+                0
+              }`}
           </Box>
         </Text>
         <Text>

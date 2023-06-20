@@ -11,6 +11,7 @@ exports.products = {
         limit: 1_000,
       },
     ],
+    monthlyPrice: 0,
   },
   prod_1: {
     order: 1,
@@ -24,6 +25,7 @@ exports.products = {
         limit: 3_000,
       },
     ],
+    monthlyPrice: 0,
   },
   prod_2: {
     order: 2,
@@ -36,6 +38,7 @@ exports.products = {
         price: 0.0,
       },
     ],
+    monthlyPrice: 0,
   },
   hacker_1: {
     order: 3,
@@ -62,6 +65,7 @@ exports.products = {
         limit: 1_000,
       },
     ],
+    monthlyPrice: 0,
   },
   growth_1: {
     order: 4,
@@ -87,6 +91,7 @@ exports.products = {
         limit: 10_000,
       },
     ],
+    monthlyPrice: 100,
   },
   scale_1: {
     order: 5,
@@ -112,6 +117,7 @@ exports.products = {
         limit: 50_000,
       },
     ],
+    monthlyPrice: 500,
   },
   pay_as_you_go_1: {
     order: 6,
@@ -134,6 +140,7 @@ exports.products = {
         price: 0.003,
       },
     ],
+    monthlyPrice: 0,
   },
   prod_4: {
     order: 7,
@@ -156,5 +163,6 @@ exports.products = {
         price: 0,
       },
     ],
+    monthlyPrice: 0,
   },
 };
