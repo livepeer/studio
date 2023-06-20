@@ -85,7 +85,9 @@ const UsageSummary = () => {
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
   const [overUsage, setOverUsage] = useState(null);
-  const [overUsageBill, setOverUsageBill] = useState(null);
+  const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
+    null
+  );
   const product = getUserProduct(user);
   const prices = product.usage;
   const transcodingPrice = prices[0].price;
@@ -299,10 +301,10 @@ const UsageSummary = () => {
           <Box css={{ ml: "$1", fontWeight: 600 }}>
             {usage &&
               `$${
-                products[user.stripeProductId]?.monthlyPrice.toLocaleString() ||
                 products[
                   user.newStripeProductId
                 ]?.monthlyPrice.toLocaleString() ||
+                products[user.stripeProductId]?.monthlyPrice.toLocaleString() ||
                 0
               }`}
           </Box>

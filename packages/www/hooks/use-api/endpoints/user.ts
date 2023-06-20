@@ -175,9 +175,12 @@ export const getUser = async (
 // Get current Stripe product, allowing for development users that don't have any
 export const getUserProduct = (user: User) => {
   if (hasStripe) {
-    return products[user.stripeProductId];
+    return products[user.newStripeProductId] || products[user.stripeProductId];
   }
-  return products[user.stripeProductId || "prod_0"];
+  return (
+    products[user.newStripeProductId] ||
+    products[user.stripeProductId || "prod_0"]
+  );
 };
 
 export const getUsers = async (
