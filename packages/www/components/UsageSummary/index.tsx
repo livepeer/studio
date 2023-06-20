@@ -146,6 +146,8 @@ const UsageSummary = () => {
     };
 
     const calculateOverUsage = async (product, usage) => {
+      console.log(`usage: ${JSON.stringify(usage)}`);
+      console.log(`product: ${JSON.stringify(product)}`);
       const productData = products[product];
       const limits = {
         transcoding: productData?.usage[0].limit,
@@ -166,6 +168,7 @@ const UsageSummary = () => {
     };
 
     const calculateOverUsageBill = async (overusage) => {
+      console.log(`Overusage: ${JSON.stringify(overusage)}`);
       const payAsYouGoData = products["pay_as_you_go_1"];
 
       const overUsageBill: OverUsageBill = {
