@@ -148,11 +148,10 @@ const UsageSummary = () => {
     const calculateOverUsage = async (product, usage) => {
       console.log(`usage: ${JSON.stringify(usage)}`);
       console.log(`product: ${JSON.stringify(product)}`);
-      const productData = products[product];
       const limits = {
-        transcoding: productData?.usage[0].limit,
-        streaming: productData?.usage[1].limit,
-        storage: productData?.usage[2].limit,
+        transcoding: product?.usage[0].limit,
+        streaming: product?.usage[1].limit,
+        storage: product?.usage[2].limit,
       };
 
       const overUsage = {
