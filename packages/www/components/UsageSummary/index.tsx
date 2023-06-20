@@ -121,6 +121,7 @@ const UsageSummary = () => {
 
       if (res.status == 200) {
         setUsage(usage);
+        doCaculateOverUsage(usage);
       }
     };
     const getSubscriptionAndUsage = async (subscriptionId) => {
@@ -200,7 +201,6 @@ const UsageSummary = () => {
     if (user) {
       doGetInvoices(user.stripeCustomerId);
       getSubscriptionAndUsage(user.stripeCustomerSubscriptionId);
-      doCaculateOverUsage(usage);
     }
   }, [user]);
 
@@ -310,7 +310,7 @@ const UsageSummary = () => {
           </Box>
         </Text>
         <Text>
-          Overusage: {""}
+          Pay as you go (overusage): {""}
           <Box css={{ ml: "$1", fontWeight: 600 }}>
             Transcoding minutes:{" "}
             {overUsageBill && `$${overUsageBill.transcodingBill.total}`}
