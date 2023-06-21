@@ -1071,6 +1071,10 @@ components:
       properties:
         name:
           type: string
+        roomAdmin:
+          type: boolean
+        canPublish:
+          type: boolean
     room-egress-payload:
       type: object
       required:

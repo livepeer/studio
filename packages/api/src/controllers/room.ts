@@ -190,7 +190,16 @@ app.post(
         ttl: 5 * 60,
       }
     );
-    at.addGrant({ roomJoin: true, room: req.params.roomId });
+    at.addGrant({
+      roomJoin: true,
+      room: req.params.roomId,
+      ...(req.body.roomAdmin !== undefined && {
+        roomAdmin: req.body.roomAdmin,
+      }),
+      ...(req.body.canPublish !== undefined && {
+        canPublish: req.body.canPublish,
+      }),
+    });
     const token = at.toJwt();
 
     res.status(201);
