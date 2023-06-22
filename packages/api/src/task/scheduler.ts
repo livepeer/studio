@@ -202,6 +202,22 @@ export class TaskScheduler {
           });
         }
         break;
+      case "export-data":
+        if (task.params["export-data"].type === "attestation") {
+          db.attestation.update([sql`id = ${task.params["export-data"].id}`], {
+            storage: {
+              ipfs: {
+                cid: event.output.exportData.ipfs.cid,
+                updatedAt: Date.now(),
+              },
+              status: {
+                phase: "ready",
+                tasks: { last: task.id },
+              },
+            },
+          });
+        }
+        break;
     }
     await this.updateTask(task, {
       status: {

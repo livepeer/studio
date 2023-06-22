@@ -4,9 +4,11 @@ import { validatePost } from "../../middleware";
 import { ethers } from "ethers";
 import { makeNextHREF, toStringValues } from "../helpers";
 import _ from "lodash";
+import sql from "sql-template-strings";
 import * as fcl from "@onflow/fcl";
 import stringify from "fast-stable-stringify";
 import { Attestation } from "../../schema/types";
+import { taskScheduler } from "../../task/scheduler";
 
 const app = Router();
 
@@ -65,9 +67,40 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     ...req.body,
   });
 
-  // TODO: VID-214, pin to IPFS and add CID to Video Metadata
+  const task = await taskScheduler.createAndScheduleTask("export-data", {
+    "export-data": {
+      ipfs: {},
+      type: "attestation",
+      id: attestationMetadata.id,
+      content: toContent(attestationMetadata),
+    },
+  });
+
+  attestationMetadata.storage = {
+    status: {
+      phase: "waiting",
+      tasks: {
+        pending: task.id,
+      },
+    },
+  };
+
+  db.attestation.update([sql`id = ${attestationMetadata.id}`], {
+    storage: attestationMetadata.storage,
+  });
+
   return res.status(201).json(attestationMetadata);
 });
+
+function toContent(attestation: Attestation): string {
+  return JSON.stringify({
+    domain: attestation.domain,
+    primaryType: attestation.primaryType,
+    message: attestation.message,
+    signature: attestation.signature,
+    signatureType: attestation.signatureType,
+  });
+}
 
 async function verifySignature(
   message: any,
