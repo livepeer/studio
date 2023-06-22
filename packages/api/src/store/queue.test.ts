@@ -1,14 +1,8 @@
-import setupPromise from "../test-server";
 import { semaphore, sleep } from "../util";
 import { RabbitQueue } from "./queue";
 import { rabbitMgmt } from "../test-helpers";
 
 jest.setTimeout(10000);
-
-beforeAll(async () => {
-  // dummy initialize the DB as tests were somehow failing with a DB exception
-  await setupPromise;
-});
 
 describe("Queue", () => {
   let queue: RabbitQueue;
