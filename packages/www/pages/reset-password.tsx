@@ -79,7 +79,7 @@ const ResetPasswordPage = () => {
               errors={errors}
               loading={loading}
             />
-            <Box css={{ maxWidth: 450, width: "100%" }}>
+            <Box css={{ maxWidth: 500, width: "100%" }}>
               <Box
                 css={{
                   width: "100%",

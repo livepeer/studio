@@ -6,7 +6,7 @@
 
 const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
 const defaultDescription =
-  "Your home for building onchain and open social video experiences with Livepeer, the world's open video infrastructure.";
+  "Your all-in-one dashboard for building, broadcasting, and publishing video on the open internet with Livepeer Protocol. Effortlessly manage livestreams, video uploads, API keys, network usage, billing, and more.";
 const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
 
 // Main website
@@ -41,7 +41,7 @@ export const Register = {
   metaData: {
     title: makeCompleteTitle("Register"),
     description:
-      "Start for free with 1,000 streaming minutes a month. Build with affordable, reliable, decentralized video infrastructure.",
+      "Start for free, then pay as you grow. Build with affordable, reliable, decentralized video infrastructure.",
     url: makeCompleteUrl("register"),
   },
 };
