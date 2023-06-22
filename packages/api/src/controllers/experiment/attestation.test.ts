@@ -1,5 +1,6 @@
 import serverPromise, { TestServer } from "../../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../../test-helpers";
+import { v4 as uuid } from "uuid";
 
 const CREATOR_PUBLIC_KEY = "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC";
 const NOW = 1685527855812;
@@ -48,6 +49,7 @@ const FLOW_REQUEST = {
 
 let server: TestServer;
 let id: string;
+let adminApiKey: string;
 
 let dateNowSpy;
 
@@ -59,7 +61,6 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   let client: TestClient;
-  let adminApiKey: string;
   ({ client, adminApiKey } = await setupUsers(
     server,
     {
@@ -202,6 +203,45 @@ describe("Attestation API", () => {
     it("should return error for non-existing attestation metadata", async () => {
       const res = await client.get(`/experiment/-/attestation/12345`);
       expect(res.status).toEqual(404);
+    });
+
+    it("should export attestation into IPFS and get task by its CID", async () => {
+      let res = await client.get(`/experiment/-/attestation/${id}`);
+      expect(res.status).toEqual(200);
+      let attestation = await res.json();
+      expect(attestation.storage.ipfs).not.toBeNull();
+
+      const taskId = attestation.storage.status.tasks.pending;
+      expect(taskId).not.toBeNull();
+      client.apiKey = adminApiKey;
+      res = await client.get(`/task/${taskId}`);
+      expect(res.status).toBe(200);
+      const task = await res.json();
+      expect(task.type).toEqual("export-data");
+
+      await server.taskScheduler.processTaskEvent({
+        id: uuid(),
+        type: "task_result",
+        timestamp: Date.now(),
+        task: {
+          id: taskId,
+          type: "export-data",
+          snapshot: task,
+        },
+        error: null,
+        output: {
+          exportData: {
+            ipfs: {
+              cid: "QmX",
+            },
+          },
+        },
+      });
+      res = await client.get(`/experiment/-/attestation/QmX`);
+      expect(res.status).toEqual(200);
+      attestation = await res.json();
+      expect(attestation.storage.ipfs.cid).toEqual("QmX");
+      expect(attestation.storage.status.phase).toEqual("ready");
     });
   });
 
