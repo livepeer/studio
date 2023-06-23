@@ -202,6 +202,22 @@ export class TaskScheduler {
           });
         }
         break;
+      case "export-data":
+        if (task.params.exportData.type === "attestation") {
+          db.attestation.update(task.params.exportData.id, {
+            storage: {
+              ipfs: {
+                cid: event.output.exportData.ipfs.cid,
+                updatedAt: Date.now(),
+              },
+              status: {
+                phase: "ready",
+                tasks: { last: task.id },
+              },
+            },
+          });
+        }
+        break;
     }
     await this.updateTask(task, {
       status: {
@@ -314,6 +330,18 @@ export class TaskScheduler {
                   last: inputAsset.storage.status.tasks.last,
                   failed: task.id,
                 },
+              },
+            },
+          });
+        }
+        break;
+      case "export-data":
+        if (task.params.exportData.type === "attestation") {
+          db.attestation.update(task.params.exportData.id, {
+            storage: {
+              status: {
+                phase: "failed",
+                tasks: { failed: task.id },
               },
             },
           });
