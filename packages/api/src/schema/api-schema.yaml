@@ -1042,6 +1042,15 @@ components:
         streamId:
           type: string
           description: The ID of the Livepeer Stream to stream to
+    room-user-update-payload:
+      type: object
+      required:
+        - canPublish
+      additionalProperties: false
+      properties:
+        canPublish:
+          type: boolean
+          description: Whether a user is allowed to publish audio/video tracks
     transcode-payload:
       additionalProperties: false
       required:
@@ -2864,10 +2873,12 @@ paths:
           description: Success
           content:
             application/json:
-              additionalProperties: false
-              properties:
-                id:
-                  type: string
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
         default:
           description: Error
           content:
@@ -2888,7 +2899,8 @@ paths:
           description: Success
           content:
             application/json:
-              $ref: "#/components/schemas/room"
+              schema:
+                $ref: "#/components/schemas/room"
         default:
           description: Error
           content:
@@ -2976,6 +2988,69 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
   "/room/{id}/user/{userId}":
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Get user details
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  joinedAt:
+                    type: integer
+                  name:
+                    type: string
+                  isPublisher:
+                    type: boolean
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    put:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-user-update-payload"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Update a users permissions
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: id
