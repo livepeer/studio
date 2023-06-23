@@ -2820,10 +2820,12 @@ paths:
           description: Success
           content:
             application/json:
-              additionalProperties: false
-              properties:
-                id:
-                  type: string
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
         default:
           description: Error
           content:
@@ -2844,7 +2846,8 @@ paths:
           description: Success
           content:
             application/json:
-              $ref: "#/components/schemas/room"
+              schema:
+                $ref: "#/components/schemas/room"
         default:
           description: Error
           content:
@@ -2948,6 +2951,19 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  joinedAt:
+                    type: integer
+                  name:
+                    type: string
+                  isPublisher:
+                    type: boolean
         default:
           description: Error
           content:
