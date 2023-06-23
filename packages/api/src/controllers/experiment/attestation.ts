@@ -85,7 +85,7 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     },
   };
 
-  db.attestation.update([sql`id = ${attestationMetadata.id}`], {
+  db.attestation.update(attestationMetadata.id, {
     storage: attestationMetadata.storage,
   });
 
