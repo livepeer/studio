@@ -248,6 +248,13 @@ export class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
+    await this.updateTask(task, {
+      sourceReadyAt: Date.now(),
+      status: {
+        ...task.status,
+        updatedAt: Date.now(),
+      },
+    });
 
     return true;
   }
@@ -440,7 +447,7 @@ export class TaskScheduler {
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "scheduledAt" | "status" | "output">,
+    updates: Pick<Task, "scheduledAt" | "status" | "output" | "sourceReadyAt">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
     updates = this.deleteCredentials(task, updates);

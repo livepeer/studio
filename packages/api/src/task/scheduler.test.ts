@@ -85,6 +85,9 @@ describe("scheduler handle tasks", () => {
       const updated = await db.asset.get(asset.id);
       expect(updated.sourcePlaybackReady).toBe(true);
       expect(updated.files).toStrictEqual(files);
+
+      const updatedTask = await db.task.get(task.id);
+      expect(updatedTask.sourceReadyAt).toBeGreaterThan(0);
     });
   });
 });
