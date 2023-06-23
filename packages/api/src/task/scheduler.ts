@@ -204,7 +204,7 @@ export class TaskScheduler {
         break;
       case "export-data":
         if (task.params["export-data"].type === "attestation") {
-          db.attestation.update([sql`id = ${task.params["export-data"].id}`], {
+          db.attestation.update(task.params["export-data"].id, {
             storage: {
               ipfs: {
                 cid: event.output.exportData.ipfs.cid,
