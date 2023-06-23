@@ -798,7 +798,7 @@ components:
                     updated
                   example: 1587667174725
             status:
-              $ref: "#/components/schemas/storageStatus"
+              $ref: "#/components/schemas/storage-status"
         status:
           readOnly: true
           type: object
@@ -1297,7 +1297,7 @@ components:
                   type: string
                   description: File content to store into IPFS
                 ipfs:
-                  $ref: "#/components/schemas/ipfs"
+                  $ref: "#/components/schemas/ipfs-export-params"
                 type:
                   type: string
                   description: Optional type of content
@@ -1553,7 +1553,7 @@ components:
             - ipfs
           properties:
             ipfs:
-              $ref: "#/components/schemas/ipfs"
+              $ref: "#/components/schemas/ipfs-export-params"
     signing-key:
       type: object
       additionalProperties: false
@@ -2030,8 +2030,8 @@ components:
                     Timestamp (in milliseconds) at which IPFS export task was updated
                   example: 1587667174725
             status:
-              $ref: "#/components/schemas/storageStatus"
-    ipfs:
+              $ref: "#/components/schemas/storage-status"
+    ipfs-export-params:
       type: object
       additionalProperties: false
       properties:
@@ -2067,7 +2067,7 @@ components:
                   writeOnly: true
                   description:
                     Will be added to the pinata_secret_api_key header.
-    storageStatus:
+    storage-status:
       readOnly: true
       additionalProperties: false
       required:
