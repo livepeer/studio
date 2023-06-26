@@ -134,4 +134,128 @@ app.post("/migrate-users-to-stripe", async (req, res) => {
   res.json(users);
 });
 
+// Migrate personal users to hacker
+app.post("/migrate-personal-users", async (req, res) => {
+  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
+    res.status(403);
+    return res.json({ errors: ["unauthorized"] });
+  }
+
+  const [users] = await db.user.find(
+    [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
+    {
+      limit: 9999999999,
+      useReplica: false,
+    }
+  );
+
+  for (let index = 0; index < users.length; index++) {
+    let user = users[index];
+
+    const { data } = await req.stripe.customers.list({
+      email: user.email,
+    });
+
+    if (data.length > 0) {
+      if (user.stripeProductId === "prod_0") {
+        // get the stripe customer
+        const customer = await req.stripe.customers.get({
+          email: user.email,
+        });
+
+        // fetch prices associated with hacker plan
+        const items = await req.stripe.prices.list({
+          lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
+        });
+
+        // Subscribe the user to the hacker plan
+        const subscription = await req.stripe.subscriptions.update({
+          cancel_at_period_end: false,
+          customer: customer.id,
+          items: items.data.map((item) => ({ price: item.id })),
+        });
+
+        // Update user's customer, product, subscription, and payment id in our db
+        await db.user.update(user.id, {
+          stripeCustomerId: customer.id,
+          stripeProductId: "prod_O9XuIjn7EqYRVW",
+          stripeCustomerSubscriptionId: subscription.id,
+          stripeCustomerPaymentMethodId: null,
+        });
+
+        // sleep for a 200 ms to get around stripe rate limits
+        await sleep(200);
+      }
+    }
+  }
+
+  res.json(users);
+});
+
+const testProducts = ["hacker_1", "growth_1", "scale_1"];
+const productMapping = {
+  hacker_1: "prod_O9XuIjn7EqYRVW",
+  growth_1: "prod_O9XtHhI6rbTT1B",
+  scale_1: "prod_O9XtcfOSMjSD5L",
+};
+
+// Migrate test products for each user on stripe
+app.post("/migrate-test-products", async (req, res) => {
+  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
+    res.status(403);
+    return res.json({ errors: ["unauthorized"] });
+  }
+
+  const [users] = await db.user.find(
+    [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
+    {
+      limit: 9999999999,
+      useReplica: false,
+    }
+  );
+
+  for (let index = 0; index < users.length; index++) {
+    let user = users[index];
+
+    // If user.newStripeProductId is in testProducts, migrate it to the new product
+    if (testProducts.includes(user.newStripeProductId)) {
+      // get the stripe customer
+      const customer = await req.stripe.customers.get({
+        email: user.email,
+      });
+
+      // fetch prices associated with new product
+      const items = await req.stripe.prices.list({
+        lookup_keys:
+          products[productMapping[user.newStripeProductId]].lookupKeys,
+      });
+
+      // Subscribe the user to the new product
+      const subscription = await req.stripe.subscriptions.update({
+        cancel_at_period_end: false,
+        customer: customer.id,
+        items: items.data.map((item) => ({ price: item.id })),
+      });
+
+      // Update user's customer, product, subscription, and payment id in our db
+      await db.user.update(user.id, {
+        stripeCustomerId: customer.id,
+        stripeProductId: productMapping[user.newStripeProductId],
+        stripeCustomerSubscriptionId: subscription.id,
+        stripeCustomerPaymentMethodId: null,
+      });
+
+      // sleep for a 200 ms to get around stripe rate limits
+      await sleep(200);
+
+      // Update user's newStripeProductId to null
+      await db.user.update(user.id, {
+        newStripeProductId: null,
+      });
+    }
+  }
+
+  res.json(users);
+});
+
 export default app;
