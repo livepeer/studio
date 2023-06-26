@@ -179,7 +179,7 @@ const Billing = () => {
                 {user?.stripeProductId
                   ? products[user.newStripeProductId]?.name ||
                     products[user.stripeProductId]?.name
-                  : products["prod_0"]?.name}
+                  : products["prod_O9XuIjn7EqYRVW"]?.name}
               </Badge>
               plan.
             </Text>

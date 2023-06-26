@@ -48,10 +48,12 @@ const PlansPage = () => {
         <Plans
           dashboard={true}
           stripeProductId={
-            user?.stripeProductId ? user.stripeProductId : "prod_0"
+            user?.stripeProductId ? user.stripeProductId : "prod_O9XuIjn7EqYRVW"
           }
           newStripeProductId={
-            user?.newStripeProductId ? user.newStripeProductId : "prod_0"
+            user?.newStripeProductId
+              ? user.newStripeProductId
+              : "prod_O9XuIjn7EqYRVW"
           }
         />
       </Box>

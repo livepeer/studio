@@ -93,7 +93,7 @@ export const register = async ({
   // Subscribe customer to free plan upon registation
   await createSubscription({
     stripeCustomerId: customer.id,
-    stripeProductId: "prod_0",
+    stripeProductId: "prod_O9XuIjn7EqYRVW",
   });
 
   return login(email, password);
@@ -165,7 +165,7 @@ export const getUser = async (
     const customer = await createCustomer(user.email);
     await createSubscription({
       stripeCustomerId: customer.id,
-      stripeProductId: "prod_0",
+      stripeProductId: "prod_O9XuIjn7EqYRVW",
     });
     [res, user] = await context.fetch(`/user/${userId}`, opts);
   }
@@ -179,7 +179,7 @@ export const getUserProduct = (user: User) => {
   }
   return (
     products[user.newStripeProductId] ||
-    products[user.stripeProductId || "prod_0"]
+    products[user.stripeProductId || "prod_O9XuIjn7EqYRVW"]
   );
 };
 

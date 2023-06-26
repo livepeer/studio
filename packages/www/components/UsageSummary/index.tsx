@@ -168,7 +168,7 @@ const UsageSummary = () => {
 
     const calculateOverUsageBill = async (overusage) => {
       console.log(`Overusage: ${JSON.stringify(overusage)}`);
-      const payAsYouGoData = products["pay_as_you_go_1"];
+      const payAsYouGoData = products["prod_O9XuWMU1Up6QKf"];
 
       const overUsageBill: OverUsageBill = {
         transcodingBill: {
@@ -246,7 +246,7 @@ const UsageSummary = () => {
               {user?.stripeProductId
                 ? products[user.newStripeProductId]?.name ||
                   products[user.stripeProductId]?.name
-                : products["prod_0"].name}{" "}
+                : products["hacker_1"].name}{" "}
               Plan
             </Badge>
           </Flex>

@@ -251,24 +251,26 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["hacker_1"].name}
+                {products["prod_O9XuIjn7EqYRVW"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "hacker_1"
+                    ? newStripeProductId === "prod_O9XuIjn7EqYRVW"
                       ? "Current plan"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "hacker_1" ? true : false
+                  dashboard && newStripeProductId === "prod_O9XuIjn7EqYRVW"
+                    ? true
+                    : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="hacker_1"
+                stripeProductId="prod_O9XuIjn7EqYRVW"
                 onClick={() => {
                   if (!dashboard) {
                     router.push("/register");
@@ -327,26 +329,28 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["growth_1"].name}
+                {products["prod_O9XtHhI6rbTT1B"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "growth_1"
+                    ? newStripeProductId === "prod_O9XtHhI6rbTT1B"
                       ? "Current plan"
-                      : newStripeProductId === "scale_1"
+                      : newStripeProductId === "prod_O9XtcfOSMjSD5L"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "growth_1" ? true : false
+                  dashboard && newStripeProductId === "prod_O9XtHhI6rbTT1B"
+                    ? true
+                    : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="growth_1"
+                stripeProductId="prod_O9XtHhI6rbTT1B"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -487,26 +491,28 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["scale_1"].name}
+                {products["prod_O9XtcfOSMjSD5L"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "scale_1"
+                    ? newStripeProductId === "prod_O9XtcfOSMjSD5L"
                       ? "Current plan"
-                      : newStripeProductId === "scale_1"
+                      : newStripeProductId === "prod_O9XtcfOSMjSD5L"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "scale_1" ? true : false
+                  dashboard && newStripeProductId === "prod_O9XtcfOSMjSD5L"
+                    ? true
+                    : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="scale_1"
+                stripeProductId="prod_O9XtcfOSMjSD5L"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);

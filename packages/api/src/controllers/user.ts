@@ -121,7 +121,7 @@ export async function terminateUserStreams(
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
 
-const defaultProductId: StripeProductIDs = "prod_0";
+const defaultProductId: StripeProductIDs = "prod_O9XuIjn7EqYRVW";
 
 async function getOrCreateCustomer(stripe: Stripe, email: string) {
   const existing = await stripe.customers.list({ email });
@@ -769,8 +769,6 @@ app.post(
     res.json(customer);
   }
 );
-
-const deprecatedProducts = ["prod_0", "prod_1", "prod_2"];
 
 app.post(
   "/create-subscription",

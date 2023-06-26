@@ -225,6 +225,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
     update-subscription:
       type: object
       required:
@@ -256,6 +260,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
     update-customer-payment-method:
       type: object
       required:
@@ -983,6 +991,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
         newStripeProductId:
           type: string
           enum:
@@ -991,6 +1003,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU
