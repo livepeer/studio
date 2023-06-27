@@ -1303,7 +1303,7 @@ components:
                 - content
               properties:
                 content:
-                  type: string
+                  type: object
                   description: File content to store into IPFS
                 ipfs:
                   $ref: "#/components/schemas/ipfs-export-params"
