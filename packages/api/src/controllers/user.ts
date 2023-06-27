@@ -676,7 +676,7 @@ app.post(
     );
     if (newToken) {
       res.status(201);
-      res.json(newToken);
+      res.json({});
     } else {
       res.status(403);
       res.json({ errors: ["error creating password reset token"] });
