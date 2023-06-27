@@ -131,7 +131,7 @@ async function getOrCreateCustomer(stripe: Stripe, email: string) {
   return await stripe.customers.create({ email });
 }
 
-async function getOrCreateSubscription(
+async function createSubscription(
   stripe: Stripe,
   stripeProductId: StripeProductIDs,
   stripeCustomerId: string
@@ -140,7 +140,7 @@ async function getOrCreateSubscription(
     customer: stripeCustomerId,
   });
   if (existing.data.length > 0) {
-    return existing.data[0];
+    return new InternalServerError("existing subscription already found");
   }
 
   const prices = await stripe.prices.list({
@@ -309,7 +309,7 @@ app.post("/", validatePost("user"), async (req, res) => {
   let stripeFields: Partial<User> = {};
   if (req.stripe) {
     const customer = await getOrCreateCustomer(req.stripe, lowercaseEmail);
-    const subscription = await getOrCreateSubscription(
+    const subscription = await createSubscription(
       req.stripe,
       defaultProductId,
       customer.id
@@ -824,7 +824,7 @@ app.post(
     }
 
     // Create the subscription
-    const subscription = await getOrCreateSubscription(
+    const subscription = await createSubscription(
       req.stripe,
       stripeProductId,
       stripeCustomerId
