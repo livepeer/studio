@@ -2789,6 +2789,11 @@ paths:
         /api/asset/upload/url API.
         \
         \
+        For rapid processing of assets that will also be archived on IPFS or Arweave, 
+        we strongly encourage uploading the raw file to Livepeer via a direct upload rather than passing the IPFS / Arweave gateway URL to this endpoint. 
+        The gateway URL will work, but may incur longer-than-usual processing time.
+        \
+        \
         For IPFS HTTP gateway URLs, the API currently only supports “path style”
         URLs and does not support “subdomain style” URLs. The API will support
         both styles of URLs in a future update.
