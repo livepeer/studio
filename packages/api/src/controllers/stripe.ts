@@ -3,8 +3,72 @@ import { db } from "../store";
 import Stripe from "stripe";
 import { products } from "../config";
 import sql from "sql-template-strings";
+import fetch from "node-fetch";
+import qs from "qs";
 
 const app = Router();
+
+interface OverUsageBill {
+  transcodingBill: OverUsageItem;
+  deliveryBill: OverUsageItem;
+  storageBill: OverUsageItem;
+}
+
+interface OverUsageItem {
+  units: number;
+  total: number;
+}
+
+interface BillingUsageData {
+  DeliveryUsageMins: number;
+  TotalUsageMins: number;
+  StorageUsageMins: number;
+}
+
+const testProducts = ["hacker_1", "growth_1", "scale_1"];
+
+const productMapping = {
+  hacker_1: "prod_O9XuIjn7EqYRVW",
+  growth_1: "prod_O9XtHhI6rbTT1B",
+  scale_1: "prod_O9XtcfOSMjSD5L",
+};
+
+const payAsYouGoPlans = ["prod_O9XtHhI6rbTT1B", "prod_O9XtcfOSMjSD5L"];
+
+const calculateOverUsage = async (product, usage) => {
+  const limits = {
+    transcoding: product?.usage[0].limit,
+    streaming: product?.usage[1].limit,
+    storage: product?.usage[2].limit,
+  };
+
+  const overUsage = {
+    TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
+    DeliveryUsageMins: Math.max(usage?.DeliveryUsageMins - limits.streaming, 0),
+    StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
+  };
+
+  return overUsage;
+};
+
+const getBillingUsage = async (userId, fromTime, toTime) => {
+  const api_token = await db.apiToken.find({ userId });
+
+  // Fetch usage data from /data/usage endpoint
+  const usage = await fetch(
+    `/data/usage/query?${qs.stringify({
+      from: fromTime,
+      to: toTime,
+    })}`,
+    {
+      headers: {
+        Authorization: `Bearer ${api_token}`,
+      },
+    }
+  ).then((res) => res.json());
+
+  return usage;
+};
 
 // Webhook handler for asynchronous events.
 app.post("/webhook", async (req, res) => {
@@ -38,6 +102,51 @@ app.post("/webhook", async (req, res) => {
     }
 
     const user = users[0];
+
+    if (payAsYouGoPlans.includes(user.stripeProductId)) {
+      let usage = await getBillingUsage(
+        user.id,
+        invoice.period_start,
+        invoice.period_end
+      );
+      let overUsage = await calculateOverUsage(user.stripeProductId, usage);
+
+      // Invoice items based on overusage
+      await Promise.all(
+        products[user.stripeProductId].usage.map(async (product) => {
+          if (product.name === "Transcoding") {
+            await req.stripe.subscriptionItems.createUsageRecord(
+              "si_I3oUKEe6JSoTkO",
+              {
+                quantity: overUsage.TotalUsageMins,
+                timestamp: new Date().getTime() / 1000,
+                action: "set",
+              }
+            );
+          } else if (product.name === "Streaming") {
+            await req.stripe.subscriptionItems.createUsageRecord(
+              "si_I3oUKEe6JSoTkO",
+              {
+                quantity: overUsage.DeliveryUsageMins,
+                timestamp: new Date().getTime() / 1000,
+                action: "set",
+              }
+            );
+          } else if (product.name === "Storage") {
+            await req.stripe.subscriptionItems.createUsageRecord(
+              "si_I3oUKEe6JSoTkO",
+              {
+                quantity: overUsage.StorageUsageMins,
+                timestamp: new Date().getTime() / 1000,
+                action: "set",
+              }
+            );
+          }
+        })
+      );
+      return res.sendStatus(200);
+    }
+
     const usageRes = await db.stream.usage(
       user.id,
       invoice.period_start,
@@ -191,13 +300,6 @@ app.post("/migrate-personal-users", async (req, res) => {
 
   res.json(users);
 });
-
-const testProducts = ["hacker_1", "growth_1", "scale_1"];
-const productMapping = {
-  hacker_1: "prod_O9XuIjn7EqYRVW",
-  growth_1: "prod_O9XtHhI6rbTT1B",
-  scale_1: "prod_O9XtcfOSMjSD5L",
-};
 
 // Migrate test products for each user on stripe
 app.post("/migrate-test-products", async (req, res) => {
