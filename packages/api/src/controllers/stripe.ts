@@ -116,12 +116,16 @@ app.post("/webhook", async (req, res) => {
       );
       let overUsage = await calculateOverUsage(user.stripeProductId, usage);
 
+      const subscriptionItems = await req.stripe.subscriptionItems.list({
+        subscription: user.stripeCustomerSubscriptionId,
+      });
+
       // Invoice items based on overusage
       await Promise.all(
         products[user.stripeProductId].usage.map(async (product) => {
           if (product.name === "Transcoding") {
             await req.stripe.subscriptionItems.createUsageRecord(
-              "si_I3oUKEe6JSoTkO",
+              subscriptionItems[0],
               {
                 quantity: overUsage.TotalUsageMins,
                 timestamp: new Date().getTime() / 1000,
@@ -130,7 +134,7 @@ app.post("/webhook", async (req, res) => {
             );
           } else if (product.name === "Streaming") {
             await req.stripe.subscriptionItems.createUsageRecord(
-              "si_I3oUKEe6JSoTkO",
+              subscriptionItems[0],
               {
                 quantity: overUsage.DeliveryUsageMins,
                 timestamp: new Date().getTime() / 1000,
@@ -139,7 +143,7 @@ app.post("/webhook", async (req, res) => {
             );
           } else if (product.name === "Storage") {
             await req.stripe.subscriptionItems.createUsageRecord(
-              "si_I3oUKEe6JSoTkO",
+              subscriptionItems[0],
               {
                 quantity: overUsage.StorageUsageMins,
                 timestamp: new Date().getTime() / 1000,
