@@ -257,20 +257,18 @@ const Plans = ({
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "prod_O9XuIjn7EqYRVW"
+                    ? newStripeProductId === "hacker_1"
                       ? "Current plan"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "prod_O9XuIjn7EqYRVW"
-                    ? true
-                    : false
+                  dashboard && newStripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="prod_O9XuIjn7EqYRVW"
+                stripeProductId="hacker_1"
                 onClick={() => {
                   if (!dashboard) {
                     router.push("/register");
@@ -329,28 +327,26 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["prod_O9XtHhI6rbTT1B"].name}
+                {products["growth_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "prod_O9XtHhI6rbTT1B"
+                    ? newStripeProductId === "growth_1"
                       ? "Current plan"
-                      : newStripeProductId === "prod_O9XtcfOSMjSD5L"
+                      : newStripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "prod_O9XtHhI6rbTT1B"
-                    ? true
-                    : false
+                  dashboard && newStripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="prod_O9XtHhI6rbTT1B"
+                stripeProductId="growth_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -491,28 +487,26 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["prod_O9XtcfOSMjSD5L"].name}
+                {products["scale_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "prod_O9XtcfOSMjSD5L"
+                    ? newStripeProductId === "scale_1"
                       ? "Current plan"
-                      : newStripeProductId === "prod_O9XtcfOSMjSD5L"
+                      : newStripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "prod_O9XtcfOSMjSD5L"
-                    ? true
-                    : false
+                  dashboard && newStripeProductId === "scale_1" ? true : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="prod_O9XtcfOSMjSD5L"
+                stripeProductId="scale_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);

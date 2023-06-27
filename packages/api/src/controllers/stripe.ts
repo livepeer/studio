@@ -33,7 +33,12 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-const payAsYouGoPlans = ["prod_O9XtHhI6rbTT1B", "prod_O9XtcfOSMjSD5L"];
+const payAsYouGoPlans = [
+  "prod_O9XtHhI6rbTT1B",
+  "prod_O9XtcfOSMjSD5L",
+  "growth_1",
+  "scale_1",
+];
 
 const calculateOverUsage = async (product, usage) => {
   const limits = {
