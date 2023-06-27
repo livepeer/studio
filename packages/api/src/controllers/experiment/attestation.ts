@@ -92,14 +92,14 @@ app.post("/", validatePost("attestation"), async (req, res) => {
   return res.status(201).json(attestationMetadata);
 });
 
-function toContent(attestation: Attestation): string {
-  return JSON.stringify({
+function toContent(attestation: Attestation) {
+  return {
     domain: attestation.domain,
     primaryType: attestation.primaryType,
     message: attestation.message,
     signature: attestation.signature,
     signatureType: attestation.signatureType,
-  });
+  };
 }
 
 async function verifySignature(
