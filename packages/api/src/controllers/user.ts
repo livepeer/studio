@@ -140,7 +140,7 @@ async function createSubscription(
     customer: stripeCustomerId,
   });
   if (existing.data.length > 0) {
-    return new InternalServerError("existing subscription already found");
+    return null;
   }
 
   const prices = await stripe.prices.list({
@@ -314,6 +314,10 @@ app.post("/", validatePost("user"), async (req, res) => {
       defaultProductId,
       customer.id
     );
+    if (!subscription) {
+      res.status(400);
+      res.json({ errors: ["error creating subscription"] });
+    }
     stripeFields = {
       stripeCustomerId: customer.id,
       stripeCustomerSubscriptionId: subscription.id,
@@ -829,6 +833,11 @@ app.post(
       stripeProductId,
       stripeCustomerId
     );
+    if (!subscription) {
+      return res
+        .status(400)
+        .send({ errors: ["could not create subscription"] });
+    }
 
     if (
       stripeProductId !== "prod_0" &&
