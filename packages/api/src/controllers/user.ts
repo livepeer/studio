@@ -723,6 +723,7 @@ app.post(
       res.json(customer);
     } else {
       res.status(400);
+      res.json({ errors: ["error creating customer"] });
     }
   }
 );
