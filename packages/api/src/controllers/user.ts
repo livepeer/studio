@@ -716,8 +716,10 @@ app.post(
         stripeCustomerId: customer.id,
       });
       res.status(201);
+      res.json(customer);
+    } else {
+      res.status(400);
     }
-    res.json(customer);
   }
 );
 
