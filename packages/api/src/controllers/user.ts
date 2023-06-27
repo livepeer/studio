@@ -574,7 +574,7 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
       });
     }
   }
-  res.status(200).json(cleanUserFields(user));
+  res.status(200);
 });
 
 app.post(

@@ -77,7 +77,7 @@ const Verify = ({
       openSnackbar(`Errors: ${res.errors.join(", ")}`);
     } else {
       openSnackbar(
-        `We've sent you a link to verify your email. Please check your inbox at ${res.email}`
+        `We've sent you a link to verify your email. Please check your inbox at ${email}`
       );
     }
   };
