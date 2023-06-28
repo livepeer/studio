@@ -485,6 +485,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
     if (record === "true" || record === "1") {
       query.push(sql`data->>'record' = 'true'`);
     } else if (record === "false" || record === "0") {
+      query.push(sql`(data->>'record' = 'false'` OR data->>'record' IS NULL)`);
       filterOut = true;
     }
   }
