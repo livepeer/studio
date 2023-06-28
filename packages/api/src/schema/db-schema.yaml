@@ -752,8 +752,6 @@ components:
           $ref: "#/components/schemas/stream/properties/presets"
         renditions:
           $ref: "#/components/schemas/stream/properties/renditions"
-        recordObjectStoreId:
-          $ref: "#/components/schemas/stream/properties/recordObjectStoreId"
         objectStoreId:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
         detection:
