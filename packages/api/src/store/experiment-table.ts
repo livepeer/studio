@@ -8,8 +8,9 @@ import { WithID } from "./types";
 
 export async function isExperimentSubject(experiment: string, userId: string) {
   try {
-    const { audienceUserIds } = await db.experiment.getByNameOrId(experiment);
-    return audienceUserIds?.includes(userId) ?? false;
+    const { audienceUserIds, audienceAllowAll } =
+      await db.experiment.getByNameOrId(experiment);
+    return audienceAllowAll || (audienceUserIds?.includes(userId) ?? false);
   } catch (err) {
     return false;
   }

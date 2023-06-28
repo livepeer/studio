@@ -18,11 +18,18 @@ import UpcomingInvoiceTable from "components/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
+import React, { PureComponent } from "react";
 
 const Billing = () => {
   useLoggedIn();
-  const { user, getUsage, getSubscription, getInvoices, getPaymentMethod } =
-    useApi();
+  const {
+    user,
+    getUsage,
+    getBillingUsage,
+    getSubscription,
+    getInvoices,
+    getPaymentMethod,
+  } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
@@ -170,7 +177,8 @@ const Billing = () => {
                 variant="neutral"
                 css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
                 {user?.stripeProductId
-                  ? products[user.stripeProductId]?.name
+                  ? products[user.newStripeProductId]?.name ||
+                    products[user.stripeProductId]?.name
                   : products["prod_0"]?.name}
               </Badge>
               plan.
@@ -244,15 +252,44 @@ const Billing = () => {
                     fontWeight: 600,
                     letterSpacing: "0",
                   }}>
+                  Usage
+                </Box>
+              </Flex>
+            </Heading>
+          </Flex>
+          <Link href="/dashboard/usage" passHref legacyBehavior>
+            <A
+              variant="primary"
+              css={{ display: "flex", alignItems: "center" }}>
+              View Usage Details <ArrowRightIcon />
+            </A>
+          </Link>
+        </Box>
+        <Box css={{ mb: "$9" }}>
+          <Flex
+            justify="between"
+            align="end"
+            css={{
+              mb: "$4",
+              width: "100%",
+            }}>
+            <Heading size="1">
+              <Flex align="center">
+                <Box
+                  css={{
+                    mr: "$3",
+                    fontWeight: 600,
+                    letterSpacing: "0",
+                  }}>
                   Upcoming Invoice
                 </Box>
               </Flex>
             </Heading>
           </Flex>
-          {!products[user.stripeProductId].order ? (
+          {!products[user.stripeProductId]?.order ? (
             <Text variant="neutral">
-              The Personal plan is free of charge up to 1000 minutes per month
-              and limited to 10 concurrent viewers per account.
+              The Hacker plan is free of charge up to 1000 minutes per month and
+              limited to 10 concurrent viewers per account.
             </Text>
           ) : (
             subscription && (

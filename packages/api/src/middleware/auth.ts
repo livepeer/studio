@@ -224,6 +224,11 @@ export const corsApiKeyAccessRules: AuthRule[] = [
       "/data/views/query/creator",
     ],
   },
+  // Experiment
+  {
+    methods: ["post"],
+    resources: ["/experiment/-/attestation"],
+  },
 ];
 
 function isRestrictedCors(token?: ApiToken) {

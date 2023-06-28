@@ -6,6 +6,7 @@ import {
   Button,
   Text,
   styled,
+  Tooltip,
 } from "@livepeer/design-system";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/PlanForm";
@@ -14,6 +15,7 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ContactDialog from "../ContactDialog";
 
 const Tour: any = dynamic(() => import("reactour"), { ssr: false });
 const steps = [
@@ -57,12 +59,13 @@ const Item = ({
 }) => (
   <Flex
     css={{
-      fontSize: "$2",
+      fontSize: "$1",
       height: 50,
       alignItems: "center",
       borderBottom: "1px solid",
       letterSpacing: -0.3,
       borderColor: "$neutral5",
+      textAlign: "center",
       ...css,
     }}>
     {displayCheck && (
@@ -84,9 +87,15 @@ const List = ({ children, ...props }) => (
 type PlanProps = {
   dashboard?: boolean;
   stripeProductId?: string;
+  newStripeProductId?: string;
 };
 
-const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
+const Plans = ({
+  dashboard = false,
+  stripeProductId,
+  newStripeProductId,
+}: PlanProps) => {
+  const [open, setOpen] = useState(false);
   const router = useRouter();
   const [isTourOpen, setIsTourOpen] = useState(false);
   const promptUpgrade = router.query?.promptUpgrade;
@@ -128,13 +137,13 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
           css={{
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
           }}>
           <Box
             css={{
               pl: 4,
               width: "25%",
-              maxWidth: 174,
+              minWidth: 120,
+              maxWidth: 200,
             }}>
             <Flex
               css={{
@@ -142,31 +151,96 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 flexDirection: "column",
                 justifyContent: "flex-end",
                 height: 116,
-                fontWeight: 500,
+                fontWeight: 600,
+                fontSize: "$4",
               }}>
               Usage
             </Flex>
             <List>
-              <Item displayCheck={false} title="Transcoding" />
-              <Item displayCheck={false} title="Recording storage" />
               <Item
+                css={{
+                  borderBottom: 0,
+                  textDecoration: "underline dotted rgb(67, 76, 88)",
+                  fontSize: "$3",
+                }}
                 displayCheck={false}
-                title="Stream Delivery via CDN"
-                css={{ borderBottom: 0 }}
+                title={
+                  <Tooltip
+                    multiline
+                    content=" Create multiple versions of your source stream for different
+                    devices in real time.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Transcoding
+                    </Text>
+                  </Tooltip>
+                }
+              />
+              <Item
+                css={{
+                  borderBottom: 0,
+                  fontSize: "$3",
+                }}
+                displayCheck={false}
+                title={
+                  <Tooltip
+                    multiline
+                    content="Store video content reliably on decentralized or traditional cloud
+                    storage providers.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Storage
+                    </Text>
+                  </Tooltip>
+                }
               />
               <Item
                 displayCheck={false}
-                title="Multistreaming*"
-                css={{ borderBottom: 0 }}
+                title={
+                  <Tooltip
+                    multiline
+                    content=" Deliver high-quality playback on whatever device or bandwidth the
+                    end viewer is watching.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Delivery
+                    </Text>
+                  </Tooltip>
+                }
+                css={{
+                  borderBottom: 0,
+                  fontSize: "$3",
+                }}
               />
+              <Item displayCheck={false} css={{ borderBottom: 0 }} title={""} />
             </List>
           </Box>
           <Box
             css={{
               p: "$4",
               borderRadius: 16,
-              width: "25%",
-              minWidth: 300,
+              width: "12%",
+              background: "$green3",
+              minWidth: 230,
+              mr: "$2",
             }}>
             <Flex
               css={{
@@ -174,24 +248,27 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_0"].name}
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
+                {products["hacker_1"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_0"
+                    ? newStripeProductId === "hacker_1"
                       ? "Current plan"
-                      : "Downgrade"
+                      : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_0" ? true : false
+                  dashboard && newStripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_0"
+                bc="$sage12"
+                color="$loContrast"
+                stripeProductId="hacker_1"
                 onClick={() => {
                   if (!dashboard) {
                     router.push("/register");
@@ -200,34 +277,46 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               />
             </Flex>
             <List>
-              <Item title={<span>1000 minutes / month</span>} />
               <Item
-                title={<span>None</span>}
-                displayX={true}
                 displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>1,000 minutes</span>
+                  </Flex>
+                }
               />
               <Item
-                title={<span>10 concurrent viewers / account</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>1,000 minutes</span>
+                  </Flex>
+                }
+                displayX={false}
               />
               <Item
-                title={<span>3 stream destinations</span>}
-                displayCheck={true}
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>10,000 minutes</span>
+                  </Flex>
+                }
                 css={{ borderBottom: 0 }}
               />
+              <Item css={{ borderBottom: 0 }} displayCheck={false} title={""} />
             </List>
           </Box>
           <Box
             className="upgrade-card"
             css={{
-              width: "25%",
+              width: "12%",
               color: "$hiContrast",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
               borderRadius: "16px",
-              background: "$panel",
+              background: "$green5",
               p: "$4",
-              minWidth: 300,
+              mr: "$2",
+              minWidth: 230,
             }}>
             <Flex
               css={{
@@ -235,26 +324,29 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_1"].name}
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
+                {products["growth_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? stripeProductId === "prod_1"
+                    ? newStripeProductId === "growth_1"
                       ? "Current plan"
-                      : stripeProductId === "prod_2"
-                      ? "Downgrade"
-                      : "Upgrade"
+                      : newStripeProductId === "scale_1"
+                      ? "Select"
+                      : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && stripeProductId === "prod_1" ? true : false
+                  dashboard && newStripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
-                stripeProductId="prod_1"
+                bc="$sage12"
+                color="$loContrast"
+                stripeProductId="growth_1"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -267,29 +359,109 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
 
             <List>
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
-                title={<span>$0.005 USD / min video ingested</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>3,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $5 for every additional 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
-                title={<span>Coming soon</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>10,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $3 for every additional 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
+                displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.015 USD / gb video streamed</span>}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>100,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      css={{ float: "right" }}
+                      content="Then $0.40 for every additional 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.002 USD / min per destination</span>}
+                css={{ borderBottom: 0, fontSize: "11px" }}
+                displayCheck={false}
+                title={"*Pay as you go past alloted minutes"}
               />
             </List>
           </Box>
+
           <Box
+            className="upgrade-card"
             css={{
-              borderRadius: 16,
+              width: "12%",
+              color: "$hiContrast",
+              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
+              borderRadius: "16px",
+              background: "$green6",
               p: "$4",
-              width: "25%",
-              minWidth: 300,
+              mr: "$2",
+              minWidth: 230,
             }}>
             <Flex
               css={{
@@ -297,40 +469,201 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
+                textAlign: "center",
               }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_2"].name}
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
+                {products["scale_1"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
-              <Link
-                href="/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                passHref
-                legacyBehavior>
-                <Button
-                  as="a"
-                  size="3"
-                  onClick={() => {
-                    router.push(
-                      "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                    );
-                  }}
-                  variant="green">
-                  Contact Us
-                </Button>
-              </Link>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
+              <PlanForm
+                text={
+                  dashboard
+                    ? newStripeProductId === "scale_1"
+                      ? "Current plan"
+                      : newStripeProductId === "scale_1"
+                      ? "Select"
+                      : "Select"
+                    : "Sign up"
+                }
+                disabled={
+                  dashboard && newStripeProductId === "scale_1" ? true : false
+                }
+                variant="primary"
+                bc="$sage12"
+                color="$loContrast"
+                stripeProductId="scale_1"
+                onClick={() => {
+                  if (dashboard) {
+                    setIsTourOpen(false);
+                  } else {
+                    router.push("/register?selectedPlan=2");
+                  }
+                }}
+              />
             </Flex>
 
             <List>
-              <Item title={<span>Custom pricing available</span>} />
-              <Item title={<span>Coming soon</span>} />
               <Item
-                title={<span>Custom pricing available</span>}
-                css={{ borderBottom: 0 }}
+                displayCheck={false}
+                css={{ borderColor: "$neutral5" }}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>20,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $5 for every additional 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
               />
               <Item
-                title={<span>Custom pricing available</span>}
+                displayCheck={false}
+                css={{ borderColor: "$neutral5" }}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>50,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $3 for every additional 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
+              />
+              <Item
+                displayCheck={false}
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={
+                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                    <span>500,000 minutes</span>
+                    <Tooltip
+                      multiline
+                      content="Then $0.40 for every additional 1,000 minutes">
+                      <Flex
+                        css={{
+                          borderRadius: 1000,
+                          bc: "$sage12",
+                          color: "$loContrast",
+                          width: 18,
+                          height: 18,
+                          fontSize: "$1",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "default",
+                          ml: "$2",
+                        }}>
+                        $
+                      </Flex>
+                    </Tooltip>
+                  </Flex>
+                }
+              />
+              <Item
+                css={{ borderBottom: 0, fontSize: "11px" }}
+                displayCheck={false}
+                title={"*Pay as you go past alloted minutes"}
+              />
+            </List>
+          </Box>
+
+          <Box
+            css={{
+              borderRadius: 16,
+              p: "$4",
+              width: "12%",
+              minWidth: 230,
+              mr: "$2",
+              background: "$green7",
+            }}>
+            <Flex
+              css={{
+                mb: "$4",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: 116,
+                textAlign: "center",
+              }}>
+              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
+                {products["prod_4"].name}
+              </Heading>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
+              <Button
+                as="a"
+                size="3"
+                onClick={() => setOpen(true)}
+                css={{
+                  background: "$sage12",
+                  border: "none",
+                  color: "$loContrast",
+                  cursor: "pointer",
+                  borderRadius: "$3",
+                  "&:hover": {
+                    boxShadow: "none",
+                    background: "$sage12",
+                    color: "$loContrast",
+                  },
+                }}>
+                Contact Us
+              </Button>
+              <ContactDialog open={open} setOpen={setOpen} />
+            </Flex>
+
+            <List>
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Custom pricing</span>
+                  </Flex>
+                }
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Custom pricing</span>
+                  </Flex>
+                }
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Custom pricing</span>
+                  </Flex>
+                }
                 css={{ borderBottom: 0 }}
               />
+              <Item css={{ borderBottom: 0 }} displayCheck={false} title={""} />
             </List>
           </Box>
         </Flex>
@@ -343,10 +676,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             mx: "auto",
             fontStyle: "italic",
             color: "$hiContrast",
-          }}>
-          *Currently, we are not charging for this feature. We'll be sure to
-          reach out before we do.
-        </Container>
+          }}></Container>
       </Box>
     </>
   );

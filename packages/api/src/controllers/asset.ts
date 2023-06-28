@@ -15,6 +15,8 @@ import {
   pathJoin,
   getObjectStoreS3Config,
   reqUseReplica,
+  isValidBase64,
+  mapInputCreatorId,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -104,12 +106,62 @@ function cleanAssetTracks(asset: WithID<Asset>) {
       };
 }
 
+function anyMatchesRegexOrPrefix(
+  arr: (string | RegExp)[],
+  value: string
+): boolean {
+  for (const item of arr) {
+    if (item instanceof RegExp && item.test(value)) {
+      return true;
+    }
+    if (typeof item === "string" && value.startsWith(item)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function parseUrlToDStorageUrl(
+  url: string,
+  { trustedIpfsGateways, trustedArweaveGateways }: CliArgs
+): string {
+  const urlObj = new URL(url);
+  const path = urlObj.pathname;
+
+  let pathElements = path.split("/");
+  if (pathElements.length > 0 && pathElements[0] === "") {
+    pathElements = pathElements.slice(1);
+  }
+
+  const isIpfs = pathElements.length >= 2 && pathElements[0] === "ipfs";
+  if (isIpfs) {
+    const isTrusted = anyMatchesRegexOrPrefix(trustedIpfsGateways, url);
+    if (!isTrusted) {
+      return null;
+    }
+
+    const cidPath = pathElements.slice(1).join("/");
+    return `ipfs://${cidPath}`;
+  }
+
+  const isArweave =
+    pathElements.length >= 1 &&
+    anyMatchesRegexOrPrefix(trustedArweaveGateways, url);
+  if (isArweave) {
+    const txIdPath = pathElements.join("/");
+    return `ar://${txIdPath}`;
+  }
+
+  return null;
+}
+
 async function validateAssetPayload(
   id: string,
   playbackId: string,
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
+  config: CliArgs,
   payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
@@ -130,10 +182,18 @@ async function validateAssetPayload(
     createdAt
   );
 
-  const creatorId =
-    typeof payload.creatorId === "string"
-      ? ({ type: "unverified", value: payload.creatorId } as const)
-      : payload.creatorId;
+  // Transform IPFS and Arweave gateway URLs into native protocol URLs
+  if (source.type === "url") {
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, config);
+
+    if (dStorageUrl) {
+      source = {
+        type: "url",
+        url: dStorageUrl,
+        gatewayUrl: source.url,
+      };
+    }
+  }
 
   return {
     id,
@@ -147,7 +207,7 @@ async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    creatorId,
+    creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
     storage: storageInputToState(payload.storage),
@@ -155,7 +215,7 @@ async function validateAssetPayload(
 }
 
 async function validateAssetPlaybackPolicy(
-  { playbackPolicy, objectStoreId }: Partial<NewAssetPayload>,
+  { playbackPolicy, objectStoreId, encryption }: Partial<NewAssetPayload>,
   playbackId: string,
   userId: string,
   createdAt: number
@@ -192,6 +252,13 @@ async function validateAssetPlaybackPolicy(
     if (webhook.userId !== userId) {
       throw new BadRequestError(
         `webhook ${playbackPolicy.webhookId} not found`
+      );
+    }
+  }
+  if (encryption?.encryptedKey) {
+    if (!playbackPolicy) {
+      throw new BadRequestError(
+        `a playbackPolicy is required when using encryption`
       );
     }
   }
@@ -292,7 +359,8 @@ export async function withPlaybackUrls(
   asset: WithID<Asset>,
   os?: ObjectStore
 ): Promise<WithID<Asset>> {
-  if (asset.status.phase !== "ready") {
+  if (asset.files?.length < 1) {
+    // files is only set when playback is available
     return asset;
   }
   try {
@@ -303,8 +371,10 @@ export async function withPlaybackUrls(
   }
   return {
     ...asset,
+    ...(asset.status.phase === "ready" && {
+      downloadUrl: getDownloadUrl(config, ingest, asset, os),
+    }),
     playbackUrl: getPlaybackUrl(config, ingest, asset, os),
-    downloadUrl: getDownloadUrl(config, ingest, asset, os),
   };
 }
 
@@ -679,7 +749,13 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     });
   }
   if (encryption) {
-    await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+    if (encryption.encryptedKey) {
+      if (!isValidBase64(encryption.encryptedKey)) {
+        return res.status(422).json({
+          errors: [`"encryptedKey" must be valid base64`],
+        });
+      }
+    }
   }
 
   const id = uuid();
@@ -690,6 +766,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req),
+    req.config,
     req.body,
     { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
   );
@@ -770,6 +847,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     defaultObjectStoreId(req, true), // transcode only in old pipeline for now
+    req.config,
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -818,7 +896,13 @@ app.post(
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     const { encryption } = req.body as NewAssetPayload;
     if (encryption) {
-      await ensureExperimentSubject("vod-encrypted-input", req.user.id);
+      if (encryption.encryptedKey) {
+        if (!isValidBase64(encryption.encryptedKey)) {
+          return res.status(422).json({
+            errors: [`encryptedKey must be valid base64`],
+          });
+        }
+      }
     }
 
     let asset = await validateAssetPayload(
@@ -827,6 +911,7 @@ app.post(
       req.user.id,
       Date.now(),
       defaultObjectStoreId(req),
+      req.config,
       req.body,
       {
         type: "directUpload",
@@ -1060,6 +1145,7 @@ app.patch(
       name,
       playbackPolicy,
       storage: storageInput,
+      creatorId,
     } = req.body as AssetPatchPayload;
 
     // update a specific asset
@@ -1113,9 +1199,79 @@ app.patch(
       name,
       storage,
       playbackPolicy,
+      creatorId: mapInputCreatorId(creatorId),
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
+  }
+);
+
+// TODO: create migration API to parse and migrate gateway URL of existing
+// assets in the DB.
+
+app.post(
+  "/migrate/dstorage-urls",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    // parse limit from querystring
+    const limit = parseInt(req.query.limit?.toString() || "1000");
+    const urlPrefix = req.query.urlPrefix?.toString() || "https://arweave.net/";
+    const urlLike = req.query.urlLike?.toString() || urlPrefix + "%";
+    const from = req.query.from?.toString();
+
+    const [assets] = await db.asset.find(
+      [
+        sql`data->'source'->>'url' LIKE ${urlLike}`,
+        ...(!from ? [] : [sql`data->'source'->>'url' > ${from}`]),
+      ],
+      { limit, order: parseOrder(fieldsMap, "sourceUrl-false") }
+    );
+
+    let tasks: Promise<WithID<Asset>>[] = [];
+    let results: WithID<Asset>[] = [];
+    let last: string;
+    for (const asset of assets) {
+      if (asset.source.type !== "url") {
+        continue;
+      }
+
+      // Transform IPFS and Arweave gateway URLs into native protocol URLs
+      const url = (last = asset.source.url);
+      const dStorageUrl = parseUrlToDStorageUrl(url, req.config);
+
+      if (dStorageUrl) {
+        const source = {
+          type: "url",
+          url: dStorageUrl,
+          gatewayUrl: url,
+        } as const;
+
+        tasks.push(
+          db.asset
+            .update(asset.id, { source })
+            .then(() => db.asset.get(asset.id))
+        );
+      }
+
+      if (tasks.length >= 3) {
+        results = results.concat(await Promise.all(tasks));
+        tasks = [];
+      }
+    }
+    if (tasks.length > 0) {
+      results = results.concat(await Promise.all(tasks));
+    }
+
+    res.status(200).json({
+      migrated: results.length,
+      total: assets.length,
+      last,
+      assets: results.map(({ id, playbackId, source }) => ({
+        id,
+        playbackId,
+        source,
+      })),
+    });
   }
 );
 

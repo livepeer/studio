@@ -22,7 +22,15 @@ import { useForm } from "react-hook-form";
 import Spinner from "components/Spinner";
 import { useTheme } from "next-themes";
 
-const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
+const PlanForm = ({
+  stripeProductId,
+  text,
+  variant,
+  disabled,
+  onClick,
+  bc,
+  color,
+}) => {
   const { user, updateSubscription } = useApi();
   const [status, setStatus] = useState("initial");
   const stripe = useStripe();
@@ -185,9 +193,20 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
         <Flex css={{ ai: "center" }}>
           <Button
             size="3"
-            css={{ width: "100%" }}
+            css={{
+              width: "100%",
+              background: bc,
+              color: color,
+              borderRadius: "$3",
+              cursor: "pointer",
+              "&:hover": {
+                boxShadow: "none",
+                background: bc,
+                color: color,
+              },
+            }}
             disabled={disabled}
-            variant={variant}
+            variant="primary"
             onClick={() => {
               onClick();
               setOpen(true);
@@ -215,7 +234,9 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 <Box
                   css={{ mt: "$4", lineHeight: "22px", color: "$hiContrast" }}>
                   <Box>
-                    <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
+                    <Label
+                      css={{ mb: "$1", display: "block", textAlign: "left" }}
+                      htmlFor="name">
                       Full name
                     </Label>
                     <TextField
@@ -239,7 +260,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     }}>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="email">
                         Email
                       </Label>
@@ -256,7 +277,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     </Box>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="phone">
                         Phone
                       </Label>
@@ -274,7 +295,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   </Grid>
                   <Box>
                     <Label
-                      css={{ mb: "$1", display: "block" }}
+                      css={{ mb: "$1", display: "block", textAlign: "left" }}
                       htmlFor="address">
                       Address
                     </Label>
@@ -299,7 +320,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     }}>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="city">
                         City
                       </Label>
@@ -316,7 +337,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     </Box>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="State">
                         State
                       </Label>
@@ -333,7 +354,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     </Box>
                     <Box>
                       <Label
-                        css={{ mb: "$1", display: "block" }}
+                        css={{ mb: "$1", display: "block", textAlign: "left" }}
                         htmlFor="postalCode">
                         ZIP
                       </Label>
@@ -356,6 +377,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       color: "$hiContrast",
                       fontWeight: 500,
                       mb: "$1",
+                      textAlign: "left",
                     }}>
                     Card
                   </Box>
@@ -406,9 +428,12 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 <Box css={{ mt: "$4" }}>
                   <Text variant="neutral">
                     You are currently using the{" "}
-                    {products[user.stripeProductId].name} plan. Do you want to{" "}
+                    {products[user.newStripeProductId]?.name ||
+                      products[stripeProductId]?.name}{" "}
+                    plan. Do you want to{" "}
                     {products[stripeProductId].order <
-                    products[user.stripeProductId].order
+                      products[user.newStripeProductId]?.order ||
+                    products[stripeProductId]?.order
                       ? "downgrade"
                       : "upgrade"}{" "}
                     to the {products[stripeProductId].name} plan?

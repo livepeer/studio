@@ -23,6 +23,7 @@ import {
   StreamIcon,
   TerminalIcon,
   BillingIcon,
+  UsageIcon,
   AssetsIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
@@ -65,6 +66,7 @@ export type SidebarId =
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
+  | "usage"
   | "billing"
   | "billing/plans";
 
@@ -225,6 +227,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 </Link>
               </Box>
             )}
+          </Box>
+
+          <Box>
+            <Link href="/dashboard/usage" passHref legacyBehavior>
+              <NavLink active={id === "usage"}>
+                <UsageIcon active={id === "usage"} />
+                Usage
+              </NavLink>
+            </Link>
           </Box>
 
           <Box>

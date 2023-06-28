@@ -64,7 +64,7 @@ export class TaskScheduler {
   }
 
   async handleTaskQueue(data: ConsumeMessage) {
-    let event: messages.TaskResult;
+    let event: messages.TaskResult | messages.TaskResultPartial;
     try {
       event = JSON.parse(data.content.toString());
       console.log(
@@ -79,7 +79,13 @@ export class TaskScheduler {
 
     let ack: boolean;
     try {
-      ack = await this.processTaskEvent(event);
+      if (event.type === "task_result") {
+        ack = await this.processTaskEvent(event);
+      } else if (event.type === "task_result_partial") {
+        ack = await this.processTaskResultPartial(event);
+      } else {
+        throw new Error("unknown event type: " + (event as any).type);
+      }
     } catch (err) {
       ack = true;
       console.log("handleTaskQueue Error ", err);
@@ -196,6 +202,22 @@ export class TaskScheduler {
           });
         }
         break;
+      case "export-data":
+        if (task.params.exportData.type === "attestation") {
+          db.attestation.update(task.params.exportData.id, {
+            storage: {
+              ipfs: {
+                cid: event.output.exportData.ipfs.cid,
+                updatedAt: Date.now(),
+              },
+              status: {
+                phase: "ready",
+                tasks: { last: task.id },
+              },
+            },
+          });
+        }
+        break;
     }
     await this.updateTask(task, {
       status: {
@@ -204,6 +226,36 @@ export class TaskScheduler {
       },
       output: event.output,
     });
+    return true;
+  }
+
+  async processTaskResultPartial(
+    event: messages.TaskResultPartial
+  ): Promise<boolean> {
+    const tasks = await db.task.find({ id: event.task.id });
+    if (!tasks?.length || !tasks[0].length) {
+      console.log(`task event process error: task ${event.task.id} not found`);
+      return true;
+    }
+    const task = tasks[0][0];
+
+    const asset = await db.asset.get(task.outputAssetId);
+    await this.updateAsset(task.outputAssetId, {
+      sourcePlaybackReady: true,
+      files: event.output.upload.assetSpec.files,
+      status: {
+        ...asset.status,
+        updatedAt: Date.now(),
+      },
+    });
+    await this.updateTask(task, {
+      sourceReadyAt: Date.now(),
+      status: {
+        ...task.status,
+        updatedAt: Date.now(),
+      },
+    });
+
     return true;
   }
 
@@ -278,6 +330,18 @@ export class TaskScheduler {
                   last: inputAsset.storage.status.tasks.last,
                   failed: task.id,
                 },
+              },
+            },
+          });
+        }
+        break;
+      case "export-data":
+        if (task.params.exportData.type === "attestation") {
+          db.attestation.update(task.params.exportData.id, {
+            storage: {
+              status: {
+                phase: "failed",
+                tasks: { failed: task.id },
               },
             },
           });
@@ -383,7 +447,7 @@ export class TaskScheduler {
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "scheduledAt" | "status" | "output">,
+    updates: Pick<Task, "scheduledAt" | "status" | "output" | "sourceReadyAt">,
     filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
     updates = this.deleteCredentials(task, updates);

@@ -8,6 +8,7 @@ import {
   Text,
   styled,
   Skeleton,
+  Tooltip,
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
@@ -15,13 +16,14 @@ import UpcomingIcon from "../../public/img/icons/upcoming.svg";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
+import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
   color: "$gray",
 });
 
-const UsageCard = ({ title, usage, limit, loading = false }) => {
+export const UsageCard = ({ title, usage, limit, loading = false }) => {
   return (
     <Box
       css={{
@@ -41,16 +43,18 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
             fd: "column",
             gap: "$3",
           }}>
-          <Skeleton variant="title" css={{ width: "50%" }} />
           <Skeleton variant="heading" css={{ width: "25%" }} />
+          <Skeleton variant="title" css={{ width: "50%", mr: "$3" }} />
         </Box>
       ) : (
         <>
-          <Box css={{ mb: "$2", color: "$hiContrast" }}>{title}</Box>
+          <Flex align="center">
+            <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
+              {title}
+            </Box>
+          </Flex>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
-            {limit && <Box css={{ mx: "$1" }}>/</Box>}
-            {limit && <Box>{limit}</Box>}
           </Flex>
         </>
       )}
@@ -59,8 +63,13 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
 };
 
 const UsageSummary = () => {
-  const { user, getUsage, getSubscription, getInvoices, getUserProduct } =
-    useApi();
+  const {
+    user,
+    getBillingUsage,
+    getSubscription,
+    getInvoices,
+    getUserProduct,
+  } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
@@ -76,7 +85,10 @@ const UsageSummary = () => {
     };
 
     const doGetUsage = async (fromTime, toTime, userId) => {
-      const [res, usage] = await getUsage(fromTime, toTime, userId);
+      const [res, usage] = await getBillingUsage(
+        fromTime * 1000,
+        toTime * 1000
+      );
       if (res.status == 200) {
         setUsage(usage);
       }
@@ -121,12 +133,24 @@ const UsageSummary = () => {
               }}>
               Usage
             </Box>
+            <Flex align="center" css={{ mr: "$3" }}>
+              <Tooltip
+                multiline
+                content={
+                  <Box>
+                    Usage minutes may take up to an hour to be reflected.
+                  </Box>
+                }>
+                <Help />
+              </Tooltip>
+            </Flex>
             <Badge
               size="1"
               variant="neutral"
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
-                ? products[user.stripeProductId].name
+                ? products[user.newStripeProductId]?.name ||
+                  products[user.stripeProductId]?.name
                 : products["prod_0"].name}{" "}
               Plan
             </Badge>
@@ -158,17 +182,26 @@ const UsageSummary = () => {
         <UsageCard
           title="Transcoding minutes"
           loading={!usage}
-          usage={
-            usage &&
-            (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
-          }
+          usage={usage && usage.TotalUsageMins.toFixed(2).toLocaleString()}
+          limit={!products[user.stripeProductId]?.order ? 1000 : false}
+        />
+        <UsageCard
+          title="Delivery minutes"
+          loading={!usage}
+          usage={usage && usage.DeliveryUsageMins.toFixed(2).toLocaleString()}
+          limit={!products[user.stripeProductId]?.order ? 10000 : false}
+        />
+        <UsageCard
+          title="Storage minutes"
+          loading={!usage}
+          usage={usage && usage.StorageUsageMins.toFixed(2).toLocaleString()}
           limit={!products[user.stripeProductId]?.order ? 1000 : false}
         />
       </Grid>
       <Flex
         justify="between"
         align="center"
-        css={{ fontSize: "$3", color: "$hiContrast" }}>
+        css={{ fontSize: "$3", color: "$hiContrast", display: "none" }}>
         <Text variant="neutral" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
           Upcoming invoice:{" "}

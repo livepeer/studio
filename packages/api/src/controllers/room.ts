@@ -220,6 +220,54 @@ app.delete("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
   res.status(204).end();
 });
 
+app.get("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
+  await getRoom(req);
+
+  const svc = new RoomServiceClient(
+    req.config.livekitHost,
+    req.config.livekitApiKey,
+    req.config.livekitSecret
+  );
+  const participant = await svc.getParticipant(
+    req.params.roomId,
+    req.params.participantId
+  );
+
+  res.status(200);
+  res.json({
+    id: participant.identity,
+    state: participant.state,
+    joinedAt: participant.joinedAt,
+    name: participant.name,
+    permission: participant.permission,
+    isPublisher: participant.isPublisher,
+  });
+});
+
+app.put(
+  "/:roomId/user/:participantId",
+  authorizer({}),
+  validatePost("room-user-update-payload"),
+  async (req, res) => {
+    await getRoom(req);
+
+    const svc = new RoomServiceClient(
+      req.config.livekitHost,
+      req.config.livekitApiKey,
+      req.config.livekitSecret
+    );
+    await svc.updateParticipant(
+      req.params.roomId,
+      req.params.participantId,
+      undefined,
+      req.body.canPublish !== undefined
+        ? ({ canPublish: req.body.canPublish } as any)
+        : undefined
+    );
+    res.status(204).end();
+  }
+);
+
 // Implement a webhook handler to receive webhooks from Livekit to update our state with room and participant details.
 app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
   const receiver = new WebhookReceiver(

@@ -17,9 +17,72 @@ import { PlaybackPolicy } from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeout } from "../util";
+import fetch from "node-fetch";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const app = Router();
+
+async function fireGateWebhook(
+  webhook: DBWebhook,
+  plabackPolicy: PlaybackPolicy,
+  accessKey: string
+) {
+  let timestamp = Date.now();
+  let params = {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "user-agent": "livepeer.studio",
+    },
+    timeout: WEBHOOK_TIMEOUT,
+    body: JSON.stringify({
+      context: plabackPolicy.webhookContext,
+      accessKey: accessKey,
+      timestamp: timestamp,
+    }),
+  };
+
+  const sigHeaders = signatureHeaders(
+    params.body,
+    webhook.sharedSecret,
+    timestamp
+  );
+  params.headers = { ...params.headers, ...sigHeaders };
+
+  const startTime = process.hrtime();
+  let resp: Response;
+  let errorMessage: string;
+  let statusCode: number;
+
+  try {
+    resp = await fetchWithTimeout(webhook.url, params);
+    // TODO: remember to handle redirects
+    statusCode = resp.status;
+
+    if (resp.status < 200 || resp.status >= 300) {
+      console.error(
+        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
+      );
+      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`;
+    }
+  } catch (e) {
+    errorMessage = e.message;
+    statusCode = 0;
+  } finally {
+    await storeTriggerStatus(
+      webhook,
+      timestamp,
+      statusCode,
+      errorMessage,
+      undefined
+    );
+    if (resp) {
+      // Dispose of the response body
+      await resp.text();
+    }
+  }
+  return statusCode;
+}
 
 app.use("/signing-key", signingKeyApp);
 
@@ -159,66 +222,34 @@ app.post(
   }
 );
 
-async function fireGateWebhook(
-  webhook: DBWebhook,
-  plabackPolicy: PlaybackPolicy,
-  accessKey: string
-) {
-  let timestamp = Date.now();
-  let params = {
-    method: "POST",
+app.get("/public-key", async (req, res) => {
+  const { catalystBaseUrl } = req.config;
+
+  let url = `${catalystBaseUrl}/api/pubkey`;
+  let options = {
+    method: "GET",
     headers: {
-      "content-type": "application/json",
-      "user-agent": "livepeer.studio",
+      "Content-Type": "application/json",
     },
-    timeout: WEBHOOK_TIMEOUT,
-    body: JSON.stringify({
-      context: plabackPolicy.webhookContext,
-      accessKey: accessKey,
-      timestamp: timestamp,
-    }),
   };
 
-  const sigHeaders = signatureHeaders(
-    params.body,
-    webhook.sharedSecret,
-    timestamp
-  );
-  params.headers = { ...params.headers, ...sigHeaders };
-
-  const startTime = process.hrtime();
-  let resp: Response;
-  let errorMessage: string;
-  let statusCode: number;
-
-  try {
-    resp = await fetchWithTimeout(webhook.url, params);
-    // TODO: remember to handle redirects
-    statusCode = resp.status;
-
-    if (resp.status < 200 || resp.status >= 300) {
-      console.error(
-        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
-      );
-      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`;
-    }
-  } catch (e) {
-    errorMessage = e.message;
-    statusCode = 0;
-  } finally {
-    await storeTriggerStatus(
-      webhook,
-      timestamp,
-      statusCode,
-      errorMessage,
-      undefined
-    );
-    if (resp) {
-      // Dispose of the response body
-      await resp.text();
-    }
-  }
-  return statusCode;
-}
+  await fetch(url, options)
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        throw new Error(
+          `access-control: error retrieving public key from catalyst statusCode=${response.status} catalystUrl=${url}`
+        );
+      }
+    })
+    .then((responseJson) => {
+      res.status(200).json(responseJson);
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "Unable to retrieve public key" });
+    });
+});
 
 export default app;

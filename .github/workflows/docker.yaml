@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.build.package }} docker image generation
+    name: ${{ matrix.build.package }} builds
     if:
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository
@@ -70,15 +70,16 @@ jobs:
             ${{ matrix.build.image }}
             ghcr.io/${{ github.repository }}/${{ matrix.build.package }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=ref,event=pr
             type=sha
+            type=ref,event=pr
+            type=ref,event=tag
             type=sha,format=long
+            type=ref,event=branch
             type=semver,pattern={{version}},prefix=v
             type=semver,pattern={{major}}.{{minor}},prefix=v
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ github.event.pull_request.head.ref }}
+            type=raw,value=stable,enable=${{ startsWith(github.event.ref, 'refs/tags/v') }}
 
       - name: Build and push livepeer docker image
         uses: docker/build-push-action@v3

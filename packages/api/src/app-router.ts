@@ -25,6 +25,7 @@ import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
+import * as fcl from "@onflow/fcl";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -52,10 +53,10 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
 
 export default async function makeApp(params: CliArgs) {
   const {
-    httpPrefix = "/api",
+    httpPrefix,
     postgresUrl,
     postgresReplicaUrl,
-    frontendDomain = "livepeer.studio",
+    frontendDomain,
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
@@ -74,7 +75,7 @@ export default async function makeApp(params: CliArgs) {
     broadcasters = [],
     ingest = [],
     prices = [],
-    corsJwtAllowlist = [`https://${frontendDomain}`],
+    corsJwtAllowlist,
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,
@@ -260,6 +261,12 @@ export default async function makeApp(params: CliArgs) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
   app.use(errorHandler());
+
+  // These parameters are required to use the fcl library, even though we don't use on-chain verification
+  await fcl.config({
+    "flow.network": "testnet",
+    "accessNode.api": "https://access-testnet.onflow.org",
+  });
 
   return {
     router: app,

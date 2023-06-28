@@ -40,6 +40,7 @@ declare global {
       taskScheduler?: TaskScheduler;
       stripe?: Stripe;
       frontendDomain: string;
+      catalystBaseUrl: string;
       user?: User;
       isUIAdmin?: boolean;
       token?: WithID<ApiToken>;
