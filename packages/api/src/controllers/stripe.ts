@@ -111,8 +111,8 @@ app.post("/webhook", async (req, res) => {
     if (payAsYouGoPlans.includes(user.stripeProductId)) {
       let usage = await getBillingUsage(
         user.id,
-        invoice.period_start,
-        invoice.period_end
+        1685311200000, //invoice.period_start, // TMP Fixed billing cycle to test usage
+        1687989600000 //invoice.period_end // TMP Fixed billing cycle to test usage
       );
       let overUsage = await calculateOverUsage(user.stripeProductId, usage);
 

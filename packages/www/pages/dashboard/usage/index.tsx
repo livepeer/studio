@@ -89,8 +89,8 @@ const Usage = () => {
       toTime: any,
       status: any
     ) => {
-      fromTime = fromTime * 1000;
-      toTime = toTime * 1000;
+      fromTime = 1685311200000; // fromTime * 1000; // TMP fixed billing cycle
+      toTime = 1687989600000; // toTime * 1000; // TMP fixed billing cycle
 
       // if subscription is cancelled, get current month data
       if (status === "canceled") {

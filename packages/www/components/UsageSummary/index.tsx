@@ -101,8 +101,8 @@ const UsageSummary = () => {
     };
 
     const doGetUsage = async (fromTime, toTime, status) => {
-      fromTime = fromTime * 1000;
-      toTime = toTime * 1000;
+      fromTime = 1685311200000; // fromTime * 1000; // TMP Fixed billing cycle to test usage
+      toTime = 1687989600000; // toTime * 1000; // TMP Fixed billing cycle to test usage
 
       if (status === "canceled") {
         const now = new Date();

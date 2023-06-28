@@ -148,6 +148,7 @@ async function createSubscription(
   });
   return await stripe.subscriptions.create({
     cancel_at_period_end: false,
+    backdate_start_date: 1685311200, // TEMPORARY BACKDATE TO TEST BILLING
     customer: stripeCustomerId,
     items: prices.data.map((item) => ({ price: item.id })),
     expand: ["latest_invoice.payment_intent"],
