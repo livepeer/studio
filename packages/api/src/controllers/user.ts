@@ -1085,10 +1085,19 @@ app.post(
     if (req.user.stripeCustomerId !== stripeCustomerId) {
       return res.status(403).json({ errors: ["access forbidden"] });
     }
+
+    let subscriptionItems = await req.stripe.subscriptionItems.list({
+      subscription: req.user.stripeCustomerSubscriptionId,
+    });
+
     const invoices = await req.stripe.invoices.retrieveUpcoming({
       customer: stripeCustomerId,
     });
-    res.status(200).json(invoices);
+
+    res.status(200).json({
+      invoices,
+      subscriptionItems,
+    });
   }
 );
 

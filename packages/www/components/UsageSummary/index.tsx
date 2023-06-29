@@ -143,8 +143,8 @@ const UsageSummary = () => {
         const oBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(oBill);
         let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
-        setUpcomingInvoice(uInvoice);
-        setUpcomingInvoiceTotal(upcomingInvoice.amount_due / 100);
+        setUpcomingInvoice(uInvoice?.invoice);
+        setUpcomingInvoiceTotal((uInvoice?.invoice.amount_due / 100) | 0);
       }
     };
 

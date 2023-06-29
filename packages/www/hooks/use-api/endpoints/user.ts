@@ -236,7 +236,7 @@ export const getBillingUsage = async (
 
 export const getUpcomingInvoice = async (
   stripeCustomerId: string
-): Promise<[Response, UpcomingInvoice | ApiError]> => {
+): Promise<[Response, any | ApiError]> => {
   let [res, invoice] = await context.fetch(`/user/retrieve-upcoming-invoice`, {
     method: "POST",
     body: JSON.stringify({ stripeCustomerId }),
@@ -245,7 +245,7 @@ export const getUpcomingInvoice = async (
     },
   });
 
-  return [res, invoice as UpcomingInvoice | ApiError];
+  return [res, invoice as any | ApiError];
 };
 
 export const makeUserAdmin = async (
