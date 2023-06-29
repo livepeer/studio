@@ -33,7 +33,7 @@ const UpcomingInvoiceTable = ({
         <Tr>
           <Th>Transcoding</Th>
           <Td>
-            {usage && usage.TotalUsageMins.toFixed(0).toLocaleString()} minutes
+            {usage && parseInt(usage.TotalUsageMins).toLocaleString()} minutes
           </Td>
           <Td>{product.usage[0].limit.toLocaleString()} minutes</Td>
           <Td>${product.usage[0].price} / min</Td>
@@ -46,7 +46,7 @@ const UpcomingInvoiceTable = ({
         <Tr>
           <Th>Delivery</Th>
           <Td>
-            {usage && usage.DeliveryUsageMins.toFixed(0).toLocaleString()}{" "}
+            {usage && parseInt(usage.DeliveryUsageMins).toLocaleString()}{" "}
             minutes
           </Td>
           <Td>{product.usage[1].limit.toLocaleString()} minutes</Td>
@@ -59,8 +59,7 @@ const UpcomingInvoiceTable = ({
         <Tr>
           <Th>Storage</Th>
           <Td>
-            {usage && usage.StorageUsageMins.toFixed(0).toLocaleString()}{" "}
-            minutes
+            {usage && parseInt(usage.StorageUsageMins).toLocaleString()} minutes
           </Td>
           <Td>{product.usage[2].limit.toLocaleString()} minutes</Td>
           <Td>${product.usage[2].price} / min</Td>
