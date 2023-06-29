@@ -229,6 +229,17 @@ export const getBillingUsage = async (
   return [res, usage as BillingUsageData | ApiError];
 };
 
+export const getUpcomingInvoice = async (): Promise<
+  [Response, any | ApiError]
+> => {
+  let [res, invoice] = await context.fetch(
+    `/user/retrieve-upcoming-invoice`,
+    {}
+  );
+
+  return [res, invoice as any | ApiError];
+};
+
 export const makeUserAdmin = async (
   email,
   admin

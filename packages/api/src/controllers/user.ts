@@ -1077,6 +1077,22 @@ app.post(
 );
 
 app.post(
+  "/retrieve-upcoming-invoice",
+  authorizer({ noApiToken: true }),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerId } = req.body;
+    if (req.user.stripeCustomerId !== stripeCustomerId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const invoices = await req.stripe.invoices.retrieveUpcoming({
+      customer: stripeCustomerId,
+    });
+    res.status(200).json(invoices);
+  }
+);
+
+app.post(
   "/retrieve-payment-method",
   authorizer({ noApiToken: true }),
   requireStripe(),

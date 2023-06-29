@@ -77,6 +77,7 @@ const UsageSummary = () => {
   const {
     user,
     getBillingUsage,
+    getUpcomingInvoice,
     getSubscription,
     getInvoices,
     getUserProduct,
@@ -88,6 +89,7 @@ const UsageSummary = () => {
     null
   );
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
+  const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
   const product = getUserProduct(user);
   const prices = product.usage;
 
@@ -148,6 +150,8 @@ const UsageSummary = () => {
             overUsageBill.storageBill.total +
             planPrice
         );
+        let uInvoice = await getUpcomingInvoice();
+        setUpcomingInvoice(uInvoice);
       }
     };
 
