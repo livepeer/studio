@@ -24,7 +24,7 @@ const UpcomingInvoiceTable = ({
         <Tr>
           <Th>Item</Th>
           <Td>Usage</Td>
-          <Td>Limit</Td>
+          <Td>Plan Usage Limit</Td>
           <Td>Unit Price</Td>
           <Td>Amount Due</Td>
         </Tr>
@@ -33,8 +33,8 @@ const UpcomingInvoiceTable = ({
         <Tr>
           <Th>Monthly Subscription</Th>
           <Td></Td>
-          <Td>${price} / month</Td>
           <Td></Td>
+          <Td>${price} / month</Td>
           <Td>{usage && `$${price}`}</Td>
         </Tr>
         <Tr>

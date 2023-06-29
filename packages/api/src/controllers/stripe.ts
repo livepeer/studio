@@ -129,7 +129,7 @@ app.post("/webhook", async (req, res) => {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["transcoding_usage"],
               {
-                quantity: overUsage.TotalUsageMins,
+                quantity: overUsage.TotalUsageMins.toFixed(0),
                 timestamp: new Date().getTime() / 1000,
                 action: "set",
               }
@@ -138,7 +138,7 @@ app.post("/webhook", async (req, res) => {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["tstreaming_usage"],
               {
-                quantity: overUsage.DeliveryUsageMins,
+                quantity: overUsage.DeliveryUsageMins.toFixed(0),
                 timestamp: new Date().getTime() / 1000,
                 action: "set",
               }
@@ -147,7 +147,7 @@ app.post("/webhook", async (req, res) => {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["tstorage_usage"],
               {
-                quantity: overUsage.StorageUsageMins,
+                quantity: overUsage.StorageUsageMins.toFixed(0),
                 timestamp: new Date().getTime() / 1000,
                 action: "set",
               }
