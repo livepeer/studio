@@ -112,7 +112,7 @@ const Billing = () => {
         setOverUsageBill(oBill);
         let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
         setUpcomingInvoice(uInvoice?.invoices);
-        setUpcomingInvoiceTotal((uInvoice?.invoices.amount_due / 100) | 0);
+        setUpcomingInvoiceTotal((uInvoice?.invoices.total / 100) | 0);
       }
     };
 
@@ -398,7 +398,7 @@ const Billing = () => {
                 usage={usage}
                 overUsageBill={overUsageBill}
                 upcomingInvoice={upcomingInvoice}
-                prices={products[user.stripeProductId].usage}
+                product={products[user.stripeProductId]}
               />
             )
           )}
