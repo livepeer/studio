@@ -31,6 +31,13 @@ const UpcomingInvoiceTable = ({
       </Thead>
       <Tbody>
         <Tr>
+          <Th>{product.name} Plan</Th>
+          <Td></Td>
+          <Td></Td>
+          <Td>${price} / month</Td>
+          <Td>{usage && `$${price}`}</Td>
+        </Tr>
+        <Tr>
           <Th>Transcoding</Th>
           <Td>
             {usage && parseInt(usage.TotalUsageMins).toLocaleString()} minutes
@@ -67,13 +74,6 @@ const UpcomingInvoiceTable = ({
           <Td>
             {overUsageBill && `$${overUsageBill.storageBill.total.toFixed(2)}`}
           </Td>
-        </Tr>
-        <Tr>
-          <Th>Monthly Subscription</Th>
-          <Td></Td>
-          <Td></Td>
-          <Td>${price} / month</Td>
-          <Td>{usage && `$${price}`}</Td>
         </Tr>
         <Tr>
           <Th
