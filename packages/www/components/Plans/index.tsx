@@ -257,13 +257,13 @@ const Plans = ({
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "hacker_1"
+                    ? stripeProductId === "hacker_1"
                       ? "Current plan"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "hacker_1" ? true : false
+                  dashboard && stripeProductId === "hacker_1" ? true : false
                 }
                 variant="primary"
                 bc="$sage12"
@@ -333,15 +333,15 @@ const Plans = ({
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "growth_1"
+                    ? stripeProductId === "growth_1"
                       ? "Current plan"
-                      : newStripeProductId === "scale_1"
+                      : stripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "growth_1" ? true : false
+                  dashboard && stripeProductId === "growth_1" ? true : false
                 }
                 variant="primary"
                 bc="$sage12"
@@ -493,15 +493,15 @@ const Plans = ({
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "scale_1"
+                    ? stripeProductId === "scale_1"
                       ? "Current plan"
-                      : newStripeProductId === "scale_1"
+                      : stripeProductId === "scale_1"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "scale_1" ? true : false
+                  dashboard && stripeProductId === "scale_1" ? true : false
                 }
                 variant="primary"
                 bc="$sage12"
