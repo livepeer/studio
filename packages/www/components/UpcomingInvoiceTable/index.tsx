@@ -25,8 +25,8 @@ const UpcomingInvoiceTable = ({
           <Tr>
             <Th>Item</Th>
             <Td></Td>
-            <Td>Usage</Td>
-            <Td>Plan Usage Limit</Td>
+            <Td></Td>
+            <Td></Td>
             <Td>Unit Price</Td>
             <Td>Amount Due</Td>
           </Tr>
@@ -45,8 +45,8 @@ const UpcomingInvoiceTable = ({
           <Tr>
             <Th css={{ fontSize: "$2", fontWeight: 600 }}>Overage</Th>
             <Td></Td>
-            <Td></Td>
-            <Td></Td>
+            <Td css={{ fontSize: "$2", fontWeight: 600 }}>Usage</Td>
+            <Td css={{ fontSize: "$2", fontWeight: 600 }}>Plan Usage Limit</Td>
             <Td></Td>
             <Td>
               {usage &&
