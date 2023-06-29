@@ -1001,7 +1001,7 @@ app.post(
       if (products[payload.stripeProductId].payAsYouGo) {
         // Get the prices for the pay as you go product
         const payAsYouGoPrices = await req.stripe.prices.list({
-          lookup_keys: products[payload.stripeProductId].lookupKeys,
+          lookup_keys: products["pay_as_you_go_1"].lookupKeys,
         });
 
         // Map the prices to the additional items array
