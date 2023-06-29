@@ -50,10 +50,10 @@ const FileUploading = ({ progress }) => (
   </Flex>
 );
 
-const ProcessingProgress = ({ progress, playbackReady }) => (
+const ProcessingProgress = ({ progress, playbackUrl }) => (
   <Flex gap={1}>
     <UploadIcon /> Processing {Math.floor(progress * 100)}%
-    {playbackReady && (
+    {playbackUrl && (
       <Tooltip
         multiline
         content={
@@ -87,6 +87,7 @@ const CreatedAtCell = <D extends TableData>({
   const { id, date, fallback, asset } = cell.value;
   const { phase, errorMessage, progress } = asset.status;
   const isFileUploading = fileUploadProgress !== undefined;
+  const playbackUrl = asset.playbackUrl;
 
   useEffect(() => {
     // Has to fetch the file uploads from this cell, instead of from the table fetcher, to avoid fetching again assets too
@@ -101,12 +102,7 @@ const CreatedAtCell = <D extends TableData>({
     return <FailedProcessing id={id} errorMessage={errorMessage} />;
   }
   if (phase === "processing") {
-    return (
-      <ProcessingProgress
-        progress={progress}
-        playbackReady={asset.playbackUrl !== undefined}
-      />
-    );
+    return <ProcessingProgress progress={progress} playbackUrl={playbackUrl} />;
   }
   if (isFileUploading) {
     return <FileUploading progress={fileUploadProgress} />;
