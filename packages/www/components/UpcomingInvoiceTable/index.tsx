@@ -24,8 +24,9 @@ const UpcomingInvoiceTable = ({
         <Thead>
           <Tr>
             <Th>Plan</Th>
-            <Td></Td>
-            <Td></Td>
+            <Td> - </Td>
+            <Td> - </Td>
+            <Td> - </Td>
             <Td>Monthly Price</Td>
             <Td>Amount Due</Td>
           </Tr>
@@ -33,6 +34,7 @@ const UpcomingInvoiceTable = ({
         <Tbody>
           <Tr>
             <Th>{product.name} Plan</Th>
+            <Td></Td>
             <Td></Td>
             <Td></Td>
             <Td>${price} / month</Td>
@@ -49,7 +51,8 @@ const UpcomingInvoiceTable = ({
         }}>
         <Thead>
           <Tr>
-            <Th>Item</Th>
+            <Th></Th>
+            <Td>Item</Td>
             <Td>Usage</Td>
             <Td>Plan Usage Limit</Td>
             <Td>Unit Price</Td>
@@ -58,11 +61,12 @@ const UpcomingInvoiceTable = ({
         </Thead>
         <Tbody>
           <Tr>
-            <Th>Overage</Th>
+            <Th css={{ fontSize: "$2", fontWeight: 600 }}>Overage</Th>
             <Td></Td>
             <Td></Td>
             <Td></Td>
-            <Td>
+            <Td></Td>
+            <Td css={{ fontSize: "$2", fontWeight: 600 }}>
               {usage &&
                 `$${(
                   overUsageBill.transcodingBill.total +
@@ -72,7 +76,8 @@ const UpcomingInvoiceTable = ({
             </Td>
           </Tr>
           <Tr>
-            <Th>Transcoding</Th>
+            <Th></Th>
+            <Td>Transcoding</Td>
             <Td>
               {usage && parseInt(usage.TotalUsageMins).toLocaleString()} minutes
             </Td>
@@ -85,7 +90,8 @@ const UpcomingInvoiceTable = ({
             </Td>
           </Tr>
           <Tr>
-            <Th>Delivery</Th>
+            <Th></Th>
+            <Td>Delivery</Td>
             <Td>
               {usage && parseInt(usage.DeliveryUsageMins).toLocaleString()}{" "}
               minutes
@@ -99,7 +105,8 @@ const UpcomingInvoiceTable = ({
             </Td>
           </Tr>
           <Tr>
-            <Th>Storage</Th>
+            <Th></Th>
+            <Td>Storage</Td>
             <Td>
               {usage && parseInt(usage.StorageUsageMins).toLocaleString()}{" "}
               minutes
@@ -131,6 +138,7 @@ const UpcomingInvoiceTable = ({
                 day: "numeric",
               })}
             </Td>
+            <Td></Td>
             <Td></Td>
             <Td></Td>
             <Td css={{ fontSize: "$2", fontWeight: 600 }}>
