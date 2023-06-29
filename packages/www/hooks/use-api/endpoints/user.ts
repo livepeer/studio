@@ -229,13 +229,12 @@ export const getBillingUsage = async (
   return [res, usage as BillingUsageData | ApiError];
 };
 
-export const getUpcomingInvoice = async (): Promise<
-  [Response, any | ApiError]
-> => {
-  let [res, invoice] = await context.fetch(
-    `/user/retrieve-upcoming-invoice`,
-    {}
-  );
+export const getUpcomingInvoice = async (
+  stripeCustomerId: string
+): Promise<[Response, any | ApiError]> => {
+  let [res, invoice] = await context.fetch(`/user/retrieve-upcoming-invoice`, {
+    stripeCustomerId,
+  });
 
   return [res, invoice as any | ApiError];
 };

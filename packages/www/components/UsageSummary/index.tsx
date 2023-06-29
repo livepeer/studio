@@ -150,7 +150,7 @@ const UsageSummary = () => {
             oBill?.storageBill.total +
             planPrice
         );
-        let uInvoice = await getUpcomingInvoice();
+        let uInvoice = await getUpcomingInvoice(user.stripeCustomerId);
         setUpcomingInvoice(uInvoice);
       }
     };
