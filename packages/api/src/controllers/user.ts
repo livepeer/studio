@@ -1012,7 +1012,7 @@ app.post(
       updatedSubscription = await req.stripe.subscriptions.update(
         payload.stripeCustomerSubscriptionId,
         {
-          proration_behavior: "create_prorations", // bill at the end of the month
+          billing_cycle_anchor: "now", // reset billing anchor when updating subscription
           items: [
             ...subscriptionItems.data.map((item) => {
               // Check if the item is metered
