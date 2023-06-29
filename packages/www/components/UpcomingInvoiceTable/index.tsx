@@ -37,7 +37,7 @@ const UpcomingInvoiceTable = ({
         </Tr>
         <Tr>
           <Th>Transcoding</Th>
-          <Td>{usage && usage.TotalUsageMins.toFixed(2)} minutes</Td>
+          <Td>{usage && usage.TotalUsageMins.toFixed(0)} minutes</Td>
           <Td>${transcodingPrice} / min</Td>
           <Td>
             {overUsageBill &&
@@ -46,7 +46,7 @@ const UpcomingInvoiceTable = ({
         </Tr>
         <Tr>
           <Th>Delivery</Th>
-          <Td>{usage && usage.DeliveryUsageMins.toFixed(2)} minutes</Td>
+          <Td>{usage && usage.DeliveryUsageMins.toFixed(0)} minutes</Td>
           <Td>${deliveryPrice} / min</Td>
           <Td>
             {overUsageBill && `$${overUsageBill.deliveryBill.total.toFixed(2)}`}
@@ -54,7 +54,7 @@ const UpcomingInvoiceTable = ({
         </Tr>
         <Tr>
           <Th>Storage</Th>
-          <Td>{usage && usage.StorageUsageMins.toFixed(2)} minutes</Td>
+          <Td>{usage && usage.StorageUsageMins.toFixed(0)} minutes</Td>
           <Td>${storagePrice} / min</Td>
           <Td>
             {overUsageBill && `$${overUsageBill.storageBill.total.toFixed(2)}`}

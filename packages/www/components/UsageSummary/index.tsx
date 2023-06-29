@@ -304,21 +304,6 @@ const UsageSummary = () => {
             {usage && `$${upcomingInvoiceTotal}`}
           </Box>
         </Text>
-        <Text>
-          Pay as you go (overusage): {""}
-          <Box css={{ ml: "$1", fontWeight: 600 }}>
-            Transcoding minutes:{" "}
-            {overUsageBill && `$${overUsageBill.transcodingBill.total}`}
-          </Box>
-          <Box css={{ ml: "$1", fontWeight: 600 }}>
-            Delivery minutes:{" "}
-            {overUsageBill && `$${overUsageBill.deliveryBill.total}`}
-          </Box>
-          <Box css={{ ml: "$1", fontWeight: 600 }}>
-            Storage minutes:{" "}
-            {overUsageBill && `$${overUsageBill.storageBill.total}`}
-          </Box>
-        </Text>
         <Link href="/dashboard/billing" passHref legacyBehavior>
           <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
