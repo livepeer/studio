@@ -50,20 +50,22 @@ const FileUploading = ({ progress }) => (
   </Flex>
 );
 
-const ProcessingProgress = ({ progress }) => (
+const ProcessingProgress = ({ progress, playbackReady }) => (
   <Flex gap={1}>
     <UploadIcon /> Processing {Math.floor(progress * 100)}%
-    <Tooltip
-      multiline
-      content={
-        <Box>
-          Your video can now be played. In the background, it is converted into
-          several quality levels so that it can be played smoothly by all
-          viewers.
-        </Box>
-      }>
-      <Help />
-    </Tooltip>
+    {playbackReady && (
+      <Tooltip
+        multiline
+        content={
+          <Box>
+            Your video can now be played. In the background, it is converted
+            into several quality levels so that it can be played smoothly by all
+            viewers.
+          </Box>
+        }>
+        <Help />
+      </Tooltip>
+    )}
   </Flex>
 );
 
@@ -99,7 +101,12 @@ const CreatedAtCell = <D extends TableData>({
     return <FailedProcessing id={id} errorMessage={errorMessage} />;
   }
   if (phase === "processing") {
-    return <ProcessingProgress progress={progress} />;
+    return (
+      <ProcessingProgress
+        progress={progress}
+        playbackReady={asset.playbackUrl !== undefined}
+      />
+    );
   }
   if (isFileUploading) {
     return <FileUploading progress={fileUploadProgress} />;
