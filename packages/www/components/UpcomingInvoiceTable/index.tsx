@@ -23,8 +23,8 @@ const UpcomingInvoiceTable = ({
         }}>
         <Thead>
           <Tr>
-            <Th></Th>
-            <Td>Item</Td>
+            <Th>Item</Th>
+            <Td></Td>
             <Td>Usage</Td>
             <Td>Plan Usage Limit</Td>
             <Td>Unit Price</Td>
@@ -33,7 +33,9 @@ const UpcomingInvoiceTable = ({
         </Thead>
         <Tbody>
           <Tr>
-            <Th>{product.name} Plan</Th>
+            <Th css={{ fontSize: "$2", fontWeight: 600 }}>
+              {product.name} Plan
+            </Th>
             <Td></Td>
             <Td></Td>
             <Td></Td>
@@ -46,7 +48,7 @@ const UpcomingInvoiceTable = ({
             <Td></Td>
             <Td></Td>
             <Td></Td>
-            <Td css={{ fontSize: "$2", fontWeight: 600 }}>
+            <Td>
               {usage &&
                 `$${(
                   overUsageBill.transcodingBill.total +
