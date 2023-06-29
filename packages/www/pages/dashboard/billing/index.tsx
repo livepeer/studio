@@ -20,6 +20,17 @@ import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
 
+export interface OverUsageBill {
+  transcodingBill: OverUsageItem;
+  deliveryBill: OverUsageItem;
+  storageBill: OverUsageItem;
+}
+
+export interface OverUsageItem {
+  units: number;
+  total: number;
+}
+
 const Billing = () => {
   useLoggedIn();
   const {
@@ -29,10 +40,18 @@ const Billing = () => {
     getSubscription,
     getInvoices,
     getPaymentMethod,
+    getUserProduct,
+    getUpcomingInvoice,
   } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
+  const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
+  const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
+  const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
+    null
+  );
+  const product = getUserProduct(user);
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -63,12 +82,94 @@ const Billing = () => {
       }
     };
 
-    const doGetUsage = async (fromTime, toTime, userId) => {
-      const [res, usage] = await getUsage(fromTime, toTime, userId);
+    const doGetUsage = async (fromTime, toTime, status) => {
+      fromTime = 1685311200000; // fromTime * 1000; // TMP Fixed billing cycle to test usage
+      toTime = 1687989600000; // toTime * 1000; // TMP Fixed billing cycle to test usage
+
+      if (status === "canceled") {
+        const now = new Date();
+        fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        toTime = now.getTime();
+      }
+
+      let [
+        res,
+        usage = {
+          TotalUsageMins: 0,
+          DeliveryUsageMins: 0,
+          StorageUsageMins: 0,
+        },
+      ] = await getBillingUsage(fromTime, toTime);
+
       if (res.status == 200) {
         setUsage(usage);
+        doCaculateOverUsage(usage);
       }
     };
+
+    const doCaculateOverUsage = async (usage) => {
+      const overusage = await calculateOverUsage(product, usage);
+      if (overusage) {
+        const oBill = await calculateOverUsageBill(overusage);
+        setOverUsageBill(oBill);
+        let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
+        setUpcomingInvoice(uInvoice?.invoice);
+        setUpcomingInvoiceTotal((uInvoice?.invoice.amount_due / 100) | 0);
+      }
+    };
+
+    const calculateOverUsage = async (product, usage) => {
+      const limits = {
+        transcoding: product?.usage[0].limit,
+        streaming: product?.usage[1].limit,
+        storage: product?.usage[2].limit,
+      };
+
+      const overUsage = {
+        TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
+        DeliveryUsageMins: Math.max(
+          usage?.DeliveryUsageMins - limits.streaming,
+          0
+        ),
+        StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
+      };
+
+      return overUsage;
+    };
+
+    const calculateOverUsageBill = async (overusage) => {
+      const payAsYouGoData = products["prod_O9XuWMU1Up6QKf"];
+
+      const overUsageBill: OverUsageBill = {
+        transcodingBill: {
+          units: overusage.TotalUsageMins,
+          total: Number(
+            (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
+              2
+            )
+          ),
+        },
+        deliveryBill: {
+          units: overusage.DeliveryUsageMins,
+          total: Number(
+            (
+              overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
+            ).toFixed(2)
+          ),
+        },
+        storageBill: {
+          units: overusage.StorageUsageMins,
+          total: Number(
+            (
+              overusage.StorageUsageMins * payAsYouGoData.usage[2].price
+            ).toFixed(2)
+          ),
+        },
+      };
+
+      return overUsageBill;
+    };
+
     const getSubscriptionAndUsage = async (subscriptionId) => {
       const [res, subscription] = await getSubscription(subscriptionId);
       if (res.status == 200) {
@@ -77,7 +178,7 @@ const Billing = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        user.id
+        subscription?.status
       );
     };
 
@@ -296,6 +397,8 @@ const Billing = () => {
               <UpcomingInvoiceTable
                 subscription={subscription}
                 usage={usage}
+                overUsageBill={overUsageBill}
+                upcomingInvoice={upcomingInvoice}
                 prices={products[user.stripeProductId].usage}
               />
             )

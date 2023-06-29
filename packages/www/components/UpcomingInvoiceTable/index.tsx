@@ -1,6 +1,12 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@livepeer/design-system";
 
-const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
+const UpcomingInvoiceTable = ({
+  subscription,
+  usage,
+  prices,
+  overUsageBill,
+  upcomingInvoice,
+}) => {
   const transcodingPrice = prices[0].price;
 
   return (
@@ -21,17 +27,40 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
       </Thead>
       <Tbody>
         <Tr>
+          <Th>Monthly Subscription</Th>
+          <Td></Td>
+          <Td>${transcodingPrice} / min</Td>
+          <Td>{overUsageBill && `$${200}`}</Td>
+        </Tr>
+        <Tr>
           <Th>Transcoding</Th>
           <Td>
             {usage && (usage.sourceSegmentsDuration / 60).toFixed(2)} minutes
           </Td>
           <Td>${transcodingPrice} / min</Td>
           <Td>
-            {usage &&
-              `$${(
-                (usage.sourceSegmentsDuration / 60) *
-                transcodingPrice
-              ).toFixed(2)}`}
+            {overUsageBill &&
+              `$${overUsageBill.transcodingBill.total.toFixed(2)}`}
+          </Td>
+        </Tr>
+        <Tr>
+          <Th>Delivery</Th>
+          <Td>
+            {usage && (usage.sourceSegmentsDuration / 60).toFixed(2)} minutes
+          </Td>
+          <Td>${transcodingPrice} / min</Td>
+          <Td>
+            {overUsageBill && `$${overUsageBill.deliveryBill.total.toFixed(2)}`}
+          </Td>
+        </Tr>
+        <Tr>
+          <Th>Storage</Th>
+          <Td>
+            {usage && (usage.sourceSegmentsDuration / 60).toFixed(2)} minutes
+          </Td>
+          <Td>${transcodingPrice} / min</Td>
+          <Td>
+            {overUsageBill && `$${overUsageBill.storageBill.total.toFixed(2)}`}
           </Td>
         </Tr>
 
