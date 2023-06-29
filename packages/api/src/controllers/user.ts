@@ -974,25 +974,45 @@ app.post(
 
     */
 
-    // Update the customer's subscription plan.
-    // Stripe will automatically invoice the customer based on its usage up until this point
-    const updatedSubscription = await req.stripe.subscriptions.update(
-      payload.stripeCustomerSubscriptionId,
-      {
-        billing_cycle_anchor: "now", // reset billing anchor when updating subscription
-        items: [
-          ...subscriptionItems.data.map((item) => ({
-            id: item.id,
-            deleted: true,
-            clear_usage: true,
-            price: item.price.id,
-          })),
-          ...items.data.map((item) => ({
-            price: item.id,
-          })),
-        ],
-      }
-    );
+    let updatedSubscription;
+    if (products[payload.stripeProductId].deprecated) {
+      // Update the customer's subscription plan.
+      // Stripe will automatically invoice the customer based on its usage up until this point
+      updatedSubscription = await req.stripe.subscriptions.update(
+        payload.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now", // reset billing anchor when updating subscription
+          items: [
+            ...subscriptionItems.data.map((item) => ({
+              id: item.id,
+              deleted: true,
+              clear_usage: true,
+              price: item.price.id,
+            })),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+          ],
+        }
+      );
+    } else {
+      updatedSubscription = await req.stripe.subscriptions.update(
+        payload.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now", // reset billing anchor when updating subscription
+          items: [
+            ...subscriptionItems.data.map((item) => ({
+              id: item.id,
+              deleted: true,
+              price: item.price.id,
+            })),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+          ],
+        }
+      );
+    }
 
     // Update user's product subscription in our db
     await db.user.update(user.id, {

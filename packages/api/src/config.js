@@ -1,5 +1,6 @@
 exports.products = {
   prod_0: {
+    deprecated: true,
     order: 0,
     name: "Personal",
     lookupKeys: ["price_0"],
@@ -14,6 +15,7 @@ exports.products = {
     monthlyPrice: 0,
   },
   prod_1: {
+    deprecated: true,
     order: 1,
     name: "Pro",
     lookupKeys: ["price_1"],
@@ -28,6 +30,7 @@ exports.products = {
     monthlyPrice: 0,
   },
   prod_2: {
+    deprecated: true,
     order: 2,
     name: "Business",
     lookupKeys: ["price_2"],
@@ -143,6 +146,7 @@ exports.products = {
     monthlyPrice: 0,
   },
   prod_4: {
+    deprecated: true,
     order: 7,
     name: "Enterprise",
     lookupKeys: ["enterprise_1"],

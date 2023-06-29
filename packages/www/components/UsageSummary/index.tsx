@@ -84,14 +84,12 @@ const UsageSummary = () => {
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
-  const [overUsage, setOverUsage] = useState(null);
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
     null
   );
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const product = getUserProduct(user);
   const prices = product.usage;
-  const transcodingPrice = prices[0].price;
 
   useEffect(() => {
     const doGetInvoices = async (stripeCustomerId) => {
@@ -140,7 +138,6 @@ const UsageSummary = () => {
     const doCaculateOverUsage = async (usage) => {
       const overusage = await calculateOverUsage(product, usage);
       if (overusage) {
-        setOverUsage(overusage);
         const overusageBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(overusageBill);
         let planPrice =
@@ -157,8 +154,6 @@ const UsageSummary = () => {
     };
 
     const calculateOverUsage = async (product, usage) => {
-      console.log(`usage: ${JSON.stringify(usage)}`);
-      console.log(`product: ${JSON.stringify(product)}`);
       const limits = {
         transcoding: product?.usage[0].limit,
         streaming: product?.usage[1].limit,
@@ -178,7 +173,6 @@ const UsageSummary = () => {
     };
 
     const calculateOverUsageBill = async (overusage) => {
-      console.log(`Overusage: ${JSON.stringify(overusage)}`);
       const payAsYouGoData = products["prod_O9XuWMU1Up6QKf"];
 
       const overUsageBill: OverUsageBill = {
