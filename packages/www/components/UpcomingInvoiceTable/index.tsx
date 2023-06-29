@@ -23,11 +23,11 @@ const UpcomingInvoiceTable = ({
         }}>
         <Thead>
           <Tr>
-            <Th>Plan</Th>
-            <Td> - </Td>
-            <Td> - </Td>
-            <Td> - </Td>
-            <Td>Monthly Price</Td>
+            <Th></Th>
+            <Td>Item</Td>
+            <Td>Usage</Td>
+            <Td>Plan Usage Limit</Td>
+            <Td>Unit Price</Td>
             <Td>Amount Due</Td>
           </Tr>
         </Thead>
@@ -40,26 +40,6 @@ const UpcomingInvoiceTable = ({
             <Td>${price} / month</Td>
             <Td>{usage && `$${price}`}</Td>
           </Tr>
-        </Tbody>
-      </Table>
-      <Table
-        css={{
-          minWidth: "100%",
-          borderCollapse: "separate",
-          borderSpacing: 0,
-          tableLayout: "initial",
-        }}>
-        <Thead>
-          <Tr>
-            <Th></Th>
-            <Td>Item</Td>
-            <Td>Usage</Td>
-            <Td>Plan Usage Limit</Td>
-            <Td>Unit Price</Td>
-            <Td>Amount Due</Td>
-          </Tr>
-        </Thead>
-        <Tbody>
           <Tr>
             <Th css={{ fontSize: "$2", fontWeight: 600 }}>Overage</Th>
             <Td></Td>
