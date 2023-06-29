@@ -1014,11 +1014,16 @@ app.post(
         {
           proration_behavior: "create_prorations", // bill at the end of the month
           items: [
-            ...subscriptionItems.data.map((item) => ({
-              id: item.id,
-              deleted: true,
-              price: item.price.id,
-            })),
+            ...subscriptionItems.data.map((item) => {
+              // Check if the item is metered
+              const isMetered = item.price.recurring.usage_type === "metered";
+              return {
+                id: item.id,
+                deleted: true,
+                clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                price: item.price.id,
+              };
+            }),
             ...items.data.map((item) => ({
               price: item.id,
             })),
