@@ -140,14 +140,14 @@ const UsageSummary = () => {
     const doCaculateOverUsage = async (usage) => {
       const overusage = await calculateOverUsage(product, usage);
       if (overusage) {
-        const overusageBill = await calculateOverUsageBill(overusage);
-        setOverUsageBill(overusageBill);
+        const oBill = await calculateOverUsageBill(overusage);
+        setOverUsageBill(oBill);
         let planPrice =
           products[user.stripeProductId]?.monthlyPrice.toLocaleString() || 0;
         setUpcomingInvoiceTotal(
-          overUsageBill.transcodingBill.total +
-            overUsageBill.deliveryBill.total +
-            overUsageBill.storageBill.total +
+          oBill?.transcodingBill.total +
+            oBill?.deliveryBill.total +
+            oBill?.storageBill.total +
             planPrice
         );
         let uInvoice = await getUpcomingInvoice();
