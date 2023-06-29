@@ -999,7 +999,7 @@ app.post(
       );
     } else {
       let payAsYouGoItems = [];
-      if (payAsYouGoPlans.include(payload.stripeProductId)) {
+      if (payAsYouGoPlans.includes(payload.stripeProductId)) {
         // Get the prices for the pay as you go product
         const payAsYouGoPrices = await req.stripe.prices.list({
           lookup_keys: products[payload.stripeProductId].lookupKeys,
