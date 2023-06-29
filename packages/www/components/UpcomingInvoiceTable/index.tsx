@@ -31,13 +31,6 @@ const UpcomingInvoiceTable = ({
       </Thead>
       <Tbody>
         <Tr>
-          <Th>Monthly Subscription</Th>
-          <Td></Td>
-          <Td></Td>
-          <Td>${price} / month</Td>
-          <Td>{usage && `$${price}`}</Td>
-        </Tr>
-        <Tr>
           <Th>Transcoding</Th>
           <Td>
             {usage && usage.TotalUsageMins.toFixed(0).toLocaleString()} minutes
@@ -76,7 +69,13 @@ const UpcomingInvoiceTable = ({
             {overUsageBill && `$${overUsageBill.storageBill.total.toFixed(2)}`}
           </Td>
         </Tr>
-
+        <Tr>
+          <Th>Monthly Subscription</Th>
+          <Td></Td>
+          <Td></Td>
+          <Td>${price} / month</Td>
+          <Td>{usage && `$${price}`}</Td>
+        </Tr>
         <Tr>
           <Th
             css={{
@@ -96,6 +95,7 @@ const UpcomingInvoiceTable = ({
               day: "numeric",
             })}
           </Td>
+          <Td></Td>
           <Td></Td>
           <Td css={{ fontSize: "$2", fontWeight: 600 }}>
             {usage &&
