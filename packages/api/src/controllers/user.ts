@@ -33,7 +33,6 @@ import {
   FieldsMap,
 } from "./helpers";
 import { terminateStreamReq } from "./stream";
-import payAsYouGoPlans from "./stripe";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -999,7 +998,7 @@ app.post(
       );
     } else {
       let payAsYouGoItems = [];
-      if (payAsYouGoPlans.includes(payload.stripeProductId)) {
+      if (products[payload.stripeProductId].payAsYouGo) {
         // Get the prices for the pay as you go product
         const payAsYouGoPrices = await req.stripe.prices.list({
           lookup_keys: products[payload.stripeProductId].lookupKeys,

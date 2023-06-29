@@ -33,13 +33,6 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-export const payAsYouGoPlans = [
-  "prod_O9XtHhI6rbTT1B",
-  "prod_O9XtcfOSMjSD5L",
-  "growth_1",
-  "scale_1",
-];
-
 const calculateOverUsage = async (product, usage) => {
   const limits = {
     transcoding: product?.usage[0].limit,
@@ -108,7 +101,7 @@ app.post("/webhook", async (req, res) => {
 
     const user = users[0];
 
-    if (payAsYouGoPlans.includes(user.stripeProductId)) {
+    if (products[user.stripeProductId].payAsYouGo) {
       let usage = await getBillingUsage(
         user.id,
         1685311200000, //invoice.period_start, // TMP Fixed billing cycle to test usage

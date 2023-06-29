@@ -95,6 +95,7 @@ exports.products = {
       },
     ],
     monthlyPrice: 100,
+    payAsYouGo: true,
   },
   scale_1: {
     order: 5,
@@ -121,6 +122,7 @@ exports.products = {
       },
     ],
     monthlyPrice: 500,
+    payAsYouGo: true,
   },
   pay_as_you_go_1: {
     order: 6,
@@ -220,6 +222,7 @@ exports.products = {
       },
     ],
     monthlyPrice: 100,
+    payAsYouGo: true,
   },
   prod_O9XtcfOSMjSD5L: {
     order: 10,
@@ -246,6 +249,7 @@ exports.products = {
       },
     ],
     monthlyPrice: 500,
+    payAsYouGo: true,
   },
   prod_O9XuWMU1Up6QKf: {
     order: 11,
