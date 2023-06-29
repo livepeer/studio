@@ -33,6 +33,7 @@ import {
   FieldsMap,
 } from "./helpers";
 import { terminateStreamReq } from "./stream";
+import payAsYouGoPlans from "./stripe";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -146,6 +147,7 @@ async function createSubscription(
   const prices = await stripe.prices.list({
     lookup_keys: products[stripeProductId].lookupKeys,
   });
+
   return await stripe.subscriptions.create({
     cancel_at_period_end: false,
     backdate_start_date: 1685311200, // TEMPORARY BACKDATE TO TEST BILLING
@@ -996,6 +998,18 @@ app.post(
         }
       );
     } else {
+      let payAsYouGoItems = [];
+      if (payAsYouGoPlans.include(payload.stripeProductId)) {
+        // Get the prices for the pay as you go product
+        const payAsYouGoPrices = await req.stripe.prices.list({
+          lookup_keys: products[payload.stripeProductId].lookupKeys,
+        });
+
+        // Map the prices to the additional items array
+        payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+          price: item.id,
+        }));
+      }
       updatedSubscription = await req.stripe.subscriptions.update(
         payload.stripeCustomerSubscriptionId,
         {
@@ -1009,6 +1023,7 @@ app.post(
             ...items.data.map((item) => ({
               price: item.id,
             })),
+            ...payAsYouGoItems,
           ],
         }
       );

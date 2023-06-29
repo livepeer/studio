@@ -33,7 +33,7 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-const payAsYouGoPlans = [
+export const payAsYouGoPlans = [
   "prod_O9XtHhI6rbTT1B",
   "prod_O9XtcfOSMjSD5L",
   "growth_1",
