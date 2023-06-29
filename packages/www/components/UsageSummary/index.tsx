@@ -141,9 +141,7 @@ const UsageSummary = () => {
         const overusageBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(overusageBill);
         let planPrice =
-          products[user.newStripeProductId]?.monthlyPrice.toLocaleString() ||
-          products[user.stripeProductId]?.monthlyPrice.toLocaleString() ||
-          0;
+          products[user.stripeProductId]?.monthlyPrice.toLocaleString() || 0;
         setUpcomingInvoiceTotal(
           overUsageBill.transcodingBill.total +
             overUsageBill.deliveryBill.total +
