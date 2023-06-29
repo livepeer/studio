@@ -88,6 +88,7 @@ const UsageSummary = () => {
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
     null
   );
+  const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const product = getUserProduct(user);
   const prices = product.usage;
   const transcodingPrice = prices[0].price;
@@ -142,6 +143,16 @@ const UsageSummary = () => {
         setOverUsage(overusage);
         const overusageBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(overusageBill);
+        let planPrice =
+          products[user.newStripeProductId]?.monthlyPrice.toLocaleString() ||
+          products[user.stripeProductId]?.monthlyPrice.toLocaleString() ||
+          0;
+        setUpcomingInvoiceTotal(
+          overUsageBill.transcodingBill.total +
+            overUsageBill.deliveryBill.total +
+            overUsageBill.storageBill.total +
+            planPrice
+        );
       }
     };
 
@@ -301,14 +312,7 @@ const UsageSummary = () => {
           <StyledUpcomingIcon />
           Upcoming invoice:{" "}
           <Box css={{ ml: "$1", fontWeight: 600 }}>
-            {usage &&
-              `$${
-                products[
-                  user.newStripeProductId
-                ]?.monthlyPrice.toLocaleString() ||
-                products[user.stripeProductId]?.monthlyPrice.toLocaleString() ||
-                0
-              }`}
+            {usage && `$${upcomingInvoiceTotal}`}
           </Box>
         </Text>
         <Text>
