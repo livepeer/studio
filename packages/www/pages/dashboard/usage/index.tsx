@@ -47,7 +47,14 @@ const Usage = () => {
 
   const doSetTimeStep = async (ts: string) => {
     setTimestep(ts);
-    const [res, usage] = await getBillingUsage(from, to, null, ts);
+    const [
+      res,
+      usage = {
+        TotalUsageMins: 0,
+        DeliveryUsageMins: 0,
+        StorageUsageMins: 0,
+      },
+    ] = await getBillingUsage(from, to, null, ts);
     if (res.status == 200 && Array.isArray(usage)) {
       const now = new Date();
       const currentMonth = now.toLocaleString("default", { month: "short" });
@@ -99,7 +106,14 @@ const Usage = () => {
         toTime = now.getTime();
       }
 
-      let [res, usage] = await getBillingUsage(fromTime, toTime);
+      let [
+        res,
+        usage = {
+          TotalUsageMins: 0,
+          DeliveryUsageMins: 0,
+          StorageUsageMins: 0,
+        },
+      ] = await getBillingUsage(fromTime, toTime);
 
       if (res.status == 200) {
         if (!usage) {

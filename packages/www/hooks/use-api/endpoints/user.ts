@@ -231,6 +231,17 @@ export const getBillingUsage = async (
     {}
   );
 
+  if (!usage) {
+    return [
+      res,
+      {
+        TotalUsageMins: 0,
+        DeliveryUsageMins: 0,
+        StorageUsageMins: 0,
+      } as BillingUsageData | ApiError,
+    ];
+  }
+
   return [res, usage as BillingUsageData | ApiError];
 };
 
