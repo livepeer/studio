@@ -35,7 +35,6 @@ const Billing = () => {
   useLoggedIn();
   const {
     user,
-    getUsage,
     getBillingUsage,
     getSubscription,
     getInvoices,
@@ -51,7 +50,6 @@ const Billing = () => {
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
     null
   );
-  const product = getUserProduct(user);
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
@@ -108,7 +106,7 @@ const Billing = () => {
     };
 
     const doCaculateOverUsage = async (usage) => {
-      const overusage = await calculateOverUsage(product, usage);
+      const overusage = await calculateOverUsage(usage);
       if (overusage) {
         const oBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(oBill);
@@ -118,7 +116,8 @@ const Billing = () => {
       }
     };
 
-    const calculateOverUsage = async (product, usage) => {
+    const calculateOverUsage = async (usage) => {
+      const product = getUserProduct(user);
       const limits = {
         transcoding: product?.usage[0].limit,
         streaming: product?.usage[1].limit,
