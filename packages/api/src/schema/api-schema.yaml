@@ -1033,6 +1033,9 @@ components:
       properties:
         name:
           type: string
+        canPublish:
+          type: boolean
+          description: Whether a user is allowed to publish audio/video tracks
     room-egress-payload:
       type: object
       required:
