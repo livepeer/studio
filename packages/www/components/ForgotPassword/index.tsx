@@ -57,7 +57,7 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
           mb: "$3",
           ml: "auto",
           mr: "auto",
-          maxWidth: 450,
+          maxWidth: 500,
         }}>
         <form id={id} onSubmit={submit}>
           <Text

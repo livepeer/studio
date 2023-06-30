@@ -137,7 +137,7 @@ const RegisterPage = () => {
               loading={loading}
               errors={errors}
             />
-            <Box css={{ maxWidth: 450, width: "100%" }}>
+            <Box css={{ maxWidth: 500, width: "100%" }}>
               <Box
                 css={{
                   width: "100%",
