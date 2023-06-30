@@ -1033,9 +1033,53 @@ components:
       properties:
         name:
           type: string
+          description: Display name
+          example: name
         canPublish:
           type: boolean
           description: Whether a user is allowed to publish audio/video tracks
+          example: true
+    create-room-response:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the room
+          example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
+    room-user-response:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the user
+          example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
+        joinUrl:
+          type: string
+          description: Joining URL
+          example: https://meet.livepeer.chat
+        token:
+          type: string
+          description: Joining JWT
+          example: token
+    get-room-user-response:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the user
+          example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
+        joinedAt:
+          type: integer
+          description: The time the user joined
+          example: 1687771565
+        name:
+          type: string
+          description: The display name of the user
+          example: name
+        isPublisher:
+          type: boolean
+          description: Whether a user is allowed to publish audio/video tracks
+          example: true
     room-egress-payload:
       type: object
       required:
@@ -1045,6 +1089,7 @@ components:
         streamId:
           type: string
           description: The ID of the Livepeer Stream to stream to
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
     room-user-update-payload:
       type: object
       required:
@@ -1054,6 +1099,7 @@ components:
         canPublish:
           type: boolean
           description: Whether a user is allowed to publish audio/video tracks
+          example: true
     transcode-payload:
       additionalProperties: false
       required:
@@ -1746,6 +1792,7 @@ components:
           type: string
           readOnly: true
           description: room ID
+          example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
         createdAt:
           type: number
           readOnly: true
@@ -1767,8 +1814,10 @@ components:
             properties:
               eventName:
                 type: string
+                example: event name
               timestamp:
                 type: integer
+                example: 1587667174725
         participants:
           type: object
           additionalProperties:
@@ -2886,11 +2935,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  id:
-                    type: string
+                $ref: "#/components/schemas/create-room-response"
         default:
           description: Error
           content:
@@ -2961,13 +3006,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      summary: Stop room RTMP egress
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
-      summary: Stop room RTMP egress
       responses:
         "204":
           description: Success
@@ -2993,6 +3038,12 @@ paths:
             type: string
       summary: Create a room user
       responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/room-user-response"
         default:
           description: Error
           content:
@@ -3019,16 +3070,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  joinedAt:
-                    type: integer
-                  name:
-                    type: string
-                  isPublisher:
-                    type: boolean
+                $ref: "#/components/schemas/get-room-user-response"
         default:
           description: Error
           content:
@@ -3053,7 +3095,7 @@ paths:
           required: true
           schema:
             type: string
-      summary: Update a users permissions
+      summary: Update a room user
       responses:
         "204":
           description: Success
