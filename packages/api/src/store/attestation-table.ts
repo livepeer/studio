@@ -6,8 +6,7 @@ import { QueryOptions, WithID } from "./types";
 export default class AttestationTable extends Table<WithID<Attestation>> {
   async getByIdOrCid(idOrCid: string, opts?: QueryOptions) {
     const query = [
-      sql`attestation.id = ${idOrCid}`,
-      // TODO: VID-214, get by the metadata CID
+      sql`attestation.id = ${idOrCid} OR attestation.data->'storage'->'ipfs'->>'cid' = ${idOrCid}`,
     ];
     const [attestations] = await this.find(query, {
       ...opts,

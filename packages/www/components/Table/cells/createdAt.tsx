@@ -1,12 +1,13 @@
 import { fileUploadProgressForAsset } from "components/AssetsTable/helpers";
 import { Asset } from "livepeer";
-import { Badge, Flex } from "@livepeer/design-system";
+import { Badge, Box, Flex, Tooltip } from "@livepeer/design-system";
 import { UploadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
+import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
 const CreatedAt = ({ date, fallback }) => {
   try {
@@ -52,6 +53,17 @@ const FileUploading = ({ progress }) => (
 const ProcessingProgress = ({ progress }) => (
   <Flex gap={1}>
     <UploadIcon /> Processing {Math.floor(progress * 100)}%
+    <Tooltip
+      multiline
+      content={
+        <Box>
+          Your video can now be played. In the background, it is converted into
+          several quality levels so that it can be played smoothly by all
+          viewers.
+        </Box>
+      }>
+      <Help />
+    </Tooltip>
   </Flex>
 );
 

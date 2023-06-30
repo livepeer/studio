@@ -798,45 +798,7 @@ components:
                     updated
                   example: 1587667174725
             status:
-              readOnly: true
-              additionalProperties: false
-              required:
-                - phase
-                - tasks
-              properties:
-                phase:
-                  type: string
-                  description: Phase of the asset storage
-                  enum:
-                    - waiting
-                    - processing
-                    - ready
-                    - failed
-                    - reverted
-                progress:
-                  type: number
-                  description:
-                    Current progress of the task updating the storage.
-                errorMessage:
-                  type: string
-                  description: Error message if the last storage changed failed.
-                tasks:
-                  type: object
-                  additionalProperties: false
-                  properties:
-                    pending:
-                      type: string
-                      description: |
-                        ID of any currently running task that is exporting this
-                        asset to IPFS.
-                    last:
-                      type: string
-                      description: |
-                        ID of the last task to run successfully, that created
-                        the currently saved data.
-                    failed:
-                      type: string
-                      description: ID of the last task to fail execution.
+              $ref: "#/components/schemas/storage-status"
         status:
           readOnly: true
           type: object
@@ -1071,6 +1033,9 @@ components:
       properties:
         name:
           type: string
+        canPublish:
+          type: boolean
+          description: Whether a user is allowed to publish audio/video tracks
     room-egress-payload:
       type: object
       required:
@@ -1080,6 +1045,15 @@ components:
         streamId:
           type: string
           description: The ID of the Livepeer Stream to stream to
+    room-user-update-payload:
+      type: object
+      required:
+        - canPublish
+      additionalProperties: false
+      properties:
+        canPublish:
+          type: boolean
+          description: Whether a user is allowed to publish audio/video tracks
     transcode-payload:
       additionalProperties: false
       required:
@@ -1275,6 +1249,7 @@ components:
             - upload
             - import
             - export
+            - export-data
             - transcode
             - transcode-file
         createdAt:
@@ -1323,8 +1298,25 @@ components:
               $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:
               $ref: "#/components/schemas/export-task-params"
-            transcode:
+            exportData:
               type: object
+              additionalProperties: false
+              description: Parameters for the export-data task
+              required:
+                - content
+              properties:
+                content:
+                  type: object
+                  description: File content to store into IPFS
+                ipfs:
+                  $ref: "#/components/schemas/ipfs-export-params"
+                type:
+                  type: string
+                  description: Optional type of content
+                id:
+                  type: string
+                  description: Optional ID of the content
+            transcode:
               additionalProperties: false
               description: Parameters for the transcode task
               properties:
@@ -1483,6 +1475,20 @@ components:
                       description: |
                         URL to access metadata file via HTTP through an IPFS
                         gateway
+            exportData:
+              type: object
+              additionalProperties: false
+              description: Output of the export data task
+              properties:
+                ipfs:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - cid
+                  properties:
+                    cid:
+                      type: string
+                      description: IPFS CID of the exported data
             transcode:
               type: object
               additionalProperties: false
@@ -1559,42 +1565,7 @@ components:
             - ipfs
           properties:
             ipfs:
-              type: object
-              additionalProperties: false
-              properties:
-                $ref: >-
-                  #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties
-                pinata:
-                  description: |
-                    Custom credentials for the Piñata service. Must have either
-                    a JWT or an API key and an API secret.
-                  oneOf:
-                    - type: object
-                      additionalProperties: false
-                      required:
-                        - jwt
-                      properties:
-                        jwt:
-                          type: string
-                          writeOnly: true
-                          description: |
-                            Will be added to the Authorization header as a
-                            Bearer token.
-                    - type: object
-                      additionalProperties: false
-                      required:
-                        - apiKey
-                        - apiSecret
-                      properties:
-                        apiKey:
-                          type: string
-                          description:
-                            Will be added to the pinata_api_key header.
-                        apiSecret:
-                          type: string
-                          writeOnly: true
-                          description:
-                            Will be added to the pinata_secret_api_key header.
+              $ref: "#/components/schemas/ipfs-export-params"
     signing-key:
       type: object
       additionalProperties: false
@@ -1989,6 +1960,10 @@ components:
         - message
         - signature
       properties:
+        id:
+          type: string
+          readOnly: true
+          example: 5b9e63bb-6fd0-4bea-aff2-cc5d4eb9cad0
         primaryType:
           type: string
           description: Video Metadata EIP-712 primaryType
@@ -2052,7 +2027,97 @@ components:
           enum:
             - eip712
             - flow
-
+        storage:
+          additionalProperties: false
+          properties:
+            ipfs:
+              type: object
+              additionalProperties: false
+              properties:
+                $ref: "#/components/schemas/ipfs-file-info/properties"
+                updatedAt:
+                  readOnly: true
+                  type: number
+                  description: |
+                    Timestamp (in milliseconds) at which IPFS export task was updated
+                  example: 1587667174725
+            status:
+              $ref: "#/components/schemas/storage-status"
+    ipfs-export-params:
+      type: object
+      additionalProperties: false
+      properties:
+        $ref: >-
+          #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties
+        pinata:
+          description: |
+            Custom credentials for the Piñata service. Must have either
+            a JWT or an API key and an API secret.
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+                - jwt
+              properties:
+                jwt:
+                  type: string
+                  writeOnly: true
+                  description: |
+                    Will be added to the Authorization header as a
+                    Bearer token.
+            - type: object
+              additionalProperties: false
+              required:
+                - apiKey
+                - apiSecret
+              properties:
+                apiKey:
+                  type: string
+                  description: Will be added to the pinata_api_key header.
+                apiSecret:
+                  type: string
+                  writeOnly: true
+                  description:
+                    Will be added to the pinata_secret_api_key header.
+    storage-status:
+      readOnly: true
+      additionalProperties: false
+      required:
+        - phase
+        - tasks
+      properties:
+        phase:
+          type: string
+          description: Phase of the asset storage
+          enum:
+            - waiting
+            - processing
+            - ready
+            - failed
+            - reverted
+        progress:
+          type: number
+          description: Current progress of the task updating the storage.
+        errorMessage:
+          type: string
+          description: Error message if the last storage changed failed.
+        tasks:
+          type: object
+          additionalProperties: false
+          properties:
+            pending:
+              type: string
+              description: |
+                ID of any currently running task that is exporting this
+                asset to IPFS.
+            last:
+              type: string
+              description: |
+                ID of the last task to run successfully, that created
+                the currently saved data.
+            failed:
+              type: string
+              description: ID of the last task to fail execution.
 paths:
   /stream:
     post:
@@ -2727,6 +2792,11 @@ paths:
         /api/asset/upload/url API.
         \
         \
+        For rapid processing of assets that will also be archived on IPFS or Arweave, 
+        we strongly encourage uploading the raw file to Livepeer via a direct upload rather than passing the IPFS / Arweave gateway URL to this endpoint. 
+        The gateway URL will work, but may incur longer-than-usual processing time.
+        \
+        \
         For IPFS HTTP gateway URLs, the API currently only supports “path style”
         URLs and does not support “subdomain style” URLs. The API will support
         both styles of URLs in a future update.
@@ -2811,10 +2881,12 @@ paths:
           description: Success
           content:
             application/json:
-              additionalProperties: false
-              properties:
-                id:
-                  type: string
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
         default:
           description: Error
           content:
@@ -2835,7 +2907,8 @@ paths:
           description: Success
           content:
             application/json:
-              $ref: "#/components/schemas/room"
+              schema:
+                $ref: "#/components/schemas/room"
         default:
           description: Error
           content:
@@ -2923,6 +2996,69 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
   "/room/{id}/user/{userId}":
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Get user details
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  joinedAt:
+                    type: integer
+                  name:
+                    type: string
+                  isPublisher:
+                    type: boolean
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    put:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/room-user-update-payload"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Update a users permissions
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: id

@@ -8,7 +8,7 @@ import FileUploadingProgress from "./FileUploadingProgress";
 import ProcessingProgress from "./ProcessingProgress";
 
 const AssetStatusBox = ({ asset }: { asset?: Asset }) => {
-  if (asset?.status?.phase === "ready" && asset.playbackUrl) {
+  if (asset?.playbackUrl) {
     return (
       <AppPlayer
         playbackUrl={asset.playbackUrl}

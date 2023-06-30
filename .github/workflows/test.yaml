@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-20.04
     services:
       postgres:
-        image: postgres
+        image: postgres:14-alpine
         env:
           POSTGRES_HOST_AUTH_METHOD: "trust"
           # Set health checks to wait until postgres has started
