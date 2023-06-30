@@ -90,18 +90,20 @@ const Billing = () => {
         toTime = now.getTime();
       }
 
-      let [
-        res,
-        usage = {
-          TotalUsageMins: 0,
-          DeliveryUsageMins: 0,
-          StorageUsageMins: 0,
-        },
-      ] = await getBillingUsage(fromTime, toTime);
+      let [res, billingUsage] = await getBillingUsage(fromTime, toTime);
 
       if (res.status == 200) {
-        setUsage(usage);
-        doCaculateOverUsage(usage);
+        if (billingUsage) {
+          setUsage(billingUsage);
+        } else {
+          billingUsage = {
+            TotalUsageMins: 0,
+            DeliveryUsageMins: 0,
+            StorageUsageMins: 0,
+          };
+          setUsage(billingUsage);
+        }
+        doCaculateOverUsage(billingUsage);
       }
     };
 

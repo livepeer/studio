@@ -38,7 +38,11 @@ const Usage = () => {
     getUserProduct,
   } = useApi();
   const [_usage, setUsage] = useState(null);
-  const [billingUsage, setBillingUsage] = useState(null);
+  const [billingUsage, setBillingUsage] = useState<any>({
+    TotalUsageMins: 0,
+    DeliveryUsageMins: 0,
+    StorageUsageMins: 0,
+  });
   const [subscription, setSubscription] = useState(null);
   const [timestep, setTimestep] = useState("day");
   const [from, setFrom] = useState(0);
@@ -106,14 +110,7 @@ const Usage = () => {
         toTime = now.getTime();
       }
 
-      let [
-        res,
-        usage = {
-          TotalUsageMins: 0,
-          DeliveryUsageMins: 0,
-          StorageUsageMins: 0,
-        },
-      ] = await getBillingUsage(fromTime, toTime);
+      let [res, usage] = await getBillingUsage(fromTime, toTime);
 
       if (res.status == 200) {
         if (!usage) {
