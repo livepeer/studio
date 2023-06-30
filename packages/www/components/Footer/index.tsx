@@ -17,6 +17,22 @@ const Footer = () => {
           </A>
         </Link>
         <Link
+          href="https://livepeer.studio/terms-of-service"
+          passHref
+          legacyBehavior>
+          <A target="_blank" css={{ fontSize: 10 }} variant="subtle">
+            Terms of Service
+          </A>
+        </Link>
+        <Link
+          href="https://livepeer.studio/privacy-policy"
+          passHref
+          legacyBehavior>
+          <A target="_blank" css={{ fontSize: 10 }} variant="subtle">
+            Privacy Policy
+          </A>
+        </Link>
+        <Link
           href="https://livepeer.typeform.com/to/McJZ2nMI"
           passHref
           legacyBehavior>
