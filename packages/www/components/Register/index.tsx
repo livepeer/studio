@@ -73,14 +73,14 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           flexDirection: "column",
           ml: "auto",
           mr: "auto",
-          maxWidth: 450,
+          maxWidth: 500,
         }}>
         <form id={id} onSubmit={submit}>
           <Text
             variant="neutral"
             size={5}
             css={{
-              maxWidth: 450,
+              maxWidth: 500,
               textAlign: "center",
               mx: "auto",
               mb: "$6",

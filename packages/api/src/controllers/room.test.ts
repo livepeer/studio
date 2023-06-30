@@ -109,6 +109,30 @@ describe("controllers/room", () => {
       expect(resp.id).toBeDefined();
       expect(resp.joinUrl).toBeDefined();
 
+      const mockGetParticipant = jest.spyOn(
+        roomServiceClient,
+        "getParticipant"
+      );
+      mockGetParticipant.mockReturnValueOnce(
+        Promise.resolve({
+          identity: resp.id,
+          name: "name",
+          someOtherProp: "foo",
+        })
+      );
+      res = await client.get(`/room/${roomId}/user/${resp.id}`);
+      expect(res.status).toBe(200);
+      const participantResp = await res.json();
+      expect(participantResp).toStrictEqual({
+        id: resp.id,
+        name: "name",
+      });
+
+      res = await client.put(`/room/${roomId}/user/${resp.id}`, {
+        canPublish: true,
+      });
+      expect(res.status).toBe(204);
+
       const mockRemoveParticipant = jest.spyOn(
         roomServiceClient,
         "removeParticipant"

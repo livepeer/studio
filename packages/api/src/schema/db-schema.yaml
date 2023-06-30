@@ -877,6 +877,9 @@ components:
         deleted:
           type: boolean
           description: Set to true when the asset is deleted
+        sourcePlaybackReady:
+          type: boolean
+          description: Whether source playback is ready
         playbackRecordingId:
           type: string
           writeOnly: true
@@ -1026,6 +1029,12 @@ components:
         deleted:
           type: boolean
           description: Set to true when the task is deleted
+        sourceReadyAt:
+          writeOnly: true
+          type: number
+          description: |
+            Timestamp (in milliseconds) at which source playback was ready (for upload tasks only).
+          example: 1587667174725
     user:
       table: users
       properties:
