@@ -121,6 +121,9 @@ const Usage = () => {
           };
         }
         setBillingUsage(usage);
+        setInterval(function () {
+          console.log("billing-usage:" + billingUsage);
+        }, 2000);
       }
 
       const [res2, usageByDay] = await getBillingUsage(
