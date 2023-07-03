@@ -35,14 +35,14 @@ app.post("/", authorizer({}), async (req, res) => {
     req.config.livekitApiKey,
     req.config.livekitSecret
   );
-  const room = await svc.createRoom({
+  await svc.createRoom({
     name: id,
     // timeout in seconds
     emptyTimeout: 15 * 60,
     maxParticipants: 10,
     metadata: JSON.stringify({ userId: req.user.id }),
   });
-  console.log("livekit room created", room);
+  console.log(`livekit room created. userId=${req.user.id} roomId=${id}`);
 
   await db.room.create({
     id: id,
@@ -113,6 +113,7 @@ app.post(
   authorizer({}),
   validatePost("room-egress-payload"),
   async (req, res) => {
+    // check the room exists and the user is correct
     await getRoom(req);
 
     const egressClient = new EgressClient(
@@ -141,22 +142,21 @@ app.post(
       urls: [req.config.ingest[0].ingest + "/" + stream.streamKey],
     };
 
-    const info = await egressClient.startRoomCompositeEgress(
-      req.params.roomId,
-      output,
-      {
-        layout: "speaker-dark",
-        encodingOptions: {
-          keyFrameInterval: 2,
-        },
-      }
+    await egressClient.startRoomCompositeEgress(req.params.roomId, output, {
+      layout: "speaker-dark",
+      encodingOptions: {
+        keyFrameInterval: 2,
+      },
+    });
+    console.log(
+      `egress started. userId=${req.user.id} roomId=${req.params.roomId} streamId=${req.body.streamId}`
     );
-    console.log("egress started", info);
     res.status(204).end();
   }
 );
 
 app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
+  // check the room exists and the user is correct
   await getRoom(req);
 
   const egressClient = new EgressClient(
@@ -170,8 +170,10 @@ app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
   for (const egress of currentEgress) {
     if (isEgressRunning(egress)) {
       found = true;
-      const info = await egressClient.stopEgress(egress.egressId);
-      console.log("egress stopped", info);
+      await egressClient.stopEgress(egress.egressId);
+      console.log(
+        `egress stopped. userId=${req.user.id} roomId=${req.params.roomId}`
+      );
     }
   }
   if (!found) {
@@ -301,8 +303,7 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
     event = receiver.receive(req.body, req.get("Authorization"));
   } catch (e) {
     console.log(
-      "failed to receive room webhook. auth:",
-      req.get("Authorization")
+      `failed to receive room webhook. auth=${req.get("Authorization")}`
     );
     throw e;
   }
