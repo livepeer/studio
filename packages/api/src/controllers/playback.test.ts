@@ -408,7 +408,6 @@ describe("controllers/playback", () => {
       it("should return 404 for recorded sessions without recording ready", async () => {
         await db.session.update(session.id, {
           record: true,
-          recordObjectStoreId: "mock_store",
           lastSeen: Date.now() - 60 * 60 * 1000,
         });
         let res = await client.get(`/playback/${session.id}`);
@@ -418,7 +417,6 @@ describe("controllers/playback", () => {
       it("should return playback URL for sessions with recording ready", async () => {
         await db.session.update(session.id, {
           record: true,
-          recordObjectStoreId: "mock_store",
           lastSeen: Date.now() - 60 * 60 * 1000,
         });
         await db.asset.create({
@@ -462,7 +460,6 @@ describe("controllers/playback", () => {
       await db.session.update(session.id, {
         version: "v1",
         record: true,
-        recordObjectStoreId: "mock_store",
         lastSeen: Date.now() - 60 * 60 * 1000,
       });
 

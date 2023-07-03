@@ -22,6 +22,7 @@ import {
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, {
   DeprecatedStreamFields,
+  DeprecatedSessionFields,
   StreamStats,
 } from "./stream-table";
 import { kebabToCamel } from "../util";
@@ -43,7 +44,10 @@ export interface PostgresParams {
   appName?: string;
 }
 
-export type DBSession = WithID<Session> & StreamStats & DeprecatedStreamFields;
+export type DBSession = WithID<Session> &
+  StreamStats &
+  DeprecatedStreamFields &
+  DeprecatedSessionFields;
 
 type Table<T> = BaseTable<WithID<T>>;
 
