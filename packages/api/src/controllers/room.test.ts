@@ -7,6 +7,7 @@ import {
   WebhookReceiver,
 } from "livekit-server-sdk";
 import { db } from "../store";
+import { EgressStatus } from "livekit-server-sdk/dist/proto/livekit_egress";
 
 jest.mock("livekit-server-sdk");
 const MockedRoomServiceClient =
@@ -157,6 +158,8 @@ describe("controllers/room", () => {
       );
       let mockStopEgress = jest.spyOn(egressClient, "stopEgress");
       mockStopEgress.mockReturnValueOnce(Promise.resolve(undefined));
+      let mockListEgress = jest.spyOn(egressClient, "listEgress");
+      mockListEgress.mockReturnValueOnce(Promise.resolve([]));
 
       let res = await client.delete(`/room/${roomId}/egress`);
       expect(res.status).toBe(400);
@@ -167,21 +170,33 @@ describe("controllers/room", () => {
       expect(res.status).toBe(201);
       const streamResp = await res.json();
 
+      mockListEgress.mockReturnValueOnce(Promise.resolve([]));
       res = await client.post(`/room/${roomId}/egress`, {
         streamId: streamResp.id,
       });
       expect(res.status).toBe(204);
 
+      mockListEgress.mockReturnValueOnce(
+        Promise.resolve([
+          { egressId: "egress-id", status: EgressStatus.EGRESS_ACTIVE },
+        ])
+      );
       // already started so should 400
       res = await client.post(`/room/${roomId}/egress`, {
         streamId: streamResp.id,
       });
       expect(res.status).toBe(400);
 
+      mockListEgress.mockReturnValueOnce(
+        Promise.resolve([
+          { egressId: "egress-id", status: EgressStatus.EGRESS_ACTIVE },
+        ])
+      );
       res = await client.delete(`/room/${roomId}/egress`);
       expect(res.status).toBe(204);
 
       // already stopped so should 400
+      mockListEgress.mockReturnValueOnce(Promise.resolve([]));
       res = await client.delete(`/room/${roomId}/egress`);
       expect(res.status).toBe(400);
 
