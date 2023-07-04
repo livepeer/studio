@@ -131,7 +131,7 @@ async function getOrCreateCustomer(stripe: Stripe, email: string) {
   return await stripe.customers.create({ email });
 }
 
-async function getOrCreateSubscription(
+async function createSubscription(
   stripe: Stripe,
   stripeProductId: StripeProductIDs,
   stripeCustomerId: string
@@ -140,7 +140,7 @@ async function getOrCreateSubscription(
     customer: stripeCustomerId,
   });
   if (existing.data.length > 0) {
-    return existing.data[0];
+    return null;
   }
 
   const prices = await stripe.prices.list({
@@ -309,11 +309,15 @@ app.post("/", validatePost("user"), async (req, res) => {
   let stripeFields: Partial<User> = {};
   if (req.stripe) {
     const customer = await getOrCreateCustomer(req.stripe, lowercaseEmail);
-    const subscription = await getOrCreateSubscription(
+    const subscription = await createSubscription(
       req.stripe,
       defaultProductId,
       customer.id
     );
+    if (!subscription) {
+      res.status(400);
+      res.json({ errors: ["error creating subscription"] });
+    }
     stripeFields = {
       stripeCustomerId: customer.id,
       stripeCustomerSubscriptionId: subscription.id,
@@ -574,7 +578,7 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
       });
     }
   }
-  res.status(200).json(cleanUserFields(user));
+  res.status(200).json({});
 });
 
 app.post(
@@ -672,7 +676,7 @@ app.post(
     );
     if (newToken) {
       res.status(201);
-      res.json(newToken);
+      res.json({});
     } else {
       res.status(403);
       res.json({ errors: ["error creating password reset token"] });
@@ -716,8 +720,11 @@ app.post(
         stripeCustomerId: customer.id,
       });
       res.status(201);
+      res.json(customer);
+    } else {
+      res.status(400);
+      res.json({ errors: ["error creating customer"] });
     }
-    res.json(customer);
   }
 );
 
@@ -822,11 +829,16 @@ app.post(
     }
 
     // Create the subscription
-    const subscription = await getOrCreateSubscription(
+    const subscription = await createSubscription(
       req.stripe,
       stripeProductId,
       stripeCustomerId
     );
+    if (!subscription) {
+      return res
+        .status(400)
+        .send({ errors: ["could not create subscription"] });
+    }
 
     if (
       stripeProductId !== "prod_0" &&
