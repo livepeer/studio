@@ -1233,6 +1233,8 @@ components:
           type: number
           description:
             How many seconds the duration of each output segment should be
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
     task:
       type: object
       additionalProperties: false
@@ -1381,6 +1383,8 @@ components:
                   description: |
                     How many seconds the duration of each output segment should
                     be
+                creatorId:
+                  $ref: "#/components/schemas/input-creator-id"
         status:
           readOnly: true
           type: object
