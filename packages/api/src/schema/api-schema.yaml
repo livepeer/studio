@@ -3152,6 +3152,7 @@ paths:
             items:
               type: string
               enum:
+                - playbackId
                 - deviceType
                 - device
                 - cpu
@@ -3163,6 +3164,7 @@ paths:
                 - subdivision
                 - timezone
                 - viewerId
+                - creatorId
       responses:
         "200":
           description: A list of Metric objects
