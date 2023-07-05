@@ -259,7 +259,7 @@ app.get("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
   res.json({
     id: participant.identity,
     state: participant.state,
-    joinedAt: participant.joinedAt,
+    joinedAt: participant.joinedAt * 1000,
     name: participant.name,
     permission: participant.permission,
     isPublisher: participant.isPublisher,

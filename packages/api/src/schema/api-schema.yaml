@@ -1055,11 +1055,15 @@ components:
           example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
         joinUrl:
           type: string
-          description: Joining URL
+          description:
+            Joining URL - use this for Livepeer's default meeting app (see the
+            multiparticipant streaming guide for more info).
           example: https://meet.livepeer.chat
         token:
           type: string
-          description: Joining JWT
+          description:
+            Joining JWT - this can be used if you have a custom meeting app (see
+            the multiparticipant streaming guide for more info).
           example: token
     get-room-user-response:
       type: object
@@ -1070,8 +1074,8 @@ components:
           example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
         joinedAt:
           type: integer
-          description: The time the user joined
-          example: 1687771565
+          description: Timestamp (in milliseconds) at which the user joined
+          example: 1687517025261
         name:
           type: string
           description: The display name of the user
@@ -1080,6 +1084,7 @@ components:
           type: boolean
           description: Whether a user is allowed to publish audio/video tracks
           example: true
+          default: true
     room-egress-payload:
       type: object
       required:
@@ -1100,6 +1105,7 @@ components:
           type: boolean
           description: Whether a user is allowed to publish audio/video tracks
           example: true
+          default: true
     transcode-payload:
       additionalProperties: false
       required:
@@ -1806,18 +1812,6 @@ components:
         egressId:
           type: string
           description: internal ID for egress output
-        events:
-          type: array
-          items:
-            type: object
-            additionalProperties: false
-            properties:
-              eventName:
-                type: string
-                example: event name
-              timestamp:
-                type: integer
-                example: 1587667174725
         participants:
           type: object
           additionalProperties:

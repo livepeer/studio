@@ -1131,6 +1131,19 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which the room was deleted
           example: 1587667174725
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              eventName:
+                type: string
+                example: event name
+              timestamp:
+                type: integer
+                description: Event timestamp (in milliseconds)
+                example: 1587667174725
         participants:
           type: object
           additionalProperties:
