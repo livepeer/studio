@@ -1,6 +1,8 @@
 import Router from "express/lib/router";
 import { db } from "../store";
 import { authorizer, validatePost } from "../middleware";
+import { products } from "../config";
+import { reportUsage } from "./stripe";
 
 const app = Router();
 
@@ -31,6 +33,9 @@ app.post(
   validatePost("usage"),
   async (req, res) => {
     let { fromTime, toTime } = req.query;
+
+    // New automated billing usage report
+    await reportUsage(req);
 
     // if time range isn't specified return all usage
     if (!fromTime) {

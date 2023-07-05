@@ -33,6 +33,102 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
+export const reportUsage = async (req) => {
+  let payAsYouGoPlans = [];
+
+  for (let product in products) {
+    if (products[product].payAsYouGo) {
+      payAsYouGoPlans.push(product);
+    }
+  }
+
+  const [users] = await db.user.find(
+    [
+      `users.data->>'stripeProductId' IN (${payAsYouGoPlans
+        .map(() => "?")
+        .join(",")})`,
+      ...payAsYouGoPlans,
+    ],
+    {
+      limit: 9999999999,
+      useReplica: true,
+    }
+  );
+
+  for (const user of users) {
+    const userSubscription = await req.stripe.subscriptions.retrieve(
+      user.stripeCustomerSubscriptionId
+    );
+
+    const billingCycleStart = new Date(
+      userSubscription.current_period_start * 1000
+    );
+    const billingCycleEnd = new Date(
+      userSubscription.current_period_end * 1000
+    );
+
+    const billingUsage = await getBillingUsage(
+      user.id,
+      billingCycleStart.getTime() / 1000,
+      billingCycleEnd.getTime() / 1000
+    );
+
+    const overUsage = await calculateOverUsage(
+      products[user.stripeProductId],
+      billingUsage
+    );
+
+    const subscriptionItems = await req.stripe.subscriptionItems.list({
+      subscription: user.stripeCustomerSubscriptionId,
+    });
+
+    // create a map of subscription items by their lookup keys
+    const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
+      (acc, item) => {
+        acc[item.price.lookup_key] = item.id;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+
+    // Invoice items based on overusage
+    await Promise.all(
+      products[user.stripeProductId].usage.map(async (product) => {
+        if (product.name === "Transcoding") {
+          await req.stripe.subscriptionItems.createUsageRecord(
+            subscriptionItemsByLookupKey["transcoding_usage"],
+            {
+              quantity: overUsage.TotalUsageMins.toFixed(0),
+              timestamp: new Date().getTime() / 1000,
+              action: "set",
+            }
+          );
+        } else if (product.name === "Streaming") {
+          await req.stripe.subscriptionItems.createUsageRecord(
+            subscriptionItemsByLookupKey["tstreaming_usage"],
+            {
+              quantity: overUsage.DeliveryUsageMins.toFixed(0),
+              timestamp: new Date().getTime() / 1000,
+              action: "set",
+            }
+          );
+        } else if (product.name === "Storage") {
+          await req.stripe.subscriptionItems.createUsageRecord(
+            subscriptionItemsByLookupKey["tstorage_usage"],
+            {
+              quantity: overUsage.StorageUsageMins.toFixed(0),
+              timestamp: new Date().getTime() / 1000,
+              action: "set",
+            }
+          );
+        }
+      })
+    );
+  }
+
+  return;
+};
+
 const calculateOverUsage = async (product, usage) => {
   const limits = {
     transcoding: product?.usage[0].limit,
@@ -100,63 +196,6 @@ app.post("/webhook", async (req, res) => {
     }
 
     const user = users[0];
-
-    if (products[user.stripeProductId].payAsYouGo) {
-      let usage = await getBillingUsage(
-        user.id,
-        1685311200000, //invoice.period_start, // TMP Fixed billing cycle to test usage
-        1687989600000 //invoice.period_end // TMP Fixed billing cycle to test usage
-      );
-      let overUsage = await calculateOverUsage(user.stripeProductId, usage);
-
-      const subscriptionItems = await req.stripe.subscriptionItems.list({
-        subscription: user.stripeCustomerSubscriptionId,
-      });
-
-      // create a map of subscription items by their lookup keys
-      const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
-        (acc, item) => {
-          acc[item.price.lookup_key] = item.id;
-          return acc;
-        },
-        {} as Record<string, string>
-      );
-
-      // Invoice items based on overusage
-      await Promise.all(
-        products[user.stripeProductId].usage.map(async (product) => {
-          if (product.name === "Transcoding") {
-            await req.stripe.subscriptionItems.createUsageRecord(
-              subscriptionItemsByLookupKey["transcoding_usage"],
-              {
-                quantity: overUsage.TotalUsageMins.toFixed(0),
-                timestamp: new Date().getTime() / 1000,
-                action: "set",
-              }
-            );
-          } else if (product.name === "Streaming") {
-            await req.stripe.subscriptionItems.createUsageRecord(
-              subscriptionItemsByLookupKey["tstreaming_usage"],
-              {
-                quantity: overUsage.DeliveryUsageMins.toFixed(0),
-                timestamp: new Date().getTime() / 1000,
-                action: "set",
-              }
-            );
-          } else if (product.name === "Storage") {
-            await req.stripe.subscriptionItems.createUsageRecord(
-              subscriptionItemsByLookupKey["tstorage_usage"],
-              {
-                quantity: overUsage.StorageUsageMins.toFixed(0),
-                timestamp: new Date().getTime() / 1000,
-                action: "set",
-              }
-            );
-          }
-        })
-      );
-      return res.sendStatus(200);
-    }
 
     const usageRes = await db.stream.usage(
       user.id,
