@@ -3163,6 +3163,7 @@ paths:
                 - country
                 - subdivision
                 - timezone
+                - geohash
                 - viewerId
                 - creatorId
       responses:
