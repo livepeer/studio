@@ -1881,7 +1881,7 @@ components:
         errorRate:
           type: number
           description: The error rate for the asset
-        existsBeforeStart:
+        exitsBeforeStart:
           type: number
           description: |
             The percentage of sessions that existed before the asset started
