@@ -1824,6 +1824,12 @@ components:
         playbackId:
           type: string
           description: The playback ID associated with the metric
+        creatorId:
+          type: string
+          description: The ID of the creator associated with the metric
+        viewerId:
+          type: string
+          description: The ID of the viewer associated with the metric
         dStorageUrl:
           type: string
           description: The URL of the distributed storage used for the asset
@@ -1866,6 +1872,9 @@ components:
         timezone:
           type: string
           description: The timezone where the viewer is located
+        geohas:
+          type: string
+          description: Geographic encoding of the viewers location. Accurate to 3 digits.
         viewCount:
           type: integer
           description: The number of views for the asset
