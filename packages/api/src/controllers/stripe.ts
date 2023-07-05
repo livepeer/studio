@@ -60,17 +60,13 @@ export const reportUsage = async (req) => {
       user.stripeCustomerSubscriptionId
     );
 
-    const billingCycleStart = new Date(
-      userSubscription.current_period_start * 1000
-    );
-    const billingCycleEnd = new Date(
-      userSubscription.current_period_end * 1000
-    );
+    const billingCycleStart = 1685311200000; // userSubscription.current_period_start * 1000 // TMP: use a fixed date for now
+    const billingCycleEnd = 1687989600000; // userSubscription.current_period_end * 1000) // TMP: use a fixed date for now
 
     const billingUsage = await getBillingUsage(
       user.id,
-      billingCycleStart.getTime() / 1000,
-      billingCycleEnd.getTime() / 1000
+      billingCycleStart,
+      billingCycleEnd
     );
 
     const overUsage = await calculateOverUsage(
