@@ -868,6 +868,7 @@ components:
         sourcePlaybackReady:
           type: boolean
           description: Whether source playback is ready
+          writeOnly: true
         playbackRecordingId:
           type: string
           writeOnly: true
