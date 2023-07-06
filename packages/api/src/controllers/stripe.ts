@@ -89,7 +89,7 @@ export const reportUsage = async (req) => {
               subscriptionItemsByLookupKey["transcoding_usage"],
               {
                 quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
-                timestamp: new Date().getTime() / 1000,
+                timestamp: Math.floor(new Date().getTime() / 1000),
                 action: "set",
               }
             );
@@ -98,7 +98,7 @@ export const reportUsage = async (req) => {
               subscriptionItemsByLookupKey["tstreaming_usage"],
               {
                 quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
-                timestamp: new Date().getTime() / 1000,
+                timestamp: Math.floor(new Date().getTime() / 1000),
                 action: "set",
               }
             );
@@ -107,18 +107,31 @@ export const reportUsage = async (req) => {
               subscriptionItemsByLookupKey["tstorage_usage"],
               {
                 quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
-                timestamp: new Date().getTime() / 1000,
+                timestamp: Math.floor(new Date().getTime() / 1000),
                 action: "set",
               }
             );
           }
         })
       );
-      updatedUsers.push(user.id);
+      updatedUsers.push({
+        id: user.id,
+        email: user.email,
+        overUsage: overUsage,
+        usageReported: true,
+      });
     } catch (e) {
       console.log(`
         Failed to create usage record for user=${user.id} with error=${e.message} - it's pay as you go subscription probably needs to get migrated
       `);
+      updatedUsers.push({
+        id: user.id,
+        email: user.email,
+        overUsage: overUsage,
+        usageReported: false,
+        subscriptionItems: subscriptionItems,
+        subscriptionItemsByLookupKey: subscriptionItemsByLookupKey,
+      });
     }
   }
 
