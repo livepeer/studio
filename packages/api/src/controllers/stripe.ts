@@ -34,7 +34,7 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-export const reportUsage = async (req) => {
+export const reportUsage = async (req, adminToken) => {
   const [users] = await db.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
@@ -59,7 +59,8 @@ export const reportUsage = async (req) => {
       user.id,
       billingCycleStart,
       billingCycleEnd,
-      ingests[0].origin
+      ingests[0].origin,
+      adminToken
     );
 
     const overUsage = await calculateOverUsage(
@@ -157,18 +158,23 @@ const calculateOverUsage = async (product, usage) => {
   return overUsage;
 };
 
-const getBillingUsage = async (userId, fromTime, toTime, baseUrl) => {
-  const api_token = await db.apiToken.find({ userId });
-
+const getBillingUsage = async (
+  userId,
+  fromTime,
+  toTime,
+  baseUrl,
+  adminToken
+) => {
   // Fetch usage data from /data/usage endpoint
   const usage = await fetch(
     `${baseUrl}/api/data/usage/query?${qs.stringify({
       from: fromTime,
       to: toTime,
+      userId: userId,
     })}`,
     {
       headers: {
-        Authorization: `Bearer ${api_token}`,
+        Authorization: `Bearer ${adminToken}`,
       },
     }
   ).then((res) => res.json());

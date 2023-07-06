@@ -34,8 +34,14 @@ app.post(
   async (req, res) => {
     let { fromTime, toTime } = req.query;
 
+    const authHeader = req.headers.authorization;
+    let token = "";
+    if (authHeader) {
+      token = authHeader.split(" ")[1];
+    }
+
     // New automated billing usage report
-    let result = await reportUsage(req);
+    let result = await reportUsage(req, token);
 
     res.status(200);
     res.json(result);
