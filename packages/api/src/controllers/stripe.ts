@@ -118,6 +118,7 @@ export const reportUsage = async (req) => {
         id: user.id,
         email: user.email,
         overUsage: overUsage,
+        usage: billingUsage,
         usageReported: true,
       });
     } catch (e) {
@@ -128,9 +129,9 @@ export const reportUsage = async (req) => {
         id: user.id,
         email: user.email,
         overUsage: overUsage,
+        usage: billingUsage,
         usageReported: false,
-        subscriptionItems: subscriptionItems,
-        subscriptionItemsByLookupKey: subscriptionItemsByLookupKey,
+        error: e.message,
       });
     }
   }
