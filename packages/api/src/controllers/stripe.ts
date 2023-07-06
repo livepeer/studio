@@ -94,7 +94,7 @@ export const reportUsage = async (req, adminToken) => {
                 action: "set",
               }
             );
-          } else if (product.name === "Streaming") {
+          } else if (product.name === "Delivery") {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["tstreaming_usage"],
               {
