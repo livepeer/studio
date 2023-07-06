@@ -33,21 +33,16 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-const payAsYouGoPlans = [
-  "prod_O9XtHhI6rbTT1B",
-  "prod_O9XtcfOSMjSD5L",
-  "growth_1",
-  "scale_1",
-];
-
 export const reportUsage = async (req) => {
-  let placeholders = payAsYouGoPlans.map((_, i) => "$" + (i + 1)).join(",");
-  let query = `users.data->>'stripeProductId' IS NOT NULL AND users.data->>'stripeProductId' IN (${placeholders})`;
-
-  const [users] = await db.user.find([query, ...payAsYouGoPlans], {
-    limit: 9999999999,
-    useReplica: true,
-  });
+  const [users] = await db.user.find(
+    [
+      sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
+    ],
+    {
+      limit: 9999999999,
+      useReplica: true,
+    }
+  );
 
   for (const user of users) {
     const userSubscription = await req.stripe.subscriptions.retrieve(
