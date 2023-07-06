@@ -296,6 +296,29 @@ export async function sendgridEmail({
   await SendgridMail.send(msg);
 }
 
+export async function sendgridEmailPaymentFailed({
+  email,
+  sendgridApiKey,
+  userId,
+  invoiceId,
+}) {
+  const [supportName, supportEmail] = email;
+  const msg = {
+    text: `User ${userId} failed to pay invoice ${invoiceId}`,
+    from: {
+      email: supportEmail,
+      name: supportName,
+    },
+    reply_to: {
+      email: supportEmail,
+      name: supportName,
+    },
+  };
+
+  SendgridMail.setApiKey(sendgridApiKey);
+  await SendgridMail.send(msg);
+}
+
 export function sendgridValidateEmail(email: string, validationApiKey: string) {
   if (!validationApiKey) {
     return;

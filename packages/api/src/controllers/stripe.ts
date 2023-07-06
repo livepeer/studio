@@ -5,6 +5,7 @@ import { products } from "../config";
 import sql from "sql-template-strings";
 import fetch from "node-fetch";
 import qs from "qs";
+import { sendgridEmailPaymentFailed } from "./helpers";
 
 const app = Router();
 
@@ -78,42 +79,53 @@ export const reportUsage = async (req) => {
       {} as Record<string, string>
     );
 
-    // Invoice items based on overusage
-    await Promise.all(
-      products[user.stripeProductId].usage.map(async (product) => {
-        if (product.name === "Transcoding") {
-          await req.stripe.subscriptionItems.createUsageRecord(
-            subscriptionItemsByLookupKey["transcoding_usage"],
-            {
-              quantity: overUsage.TotalUsageMins.toFixed(0),
-              timestamp: new Date().getTime() / 1000,
-              action: "set",
-            }
-          );
-        } else if (product.name === "Streaming") {
-          await req.stripe.subscriptionItems.createUsageRecord(
-            subscriptionItemsByLookupKey["tstreaming_usage"],
-            {
-              quantity: overUsage.DeliveryUsageMins.toFixed(0),
-              timestamp: new Date().getTime() / 1000,
-              action: "set",
-            }
-          );
-        } else if (product.name === "Storage") {
-          await req.stripe.subscriptionItems.createUsageRecord(
-            subscriptionItemsByLookupKey["tstorage_usage"],
-            {
-              quantity: overUsage.StorageUsageMins.toFixed(0),
-              timestamp: new Date().getTime() / 1000,
-              action: "set",
-            }
-          );
-        }
-      })
-    );
+    try {
+      // Invoice items based on overusage
+      await Promise.all(
+        products[user.stripeProductId].usage.map(async (product) => {
+          if (product.name === "Transcoding") {
+            await req.stripe.subscriptionItems.createUsageRecord(
+              subscriptionItemsByLookupKey["transcoding_usage"],
+              {
+                quantity: overUsage.TotalUsageMins.toFixed(0),
+                timestamp: new Date().getTime() / 1000,
+                action: "set",
+              }
+            );
+          } else if (product.name === "Streaming") {
+            await req.stripe.subscriptionItems.createUsageRecord(
+              subscriptionItemsByLookupKey["tstreaming_usage"],
+              {
+                quantity: overUsage.DeliveryUsageMins.toFixed(0),
+                timestamp: new Date().getTime() / 1000,
+                action: "set",
+              }
+            );
+          } else if (product.name === "Storage") {
+            await req.stripe.subscriptionItems.createUsageRecord(
+              subscriptionItemsByLookupKey["tstorage_usage"],
+              {
+                quantity: overUsage.StorageUsageMins.toFixed(0),
+                timestamp: new Date().getTime() / 1000,
+                action: "set",
+              }
+            );
+          }
+        })
+      );
+    } catch (e) {
+      return {
+        error: true,
+        subscriptionItems: subscriptionItems,
+        user: user,
+      };
+    }
   }
 
-  return;
+  return {
+    error: false,
+    subscriptionItems: [],
+  };
 };
 
 const calculateOverUsage = async (product, usage) => {
@@ -214,6 +226,21 @@ app.post("/webhook", async (req, res) => {
         }
       })
     );
+  } else if (event.type === "invoice.payment_failed") {
+    // Notify via email
+    const invoice = event.data.object;
+    const [users] = await db.user.find(
+      { stripeCustomerId: invoice.customer },
+      { useReplica: false }
+    );
+
+    // notify shih-yu@livepeer.org
+    await sendgridEmailPaymentFailed({
+      email: "shih-yu@livepeer.org",
+      sendgridApiKey: req.config.sendgridApiKey,
+      userId: users[0].id,
+      invoiceId: invoice.id,
+    });
   }
 
   // Return a response to acknowledge receipt of the event

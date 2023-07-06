@@ -35,7 +35,11 @@ app.post(
     let { fromTime, toTime } = req.query;
 
     // New automated billing usage report
-    await reportUsage(req);
+    let result = await reportUsage(req);
+
+    res.status(200);
+    res.json(result);
+    return;
 
     // if time range isn't specified return all usage
     if (!fromTime) {
