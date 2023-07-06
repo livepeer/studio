@@ -45,6 +45,7 @@ export const reportUsage = async (req) => {
     }
   );
 
+  let updatedUsers = [];
   for (const user of users) {
     const userSubscription = await req.stripe.subscriptions.retrieve(
       user.stripeCustomerSubscriptionId
@@ -113,18 +114,16 @@ export const reportUsage = async (req) => {
           }
         })
       );
+      updatedUsers.push(user.id);
     } catch (e) {
-      return {
-        error: true,
-        subscriptionItems: subscriptionItems,
-        user: user,
-      };
+      console.log(`
+        Failed to create usage record for user=${user.id} with error=${e.message} - it's pay as you go subscription probably needs to get migrated
+      `);
     }
   }
 
   return {
-    error: false,
-    subscriptionItems: [],
+    updatedUsers: updatedUsers,
   };
 };
 
@@ -234,9 +233,9 @@ app.post("/webhook", async (req, res) => {
       { useReplica: false }
     );
 
-    // notify shih-yu@livepeer.org
+    // notify help@livepeer.org
     await sendgridEmailPaymentFailed({
-      email: "shih-yu@livepeer.org",
+      email: "help@livepeer.org",
       sendgridApiKey: req.config.sendgridApiKey,
       userId: users[0].id,
       invoiceId: invoice.id,
