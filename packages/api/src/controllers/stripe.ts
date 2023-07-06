@@ -52,10 +52,12 @@ export const reportUsage = async (req) => {
     const billingCycleStart = 1685311200000; // userSubscription.current_period_start * 1000 // TMP: use a fixed date for now
     const billingCycleEnd = 1687989600000; // userSubscription.current_period_end * 1000) // TMP: use a fixed date for now
 
+    const ingests = await req.getIngest();
     const billingUsage = await getBillingUsage(
       user.id,
       billingCycleStart,
-      billingCycleEnd
+      billingCycleEnd,
+      ingests[0].origin
     );
 
     const overUsage = await calculateOverUsage(
@@ -130,12 +132,12 @@ const calculateOverUsage = async (product, usage) => {
   return overUsage;
 };
 
-const getBillingUsage = async (userId, fromTime, toTime) => {
+const getBillingUsage = async (userId, fromTime, toTime, baseUrl) => {
   const api_token = await db.apiToken.find({ userId });
 
   // Fetch usage data from /data/usage endpoint
   const usage = await fetch(
-    `/data/usage/query?${qs.stringify({
+    `${baseUrl}/api/data/usage/query?${qs.stringify({
       from: fromTime,
       to: toTime,
     })}`,
