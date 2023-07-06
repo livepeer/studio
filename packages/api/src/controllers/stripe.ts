@@ -88,7 +88,7 @@ export const reportUsage = async (req) => {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["transcoding_usage"],
               {
-                quantity: overUsage.TotalUsageMins.toFixed(0),
+                quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
                 timestamp: new Date().getTime() / 1000,
                 action: "set",
               }
@@ -97,7 +97,7 @@ export const reportUsage = async (req) => {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["tstreaming_usage"],
               {
-                quantity: overUsage.DeliveryUsageMins.toFixed(0),
+                quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
                 timestamp: new Date().getTime() / 1000,
                 action: "set",
               }
@@ -106,7 +106,7 @@ export const reportUsage = async (req) => {
             await req.stripe.subscriptionItems.createUsageRecord(
               subscriptionItemsByLookupKey["tstorage_usage"],
               {
-                quantity: overUsage.StorageUsageMins.toFixed(0),
+                quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
                 timestamp: new Date().getTime() / 1000,
                 action: "set",
               }
@@ -114,24 +114,11 @@ export const reportUsage = async (req) => {
           }
         })
       );
-      updatedUsers.push({
-        id: user.id,
-        email: user.email,
-        overUsage: overUsage,
-        usageReported: true,
-      });
+      updatedUsers.push(user.id);
     } catch (e) {
       console.log(`
         Failed to create usage record for user=${user.id} with error=${e.message} - it's pay as you go subscription probably needs to get migrated
       `);
-      updatedUsers.push({
-        id: user.id,
-        email: user.email,
-        overUsage: overUsage,
-        usageReported: false,
-        subscriptionItems: subscriptionItems,
-        subscriptionItemsByLookupKey: subscriptionItemsByLookupKey,
-      });
     }
   }
 
