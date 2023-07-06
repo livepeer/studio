@@ -41,18 +41,13 @@ const payAsYouGoPlans = [
 ];
 
 export const reportUsage = async (req) => {
-  const [users] = await db.user.find(
-    [
-      `users.data->>'stripeProductId' IS NOT NULL AND users.data->>'stripeProductId' IN (${payAsYouGoPlans
-        .map((_, i) => `'${_}'`)
-        .join(",")})`,
-      ...payAsYouGoPlans,
-    ],
-    {
-      limit: 9999999999,
-      useReplica: true,
-    }
-  );
+  let placeholders = payAsYouGoPlans.map((_, i) => "$" + (i + 1)).join(",");
+  let query = `users.data->>'stripeProductId' IS NOT NULL AND users.data->>'stripeProductId' IN (${placeholders})`;
+
+  const [users] = await db.user.find([query, ...payAsYouGoPlans], {
+    limit: 9999999999,
+    useReplica: true,
+  });
 
   for (const user of users) {
     const userSubscription = await req.stripe.subscriptions.retrieve(
