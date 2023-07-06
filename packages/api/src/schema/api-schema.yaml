@@ -1874,7 +1874,8 @@ components:
           description: The timezone where the viewer is located
         geohas:
           type: string
-          description: Geographic encoding of the viewers location. Accurate to 3 digits.
+          description:
+            Geographic encoding of the viewers location. Accurate to 3 digits.
         viewCount:
           type: integer
           description: The number of views for the asset
