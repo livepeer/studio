@@ -368,22 +368,21 @@ app.post("/migrate-personal-users", async (req, res) => {
           user.newStripeProductId !== "growth_1" &&
           user.newStripeProductId !== "scale_1"
         ) {
-          const customer = await req.stripe.customers.get({
-            email: user.email,
-          });
-
           const items = await req.stripe.prices.list({
             lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
           });
 
-          const subscription = await req.stripe.subscriptions.update({
-            cancel_at_period_end: false,
-            customer: customer.id,
-            items: items.data.map((item) => ({ price: item.id })),
-          });
+          const subscription = await req.stripe.subscriptions.update(
+            user.stripeCustomerSubscriptionId,
+            {
+              billing_cycle_anchor: "now",
+              cancel_at_period_end: false,
+              items: items.data.map((item) => ({ price: item.id })),
+            }
+          );
 
           await db.user.update(user.id, {
-            stripeCustomerId: customer.id,
+            stripeCustomerId: user.stripeCustomerId,
             stripeProductId: "prod_O9XuIjn7EqYRVW",
             stripeCustomerSubscriptionId: subscription.id,
             stripeCustomerPaymentMethodId: null,
