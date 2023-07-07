@@ -338,6 +338,8 @@ app.post("/migrate-personal-users", async (req, res) => {
   let users = [];
   let keepGoing = true;
 
+  let migratedUsers = [];
+
   while (keepGoing) {
     const [currentUsers, newCursor] = await db.user.find(
       [sql`users.data->>'stripeProductId' = 'prod_0'`],
@@ -371,10 +373,18 @@ app.post("/migrate-personal-users", async (req, res) => {
           const items = await req.stripe.prices.list({
             lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
           });
+          let subscription;
 
-          let subscription = await req.stripe.subscriptions.retrieve(
-            user.stripeCustomerSubscriptionId
-          );
+          try {
+            subscription = await req.stripe.subscriptions.retrieve(
+              user.stripeCustomerSubscriptionId
+            );
+          } catch (e) {
+            console.log(`
+              Unable to migrate personal user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+            `);
+            continue;
+          }
 
           if (subscription.status != "active") {
             console.log(`
@@ -399,6 +409,8 @@ app.post("/migrate-personal-users", async (req, res) => {
             stripeCustomerPaymentMethodId: null,
           });
 
+          migratedUsers.push(user.email);
+
           await sleep(200);
         }
       }
@@ -407,7 +419,7 @@ app.post("/migrate-personal-users", async (req, res) => {
     cursor = newCursor;
   }
 
-  res.json(users);
+  res.json(migratedUsers);
 });
 
 // Migrate June test products to production products
