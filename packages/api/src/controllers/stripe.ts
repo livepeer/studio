@@ -51,8 +51,8 @@ export const reportUsage = async (req, adminToken) => {
       user.stripeCustomerSubscriptionId
     );
 
-    const billingCycleStart = 1685311200000; // userSubscription.current_period_start * 1000 // TMP: use a fixed date for now
-    const billingCycleEnd = 1687989600000; // userSubscription.current_period_end * 1000) // TMP: use a fixed date for now
+    const billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
+    const billingCycleEnd = userSubscription.current_period_end * 1000; // 1687989600000 // Test date
 
     const ingests = await req.getIngest();
     const billingUsage = await getBillingUsage(
@@ -333,52 +333,68 @@ app.post("/migrate-personal-users", async (req, res) => {
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const [users] = await db.user.find(
-    [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
-    {
-      limit: 9999999999,
-      useReplica: false,
+  const batchSize = 100;
+  let cursor = null;
+  let users = [];
+  let keepGoing = true;
+
+  while (keepGoing) {
+    const [currentUsers, newCursor] = await db.user.find(
+      [sql`users.data->>'stripeProductId' = 'prod_0'`],
+      {
+        cursor: cursor,
+        limit: batchSize,
+        useReplica: false,
+      }
+    );
+
+    if (currentUsers.length === 0) {
+      keepGoing = false;
+      continue;
     }
-  );
 
-  for (let index = 0; index < users.length; index++) {
-    let user = users[index];
+    users = users.concat(currentUsers);
 
-    const { data } = await req.stripe.customers.list({
-      email: user.email,
-    });
+    for (let index = 0; index < currentUsers.length; index++) {
+      let user = currentUsers[index];
 
-    if (data.length > 0) {
-      if (user.stripeProductId === "prod_0") {
-        // get the stripe customer
-        const customer = await req.stripe.customers.get({
-          email: user.email,
-        });
+      const { data } = await req.stripe.customers.list({
+        email: user.email,
+      });
 
-        // fetch prices associated with hacker plan
-        const items = await req.stripe.prices.list({
-          lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
-        });
+      if (data.length > 0) {
+        if (
+          user.stripeProductId === "prod_0" &&
+          user.newStripeProductId !== "growth_1" &&
+          user.newStripeProductId !== "scale_1"
+        ) {
+          const customer = await req.stripe.customers.get({
+            email: user.email,
+          });
 
-        // Subscribe the user to the hacker plan
-        const subscription = await req.stripe.subscriptions.update({
-          cancel_at_period_end: false,
-          customer: customer.id,
-          items: items.data.map((item) => ({ price: item.id })),
-        });
+          const items = await req.stripe.prices.list({
+            lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
+          });
 
-        // Update user's customer, product, subscription, and payment id in our db
-        await db.user.update(user.id, {
-          stripeCustomerId: customer.id,
-          stripeProductId: "prod_O9XuIjn7EqYRVW",
-          stripeCustomerSubscriptionId: subscription.id,
-          stripeCustomerPaymentMethodId: null,
-        });
+          const subscription = await req.stripe.subscriptions.update({
+            cancel_at_period_end: false,
+            customer: customer.id,
+            items: items.data.map((item) => ({ price: item.id })),
+          });
 
-        // sleep for a 200 ms to get around stripe rate limits
-        await sleep(200);
+          await db.user.update(user.id, {
+            stripeCustomerId: customer.id,
+            stripeProductId: "prod_O9XuIjn7EqYRVW",
+            stripeCustomerSubscriptionId: subscription.id,
+            stripeCustomerPaymentMethodId: null,
+          });
+
+          await sleep(200);
+        }
       }
     }
+
+    cursor = newCursor;
   }
 
   res.json(users);
