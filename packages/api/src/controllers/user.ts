@@ -149,7 +149,6 @@ async function createSubscription(
 
   return await stripe.subscriptions.create({
     cancel_at_period_end: false,
-    backdate_start_date: 1685311200, // TEMPORARY BACKDATE TO TEST BILLING
     customer: stripeCustomerId,
     items: prices.data.map((item) => ({ price: item.id })),
     expand: ["latest_invoice.payment_intent"],
@@ -839,19 +838,6 @@ app.post(
         .status(400)
         .send({ errors: ["could not create subscription"] });
     }
-
-    /*if (
-      stripeProductId !== "prod_0" &&
-      stripeProductId !== "prod_1" &&
-      stripeProductId !== "prod_2"
-    ) {
-      await db.user.update(user.id, {
-        newStripeProductId: stripeProductId,
-        stripeCustomerSubscriptionId: subscription.id,
-      });
-      res.send(subscription);
-      return;
-    }*/
 
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {

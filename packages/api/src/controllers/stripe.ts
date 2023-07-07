@@ -400,60 +400,116 @@ app.post("/migrate-personal-users", async (req, res) => {
   res.json(users);
 });
 
-// Migrate test products for each user on stripe
+// Migrate June test products to production products
 app.post("/migrate-test-products", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const [users] = await db.user.find(
-    [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
-    {
-      limit: 9999999999,
-      useReplica: false,
+  const batchSize = 100;
+  let cursor = null;
+  let users = [];
+  let keepGoing = true;
+
+  while (keepGoing) {
+    // Get users in batches
+    const [currentUsers, newCursor] = await db.user.find(
+      [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
+      {
+        cursor: cursor,
+        limit: batchSize,
+        useReplica: false,
+      }
+    );
+
+    if (currentUsers.length === 0) {
+      keepGoing = false;
+      continue;
     }
-  );
 
-  for (let index = 0; index < users.length; index++) {
-    let user = users[index];
+    users = users.concat(currentUsers);
 
-    // If user.newStripeProductId is in testProducts, migrate it to the new product
-    if (testProducts.includes(user.newStripeProductId)) {
-      // get the stripe customer
-      const customer = await req.stripe.customers.get({
-        email: user.email,
-      });
+    for (let index = 0; index < currentUsers.length; index++) {
+      let user = currentUsers[index];
 
-      // fetch prices associated with new product
-      const items = await req.stripe.prices.list({
-        lookup_keys:
-          products[productMapping[user.newStripeProductId]].lookupKeys,
-      });
+      // If user.newStripeProductId is in testProducts, migrate it to the new product
+      if (testProducts.includes(user.newStripeProductId)) {
+        // get the stripe customer
+        const customer = await req.stripe.customers.get({
+          email: user.email,
+        });
 
-      // Subscribe the user to the new product
-      const subscription = await req.stripe.subscriptions.update({
-        cancel_at_period_end: false,
-        customer: customer.id,
-        items: items.data.map((item) => ({ price: item.id })),
-      });
+        let payAsYouGoItems = [];
+        let isPayAsYouGoPlan =
+          products[productMapping[user.newStripeProductId]].payAsYouGo;
 
-      // Update user's customer, product, subscription, and payment id in our db
-      await db.user.update(user.id, {
-        stripeCustomerId: customer.id,
-        stripeProductId: productMapping[user.newStripeProductId],
-        stripeCustomerSubscriptionId: subscription.id,
-        stripeCustomerPaymentMethodId: null,
-      });
+        // Get the prices associated with the subscription
+        const subscriptionItems = await req.stripe.subscriptionItems.list({
+          subscription: user.stripeCustomerSubscriptionId,
+        });
 
-      // sleep for a 200 ms to get around stripe rate limits
-      await sleep(200);
+        // fetch prices associated with new product
+        const items = await req.stripe.prices.list({
+          lookup_keys:
+            products[productMapping[user.newStripeProductId]].lookupKeys,
+        });
 
-      // Update user's newStripeProductId to null
-      await db.user.update(user.id, {
-        newStripeProductId: null,
-      });
+        if (isPayAsYouGoPlan) {
+          // Get the prices for the pay as you go product
+          const payAsYouGoPrices = await req.stripe.prices.list({
+            lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+          });
+
+          // Map the prices to the additional items array
+          payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+            price: item.id,
+          }));
+        }
+
+        // Subscribe the user to the new product
+        const subscription = await req.stripe.subscriptions.update(
+          user.stripeCustomerSubscriptionId,
+          {
+            billing_cycle_anchor: "now", // reset billing anchor when updating subscription
+            items: [
+              ...subscriptionItems.data.map((item) => {
+                // Check if the item is metered
+                const isMetered = item.price.recurring.usage_type === "metered";
+                return {
+                  id: item.id,
+                  deleted: true,
+                  clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                  price: item.price.id,
+                };
+              }),
+              ...items.data.map((item) => ({
+                price: item.id,
+              })),
+              ...payAsYouGoItems,
+            ],
+          }
+        );
+
+        // Update user's customer, product, subscription, and payment id in our db
+        await db.user.update(user.id, {
+          stripeCustomerId: customer.id,
+          stripeProductId: productMapping[user.newStripeProductId],
+          stripeCustomerSubscriptionId: subscription.id,
+          stripeCustomerPaymentMethodId: null,
+        });
+
+        // sleep for a 200 ms to get around stripe rate limits
+        await sleep(200);
+
+        // Update user's newStripeProductId to null
+        await db.user.update(user.id, {
+          newStripeProductId: null,
+        });
+      }
     }
+
+    cursor = newCursor;
   }
 
   res.json(users);
