@@ -393,12 +393,31 @@ app.post("/migrate-personal-users", async (req, res) => {
             continue;
           }
 
+          const subscriptionItems = await req.stripe.subscriptionItems.list({
+            subscription: user.stripeCustomerSubscriptionId,
+          });
+
           subscription = await req.stripe.subscriptions.update(
             user.stripeCustomerSubscriptionId,
             {
               billing_cycle_anchor: "now",
               cancel_at_period_end: false,
-              items: items.data.map((item) => ({ price: item.id })),
+              items: [
+                ...subscriptionItems.data.map((item) => {
+                  // Check if the item is metered
+                  const isMetered =
+                    item.price.recurring.usage_type === "metered";
+                  return {
+                    id: item.id,
+                    deleted: true,
+                    clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                    price: item.price.id,
+                  };
+                }),
+                ...items.data.map((item) => ({
+                  price: item.id,
+                })),
+              ],
             }
           );
 
