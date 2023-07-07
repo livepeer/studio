@@ -1007,6 +1007,9 @@ components:
             - prod_O9XtHhI6rbTT1B
             - prod_O9XtcfOSMjSD5L
             - prod_O9XuWMU1Up6QKf
+        oldProPlan:
+          type: boolean
+          default: false
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU

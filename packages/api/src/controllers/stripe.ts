@@ -45,8 +45,21 @@ export const reportUsage = async (req, adminToken) => {
     }
   );
 
+  const [oldProPlanUsers] = await db.user.find(
+    [
+      sql`users.data->>'oldProPlan' = true AND users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW')`,
+    ],
+    {
+      limit: 9999999999,
+      useReplica: true,
+    }
+  );
+
+  // Join oldProPlanUsers and users
+  const payAsYouGoUsers = [...users, ...oldProPlanUsers];
+
   let updatedUsers = [];
-  for (const user of users) {
+  for (const user of payAsYouGoUsers) {
     const userSubscription = await req.stripe.subscriptions.retrieve(
       user.stripeCustomerSubscriptionId
     );
@@ -425,7 +438,135 @@ app.post("/migrate-personal-users", async (req, res) => {
             stripeCustomerId: user.stripeCustomerId,
             stripeProductId: "prod_O9XuIjn7EqYRVW",
             stripeCustomerSubscriptionId: subscription.id,
-            stripeCustomerPaymentMethodId: null,
+          });
+
+          migratedUsers.push(user.email);
+
+          await sleep(200);
+        }
+      }
+    }
+
+    cursor = newCursor;
+  }
+
+  res.json(migratedUsers);
+});
+
+// Migrate Pro users to hacker with pay as you go
+app.post("/migrate-pro-users", async (req, res) => {
+  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
+    res.status(403);
+    return res.json({ errors: ["unauthorized"] });
+  }
+
+  const batchSize = 100;
+  let cursor = null;
+  let users = [];
+  let keepGoing = true;
+
+  let migratedUsers = [];
+
+  while (keepGoing) {
+    const [currentUsers, newCursor] = await db.user.find(
+      [sql`users.data->>'stripeProductId' = 'prod_1'`],
+      {
+        cursor: cursor,
+        limit: batchSize,
+        useReplica: false,
+      }
+    );
+
+    if (currentUsers.length === 0) {
+      keepGoing = false;
+      continue;
+    }
+
+    users = users.concat(currentUsers);
+
+    for (let index = 0; index < currentUsers.length; index++) {
+      let user = currentUsers[index];
+
+      const { data } = await req.stripe.customers.list({
+        email: user.email,
+      });
+
+      if (data.length > 0) {
+        if (
+          user.stripeProductId === "prod_1" &&
+          user.newStripeProductId !== "growth_1" &&
+          user.newStripeProductId !== "scale_1"
+        ) {
+          const items = await req.stripe.prices.list({
+            lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
+          });
+          let subscription;
+
+          try {
+            subscription = await req.stripe.subscriptions.retrieve(
+              user.stripeCustomerSubscriptionId
+            );
+          } catch (e) {
+            console.log(`
+              Unable to migrate pro user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+            `);
+            continue;
+          }
+
+          if (subscription.status != "active") {
+            console.log(`
+              Unable to migrate pro user - user=${user.id} has a status=${subscription.status} subscription
+            `);
+            continue;
+          }
+
+          const subscriptionItems = await req.stripe.subscriptionItems.list({
+            subscription: user.stripeCustomerSubscriptionId,
+          });
+
+          let payAsYouGoItems = [];
+          if (products[user.stripeProductId].payAsYouGo) {
+            // Get the prices for the pay as you go product
+            const payAsYouGoPrices = await req.stripe.prices.list({
+              lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+            });
+
+            // Map the prices to the additional items array
+            payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+              price: item.id,
+            }));
+          }
+
+          subscription = await req.stripe.subscriptions.update(
+            user.stripeCustomerSubscriptionId,
+            {
+              billing_cycle_anchor: "now",
+              cancel_at_period_end: false,
+              items: [
+                ...subscriptionItems.data.map((item) => {
+                  // Check if the item is metered
+                  const isMetered =
+                    item.price.recurring.usage_type === "metered";
+                  return {
+                    id: item.id,
+                    deleted: true,
+                    clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                    price: item.price.id,
+                  };
+                }),
+                ...items.data.map((item) => ({
+                  price: item.id,
+                })),
+                ...payAsYouGoItems,
+              ],
+            }
+          );
+
+          await db.user.update(user.id, {
+            stripeCustomerId: user.stripeCustomerId,
+            stripeProductId: "prod_O9XuIjn7EqYRVW",
+            stripeCustomerSubscriptionId: subscription.id,
+            oldProPlan: true,
           });
 
           migratedUsers.push(user.email);
