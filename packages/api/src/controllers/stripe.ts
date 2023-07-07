@@ -372,7 +372,18 @@ app.post("/migrate-personal-users", async (req, res) => {
             lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
           });
 
-          const subscription = await req.stripe.subscriptions.update(
+          let subscription = await req.stripe.subscriptions.retrieve(
+            user.stripeCustomerSubscriptionId
+          );
+
+          if (subscription.status != "active") {
+            console.log(`
+              Unable to migrate personal user - user=${user.id} has a status=${subscription.status} subscription
+            `);
+            continue;
+          }
+
+          subscription = await req.stripe.subscriptions.update(
             user.stripeCustomerSubscriptionId,
             {
               billing_cycle_anchor: "now",
