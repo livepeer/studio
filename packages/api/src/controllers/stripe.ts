@@ -339,7 +339,6 @@ app.post("/migrate-users-to-stripe", async (req, res) => {
   res.json(users);
 });
 
-// Migrate personal users to hacker
 app.post("/migrate-personal-users", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
@@ -350,6 +349,7 @@ app.post("/migrate-personal-users", async (req, res) => {
   let cursor = null;
   let users = [];
   let keepGoing = true;
+  let firstUserId = null;
 
   let migratedUsers = [];
 
@@ -372,6 +372,15 @@ app.post("/migrate-personal-users", async (req, res) => {
 
     for (let index = 0; index < currentUsers.length; index++) {
       let user = currentUsers[index];
+
+      if (firstUserId == user.id) {
+        keepGoing = false;
+        break;
+      }
+
+      if (!firstUserId) {
+        firstUserId = user.id;
+      }
 
       const { data } = await req.stripe.customers.list({
         email: user.email,
@@ -447,6 +456,7 @@ app.post("/migrate-personal-users", async (req, res) => {
       }
     }
 
+    // Update cursor with newCursor after processing each batch of users
     cursor = newCursor;
   }
 
@@ -466,6 +476,7 @@ app.post("/migrate-pro-users", async (req, res) => {
   let keepGoing = true;
 
   let migratedUsers = [];
+  let firstUserId = null;
 
   while (keepGoing) {
     const [currentUsers, newCursor] = await db.user.find(
@@ -486,6 +497,15 @@ app.post("/migrate-pro-users", async (req, res) => {
 
     for (let index = 0; index < currentUsers.length; index++) {
       let user = currentUsers[index];
+
+      if (firstUserId == user.id) {
+        keepGoing = false;
+        break;
+      }
+
+      if (!firstUserId) {
+        firstUserId = user.id;
+      }
 
       const { data } = await req.stripe.customers.list({
         email: user.email,
