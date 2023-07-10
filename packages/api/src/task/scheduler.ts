@@ -264,13 +264,13 @@ export class TaskScheduler {
       const asset = await db.asset.get(task.outputAssetId);
       if (asset && asset.source.type == "recording" && asset.source.sessionId) {
         const session = await db.session.get(asset.source.sessionId);
-        const externalSession = await toExternalSession(
-          this.config,
-          session,
-          null,
-          true
-        );
         if (session) {
+          const externalSession = await toExternalSession(
+            this.config,
+            session,
+            null,
+            true
+          );
           await this.queue.publishWebhook("events.recording.ready", {
             type: "webhook_event",
             id: uuid(),
