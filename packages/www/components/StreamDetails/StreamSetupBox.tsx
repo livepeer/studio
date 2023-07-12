@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text } from "@livepeer/design-system";
+import { Box, Flex, Heading, Link, Text } from "@livepeer/design-system";
 import { Stream } from "livepeer";
 import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
@@ -46,9 +46,21 @@ const StreamSetupBox = ({
               : "Go live from the browser"}
           </Box>
           <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
-            {activeTab === "Streaming Software"
-              ? "Copy and paste the stream key into your streaming software. Use either the RTMP or SRT ingest, depending on your use-case. The RTMP ingest is more common with OBS users."
-              : 'Check that your camera and microphone inputs are properly working before clicking the "Go live" button above.'}
+            {activeTab === "Streaming Software" ? (
+              <>
+                Copy and paste the stream key into your streaming software. Use
+                either the RTMP or SRT ingest, depending on your use-case. The
+                RTMP ingest is more common with OBS users.{" "}
+                <Link
+                  css={{ mt: "$2" }}
+                  target="_blank"
+                  href="https://docs.livepeer.org/guides/developing/stream-via-obs">
+                  Check out our docs for more details.
+                </Link>
+              </>
+            ) : (
+              'Check that your camera and microphone inputs are properly working before clicking the "Go live" button above.'
+            )}
           </Text>
           {activeTab === "Streaming Software" && (
             <>
