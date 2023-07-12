@@ -71,7 +71,7 @@ const StreamSetupBox = ({
                   fontWeight: 600,
                   color: "$hiContrast",
                 }}>
-                RTMP Ingest
+                RTMP ingest
               </Box>
               <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
                 <ShowURL url={globalIngestUrl} anchor={false} />
@@ -83,7 +83,7 @@ const StreamSetupBox = ({
                   fontWeight: 600,
                   color: "$hiContrast",
                 }}>
-                SRT Ingest
+                SRT ingest
               </Box>
               <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
                 <ShowURL url={globalSrtIngestUrl} anchor={false} />
