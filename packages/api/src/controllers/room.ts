@@ -128,6 +128,16 @@ app.post(
       }
     }
 
+    const svc = new RoomServiceClient(
+      req.config.livekitHost,
+      req.config.livekitApiKey,
+      req.config.livekitSecret
+    );
+    const rooms = await svc.listRooms([req.params.roomId]);
+    if (rooms.length < 1) {
+      throw new BadRequestError(`room not currently running`);
+    }
+
     const stream = await db.stream.get(req.body.streamId);
     if (
       !stream ||
@@ -206,6 +216,7 @@ app.post(
         name: req.body.name,
         identity: id,
         ttl: 5 * 60,
+        metadata: req.body.metadata,
       }
     );
     at.addGrant({
@@ -261,8 +272,11 @@ app.get("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
     state: participant.state,
     joinedAt: participant.joinedAt * 1000,
     name: participant.name,
-    permission: participant.permission,
+    permission: {
+      canPublish: participant.permission.canPublish,
+    },
     isPublisher: participant.isPublisher,
+    metadata: participant.metadata,
   });
 });
 
@@ -281,7 +295,7 @@ app.put(
     await svc.updateParticipant(
       req.params.roomId,
       req.params.participantId,
-      undefined,
+      req.body.metadata,
       req.body.canPublish !== undefined
         ? ({ canPublish: req.body.canPublish } as any)
         : undefined
