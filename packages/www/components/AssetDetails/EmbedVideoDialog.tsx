@@ -9,10 +9,11 @@ import {
   TextField,
   useSnackbar,
 } from "@livepeer/design-system";
+import { isStaging } from "lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const embedStringForAsset = (playbackId: string) =>
-  `<iframe src="https://lvpr.tv?v=${playbackId}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts"></iframe>`;
+const embedStringForAsset = (embedUrl: string) =>
+  `<iframe src="${embedUrl}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-same-origin allow-scripts"></iframe>`;
 
 export type EmbedVideoDialog = {
   isOpen: boolean;
@@ -25,7 +26,10 @@ const EmbedVideoDialog = ({
   onOpenChange,
   playbackId,
 }: EmbedVideoDialog) => {
-  const embedString = embedStringForAsset(playbackId);
+  const embedUrl = isStaging()
+    ? `https://monster.lvpr.tv?v=${playbackId}`
+    : `https://lvpr.tv?v=${playbackId}`;
+  const embedString = embedStringForAsset(embedUrl);
   const [openSnackbar] = useSnackbar();
 
   const onCopy = () => {

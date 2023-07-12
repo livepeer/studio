@@ -4,7 +4,6 @@ import RelativeTime from "../RelativeTime";
 import ShowURL from "../ShowURL";
 import Record from "./Record";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
-import { useState } from "react";
 import { Stream } from "livepeer";
 
 const Cell = ({ children, css = {} }) => {
@@ -15,22 +14,17 @@ const Cell = ({ children, css = {} }) => {
   );
 };
 
-export type StreamDetailsBoxProps = {
+export type StreamOverviewBoxProps = {
   stream: Stream & { suspended?: boolean };
-  globalIngestUrl: string;
-  globalSrtIngestUrl: string;
   globalPlaybackUrl: string;
   invalidateStream: () => void;
 };
 
-const StreamDetailsBox = ({
+const StreamOverviewBox = ({
   stream,
-  globalIngestUrl,
-  globalSrtIngestUrl,
   globalPlaybackUrl,
   invalidateStream,
-}: StreamDetailsBoxProps) => {
-  const [keyRevealed, setKeyRevealed] = useState(false);
+}: StreamOverviewBoxProps) => {
   return (
     <>
       <Box
@@ -42,7 +36,7 @@ const StreamDetailsBox = ({
           width: "100%",
         }}>
         <Heading size="1" css={{ fontWeight: 600 }}>
-          Details
+          Overview
         </Heading>
       </Box>
       <Flex
@@ -60,38 +54,9 @@ const StreamDetailsBox = ({
             fontSize: "$2",
             position: "relative",
           }}>
-          <Cell css={{ color: "$hiContrast" }}>Stream name</Cell>
-          <Cell>{stream.name}</Cell>
           <Cell css={{ color: "$hiContrast" }}>Stream ID</Cell>
           <Cell>
             <ClipButton value={stream.id} text={stream.id} />
-          </Cell>
-          <Cell css={{ color: "$hiContrast" }}>Stream key</Cell>
-          <Cell>
-            {keyRevealed ? (
-              <Flex>
-                <ClipButton value={stream.streamKey} text={stream.streamKey} />
-              </Flex>
-            ) : (
-              <Button type="button" onClick={() => setKeyRevealed(true)}>
-                Reveal stream key
-              </Button>
-            )}
-          </Cell>
-          <Cell css={{ color: "$hiContrast" }}>RTMP ingest URL</Cell>
-          <Cell>
-            <ShowURL url={globalIngestUrl} anchor={false} />
-          </Cell>
-          <Cell css={{ color: "$hiContrast" }}>SRT ingest URL</Cell>
-          <Cell>
-            <ShowURL
-              url={globalSrtIngestUrl}
-              shortendUrl={globalSrtIngestUrl.replace(
-                globalSrtIngestUrl.slice(38),
-                "…"
-              )}
-              anchor={false}
-            />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Playback ID</Cell>
           <Cell>
@@ -107,26 +72,6 @@ const StreamDetailsBox = ({
               )}
               anchor={false}
             />
-          </Cell>
-          <Cell css={{ color: "$hiContrast" }}>Record sessions</Cell>
-          <Cell>
-            <Flex css={{ position: "relative", top: "2px" }}>
-              <Box css={{ mr: "$2" }}>
-                <Record stream={stream} invalidate={invalidateStream} />
-              </Box>
-              <Tooltip
-                multiline
-                content={
-                  <Box>
-                    When enabled, transcoded streaming sessions will be recorded
-                    and stored by Livepeer Studio. Each recorded session will
-                    have a recording .m3u8 URL for playback and an MP4 download
-                    link. This feature is currently free.
-                  </Box>
-                }>
-                <Help />
-              </Tooltip>
-            </Flex>
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Created at</Cell>
           <Cell>
@@ -148,12 +93,30 @@ const StreamDetailsBox = ({
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Status</Cell>
           <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
-          <Cell css={{ color: "$hiContrast" }}>Suspended</Cell>
-          <Cell>{stream.suspended ? "Suspended" : "Normal"}</Cell>
+          <Cell css={{ color: "$hiContrast" }}>Record sessions</Cell>
+          <Cell>
+            <Flex css={{ position: "relative", top: "2px" }}>
+              <Box css={{ mr: "$2" }}>
+                <Record stream={stream} invalidate={invalidateStream} />
+              </Box>
+              <Tooltip
+                multiline
+                content={
+                  <Box>
+                    When enabled, transcoded streaming sessions will be recorded
+                    and stored by Livepeer Studio. Each recorded session will
+                    have a recording .m3u8 URL for playback and an MP4 download
+                    link. This feature is currently free.
+                  </Box>
+                }>
+                <Help />
+              </Tooltip>
+            </Flex>
+          </Cell>
         </Box>
       </Flex>
     </>
   );
 };
 
-export default StreamDetailsBox;
+export default StreamOverviewBox;

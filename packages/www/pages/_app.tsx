@@ -66,14 +66,31 @@ const livepeerClient = createReactClient({
     // eventually should move to using JWT from user's login
     apiKey: "",
     baseUrl: isStaging()
-      ? "https://livepeer.monster"
-      : "https://livepeer.studio",
+      ? "https://livepeer.monster/api"
+      : "https://livepeer.studio/api",
+    webrtcIngestBaseUrl: isStaging()
+      ? "https://webrtc.livepeer.monster/webrtc"
+      : "https://webrtc.livepeer.studio/webrtc",
   }),
 });
 
 const livepeerTheme: ThemeConfig = {
   colors: {
     accent: "$colors$green10",
+  },
+  fontSizes: {
+    timeFontSize: "0.85rem",
+    timeFontSizeMd: "0.85rem",
+    timeFontSizeSm: "0.85rem",
+    titleFontSize: "0.9rem",
+    titleFontSizeMd: "0.9rem",
+    titleFontSizeSm: "0.9rem",
+    errorTitleFontSize: "1.3rem",
+    errorTitleFontSizeMd: "1.3rem",
+    errorTitleFontSizeSm: "1.3rem",
+    errorTextFontSize: "0.85rem",
+    errorTextFontSizeMd: "0.85rem",
+    errorTextFontSizeSm: "0.85rem",
   },
 };
 

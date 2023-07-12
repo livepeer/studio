@@ -6,6 +6,7 @@ import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/StreamDetails/StreamOverviewTab";
+import StreamDetailsTab from "components/StreamDetails/StreamDetailsTab";
 
 const refetchInterval = 5 * 1000;
 
@@ -14,9 +15,9 @@ const StreamDetails = () => {
   const queryClient = useQueryClient();
   const { getStream } = useApi();
   const { getHealth } = useAnalyzer();
-  const [currentTab, setCurrentTab] = useState<"Overview" | "Health">(
-    "Overview"
-  );
+  const [currentTab, setCurrentTab] = useState<
+    "Overview" | "Details" | "Health"
+  >("Overview");
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
 
   const { query } = router;
@@ -58,6 +59,13 @@ const StreamDetails = () => {
       setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}>
       {currentTab === "Overview" ? (
         <StreamOverviewTab
+          id={id}
+          stream={stream}
+          streamHealth={streamHealth}
+          invalidateStream={invalidateStream}
+        />
+      ) : currentTab === "Details" ? (
+        <StreamDetailsTab
           id={id}
           stream={stream}
           streamHealth={streamHealth}

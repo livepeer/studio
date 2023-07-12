@@ -2,13 +2,26 @@ import { Player } from "@livepeer/react";
 import mux from "mux-embed";
 import { memo, useCallback } from "react";
 
-interface AppPlayerProps {
-  playbackUrl: string;
+type AppPlayerProps = {
+  playbackUrl?: string;
+  playbackId?: string;
   autoPlay?: boolean;
   type: "asset" | "stream";
-}
+} & (
+  | {
+      playbackUrl: string;
+    }
+  | {
+      playbackId: string;
+    }
+);
 
-const AppPlayer = ({ playbackUrl, autoPlay = true, type }: AppPlayerProps) => {
+const AppPlayer = ({
+  playbackUrl,
+  playbackId,
+  autoPlay = true,
+  type,
+}: AppPlayerProps) => {
   const mediaElementRef = useCallback((element: HTMLMediaElement) => {
     mux.monitor(element, {
       debug: false,
@@ -25,11 +38,12 @@ const AppPlayer = ({ playbackUrl, autoPlay = true, type }: AppPlayerProps) => {
   return (
     <Player
       src={playbackUrl}
+      playbackId={playbackId}
       autoPlay={autoPlay}
-      objectFit="contain"
       mediaElementRef={mediaElementRef}
       priority
       muted
+      lowLatency
     />
   );
 };
