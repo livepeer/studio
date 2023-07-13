@@ -9,23 +9,6 @@ import { sendgridEmailPaymentFailed } from "./helpers";
 
 const app = Router();
 
-interface OverUsageBill {
-  transcodingBill: OverUsageItem;
-  deliveryBill: OverUsageItem;
-  storageBill: OverUsageItem;
-}
-
-interface OverUsageItem {
-  units: number;
-  total: number;
-}
-
-interface BillingUsageData {
-  DeliveryUsageMins: number;
-  TotalUsageMins: number;
-  StorageUsageMins: number;
-}
-
 const testProducts = ["hacker_1", "growth_1", "scale_1"];
 
 const productMapping = {
@@ -45,6 +28,9 @@ export const reportUsage = async (req, adminToken) => {
     }
   );
 
+  // This is for old users who are on the pro plan
+  // They are on the hacker plan after migration, with pay as you go enabled
+  // We need to report usage for them as well
   const [oldProPlanUsers] = await db.user.find(
     [
       sql`users.data->>'oldProPlan' = true AND users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW')`,
@@ -55,86 +41,13 @@ export const reportUsage = async (req, adminToken) => {
     }
   );
 
-  // Join oldProPlanUsers and users
   const payAsYouGoUsers = [...users, ...oldProPlanUsers];
 
   let updatedUsers = [];
   for (const user of payAsYouGoUsers) {
-    const userSubscription = await req.stripe.subscriptions.retrieve(
-      user.stripeCustomerSubscriptionId
-    );
-
-    const billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
-    const billingCycleEnd = userSubscription.current_period_end * 1000; // 1687989600000 // Test date
-
-    const ingests = await req.getIngest();
-    const billingUsage = await getBillingUsage(
-      user.id,
-      billingCycleStart,
-      billingCycleEnd,
-      ingests[0].origin,
-      adminToken
-    );
-
-    const overUsage = await calculateOverUsage(
-      products[user.stripeProductId],
-      billingUsage
-    );
-
-    const subscriptionItems = await req.stripe.subscriptionItems.list({
-      subscription: user.stripeCustomerSubscriptionId,
-    });
-
-    // create a map of subscription items by their lookup keys
-    const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
-      (acc, item) => {
-        acc[item.price.lookup_key] = item.id;
-        return acc;
-      },
-      {} as Record<string, string>
-    );
-
     try {
-      // Invoice items based on overusage
-      await Promise.all(
-        products[user.stripeProductId].usage.map(async (product) => {
-          if (product.name === "Transcoding") {
-            await req.stripe.subscriptionItems.createUsageRecord(
-              subscriptionItemsByLookupKey["transcoding_usage"],
-              {
-                quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
-                timestamp: Math.floor(new Date().getTime() / 1000),
-                action: "set",
-              }
-            );
-          } else if (product.name === "Delivery") {
-            await req.stripe.subscriptionItems.createUsageRecord(
-              subscriptionItemsByLookupKey["tstreaming_usage"],
-              {
-                quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
-                timestamp: Math.floor(new Date().getTime() / 1000),
-                action: "set",
-              }
-            );
-          } else if (product.name === "Storage") {
-            await req.stripe.subscriptionItems.createUsageRecord(
-              subscriptionItemsByLookupKey["tstorage_usage"],
-              {
-                quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
-                timestamp: Math.floor(new Date().getTime() / 1000),
-                action: "set",
-              }
-            );
-          }
-        })
-      );
-      updatedUsers.push({
-        id: user.id,
-        email: user.email,
-        overUsage: overUsage,
-        usage: billingUsage,
-        usageReported: true,
-      });
+      let userUpdated = await reportUsageForUser(req, user, adminToken);
+      updatedUsers.push(userUpdated);
     } catch (e) {
       console.log(`
         Failed to create usage record for user=${user.id} with error=${e.message} - it's pay as you go subscription probably needs to get migrated
@@ -142,8 +55,6 @@ export const reportUsage = async (req, adminToken) => {
       updatedUsers.push({
         id: user.id,
         email: user.email,
-        overUsage: overUsage,
-        usage: billingUsage,
         usageReported: false,
         error: e.message,
       });
@@ -155,17 +66,108 @@ export const reportUsage = async (req, adminToken) => {
   };
 };
 
-const calculateOverUsage = async (product, usage) => {
-  const limits = {
-    transcoding: product?.usage[0].limit,
-    streaming: product?.usage[1].limit,
-    storage: product?.usage[2].limit,
+async function reportUsageForUser(req, user, adminToken) {
+  const userSubscription = await req.stripe.subscriptions.retrieve(
+    user.stripeCustomerSubscriptionId
+  );
+
+  const billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
+  const billingCycleEnd = userSubscription.current_period_end * 1000; // 1687989600000 // Test date
+
+  const ingests = await req.getIngest();
+  const billingUsage = await getBillingUsage(
+    user.id,
+    billingCycleStart,
+    billingCycleEnd,
+    ingests[0].origin,
+    adminToken
+  );
+
+  const overUsage = await calculateOverUsage(
+    products[user.stripeProductId],
+    billingUsage
+  );
+
+  const subscriptionItems = await req.stripe.subscriptionItems.list({
+    subscription: user.stripeCustomerSubscriptionId,
+  });
+
+  // create a map of subscription items by their lookup keys
+  const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
+    (acc, item) => {
+      acc[item.price.lookup_key] = item.id;
+      return acc;
+    },
+    {} as Record<string, string>
+  );
+
+  // Invoice items based on overusage
+  await Promise.all(
+    products[user.stripeProductId].usage.map(async (product) => {
+      if (product.name === "Transcoding") {
+        await req.stripe.subscriptionItems.createUsageRecord(
+          subscriptionItemsByLookupKey["transcoding_usage"],
+          {
+            quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
+            timestamp: Math.floor(new Date().getTime() / 1000),
+            action: "set",
+          }
+        );
+      } else if (product.name === "Delivery") {
+        await req.stripe.subscriptionItems.createUsageRecord(
+          subscriptionItemsByLookupKey["tstreaming_usage"],
+          {
+            quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
+            timestamp: Math.floor(new Date().getTime() / 1000),
+            action: "set",
+          }
+        );
+      } else if (product.name === "Storage") {
+        await req.stripe.subscriptionItems.createUsageRecord(
+          subscriptionItemsByLookupKey["tstorage_usage"],
+          {
+            quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
+            timestamp: Math.floor(new Date().getTime() / 1000),
+            action: "set",
+          }
+        );
+      }
+    })
+  );
+  return {
+    id: user.id,
+    email: user.email,
+    overUsage: overUsage,
+    usage: billingUsage,
+    usageReported: true,
   };
+}
+
+const calculateOverUsage = async (product, usage) => {
+  let limits: any = {};
+
+  if (product?.usage) {
+    product.usage.forEach((item) => {
+      if (item.name.toLowerCase() === "transcoding")
+        limits.transcoding = item.limit;
+      if (item.name.toLowerCase() === "delivery") limits.streaming = item.limit;
+      if (item.name.toLowerCase() === "storage") limits.storage = item.limit;
+    });
+  }
 
   const overUsage = {
-    TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
-    DeliveryUsageMins: Math.max(usage?.DeliveryUsageMins - limits.streaming, 0),
-    StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
+    TotalUsageMins: Math.max(
+      usage?.TotalUsageMins - (limits.transcoding || 0),
+      0
+    ),
+    DeliveryUsageMins: Math.max(
+      usage?.DeliveryUsageMins - (limits.streaming || 0),
+      0
+    ),
+    StorageUsageMins: Math.max(
+      usage?.StorageUsageMins - (limits.storage || 0),
+      0
+    ),
   };
 
   return overUsage;
@@ -195,7 +197,8 @@ const getBillingUsage = async (
   return usage;
 };
 
-// Webhook handler for asynchronous events.
+// Webhook handler for asynchronous events called by stripe on invoice generation
+// https://stripe.com/docs/billing/subscriptions/webhooks
 app.post("/webhook", async (req, res) => {
   const sig = req.headers["stripe-signature"];
 
@@ -283,438 +286,320 @@ async function sleep(millis) {
   return new Promise((resolve) => setTimeout(resolve, millis));
 }
 
-// Migrate existing users to stripe
-app.post("/migrate-users-to-stripe", async (req, res) => {
+app.post("/migrate-personal-user", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const [users] = await db.user.find(
-    [sql`users.data->>'stripeCustomerId' IS NULL`],
+  const [currentUser, _newCursor] = await db.user.find(
+    [sql`users.data->>'stripeProductId' = 'prod_0'`],
     {
-      limit: 9999999999,
+      limit: 1,
       useReplica: false,
     }
   );
 
-  for (let index = 0; index < users.length; index++) {
-    let user = users[index];
-
-    const { data } = await req.stripe.customers.list({
-      email: user.email,
+  if (currentUser.length < 0) {
+    res.json({
+      errors: ["no users found"],
     });
+    return;
+  }
 
-    if (data.length === 0) {
-      // create the stripe customer
-      const customer = await req.stripe.customers.create({
-        email: user.email,
-      });
+  let user = currentUser[0];
 
-      // fetch prices associated with free plan
+  const { data } = await req.stripe.customers.list({
+    email: user.email,
+  });
+
+  if (data.length > 0) {
+    if (
+      user.stripeProductId === "prod_0" &&
+      user.newStripeProductId !== "growth_1" &&
+      user.newStripeProductId !== "scale_1"
+    ) {
       const items = await req.stripe.prices.list({
-        lookup_keys: products["prod_0"].lookupKeys,
+        lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
       });
+      let subscription;
 
-      // Subscribe the user to the free plan
-      const subscription = await req.stripe.subscriptions.create({
-        cancel_at_period_end: false,
-        customer: customer.id,
-        items: items.data.map((item) => ({ price: item.id })),
-      });
-
-      // Update user's customer, product, subscription, and payment id in our db
-      await db.user.update(user.id, {
-        stripeCustomerId: customer.id,
-        stripeProductId: "prod_0",
-        stripeCustomerSubscriptionId: subscription.id,
-        stripeCustomerPaymentMethodId: null,
-      });
-
-      // sleep for a 200 ms to get around stripe rate limits
-      await sleep(200);
-    }
-  }
-
-  res.json(users);
-});
-
-app.post("/migrate-personal-users", async (req, res) => {
-  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
-
-  const batchSize = 100;
-  let cursor = null;
-  let users = [];
-  let keepGoing = true;
-  let firstUserId = null;
-
-  let migratedUsers = [];
-
-  while (keepGoing) {
-    const [currentUsers, newCursor] = await db.user.find(
-      [sql`users.data->>'stripeProductId' = 'prod_0'`],
-      {
-        cursor: cursor,
-        limit: batchSize,
-        useReplica: false,
-      }
-    );
-
-    if (currentUsers.length === 0) {
-      keepGoing = false;
-      continue;
-    }
-
-    users = users.concat(currentUsers);
-
-    for (let index = 0; index < currentUsers.length; index++) {
-      let user = currentUsers[index];
-
-      if (firstUserId == user.id) {
-        keepGoing = false;
-        break;
-      }
-
-      if (!firstUserId) {
-        firstUserId = user.id;
-      }
-
-      const { data } = await req.stripe.customers.list({
-        email: user.email,
-      });
-
-      if (data.length > 0) {
-        if (
-          user.stripeProductId === "prod_0" &&
-          user.newStripeProductId !== "growth_1" &&
-          user.newStripeProductId !== "scale_1"
-        ) {
-          const items = await req.stripe.prices.list({
-            lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
-          });
-          let subscription;
-
-          try {
-            subscription = await req.stripe.subscriptions.retrieve(
-              user.stripeCustomerSubscriptionId
-            );
-          } catch (e) {
-            console.log(`
+      try {
+        subscription = await req.stripe.subscriptions.retrieve(
+          user.stripeCustomerSubscriptionId
+        );
+      } catch (e) {
+        console.log(`
               Unable to migrate personal user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
             `);
-            continue;
-          }
+        res.json({
+          errors: [
+            `Unable to migrate personal user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+          ],
+        });
+        return;
+      }
 
-          if (subscription.status != "active") {
-            console.log(`
+      if (subscription.status != "active") {
+        console.log(`
               Unable to migrate personal user - user=${user.id} has a status=${subscription.status} subscription
             `);
-            continue;
-          }
-
-          const subscriptionItems = await req.stripe.subscriptionItems.list({
-            subscription: user.stripeCustomerSubscriptionId,
-          });
-
-          subscription = await req.stripe.subscriptions.update(
-            user.stripeCustomerSubscriptionId,
-            {
-              billing_cycle_anchor: "now",
-              cancel_at_period_end: false,
-              items: [
-                ...subscriptionItems.data.map((item) => {
-                  // Check if the item is metered
-                  const isMetered =
-                    item.price.recurring.usage_type === "metered";
-                  return {
-                    id: item.id,
-                    deleted: true,
-                    clear_usage: isMetered ? true : undefined, // If metered, clear usage
-                    price: item.price.id,
-                  };
-                }),
-                ...items.data.map((item) => ({
-                  price: item.id,
-                })),
-              ],
-            }
-          );
-
-          await db.user.update(user.id, {
-            stripeCustomerId: user.stripeCustomerId,
-            stripeProductId: "prod_O9XuIjn7EqYRVW",
-            stripeCustomerSubscriptionId: subscription.id,
-          });
-
-          migratedUsers.push(user.email);
-
-          await sleep(200);
-        }
+        res.json({
+          errors: [
+            "Unable to migrate personal user - user has a status=${subscription.status} subscription",
+          ],
+        });
+        return;
       }
+
+      const subscriptionItems = await req.stripe.subscriptionItems.list({
+        subscription: user.stripeCustomerSubscriptionId,
+      });
+
+      subscription = await req.stripe.subscriptions.update(
+        user.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now",
+          cancel_at_period_end: false,
+          items: [
+            ...subscriptionItems.data.map((item) => {
+              // Check if the item is metered
+              const isMetered = item.price.recurring.usage_type === "metered";
+              return {
+                id: item.id,
+                deleted: true,
+                clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                price: item.price.id,
+              };
+            }),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+          ],
+        }
+      );
+
+      await db.user.update(user.id, {
+        stripeCustomerId: user.stripeCustomerId,
+        stripeProductId: "prod_O9XuIjn7EqYRVW",
+        stripeCustomerSubscriptionId: subscription.id,
+      });
     }
-
-    // Update cursor with newCursor after processing each batch of users
-    cursor = newCursor;
   }
-
-  res.json(migratedUsers);
+  res.json({
+    result: "Migrated user with email " + user.email + " to hacker plan",
+  });
 });
 
-// Migrate Pro users to hacker with pay as you go
-app.post("/migrate-pro-users", async (req, res) => {
+app.post("/migrate-pro-user", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const batchSize = 100;
-  let cursor = null;
-  let users = [];
-  let keepGoing = true;
-
-  let migratedUsers = [];
-  let firstUserId = null;
-
-  while (keepGoing) {
-    const [currentUsers, newCursor] = await db.user.find(
-      [sql`users.data->>'stripeProductId' = 'prod_1'`],
-      {
-        cursor: cursor,
-        limit: batchSize,
-        useReplica: false,
-      }
-    );
-
-    if (currentUsers.length === 0) {
-      keepGoing = false;
-      continue;
+  const [currentUser, _newCursor] = await db.user.find(
+    [sql`users.data->>'stripeProductId' = 'prod_1'`],
+    {
+      limit: 1,
+      useReplica: false,
     }
+  );
 
-    users = users.concat(currentUsers);
-
-    for (let index = 0; index < currentUsers.length; index++) {
-      let user = currentUsers[index];
-
-      if (firstUserId == user.id) {
-        keepGoing = false;
-        break;
-      }
-
-      if (!firstUserId) {
-        firstUserId = user.id;
-      }
-
-      const { data } = await req.stripe.customers.list({
-        email: user.email,
-      });
-
-      if (data.length > 0) {
-        if (
-          user.stripeProductId === "prod_1" &&
-          user.newStripeProductId !== "growth_1" &&
-          user.newStripeProductId !== "scale_1"
-        ) {
-          const items = await req.stripe.prices.list({
-            lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
-          });
-          let subscription;
-
-          try {
-            subscription = await req.stripe.subscriptions.retrieve(
-              user.stripeCustomerSubscriptionId
-            );
-          } catch (e) {
-            console.log(`
-              Unable to migrate pro user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
-            `);
-            continue;
-          }
-
-          if (subscription.status != "active") {
-            console.log(`
-              Unable to migrate pro user - user=${user.id} has a status=${subscription.status} subscription
-            `);
-            continue;
-          }
-
-          const subscriptionItems = await req.stripe.subscriptionItems.list({
-            subscription: user.stripeCustomerSubscriptionId,
-          });
-
-          let payAsYouGoItems = [];
-          if (products[user.stripeProductId].payAsYouGo) {
-            // Get the prices for the pay as you go product
-            const payAsYouGoPrices = await req.stripe.prices.list({
-              lookup_keys: products["pay_as_you_go_1"].lookupKeys,
-            });
-
-            // Map the prices to the additional items array
-            payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
-              price: item.id,
-            }));
-          }
-
-          subscription = await req.stripe.subscriptions.update(
-            user.stripeCustomerSubscriptionId,
-            {
-              billing_cycle_anchor: "now",
-              cancel_at_period_end: false,
-              items: [
-                ...subscriptionItems.data.map((item) => {
-                  // Check if the item is metered
-                  const isMetered =
-                    item.price.recurring.usage_type === "metered";
-                  return {
-                    id: item.id,
-                    deleted: true,
-                    clear_usage: isMetered ? true : undefined, // If metered, clear usage
-                    price: item.price.id,
-                  };
-                }),
-                ...items.data.map((item) => ({
-                  price: item.id,
-                })),
-                ...payAsYouGoItems,
-              ],
-            }
-          );
-
-          await db.user.update(user.id, {
-            stripeCustomerId: user.stripeCustomerId,
-            stripeProductId: "prod_O9XuIjn7EqYRVW",
-            stripeCustomerSubscriptionId: subscription.id,
-            oldProPlan: true,
-          });
-
-          migratedUsers.push(user.email);
-
-          await sleep(200);
-        }
-      }
-    }
-
-    cursor = newCursor;
+  if (currentUser.length < 0) {
+    res.json({
+      errors: ["no users found"],
+    });
+    return;
   }
 
-  res.json(migratedUsers);
+  let user = currentUser[0];
+
+  const { data } = await req.stripe.customers.list({
+    email: user.email,
+  });
+
+  if (data.length > 0) {
+    if (
+      user.stripeProductId === "prod_1" &&
+      user.newStripeProductId !== "growth_1" &&
+      user.newStripeProductId !== "scale_1"
+    ) {
+      const items = await req.stripe.prices.list({
+        lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
+      });
+      let subscription;
+
+      try {
+        subscription = await req.stripe.subscriptions.retrieve(
+          user.stripeCustomerSubscriptionId
+        );
+      } catch (e) {
+        console.log(`
+              Unable to migrate pro user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+            `);
+        res.json({
+          errors: [
+            `Unable to migrate pro user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+          ],
+        });
+        return;
+      }
+
+      if (subscription.status != "active") {
+        console.log(`
+              Unable to migrate pro user - user=${user.id} has a status=${subscription.status} subscription
+            `);
+        res.json({
+          errors: [
+            "Unable to migrate pro user - user has a status=${subscription.status} subscription",
+          ],
+        });
+        return;
+      }
+
+      const subscriptionItems = await req.stripe.subscriptionItems.list({
+        subscription: user.stripeCustomerSubscriptionId,
+      });
+
+      let payAsYouGoItems = [];
+      if (products[user.stripeProductId].payAsYouGo) {
+        const payAsYouGoPrices = await req.stripe.prices.list({
+          lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+        });
+        payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+          price: item.id,
+        }));
+      }
+
+      subscription = await req.stripe.subscriptions.update(
+        user.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now",
+          cancel_at_period_end: false,
+          items: [
+            ...subscriptionItems.data.map((item) => {
+              const isMetered = item.price.recurring.usage_type === "metered";
+              return {
+                id: item.id,
+                deleted: true,
+                clear_usage: isMetered ? true : undefined,
+                price: item.price.id,
+              };
+            }),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+            ...payAsYouGoItems,
+          ],
+        }
+      );
+
+      await db.user.update(user.id, {
+        stripeCustomerId: user.stripeCustomerId,
+        stripeProductId: "prod_O9XuIjn7EqYRVW",
+        stripeCustomerSubscriptionId: subscription.id,
+        oldProPlan: true,
+      });
+    }
+  }
+  res.json({
+    result: "Migrated pro user with email " + user.email + " to hacker plan",
+  });
 });
 
-// Migrate June test products to production products
 app.post("/migrate-test-products", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const batchSize = 100;
-  let cursor = null;
-  let users = [];
-  let keepGoing = true;
+  const [currentUser, _newCursor] = await db.user.find(
+    [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
+    {
+      limit: 1,
+      useReplica: false,
+    }
+  );
 
-  while (keepGoing) {
-    // Get users in batches
-    const [currentUsers, newCursor] = await db.user.find(
-      [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
+  if (currentUser.length < 0) {
+    res.json({
+      errors: ["no users found"],
+    });
+    return;
+  }
+
+  let user = currentUser[0];
+
+  // If user.newStripeProductId is in testProducts, migrate it to the new product
+  if (testProducts.includes(user.newStripeProductId)) {
+    // get the stripe customer
+    const customer = await req.stripe.customers.get({
+      email: user.email,
+    });
+
+    let payAsYouGoItems = [];
+    let isPayAsYouGoPlan =
+      products[productMapping[user.newStripeProductId]].payAsYouGo;
+
+    // Get the prices associated with the subscription
+    const subscriptionItems = await req.stripe.subscriptionItems.list({
+      subscription: user.stripeCustomerSubscriptionId,
+    });
+
+    // fetch prices associated with new product
+    const items = await req.stripe.prices.list({
+      lookup_keys: products[productMapping[user.newStripeProductId]].lookupKeys,
+    });
+
+    if (isPayAsYouGoPlan) {
+      // Get the prices for the pay as you go product
+      const payAsYouGoPrices = await req.stripe.prices.list({
+        lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+      });
+
+      // Map the prices to the additional items array
+      payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+        price: item.id,
+      }));
+    }
+
+    // Subscribe the user to the new product
+    const subscription = await req.stripe.subscriptions.update(
+      user.stripeCustomerSubscriptionId,
       {
-        cursor: cursor,
-        limit: batchSize,
-        useReplica: false,
+        billing_cycle_anchor: "now", // reset billing anchor when updating subscription
+        items: [
+          ...subscriptionItems.data.map((item) => {
+            // Check if the item is metered
+            const isMetered = item.price.recurring.usage_type === "metered";
+            return {
+              id: item.id,
+              deleted: true,
+              clear_usage: isMetered ? true : undefined, // If metered, clear usage
+              price: item.price.id,
+            };
+          }),
+          ...items.data.map((item) => ({
+            price: item.id,
+          })),
+          ...payAsYouGoItems,
+        ],
       }
     );
 
-    if (currentUsers.length === 0) {
-      keepGoing = false;
-      continue;
-    }
-
-    users = users.concat(currentUsers);
-
-    for (let index = 0; index < currentUsers.length; index++) {
-      let user = currentUsers[index];
-
-      // If user.newStripeProductId is in testProducts, migrate it to the new product
-      if (testProducts.includes(user.newStripeProductId)) {
-        // get the stripe customer
-        const customer = await req.stripe.customers.get({
-          email: user.email,
-        });
-
-        let payAsYouGoItems = [];
-        let isPayAsYouGoPlan =
-          products[productMapping[user.newStripeProductId]].payAsYouGo;
-
-        // Get the prices associated with the subscription
-        const subscriptionItems = await req.stripe.subscriptionItems.list({
-          subscription: user.stripeCustomerSubscriptionId,
-        });
-
-        // fetch prices associated with new product
-        const items = await req.stripe.prices.list({
-          lookup_keys:
-            products[productMapping[user.newStripeProductId]].lookupKeys,
-        });
-
-        if (isPayAsYouGoPlan) {
-          // Get the prices for the pay as you go product
-          const payAsYouGoPrices = await req.stripe.prices.list({
-            lookup_keys: products["pay_as_you_go_1"].lookupKeys,
-          });
-
-          // Map the prices to the additional items array
-          payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
-            price: item.id,
-          }));
-        }
-
-        // Subscribe the user to the new product
-        const subscription = await req.stripe.subscriptions.update(
-          user.stripeCustomerSubscriptionId,
-          {
-            billing_cycle_anchor: "now", // reset billing anchor when updating subscription
-            items: [
-              ...subscriptionItems.data.map((item) => {
-                // Check if the item is metered
-                const isMetered = item.price.recurring.usage_type === "metered";
-                return {
-                  id: item.id,
-                  deleted: true,
-                  clear_usage: isMetered ? true : undefined, // If metered, clear usage
-                  price: item.price.id,
-                };
-              }),
-              ...items.data.map((item) => ({
-                price: item.id,
-              })),
-              ...payAsYouGoItems,
-            ],
-          }
-        );
-
-        // Update user's customer, product, subscription, and payment id in our db
-        await db.user.update(user.id, {
-          stripeCustomerId: customer.id,
-          stripeProductId: productMapping[user.newStripeProductId],
-          stripeCustomerSubscriptionId: subscription.id,
-          stripeCustomerPaymentMethodId: null,
-        });
-
-        // sleep for a 200 ms to get around stripe rate limits
-        await sleep(200);
-
-        // Update user's newStripeProductId to null
-        await db.user.update(user.id, {
-          newStripeProductId: null,
-        });
-      }
-    }
-
-    cursor = newCursor;
+    // Update user's customer, product, subscription, and payment id in our db
+    await db.user.update(user.id, {
+      stripeCustomerId: customer.id,
+      stripeProductId: productMapping[user.newStripeProductId],
+      stripeCustomerSubscriptionId: subscription.id,
+      stripeCustomerPaymentMethodId: null,
+      newStripeProductId: null,
+    });
   }
 
-  res.json(users);
+  res.json({
+    result: "Migrated user with email " + user.email + " to new product",
+  });
 });
 
 export default app;
