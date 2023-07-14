@@ -289,7 +289,7 @@ app.post("/migrate-personal-user", async (req, res) => {
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const [currentUser, _newCursor] = await db.user.find(
+  const [users] = await db.user.find(
     [
       sql`users.data->>'stripeProductId' = 'prod_0'  AND users.data->>'isActiveSubscription' = 'true'`,
     ],
@@ -299,14 +299,14 @@ app.post("/migrate-personal-user", async (req, res) => {
     }
   );
 
-  if (currentUser.length < 0) {
+  if (users.length == 0) {
     res.json({
       errors: ["no users found"],
     });
     return;
   }
 
-  let user = currentUser[0];
+  let user = users[0];
 
   const { data } = await req.stripe.customers.list({
     email: user.email,
@@ -402,7 +402,7 @@ app.post("/migrate-pro-user", async (req, res) => {
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const [currentUser, _newCursor] = await db.user.find(
+  const [users] = await db.user.find(
     [
       sql`users.data->>'stripeProductId' = 'prod_1' AND users.data->>'isActiveSubscription' = 'true'`,
     ],
@@ -412,14 +412,14 @@ app.post("/migrate-pro-user", async (req, res) => {
     }
   );
 
-  if (currentUser.length < 0) {
+  if (users.length == 0) {
     res.json({
       errors: ["no users found"],
     });
     return;
   }
 
-  let user = currentUser[0];
+  let user = users[0];
 
   const { data } = await req.stripe.customers.list({
     email: user.email,
