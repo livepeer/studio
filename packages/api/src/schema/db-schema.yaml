@@ -1010,6 +1010,9 @@ components:
         oldProPlan:
           type: boolean
           default: false
+        isActiveSubscription:
+          type: boolean
+          default: true
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU
