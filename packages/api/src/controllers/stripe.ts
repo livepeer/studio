@@ -291,7 +291,7 @@ app.post("/migrate-personal-user", async (req, res) => {
 
   const [currentUser, _newCursor] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_0'  AND users.data->>'isActiveSubscription' = true`,
+      sql`users.data->>'stripeProductId' = 'prod_0'  AND users.data->>'isActiveSubscription' = 'true'`,
     ],
     {
       limit: 1,
@@ -404,7 +404,7 @@ app.post("/migrate-pro-user", async (req, res) => {
 
   const [currentUser, _newCursor] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_1' AND users.data->>'isActiveSubscription' = true`,
+      sql`users.data->>'stripeProductId' = 'prod_1' AND users.data->>'isActiveSubscription' = 'true'`,
     ],
     {
       limit: 1,
