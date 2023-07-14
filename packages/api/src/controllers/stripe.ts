@@ -396,6 +396,115 @@ app.post("/migrate-personal-user", async (req, res) => {
   });
 });
 
+app.post("/migrate-hacker-user", async (req, res) => {
+  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
+    res.status(403);
+    return res.json({ errors: ["unauthorized"] });
+  }
+
+  const [users] = await db.user.find(
+    [
+      sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW'  AND users.data->>'isActiveSubscription' = 'true'`,
+    ],
+    {
+      limit: 1,
+      useReplica: false,
+    }
+  );
+
+  if (users.length == 0) {
+    res.json({
+      errors: ["no users found"],
+    });
+    return;
+  }
+
+  let user = users[0];
+
+  const { data } = await req.stripe.customers.list({
+    email: user.email,
+  });
+
+  if (data.length > 0) {
+    if (user.stripeProductId === "prod_O9XuIjn7EqYRVW") {
+      const items = await req.stripe.prices.list({
+        lookup_keys: products["prod_0"].lookupKeys,
+      });
+      let subscription;
+
+      try {
+        subscription = await req.stripe.subscriptions.retrieve(
+          user.stripeCustomerSubscriptionId
+        );
+      } catch (e) {
+        console.log(`
+              Unable to migrate hacker user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+            `);
+        await db.user.update(user.id, {
+          isActiveSubscription: false,
+        });
+        res.json({
+          errors: [
+            `Unable to migrate hacker user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+          ],
+        });
+        return;
+      }
+
+      if (subscription.status != "active") {
+        console.log(`
+              Unable to migrate hacker user - user=${user.id} has a status=${subscription.status} subscription
+            `);
+        await db.user.update(user.id, {
+          isActiveSubscription: false,
+        });
+        res.json({
+          errors: [
+            `Unable to migrate hacker user - user=${user.id} has a status=${subscription.status} subscription`,
+          ],
+        });
+        return;
+      }
+
+      const subscriptionItems = await req.stripe.subscriptionItems.list({
+        subscription: user.stripeCustomerSubscriptionId,
+      });
+
+      subscription = await req.stripe.subscriptions.update(
+        user.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now",
+          cancel_at_period_end: false,
+          items: [
+            ...subscriptionItems.data.map((item) => {
+              // Check if the item is metered
+              const isMetered = item.price.recurring.usage_type === "metered";
+              return {
+                id: item.id,
+                deleted: true,
+                clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                price: item.price.id,
+              };
+            }),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+          ],
+        }
+      );
+
+      await db.user.update(user.id, {
+        stripeCustomerId: user.stripeCustomerId,
+        stripeProductId: "prod_0",
+        stripeCustomerSubscriptionId: subscription.id,
+      });
+    }
+  }
+  res.json({
+    result: "Migrated user with email " + user.email + " to personal plan",
+  });
+});
+
 app.post("/migrate-pro-user", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
