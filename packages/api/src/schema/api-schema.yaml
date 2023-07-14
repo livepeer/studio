@@ -1103,7 +1103,9 @@ components:
       properties:
         canPublish:
           type: boolean
-          description: Whether a user is allowed to publish audio/video tracks
+          description:
+            Whether a user is allowed to publish audio/video tracks (i.e. their
+            microphone and webcam)
           example: true
           default: true
     transcode-payload:
@@ -2933,6 +2935,8 @@ paths:
   /room:
     post:
       summary: Create a room
+      description: |
+        Create a multiparticipant livestreaming room.
       responses:
         "200":
           description: Success
@@ -3000,6 +3004,9 @@ paths:
           schema:
             type: string
       summary: Start room RTMP egress
+      description: |
+        Create a livestream for your room.
+        This allows you to leverage livestreaming features like recording and HLS output.
       responses:
         "204":
           description: Success
@@ -3041,6 +3048,10 @@ paths:
           schema:
             type: string
       summary: Create a room user
+      description: |
+        Call this endpoint to add a user to a room, specifying a display name at a minimum.
+        The response will contain a joining URL for Livepeer's default meeting app.
+        Alternatively the joining token can be used with a custom app.
       responses:
         "201":
           description: Success
@@ -3100,6 +3111,7 @@ paths:
           schema:
             type: string
       summary: Update a room user
+      description: Update properties for a user.
       responses:
         "204":
           description: Success
