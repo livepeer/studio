@@ -2,6 +2,7 @@ import { Box, Flex, Heading, Link, Text } from "@livepeer/design-system";
 import { Stream } from "livepeer";
 import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
+import { isStaging } from "lib/utils";
 
 export type StreamSetupBoxProps = {
   activeTab: "Browser" | "Streaming Software";
@@ -19,6 +20,10 @@ const StreamSetupBox = ({
   globalSrtIngestUrl,
   invalidateStream,
 }: StreamSetupBoxProps) => {
+  const broadcastIframeUrl = isStaging()
+    ? `https://monster.lvpr.tv/broadcast/${stream.streamKey}`
+    : `https://lvpr.tv/broadcast/${stream.streamKey}`;
+
   return (
     <>
       <Flex
@@ -37,7 +42,7 @@ const StreamSetupBox = ({
           }}>
           <Box
             css={{
-              fontSize: "$3",
+              fontSize: "$4",
               fontWeight: 600,
               color: "$hiContrast",
             }}>
@@ -59,23 +64,36 @@ const StreamSetupBox = ({
                 </Link>
               </>
             ) : (
-              'Check that your camera and microphone inputs are properly working before clicking the "Go live" button above.'
+              'Check that your camera and microphone inputs are properly working before clicking the "Go live" button above. You can also share the embeddable broadcast URL below with creators, or embed it as an iframe in your application.'
             )}
+          </Text>
+          <Box
+            css={{
+              mt: "$4",
+              fontSize: "$3",
+              fontWeight: 600,
+              color: "$hiContrast",
+            }}>
+            {activeTab === "Streaming Software"
+              ? "Stream key"
+              : "Embeddable broadcast"}
+          </Box>
+          <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
+            <ClipButton
+              value={
+                activeTab === "Streaming Software"
+                  ? stream.streamKey
+                  : broadcastIframeUrl
+              }
+              text={
+                activeTab === "Streaming Software"
+                  ? stream.streamKey
+                  : broadcastIframeUrl
+              }
+            />
           </Text>
           {activeTab === "Streaming Software" && (
             <>
-              <Box
-                css={{
-                  mt: "$4",
-                  fontSize: "$3",
-                  fontWeight: 600,
-                  color: "$hiContrast",
-                }}>
-                Stream key
-              </Box>
-              <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
-                <ClipButton value={stream.streamKey} text={stream.streamKey} />
-              </Text>
               <Box
                 css={{
                   mt: "$4",
