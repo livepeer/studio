@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 import Spinner from "components/Spinner";
 import { Variant as StatusVariant } from "components/StatusBadge";
 import StreamPlayerBox from "components/StreamDetails/StreamPlayerBox/";
-import StreamDetailsBox from "components/StreamDetails/StreamDetailsBox";
+import StreamSetupBox from "components/StreamDetails/StreamSetupBox";
 import StreamHeadingBox from "components/StreamDetails/StreamHeadingBox";
 import StreamChildrenHeadingBox from "components/StreamDetails/StreamChildrenHeadingBox";
 import EmbedVideoDialog from "components/AssetDetails/EmbedVideoDialog";
@@ -129,7 +129,7 @@ const StreamDetail = ({
       />
 
       <Layout id="streams" breadcrumbs={breadcrumbs}>
-        <Box css={{ px: "$6", py: "$7" }}>
+        <Box css={{ px: "$6", py: "$2" }}>
           {stream ? (
             <>
               <StreamHealthWarningAlert stream={stream} />
@@ -150,12 +150,8 @@ const StreamDetail = ({
                       stream={stream}
                       globalPlaybackUrl={globalPlaybackUrl}
                       onEmbedVideoClick={() => setEmbedVideoDialogOpen(true)}
-                    />
-                    <StreamDetailsBox
-                      stream={stream}
                       globalIngestUrl={globalIngestUrl}
                       globalSrtIngestUrl={globalSrtIngestUrl}
-                      globalPlaybackUrl={globalPlaybackUrl}
                       invalidateStream={invalidateStream}
                     />
                   </Box>

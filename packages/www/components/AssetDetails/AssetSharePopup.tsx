@@ -10,6 +10,7 @@ import {
 } from "@livepeer/design-system";
 import { CodeIcon, Link1Icon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { isStaging } from "lib/utils";
 
 const buttonLinkCss = {
   display: "flex",
@@ -29,7 +30,9 @@ const AssetSharePopup = ({
   onEmbedVideoClick,
 }: AssetSharePopupProps) => {
   const [openSnackbar] = useSnackbar();
-  const copyString = `https://lvpr.tv?v=${playbackId}`;
+  const copyString = isStaging()
+    ? `https://monster.lvpr.tv?v=${playbackId}`
+    : `https://lvpr.tv?v=${playbackId}`;
 
   return (
     <Popover>

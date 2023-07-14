@@ -1,7 +1,7 @@
 import AppPlayer from "components/AppPlayer";
 import { Badge, Box, Status } from "@livepeer/design-system";
 
-const ActiveStream = ({ playbackUrl }: { playbackUrl: string }) => (
+const ActiveStream = ({ playbackId }: { playbackId: string }) => (
   <>
     <Badge
       size="2"
@@ -18,7 +18,7 @@ const ActiveStream = ({ playbackUrl }: { playbackUrl: string }) => (
       </Box>
       Active
     </Badge>
-    <AppPlayer playbackUrl={playbackUrl} type="stream" autoPlay />
+    <AppPlayer playbackId={playbackId} type="stream" autoPlay />
   </>
 );
 

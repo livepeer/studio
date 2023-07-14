@@ -21,7 +21,6 @@ const StreamHeadingBox = ({
       align="end"
       css={{
         pb: "$3",
-        mb: "$5",
         width: "100%",
       }}>
       <Heading size="2">
