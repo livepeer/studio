@@ -219,7 +219,7 @@ export const CARD_OPTIONS = {
 };
 
 export function isStaging(): boolean {
-  return (true||
+  return (
     typeof window !== "undefined" &&
     (window.location.hostname.includes("livepeer.monster") ||
       window.location.hostname.includes("livepeer.vercel.app") ||
