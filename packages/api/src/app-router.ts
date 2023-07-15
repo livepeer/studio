@@ -26,6 +26,8 @@ import { pathJoin } from "./controllers/helpers";
 import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
 import * as fcl from "@onflow/fcl";
+import express from "express";
+import path from "path";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -260,7 +262,20 @@ export default async function makeApp(params: CliArgs) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
+
+  // Serve the frontend in the development or pkg case
+  app.use(express.static(path.resolve(__dirname, "..", "..", "www", "out")));
+  // For all requests that aren't /api, return index.html if available
   app.use(errorHandler());
+  app.use((req, res, next) => {
+    if (req.url.startsWith(httpPrefix)) {
+      return next();
+    }
+
+    res.sendFile(
+      path.resolve(__dirname, "..", "..", "www", "out", "index.html")
+    );
+  });
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
   await fcl.config({
