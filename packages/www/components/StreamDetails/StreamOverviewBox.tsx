@@ -36,7 +36,7 @@ const StreamOverviewBox = ({
           width: "100%",
         }}>
         <Heading size="1" css={{ fontWeight: 600 }}>
-          Overview
+          Details
         </Heading>
       </Box>
       <Flex
