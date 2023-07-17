@@ -22,7 +22,7 @@ export type StreamChildrenHeadingBoxProps = {
   stream: Stream;
   user: User;
   activeTab: string;
-  setSwitchTab: Dispatch<SetStateAction<"Overview" | "Details" | "Health">>;
+  setSwitchTab: Dispatch<SetStateAction<"Overview" | "Health">>;
   invalidateStream: () => void;
 };
 
@@ -59,22 +59,6 @@ const StreamChildrenHeadingBox = ({
             },
           }}>
           Overview
-        </Box>
-        <Box
-          as="div"
-          onClick={() => setSwitchTab("Details")}
-          css={{
-            textDecoration: "none",
-            pb: "$2",
-            width: "100%",
-            cursor: "default",
-            borderBottom: "2px solid",
-            borderColor: activeTab === "Details" ? "$green9" : "transparent",
-            "&:hover": {
-              textDecoration: "none",
-            },
-          }}>
-          Details
         </Box>
         <Box
           as="div"
