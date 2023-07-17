@@ -136,6 +136,8 @@ app.post(
     const rooms = await svc.listRooms([req.params.roomId]);
     if (rooms.length < 1) {
       throw new BadRequestError(`room not currently running`);
+    } else if (rooms.length > 1) {
+      throw new InternalServerError(`more than one room found`);
     }
 
     const stream = await db.stream.get(req.body.streamId);
