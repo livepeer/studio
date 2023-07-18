@@ -26,8 +26,7 @@ import { pathJoin } from "./controllers/helpers";
 import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
 import * as fcl from "@onflow/fcl";
-import express from "express";
-import path from "path";
+import wwwHandlerPromise from "@livepeer.studio/www";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -263,7 +262,7 @@ export default async function makeApp(params: CliArgs) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
-  const wwwHandler = await require("@livepeer.studio/www");
+  const wwwHandler = await wwwHandlerPromise;
   app.use(wwwHandler);
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
