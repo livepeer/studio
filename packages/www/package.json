@@ -14,6 +14,7 @@
     "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-master}) -f Dockerfile ../..",
     "analyze-bundle": "ANALYZE=true yarn build"
   },
+  "main": "server.js",
   "license": "MIT",
   "dependencies": {
     "@emotion/core": "^10.0.17",

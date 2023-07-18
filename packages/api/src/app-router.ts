@@ -262,20 +262,8 @@ export default async function makeApp(params: CliArgs) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
-
-  // Serve the frontend in the development or pkg case
-  app.use(express.static(path.resolve(__dirname, "..", "..", "www", "out")));
-  // For all requests that aren't /api, return index.html if available
-  app.use(errorHandler());
-  app.use((req, res, next) => {
-    if (req.url.startsWith(httpPrefix)) {
-      return next();
-    }
-
-    res.sendFile(
-      path.resolve(__dirname, "..", "..", "www", "out", "index.html")
-    );
-  });
+  const wwwHandler = await require("@livepeer.studio/www");
+  app.use(wwwHandler);
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
   await fcl.config({
