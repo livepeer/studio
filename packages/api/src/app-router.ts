@@ -248,6 +248,7 @@ export default async function makeApp(params: CliArgs) {
       prefixRouter.use(`/${name}`, controller);
     }
   }
+  prefixRouter.use(errorHandler());
   app.use(httpPrefix, prefixRouter);
   // Special case: handle /stream proxies off that endpoint
   app.use("/stream", streamProxy);
