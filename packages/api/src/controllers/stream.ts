@@ -484,8 +484,9 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   if (record) {
     if (record === "true" || record === "1") {
       query.push(sql`data->>'record' = 'true'`);
+      query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
     } else if (record === "false" || record === "0") {
-      query.push(sql`(data->>'record' = 'false' OR data->>'record' IS NULL)`);
+      query.push(sql`data->>'recordObjectStoreId' IS NULL`);
       filterOut = true;
     }
   }
@@ -764,6 +765,9 @@ app.post(
     const createdAt = Date.now();
 
     const record = stream.record;
+    const recordObjectStoreId =
+      stream.recordObjectStoreId ||
+      (record ? req.config.recordObjectStoreId : undefined);
     const childStream: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
@@ -771,6 +775,7 @@ app.post(
       renditions: {},
       objectStoreId: stream.objectStoreId,
       record,
+      recordObjectStoreId,
       sessionId,
       id,
       createdAt,
@@ -810,6 +815,7 @@ app.post(
         deleted: false,
         profiles: childStream.profiles,
         record,
+        recordObjectStoreId,
         recordingStatus: record ? "waiting" : undefined,
       };
       await db.session.create(session);
@@ -1631,19 +1637,58 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
-  let objectStore: string;
+  let objectStore: string,
+    recordObjectStore: string,
+    recordObjectStoreUrl: string;
   if (stream.objectStoreId) {
     const os = await db.objectStore.get(stream.objectStoreId);
     if (!os || os.deleted || os.disabled) {
       res.status(500);
       return res.json({
         errors: [
-          `data integrity error: object store ${stream.objectStoreId} not found or disabled`,
+          `data integity error: object store ${stream.objectStoreId} not found or disabled`,
         ],
       });
     }
     objectStore = os.url;
   }
+  const isLive = live === "live";
+  if (
+    isLive &&
+    stream.record &&
+    req.config.recordObjectStoreId &&
+    !stream.recordObjectStoreId // we used to create sessions without recordObjectStoreId
+  ) {
+    const ros = await db.objectStore.get(req.config.recordObjectStoreId);
+    if (ros && !ros.deleted && !ros.disabled) {
+      await db.stream.update(stream.id, {
+        recordObjectStoreId: req.config.recordObjectStoreId,
+      });
+      stream.recordObjectStoreId = req.config.recordObjectStoreId;
+      if (stream.parentId) {
+        const sessionId = stream.sessionId ?? stream.id;
+        await db.session.update(sessionId, {
+          recordObjectStoreId: req.config.recordObjectStoreId,
+        });
+      }
+    }
+  }
+  if (stream.recordObjectStoreId && !req.config.supressRecordInHook) {
+    const ros = await db.objectStore.get(stream.recordObjectStoreId);
+    if (!ros || ros.deleted || ros.disabled) {
+      res.status(500);
+      return res.json({
+        errors: [
+          `data integity error: record object store ${stream.recordObjectStoreId} not found or disabled`,
+        ],
+      });
+    }
+    recordObjectStore = ros.url;
+    if (ros.publicUrl) {
+      recordObjectStoreUrl = ros.publicUrl;
+    }
+  }
+
   // Use our parents' playbackId for sharded playback
   let manifestID = streamId;
   if (stream.parentId) {
@@ -1662,6 +1707,16 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
         (w) => w.id
       )}" for manifestId=${manifestID}`
     );
+    // TODO: Validate if these are the best default configs
+    // detection = {
+    //   freq: 4, // Segment sample rate. Process 1 / freq segments
+    //   sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
+    //   sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+    // };
+    // if (stream.detection?.sceneClassification) {
+    //   detection.sceneClassification = stream.detection?.sceneClassification;
+    // }
+    // console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
   }
 
   console.log(
@@ -1677,6 +1732,8 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,
+    recordObjectStore,
+    recordObjectStoreUrl,
     previousSessions: stream.previousSessions,
     detection,
     verificationFreq: req.config.verificationFrequency,
