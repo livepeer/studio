@@ -16,9 +16,6 @@ concurrency:
 jobs:
   build:
     name: ${{ matrix.build.package }} builds
-    if:
-      github.event_name == 'push' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       packages: write
       contents: read
@@ -89,7 +86,10 @@ jobs:
             GITHUB_SHA=${{ (github.event.pull_request.head.sha || github.sha) }}
           context: .
           platforms: linux/amd64
-          push: true
+          push:
+            ${{ github.event_name == 'push' ||
+            github.event.pull_request.head.repo.full_name == github.repository
+            }}
           tags: ${{ steps.meta.outputs.tags }}
           file: ${{ matrix.build.path }}/Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
