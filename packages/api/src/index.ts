@@ -21,7 +21,10 @@ function getGitHash(): string {
   let version = process.env.VERSION || process.env.GITHUB_SHA;
   if (!version) {
     try {
-      require("child_process").execSync("git rev-parse HEAD").toString().trim();
+      version = require("child_process")
+        .execSync("git rev-parse HEAD")
+        .toString()
+        .trim();
     } catch (e) {
       // Oh well
     }
