@@ -216,7 +216,13 @@ const PlanForm = ({
         </Flex>
 
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          css={{
+            maxWidth: 450,
+            px: "$5",
+            pt: "$4",
+            pb: "$4",
+            textAlign: "left",
+          }}>
           <Box
             as="form"
             onSubmit={handleSubmit(onSubmit)}
@@ -434,8 +440,8 @@ const PlanForm = ({
                     {products[stripeProductId].order <
                       products[user.newStripeProductId]?.order ||
                     products[stripeProductId]?.order
-                      ? "downgrade"
-                      : "upgrade"}{" "}
+                      ? "upgrade"
+                      : "downgrade"}{" "}
                     to the {products[stripeProductId].name} plan?
                   </Text>
                 </Box>
