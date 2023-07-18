@@ -1,0 +1,42 @@
+name: Verify static build still works
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - dev
+    tags:
+      - "v*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: Do a static build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          # Check https://github.com/livepeer/go-livepeer/pull/1891
+          # for ref value discussion
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+
+      - name: yarn install
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: build api dependency
+        run: cd packages/api && yarn run prepare
+
+      - name: static build
+        run: cd packages/www && yarn run static
