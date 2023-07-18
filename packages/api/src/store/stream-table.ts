@@ -70,14 +70,6 @@ export type DeprecatedStreamFields = {
   userSessionCreatedAt?: number;
 };
 
-export type DeprecatedSessionFields = {
-  /**
-   * @deprecated Used to represent the ID of the last session to have started in
-   * a chain of sessions.
-   */
-  recordObjectStoreId?: string;
-};
-
 export type DBStream = WithID<Stream> & StreamStats & DeprecatedStreamFields;
 
 export default class StreamTable extends Table<DBStream> {
