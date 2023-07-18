@@ -48,6 +48,9 @@ jobs:
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
+        if:
+          ${{ github.event_name == 'push' ||
+          github.event.pull_request.head.repo.full_name == github.repository }}
         with:
           username: ${{ secrets.CI_DOCKERHUB_USERNAME }}
           password: ${{ secrets.CI_DOCKERHUB_TOKEN }}
