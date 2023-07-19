@@ -18,12 +18,18 @@ const prefix = "livepeer_api_";
 collectDefaultMetrics({ prefix });
 
 function getGitHash(): string {
-  return (
-    process.env.VERSION ||
-    process.env.GITHUB_SHA ||
-    require("child_process").execSync("git rev-parse HEAD").toString().trim() ||
-    "undefined"
-  );
+  let version = process.env.VERSION || process.env.GITHUB_SHA;
+  if (!version) {
+    try {
+      version = require("child_process")
+        .execSync("git rev-parse HEAD")
+        .toString()
+        .trim();
+    } catch (e) {
+      // Oh well
+    }
+  }
+  return version || "undefined";
 }
 
 export default async function makeApp(params: CliArgs) {

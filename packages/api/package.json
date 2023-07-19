@@ -37,7 +37,7 @@
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
     "coverage": "yarn run test --coverage",
     "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
-    "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')"
+    "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node18-${os.platform()}-${os.arch()}`')"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.48.0",
@@ -109,7 +109,8 @@
     "whatwg-fetch": "^3.4.0",
     "winston": "^3.2.1",
     "wolfy87-eventemitter": "^5.2.9",
-    "yargs": "^17.3.1"
+    "yargs": "^17.3.1",
+    "@livepeer.studio/www": "0.15.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -141,7 +142,7 @@
     "npm-run-all": "^4.1.5",
     "nyc": "^14.0.0",
     "parcel": "^1.12.4",
-    "pkg": "^5.7.0",
+    "pkg": "^5.8.1",
     "prettier": "^2.6.2",
     "redoc-cli": "^0.8.3",
     "tus-js-client": "^3.0.0-0",
@@ -173,11 +174,18 @@
   },
   "pkg": {
     "targets": [
-      "node16-macos-arm64",
-      "node16-macos-x64",
-      "node16-linux-arm64",
-      "node16-linux-x64",
-      "node16-windows-x64"
+      "node18-macos-arm64",
+      "node18-macos-x64",
+      "node18-linux-arm64",
+      "node18-linux-x64",
+      "node18-windows-x64"
+    ],
+    "assets": [
+      "../www/.next",
+      "../www/next.config.js",
+      "../../node_modules/dom-helpers/**/*",
+      "../../node_modules/react-icons/**/*",
+      "../../node_modules/next-mdx-remote/**/*"
     ]
   }
 }

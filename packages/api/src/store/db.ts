@@ -14,7 +14,6 @@ import {
   Region,
   WebhookResponse,
   Session,
-  CdnUsageLast,
   SigningKey,
   Room,
   Attestation,
@@ -28,7 +27,6 @@ import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
-import { CdnUsageTable } from "./cdn-usage-table";
 import AssetTable from "./asset-table";
 import TaskTable from "./task-table";
 import ExperimentTable from "./experiment-table";
@@ -80,8 +78,6 @@ export class DB {
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: Table<DBSession>;
-  cdnUsageLast: Table<CdnUsageLast>;
-  cdnUsageTable: CdnUsageTable;
   room: Table<Room>;
 
   postgresUrl: string;
@@ -188,10 +184,6 @@ export class DB {
       schema: schemas["webhook-response"],
     });
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
-    this.cdnUsageLast = makeTable<CdnUsageLast>({
-      db: this,
-      schema: schemas["cdn-usage-last"],
-    });
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
@@ -203,9 +195,6 @@ export class DB {
         return this[camelName].ensureTable();
       })
     );
-
-    this.cdnUsageTable = new CdnUsageTable(this);
-    await this.cdnUsageTable.makeTable();
   }
 
   queryWithOpts<T, I extends any[] = any[]>(
