@@ -394,7 +394,9 @@ export default async function makeApp(params: CliArgs) {
       listener = app
         .listen(port, () => {
           listenPort = listener.address().port;
-          logger.info(`API server listening on http://0.0.0.0:${listenPort}`);
+          logger.info(
+            `Stream info server listening on http://0.0.0.0:${listenPort}`
+          );
           resolve();
         })
         .on("error", (err) => {
