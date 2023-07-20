@@ -523,6 +523,27 @@ export function isValidBase64(str: string) {
   }
 }
 
+export async function triggerCatalystStreamUpdated(
+  req: Request,
+  playbackId: string
+) {
+  const { catalystBaseUrl } = req.config;
+
+  let url = `${catalystBaseUrl}/api/events`;
+  let options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      resource: "stream",
+      playback_id: playbackId,
+    }),
+  };
+
+  fetch(url, options);
+}
+
 export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
   return typeof inputId === "string"
     ? { type: "unverified", value: inputId }
