@@ -24,7 +24,7 @@ import {
 import Spinner from "components/Spinner";
 
 import { useApi } from "../../../hooks";
-import { MultistreamTarget } from "@livepeer.studio/api";
+import { MultistreamTarget, Stream } from "@livepeer.studio/api";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 
 const DisableDialog = ({
