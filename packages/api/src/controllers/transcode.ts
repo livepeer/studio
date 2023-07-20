@@ -27,14 +27,24 @@ app.post(
 
     let inUrl = params.input["url"];
     if (!inUrl) {
-      inUrl =
-        toObjectStoreUrl(params.input as ObjectStoreStorage) +
-        params.input["path"];
+      let path = params.input["path"];
+      if (!path.startsWith("/")) {
+        path = "/" + path;
+      }
+      inUrl = toObjectStoreUrl(params.input as ObjectStoreStorage) + path;
     }
     const storageUrl =
       params.storage.type === "web3.storage"
         ? toWeb3StorageUrl(params.storage)
         : toObjectStoreUrl(params.storage);
+
+    const outputs = params.outputs;
+    if (outputs.hls?.path != null && !outputs.hls.path.startsWith("/")) {
+      outputs.hls.path = "/" + outputs.hls.path;
+    }
+    if (outputs.mp4?.path != null && !outputs.mp4.path.startsWith("/")) {
+      outputs.mp4.path = "/" + outputs.mp4.path;
+    }
 
     const task = await req.taskScheduler.createAndScheduleTask(
       "transcode-file",
@@ -46,7 +56,7 @@ app.post(
           storage: {
             url: storageUrl,
           },
-          outputs: params.outputs,
+          outputs,
           profiles: params.profiles,
           targetSegmentSizeSecs: params.targetSegmentSizeSecs,
           creatorId: params.creatorId,
