@@ -1101,3 +1101,37 @@ components:
                       type: string
                     timestamp:
                       type: integer
+    object-store-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/object-store/properties/name"
+        disabled:
+          $ref: "#/components/schemas/object-store/properties/disabled"
+        url:
+          $ref: "#/components/schemas/object-store/properties/url"
+        publicUrl:
+          $ref: "#/components/schemas/object-store/properties/publicUrl"
+    stream-set-active-payload:
+      type: object
+      required:
+        - active
+      properties:
+        active:
+          $ref: "#/components/schemas/stream/properties/isActive"
+        hostName:
+          $ref: "#/components/schemas/stream/properties/mistHost"
+        startedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the stream started.
+          example: 1587667174725
+    signing-key-response-payload:
+      type: object
+      required:
+        - publicKey
+        - privateKey
+      properties:
+        $ref: "#/components/schemas/signing-key/properties"
+        privateKey:
+          type: string

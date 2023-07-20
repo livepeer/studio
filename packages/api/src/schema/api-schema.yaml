@@ -385,19 +385,6 @@ components:
           minItems: 1
           items:
             type: string
-    stream-set-active-payload:
-      type: object
-      required:
-        - active
-      properties:
-        active:
-          $ref: "#/components/schemas/stream/properties/isActive"
-        hostName:
-          $ref: "#/components/schemas/stream/properties/mistHost"
-        startedAt:
-          type: number
-          description: Timestamp (in milliseconds) at which the stream started.
-          example: 1587667174725
     asset-patch-payload:
       type: object
       additionalProperties: false
@@ -501,18 +488,6 @@ components:
             An object containing any additional fields sent by mist in the
             health (STREAM_BUFFER) payload.
           additionalProperties: true
-    object-store-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: "#/components/schemas/object-store/properties/name"
-        disabled:
-          $ref: "#/components/schemas/object-store/properties/disabled"
-        url:
-          $ref: "#/components/schemas/object-store/properties/url"
-        publicUrl:
-          $ref: "#/components/schemas/object-store/properties/publicUrl"
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
       required: []
@@ -787,7 +762,18 @@ components:
                         Additional data to add to the NFT metadata exported to
                         IPFS. Will be deep merged with the default metadata
                         exported.
-                $ref: "#/components/schemas/ipfs-file-info/properties"
+                cid:
+                  type: string
+                  description: CID of the file on IPFS
+                url:
+                  readOnly: true
+                  type: string
+                  description: URL with IPFS scheme for the file
+                gatewayUrl:
+                  readOnly: true
+                  type: string
+                  description:
+                    URL to access file via HTTP through an IPFS gateway
                 nftMetadata:
                   $ref: "#/components/schemas/ipfs-file-info"
                 updatedAt:
@@ -1000,11 +986,10 @@ components:
                   properties:
                     spec:
                       oneOf:
-                        - type: "null"
+                        - type: object
                         - $ref: >-
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
                 - type: boolean
-                - type: "null"
         url:
           type: string
           format: uri
@@ -1663,15 +1648,6 @@ components:
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
-    signing-key-response-payload:
-      type: object
-      required:
-        - publicKey
-        - privateKey
-      properties:
-        $ref: "#/components/schemas/signing-key/properties"
-        privateKey:
-          type: string
     user:
       type: object
       required:
@@ -2102,7 +2078,18 @@ components:
               type: object
               additionalProperties: false
               properties:
-                $ref: "#/components/schemas/ipfs-file-info/properties"
+                cid:
+                  type: string
+                  description: CID of the file on IPFS
+                url:
+                  readOnly: true
+                  type: string
+                  description: URL with IPFS scheme for the file
+                gatewayUrl:
+                  readOnly: true
+                  type: string
+                  description:
+                    URL to access file via HTTP through an IPFS gateway
                 updatedAt:
                   readOnly: true
                   type: number
@@ -2115,8 +2102,23 @@ components:
       type: object
       additionalProperties: false
       properties:
-        $ref: >-
-          #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties
+        nftMetadataTemplate:
+          type: string
+          enum:
+            - file
+            - player
+          default: file
+          description: |
+            Name of the NFT metadata template to export. 'player'
+            will embed the Livepeer Player on the NFT while 'file'
+            will reference only the immutable MP4 files.
+        nftMetadata:
+          type: object
+          description: |
+            Additional data to add to the NFT metadata exported to
+            IPFS. Will be deep merged with the default metadata
+            exported.
+
         pinata:
           description: |
             Custom credentials for the Piñata service. Must have either
@@ -3336,7 +3338,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-  "/data/views/query/total/{playbackid}":
+  "/data/views/query/total/{playbackId}":
     get:
       summary: Query public total views metrics
       description: |
