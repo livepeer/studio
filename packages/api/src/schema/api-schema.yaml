@@ -763,17 +763,11 @@ components:
                         IPFS. Will be deep merged with the default metadata
                         exported.
                 cid:
-                  type: string
-                  description: CID of the file on IPFS
+                  $ref: "#/components/schemas/ipfs-file-info/properties/cid"
                 url:
-                  readOnly: true
-                  type: string
-                  description: URL with IPFS scheme for the file
+                  $ref: "#/components/schemas/ipfs-file-info/properties/url"
                 gatewayUrl:
-                  readOnly: true
-                  type: string
-                  description:
-                    URL to access file via HTTP through an IPFS gateway
+                  $ref: "#/components/schemas/ipfs-file-info/properties/gatewayUrl"
                 nftMetadata:
                   $ref: "#/components/schemas/ipfs-file-info"
                 updatedAt:
@@ -953,6 +947,26 @@ components:
         name:
           type: string
           description: Name of the signing key
+    signing-key-response-payload:
+      type: object
+      required:
+        - publicKey
+        - privateKey
+      properties:
+        id:
+          $ref: "#/components/schemas/signing-key/properties/id"
+        name:
+          $ref: "#/components/schemas/signing-key/properties/name"
+        createdAt:
+          $ref: "#/components/schemas/signing-key/properties/createdAt"
+        lastSeen:
+          $ref: "#/components/schemas/signing-key/properties/lastSeen"
+        publicKey:
+          $ref: "#/components/schemas/signing-key/properties/publicKey"
+        disabled:
+          $ref: "#/components/schemas/signing-key/properties/disabled"
+        privateKey:
+          type: string
     new-asset-payload:
       additionalProperties: false
       required:
@@ -2079,17 +2093,11 @@ components:
               additionalProperties: false
               properties:
                 cid:
-                  type: string
-                  description: CID of the file on IPFS
+                  $ref: "#/components/schemas/ipfs-file-info/properties/cid"
                 url:
-                  readOnly: true
-                  type: string
-                  description: URL with IPFS scheme for the file
+                  $ref: "#/components/schemas/ipfs-file-info/properties/url"
                 gatewayUrl:
-                  readOnly: true
-                  type: string
-                  description:
-                    URL to access file via HTTP through an IPFS gateway
+                  $ref: "#/components/schemas/ipfs-file-info/properties/gatewayUrl"
                 updatedAt:
                   readOnly: true
                   type: number
@@ -2103,22 +2111,9 @@ components:
       additionalProperties: false
       properties:
         nftMetadataTemplate:
-          type: string
-          enum:
-            - file
-            - player
-          default: file
-          description: |
-            Name of the NFT metadata template to export. 'player'
-            will embed the Livepeer Player on the NFT while 'file'
-            will reference only the immutable MP4 files.
+          $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties/nftMetadataTemplate"
         nftMetadata:
-          type: object
-          description: |
-            Additional data to add to the NFT metadata exported to
-            IPFS. Will be deep merged with the default metadata
-            exported.
-
+          $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties/nftMetadata"
         pinata:
           description: |
             Custom credentials for the Piñata service. Must have either
@@ -3535,7 +3530,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/signing-key"
+                $ref: "#/components/schemas/signing-key-response-payload"
         default:
           description: Error
           content:

@@ -1126,12 +1126,3 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
-    signing-key-response-payload:
-      type: object
-      required:
-        - publicKey
-        - privateKey
-      properties:
-        $ref: "#/components/schemas/signing-key/properties"
-        privateKey:
-          type: string
