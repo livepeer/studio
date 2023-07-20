@@ -8,7 +8,17 @@ info:
   version: 1.0.0
 servers:
   - url: "https://livepeer.studio/api"
+
+security:
+  - apiKey: []
+
 components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Bearer api-key
   schemas:
     ffmpeg-profile:
       type: object
