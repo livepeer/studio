@@ -1005,12 +1005,12 @@ components:
                 pinned files, specify an object with a spec field. False or null
                 means to unpin from IPFS, but it's unsupported right now.
               oneOf:
-                - type: "null"
+                - type: object
                   additionalProperties: false
                   properties:
                     spec:
                       oneOf:
-                        - type: object
+                        - type: "null"
                         - $ref: >-
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
                 - type: boolean
