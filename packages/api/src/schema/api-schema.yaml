@@ -2197,6 +2197,7 @@ paths:
   /stream:
     post:
       summary: Create a stream
+      operationId: createStream
       description: |
         POST /stream creates a stream object. The configuration on this stream
         object is inherited by all live sessions using this stream's streamKey.
@@ -2245,6 +2246,7 @@ paths:
                 $ref: "#/components/schemas/error"
     get:
       summary: Retrieve streams
+      operationId: getStreams
       description: >
         GET `/stream` endpoint is used to retrieve all stream objects with the
         same userId. The response will include both parent stream objects and
@@ -2330,6 +2332,7 @@ paths:
           type: string
     get:
       summary: Retrieve a stream
+      operationId: getStream
       description: |
         In order to retrieve a specific stream, you can just pass the stream id
         to this API
@@ -2348,6 +2351,7 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update a stream
+      operationId: updateStream
       description: |
         PATCH /stream/{id} can be used to modify a stream object. It is a single
         endpoint that can update any of the mutable properties of a stream.
@@ -2380,6 +2384,7 @@ paths:
                 $ref: "#/components/schemas/error"
     delete:
       summary: Delete a stream
+      operationId: deleteStream
       description: |
         DELETE /stream/{id} deletes an existing stream object.
         \
@@ -2407,6 +2412,7 @@ paths:
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
+      operationId: getMultistreamTargets
       description: |
         Use /multistream/target to a return a list of your existing multistream
         targets.
@@ -2427,6 +2433,7 @@ paths:
                 $ref: "#/components/schemas/error"
     post:
       summary: Create a multistream target
+      operationId: createMultistreamTarget
       requestBody:
         required: true
         content:
@@ -2458,6 +2465,7 @@ paths:
           type: string
     get:
       summary: Retrieve a multistream target
+      operationId: getMultistreamTarget
       description:
         You can retrieve a multistream target from its ID with this API.
       responses:
@@ -2475,6 +2483,7 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update Multistream Target
+      operationId: updateMultistreamTarget
       description: |
         PATCH /multistream/target/{id} updates an existing multistream target
         object. You can change any user-defined field in the current object,
@@ -2510,6 +2519,7 @@ paths:
                 $ref: "#/components/schemas/error"
     delete:
       summary: Delete a multistream target
+      operationId: deleteMultistreamTarget
       description: |
         DELETE /multistream/target/{id} deletes an existing multistream target
         object. Make sure to remove any references to the target on existing
@@ -2526,6 +2536,7 @@ paths:
   /webhook:
     get:
       summary: Retrieve a Webhook
+      operationId: getWebhooks
       responses:
         "200":
           description: Success
@@ -2543,6 +2554,7 @@ paths:
                 $ref: "#/components/schemas/error"
     post:
       summary: Create a webhook
+      operationId: createWebhook
       description: >
         To create a new webhook, you need to make an API call with the events
 
@@ -2656,6 +2668,7 @@ paths:
   "/webhook/{id}":
     get:
       summary: Retrieve a webhook
+      operationId: getWebhook
       parameters:
         - name: id
           in: path
@@ -2683,6 +2696,7 @@ paths:
           schema:
             type: string
       summary: Update a webhook
+      operationId: updateWebhook
       description: |
         You can update a webhook by calling the PATCH webhook endpoint with the
         webhookId. It is a single endpoint that can update any of the mutable
@@ -2711,6 +2725,7 @@ paths:
           schema:
             type: string
       summary: Delete a webhook
+      operationId: deleteWebhook
       responses:
         "200":
           description: Success
@@ -2727,6 +2742,7 @@ paths:
   /asset:
     get:
       summary: Retrieve assets
+      operationId: getAssets
       responses:
         "200":
           description: Success
@@ -2745,6 +2761,7 @@ paths:
   /asset/request-upload:
     post:
       summary: Upload an asset
+      operationId: requestUpload
       description: |
         To upload an asset, your first need to request for a direct upload URL
         and only then actually upload the contents of the asset.
@@ -2862,6 +2879,7 @@ paths:
   /asset/upload/url:
     post:
       summary: Upload asset via URL
+      operationId: uploadAssetViaURL
       description: |
         Import a video Asset from an external URL through the POST
         /api/asset/upload/url API.
@@ -2910,6 +2928,7 @@ paths:
   "/asset/{assetId}":
     get:
       summary: Retrieves an asset
+      operationId: getAsset
       parameters:
         - in: path
           name: assetId
@@ -2932,6 +2951,7 @@ paths:
                 $ref: "#/components/schemas/error"
     delete:
       summary: Delete an asset
+      operationId: deleteAsset
       parameters:
         - in: path
           name: assetId
@@ -2951,6 +2971,7 @@ paths:
   /room:
     post:
       summary: Create a room
+      operationId: createRoom
       description: |
         Create a multiparticipant livestreaming room.
       responses:
@@ -2975,6 +2996,7 @@ paths:
           schema:
             type: string
       summary: Retrieve a room
+      operationId: getRoom
       responses:
         "200":
           description: Success
@@ -2996,6 +3018,7 @@ paths:
           schema:
             type: string
       summary: Delete a room
+      operationId: deleteRoom
       responses:
         "204":
           description: Success
@@ -3020,6 +3043,7 @@ paths:
           schema:
             type: string
       summary: Start room RTMP egress
+      operationId: startRoomEgress
       description: |
         Create a livestream for your room.
         This allows you to leverage livestreaming features like recording and HLS output.
@@ -3034,6 +3058,7 @@ paths:
                 $ref: "#/components/schemas/error"
     delete:
       summary: Stop room RTMP egress
+      operationId: stopRoomEgress
       parameters:
         - name: id
           in: path
@@ -3064,6 +3089,7 @@ paths:
           schema:
             type: string
       summary: Create a room user
+      operationId: createRoomUser
       description: |
         Call this endpoint to add a user to a room, specifying a display name at a minimum.
         The response will contain a joining URL for Livepeer's default meeting app.
@@ -3095,6 +3121,7 @@ paths:
           schema:
             type: string
       summary: Get user details
+      operationId: getRoomUserDetails
       responses:
         "200":
           description: Success
@@ -3127,6 +3154,7 @@ paths:
           schema:
             type: string
       summary: Update a room user
+      operationId: updateRoomUserDetails
       description: Update properties for a user.
       responses:
         "204":
@@ -3150,6 +3178,7 @@ paths:
           schema:
             type: string
       summary: Remove a user from the room
+      operationId: deleteRoomUser
       responses:
         "204":
           description: Success
@@ -3162,6 +3191,7 @@ paths:
   /data/views/query:
     get:
       summary: Query viewership metrics
+      operationId: getViewershipsMetrics
       description: |
         Allows querying any metric in its raw form. Requires a private
         (non-CORS) API key to be used.
@@ -3258,6 +3288,7 @@ paths:
   /data/views/query/creator:
     get:
       summary: Query creator viewership metrics
+      operationId: getCreatorMetrics
       description: |
         Allows querying creator-specific metrics. Requires a proof of ownership
         to be sent in the request, which for now is just the assetId or streamId
@@ -3346,6 +3377,7 @@ paths:
   "/data/views/query/total/{playbackId}":
     get:
       summary: Query public total views metrics
+      operationId: getPublicTotalViewsMetrics
       description: |
         Allows querying for the public metrics for viewership about a video.
         This can be called from the frontend with a CORS key, or even
@@ -3396,6 +3428,7 @@ paths:
   "/data/usage/query":
     get:
       summary: Query usage metrics
+      operationId: getUsageMetrics
       description: |
         Allows querying any metric in its raw form. 
         This can be called from the frontend with a CORS key.
@@ -3443,6 +3476,7 @@ paths:
   /session:
     get:
       summary: Retrieve sessions
+      operationId: getSessions
       responses:
         "200":
           description: Success
@@ -3461,6 +3495,7 @@ paths:
   "/session/{id}":
     get:
       summary: Retrieve a session
+      operationId: getSession
       parameters:
         - in: path
           name: id
@@ -3484,6 +3519,7 @@ paths:
   "/stream/{parentId}/sessions":
     get:
       summary: Retrieve Recorded Sessions
+      operationId: getRecordedSessions
       parameters:
         - in: path
           name: parentId
@@ -3517,6 +3553,8 @@ paths:
   /access-control/signing-key:
     post:
       summary: Create a signing key
+      operationId: createSigningKey
+
       description: |
         A signing key is used to sign JWTs and are necessary to make a stream
         private.
@@ -3549,6 +3587,7 @@ paths:
                 $ref: "#/components/schemas/error"
     get:
       summary: Retrieves signing keys
+      operationId: getSigningKeys
       description: |
         You can list all the signing keys in your account by making a GET
         request on /api/access-control/signing-key.
@@ -3570,6 +3609,7 @@ paths:
   "/access-control/signing-key/{keyId}":
     delete:
       summary: Delete Signing Key
+      operationId: deleteSigningKey
       parameters:
         - in: path
           name: keyId
@@ -3588,6 +3628,8 @@ paths:
                 $ref: "#/components/schemas/error"
     get:
       summary: Retrieves a signing key
+      operationId: getSigningKey
+
       parameters:
         - in: path
           name: keyId
@@ -3610,6 +3652,8 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update a signing key
+      operationId: updateSigningKey
+
       description: |
         PATCH /access-control/signing-key/{KEY_ID} updates an existing signing
         key. It is a single endpoint that can update any of the mutable
@@ -3651,6 +3695,8 @@ paths:
   /task:
     get:
       summary: Retrieve Tasks
+      operationId: getTasks
+
       responses:
         "200":
           description: Success
@@ -3669,6 +3715,8 @@ paths:
   "/task/{taskId}":
     get:
       summary: Retrieve a Task
+      operationId: getTask
+
       description: |
         Retrieves the details of a Task, including progress updates and status.
         Supply the unique Task ID that was returned from your previous request
@@ -3692,6 +3740,8 @@ paths:
   /transcode:
     post:
       summary: Transcode a video
+      operationId: transcode
+
       description: >
         `POST /transcode` transcodes a video file and uploads the results to the
 
@@ -3990,6 +4040,8 @@ paths:
   "/playback/{id}":
     get:
       summary: Retrieve Playback Info
+      operationId: getPlaybackInfo
+
       description: |
         You can retrieve the playback information about any playback identifier
         by calling this endpoint. It accepts playbackIds from any resource in
