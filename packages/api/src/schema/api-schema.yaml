@@ -1039,6 +1039,11 @@ components:
           type: boolean
           description: Whether a user is allowed to publish audio/video tracks
           example: true
+        canPublishData:
+          type: boolean
+          description:
+            Whether a user is allowed to publish data messages to the room
+          example: true
         metadata:
           type: string
           description: User defined payload to store for the participant
@@ -1112,6 +1117,12 @@ components:
           description:
             Whether a user is allowed to publish audio/video tracks (i.e. their
             microphone and webcam)
+          example: true
+          default: true
+        canPublishData:
+          type: boolean
+          description:
+            Whether a user is allowed to publish data messages to the room
           example: true
           default: true
         metadata:
