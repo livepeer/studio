@@ -390,6 +390,16 @@ app.post("/migrate-personal-user", async (req, res) => {
         stripeCustomerSubscriptionId: subscription.id,
       });
     }
+  } else {
+    res.json({
+      errors: [
+        `Unable to migrate personal user - customer not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+      ],
+    });
+    await db.user.update(user.id, {
+      isActiveSubscription: false,
+    });
+    return;
   }
   res.json({
     result: "Migrated user with email " + user.email + " to hacker plan",
@@ -499,6 +509,16 @@ app.post("/migrate-hacker-user", async (req, res) => {
         stripeCustomerSubscriptionId: subscription.id,
       });
     }
+  } else {
+    res.json({
+      errors: [
+        `Unable to migrate hacker user - customer not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+      ],
+    });
+    await db.user.update(user.id, {
+      isActiveSubscription: false,
+    });
+    return;
   }
   res.json({
     result: "Migrated user with email " + user.email + " to personal plan",
@@ -623,6 +643,16 @@ app.post("/migrate-pro-user", async (req, res) => {
         oldProPlan: true,
       });
     }
+  } else {
+    res.json({
+      errors: [
+        `Unable to migrate pro user - customer not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+      ],
+    });
+    await db.user.update(user.id, {
+      isActiveSubscription: false,
+    });
+    return;
   }
   res.json({
     result: "Migrated pro user with email " + user.email + " to hacker plan",
