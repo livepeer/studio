@@ -21,4 +21,4 @@ const getApp = async () => {
   await app.prepare();
   return app.getRequestHandler();
 };
-module.exports = getApp();
+module.exports = getApp;

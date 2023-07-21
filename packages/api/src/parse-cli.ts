@@ -422,6 +422,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://meet.livekit.io/custom",
       },
+      frontend: {
+        describe: "serve the embedded @livepeer/www Next.js frontend",
+        type: "boolean",
+        default: true,
+      },
     })
     .usage(
       `
