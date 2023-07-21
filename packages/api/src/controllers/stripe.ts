@@ -288,6 +288,7 @@ app.post("/migrate-personal-user", async (req, res) => {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
+  let migration = [];
 
   const [users] = await db.user.find(
     [
@@ -306,7 +307,11 @@ app.post("/migrate-personal-user", async (req, res) => {
     return;
   }
 
+  migration.push(`Found ${users.length} users to migrate`);
+
   let user = users[0];
+
+  migration.push(`Migrating user ${user.email}`);
 
   const { data } = await req.stripe.customers.list({
     email: user.email,
@@ -318,6 +323,9 @@ app.post("/migrate-personal-user", async (req, res) => {
       user.newStripeProductId !== "growth_1" &&
       user.newStripeProductId !== "scale_1"
     ) {
+      migration.push(
+        `User ${user.email} is migrating from ${user.stripeProductId} to ${user.newStripeProductId}`
+      );
       const items = await req.stripe.prices.list({
         lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
       });
@@ -326,6 +334,9 @@ app.post("/migrate-personal-user", async (req, res) => {
       try {
         subscription = await req.stripe.subscriptions.retrieve(
           user.stripeCustomerSubscriptionId
+        );
+        migration.push(
+          `User ${user.email} subscription is ${subscription.status}`
         );
       } catch (e) {
         console.log(`
@@ -357,38 +368,60 @@ app.post("/migrate-personal-user", async (req, res) => {
         return;
       }
 
-      const subscriptionItems = await req.stripe.subscriptionItems.list({
-        subscription: user.stripeCustomerSubscriptionId,
-      });
+      try {
+        const subscriptionItems = await req.stripe.subscriptionItems.list({
+          subscription: user.stripeCustomerSubscriptionId,
+        });
 
-      subscription = await req.stripe.subscriptions.update(
-        user.stripeCustomerSubscriptionId,
-        {
-          billing_cycle_anchor: "now",
-          cancel_at_period_end: false,
-          items: [
-            ...subscriptionItems.data.map((item) => {
-              // Check if the item is metered
-              const isMetered = item.price.recurring.usage_type === "metered";
-              return {
-                id: item.id,
-                deleted: true,
-                clear_usage: isMetered ? true : undefined, // If metered, clear usage
-                price: item.price.id,
-              };
-            }),
-            ...items.data.map((item) => ({
-              price: item.id,
-            })),
+        migration.push(
+          `User ${user.email} has ${subscriptionItems.data.length} subscription items`
+        );
+
+        subscription = await req.stripe.subscriptions.update(
+          user.stripeCustomerSubscriptionId,
+          {
+            billing_cycle_anchor: "now",
+            cancel_at_period_end: false,
+            items: [
+              ...subscriptionItems.data.map((item) => {
+                // Check if the item is metered
+                const isMetered = item.price.recurring.usage_type === "metered";
+                return {
+                  id: item.id,
+                  deleted: true,
+                  clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                  price: item.price.id,
+                };
+              }),
+              ...items.data.map((item) => ({
+                price: item.id,
+              })),
+            ],
+          }
+        );
+
+        migration.push(
+          `User ${user.email} has been updated to ${subscription.id}`
+        );
+
+        await db.user.update(user.id, {
+          stripeCustomerId: user.stripeCustomerId,
+          stripeProductId: "prod_O9XuIjn7EqYRVW",
+          stripeCustomerSubscriptionId: subscription.id,
+        });
+
+        migration.push(`User ${user.email} has been updated in the database`);
+      } catch (e) {
+        console.log(`
+              Unable to migrate personal user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+            `);
+        res.json({
+          errors: [
+            `Unable to migrate personal user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
           ],
-        }
-      );
-
-      await db.user.update(user.id, {
-        stripeCustomerId: user.stripeCustomerId,
-        stripeProductId: "prod_O9XuIjn7EqYRVW",
-        stripeCustomerSubscriptionId: subscription.id,
-      });
+        });
+        return;
+      }
     }
   } else {
     res.json({
@@ -401,8 +434,12 @@ app.post("/migrate-personal-user", async (req, res) => {
     });
     return;
   }
+  migration.push(
+    `User ${user.email} has been migrated to ${user.newStripeProductId}`
+  );
   res.json({
     result: "Migrated user with email " + user.email + " to hacker plan",
+    migration: migration,
   });
 });
 
