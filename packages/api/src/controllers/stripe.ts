@@ -292,7 +292,9 @@ app.post("/migrate-personal-user", async (req, res) => {
 
   const [users] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_0' AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL)`,
+      sql`users.data->>'stripeProductId' = 'prod_0' 
+          AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL) 
+          AND (users.data->>'newStripeProductId' != 'growth_1' AND users.data->>'newStripeProductId' != 'scale_1')`,
     ],
     {
       limit: 1,
