@@ -115,8 +115,7 @@ const DeleteDialog = ({
             size="3"
             variant="neutral"
             css={{ mt: "$2", lineHeight: "22px" }}>
-            Deleting a target cannot be undone. Any active sessions will
-            continue to be multistreamed to this destination.
+            Deleting a target cannot be undone.
           </Text>
         </AlertDialogDescription>
 
