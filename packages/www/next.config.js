@@ -8,6 +8,7 @@ const withMDX = require("@next/mdx")({
 });
 
 const isAnalyzeEnabled = process.env.ANALYZE === "true";
+const isStaticBuild = process.env.STATIC_BUILD === "true";
 
 const SentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
@@ -21,16 +22,12 @@ const SentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-const config = {
+let config = {
   sentry: {
     hideSourceMaps: true,
   },
   images: {
     domains: ["cdn.sanity.io", "picsum.photos"],
-  },
-  i18n: {
-    locales: ["en", "es"],
-    defaultLocale: "en",
   },
   async redirects() {
     return [
@@ -337,40 +334,56 @@ const config = {
   },
 };
 
-module.exports = withSentryConfig(
-  withPlugins(
+if (!isStaticBuild) {
+  config = {
+    ...config,
+    i18n: {
+      locales: ["en", "es"],
+      defaultLocale: "en",
+    },
+  };
+}
+
+let configWithPlugins = withPlugins(
+  [
     [
-      [
-        withMDX,
-        {
-          pageExtensions: ["js", "jsx", "mdx", "ts", "tsx", "svg"],
-          webpack(config, _options) {
-            config.module.rules.push({
-              test: /\.(graphql|gql)$/,
-              exclude: /node_modules/,
-              loader: "graphql-tag/loader",
-            });
-            config.module.rules.push({
-              test: /\.md$/,
-              use: "raw-loader",
-            });
-            config.module.rules.push({
-              test: /\.svg$/,
-              use: ["@svgr/webpack"],
-            });
-            if (isAnalyzeEnabled) {
-              const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
-              config.plugins.push(new DuplicatePackageCheckerPlugin());
-            }
-            return config;
-          },
+      withMDX,
+      {
+        pageExtensions: ["js", "jsx", "mdx", "ts", "tsx", "svg"],
+        webpack(config, _options) {
+          config.module.rules.push({
+            test: /\.(graphql|gql)$/,
+            exclude: /node_modules/,
+            loader: "graphql-tag/loader",
+          });
+          config.module.rules.push({
+            test: /\.md$/,
+            use: "raw-loader",
+          });
+          config.module.rules.push({
+            test: /\.svg$/,
+            use: ["@svgr/webpack"],
+          });
+          if (isAnalyzeEnabled) {
+            const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+            config.plugins.push(new DuplicatePackageCheckerPlugin());
+          }
+          return config;
         },
-      ],
-      ...(isAnalyzeEnabled
-        ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
-        : []),
+      },
     ],
-    config
-  ),
-  SentryWebpackPluginOptions
+    ...(isAnalyzeEnabled
+      ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
+      : []),
+  ],
+  config
 );
+
+if (!isStaticBuild) {
+  configWithPlugins = withSentryConfig(
+    configWithPlugins,
+    SentryWebpackPluginOptions
+  );
+}
+
+module.exports = configWithPlugins;

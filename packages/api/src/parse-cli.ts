@@ -287,6 +287,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       },
       recordCatalystObjectStoreId: {
         describe: "object store ID used by Catalyst to store recordings",
+        type: "string",
       },
       catalystBaseUrl: {
         describe: "base URL of Catalyst",
@@ -441,8 +442,8 @@ export default function parseCli(argv?: string | readonly string[]) {
     )
     .help()
     .parse(argv);
+  const mistOutput = yargsToMist(args);
   if (parsed.json === true) {
-    const mistOutput = yargsToMist(args);
     console.log(JSON.stringify(mistOutput));
     process.exit(0);
   }

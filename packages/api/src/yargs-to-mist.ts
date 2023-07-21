@@ -48,7 +48,7 @@ export default function yargsToMist(options: any) {
     };
     obj.optional[flag] = output;
     if (!typeMap.hasOwnProperty(opt.type)) {
-      throw new Error(`Type not found for ${opt.type}`);
+      throw new Error(`Type not found flag=--${flag} type=${opt.type}`);
     }
     output.type = typeMap[opt.type];
   }

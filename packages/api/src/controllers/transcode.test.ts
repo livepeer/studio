@@ -201,6 +201,62 @@ describe("controllers/transcode", () => {
       });
     });
 
+    it("should transcode video from private S3 bucket when no '/' prefix is specified in the path", async () => {
+      let res = await client.post(`/transcode`, {
+        input: {
+          type: "s3",
+          endpoint: "https://inendpoint.com",
+          credentials: {
+            accessKeyId: "IN_USERNAME",
+            secretAccessKey: "IN_PASS/WORD",
+          },
+          bucket: "inbucket",
+          path: "input/video.mp4",
+        },
+        storage: {
+          type: "s3",
+          endpoint: "https://endpoint.com",
+          credentials: {
+            accessKeyId: "USERNAME",
+            secretAccessKey: "PASSWORD",
+          },
+          bucket: "mybucket",
+        },
+        outputs: {
+          hls: {
+            path: "",
+          },
+        },
+      });
+      expect(res.status).toBe(200);
+      const task = await res.json();
+      const taskId = task.id;
+
+      client.apiKey = adminApiKey;
+      res = await client.get(`/task/${task.id}`);
+      expect(res.status).toBe(200);
+      expect(res.json()).resolves.toMatchObject({
+        id: taskId,
+        type: "transcode-file",
+        params: {
+          "transcode-file": {
+            input: {
+              url: "s3+https://IN_USERNAME:IN_PASS%2FWORD@inendpoint.com/inbucket/input/video.mp4",
+            },
+            storage: {
+              url: "s3+https://USERNAME:PASSWORD@endpoint.com/mybucket",
+            },
+            outputs: {
+              hls: {
+                path: "/",
+              },
+            },
+          },
+        },
+        status: { phase: "waiting" },
+      });
+    });
+
     it("should transcode video with w3s storage", async () => {
       let res = await client.post(`/transcode`, {
         input: {

@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "yarn"
 
       - name: Tags
@@ -63,30 +63,29 @@ jobs:
         run: |
           mkdir -p "${RELEASE_PATH}" "${BIN_PATH}"
 
-          for package in api www; do
-            for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64; do
-              in_name="$package-$arch"
-              out_name="livepeer-$package"
-              archive_name="livepeer-$(echo $in_name | sed -e 's/x64/amd64/;s/win/windows/;s/macos/darwin/')"
-              cd ./packages/$package/bin
-              case "$arch" in
-                win-x64)
-                  in_name="$in_name.exe"
-                  out_name="$out_name.exe"
-                  mv "./$in_name" "./$out_name"
-                  zip -q9 "${RELEASE_PATH}/${archive_name}.zip" "./$out_name"
-                  ;;
-                linux-*)
-                  mv "./$in_name" "./$out_name"
-                  tar -czvf "${RELEASE_PATH}/${archive_name}.tar.gz" "./$out_name"
-                  ;;
-                macos-*)
-                  mkdir -p "${BIN_PATH}/$arch"
-                  mv "./$in_name" "${BIN_PATH}/$arch/$out_name"
-                  ;;
-              esac
-              cd -
-            done
+          for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64; do
+            package="api"
+            in_name="$package-$arch"
+            out_name="livepeer-$package"
+            archive_name="livepeer-$(echo $in_name | sed -e 's/x64/amd64/;s/win/windows/;s/macos/darwin/')"
+            cd ./packages/$package/bin
+            case "$arch" in
+              win-x64)
+                in_name="$in_name.exe"
+                out_name="$out_name.exe"
+                mv "./$in_name" "./$out_name"
+                zip -q9 "${RELEASE_PATH}/${archive_name}.zip" "./$out_name"
+                ;;
+              linux-*)
+                mv "./$in_name" "./$out_name"
+                tar -czvf "${RELEASE_PATH}/${archive_name}.tar.gz" "./$out_name"
+                ;;
+              macos-*)
+                mkdir -p "${BIN_PATH}/$arch"
+                mv "./$in_name" "${BIN_PATH}/$arch/$out_name"
+                ;;
+            esac
+            cd -
           done
 
       - name: Upload macos binaries for codesigning (arm64)
