@@ -294,7 +294,7 @@ app.post("/migrate-personal-user", async (req, res) => {
     [
       sql`users.data->>'stripeProductId' = 'prod_0' 
           AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL) 
-          AND (users.data->>'newStripeProductId' != 'growth_1' AND users.data->>'newStripeProductId' != 'scale_1')`,
+          AND (users.data->>'newStripeProductId' IS NULL OR (users.data->>'newStripeProductId' != 'growth_1' AND users.data->>'newStripeProductId' != 'scale_1'))`,
     ],
     {
       limit: 1,
@@ -326,7 +326,7 @@ app.post("/migrate-personal-user", async (req, res) => {
       user.newStripeProductId !== "scale_1"
     ) {
       migration.push(
-        `User ${user.email} is migrating from ${user.stripeProductId} to ${user.newStripeProductId}`
+        `User ${user.email} is migrating from ${user.stripeProductId} to prod_O9XuIjn7EqYRVW`
       );
       const items = await req.stripe.prices.list({
         lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
@@ -572,7 +572,7 @@ app.post("/migrate-pro-user", async (req, res) => {
 
   const [users] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_1' AND users.data->>'isActiveSubscription' = 'true'`,
+      sql`users.data->>'stripeProductId' = 'prod_1' AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL)`,
     ],
     {
       limit: 1,
