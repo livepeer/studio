@@ -291,7 +291,7 @@ app.post("/migrate-personal-user", async (req, res) => {
 
   const [users] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_0'  AND users.data->>'isActiveSubscription' = 'true'`,
+      sql`users.data->>'stripeProductId' = 'prod_0' AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL)`,
     ],
     {
       limit: 1,
@@ -404,7 +404,7 @@ app.post("/migrate-hacker-user", async (req, res) => {
 
   const [users] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW'  AND users.data->>'isActiveSubscription' = 'true'`,
+      sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL)`,
     ],
     {
       limit: 1,
