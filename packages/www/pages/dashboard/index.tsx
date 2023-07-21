@@ -38,9 +38,8 @@ const Dashboard = () => {
     <Box css={{ p: "$6" }}>
       {!emailValid && (
         <Banner
-          title="Verify your Email"
-          description="Verify to the account email, then we'll send you a link to verify
-        your email."
+          title="Verify your email"
+          description="Verify your account with a link via email."
           button={
             <Button
               variant="primary"

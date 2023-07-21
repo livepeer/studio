@@ -72,7 +72,7 @@ const StreamPlayerBox = ({
         <Box
           css={{
             width: "100%",
-            minHeight: 250,
+            minHeight: 220,
             borderRadius: "$2",
             position: "relative",
             bc: "$panel",
