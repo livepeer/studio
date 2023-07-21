@@ -55,12 +55,12 @@ jobs:
           username: ${{ secrets.CI_DOCKERHUB_USERNAME }}
           password: ${{ secrets.CI_DOCKERHUB_TOKEN }}
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+      # - name: Log in to the Container registry
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ github.token }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -68,7 +68,7 @@ jobs:
         with:
           images: |
             ${{ matrix.build.image }}
-            ghcr.io/${{ github.repository }}/${{ matrix.build.package }}
+          #            ghcr.io/${{ github.repository }}/${{ matrix.build.package }}
           tags: |
             type=sha
             type=ref,event=pr
