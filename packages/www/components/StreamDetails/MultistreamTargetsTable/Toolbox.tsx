@@ -47,9 +47,7 @@ const DisableDialog = ({
           <Text
             size="3"
             variant="neutral"
-            css={{ mt: "$2", lineHeight: "22px" }}>
-            Changes will take effect when the next stream session is started.
-          </Text>
+            css={{ mt: "$2", lineHeight: "22px" }}></Text>
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
