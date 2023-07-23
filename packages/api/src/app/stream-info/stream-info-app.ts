@@ -14,13 +14,14 @@ import {
   MasterPlaylistDictionary,
 } from "./livepeer-types";
 import { DBStream } from "../../store/stream-table";
+import { CliArgs } from "./parse-cli";
 
 const pollInterval = 2 * 1000; // 2s
 const updateInterval = 50 * 1000; // 50s, slightly lower than USER_SESSION_TIMEOUT in API
 const deleteTimeout = 30 * 1000; // 30s
 const seenSegmentsTimeout = 2 * 60 * 1000; // 2m. should be at least two time longer than HTTP push timeout in go-livepeer
 
-async function makeRouter(params) {
+async function makeRouter(params: CliArgs) {
   const bodyParser = require("body-parser");
 
   // Logging, JSON parsing, store injection
@@ -29,7 +30,7 @@ async function makeRouter(params) {
   app.use(healthCheck);
   app.use(bodyParser.json());
   app.use((req, res, next) => {
-    req.config = params;
+    req.config = params as any;
     next();
   });
 
@@ -375,7 +376,7 @@ class statusPoller {
   }
 }
 
-export default async function makeApp(params) {
+export default async function makeApp(params: CliArgs) {
   const { port, postgresUrl, ownRegion, listen = true, broadcaster } = params;
   // Storage init
   await db.start({ postgresUrl, appName: "stream-info" });
@@ -393,7 +394,9 @@ export default async function makeApp(params) {
       listener = app
         .listen(port, () => {
           listenPort = listener.address().port;
-          logger.info(`API server listening on http://0.0.0.0:${listenPort}`);
+          logger.info(
+            `Stream info server listening on http://0.0.0.0:${listenPort}`
+          );
           resolve();
         })
         .on("error", (err) => {
