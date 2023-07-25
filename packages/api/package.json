@@ -47,6 +47,7 @@
     "@cloudflare/wrangler": "^1.8.4",
     "@kubernetes/client-node": "^0.10.2",
     "@lit-protocol/sdk-nodejs": "^1.1.241",
+    "@livepeer.studio/www": "0.15.0",
     "@livepeer/sdk": "1.0.0-alpha.7",
     "@onflow/fcl": "^1.3.2",
     "@peculiar/webcrypto": "^1.2.3",
@@ -86,7 +87,7 @@
     "isomorphic-webcrypto": "^2.3.8",
     "js-yaml": "^3.13.1",
     "jsonwebtoken": "^8.5.1",
-    "livekit-server-sdk": "^1.1.4",
+    "livekit-server-sdk": "^1.2.5",
     "lodash": "^4.17.21",
     "m3u8-parser": "^4.4.0",
     "minio": "^7.0.12",
@@ -109,8 +110,7 @@
     "whatwg-fetch": "^3.4.0",
     "winston": "^3.2.1",
     "wolfy87-eventemitter": "^5.2.9",
-    "yargs": "^17.3.1",
-    "@livepeer.studio/www": "0.15.0"
+    "yargs": "^17.3.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -185,7 +185,8 @@
       "../www/next.config.js",
       "../../node_modules/dom-helpers/**/*",
       "../../node_modules/react-icons/**/*",
-      "../../node_modules/next-mdx-remote/**/*"
+      "../../node_modules/next-mdx-remote/**/*",
+      "../../node_modules/livekit-server-sdk/**/*"
     ]
   }
 }
