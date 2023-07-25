@@ -185,7 +185,8 @@
       "../www/next.config.js",
       "../../node_modules/dom-helpers/**/*",
       "../../node_modules/react-icons/**/*",
-      "../../node_modules/next-mdx-remote/**/*"
+      "../../node_modules/next-mdx-remote/**/*",
+      "../../node_modules/livekit-server-sdk/**/*"
     ]
   }
 }
