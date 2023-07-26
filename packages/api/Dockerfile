@@ -15,5 +15,6 @@ ARG	VERSION
 ENV	VERSION ${VERSION}
 ARG	GITHUB_SHA
 ENV	GITHUB_SHA ${GITHUB_SHA}
+ENV	LP_API_PORT 80
 RUN /usr/local/bin/livepeer-api --help
 ENTRYPOINT ["/usr/local/bin/livepeer-api"]
