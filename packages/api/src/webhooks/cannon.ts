@@ -36,15 +36,6 @@ function isRuntimeError(err: any): boolean {
   return runtimeErrors.some((re) => err instanceof re);
 }
 
-// TODO: Remove this, only a temporary workaround to fix an incident
-function isStuckMindsSession(session: DBSession): boolean {
-  return [
-    "33d3cbfc-82be-470d-a84b-a40ef196ccd7",
-    "6b06abe5-90a4-4eeb-b61f-cbe789e9706b",
-    "8fbee675-d290-4699-80fc-002f081a8848",
-  ].includes(session.id);
-}
-
 export default class WebhookCannon {
   db: DB;
   running: boolean;
@@ -517,7 +508,7 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session is unused");
     }
     if (lastSeen > activeThreshold) {
-      if (isRetry || isStuckMindsSession(session)) {
+      if (isRetry) {
         throw new UnprocessableEntityError("Session is still active");
       }
       // there was an update after the delayed event was sent, so sleep a few
