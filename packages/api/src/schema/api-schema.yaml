@@ -12,6 +12,19 @@ servers:
 security:
   - apiKey: []
 
+tags:
+  - name: stream
+  - name: multistream-target
+  - name: webhook
+  - name: asset
+  - name: metrics
+  - name: room
+  - name: session
+  - name: access-control
+  - name: task
+  - name: playback
+  - name: transcode
+
 components:
   securitySchemes:
     apiKey:
@@ -34,6 +47,7 @@ components:
         width:
           type: integer
           minimum: 128
+          example: 1280
         name:
           type: string
           minLength: 1
@@ -42,17 +56,22 @@ components:
         height:
           type: integer
           minimum: 128
+          example: 720
         bitrate:
           type: integer
           minimum: 400
+          example: 4000
         fps:
           type: integer
           minimum: 0
+          example: 30
         fpsDen:
           type: integer
           minimum: 1
+          example: 1
         gop:
           type: string
+          example: "60"
         profile:
           type: string
           enum:
@@ -60,6 +79,7 @@ components:
             - H264Main
             - H264High
             - H264ConstrainedHigh
+          example: H264High
         encoder:
           type: string
           enum:
@@ -67,6 +87,7 @@ components:
             - hevc
             - vp8
             - vp9
+          example: h264
     webhook:
       type: object
       required:
@@ -80,6 +101,7 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         name:
           type: string
+          example: "My webhook"
         createdAt:
           type: number
           readOnly: true
@@ -111,17 +133,23 @@ components:
               - task.updated
               - task.completed
               - task.failed
+          example:
+            - stream.started
+            - recording.ready
         url:
           type: string
           format: uri
           pattern: "^http(s)?://"
+          example: "https://webhook.example.com"
         sharedSecret:
           type: string
           writeOnly: true
           description: shared secret used to sign the webhook payload
+          example: "mySharedSecret"
         streamId:
           type: string
           description: streamId of the stream on which the webhook is applied
+          example: "de7818e7-610a-4057-8f6f-b785dc1e6f88"
         status:
           type: object
           readOnly: true
@@ -220,16 +248,16 @@ components:
           type: number
           readOnly: true
           description:
-            Timestamp (in milliseconds) at which stream object was created
+            Timestamp (in milliseconds) at which the stream object was created
           example: 1587667174725
         parentId:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
-          description: Points to parent stream object
+          description: Points to the parent stream object
         streamKey:
           type: string
           example: hgebdhhigq
-          description: Used to form RTMP ingest URL
+          description: Used to form the RTMP ingest URL
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
@@ -288,28 +316,28 @@ components:
                   profile:
                     type: string
                     description: |
-                      Name of transcoding profile that should be sent. Use
-                      "source" for pushing source stream data
+                      Name of the transcoding profile that should be sent. Use
+                      "source" for pushing the source stream data
                     minLength: 1
                     maxLength: 500
                     example: 720p
                   videoOnly:
                     type: boolean
                     description: |
-                      If true, the stream audio will be muted and only silent
+                      If true, the stream audio will be muted, and only silent
                       video will be pushed to the target.
                     default: false
                   id:
                     type: string
                     description:
-                      ID of multistream target object where to push this stream
+                      ID of the multistream target object where to push this
+                      stream
                   spec:
                     type: object
                     writeOnly: true
                     description: |
                       Inline multistream target object. Will automatically
-                      create the target resource to be used by the created
-                      stream.
+                      create the target resource to be used by the created stream.
                     required:
                       - url
                     additionalProperties: false
@@ -374,18 +402,22 @@ components:
             The unique identifier for the specific session, created by Mist and
             used for creating the session object in the DB.
           type: string
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         is_active:
           type: boolean
           description: Indicates whether the stream is currently live or not.
+          example: true
         is_healthy:
           type: boolean
           description: Indicates whether the stream is healthy or not.
+          example: true
         issues:
           type: string
           description: |
             Raw issues affecting the stream as described by Mist, if any. We
             don't expose those to the end-user, showing only human_issues
             instead.
+          example: "Stream buffering"
         human_issues:
           type: array
           description: |
@@ -393,6 +425,9 @@ components:
             the stream, if any.
           items:
             type: string
+          example:
+            - "Buffer underflow"
+            - "Network congestion"
         tracks:
           type: object
           description: |
@@ -404,30 +439,38 @@ components:
               codec:
                 type: string
                 description: The codec being used for the track.
+                example: "H.264"
               kbits:
                 type: number
                 description: "The bitrate of the track, in kilobits per second."
+                example: 2500
               keys:
                 type: object
                 description:
                   An object containing additional track-specific metrics.
                 additionalProperties:
                   type: number
+                  example:
+                    key1: 10
+                    key2: 20
               fpks:
                 type: number
                 description: |
                   The framerate of the track, in frames per thousand seconds
                   (kilo-second).
+                example: 30
               height:
                 type: number
                 description: The height of the track's video resolution.
+                example: 720
               width:
                 type: number
                 description: The width of the track's video resolution.
+                example: 1280
         extra:
           type: object
           description: |
-            An object containing any additional fields sent by mist in the
+            An object containing any additional fields sent by Mist in the
             health (STREAM_BUFFER) payload.
           additionalProperties: true
     multistream-target-patch-payload:
@@ -485,12 +528,12 @@ components:
           readOnly: true
           type: number
           description:
-            Timestamp (in milliseconds) at which stream object was created
+            Timestamp (in milliseconds) at which the stream object was created
           example: 1587667174725
         parentId:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
-          description: Points to parent stream object
+          description: Points to the parent stream object
         record:
           description: |
             Should this stream be recorded? Uses default settings. For more
@@ -516,11 +559,17 @@ components:
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
-          description: Used to form playback URL
+          description: Used to form the playback URL
         profiles:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+          example:
+            - name: 720p
+              width: 1280
+              height: 720
+              bitrate: 3000
+              fps: 30
     error:
       required:
         - errors
@@ -531,9 +580,10 @@ components:
           minItems: 1
           items:
             type: string
-            example:
-              - id not provided
-              - user not found
+          example:
+            - "id not provided"
+            - "user not found"
+
     multistream-target:
       type: object
       required:
@@ -546,6 +596,7 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
+          example: My Multistream Target
         url:
           type: string
           writeOnly: true
@@ -562,7 +613,7 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: |
+          description:
             Timestamp (in milliseconds) at which multistream target object was
             created
           example: 1587667174725
@@ -851,14 +902,17 @@ components:
         cid:
           type: string
           description: CID of the file on IPFS
+          example: bafybeihoqtemwitqajy6d654tmghqqvxmzgblddj2egst6yilplr5num6u
         url:
           readOnly: true
           type: string
           description: URL with IPFS scheme for the file
+          example: ipfs://bafybeihoqtemwitqajy6d654tmghqqvxmzgblddj2egst6yilplr5num6u
         gatewayUrl:
           readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
+          example: https://ipfs.io
     signing-key-response-payload:
       type: object
       required:
@@ -879,6 +933,7 @@ components:
           $ref: "#/components/schemas/signing-key/properties/disabled"
         privateKey:
           type: string
+          example: "LS0tLS1CRUdJTiBQUklWQVRFIBtFWS0tLS0tCk1JR0hBZ0VBTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEJHMHdhd0lCQVFRZ1RDRzhRWDZKdkR0eC95ZDMKdlpkUHJKR25LcjhiWHRsdXNIL2FOYW5XdHEraFJBTkNBQVE0QnZ6ODI2L2lDaXV1U0NiZVkwc3FmOXljYWh0OApDRFYyUFF2bDFVM1FLSVRBcWRpaktLa0FSUFVkcWRrYWZzR21PMzBDeElPaDBLNWJSQW5XQzd4KwotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg=="
     new-asset-payload:
       additionalProperties: false
       required:
@@ -954,6 +1009,7 @@ components:
         metadata:
           type: string
           description: User defined payload to store for the participant
+          example: "host user"
     create-room-response:
       type: object
       properties:
@@ -1003,6 +1059,7 @@ components:
         metadata:
           type: string
           description: User defined payload to store for the participant
+          example: "host user"
     room-egress-payload:
       type: object
       required:
@@ -1029,6 +1086,7 @@ components:
         metadata:
           type: string
           description: User defined payload to store for the participant
+          example: "host user"
     task:
       type: object
       additionalProperties: false
@@ -1375,6 +1433,7 @@ components:
           example: 78df0075-b5f3-4683-a618-1086faca35dc
         name:
           type: string
+          example: "My signing key"
           description: Name of the signing key
         createdAt:
           readOnly: true
@@ -1390,8 +1449,10 @@ components:
           example: 1587667174725
         publicKey:
           type: string
+          example: "LS0tLS1CRUdJTiBQUklWQVRFIBtFWS0tLS0tCk1JR0hBZ0VBTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEJHMHdhd0lCQVFRZ1RDRzhRWDZKdkR0eC95ZDMKdlpkUHJKR25LcjhiWHRsdXNIL2FOYW5XdHEraFJBTkNBQVE0QnZ6ODI2L2lDaXV1U0NiZVkwc3FmOXljYWh0OApDRFYyUFF2bDFVM1FLSVRBcWRpaktLa0FSUFVkcWRrYWZzR21PMzBDeElPaDBLNWJSQW5XQzd4KwotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg=="
         disabled:
           type: boolean
+          example: false
           description: Disable the signing key to allow rotation safely
     playback-policy:
       type: object
@@ -1410,10 +1471,12 @@ components:
         webhookId:
           type: string
           description: ID of the webhook to use for playback policy
+          example: 3e02c844-d364-4d48-b401-24b2773b5d6c
         webhookContext:
           type: object
           description: User-defined webhook context
           additionalProperties: true
+          example: { "foo": "bar" }
     room:
       type: object
       required:
@@ -1439,6 +1502,7 @@ components:
         egressId:
           type: string
           description: internal ID for egress output
+          example: d32ae9e6-c459-4931-9898-e86e2f5e7e14
         participants:
           type: object
           additionalProperties:
@@ -1447,15 +1511,19 @@ components:
               identity:
                 type: string
                 description: participant ID
+                example: 3e02c844-d364-4d48-b401-24b2773b5d6c
               name:
                 type: string
                 description: user defined participant name
+                example: "John Doe"
               joinedAt:
                 type: integer
                 description: the time the participant joined
+                example: 1587667174725
               leftAt:
                 type: integer
                 description: the time the participant left
+                example: 1587667174725
     usage-metric:
       type: object
       description: |
@@ -1470,18 +1538,23 @@ components:
         UserID:
           type: string
           description: The user ID associated with the metric
+          example: 3e02c844-d364-4d48-b401-24b2773b5d6c
         CreatorID:
           type: string
           description: The creator ID associated with the metric
+          example: 3e02c844-d364-4d48-b401-24b2773b5d6c
         DeliveryUsageMins:
           type: number
           description: The number of minutes of delivery usage
+          example: 10
         TotalUsageMins:
           type: number
           description: The number of minutes of total usage
+          example: 10
         StorageUsageMins:
           type: number
           description: The number of minutes of storage usage
+          example: 10
     viewership-metric:
       type: object
       description: |
@@ -1494,12 +1567,15 @@ components:
         playbackId:
           type: string
           description: The playback ID associated with the metric
+          example: 29eb9byolvwdqkup
         creatorId:
           type: string
           description: The ID of the creator associated with the metric
+          example: 3e02c844-d364-4d48-b401-24b2773b5d6c
         viewerId:
           type: string
           description: The ID of the viewer associated with the metric
+          example: 3e02c844-d364-4d48-b401-24b2773b5d6c
         dStorageUrl:
           type: string
           description: The URL of the distributed storage used for the asset
@@ -1513,59 +1589,75 @@ components:
         device:
           type: string
           description: The device used by the viewer
+          example: iPhone
         deviceType:
           type: string
           description: The type of the device used by the viewer
+          example: mobile
         cpu:
           type: string
           description: The CPU used by the viewer's device
         os:
           type: string
           description: The operating system used by the viewer
+          example: iOS
         browser:
           type: string
           description: The browser used by the viewer
+          example: Safari
         browserEngine:
           type: string
           description: The browser engine used by the viewer's browser
+          example: WebKit
         continent:
           type: string
           description: The continent where the viewer is located
+          example: North America
         country:
           type: string
           description: The country where the viewer is located
+          example: United States
         subdivision:
           type: string
           description: |
             The subdivision (e.g., state or province) where the viewer is
             located
+          example: California
         timezone:
           type: string
           description: The timezone where the viewer is located
+          example: America/Los_Angeles
         geohas:
           type: string
           description:
             Geographic encoding of the viewers location. Accurate to 3 digits.
+          example: 9q8
         viewCount:
           type: integer
           description: The number of views for the asset
+          example: 10
         playtimeMins:
           type: number
           description: The total playtime in minutes for the asset
+          example: 10
         ttffMs:
           type: number
           description: The time-to-first-frame (TTFF) in milliseconds
+          example: 2
         rebufferRatio:
           type: number
           description: The rebuffering ratio for the asset
+          example: 0.1
         errorRate:
           type: number
           description: The error rate for the asset
+          example: 5
         exitsBeforeStart:
           type: number
           description: |
             The percentage of sessions that existed before the asset started
             playing
+          example: 10
     playback-info:
       type: object
       additionalProperties: false
@@ -1812,6 +1904,8 @@ components:
 paths:
   /stream:
     post:
+      tags:
+        - stream
       summary: Create a stream
       operationId: createStream
       description: |
@@ -1860,6 +1954,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
+      tags:
+        - stream
       summary: Retrieve streams
       operationId: getStreams
       description: >
@@ -1949,6 +2045,8 @@ paths:
         schema:
           type: string
     get:
+      tags:
+        - stream
       summary: Retrieve a stream
       operationId: getStream
       description: |
@@ -1968,6 +2066,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
+      tags:
+        - stream
       summary: Update a stream
       operationId: updateStream
       description: |
@@ -2001,6 +2101,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      tags:
+        - stream
       summary: Delete a stream
       operationId: deleteStream
       description: |
@@ -2029,6 +2131,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /multistream/target:
     get:
+      tags:
+        - multistream-target
       summary: Retrieve Multistream Targets
       operationId: getMultistreamTargets
       description: |
@@ -2050,6 +2154,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     post:
+      tags:
+        - multistream-target
       summary: Create a multistream target
       operationId: createMultistreamTarget
       requestBody:
@@ -2082,6 +2188,8 @@ paths:
         schema:
           type: string
     get:
+      tags:
+        - multistream-target
       summary: Retrieve a multistream target
       operationId: getMultistreamTarget
       description:
@@ -2100,6 +2208,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
+      tags:
+        - multistream-target
       summary: Update Multistream Target
       operationId: updateMultistreamTarget
       description: |
@@ -2136,6 +2246,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      tags:
+        - multistream-target
       summary: Delete a multistream target
       operationId: deleteMultistreamTarget
       description: |
@@ -2153,6 +2265,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /webhook:
     get:
+      tags:
+        - webhook
       summary: Retrieve a Webhook
       operationId: getWebhooks
       responses:
@@ -2171,6 +2285,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     post:
+      tags:
+        - webhook
       summary: Create a webhook
       operationId: createWebhook
       description: >
@@ -2285,6 +2401,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/webhook/{id}":
     get:
+      tags:
+        - webhook
       summary: Retrieve a webhook
       operationId: getWebhook
       parameters:
@@ -2308,6 +2426,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     put:
+      tags:
+        - webhook
       parameters:
         - name: id
           description: ID of the webhook
@@ -2346,6 +2466,8 @@ paths:
           schema:
             type: string
       summary: Delete a webhook
+      tags:
+        - webhook
       operationId: deleteWebhook
       responses:
         "200":
@@ -2362,6 +2484,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /asset:
     get:
+      tags:
+        - asset
       summary: Retrieve assets
       operationId: getAssets
       responses:
@@ -2381,6 +2505,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /asset/request-upload:
     post:
+      tags:
+        - asset
       summary: Upload an asset
       operationId: requestUpload
       description: |
@@ -2499,6 +2625,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /asset/upload/url:
     post:
+      tags:
+        - asset
       summary: Upload asset via URL
       operationId: uploadAssetViaURL
       description: |
@@ -2548,6 +2676,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/asset/{assetId}":
     get:
+      tags:
+        - asset
       summary: Retrieves an asset
       operationId: getAsset
       parameters:
@@ -2571,6 +2701,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      tags:
+        - asset
       summary: Delete an asset
       operationId: deleteAsset
       parameters:
@@ -2591,6 +2723,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /room:
     post:
+      tags:
+        - room
       summary: Create a room
       operationId: createRoom
       description: |
@@ -2610,6 +2744,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}":
     get:
+      tags:
+        - room
       parameters:
         - name: id
           description: ID of the room
@@ -2633,6 +2769,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      tags:
+        - room
       parameters:
         - name: id
           description: ID of the room
@@ -2654,6 +2792,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}/egress":
     post:
+      tags:
+        - room
       requestBody:
         required: true
         content:
@@ -2682,6 +2822,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      tags:
+        - room
       summary: Stop room RTMP egress
       operationId: stopRoomEgress
       parameters:
@@ -2702,6 +2844,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}/user":
     post:
+      tags:
+        - room
       requestBody:
         required: true
         content:
@@ -2736,6 +2880,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/room/{id}/user/{userId}":
     get:
+      tags:
+        - room
       parameters:
         - name: id
           description: ID of the room
@@ -2765,6 +2911,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     put:
+      tags:
+        - room
       requestBody:
         required: true
         content:
@@ -2798,6 +2946,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     delete:
+      tags:
+        - room
       parameters:
         - name: id
           description: ID of the room
@@ -2824,6 +2974,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /data/views/query:
     get:
+      tags:
+        - metrics
       summary: Query viewership metrics
       operationId: getViewershipsMetrics
       description: |
@@ -2921,6 +3073,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /data/views/query/creator:
     get:
+      tags:
+        - metrics
       summary: Query creator viewership metrics
       operationId: getCreatorMetrics
       description: |
@@ -3010,6 +3164,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/data/views/query/total/{playbackId}":
     get:
+      tags:
+        - metrics
       summary: Query public total views metrics
       operationId: getPublicTotalViewsMetrics
       description: |
@@ -3061,6 +3217,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/data/usage/query":
     get:
+      tags:
+        - metrics
       summary: Query usage metrics
       operationId: getUsageMetrics
       description: |
@@ -3109,6 +3267,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /session:
     get:
+      tags:
+        - session
       summary: Retrieve sessions
       operationId: getSessions
       responses:
@@ -3128,6 +3288,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/session/{id}":
     get:
+      tags:
+        - session
       summary: Retrieve a session
       operationId: getSession
       parameters:
@@ -3152,6 +3314,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/stream/{parentId}/sessions":
     get:
+      tags:
+        - session
       summary: Retrieve Recorded Sessions
       operationId: getRecordedSessions
       parameters:
@@ -3186,6 +3350,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /access-control/signing-key:
     post:
+      tags:
+        - access-control
       summary: Create a signing key
       operationId: createSigningKey
 
@@ -3220,6 +3386,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
+      tags:
+        - access-control
       summary: Retrieves signing keys
       operationId: getSigningKeys
       description: |
@@ -3242,6 +3410,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/access-control/signing-key/{keyId}":
     delete:
+      tags:
+        - access-control
       summary: Delete Signing Key
       operationId: deleteSigningKey
       parameters:
@@ -3261,6 +3431,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     get:
+      tags:
+        - access-control
       summary: Retrieves a signing key
       operationId: getSigningKey
 
@@ -3285,6 +3457,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
     patch:
+      tags:
+        - access-control
       summary: Update a signing key
       operationId: updateSigningKey
 
@@ -3328,6 +3502,8 @@ paths:
                 $ref: "#/components/schemas/error"
   /task:
     get:
+      tags:
+        - task
       summary: Retrieve Tasks
       operationId: getTasks
 
@@ -3348,6 +3524,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/task/{taskId}":
     get:
+      tags:
+        - task
       summary: Retrieve a Task
       operationId: getTask
 
@@ -3373,6 +3551,8 @@ paths:
           description: Error
   /transcode:
     post:
+      tags:
+        - transcode
       summary: Transcode a video
       operationId: transcode
 
@@ -3673,6 +3853,8 @@ paths:
                 $ref: "#/components/schemas/error"
   "/playback/{id}":
     get:
+      tags:
+        - playback
       summary: Retrieve Playback Info
       operationId: getPlaybackInfo
 
