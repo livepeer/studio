@@ -187,6 +187,13 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
+          example:
+            lastFailure:
+              timestamp: 1587667174725
+              error: Error message
+              response: Response body
+              statusCode: 500
+            lastTriggeredAt: 1587667174725
     stream:
       type: object
       required:
@@ -244,6 +251,7 @@ components:
           type: string
           readOnly: true
           description: Name of the token used to create this object
+          example: "staging key"
         createdAt:
           type: number
           readOnly: true
@@ -289,6 +297,12 @@ components:
               height: 720
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+          example:
+            - name: 720p
+              width: 1280
+              height: 720
+              bitrate: 3000
+              fps: 30
         record:
           description: |
             Should this stream be recorded? Uses default settings. For more
@@ -552,10 +566,12 @@ components:
           type: string
           readOnly: true
           description: URL for accessing the recording of this stream session.
+          example: https://lp-playback.com/hls/29eb9byolvwdbkue/index.m3u8
         mp4Url:
           type: string
           readOnly: true
           description: URL for the stream session recording packaged in an mp4.
+          example: https://lp-playback.com/hls/29eb9byolvwdqkue/720.mp4
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
@@ -583,7 +599,6 @@ components:
           example:
             - "id not provided"
             - "user not found"
-
     multistream-target:
       type: object
       required:
@@ -701,6 +716,10 @@ components:
                     - directUpload
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
+          example:
+            type: url
+            url: https://example.com/video.mp4
+            gatewayUrl: https://example.com/video.mp4
         creatorId:
           $ref: "#/components/schemas/creator-id"
         storage:
@@ -748,6 +767,13 @@ components:
                   example: 1587667174725
             status:
               $ref: "#/components/schemas/storage-status"
+          example:
+            ipfs:
+              spec:
+                nftMetadataTemplate: file
+                nftMetadata:
+                  name: My NFT
+                  description: My NFT description
         status:
           readOnly: true
           type: object
@@ -777,6 +803,10 @@ components:
             errorMessage:
               type: string
               description: Error message if the asset creation failed.
+          example:
+            phase: ready
+            updatedAt: 1587667174725
+            progress: 100
         name:
           type: string
           description: |
@@ -809,6 +839,10 @@ components:
                 type: string
                 description: Hash algorithm used to compute the hash
                 example: sha256
+          example:
+            - hash: >-
+                9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
+              algorithm: sha256
         videoSpec:
           readOnly: true
           type: object
@@ -893,6 +927,28 @@ components:
                     type: number
                     description: Bit depth of the track - only for audio tracks
                     example: 16
+          example:
+            format: mp4
+            duration: 23.8328
+            bitrate: 1000000
+            tracks:
+              - type: video
+                codec: h264
+                startTime: 0
+                duration: 23.8328
+                bitrate: 1000000
+                width: 1920
+                height: 1080
+                pixelFormat: yuv420p
+                fps: 30
+              - type: audio
+                codec: aac
+                startTime: 0
+                duration: 23.8328
+                bitrate: 1000000
+                channels: 2
+                sampleRate: 44100
+                bitDepth: 16
     ipfs-file-info:
       type: object
       required:
@@ -972,6 +1028,8 @@ components:
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
                 - type: boolean
                 - type: "null"
+          example:
+            ipfs: true
         url:
           type: string
           format: uri
@@ -992,6 +1050,8 @@ components:
               description: >-
                 Encryption key used to encrypt the asset. Only writable in the
                 upload asset endpoints and cannot be retrieved back.
+          example:
+            encryptedKey: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JR0hBZ0VBTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEJHMHdhd0lCQVFRZ1RDRzhRWDZKdkR0eC95ZDMKdlpkUHJKR25LcjhiWHRsdXNIL2FOYW5XdHEraFJBTkNBQVE0QnZ6ODI2L2lDaXV1U0NiZVkwc3FmOXljYWh0OApDRFYyUFF2bDFVM1FLSVRBcWRpaktLa0FSUFVkcWRrYWZzR21PMzBDeElPaDBLNWJSQW5XQzd4KwotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg=="
     room-user-payload:
       type: object
       required:
@@ -1237,6 +1297,8 @@ components:
                     be
                 creatorId:
                   $ref: "#/components/schemas/input-creator-id"
+        example:
+
         status:
           readOnly: true
           type: object
@@ -1273,6 +1335,13 @@ components:
               type: string
               writeOnly: true
               description: Step of the task processing
+          example:
+            phase: completed
+            updatedAt: 1587667174725
+            progress: 1
+            errorMessage: null
+            retries: 0
+            step: null
         output:
           type: object
           additionalProperties: false
@@ -1359,6 +1428,8 @@ components:
                       type: string
                     assetSpec:
                       $ref: "#/components/schemas/asset"
+          example:
+
     input-creator-id:
       oneOf:
         - $ref: "#/components/schemas/creator-id"
@@ -1524,6 +1595,12 @@ components:
                 type: integer
                 description: the time the participant left
                 example: 1587667174725
+          example:
+            3e02c844-d364-4d48-b401-24b2773b5d6c:
+              identity: 3e02c844-d364-4d48-b401-24b2773b5d6c
+              name: "John Doe"
+              joinedAt: 1587667174725
+              leftAt: 1587667174725
     usage-metric:
       type: object
       description: |
@@ -1579,6 +1656,7 @@ components:
         dStorageUrl:
           type: string
           description: The URL of the distributed storage used for the asset
+          example: https://ipfs.io/ipfs/bafybeihoqtemwitqajy6d654tmghqqvxmzgblddj2egst6yilplr5num6u
         timestamp:
           type: number
           example: 1587667174725
@@ -1597,6 +1675,7 @@ components:
         cpu:
           type: string
           description: The CPU used by the viewer's device
+          example: Apple A13 Bionic
         os:
           type: string
           description: The operating system used by the viewer
@@ -1761,6 +1840,9 @@ components:
               type: string
               enum:
                 - "1"
+          example:
+            name: "Verifiable Video"
+            version: "1"
         message:
           type: object
           additionalProperties: false
@@ -1793,11 +1875,13 @@ components:
         signature:
           type: string
           description: Video Metadata EIP-712 message signature
+          example: 0x0
         createdAt:
           type: number
           readOnly: true
           description:
             Timestamp (in milliseconds) at which the object was created
+          example: 1587667174725
         signatureType:
           type: string
           enum:
@@ -1862,6 +1946,8 @@ components:
                   writeOnly: true
                   description:
                     Will be added to the pinata_secret_api_key header.
+          example:
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDI4NjQwNzcsImlhdCI6MTYwMjI3NjA3NywiaXNzIjoiYXBpLmlzc3VlciIsInN1YiI6I
     storage-status:
       readOnly: true
       additionalProperties: false
@@ -1878,12 +1964,15 @@ components:
             - ready
             - failed
             - reverted
+          example: ready
         progress:
           type: number
           description: Current progress of the task updating the storage.
+          example: 0.5
         errorMessage:
           type: string
           description: Error message if the last storage changed failed.
+          example: "Failed to export to IPFS"
         tasks:
           type: object
           additionalProperties: false
@@ -1938,6 +2027,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/new-stream-payload"
+            example:
+              name: "test_stream"
+              record: true
+              playbackPolicy:
+                type: "jwt"
       responses:
         "200":
           description: Success
@@ -2018,6 +2112,7 @@ paths:
           description:
             Filter the API response and retrieve a specific subset of stream
             objects based on certain criteria
+          example: 1
           in: query
           schema:
             type: string
@@ -2040,6 +2135,7 @@ paths:
     parameters:
       - name: id
         description: ID of the stream
+        example: "de7818e7-610a-4057-8f6f-b785dc1e6f88"
         in: path
         required: true
         schema:
@@ -2408,6 +2504,7 @@ paths:
       parameters:
         - name: id
           description: ID of the webhook
+          example: d3f09469-8b49-42de-85d5-4649792f1003
           in: path
           required: true
           schema:
@@ -2431,6 +2528,8 @@ paths:
       parameters:
         - name: id
           description: ID of the webhook
+          example: d3f09469-8b49-42de-85d5-4649792f1003
+
           in: path
           required: true
           schema:
@@ -2461,6 +2560,8 @@ paths:
       parameters:
         - name: id
           description: ID of the webhook
+          example: d3f09469-8b49-42de-85d5-4649792f1003
+
           in: path
           required: true
           schema:
@@ -2686,6 +2787,8 @@ paths:
           schema:
             type: string
           description: ID of the asset
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           required: true
       responses:
         "200":
@@ -2711,6 +2814,7 @@ paths:
           schema:
             type: string
           description: ID of the asset
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           required: true
       responses:
         "204":
@@ -2750,6 +2854,8 @@ paths:
         - name: id
           description: ID of the room
           in: path
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           required: true
           schema:
             type: string
@@ -2774,6 +2880,7 @@ paths:
       parameters:
         - name: id
           description: ID of the room
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
 
           in: path
           required: true
@@ -2804,6 +2911,7 @@ paths:
         - name: id
           description: ID of the room
           in: path
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           required: true
           schema:
             type: string
@@ -2829,6 +2937,8 @@ paths:
       parameters:
         - name: id
           description: ID of the room
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           in: path
           required: true
           schema:
@@ -2857,6 +2967,8 @@ paths:
           description: ID of the room
           in: path
           required: true
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           schema:
             type: string
       summary: Create a room user
@@ -2887,11 +2999,15 @@ paths:
           description: ID of the room
           in: path
           required: true
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           schema:
             type: string
         - name: userId
           in: path
           description: ID of the user
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           required: true
           schema:
             type: string
@@ -2922,13 +3038,15 @@ paths:
       parameters:
         - name: id
           description: ID of the room
-
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           in: path
           required: true
           schema:
             type: string
         - name: userId
           description: ID of the user
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           in: path
           required: true
           schema:
@@ -2951,12 +3069,14 @@ paths:
       parameters:
         - name: id
           description: ID of the room
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           in: path
           required: true
           schema:
             type: string
         - name: userId
           description: ID of the user
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           in: path
           required: true
           schema:
@@ -2990,8 +3110,11 @@ paths:
             for assets
           schema:
             type: string
+          example: d3f0ltwdzj4ax7mb
         - name: from
           in: query
+          example: 2020-01-01T00:00:00Z
+
           description: Start timestamp for the query range (inclusive)
           schema:
             oneOf:
@@ -3000,6 +3123,8 @@ paths:
               - type: integer
         - name: to
           in: query
+          example: 2020-01-02T00:00:00Z
+
           description: End timestamp for the query range (exclusive)
           schema:
             oneOf:
@@ -3009,8 +3134,11 @@ paths:
         - name: timeStep
           in: query
           description: The time step to aggregate viewership metrics by
+          example: day
+
           schema:
             type: string
+
             enum:
               - hour
               - day
@@ -3020,16 +3148,21 @@ paths:
         - name: assetId
           in: query
           description: The asset ID to filter metrics for
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           schema:
             type: string
         - name: streamId
           in: query
           description: The stream ID to filter metrics for
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
+
           schema:
             type: string
         - name: creatorId
           in: query
           description: The creator ID to filter the query results
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8q
           schema:
             type: string
         - name: "breakdownBy[]"
@@ -3037,6 +3170,8 @@ paths:
           description: |
             The list of fields to break down the query results. Specify this
             query-string multiple times to break down by multiple fields.
+          example:
+            - deviceType
           schema:
             type: array
             items:
@@ -3087,6 +3222,7 @@ paths:
         - name: from
           in: query
           description: Start timestamp for the query range (inclusive)
+          example: 2020-01-01T00:00:00Z
           schema:
             oneOf:
               - type: string
@@ -3095,6 +3231,7 @@ paths:
         - name: to
           in: query
           description: End timestamp for the query range (exclusive)
+          example: 2020-01-02T00:00:00Z
           schema:
             oneOf:
               - type: string
@@ -3103,6 +3240,7 @@ paths:
         - name: timeStep
           in: query
           description: The time step to aggregate viewership metrics by
+          example: day
           schema:
             type: string
             enum:
@@ -3114,15 +3252,18 @@ paths:
         - name: assetId
           in: query
           description: The asset ID to filter metrics for
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           schema:
             type: string
         - name: streamId
           in: query
           description: The stream ID to filter metrics for
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
           schema:
             type: string
         - name: creatorId
           in: query
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8q
           description: The creator ID to filter the query results
           schema:
             type: string
@@ -3131,6 +3272,8 @@ paths:
           description: |
             The list of fields to break down the query results. Specify this
             query-string multiple times to break down by multiple fields.
+          example:
+            - deviceType
           schema:
             type: array
             items:
@@ -3231,8 +3374,10 @@ paths:
             Start millis timestamp for the query range (inclusive)
           schema:
             type: integer
+          example: 1614556800000
         - name: to
           in: query
+          example: 1614643200000
           description: |
             End millis timestamp for the query range (exclusive)
           schema:
@@ -3246,10 +3391,12 @@ paths:
             enum:
               - hour
               - day
+          example: hour
         - name: creatorId
           in: query
           description: |
             The creator ID to filter the query results
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8t
           schema:
             type: string
       responses:
@@ -3299,6 +3446,7 @@ paths:
             type: string
           description: ID of the session
           required: true
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
       responses:
         "200":
           description: Success
@@ -3325,8 +3473,10 @@ paths:
             type: string
           description: ID of the parent stream
           required: true
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8b
         - in: query
           name: record
+          example: 1
           schema:
             type: integer
             example: 1
@@ -3420,6 +3570,7 @@ paths:
           schema:
             type: string
           description: ID of the signing key
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8a
           required: true
       responses:
         "204":
@@ -3442,6 +3593,8 @@ paths:
           schema:
             type: string
           description: ID of the signing key
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8a
+
           required: true
       responses:
         "200":
@@ -3461,7 +3614,6 @@ paths:
         - access-control
       summary: Update a signing key
       operationId: updateSigningKey
-
       description: |
         PATCH /access-control/signing-key/{KEY_ID} updates an existing signing
         key. It is a single endpoint that can update any of the mutable
@@ -3478,6 +3630,8 @@ paths:
           schema:
             type: string
           description: ID of the signing key
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8a
+
           required: true
       requestBody:
         required: true
@@ -3491,6 +3645,8 @@ paths:
                 name:
                   type: string
               additionalProperties: false
+              examples:
+                name: "My new signing key"
       responses:
         "204":
           description: Success (No content)
@@ -3506,7 +3662,6 @@ paths:
         - task
       summary: Retrieve Tasks
       operationId: getTasks
-
       responses:
         "200":
           description: Success
@@ -3516,6 +3671,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/task"
+
         default:
           description: Error
           content:
@@ -3540,6 +3696,7 @@ paths:
             type: string
           description: ID of the task
           required: true
+          example: 58069f71-dadc-4ae8-b483-9a5b0b2c4d8a
       responses:
         "200":
           description: Success
@@ -3869,6 +4026,7 @@ paths:
           schema:
             type: string
           description: The ID of the playback
+          example: 5806xpedzb8hjkqk
       responses:
         "200":
           description: Successful response
