@@ -258,7 +258,9 @@ export class RabbitQueue implements Queue {
       },
       () => {
         console.log(
-          `emitting delayed message: delay=${delay / 1000}s msg=${JSON.stringify(msg)}`
+          `emitting delayed message: delay=${
+            delay / 1000
+          }s msg=${JSON.stringify(msg)}`
         );
         return this._channelPublish(delayedQueueName, routingKey, msg, {
           persistent: true,
