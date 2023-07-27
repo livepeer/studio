@@ -4,6 +4,7 @@ import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
+import _ from "lodash";
 
 import logger from "../logger";
 import { authorizer } from "../middleware";
@@ -1154,20 +1155,13 @@ async function triggerSessionRecordingHooks(
   isCleanup?: boolean
 ) {
   const { id, parentId } = stream;
-  let childStreams = parentId
+  const childStreams = parentId
     ? [stream]
     : await db.stream.getActiveSessions(id);
 
-  const handledSessionIds = new Set<string>();
-  for (const childStream of childStreams) {
-    const sessionId = childStream.sessionId ?? childStream.id;
-    if (handledSessionIds.has(sessionId)) {
-      // we list active child streams instead so we may get multiple streams for
-      // the same session. We only want to send one hook per session here.
-      continue;
-    }
-    handledSessionIds.add(sessionId);
-
+  // remove duplicate sessionIds from possibly broken up child streams
+  const sessionIds = _.uniq(childStreams.map((s) => s.sessionId ?? s.id));
+  for (const sessionId of sessionIds) {
     const asset = await db.asset.get(sessionId);
     if (asset) {
       // if we have an asset, then the recording has already been processed and
