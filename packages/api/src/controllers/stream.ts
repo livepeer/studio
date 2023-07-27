@@ -238,7 +238,11 @@ async function getRecordingUrls(
   };
 }
 
-function isActuallyNotActive(stream: DBStream) {
+/**
+ * Returns whether the stream is currently tagged as active but hasn't been
+ * updated in a long time and thus should be cleaned up.
+ */
+function shouldActiveCleanup(stream: DBStream) {
   return (
     stream.isActive &&
     !isNaN(stream.lastSeen) &&
@@ -252,7 +256,7 @@ function activeCleanupOne(
   queue: Queue,
   ingest: string
 ) {
-  if (!isActuallyNotActive(stream)) {
+  if (!shouldActiveCleanup(stream)) {
     return false;
   }
 
@@ -293,7 +297,7 @@ function activeCleanup(
     hasStreamsToClean ||= activeCleanupOne(config, stream, queue, ingest);
   }
   if (filterToActiveOnly && hasStreamsToClean) {
-    return streams.filter((s) => !isActuallyNotActive(s));
+    return streams.filter((s) => s.isActive); // activeCleanupOne monkey patches the stream object
   }
   return streams;
 }
@@ -1171,7 +1175,7 @@ async function triggerSessionRecordingHooks(
     }
 
     const session = await db.session.get(sessionId);
-    if (isCleanup && !parentId && !isActuallyNotActive(session)) {
+    if (isCleanup && !parentId && !shouldActiveCleanup(session)) {
       // The {activeCleanupOne} logic only checks the parent stream, so we need
       // to recheck the sessions here to avoid spamming active sessions.
       continue;
