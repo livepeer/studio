@@ -281,9 +281,12 @@ function activeCleanup(
   ingest: string,
   filterToActiveOnly = false
 ) {
-  let hasStreamsToClean: boolean;
+  let hasStreamsToClean = false;
   for (const stream of streams) {
-    hasStreamsToClean = activeCleanupOne(config, stream, queue, ingest);
+    const active = activeCleanupOne(config, stream, queue, ingest);
+    if (active) {
+      hasStreamsToClean = true;
+    }
   }
   if (filterToActiveOnly && hasStreamsToClean) {
     return streams.filter((s) => !isActuallyNotActive(s));
