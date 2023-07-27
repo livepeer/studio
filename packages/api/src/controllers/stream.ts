@@ -260,10 +260,17 @@ function activeCleanupOne(
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.waiting logic to clean-up the isActive field
-        await triggerSessionRecordingHooks(config, stream, queue, ingest);
+        await triggerSessionRecordingHooks(config, stream, queue, ingest, true);
       } else {
         const patch = { isActive: false };
-        await setStreamActiveWithHooks(config, stream, patch, queue, ingest);
+        await setStreamActiveWithHooks(
+          config,
+          stream,
+          patch,
+          queue,
+          ingest,
+          true
+        );
       }
     } catch (err) {
       logger.error("Error sending /setactive hooks err=", err);
@@ -1082,7 +1089,8 @@ async function setStreamActiveWithHooks(
   stream: DBStream,
   patch: Partial<DBStream> & { isActive: boolean },
   queue: Queue,
-  ingest: string
+  ingest: string,
+  isCleanup?: boolean
 ) {
   if (stream.parentId) {
     throw new Error(
@@ -1096,7 +1104,7 @@ async function setStreamActiveWithHooks(
     stream.isActive !== patch.isActive ||
     stream.region !== patch.region ||
     stream.mistHost !== patch.mistHost;
-  const isStaleCleanup = !patch.isActive && isStreamStale(stream);
+  const isStaleCleanup = isCleanup && !patch.isActive && isStreamStale(stream);
 
   if (changed && !isStaleCleanup) {
     const event = patch.isActive ? "stream.started" : "stream.idle";
@@ -1118,12 +1126,14 @@ async function setStreamActiveWithHooks(
   }
 
   // opportunistically trigger recording.waiting logic for this stream's sessions
-  triggerSessionRecordingHooks(config, stream, queue, ingest).catch((err) => {
-    logger.error(
-      `Error triggering session recording hooks stream_id=${stream.id} err=`,
-      err
-    );
-  });
+  triggerSessionRecordingHooks(config, stream, queue, ingest, isCleanup).catch(
+    (err) => {
+      logger.error(
+        `Error triggering session recording hooks stream_id=${stream.id} err=`,
+        err
+      );
+    }
+  );
 }
 
 /**
@@ -1135,7 +1145,8 @@ async function triggerSessionRecordingHooks(
   config: CliArgs,
   stream: DBStream,
   queue: Queue,
-  ingest: string
+  ingest: string,
+  isCleanup?: boolean
 ) {
   const { id, parentId } = stream;
   let childStreams = parentId
@@ -1160,6 +1171,12 @@ async function triggerSessionRecordingHooks(
     }
 
     const session = await db.session.get(sessionId);
+    if (isCleanup && !parentId && !isActuallyNotActive(session)) {
+      // The {activeCleanupOne} logic only checks the parent stream, so we need
+      // to recheck the sessions here to avoid spamming active sessions.
+      continue;
+    }
+
     await publishSingleRecordingWaitingHook(
       config,
       session,
