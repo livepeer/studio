@@ -1176,7 +1176,7 @@ async function triggerSessionRecordingHooks(
     }
 
     const session = await db.session.get(sessionId);
-    if (isCleanup && !parentId && !shouldActiveCleanup(session)) {
+    if (isCleanup && !shouldActiveCleanup(session)) {
       // The {activeCleanupOne} logic only checks the parent stream, so we need
       // to recheck the sessions here to avoid spamming active sessions.
       continue;
