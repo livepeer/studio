@@ -1147,6 +1147,7 @@ components:
           type: string
           description: User defined payload to store for the participant
           example: "host user"
+
     task:
       type: object
       additionalProperties: false
@@ -1297,8 +1298,6 @@ components:
                     be
                 creatorId:
                   $ref: "#/components/schemas/input-creator-id"
-        example:
-
         status:
           readOnly: true
           type: object
@@ -1335,13 +1334,6 @@ components:
               type: string
               writeOnly: true
               description: Step of the task processing
-          example:
-            phase: completed
-            updatedAt: 1587667174725
-            progress: 1
-            errorMessage: null
-            retries: 0
-            step: null
         output:
           type: object
           additionalProperties: false
@@ -1428,7 +1420,6 @@ components:
                       type: string
                     assetSpec:
                       $ref: "#/components/schemas/asset"
-          example:
 
     input-creator-id:
       oneOf:
