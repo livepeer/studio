@@ -242,9 +242,10 @@ async function getRecordingUrls(
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
  */
-function shouldActiveCleanup(stream: DBStream) {
+function shouldActiveCleanup(stream: DBStream | DBSession) {
+  const isActive = "isActive" in stream ? stream.isActive : true; // sessions don't have `isActive` field so we just assume `true`
   return (
-    stream.isActive &&
+    isActive &&
     !isNaN(stream.lastSeen) &&
     Date.now() - stream.lastSeen > ACTIVE_TIMEOUT
   );
