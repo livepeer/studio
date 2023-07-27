@@ -36,6 +36,15 @@ function isRuntimeError(err: any): boolean {
   return runtimeErrors.some((re) => err instanceof re);
 }
 
+// TODO: Remove this, only a temporary workaround to fix an incident
+function isStuckMindsSession(session: DBSession): boolean {
+  return [
+    "33d3cbfc-82be-470d-a84b-a40ef196ccd7",
+    "6b06abe5-90a4-4eeb-b61f-cbe789e9706b",
+    "8fbee675-d290-4699-80fc-002f081a8848",
+  ].includes(session.id);
+}
+
 export default class WebhookCannon {
   db: DB;
   running: boolean;
@@ -508,7 +517,7 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session is unused");
     }
     if (lastSeen > activeThreshold) {
-      if (isRetry) {
+      if (isRetry || isStuckMindsSession(session)) {
         throw new UnprocessableEntityError("Session is still active");
       }
       // there was an update after the delayed event was sent, so sleep a few
@@ -517,6 +526,14 @@ export default class WebhookCannon {
       return this.handleRecordingWaitingChecks(sessionId, true);
     }
 
+    // if we got to this point, it means we're confident this session is inactive
+    // and we can set the child streams isActive=false
+    const [childStreams] = await this.db.stream.find({ sessionId });
+    await Promise.all(
+      childStreams.map((child) => {
+        return this.db.stream.update(child.id, { isActive: false });
+      })
+    );
     const res = await this.db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");
