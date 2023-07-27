@@ -199,8 +199,8 @@ export class RabbitQueue implements Queue {
   }
 
   public handleMessage(data: any) {
-    var message = JSON.parse(data.content.toString());
-    console.log("subscriber: got message", message);
+    var message = data.content.toString();
+    console.log(`subscriber: handling message msg=${message}`);
     this.ack(data);
   }
 
@@ -217,7 +217,7 @@ export class RabbitQueue implements Queue {
     msg: messages.Any
   ): Promise<void> {
     console.log(
-      `publishing message to ${route} on exchange ${exchangeName} : ${JSON.stringify(
+      `publishing message route=${route} exchange=${exchangeName} msg=${JSON.stringify(
         msg
       )}`
     );
@@ -258,8 +258,7 @@ export class RabbitQueue implements Queue {
       },
       () => {
         console.log(
-          `emitting delayed message: delay=${delay / 1000}s msg=`,
-          msg
+          `emitting delayed message: delay=${delay / 1000}s msg=${JSON.stringify(msg)}`
         );
         return this._channelPublish(delayedQueueName, routingKey, msg, {
           persistent: true,
