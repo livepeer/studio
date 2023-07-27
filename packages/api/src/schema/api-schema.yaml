@@ -159,53 +159,6 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
-    webhook-response:
-      type: object
-      required:
-        - webhookId
-        - statusCode
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          readOnly: true
-          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
-        webhookId:
-          readOnly: true
-          type: string
-        eventId:
-          readOnly: true
-          type: string
-        createdAt:
-          readOnly: true
-          type: number
-          description: |
-            Timestamp (in milliseconds) at which webhook response object was
-            created
-          example: 1587667174725
-        duration:
-          type: number
-        statusCode:
-          type: number
-          default: 0
-        response:
-          type: object
-          additionalProperties: false
-          properties:
-            body:
-              type: string
-            headers:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: string
-            redirected:
-              type: boolean
-            status:
-              type: number
-            statusText:
-              type: string
     stream:
       type: object
       required:
@@ -386,27 +339,6 @@ components:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
-    deactivate-many-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        ids:
-          type: array
-          minItems: 1
-          items:
-            type: string
-    asset-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: "#/components/schemas/asset/properties/name"
-        creatorId:
-          $ref: "#/components/schemas/input-creator-id"
-        playbackPolicy:
-          $ref: "#/components/schemas/playback-policy"
-        storage:
-          $ref: "#/components/schemas/new-asset-payload/properties/storage"
     stream-patch-payload:
       type: object
       additionalProperties: false
@@ -500,30 +432,6 @@ components:
           additionalProperties: true
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
-      required: []
-    webhook-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: "#/components/schemas/webhook/properties/name"
-        url:
-          $ref: "#/components/schemas/webhook/properties/url"
-        events:
-          $ref: "#/components/schemas/webhook/properties/events"
-        sharedSecret:
-          $ref: "#/components/schemas/webhook/properties/sharedSecret"
-        streamId:
-          $ref: "#/components/schemas/webhook/properties/streamId"
-    webhook-status-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        errorMessage:
-          type: string
-          description: Error message if the webhook failed to process the event
-        response:
-          $ref: "#/components/schemas/webhook-response"
     session:
       type: object
       required:
@@ -951,12 +859,6 @@ components:
           readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
-    new-signing-key-payload:
-      additionalProperties: false
-      properties:
-        name:
-          type: string
-          description: Name of the signing key
     signing-key-response-payload:
       type: object
       required:
@@ -1127,187 +1029,6 @@ components:
         metadata:
           type: string
           description: User defined payload to store for the participant
-    transcode-payload:
-      additionalProperties: false
-      required:
-        - input
-        - storage
-        - outputs
-      properties:
-        input:
-          oneOf:
-            - type: object
-              additionalProperties: false
-              description: URL input video
-              required:
-                - url
-              properties:
-                url:
-                  type: string
-                  format: uri
-                  pattern: "^(https?|ipfs|ar)://"
-                  description: URL of the video to transcode
-                  example: "https://s3.amazonaws.com/bucket/file.mp4"
-            - type: object
-              additionalProperties: false
-              description: S3-like storage input video
-              required:
-                - type
-                - endpoint
-                - bucket
-                - path
-                - credentials
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - s3
-                  description: |
-                    Type of service. This is optional and defaults to `url` if
-                    ŚURL field is provided.
-                endpoint:
-                  type: string
-                  format: uri
-                  pattern: "^http(s)?://"
-                  description: >-
-                    Service endpoint URL (AWS S3 endpoint list:
-                    https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
-                    S3 endpoint: https://storage.googleapis.com, Storj:
-                    https://gateway.storjshare.io)
-                  example: "https://gateway.storjshare.io"
-                bucket:
-                  type: string
-                  description: Bucket with input file
-                  example: inputbucket
-                path:
-                  type: string
-                  description: Path to the input file inside the bucket
-                  example: /path/file.mp4
-                credentials:
-                  type: object
-                  additionalProperties: false
-                  required:
-                    - accessKeyId
-                    - secretAccessKey
-                  description: Credentials for the private input video storage
-                  properties:
-                    accessKeyId:
-                      type: string
-                      description: Access Key ID
-                      example: AKIAIOSFODNN7EXAMPLE
-                    secretAccessKey:
-                      type: string
-                      description: Secret Access Key
-                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-        storage:
-          oneOf:
-            - type: object
-              additionalProperties: false
-              required:
-                - type
-                - endpoint
-                - bucket
-                - credentials
-              description: Storage for the output files
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - s3
-                  description: Type of service used for output files
-                endpoint:
-                  type: string
-                  format: uri
-                  pattern: "^http(s)?://"
-                  description: >-
-                    Service endpoint URL (AWS S3 endpoint list:
-                    https://docs.aws.amazon.com/general/latest/gr/s3.html, GCP
-                    S3 endpoint: https://storage.googleapis.com, Storj:
-                    https://gateway.storjshare.io)
-                  example: "https://gateway.storjshare.io"
-                bucket:
-                  type: string
-                  description: Bucket with output files
-                  example: outputbucket
-                credentials:
-                  type: object
-                  additionalProperties: false
-                  required:
-                    - accessKeyId
-                    - secretAccessKey
-                  description: Credentials for the output video storage
-                  properties:
-                    accessKeyId:
-                      type: string
-                      description: Access Key ID
-                      example: AKIAIOSFODNN7EXAMPLE
-                    secretAccessKey:
-                      type: string
-                      description: Secret Access Key
-                      example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-            - type: object
-              additionalProperties: false
-              required:
-                - type
-                - credentials
-              description: Storage for the output files
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - web3.storage
-                  description: Type of service used for output files
-                credentials:
-                  type: object
-                  additionalProperties: false
-                  required:
-                    - proof
-                  description: |
-                    Delegation proof for Livepeer to be able to upload to
-                    web3.storage
-                  properties:
-                    proof:
-                      type: string
-                      description: Base64 encoded UCAN delegation proof
-                      example: >-
-                        EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
-        outputs:
-          type: object
-          additionalProperties: false
-          description: Output formats
-          properties:
-            hls:
-              type: object
-              additionalProperties: false
-              required:
-                - path
-              description: HLS output format
-              properties:
-                path:
-                  type: string
-                  description: Path for the HLS output
-                  example: /samplevideo/hls
-            mp4:
-              type: object
-              additionalProperties: false
-              required:
-                - path
-              description: MP4 output format
-              properties:
-                path:
-                  type: string
-                  description: Path for the MP4 output
-                  example: /samplevideo/mp4
-        profiles:
-          type: array
-          items:
-            $ref: "#/components/schemas/ffmpeg-profile"
-        targetSegmentSizeSecs:
-          type: number
-          description:
-            How many seconds the duration of each output segment should be
-        creatorId:
-          $ref: "#/components/schemas/input-creator-id"
     task:
       type: object
       additionalProperties: false
@@ -1579,7 +1300,6 @@ components:
                     metadataFilePath:
                       type: string
                     assetSpec:
-                      type: object
                       $ref: "#/components/schemas/asset"
     input-creator-id:
       oneOf:
@@ -1673,111 +1393,6 @@ components:
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
-    user:
-      type: object
-      required:
-        - email
-        - password
-      additionalProperties: false
-      properties:
-        email:
-          type: string
-          description: user email address
-          example: useremail@gmail.com
-        password:
-          type: string
-          example: thisisapassword
-          minLength: 64
-          maxLength: 64
-          writeOnly: true
-        emailValidToken:
-          type: string
-          example: E1F53135E559C253
-          writeOnly: true
-        emailValid:
-          type: boolean
-          example: true
-        suspended:
-          type: boolean
-        salt:
-          type: string
-          example: E1F53135E559C253
-          writeOnly: true
-        id:
-          type: string
-          readOnly: true
-          example: abc123
-        firstName:
-          type: string
-          example: Joe
-        lastName:
-          type: string
-          example: Smith
-        organization:
-          type: string
-          example: Livepeer
-        phone:
-          type: string
-          example: 2034212122
-        ccLast4:
-          type: string
-          example: 1234
-        ccBrand:
-          type: string
-          example: 1234
-        createdAt:
-          type: number
-          description:
-            Timestamp (in milliseconds) at which user object was created
-          example: 1587667174725
-        verifiedAt:
-          type: number
-          description:
-            Timestamp (in milliseconds) at which user object was verified
-          example: 1587667174725
-        planChangedAt:
-          type: number
-          description:
-            Timestamp (in milliseconds) at which user object was verified
-          example: 1587667174725
-        lastStreamedAt:
-          type: number
-          description: |
-            Timestamp (in milliseconds) at which user streamed RTMP stream last
-            time
-          example: 1587667174725
-        lastSeen:
-          type: number
-          description:
-            Timestamp (in milliseconds) at which user's password was used
-          example: 1587667174725
-    usage:
-      type: object
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          description: day associated with usage
-          example: 2021-01-30T00:00:00.000Z
-        date:
-          type: number
-          readOnly: true
-          example: usage
-        sourceSegments:
-          type: number
-          example: 200000
-        transcodedSegments:
-          type: number
-          example: 200000
-        sourceSegmentsDuration:
-          type: number
-          example: 200000
-        transcodedSegmentsDuration:
-          type: number
-          example: 200000
-        streamCount:
-          type: number
-          example: 200000
     playback-policy:
       type: object
       description:
@@ -2228,7 +1843,6 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               $ref: "#/components/schemas/new-stream-payload"
       responses:
         "200":
@@ -2305,6 +1919,9 @@ paths:
         URL-encoded.                                           |
       parameters:
         - name: streamsonly
+          description:
+            Filter the API response and retrieve a specific subset of stream
+            objects based on certain criteria
           in: query
           schema:
             type: string
@@ -2672,6 +2289,7 @@ paths:
       operationId: getWebhook
       parameters:
         - name: id
+          description: ID of the webhook
           in: path
           required: true
           schema:
@@ -2692,6 +2310,7 @@ paths:
     put:
       parameters:
         - name: id
+          description: ID of the webhook
           in: path
           required: true
           schema:
@@ -2721,6 +2340,7 @@ paths:
     delete:
       parameters:
         - name: id
+          description: ID of the webhook
           in: path
           required: true
           schema:
@@ -2992,6 +2612,7 @@ paths:
     get:
       parameters:
         - name: id
+          description: ID of the room
           in: path
           required: true
           schema:
@@ -3014,6 +2635,8 @@ paths:
     delete:
       parameters:
         - name: id
+          description: ID of the room
+
           in: path
           required: true
           schema:
@@ -3039,6 +2662,7 @@ paths:
               $ref: "#/components/schemas/room-egress-payload"
       parameters:
         - name: id
+          description: ID of the room
           in: path
           required: true
           schema:
@@ -3062,6 +2686,7 @@ paths:
       operationId: stopRoomEgress
       parameters:
         - name: id
+          description: ID of the room
           in: path
           required: true
           schema:
@@ -3085,6 +2710,7 @@ paths:
               $ref: "#/components/schemas/room-user-payload"
       parameters:
         - name: id
+          description: ID of the room
           in: path
           required: true
           schema:
@@ -3112,12 +2738,14 @@ paths:
     get:
       parameters:
         - name: id
+          description: ID of the room
           in: path
           required: true
           schema:
             type: string
         - name: userId
           in: path
+          description: ID of the user
           required: true
           schema:
             type: string
@@ -3145,11 +2773,14 @@ paths:
               $ref: "#/components/schemas/room-user-update-payload"
       parameters:
         - name: id
+          description: ID of the room
+
           in: path
           required: true
           schema:
             type: string
         - name: userId
+          description: ID of the user
           in: path
           required: true
           schema:
@@ -3169,11 +2800,13 @@ paths:
     delete:
       parameters:
         - name: id
+          description: ID of the room
           in: path
           required: true
           schema:
             type: string
         - name: userId
+          description: ID of the user
           in: path
           required: true
           schema:
