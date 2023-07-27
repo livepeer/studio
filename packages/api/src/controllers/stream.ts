@@ -1144,6 +1144,13 @@ async function triggerSessionRecordingHooks(
 
   for (const childStream of childStreams) {
     const sessionId = childStream.sessionId ?? childStream.id;
+    const asset = await db.asset.get(sessionId);
+    if (asset) {
+      // if we have an asset, then the recording has already been processed and
+      // we don't need to send a recording.waiting hook.
+      continue;
+    }
+
     const session = await db.session.get(sessionId);
     await publishSingleRecordingWaitingHook(
       config,
