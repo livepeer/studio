@@ -283,10 +283,7 @@ function activeCleanup(
 ) {
   let hasStreamsToClean = false;
   for (const stream of streams) {
-    const active = activeCleanupOne(config, stream, queue, ingest);
-    if (active) {
-      hasStreamsToClean = true;
-    }
+    hasStreamsToClean ||= activeCleanupOne(config, stream, queue, ingest);
   }
   if (filterToActiveOnly && hasStreamsToClean) {
     return streams.filter((s) => !isActuallyNotActive(s));
@@ -1145,8 +1142,16 @@ async function triggerSessionRecordingHooks(
     ? [stream]
     : await db.stream.getActiveSessions(id);
 
+  const handledSessionIds = new Set<string>();
   for (const childStream of childStreams) {
     const sessionId = childStream.sessionId ?? childStream.id;
+    if (handledSessionIds.has(sessionId)) {
+      // we list active child streams instead so we may get multiple streams for
+      // the same session. We only want to send one hook per session here.
+      continue;
+    }
+    handledSessionIds.add(sessionId);
+
     const asset = await db.asset.get(sessionId);
     if (asset) {
       // if we have an asset, then the recording has already been processed and
