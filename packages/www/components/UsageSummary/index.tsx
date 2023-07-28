@@ -23,6 +23,17 @@ const StyledUpcomingIcon = styled(UpcomingIcon, {
   color: "$gray",
 });
 
+export interface OverUsageBill {
+  transcodingBill: OverUsageItem;
+  deliveryBill: OverUsageItem;
+  storageBill: OverUsageItem;
+}
+
+export interface OverUsageItem {
+  units: number;
+  total: number;
+}
+
 export const UsageCard = ({ title, usage, limit, loading = false }) => {
   return (
     <Box
@@ -69,8 +80,6 @@ const UsageSummary = () => {
     getSubscription,
     getInvoices,
     getUserProduct,
-    calculateOverUsage,
-    calculateOverUsageBill,
   } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
@@ -131,6 +140,59 @@ const UsageSummary = () => {
         const overusageBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(overusageBill);
       }
+    };
+
+    const calculateOverUsage = async (product, usage) => {
+      const productData = products[product];
+      const limits = {
+        transcoding: productData?.usage[0].limit,
+        streaming: productData?.usage[1].limit,
+        storage: productData?.usage[2].limit,
+      };
+
+      const overUsage = {
+        TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
+        DeliveryUsageMins: Math.max(
+          usage?.DeliveryUsageMins - limits.streaming,
+          0
+        ),
+        StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
+      };
+
+      return overUsage;
+    };
+
+    const calculateOverUsageBill = async (overusage) => {
+      const payAsYouGoData = products["pay_as_you_go_1"];
+
+      const overUsageBill: OverUsageBill = {
+        transcodingBill: {
+          units: overusage.TotalUsageMins,
+          total: Number(
+            (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
+              2
+            )
+          ),
+        },
+        deliveryBill: {
+          units: overusage.DeliveryUsageMins,
+          total: Number(
+            (
+              overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
+            ).toFixed(2)
+          ),
+        },
+        storageBill: {
+          units: overusage.StorageUsageMins,
+          total: Number(
+            (
+              overusage.StorageUsageMins * payAsYouGoData.usage[2].price
+            ).toFixed(2)
+          ),
+        },
+      };
+
+      return overUsageBill;
     };
 
     if (user) {
@@ -230,7 +292,7 @@ const UsageSummary = () => {
       <Flex
         justify="between"
         align="center"
-        css={{ fontSize: "$3", color: "$hiContrast", display: "none" }}>
+        css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Text variant="neutral" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
           Upcoming invoice:{" "}
