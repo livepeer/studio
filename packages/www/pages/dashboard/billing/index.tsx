@@ -93,21 +93,12 @@ const Billing = () => {
       let [res, billingUsage] = await getBillingUsage(fromTime, toTime);
 
       if (res.status == 200) {
-        if (billingUsage) {
-          setUsage(billingUsage);
-        } else {
-          billingUsage = {
-            TotalUsageMins: 0,
-            DeliveryUsageMins: 0,
-            StorageUsageMins: 0,
-          };
-          setUsage(billingUsage);
-        }
-        doCaculateOverUsage(billingUsage);
+        setUsage(usage);
+        await doCalculateOverUsage(usage);
       }
     };
 
-    const doCaculateOverUsage = async (usage) => {
+    const doCalculateOverUsage = async (usage) => {
       const overusage = await calculateOverUsage(usage);
       if (overusage) {
         const oBill = await calculateOverUsageBill(overusage);
@@ -281,7 +272,7 @@ const Billing = () => {
                 {user?.stripeProductId
                   ? products[user.stripeProductId]?.name ||
                     products[user.newStripeProductId]?.name
-                  : products["hacker_1"]?.name}
+                  : products["prod_O9XuIjn7EqYRVW"]?.name}
               </Badge>
               plan.
             </Text>

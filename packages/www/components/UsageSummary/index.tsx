@@ -122,7 +122,7 @@ const UsageSummary = () => {
 
       if (res.status == 200) {
         setUsage(usage);
-        doCaculateOverUsage(usage);
+        await doCalculateOverUsage(usage);
       }
     };
     const getSubscriptionAndUsage = async (subscriptionId) => {
@@ -137,7 +137,7 @@ const UsageSummary = () => {
       );
     };
 
-    const doCaculateOverUsage = async (usage) => {
+    const doCalculateOverUsage = async (usage) => {
       const overusage = await calculateOverUsage(product, usage);
       if (overusage) {
         const oBill = await calculateOverUsageBill(overusage);
@@ -246,7 +246,7 @@ const UsageSummary = () => {
               {user?.stripeProductId
                 ? products[user.stripeProductId]?.name ||
                   products[user.newStripeProductId]?.name
-                : products["hacker_1"].name}{" "}
+                : products["prod_O9XuIjn7EqYRVW"].name}{" "}
               Plan
             </Badge>
           </Flex>
