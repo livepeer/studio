@@ -11,11 +11,11 @@ import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "livepeer";
 import AssetSharePopup from "../../AssetDetails/AssetSharePopup";
 
-import { useEffect, useMemo, useState } from "react";
-import { FiKey, FiVideo } from "react-icons/fi";
-import ActiveStream from "./ActiveStream";
-import StreamSetupBox from "../StreamSetupBox";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { FaKey, FaVideo } from "react-icons/fa";
+import { FiVideo } from "react-icons/fi";
+import StreamSetupBox from "../StreamSetupBox";
+import ActiveStream from "./ActiveStream";
 
 export type StreamPlayerBoxProps = {
   stream: Stream;
@@ -24,6 +24,9 @@ export type StreamPlayerBoxProps = {
   globalSrtIngestUrl: string;
   globalPlaybackUrl: string;
   invalidateStream: () => void;
+
+  isBroadcastLive: boolean;
+  setIsBroadcastLive: Dispatch<SetStateAction<boolean>>;
 };
 
 const StreamPlayerBox = ({
@@ -33,15 +36,16 @@ const StreamPlayerBox = ({
   globalSrtIngestUrl,
   globalPlaybackUrl,
   invalidateStream,
+  isBroadcastLive,
+  setIsBroadcastLive,
 }: StreamPlayerBoxProps) => {
   const [activeTab, setSwitchTab] = useState<"Browser" | "Streaming Software">(
     "Browser"
   );
-  const [showBroadcast, setShowBroadcast] = useState(false);
 
   const isStreamActiveFromExternal = useMemo(
-    () => !showBroadcast && stream.isActive,
-    [showBroadcast, stream.isActive]
+    () => !isBroadcastLive && stream.isActive,
+    [isBroadcastLive, stream.isActive]
   );
 
   useEffect(() => {
@@ -51,10 +55,10 @@ const StreamPlayerBox = ({
   }, [isStreamActiveFromExternal]);
 
   useEffect(() => {
-    if (showBroadcast) {
+    if (isBroadcastLive) {
       setSwitchTab("Browser");
     }
-  }, [showBroadcast]);
+  }, [isBroadcastLive]);
 
   return (
     <Box
@@ -79,7 +83,7 @@ const StreamPlayerBox = ({
             border: "1px solid $neutral6",
             overflow: "hidden",
           }}>
-          {showBroadcast ? (
+          {isBroadcastLive ? (
             <LivepeerBroadcast streamKey={stream.streamKey} />
           ) : stream.isActive ? (
             <ActiveStream playbackId={stream.playbackId} />
@@ -132,14 +136,14 @@ const StreamPlayerBox = ({
                 flex: 2,
               }}
               disabled={isStreamActiveFromExternal}
-              onClick={() => setShowBroadcast((prev) => !prev)}>
+              onClick={() => setIsBroadcastLive((prev) => !prev)}>
               <Box
                 as={FiVideo}
                 css={{
                   mr: "$1",
                 }}
               />
-              {showBroadcast ? "Stop broadcast" : "Go live"}
+              {isBroadcastLive ? "Stop broadcast" : "Go live"}
             </Button>
           </Tooltip>
         </Flex>
