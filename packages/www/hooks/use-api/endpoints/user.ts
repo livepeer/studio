@@ -6,7 +6,12 @@ import {
   User,
 } from "@livepeer.studio/api";
 import { isDevelopment, shouldStripe } from "../../../lib/utils";
-import { ApiState, UsageData, BillingUsageData } from "../types";
+import {
+  ApiState,
+  UsageData,
+  BillingUsageData,
+  UpcomingInvoice,
+} from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
 import { storeToken, clearToken } from "../tokenStorage";
@@ -231,7 +236,7 @@ export const getBillingUsage = async (
 
 export const getUpcomingInvoice = async (
   stripeCustomerId: string
-): Promise<[Response, any | ApiError]> => {
+): Promise<[Response, UpcomingInvoice | ApiError]> => {
   let [res, invoice] = await context.fetch(`/user/retrieve-upcoming-invoice`, {
     method: "POST",
     body: JSON.stringify({ stripeCustomerId }),
@@ -240,7 +245,7 @@ export const getUpcomingInvoice = async (
     },
   });
 
-  return [res, invoice as any | ApiError];
+  return [res, invoice as UpcomingInvoice | ApiError];
 };
 
 export const makeUserAdmin = async (

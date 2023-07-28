@@ -142,16 +142,9 @@ const UsageSummary = () => {
       if (overusage) {
         const oBill = await calculateOverUsageBill(overusage);
         setOverUsageBill(oBill);
-        let planPrice =
-          products[user.stripeProductId]?.monthlyPrice.toLocaleString() || 0;
-        setUpcomingInvoiceTotal(
-          oBill?.transcodingBill.total +
-            oBill?.deliveryBill.total +
-            oBill?.storageBill.total +
-            planPrice
-        );
-        let uInvoice = await getUpcomingInvoice(user.stripeCustomerId);
+        let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
         setUpcomingInvoice(uInvoice);
+        setUpcomingInvoiceTotal(upcomingInvoice.amount_due / 100);
       }
     };
 
