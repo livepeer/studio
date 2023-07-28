@@ -4,18 +4,20 @@ import { Stream } from "livepeer";
 import { Box } from "@livepeer/design-system";
 
 export type StreamHealthWarningAlertProps = {
+  isBrowserBroadcastLive: boolean;
   stream: Stream & { isHealthy?: boolean; issues?: string[] };
 };
 
 const StreamHealthWarningAlert = ({
   stream,
+  isBrowserBroadcastLive,
 }: StreamHealthWarningAlertProps) => {
   return (
     <Box
       css={{
         mb: "$4",
       }}>
-      {!stream.isHealthy && (
+      {!stream.isHealthy && !isBrowserBroadcastLive && (
         <>
           {stream?.issues?.slice(0, 1)?.map((issue) => (
             <Banner
