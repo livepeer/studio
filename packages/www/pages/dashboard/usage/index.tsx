@@ -99,8 +99,15 @@ const Usage = () => {
         toTime = now.getTime();
       }
 
-      const [res, usage] = await getBillingUsage(fromTime, toTime);
+      let [res, usage] = await getBillingUsage(fromTime, toTime);
       if (res.status == 200) {
+        if (!usage) {
+          usage = {
+            TotalUsageMins: 0,
+            DeliveryUsageMins: 0,
+            StorageUsageMins: 0,
+          };
+        }
         setBillingUsage(usage);
       }
       const [res2, usageByDay] = await getBillingUsage(

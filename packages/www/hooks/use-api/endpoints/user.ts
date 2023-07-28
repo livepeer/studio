@@ -270,14 +270,6 @@ export const getBillingUsage = async (
     {}
   );
 
-  if (!usage) {
-    usage = {
-      TotalUsageMins: 0,
-      DeliveryUsageMins: 0,
-      StorageUsageMins: 0,
-    };
-  }
-
   return [res, usage as BillingUsageData | ApiError];
 };
 
