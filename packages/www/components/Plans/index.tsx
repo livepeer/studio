@@ -371,7 +371,7 @@ const Plans = ({
                     <span>3,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $5 for every additional 1,000 minutes">
+                      content="Then $5.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -404,7 +404,7 @@ const Plans = ({
                     <span>10,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $3 for every additional 1,000 minutes">
+                      content="Then $3.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -438,7 +438,7 @@ const Plans = ({
                     <Tooltip
                       multiline
                       css={{ float: "right" }}
-                      content="Then $0.40 for every additional 1,000 minutes">
+                      content="Then $0.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -531,7 +531,7 @@ const Plans = ({
                     <span>20,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $5 for every additional 1,000 minutes">
+                      content="Then $5.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -564,7 +564,7 @@ const Plans = ({
                     <span>50,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $3 for every additional 1,000 minutes">
+                      content="Then $3.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -597,7 +597,7 @@ const Plans = ({
                     <span>500,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $0.40 for every additional 1,000 minutes">
+                      content="Then $0.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
