@@ -244,8 +244,8 @@ const UsageSummary = () => {
               variant="neutral"
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
-                ? products[user.newStripeProductId]?.name ||
-                  products[user.stripeProductId]?.name
+                ? products[user.stripeProductId]?.name ||
+                  products[user.newStripeProductId]?.name
                 : products["hacker_1"].name}{" "}
               Plan
             </Badge>

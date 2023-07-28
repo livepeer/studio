@@ -838,7 +838,7 @@ app.post(
         .send({ errors: ["could not create subscription"] });
     }
 
-    if (
+    /*if (
       stripeProductId !== "prod_0" &&
       stripeProductId !== "prod_1" &&
       stripeProductId !== "prod_2"
@@ -849,7 +849,7 @@ app.post(
       });
       res.send(subscription);
       return;
-    }
+    }*/
 
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {
@@ -918,7 +918,7 @@ app.post(
     );
 
     // Temporarily skip updating the subscription if user is selecting a new plan
-    if (
+    /*if (
       payload.stripeProductId !== "prod_0" &&
       payload.stripeProductId !== "prod_1" &&
       payload.stripeProductId !== "prod_2"
@@ -930,7 +930,7 @@ app.post(
       });
       res.send(subscription);
       return;
-    }
+    }*/
 
     // Get the prices associated with the subscription
     const subscriptionItems = await req.stripe.subscriptionItems.list({
