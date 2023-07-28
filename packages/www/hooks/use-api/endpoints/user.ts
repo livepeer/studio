@@ -6,7 +6,7 @@ import {
   User,
 } from "@livepeer.studio/api";
 import { isDevelopment, shouldStripe } from "../../../lib/utils";
-import { ApiState, UsageData, BillingUsageData } from "../types";
+import { ApiState, UsageData, BillingUsageData, OverUsageBill } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
 import { storeToken, clearToken } from "../tokenStorage";
@@ -180,7 +180,7 @@ export const getUserProduct = (user: User) => {
   return products[user.stripeProductId || "prod_0"];
 };
 
-export const calculateOverUsage = (
+export const calculateOverUsage = async (
   product: string,
   usage: BillingUsageData
 ) => {
@@ -200,27 +200,27 @@ export const calculateOverUsage = (
   return overUsage;
 };
 
-export const calculateOverUsageBill = (overusage: BillingUsageData) => {
+export const calculateOverUsageBill = async (overusage: BillingUsageData) => {
   const payAsYouGoData = products["pay_as_you_go_1"];
 
-  const overUsageBill = {
-    trasncodingBill: {
+  const overUsageBill: OverUsageBill = {
+    transcodingBill: {
       units: overusage.TotalUsageMins,
-      total: (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
-        2
+      total: Number(
+        (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(2)
       ),
     },
     deliveryBill: {
       units: overusage.DeliveryUsageMins,
-      total: (
-        overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
-      ).toFixed(2),
+      total: Number(
+        (overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price).toFixed(2)
+      ),
     },
     storageBill: {
       units: overusage.StorageUsageMins,
-      total: (
-        overusage.StorageUsageMins * payAsYouGoData.usage[2].price
-      ).toFixed(2),
+      total: Number(
+        (overusage.StorageUsageMins * payAsYouGoData.usage[2].price).toFixed(2)
+      ),
     },
   };
 

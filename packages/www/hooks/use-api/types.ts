@@ -34,6 +34,17 @@ export interface BillingUsageData {
   StorageUsageMins: number;
 }
 
+export interface OverUsageBill {
+  transcodingBill: OverUsageItem;
+  deliveryBill: OverUsageItem;
+  storageBill: OverUsageItem;
+}
+
+export interface OverUsageItem {
+  units: number;
+  total: number;
+}
+
 export interface BillingUsageDataWithTimestamp {
   timestamp: number;
   data: BillingUsageData;
