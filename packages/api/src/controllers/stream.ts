@@ -1254,7 +1254,8 @@ async function publishDelayedRecordingWaitingHook(
         },
       },
     },
-    USER_SESSION_TIMEOUT + 10_000
+    USER_SESSION_TIMEOUT + 10_000,
+    "recording_waiting_delayed_events"
   );
 }
 

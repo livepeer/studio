@@ -38,7 +38,8 @@ export default interface Queue {
   delayedPublishWebhook(
     key: RoutingKey,
     msg: messages.Any,
-    delay: number
+    delay: number,
+    delayedQueueName?: string
   ): Promise<void>;
 
   consume(name: QueueName, func: (msg: ConsumeMessage) => void): Promise<void>;
@@ -235,10 +236,14 @@ export class RabbitQueue implements Queue {
   public delayedPublishWebhook(
     routingKey: RoutingKey,
     msg: messages.Any,
-    delay: number
+    delay: number,
+    delayedQueueName?: string
   ): Promise<void> {
     delay = Math.round(delay);
-    const delayedQueueName = delayedWebhookQueue(delay);
+    if (!delayedQueueName) {
+      delayedQueueName = delayedWebhookQueue(delay);
+    }
+
     // TODO: Find a way to reimplement this without on-demand queues.
     return this._withSetup(
       async (channel: Channel) => {
@@ -260,7 +265,7 @@ export class RabbitQueue implements Queue {
         console.log(
           `emitting delayed message: delay=${
             delay / 1000
-          }s msg=${JSON.stringify(msg)}`
+          }s queue=${delayedQueueName} msg=${JSON.stringify(msg)}`
         );
         return this._channelPublish(delayedQueueName, routingKey, msg, {
           persistent: true,
