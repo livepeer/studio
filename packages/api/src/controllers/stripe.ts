@@ -731,7 +731,7 @@ app.post("/migrate-test-products", async (req, res) => {
       email: user.email,
     });
 
-    if (customer.data.length == 0) {
+    if (customer.data.length === 0) {
       console.log(`
         Unable to migrate user - customer not found in stripe for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
       `);
