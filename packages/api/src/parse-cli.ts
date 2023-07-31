@@ -292,7 +292,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       catalystBaseUrl: {
         describe: "base URL of Catalyst",
         type: "string",
-        default: "http://127.0.0.1:7979",
+        default: "http://localhost:7979",
       },
       googleCloudUrlSigningKeyName: {
         describe:
