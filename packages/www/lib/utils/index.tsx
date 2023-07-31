@@ -109,6 +109,23 @@ export const getStripe = () => {
   return stripePromise;
 };
 
+/**
+ * should stripe be enabled in this context?
+ */
+export const shouldStripe = () => {
+  if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    return false;
+  }
+  if (
+    process.env.NODE_ENV === "development" &&
+    !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
 export function formatAmountForDisplay(
   amount: number,
   currency: string

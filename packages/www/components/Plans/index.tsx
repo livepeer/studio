@@ -362,11 +362,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>3,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $5 for every additional 1,000 minutes">
+                      content="Then $5.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -390,11 +395,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>10,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $3 for every additional 1,000 minutes">
+                      content="Then $3.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -418,12 +428,17 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>100,000 minutes</span>
                     <Tooltip
                       multiline
                       css={{ float: "right" }}
-                      content="Then $0.40 for every additional 1,000 minutes">
+                      content="Then $0.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -446,7 +461,7 @@ const Plans = ({
               <Item
                 css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
-                title={"*Pay as you go past alloted minutes"}
+                title={"* Pay as you go past allotted minutes"}
               />
             </List>
           </Box>
@@ -507,11 +522,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>20,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $5 for every additional 1,000 minutes">
+                      content="Then $5.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -535,11 +555,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>50,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $3 for every additional 1,000 minutes">
+                      content="Then $3.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -563,11 +588,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>500,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $0.40 for every additional 1,000 minutes">
+                      content="Then $0.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -590,7 +620,7 @@ const Plans = ({
               <Item
                 css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
-                title={"*Pay as you go past alloted minutes"}
+                title={"* Pay as you go past allotted minutes"}
               />
             </List>
           </Box>

@@ -5,7 +5,7 @@ import {
   SuspendUserPayload,
   User,
 } from "@livepeer.studio/api";
-import { isDevelopment } from "../../../lib/utils";
+import { isDevelopment, shouldStripe } from "../../../lib/utils";
 import { ApiState, UsageData, BillingUsageData } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
@@ -83,11 +83,7 @@ export const register = async ({
     return body;
   }
 
-  // Only create stripe customer if developer explicitly enables stripe in dev mode
-  if (
-    process.env.NODE_ENV === "development" &&
-    !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
-  ) {
+  if (!shouldStripe()) {
     return login(email, password);
   }
 

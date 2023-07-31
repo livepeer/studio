@@ -1,16 +1,15 @@
 import { Box, Flex } from "@livepeer/design-system";
-import Layout from "layouts/dashboard";
-import { useRouter } from "next/router";
-import { useApi, useLoggedIn } from "hooks";
-import { useEffect, useState, useMemo } from "react";
+import EmbedVideoDialog from "components/AssetDetails/EmbedVideoDialog";
 import Spinner from "components/Spinner";
 import { Variant as StatusVariant } from "components/StatusBadge";
-import StreamPlayerBox from "components/StreamDetails/StreamPlayerBox/";
-import StreamSetupBox from "components/StreamDetails/StreamSetupBox";
-import StreamHeadingBox from "components/StreamDetails/StreamHeadingBox";
 import StreamChildrenHeadingBox from "components/StreamDetails/StreamChildrenHeadingBox";
-import EmbedVideoDialog from "components/AssetDetails/EmbedVideoDialog";
+import StreamHeadingBox from "components/StreamDetails/StreamHeadingBox";
 import StreamHealthWarningAlert from "components/StreamDetails/StreamHealthWarningAlert";
+import StreamPlayerBox from "components/StreamDetails/StreamPlayerBox/";
+import { useApi, useLoggedIn } from "hooks";
+import Layout from "layouts/dashboard";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
 
 const StreamDetail = ({
   breadcrumbs,
@@ -33,6 +32,8 @@ const StreamDetail = ({
   const [isCopied, setCopied] = useState(0);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
+
+  const [isBroadcastLive, setIsBroadcastLive] = useState(false);
 
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
@@ -132,7 +133,10 @@ const StreamDetail = ({
         <Box css={{ px: "$6", py: "$2" }}>
           {stream ? (
             <>
-              <StreamHealthWarningAlert stream={stream} />
+              <StreamHealthWarningAlert
+                stream={stream}
+                isBrowserBroadcastLive={isBroadcastLive}
+              />
               <Flex>
                 <Box
                   css={{
@@ -153,6 +157,8 @@ const StreamDetail = ({
                       globalIngestUrl={globalIngestUrl}
                       globalSrtIngestUrl={globalSrtIngestUrl}
                       invalidateStream={invalidateStream}
+                      isBroadcastLive={isBroadcastLive}
+                      setIsBroadcastLive={setIsBroadcastLive}
                     />
                   </Box>
                 </Box>

@@ -23,6 +23,7 @@ import {
 } from "@livepeer/react";
 import "../css/hubspot.scss";
 import { isStaging } from "lib/utils";
+import { getEndpoint } from "../hooks/use-api";
 
 const queryClient = new QueryClient();
 
@@ -65,12 +66,8 @@ const livepeerClient = createReactClient({
     // we intentionally provide no API key so any requests requiring auth will fail
     // eventually should move to using JWT from user's login
     apiKey: "",
-    baseUrl: isStaging()
-      ? "https://livepeer.monster/api"
-      : "https://livepeer.studio/api",
-    webrtcIngestBaseUrl: isStaging()
-      ? "https://webrtc.livepeer.monster/webrtc"
-      : "https://webrtc.livepeer.studio/webrtc",
+    baseUrl: `${getEndpoint()}/api`,
+    webrtcIngestBaseUrl: `${getEndpoint()}/webrtc`,
   }),
 });
 

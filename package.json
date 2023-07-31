@@ -32,7 +32,9 @@
     "prettier:base": "prettier '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'",
     "prettier": "yarn run prettier:base --write",
     "prettier:check": "yarn run prettier:base --check",
-    "release": "lerna version"
+    "release": "lerna version",
+    "pkg": "lerna run --stream build && lerna run --stream pkg",
+    "pkg:local": "lerna run --stream build && lerna run --stream pkg:local"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",

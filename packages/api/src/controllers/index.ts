@@ -20,7 +20,6 @@ import admin from "./admin";
 import usage from "./usage";
 import region from "./region";
 import session from "./session";
-import cdnData from "./cdn-data";
 import playback from "./playback";
 import did from "./did";
 import room from "./room";
@@ -49,7 +48,6 @@ export default {
   admin,
   usage,
   session,
-  "cdn-data": cdnData,
   playback,
   did,
   room,

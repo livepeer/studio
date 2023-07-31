@@ -287,6 +287,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       },
       recordCatalystObjectStoreId: {
         describe: "object store ID used by Catalyst to store recordings",
+        type: "string",
       },
       catalystBaseUrl: {
         describe: "base URL of Catalyst",
@@ -421,6 +422,21 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://meet.livekit.io/custom",
       },
+      frontend: {
+        describe: "serve the embedded @livepeer/www Next.js frontend",
+        type: "boolean",
+        default: true,
+      },
+      "stream-info-service": {
+        describe: "start the Stream Info service instead of Studio API",
+        type: "boolean",
+      },
+      broadcaster: {
+        describe:
+          "stream-info-service: broadcaster host:port to fetch info from",
+        type: "string",
+        default: "localhost:7935",
+      },
     })
     .usage(
       `
@@ -441,8 +457,8 @@ export default function parseCli(argv?: string | readonly string[]) {
     )
     .help()
     .parse(argv);
+  const mistOutput = yargsToMist(args);
   if (parsed.json === true) {
-    const mistOutput = yargsToMist(args);
     console.log(JSON.stringify(mistOutput));
     process.exit(0);
   }

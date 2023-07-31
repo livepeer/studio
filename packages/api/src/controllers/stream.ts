@@ -4,6 +4,7 @@ import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
+import _ from "lodash";
 
 import logger from "../logger";
 import { authorizer } from "../middleware";
@@ -239,9 +240,14 @@ async function getRecordingUrls(
   };
 }
 
-function isActuallyNotActive(stream: DBStream) {
+/**
+ * Returns whether the stream is currently tagged as active but hasn't been
+ * updated in a long time and thus should be cleaned up.
+ */
+function shouldActiveCleanup(stream: DBStream | DBSession) {
+  const isActive = "isActive" in stream ? stream.isActive : true; // sessions don't have `isActive` field so we just assume `true`
   return (
-    stream.isActive &&
+    isActive &&
     !isNaN(stream.lastSeen) &&
     Date.now() - stream.lastSeen > ACTIVE_TIMEOUT
   );
@@ -253,7 +259,7 @@ function activeCleanupOne(
   queue: Queue,
   ingest: string
 ) {
-  if (!isActuallyNotActive(stream)) {
+  if (!shouldActiveCleanup(stream)) {
     return false;
   }
 
@@ -261,10 +267,17 @@ function activeCleanupOne(
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.waiting logic to clean-up the isActive field
-        await triggerSessionRecordingHooks(config, stream, queue, ingest);
+        await triggerSessionRecordingHooks(config, stream, queue, ingest, true);
       } else {
         const patch = { isActive: false };
-        await setStreamActiveWithHooks(config, stream, patch, queue, ingest);
+        await setStreamActiveWithHooks(
+          config,
+          stream,
+          patch,
+          queue,
+          ingest,
+          true
+        );
       }
     } catch (err) {
       logger.error("Error sending /setactive hooks err=", err);
@@ -282,12 +295,12 @@ function activeCleanup(
   ingest: string,
   filterToActiveOnly = false
 ) {
-  let hasStreamsToClean: boolean;
+  let hasStreamsToClean = false;
   for (const stream of streams) {
-    hasStreamsToClean = activeCleanupOne(config, stream, queue, ingest);
+    hasStreamsToClean ||= activeCleanupOne(config, stream, queue, ingest);
   }
   if (filterToActiveOnly && hasStreamsToClean) {
-    return streams.filter((s) => !isActuallyNotActive(s));
+    return streams.filter((s) => s.isActive); // activeCleanupOne monkey patches the stream object
   }
   return streams;
 }
@@ -1083,7 +1096,8 @@ async function setStreamActiveWithHooks(
   stream: DBStream,
   patch: Partial<DBStream> & { isActive: boolean },
   queue: Queue,
-  ingest: string
+  ingest: string,
+  isCleanup?: boolean
 ) {
   if (stream.parentId) {
     throw new Error(
@@ -1097,7 +1111,7 @@ async function setStreamActiveWithHooks(
     stream.isActive !== patch.isActive ||
     stream.region !== patch.region ||
     stream.mistHost !== patch.mistHost;
-  const isStaleCleanup = !patch.isActive && isStreamStale(stream);
+  const isStaleCleanup = isCleanup && !patch.isActive && isStreamStale(stream);
 
   if (changed && !isStaleCleanup) {
     const event = patch.isActive ? "stream.started" : "stream.idle";
@@ -1119,12 +1133,14 @@ async function setStreamActiveWithHooks(
   }
 
   // opportunistically trigger recording.waiting logic for this stream's sessions
-  triggerSessionRecordingHooks(config, stream, queue, ingest).catch((err) => {
-    logger.error(
-      `Error triggering session recording hooks stream_id=${stream.id} err=`,
-      err
-    );
-  });
+  triggerSessionRecordingHooks(config, stream, queue, ingest, isCleanup).catch(
+    (err) => {
+      logger.error(
+        `Error triggering session recording hooks stream_id=${stream.id} err=`,
+        err
+      );
+    }
+  );
 }
 
 /**
@@ -1136,16 +1152,31 @@ async function triggerSessionRecordingHooks(
   config: CliArgs,
   stream: DBStream,
   queue: Queue,
-  ingest: string
+  ingest: string,
+  isCleanup?: boolean
 ) {
   const { id, parentId } = stream;
-  let childStreams = parentId
+  const childStreams = parentId
     ? [stream]
     : await db.stream.getActiveSessions(id);
 
-  for (const childStream of childStreams) {
-    const sessionId = childStream.sessionId ?? childStream.id;
+  // remove duplicate sessionIds from possibly broken up child streams
+  const sessionIds = _.uniq(childStreams.map((s) => s.sessionId ?? s.id));
+  for (const sessionId of sessionIds) {
+    const asset = await db.asset.get(sessionId);
+    if (asset) {
+      // if we have an asset, then the recording has already been processed and
+      // we don't need to send a recording.waiting hook.
+      continue;
+    }
+
     const session = await db.session.get(sessionId);
+    if (isCleanup && !shouldActiveCleanup(session)) {
+      // The {activeCleanupOne} logic only checks the parent stream, so we need
+      // to recheck the sessions here to avoid spamming active sessions.
+      continue;
+    }
+
     await publishSingleRecordingWaitingHook(
       config,
       session,
