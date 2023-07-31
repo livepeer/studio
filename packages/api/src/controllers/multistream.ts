@@ -158,7 +158,7 @@ target.delete("/:id", authorizer({}), async (req, res) => {
     return notFound(res);
   }
   await db.multistreamTarget.delete(id);
-  triggerCatalystMultistreamUpdated(req, id);
+  await triggerCatalystMultistreamUpdated(req, id);
 
   res.status(204);
   res.end();
@@ -188,7 +188,7 @@ target.patch(
     if (Object.keys(patch).length > 0) {
       await db.multistreamTarget.update(id, patch);
     }
-    triggerCatalystMultistreamUpdated(req, id);
+    await triggerCatalystMultistreamUpdated(req, id);
     res.status(204);
     res.end();
   }
@@ -200,9 +200,10 @@ async function triggerCatalystMultistreamUpdated(req: Request, id: string) {
     `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`
   );
   const [streams] = await db.stream.find(query, {});
-  for (const stream of streams) {
-    triggerCatalystStreamUpdated(req, stream.playbackId);
-  }
+
+  await Promise.all(
+    streams.map((s) => triggerCatalystStreamUpdated(req, s.playbackId))
+  );
 }
 
 const app = Router();

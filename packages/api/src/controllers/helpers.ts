@@ -541,7 +541,7 @@ export async function triggerCatalystStreamUpdated(
     }),
   };
 
-  fetch(url, options);
+  return await fetch(url, options);
 }
 
 export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {

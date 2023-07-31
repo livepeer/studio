@@ -1329,7 +1329,7 @@ app.patch(
     }
 
     if (multistream) {
-      triggerCatalystStreamUpdated(req, stream.playbackId);
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
     res.status(204);
