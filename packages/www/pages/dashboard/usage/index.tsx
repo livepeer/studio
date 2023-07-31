@@ -285,14 +285,14 @@ const Usage = () => {
                   mr: "$3",
                   fontWeight: 600,
                   letterSpacing: "0",
-                  display: "none",
+                  display: "",
                 }}>
                 Charts
               </Box>
             </Flex>
           </Heading>
         </Flex>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <Select
             css={{ fontSize: "$3", px: "$2", mb: "$4" }}
             defaultValue="day"
@@ -301,7 +301,7 @@ const Usage = () => {
             <option value="day">Daily</option>
           </Select>
         </Box>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -312,7 +312,7 @@ const Usage = () => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -323,7 +323,7 @@ const Usage = () => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
