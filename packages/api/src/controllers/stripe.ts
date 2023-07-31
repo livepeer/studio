@@ -758,7 +758,7 @@ app.post("/migrate-test-products", async (req, res) => {
     }
 
     if (req.body.dry_run) {
-      res.json({
+      res.status(500).json({
         migrating_user: {
           email: user.email,
           stripe_customer_id: user.stripeCustomerId,
