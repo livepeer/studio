@@ -1,4 +1,4 @@
-import Router from "express/lib/router";
+import { Router } from "express";
 import { db } from "../store";
 import Stripe from "stripe";
 import { products } from "../config";
@@ -727,9 +727,21 @@ app.post("/migrate-test-products", async (req, res) => {
   // If user.newStripeProductId is in testProducts, migrate it to the new product
   if (testProducts.includes(user.newStripeProductId)) {
     // get the stripe customer
-    const customer = await req.stripe.customers.get({
+    const customer = await req.stripe.customers.list({
       email: user.email,
     });
+
+    if (customer.data.length == 0) {
+      console.log(`
+        Unable to migrate user - customer not found in stripe for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+      `);
+      res.status(500).json({
+        errors: [
+          `Unable to migrate user - customer not found in stripe for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+        ],
+      });
+      return;
+    }
 
     let payAsYouGoItems = [];
     let isPayAsYouGoPlan =
@@ -757,7 +769,7 @@ app.post("/migrate-test-products", async (req, res) => {
       }));
     }
 
-    if (req.body.dry_run) {
+    if (!req.body.actually_migrate) {
       res.status(500).json({
         migrating_user: {
           email: user.email,
@@ -797,7 +809,7 @@ app.post("/migrate-test-products", async (req, res) => {
 
     // Update user's customer, product, subscription, and payment id in our db
     await db.user.update(user.id, {
-      stripeCustomerId: customer.id,
+      stripeCustomerId: user.stripeCustomerId,
       stripeProductId: productMapping[user.newStripeProductId],
       stripeCustomerSubscriptionId: subscription.id,
       stripeCustomerPaymentMethodId: null,
