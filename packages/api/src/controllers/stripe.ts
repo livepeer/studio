@@ -704,22 +704,25 @@ app.post("/migrate-test-products", async (req, res) => {
     return res.json({ errors: ["unauthorized"] });
   }
 
-  const [currentUser, _newCursor] = await db.user.find(
-    [sql`users.data->>'stripeCustomerId' IS NOT NULL`],
+  const [users, _newCursor] = await db.user.find(
+    [
+      sql`users.data->>'newStripeProductId' IS NOT NULL 
+          AND users.data->>'stripeCustomerId' IS NOT NULL`,
+    ],
     {
       limit: 1,
       useReplica: false,
     }
   );
 
-  if (currentUser.length < 0) {
+  if (users.length < 0) {
     res.json({
       errors: ["no users found"],
     });
     return;
   }
 
-  let user = currentUser[0];
+  let user = users[0];
 
   // If user.newStripeProductId is in testProducts, migrate it to the new product
   if (testProducts.includes(user.newStripeProductId)) {
@@ -754,6 +757,20 @@ app.post("/migrate-test-products", async (req, res) => {
       }));
     }
 
+    if (req.body.dry_run) {
+      res.json({
+        migrating_user: {
+          email: user.email,
+          stripe_customer_id: user.stripeCustomerId,
+          id: user.id,
+        },
+        test_product: user.newStripeProductId,
+        pay_as_you_go_items_to_apply: payAsYouGoItems,
+        subscription_items_to_apply: items,
+      });
+      return;
+    }
+
     // Subscribe the user to the new product
     const subscription = await req.stripe.subscriptions.update(
       user.stripeCustomerSubscriptionId,
@@ -786,6 +803,13 @@ app.post("/migrate-test-products", async (req, res) => {
       stripeCustomerPaymentMethodId: null,
       newStripeProductId: null,
     });
+  } else {
+    res.json({
+      errors: [
+        `Unable to migrate user - user=${user.id} product is not a test product newStripeProductId=${user.newStripeProductId}`,
+      ],
+    });
+    return;
   }
 
   res.json({
