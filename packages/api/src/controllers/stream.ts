@@ -43,6 +43,7 @@ import {
   FieldsMap,
   toStringValues,
   mapInputCreatorId,
+  triggerCatalystStreamUpdated,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -1356,6 +1357,10 @@ app.patch(
     if (patch.suspended) {
       // kill live stream
       await terminateStreamReq(req, stream);
+    }
+
+    if (multistream) {
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
     res.status(204);
