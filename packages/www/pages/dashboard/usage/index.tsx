@@ -38,7 +38,11 @@ const Usage = () => {
     getUserProduct,
   } = useApi();
   const [_usage, setUsage] = useState(null);
-  const [billingUsage, setBillingUsage] = useState(null);
+  const [billingUsage, setBillingUsage] = useState<any>({
+    TotalUsageMins: 0,
+    DeliveryUsageMins: 0,
+    StorageUsageMins: 0,
+  });
   const [subscription, setSubscription] = useState(null);
   const [timestep, setTimestep] = useState("day");
   const [from, setFrom] = useState(0);
@@ -47,7 +51,14 @@ const Usage = () => {
 
   const doSetTimeStep = async (ts: string) => {
     setTimestep(ts);
-    const [res, usage] = await getBillingUsage(from, to, null, ts);
+    const [
+      res,
+      usage = {
+        TotalUsageMins: 0,
+        DeliveryUsageMins: 0,
+        StorageUsageMins: 0,
+      },
+    ] = await getBillingUsage(from, to, null, ts);
     if (res.status == 200 && Array.isArray(usage)) {
       const now = new Date();
       const currentMonth = now.toLocaleString("default", { month: "short" });
@@ -84,25 +95,37 @@ const Usage = () => {
       }
     };
 
-    const doGetBillingUsage = async (fromTime, toTime) => {
-      // Gather current month data
-      /*const now = new Date();
-      const fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-      const toTime = now.getTime();
+    const doGetBillingUsage = async (
+      fromTime: any,
+      toTime: any,
+      status: any
+    ) => {
+      fromTime = fromTime * 1000;
+      toTime = toTime * 1000;
 
-      doSetFrom(fromTime);
-      doSetTo(toTime);*/
+      // if subscription is cancelled, get current month data
+      if (status === "canceled") {
+        const now = new Date();
+        fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        toTime = now.getTime();
+      }
 
-      const [res, usage] = await getBillingUsage(
-        fromTime * 1000,
-        toTime * 1000
-      );
+      let [res, usage] = await getBillingUsage(fromTime, toTime);
+
       if (res.status == 200) {
+        if (!usage) {
+          usage = {
+            TotalUsageMins: 0,
+            DeliveryUsageMins: 0,
+            StorageUsageMins: 0,
+          };
+        }
         setBillingUsage(usage);
       }
+
       const [res2, usageByDay] = await getBillingUsage(
-        fromTime * 1000,
-        toTime * 1000,
+        fromTime,
+        toTime,
         null,
         timestep
       );
@@ -123,7 +146,8 @@ const Usage = () => {
       );
       doGetBillingUsage(
         subscription?.current_period_start,
-        subscription?.current_period_end
+        subscription?.current_period_end,
+        subscription?.status
       );
     };
 
@@ -261,14 +285,14 @@ const Usage = () => {
                   mr: "$3",
                   fontWeight: 600,
                   letterSpacing: "0",
-                  display: "none",
+                  display: "",
                 }}>
                 Charts
               </Box>
             </Flex>
           </Heading>
         </Flex>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <Select
             css={{ fontSize: "$3", px: "$2", mb: "$4" }}
             defaultValue="day"
@@ -277,7 +301,7 @@ const Usage = () => {
             <option value="day">Daily</option>
           </Select>
         </Box>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -288,7 +312,7 @@ const Usage = () => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
@@ -299,7 +323,7 @@ const Usage = () => {
             </BarChart>
           </ResponsiveContainer>
         </Box>
-        <Box css={{ mb: "$4", display: "none" }}>
+        <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart width={150} height={40} data={usageData}>
               <XAxis dataKey="name" />
