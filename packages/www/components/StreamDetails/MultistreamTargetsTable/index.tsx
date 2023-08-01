@@ -11,7 +11,6 @@ import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "hooks";
 import { HealthStatus } from "hooks/use-analyzer";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
-import ErrorDialog from "../../ErrorDialog";
 import { makeColumns, makeTableData, TargetsTableData } from "./helpers";
 import { makeCreateAction } from "components/Table/helpers";
 
@@ -39,7 +38,6 @@ const MultistreamTargetsTable = ({
     tableId: "multistreamTargetsTable",
   });
   const saveDialogState = useToggleState();
-  const errorRecordDialogState = useToggleState();
 
   const columns = useMemo(makeColumns, []);
 
@@ -76,9 +74,7 @@ const MultistreamTargetsTable = ({
     [state.tableId, stream, streamHealth, invalidateTargetId, targetRefs]
   );
 
-  const onCreateClick = stream.isActive
-    ? errorRecordDialogState.onOn
-    : saveDialogState.onOn;
+  const onCreateClick = saveDialogState.onOn;
 
   return (
     <Box {...props}>
@@ -95,12 +91,6 @@ const MultistreamTargetsTable = ({
         emptyState={emptyState}
         tableLayout={tableLayout}
         createAction={makeCreateAction("Create", onCreateClick)}
-      />
-
-      <ErrorDialog
-        isOpen={errorRecordDialogState.on}
-        onOpenChange={errorRecordDialogState.onToggle}
-        description="You cannot change multistream preferences while a session is active"
       />
 
       <SaveTargetDialog
