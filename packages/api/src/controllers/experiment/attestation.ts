@@ -4,7 +4,6 @@ import { validatePost } from "../../middleware";
 import { ethers } from "ethers";
 import { makeNextHREF, toStringValues } from "../helpers";
 import _ from "lodash";
-import sql from "sql-template-strings";
 import * as fcl from "@onflow/fcl";
 import stringify from "fast-stable-stringify";
 import { Attestation } from "../../schema/types";
