@@ -10,7 +10,6 @@ import {
   parseFilters,
   parseOrder,
   toStringValues,
-  triggerCatalystStreamUpdated,
 } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery, WithID } from "../store/types";
@@ -20,7 +19,6 @@ import {
   User,
 } from "../schema/types";
 import { DBMultistreamTarget } from "../store/multistream-table";
-import { Request } from "express";
 
 const fieldsMap: FieldsMap = {
   id: `multistream_target.ID`,
@@ -158,7 +156,6 @@ target.delete("/:id", authorizer({}), async (req, res) => {
     return notFound(res);
   }
   await db.multistreamTarget.delete(id);
-  await triggerCatalystMultistreamUpdated(req, id);
 
   res.status(204);
   res.end();
@@ -188,23 +185,10 @@ target.patch(
     if (Object.keys(patch).length > 0) {
       await db.multistreamTarget.update(id, patch);
     }
-    await triggerCatalystMultistreamUpdated(req, id);
     res.status(204);
     res.end();
   }
 );
-
-async function triggerCatalystMultistreamUpdated(req: Request, id: string) {
-  const query = [];
-  query.push(
-    `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`
-  );
-  const [streams] = await db.stream.find(query, {});
-
-  await Promise.all(
-    streams.map((s) => triggerCatalystStreamUpdated(req, s.playbackId))
-  );
-}
 
 const app = Router();
 
