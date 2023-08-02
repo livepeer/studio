@@ -33,7 +33,7 @@ export const reportUsage = async (req, adminToken) => {
   // We need to report usage for them as well
   const [oldProPlanUsers] = await db.user.find(
     [
-      sql`users.data->>'oldProPlan' = true AND users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW')`,
+      sql`users.data->>'oldProPlan' = 'true' AND users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW')`,
     ],
     {
       limit: 9999999999,
