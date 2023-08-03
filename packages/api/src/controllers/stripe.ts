@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import { db } from "../store";
 import Stripe from "stripe";
 import { products } from "../config";
@@ -6,6 +6,8 @@ import sql from "sql-template-strings";
 import fetch from "node-fetch";
 import qs from "qs";
 import { sendgridEmailPaymentFailed } from "./helpers";
+import { WithID } from "../store/types";
+import { User } from "../schema/types";
 
 const app = Router();
 
@@ -17,7 +19,7 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-export const reportUsage = async (req, adminToken) => {
+export const reportUsage = async (req: Request, adminToken: string) => {
   const [users] = await db.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
@@ -41,7 +43,18 @@ export const reportUsage = async (req, adminToken) => {
     }
   );
 
-  const payAsYouGoUsers = [...users, ...oldProPlanUsers];
+  // Current date in milliseconds
+  const currentDateMillis = new Date().getTime();
+  const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
+
+  // One month ago unix millis timestamp
+  const cutOffDate = currentDateMillis - oneMonthMillis;
+
+  const [hackerUsers] = await db.user.find([
+    sql`users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW') AND (users.data->>'lastStreamedAt')::bigint > ${cutOffDate}`,
+  ]);
+
+  const payAsYouGoUsers = [...users, ...oldProPlanUsers, ...hackerUsers];
 
   let updatedUsers = [];
   for (const user of payAsYouGoUsers) {
@@ -66,7 +79,21 @@ export const reportUsage = async (req, adminToken) => {
   };
 };
 
-async function reportUsageForUser(req, user, adminToken) {
+async function reportUsageForUser(
+  req: Request,
+  user: WithID<User>,
+  adminToken: string
+) {
+  if (user.email.endsWith("@livepeer.org") || user.admin) {
+    return {
+      id: user.id,
+      email: user.email,
+      overUsage: {},
+      usage: {},
+      usageReported: true,
+    };
+  }
+
   const userSubscription = await req.stripe.subscriptions.retrieve(
     user.stripeCustomerSubscriptionId
   );
@@ -92,6 +119,36 @@ async function reportUsageForUser(req, user, adminToken) {
     subscription: user.stripeCustomerSubscriptionId,
   });
 
+  if (
+    user.stripeProductId.includes("hacker_1") ||
+    user.stripeProductId.includes("prod_O9XuIjn7EqYRVW")
+  ) {
+    if (
+      !user.stripeCustomerPaymentMethodId &&
+      (overUsage.TotalUsageMins > 0 ||
+        overUsage.DeliveryUsageMins > 0 ||
+        overUsage.StorageUsageMins > 0)
+    ) {
+      // If they don't have a card and in overusage, send a notification email
+      let emailSent = await sendgridEmailPaymentFailed({
+        email: "help@livepeer.org",
+        sendgridApiKey: req.config.sendgridApiKey,
+        user,
+        invoiceId: null,
+        invoiceUrl: null,
+        templateId: req.config.sendgridTemplateId,
+      });
+
+      if (emailSent) {
+        await db.user.update(user.id, {
+          lastEmailAboutPaymentFailure: Date.now(),
+        });
+      }
+      return {};
+    }
+    // If they have a card and in overusage, report the usage
+  }
+
   // create a map of subscription items by their lookup keys
   const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
     (acc, item) => {
@@ -101,6 +158,28 @@ async function reportUsageForUser(req, user, adminToken) {
     {} as Record<string, string>
   );
 
+  await sendUsageRecordToStripe(
+    user,
+    req,
+    subscriptionItemsByLookupKey,
+    overUsage
+  );
+
+  return {
+    id: user.id,
+    email: user.email,
+    overUsage: overUsage,
+    usage: billingUsage,
+    usageReported: true,
+  };
+}
+
+const sendUsageRecordToStripe = async (
+  user: WithID<User>,
+  req: Request,
+  subscriptionItemsByLookupKey,
+  overUsage
+) => {
   // Invoice items based on overusage
   await Promise.all(
     products[user.stripeProductId].usage.map(async (product) => {
@@ -134,14 +213,7 @@ async function reportUsageForUser(req, user, adminToken) {
       }
     })
   );
-  return {
-    id: user.id,
-    email: user.email,
-    overUsage: overUsage,
-    usage: billingUsage,
-    usageReported: true,
-  };
-}
+};
 
 const calculateOverUsage = async (product, usage) => {
   let limits: any = {};
@@ -261,29 +333,42 @@ app.post("/webhook", async (req, res) => {
   } else if (event.type === "invoice.payment_failed") {
     // Notify via email
     const invoice = event.data.object;
+    let invoiceUrl = invoice.invoice_pdf;
+
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
       { useReplica: false }
     );
 
+    if (users.length < 1) {
+      res.status(404);
+      return res.json({ errors: ["user not found"] });
+    }
+
+    const user = users[0];
+
     // notify help@livepeer.org
-    await sendgridEmailPaymentFailed({
+    let emailSent = await sendgridEmailPaymentFailed({
       email: "help@livepeer.org",
       sendgridApiKey: req.config.sendgridApiKey,
-      userId: users[0].id,
+      user,
       invoiceId: invoice.id,
+      invoiceUrl: invoiceUrl,
+      templateId: req.config.sendgridTemplateId,
     });
+
+    if (emailSent) {
+      await db.user.update(user.id, {
+        lastEmailAboutPaymentFailure: Date.now(),
+      });
+    }
   }
 
   // Return a response to acknowledge receipt of the event
   return res.sendStatus(200);
 });
 
-async function sleep(millis) {
-  return new Promise((resolve) => setTimeout(resolve, millis));
-}
-
-app.post("/migrate-personal-user", async (req, res) => {
+app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
@@ -292,9 +377,8 @@ app.post("/migrate-personal-user", async (req, res) => {
 
   const [users] = await db.user.find(
     [
-      sql`users.data->>'stripeProductId' = 'prod_0' 
-          AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL) 
-          AND (users.data->>'newStripeProductId' IS NULL OR (users.data->>'newStripeProductId' != 'growth_1' AND users.data->>'newStripeProductId' != 'scale_1'))`,
+      sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' 
+          AND (users.data->>'toMigrate' = 'true' OR users.data->>'toMigrate' IS NULL)`,
     ],
     {
       limit: 1,
@@ -320,13 +404,9 @@ app.post("/migrate-personal-user", async (req, res) => {
   });
 
   if (data.length > 0) {
-    if (
-      user.stripeProductId === "prod_0" &&
-      user.newStripeProductId !== "growth_1" &&
-      user.newStripeProductId !== "scale_1"
-    ) {
+    if (user.stripeProductId === "prod_O9XuIjn7EqYRVW") {
       migration.push(
-        `User ${user.email} is migrating from ${user.stripeProductId} to prod_O9XuIjn7EqYRVW`
+        `User ${user.email} is subscribing to pay as you go from ${user.stripeProductId}`
       );
       const items = await req.stripe.prices.list({
         lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
@@ -342,14 +422,14 @@ app.post("/migrate-personal-user", async (req, res) => {
         );
       } catch (e) {
         console.log(`
-              Unable to migrate personal user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+              Unable to subscribe hacker user  to pay as you go plans - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
             `);
         await db.user.update(user.id, {
-          isActiveSubscription: false,
+          toMigrate: false,
         });
         res.json({
           errors: [
-            `Unable to migrate personal user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+            `Unable to subscribe hacker user  to pay as you go plans - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
           ],
         });
         return;
@@ -357,14 +437,14 @@ app.post("/migrate-personal-user", async (req, res) => {
 
       if (subscription.status != "active") {
         console.log(`
-              Unable to migrate personal user - user=${user.id} has a status=${subscription.status} subscription
+              Unable to subscribe hacker user to pay as you go plans - user=${user.id} has a status=${subscription.status} subscription
             `);
         await db.user.update(user.id, {
-          isActiveSubscription: false,
+          toMigrate: false,
         });
         res.json({
           errors: [
-            `Unable to migrate personal user - user=${user.id} has a status=${subscription.status} subscription`,
+            `Unable to subscribe hacker user  to pay as you go plans - user=${user.id} has a status=${subscription.status} subscription`,
           ],
         });
         return;
@@ -378,6 +458,28 @@ app.post("/migrate-personal-user", async (req, res) => {
         migration.push(
           `User ${user.email} has ${subscriptionItems.data.length} subscription items`
         );
+
+        const payAsYouGoPrices = await req.stripe.prices.list({
+          lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+        });
+        const payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+          price: item.id,
+        }));
+
+        if (!req.body.actually_migrate) {
+          res.json({
+            user: {
+              email: user.email,
+              stripeCustomerId: user.stripeCustomerId,
+              stripeCustomerSubscriptionId: user.stripeCustomerSubscriptionId,
+            },
+            product: user.stripeProductId,
+            subscriptionItems,
+            items,
+            payAsYouGoItems,
+          });
+          return;
+        }
 
         subscription = await req.stripe.subscriptions.update(
           user.stripeCustomerSubscriptionId,
@@ -398,6 +500,7 @@ app.post("/migrate-personal-user", async (req, res) => {
               ...items.data.map((item) => ({
                 price: item.id,
               })),
+              ...payAsYouGoItems,
             ],
           }
         );
@@ -410,16 +513,17 @@ app.post("/migrate-personal-user", async (req, res) => {
           stripeCustomerId: user.stripeCustomerId,
           stripeProductId: "prod_O9XuIjn7EqYRVW",
           stripeCustomerSubscriptionId: subscription.id,
+          toMigrate: false,
         });
 
         migration.push(`User ${user.email} has been updated in the database`);
       } catch (e) {
         console.log(`
-              Unable to migrate personal user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+              Unable to subscribe hacker user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
             `);
         res.json({
           errors: [
-            `Unable to migrate personal user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+            `Unable to subscribe hacker user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
           ],
         });
         return;
@@ -437,130 +541,12 @@ app.post("/migrate-personal-user", async (req, res) => {
     return;
   }
   migration.push(
-    `User ${user.email} has been migrated to ${user.newStripeProductId}`
+    `User ${user.email} has been subscribed to pay as you go plans`
   );
   res.json({
-    result: "Migrated user with email " + user.email + " to hacker plan",
+    result:
+      "Subscribed user with email " + user.email + " to pay as you go plans",
     migration: migration,
-  });
-});
-
-app.post("/migrate-hacker-user", async (req, res) => {
-  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
-
-  const [users] = await db.user.find(
-    [
-      sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' AND (users.data->>'isActiveSubscription' = 'true' OR users.data->>'isActiveSubscription' IS NULL)`,
-    ],
-    {
-      limit: 1,
-      useReplica: false,
-    }
-  );
-
-  if (users.length == 0) {
-    res.json({
-      errors: ["no users found"],
-    });
-    return;
-  }
-
-  let user = users[0];
-
-  const { data } = await req.stripe.customers.list({
-    email: user.email,
-  });
-
-  if (data.length > 0) {
-    if (user.stripeProductId === "prod_O9XuIjn7EqYRVW") {
-      const items = await req.stripe.prices.list({
-        lookup_keys: products["prod_0"].lookupKeys,
-      });
-      let subscription;
-
-      try {
-        subscription = await req.stripe.subscriptions.retrieve(
-          user.stripeCustomerSubscriptionId
-        );
-      } catch (e) {
-        console.log(`
-              Unable to migrate hacker user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
-            `);
-        await db.user.update(user.id, {
-          isActiveSubscription: false,
-        });
-        res.json({
-          errors: [
-            `Unable to migrate hacker user - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
-          ],
-        });
-        return;
-      }
-
-      if (subscription.status != "active") {
-        console.log(`
-              Unable to migrate hacker user - user=${user.id} has a status=${subscription.status} subscription
-            `);
-        await db.user.update(user.id, {
-          isActiveSubscription: false,
-        });
-        res.json({
-          errors: [
-            `Unable to migrate hacker user - user=${user.id} has a status=${subscription.status} subscription`,
-          ],
-        });
-        return;
-      }
-
-      const subscriptionItems = await req.stripe.subscriptionItems.list({
-        subscription: user.stripeCustomerSubscriptionId,
-      });
-
-      subscription = await req.stripe.subscriptions.update(
-        user.stripeCustomerSubscriptionId,
-        {
-          billing_cycle_anchor: "now",
-          cancel_at_period_end: false,
-          items: [
-            ...subscriptionItems.data.map((item) => {
-              // Check if the item is metered
-              const isMetered = item.price.recurring.usage_type === "metered";
-              return {
-                id: item.id,
-                deleted: true,
-                clear_usage: isMetered ? true : undefined, // If metered, clear usage
-                price: item.price.id,
-              };
-            }),
-            ...items.data.map((item) => ({
-              price: item.id,
-            })),
-          ],
-        }
-      );
-
-      await db.user.update(user.id, {
-        stripeCustomerId: user.stripeCustomerId,
-        stripeProductId: "prod_0",
-        stripeCustomerSubscriptionId: subscription.id,
-      });
-    }
-  } else {
-    res.json({
-      errors: [
-        `Unable to migrate hacker user - customer not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
-      ],
-    });
-    await db.user.update(user.id, {
-      isActiveSubscription: false,
-    });
-    return;
-  }
-  res.json({
-    result: "Migrated user with email " + user.email + " to personal plan",
   });
 });
 
@@ -594,11 +580,7 @@ app.post("/migrate-pro-user", async (req, res) => {
   });
 
   if (data.length > 0) {
-    if (
-      user.stripeProductId === "prod_1" &&
-      user.newStripeProductId !== "growth_1" &&
-      user.newStripeProductId !== "scale_1"
-    ) {
+    if (user.stripeProductId === "prod_1") {
       const items = await req.stripe.prices.list({
         lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
       });
@@ -643,13 +625,26 @@ app.post("/migrate-pro-user", async (req, res) => {
       });
 
       let payAsYouGoItems = [];
-      if (products[user.stripeProductId].payAsYouGo) {
-        const payAsYouGoPrices = await req.stripe.prices.list({
-          lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+
+      const payAsYouGoPrices = await req.stripe.prices.list({
+        lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+      });
+      payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+        price: item.id,
+      }));
+
+      if (!req.body.actually_migrate) {
+        res.json({
+          migrating_user: {
+            email: user.email,
+            stripe_customer_id: user.stripeCustomerId,
+            id: user.id,
+          },
+          from_product: user.stripeProductId,
+          pay_as_you_go_items_to_apply: payAsYouGoItems,
+          subscription_items_to_apply: items,
         });
-        payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
-          price: item.id,
-        }));
+        return;
       }
 
       subscription = await req.stripe.subscriptions.update(
@@ -695,137 +690,6 @@ app.post("/migrate-pro-user", async (req, res) => {
   }
   res.json({
     result: "Migrated pro user with email " + user.email + " to hacker plan",
-  });
-});
-
-app.post("/migrate-test-products", async (req, res) => {
-  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
-
-  const [users, _newCursor] = await db.user.find(
-    [
-      sql`users.data->>'newStripeProductId' IS NOT NULL 
-          AND users.data->>'stripeCustomerId' IS NOT NULL`,
-    ],
-    {
-      limit: 1,
-      useReplica: false,
-    }
-  );
-
-  if (users.length < 0) {
-    res.json({
-      errors: ["no users found"],
-    });
-    return;
-  }
-
-  let user = users[0];
-
-  // If user.newStripeProductId is in testProducts, migrate it to the new product
-  if (testProducts.includes(user.newStripeProductId)) {
-    // get the stripe customer
-    const customer = await req.stripe.customers.list({
-      email: user.email,
-    });
-
-    if (customer.data.length === 0) {
-      console.log(`
-        Unable to migrate user - customer not found in stripe for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
-      `);
-      res.status(500).json({
-        errors: [
-          `Unable to migrate user - customer not found in stripe for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
-        ],
-      });
-      return;
-    }
-
-    let payAsYouGoItems = [];
-    let isPayAsYouGoPlan =
-      products[productMapping[user.newStripeProductId]].payAsYouGo;
-
-    // Get the prices associated with the subscription
-    const subscriptionItems = await req.stripe.subscriptionItems.list({
-      subscription: user.stripeCustomerSubscriptionId,
-    });
-
-    // fetch prices associated with new product
-    const items = await req.stripe.prices.list({
-      lookup_keys: products[productMapping[user.newStripeProductId]].lookupKeys,
-    });
-
-    if (isPayAsYouGoPlan) {
-      // Get the prices for the pay as you go product
-      const payAsYouGoPrices = await req.stripe.prices.list({
-        lookup_keys: products["pay_as_you_go_1"].lookupKeys,
-      });
-
-      // Map the prices to the additional items array
-      payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
-        price: item.id,
-      }));
-    }
-
-    if (!req.body.actually_migrate) {
-      res.status(500).json({
-        migrating_user: {
-          email: user.email,
-          stripe_customer_id: user.stripeCustomerId,
-          id: user.id,
-        },
-        test_product: user.newStripeProductId,
-        pay_as_you_go_items_to_apply: payAsYouGoItems,
-        subscription_items_to_apply: items,
-      });
-      return;
-    }
-
-    // Subscribe the user to the new product
-    const subscription = await req.stripe.subscriptions.update(
-      user.stripeCustomerSubscriptionId,
-      {
-        billing_cycle_anchor: "now", // reset billing anchor when updating subscription
-        items: [
-          ...subscriptionItems.data.map((item) => {
-            // Check if the item is metered
-            const isMetered = item.price.recurring.usage_type === "metered";
-            return {
-              id: item.id,
-              deleted: true,
-              clear_usage: isMetered ? true : undefined, // If metered, clear usage
-              price: item.price.id,
-            };
-          }),
-          ...items.data.map((item) => ({
-            price: item.id,
-          })),
-          ...payAsYouGoItems,
-        ],
-      }
-    );
-
-    // Update user's customer, product, subscription, and payment id in our db
-    await db.user.update(user.id, {
-      stripeCustomerId: user.stripeCustomerId,
-      stripeProductId: productMapping[user.newStripeProductId],
-      stripeCustomerSubscriptionId: subscription.id,
-      stripeCustomerPaymentMethodId: null,
-      newStripeProductId: null,
-    });
-  } else {
-    res.json({
-      errors: [
-        `Unable to migrate user - user=${user.id} product is not a test product newStripeProductId=${user.newStripeProductId}`,
-      ],
-    });
-    return;
-  }
-
-  res.json({
-    result: "Migrated user with email " + user.email + " to new product",
   });
 });
 

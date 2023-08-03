@@ -995,18 +995,12 @@ components:
             - prod_O9XtHhI6rbTT1B
             - prod_O9XtcfOSMjSD5L
             - prod_O9XuWMU1Up6QKf
-        newStripeProductId:
-          type: string
-          enum:
-            - hacker_1
-            - growth_1
-            - scale_1
-            - pay_as_you_go_1
-            - prod_4
-            - prod_O9XuIjn7EqYRVW
-            - prod_O9XtHhI6rbTT1B
-            - prod_O9XtcfOSMjSD5L
-            - prod_O9XuWMU1Up6QKf
+        toMigrate:
+          type: boolean
+          default: true
+        lastEmailAboutPaymentFailure:
+          type: number
+          example: 1587667174725
         oldProPlan:
           type: boolean
           default: false
