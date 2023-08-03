@@ -998,7 +998,7 @@ components:
         toMigrate:
           type: boolean
           default: true
-        lastPaymentFailed:
+        lastEmailAboutPaymentFailure:
           type: number
           example: 1587667174725
         oldProPlan:

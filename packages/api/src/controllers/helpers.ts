@@ -15,6 +15,7 @@ import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
 import { BadRequestError } from "../store/errors";
 
 const ITERATIONS = 10000;
+const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
 
 const crypto = new Crypto();
 
@@ -304,10 +305,10 @@ export async function sendgridEmailPaymentFailed({
   invoiceUrl,
   templateId,
 }) {
-  // If user.lastPaymentFailed is newer than 3 days, don't send email
+  // If user.lastEmailAboutPaymentFailure is newer than 3 days, don't send email
   if (
-    user.lastPaymentFailed &&
-    user.lastPaymentFailed > Date.now() - 3 * 24 * 60 * 60 * 1000
+    user.lastEmailAboutPaymentFailure &&
+    user.lastEmailAboutPaymentFailure > Date.now() - PAYMENT_FAILED_TIMEFRAME
   ) {
     return false;
   }

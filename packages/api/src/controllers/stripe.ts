@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import { db } from "../store";
 import Stripe from "stripe";
 import { products } from "../config";
@@ -6,6 +6,8 @@ import sql from "sql-template-strings";
 import fetch from "node-fetch";
 import qs from "qs";
 import { sendgridEmailPaymentFailed } from "./helpers";
+import { WithID } from "../store/types";
+import { User } from "../schema/types";
 
 const app = Router();
 
@@ -17,7 +19,7 @@ const productMapping = {
   scale_1: "prod_O9XtcfOSMjSD5L",
 };
 
-export const reportUsage = async (req, adminToken) => {
+export const reportUsage = async (req: Request, adminToken: string) => {
   const [users] = await db.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
@@ -42,11 +44,11 @@ export const reportUsage = async (req, adminToken) => {
   );
 
   // Current date in milliseconds
-  let currentDateMillis = new Date().getTime();
-  let oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
+  const currentDateMillis = new Date().getTime();
+  const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
 
   // One month ago unix millis timestamp
-  let cutOffDate = currentDateMillis - oneMonthMillis;
+  const cutOffDate = currentDateMillis - oneMonthMillis;
 
   const [hackerUsers] = await db.user.find([
     sql`users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW') AND (users.data->>'lastStreamedAt')::bigint > ${cutOffDate}`,
@@ -77,8 +79,12 @@ export const reportUsage = async (req, adminToken) => {
   };
 };
 
-async function reportUsageForUser(req, user, adminToken) {
-  if (user.email.includes("@livepeer.org")) {
+async function reportUsageForUser(
+  req: Request,
+  user: WithID<User>,
+  adminToken: string
+) {
+  if (user.email.endsWith("@livepeer.org") || user.admin) {
     return {
       id: user.id,
       email: user.email,
@@ -117,14 +123,13 @@ async function reportUsageForUser(req, user, adminToken) {
     user.stripeProductId.includes("hacker_1") ||
     user.stripeProductId.includes("prod_O9XuIjn7EqYRVW")
   ) {
-    // If they don't have a card and in overusage, send a notification email
-    // If they have a card and in overusage, report the usage
     if (
       !user.stripeCustomerPaymentMethodId &&
       (overUsage.TotalUsageMins > 0 ||
         overUsage.DeliveryUsageMins > 0 ||
         overUsage.StorageUsageMins > 0)
     ) {
+      // If they don't have a card and in overusage, send a notification email
       let emailSent = await sendgridEmailPaymentFailed({
         email: "help@livepeer.org",
         sendgridApiKey: req.config.sendgridApiKey,
@@ -135,12 +140,13 @@ async function reportUsageForUser(req, user, adminToken) {
       });
 
       if (emailSent) {
-        db.user.update(user.id, {
-          lastPaymentFailed: Date.now(),
+        await db.user.update(user.id, {
+          lastEmailAboutPaymentFailure: Date.now(),
         });
       }
       return {};
     }
+    // If they have a card and in overusage, report the usage
   }
 
   // create a map of subscription items by their lookup keys
@@ -169,8 +175,8 @@ async function reportUsageForUser(req, user, adminToken) {
 }
 
 const sendUsageRecordToStripe = async (
-  user,
-  req,
+  user: WithID<User>,
+  req: Request,
   subscriptionItemsByLookupKey,
   overUsage
 ) => {
@@ -352,8 +358,8 @@ app.post("/webhook", async (req, res) => {
     });
 
     if (emailSent) {
-      db.user.update(user.id, {
-        lastPaymentFailed: Date.now(),
+      await db.user.update(user.id, {
+        lastEmailAboutPaymentFailure: Date.now(),
       });
     }
   }
@@ -453,17 +459,15 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
           `User ${user.email} has ${subscriptionItems.data.length} subscription items`
         );
 
-        let payAsYouGoItems = [];
-
         const payAsYouGoPrices = await req.stripe.prices.list({
           lookup_keys: products["pay_as_you_go_1"].lookupKeys,
         });
-        payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+        const payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
           price: item.id,
         }));
 
         if (!req.body.actually_migrate) {
-          res.status(500).json({
+          res.json({
             user: {
               email: user.email,
               stripeCustomerId: user.stripeCustomerId,
@@ -630,7 +634,7 @@ app.post("/migrate-pro-user", async (req, res) => {
       }));
 
       if (!req.body.actually_migrate) {
-        res.status(500).json({
+        res.json({
           migrating_user: {
             email: user.email,
             stripe_customer_id: user.stripeCustomerId,
