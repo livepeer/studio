@@ -1,7 +1,16 @@
 import { Table, Thead, Tbody, Tr, Th, Td } from "@livepeer/design-system";
 
-const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
-  const transcodingPrice = prices[0].price;
+const UpcomingInvoiceTable = ({
+  subscription,
+  usage,
+  product,
+  overUsageBill,
+  upcomingInvoice,
+}) => {
+  const price = product.monthlyPrice;
+  const transcodingPrice = product.usage[0].price;
+  const deliveryPrice = product.usage[1].price;
+  const storagePrice = product.usage[2].price;
 
   return (
     <Table
@@ -14,27 +23,78 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
       <Thead>
         <Tr>
           <Th>Item</Th>
-          <Td>Usage</Td>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
           <Td>Unit Price</Td>
           <Td>Amount Due</Td>
         </Tr>
       </Thead>
       <Tbody>
         <Tr>
-          <Th>Transcoding</Th>
-          <Td>
-            {usage && (usage.sourceSegmentsDuration / 60).toFixed(2)} minutes
-          </Td>
-          <Td>${transcodingPrice} / min</Td>
+          <Th css={{ fontSize: "$2", fontWeight: 600 }}>{product.name} Plan</Th>
+          <Td></Td>
+          <Td></Td>
+          <Td></Td>
+          <Td>${price} / month</Td>
+          <Td>{usage && `$${price}`}</Td>
+        </Tr>
+        <Tr>
+          <Th css={{ fontSize: "$2", fontWeight: 600 }}>Overage</Th>
+          <Td></Td>
+          <Td css={{ fontSize: "$2", fontWeight: 600 }}>Usage</Td>
+          <Td css={{ fontSize: "$2", fontWeight: 600 }}>Plan Usage Limit</Td>
+          <Td></Td>
           <Td>
             {usage &&
               `$${(
-                (usage.sourceSegmentsDuration / 60) *
-                transcodingPrice
+                overUsageBill.transcodingBill.total +
+                overUsageBill.deliveryBill.total +
+                overUsageBill.storageBill.total
               ).toFixed(2)}`}
           </Td>
         </Tr>
+        <Tr>
+          <Th></Th>
+          <Td>Transcoding</Td>
+          <Td>
+            {usage && parseInt(usage.TotalUsageMins).toLocaleString()} minutes
+          </Td>
+          <Td>{product.usage[0].limit.toLocaleString()} minutes</Td>
+          <Td>${product.usage[0].price} / min</Td>
 
+          <Td>
+            {overUsageBill &&
+              `$${overUsageBill.transcodingBill.total.toFixed(2)}`}
+          </Td>
+        </Tr>
+        <Tr>
+          <Th></Th>
+          <Td>Delivery</Td>
+          <Td>
+            {usage && parseInt(usage.DeliveryUsageMins).toLocaleString()}{" "}
+            minutes
+          </Td>
+          <Td>{product.usage[1].limit.toLocaleString()} minutes</Td>
+          <Td>${product.usage[1].price} / min</Td>
+
+          <Td>
+            {overUsageBill && `$${overUsageBill.deliveryBill.total.toFixed(2)}`}
+          </Td>
+        </Tr>
+        <Tr>
+          <Th></Th>
+          <Td>Storage</Td>
+          <Td>
+            {usage && parseInt(usage.StorageUsageMins).toLocaleString()} minutes
+          </Td>
+          <Td>{product.usage[2].limit.toLocaleString()} minutes</Td>
+          <Td>${product.usage[2].price} / min</Td>
+
+          <Td>
+            {overUsageBill && `$${overUsageBill.storageBill.total.toFixed(2)}`}
+          </Td>
+        </Tr>
         <Tr>
           <Th
             css={{
@@ -55,11 +115,15 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
             })}
           </Td>
           <Td></Td>
+          <Td></Td>
+          <Td></Td>
           <Td css={{ fontSize: "$2", fontWeight: 600 }}>
             {usage &&
               `$${(
-                (usage.sourceSegmentsDuration / 60) *
-                transcodingPrice
+                price +
+                overUsageBill.transcodingBill.total +
+                overUsageBill.deliveryBill.total +
+                overUsageBill.storageBill.total
               ).toFixed(2)}`}
           </Td>
         </Tr>

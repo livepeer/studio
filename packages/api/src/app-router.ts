@@ -26,6 +26,8 @@ import { pathJoin } from "./controllers/helpers";
 import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
 import * as fcl from "@onflow/fcl";
+import createFrontend from "@livepeer.studio/www";
+import { NotFoundError } from "./store/errors";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -82,6 +84,7 @@ export default async function makeApp(params: CliArgs) {
     amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
+    frontend,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -246,6 +249,10 @@ export default async function makeApp(params: CliArgs) {
       prefixRouter.use(`/${name}`, controller);
     }
   }
+  prefixRouter.use((req, res, next) => {
+    throw new NotFoundError("not found");
+  });
+  prefixRouter.use(errorHandler());
   app.use(httpPrefix, prefixRouter);
   // Special case: handle /stream proxies off that endpoint
   app.use("/stream", streamProxy);
@@ -260,7 +267,10 @@ export default async function makeApp(params: CliArgs) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
-  app.use(errorHandler());
+  if (frontend) {
+    const wwwHandler = await createFrontend();
+    app.use(wwwHandler);
+  }
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
   await fcl.config({

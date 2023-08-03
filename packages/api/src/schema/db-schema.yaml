@@ -1,79 +1,5 @@
 components:
   schemas:
-    cdn-data-row:
-      type: object
-      description: >-
-        Fields names taken from log format description
-        https://support.highwinds.com/hc/en-us/articles/360052181571-Raw-Log-Access-through-GCS
-      additionalProperties: false
-      required:
-        - unique_client_ips
-        - total_sc_bytes
-      properties:
-        stream_id:
-          type: string
-          description: Session UUID. Used in recordings URLs.
-        playback_id:
-          type: string
-          description: Playback ID.
-        unique_client_ips:
-          type: number
-          description: >-
-            Number of unique IP addresses of clients. Not accurate because
-            StackPath zeroes last part of the IP address.
-        total_filesize:
-          type: number
-          description: Size of the asset being delivered.
-        total_cs_bytes:
-          type: number
-          description: The total size of the request header.
-        total_sc_bytes:
-          type: number
-          description: Total bytes in the response to the client.
-        count:
-          type: number
-          description: Number of parsed log lines
-    cdn-data-payload:
-      type: array
-      items:
-        type: object
-        additionalProperties: false
-        required:
-          - region
-          - file_name
-          - date
-          - data
-        properties:
-          region:
-            type: string
-          file_name:
-            type: string
-          date:
-            type: number
-          data:
-            type: array
-            minItems: 1
-            items:
-              $ref: "#/components/schemas/cdn-data-row"
-    cdn-usage-last:
-      table: cdn_usage_last
-      type: object
-      required:
-        - region
-        - fileName
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          readOnly: true
-          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
-        fileName:
-          index: true
-          type: number
-        region:
-          index: true
-          unique: true
-          type: string
     access-control-gate-payload:
       type: object
       additionalProperties: false
@@ -299,6 +225,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
     update-subscription:
       type: object
       required:
@@ -330,6 +260,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
     update-customer-payment-method:
       type: object
       required:
@@ -652,6 +586,11 @@ components:
         createdByTokenId:
           readOnly: true
           type: string
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description:
+            ID of object store where to which this stream was recorded
         objectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
@@ -752,6 +691,8 @@ components:
           $ref: "#/components/schemas/stream/properties/presets"
         renditions:
           $ref: "#/components/schemas/stream/properties/renditions"
+        recordObjectStoreId:
+          $ref: "#/components/schemas/stream/properties/recordObjectStoreId"
         objectStoreId:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
         detection:
@@ -815,6 +756,11 @@ components:
         deleted:
           type: boolean
           description: Set to true when stream deleted
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description:
+            ID of object store where to which this stream was recorded
         broadcasterHost:
           type: string
           description: Hostname of the broadcaster that transcodes that stream
@@ -1045,6 +991,10 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
         newStripeProductId:
           type: string
           enum:
@@ -1053,6 +1003,16 @@ components:
             - scale_1
             - pay_as_you_go_1
             - prod_4
+            - prod_O9XuIjn7EqYRVW
+            - prod_O9XtHhI6rbTT1B
+            - prod_O9XtcfOSMjSD5L
+            - prod_O9XuWMU1Up6QKf
+        oldProPlan:
+          type: boolean
+          default: false
+        isActiveSubscription:
+          type: boolean
+          default: true
         stripeCustomerId:
           type: string
           example: cus_Jv6KvgT0DCH8HU

@@ -251,24 +251,26 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["hacker_1"].name}
+                {products["prod_O9XuIjn7EqYRVW"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "hacker_1"
+                    ? stripeProductId === "prod_O9XuIjn7EqYRVW"
                       ? "Current plan"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "hacker_1" ? true : false
+                  dashboard && stripeProductId === "prod_O9XuIjn7EqYRVW"
+                    ? true
+                    : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="hacker_1"
+                stripeProductId="prod_O9XuIjn7EqYRVW"
                 onClick={() => {
                   if (!dashboard) {
                     router.push("/register");
@@ -327,26 +329,28 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["growth_1"].name}
+                {products["prod_O9XtHhI6rbTT1B"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "growth_1"
+                    ? stripeProductId === "prod_O9XtHhI6rbTT1B"
                       ? "Current plan"
-                      : newStripeProductId === "scale_1"
+                      : stripeProductId === "prod_O9XtcfOSMjSD5L"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "growth_1" ? true : false
+                  dashboard && stripeProductId === "prod_O9XtHhI6rbTT1B"
+                    ? true
+                    : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="growth_1"
+                stripeProductId="prod_O9XtHhI6rbTT1B"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -362,11 +366,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>3,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $5 for every additional 1,000 minutes">
+                      content="Then $5.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -390,11 +399,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>10,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $3 for every additional 1,000 minutes">
+                      content="Then $3.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -418,12 +432,17 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>100,000 minutes</span>
                     <Tooltip
                       multiline
                       css={{ float: "right" }}
-                      content="Then $0.40 for every additional 1,000 minutes">
+                      content="Then $0.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -446,7 +465,7 @@ const Plans = ({
               <Item
                 css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
-                title={"*Pay as you go past alloted minutes"}
+                title={"* Pay as you go past allotted minutes"}
               />
             </List>
           </Box>
@@ -472,26 +491,28 @@ const Plans = ({
                 textAlign: "center",
               }}>
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["scale_1"].name}
+                {products["prod_O9XtcfOSMjSD5L"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
               <PlanForm
                 text={
                   dashboard
-                    ? newStripeProductId === "scale_1"
+                    ? stripeProductId === "prod_O9XtcfOSMjSD5L"
                       ? "Current plan"
-                      : newStripeProductId === "scale_1"
+                      : stripeProductId === "prod_O9XtcfOSMjSD5L"
                       ? "Select"
                       : "Select"
                     : "Sign up"
                 }
                 disabled={
-                  dashboard && newStripeProductId === "scale_1" ? true : false
+                  dashboard && stripeProductId === "prod_O9XtcfOSMjSD5L"
+                    ? true
+                    : false
                 }
                 variant="primary"
                 bc="$sage12"
                 color="$loContrast"
-                stripeProductId="scale_1"
+                stripeProductId="prod_O9XtcfOSMjSD5L"
                 onClick={() => {
                   if (dashboard) {
                     setIsTourOpen(false);
@@ -507,11 +528,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>20,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $5 for every additional 1,000 minutes">
+                      content="Then $5.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -535,11 +561,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5" }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>50,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $3 for every additional 1,000 minutes">
+                      content="Then $3.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -563,11 +594,16 @@ const Plans = ({
                 displayCheck={false}
                 css={{ borderColor: "$neutral5", borderBottom: 0 }}
                 title={
-                  <Flex css={{ width: "100%", justifyContent: "center" }}>
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
                     <span>500,000 minutes</span>
                     <Tooltip
                       multiline
-                      content="Then $0.40 for every additional 1,000 minutes">
+                      content="Then $0.50 for every additional 1,000 minutes">
                       <Flex
                         css={{
                           borderRadius: 1000,
@@ -590,7 +626,7 @@ const Plans = ({
               <Item
                 css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
-                title={"*Pay as you go past alloted minutes"}
+                title={"* Pay as you go past allotted minutes"}
               />
             </List>
           </Box>

@@ -216,7 +216,13 @@ const PlanForm = ({
         </Flex>
 
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          css={{
+            maxWidth: 450,
+            px: "$5",
+            pt: "$4",
+            pb: "$4",
+            textAlign: "left",
+          }}>
           <Box
             as="form"
             onSubmit={handleSubmit(onSubmit)}
@@ -428,12 +434,12 @@ const PlanForm = ({
                 <Box css={{ mt: "$4" }}>
                   <Text variant="neutral">
                     You are currently using the{" "}
-                    {products[user.newStripeProductId]?.name ||
-                      products[stripeProductId]?.name}{" "}
+                    {products[stripeProductId]?.name ||
+                      products[user.newStripeProductId]?.name}{" "}
                     plan. Do you want to{" "}
                     {products[stripeProductId].order <
-                      products[user.newStripeProductId]?.order ||
-                    products[stripeProductId]?.order
+                      products[stripeProductId]?.order ||
+                    products[user.newStripeProductId]?.order
                       ? "downgrade"
                       : "upgrade"}{" "}
                     to the {products[stripeProductId].name} plan?

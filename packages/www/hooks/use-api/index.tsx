@@ -19,12 +19,26 @@ import * as userEndpointsFunctions from "./endpoints/user";
 import * as versionEndpointsFunctions from "./endpoints/version";
 import * as webhookEndpointsFunctions from "./endpoints/webhook";
 
-const endpoint =
-  process.env.NEXT_PUBLIC_USE_STAGING_ENDPOINT === "true" || isStaging()
-    ? `https://livepeer.monster`
-    : isDevelopment()
-    ? `http://localhost:3004`
-    : ``;
+// Allow for manual overriding of the API server endopint
+export const getEndpoint = () => {
+  try {
+    const override = localStorage.getItem("LP_API_SERVER_OVERRIDE");
+    if (typeof override === "string") {
+      return override;
+    }
+  } catch (e) {
+    // not found, no problem
+  }
+  if (process.env.NEXT_PUBLIC_USE_STAGING_ENDPOINT === "true" || isStaging()) {
+    return "https://livepeer.monster";
+  }
+  if (isDevelopment()) {
+    return "http://localhost:3004";
+  }
+  return "";
+};
+
+const endpoint = getEndpoint();
 
 const makeContext = (
   state: ApiState,

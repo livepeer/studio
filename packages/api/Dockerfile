@@ -1,30 +1,20 @@
-FROM	node:16	as	builder
-WORKDIR	/app
+FROM node:18 as builder
 
-ENV	NODE_ENV development
-
-COPY	packages/api/package.json	yarn.lock	./
-RUN	yarn install --ignore-scripts --frozen-lockfile
-
-COPY	packages/api/tsconfig.json	.
-COPY	packages/api/src	src
-RUN	yarn run prepare
-
-FROM	node:16
 WORKDIR /app
+COPY . .
+RUN	yarn install --frozen-lockfile --ignore-scripts
+RUN yarn run prepare:lerna
+RUN cd packages/api && yarn run pkg:local
 
-ENV	NODE_ENV production
+FROM ubuntu:22.04
 
-COPY	packages/api/package.json yarn.lock ./
-RUN	yarn install --frozen-lockfile
-COPY --from=builder	/app/dist	dist
-
+WORKDIR app
+COPY --from=builder /app/packages/api/bin/api /usr/local/bin/livepeer-api
+ENV NODE_ENV production
 ARG	VERSION
 ENV	VERSION ${VERSION}
 ARG	GITHUB_SHA
 ENV	GITHUB_SHA ${GITHUB_SHA}
-
-RUN	node dist/cli.js --help
-
 ENV	LP_API_PORT 80
-ENTRYPOINT ["node", "dist/cli.js"]
+RUN /usr/local/bin/livepeer-api --help
+ENTRYPOINT ["/usr/local/bin/livepeer-api"]

@@ -517,6 +517,14 @@ export default class WebhookCannon {
       return this.handleRecordingWaitingChecks(sessionId, true);
     }
 
+    // if we got to this point, it means we're confident this session is inactive
+    // and we can set the child streams isActive=false
+    const [childStreams] = await this.db.stream.find({ sessionId });
+    await Promise.all(
+      childStreams.map((child) => {
+        return this.db.stream.update(child.id, { isActive: false });
+      })
+    );
     const res = await this.db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");

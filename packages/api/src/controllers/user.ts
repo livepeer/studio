@@ -121,7 +121,7 @@ export async function terminateUserStreams(
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
 
-const defaultProductId: StripeProductIDs = "prod_0";
+const defaultProductId: StripeProductIDs = "prod_O9XuIjn7EqYRVW";
 
 async function getOrCreateCustomer(stripe: Stripe, email: string) {
   const existing = await stripe.customers.list({ email });
@@ -146,6 +146,7 @@ async function createSubscription(
   const prices = await stripe.prices.list({
     lookup_keys: products[stripeProductId].lookupKeys,
   });
+
   return await stripe.subscriptions.create({
     cancel_at_period_end: false,
     customer: stripeCustomerId,
@@ -770,8 +771,6 @@ app.post(
   }
 );
 
-const deprecatedProducts = ["prod_0", "prod_1", "prod_2"];
-
 app.post(
   "/create-subscription",
   validatePost("create-subscription"),
@@ -838,19 +837,6 @@ app.post(
       return res
         .status(400)
         .send({ errors: ["could not create subscription"] });
-    }
-
-    if (
-      stripeProductId !== "prod_0" &&
-      stripeProductId !== "prod_1" &&
-      stripeProductId !== "prod_2"
-    ) {
-      await db.user.update(user.id, {
-        newStripeProductId: stripeProductId,
-        stripeCustomerSubscriptionId: subscription.id,
-      });
-      res.send(subscription);
-      return;
     }
 
     // Update user's product and subscription id in our db
@@ -920,7 +906,7 @@ app.post(
     );
 
     // Temporarily skip updating the subscription if user is selecting a new plan
-    if (
+    /*if (
       payload.stripeProductId !== "prod_0" &&
       payload.stripeProductId !== "prod_1" &&
       payload.stripeProductId !== "prod_2"
@@ -932,7 +918,7 @@ app.post(
       });
       res.send(subscription);
       return;
-    }
+    }*/
 
     // Get the prices associated with the subscription
     const subscriptionItems = await req.stripe.subscriptionItems.list({
@@ -975,25 +961,63 @@ app.post(
 
     */
 
-    // Update the customer's subscription plan.
-    // Stripe will automatically invoice the customer based on its usage up until this point
-    const updatedSubscription = await req.stripe.subscriptions.update(
-      payload.stripeCustomerSubscriptionId,
-      {
-        billing_cycle_anchor: "now", // reset billing anchor when updating subscription
-        items: [
-          ...subscriptionItems.data.map((item) => ({
-            id: item.id,
-            deleted: true,
-            clear_usage: true,
-            price: item.price.id,
-          })),
-          ...items.data.map((item) => ({
-            price: item.id,
-          })),
-        ],
+    let updatedSubscription;
+    if (products[payload.stripeProductId].deprecated) {
+      // Update the customer's subscription plan.
+      // Stripe will automatically invoice the customer based on its usage up until this point
+      updatedSubscription = await req.stripe.subscriptions.update(
+        payload.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now", // reset billing anchor when updating subscription
+          items: [
+            ...subscriptionItems.data.map((item) => ({
+              id: item.id,
+              deleted: true,
+              clear_usage: true,
+              price: item.price.id,
+            })),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+          ],
+        }
+      );
+    } else {
+      let payAsYouGoItems = [];
+      if (products[payload.stripeProductId]?.payAsYouGo) {
+        // Get the prices for the pay as you go product
+        const payAsYouGoPrices = await req.stripe.prices.list({
+          lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+        });
+
+        // Map the prices to the additional items array
+        payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+          price: item.id,
+        }));
       }
-    );
+      updatedSubscription = await req.stripe.subscriptions.update(
+        payload.stripeCustomerSubscriptionId,
+        {
+          billing_cycle_anchor: "now", // reset billing anchor when updating subscription
+          items: [
+            ...subscriptionItems.data.map((item) => {
+              // Check if the item is metered
+              const isMetered = item.price.recurring.usage_type === "metered";
+              return {
+                id: item.id,
+                deleted: true,
+                clear_usage: isMetered ? true : undefined, // If metered, clear usage
+                price: item.price.id,
+              };
+            }),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+            ...payAsYouGoItems,
+          ],
+        }
+      );
+    }
 
     // Update user's product subscription in our db
     await db.user.update(user.id, {
@@ -1035,6 +1059,31 @@ app.post(
       customer: stripeCustomerId,
     });
     res.status(200).json(invoices);
+  }
+);
+
+app.post(
+  "/retrieve-upcoming-invoice",
+  authorizer({ noApiToken: true }),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerId } = req.body;
+    if (req.user.stripeCustomerId !== stripeCustomerId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+
+    let subscriptionItems = await req.stripe.subscriptionItems.list({
+      subscription: req.user.stripeCustomerSubscriptionId,
+    });
+
+    const invoices = await req.stripe.invoices.retrieveUpcoming({
+      customer: stripeCustomerId,
+    });
+
+    res.status(200).json({
+      invoices,
+      subscriptionItems,
+    });
   }
 );
 

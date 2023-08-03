@@ -5,8 +5,13 @@ import {
   SuspendUserPayload,
   User,
 } from "@livepeer.studio/api";
-import { isDevelopment } from "../../../lib/utils";
-import { ApiState, UsageData, BillingUsageData } from "../types";
+import { isDevelopment, shouldStripe } from "../../../lib/utils";
+import {
+  ApiState,
+  UsageData,
+  BillingUsageData,
+  UpcomingInvoice,
+} from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
 import { storeToken, clearToken } from "../tokenStorage";
@@ -83,11 +88,7 @@ export const register = async ({
     return body;
   }
 
-  // Only create stripe customer if developer explicitly enables stripe in dev mode
-  if (
-    process.env.NODE_ENV === "development" &&
-    !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
-  ) {
+  if (!shouldStripe()) {
     return login(email, password);
   }
 
@@ -97,7 +98,7 @@ export const register = async ({
   // Subscribe customer to free plan upon registation
   await createSubscription({
     stripeCustomerId: customer.id,
-    stripeProductId: "prod_0",
+    stripeProductId: "prod_O9XuIjn7EqYRVW",
   });
 
   return login(email, password);
@@ -169,7 +170,7 @@ export const getUser = async (
     const customer = await createCustomer(user.email);
     await createSubscription({
       stripeCustomerId: customer.id,
-      stripeProductId: "prod_0",
+      stripeProductId: "prod_O9XuIjn7EqYRVW",
     });
     [res, user] = await context.fetch(`/user/${userId}`, opts);
   }
@@ -179,9 +180,12 @@ export const getUser = async (
 // Get current Stripe product, allowing for development users that don't have any
 export const getUserProduct = (user: User) => {
   if (hasStripe) {
-    return products[user.stripeProductId];
+    return products[user.stripeProductId] || products[user.newStripeProductId];
   }
-  return products[user.stripeProductId || "prod_0"];
+  return (
+    products[user.stripeProductId] ||
+    products[user.newStripeProductId || "prod_O9XuIjn7EqYRVW"]
+  );
 };
 
 export const getUsers = async (
@@ -227,7 +231,32 @@ export const getBillingUsage = async (
     {}
   );
 
+  if (!usage) {
+    return [
+      res,
+      {
+        TotalUsageMins: 0,
+        DeliveryUsageMins: 0,
+        StorageUsageMins: 0,
+      } as BillingUsageData | ApiError,
+    ];
+  }
+
   return [res, usage as BillingUsageData | ApiError];
+};
+
+export const getUpcomingInvoice = async (
+  stripeCustomerId: string
+): Promise<[Response, any | ApiError]> => {
+  let [res, invoice] = await context.fetch(`/user/retrieve-upcoming-invoice`, {
+    method: "POST",
+    body: JSON.stringify({ stripeCustomerId }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  return [res, invoice as any | ApiError];
 };
 
 export const makeUserAdmin = async (

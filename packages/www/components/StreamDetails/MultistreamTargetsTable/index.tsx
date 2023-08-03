@@ -73,7 +73,7 @@ const MultistreamTargetsTable = ({
         invalidateStream,
         invalidateTargetId
       ),
-    [state.tableId, stream, streamHealth, ...targets]
+    [state.tableId, stream, streamHealth, invalidateTargetId, targetRefs]
   );
 
   const onCreateClick = stream.isActive

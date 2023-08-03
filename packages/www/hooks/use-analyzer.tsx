@@ -2,6 +2,7 @@ import EventSource from "eventsource";
 import { useApi } from "hooks";
 import { useContext, useMemo, createContext, ReactNode } from "react";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
+import { getEndpoint } from "./use-api";
 
 const useLocalAnalyzer = false;
 const defaultRegion = "nyc";
@@ -140,11 +141,7 @@ export namespace events {
 }
 
 const makeUrl = (region: string, path: string) => {
-  if (isDevelopment() && useLocalAnalyzer) {
-    return `http://localhost:8080/data${path}`;
-  }
-  const tld = isStaging() || isDevelopment() ? "monster" : "com";
-  return `https://${region || defaultRegion}.livepeer.${tld}/data${path}`;
+  return `${getEndpoint()}/data${path}`;
 };
 
 class AnalyzerClient {
