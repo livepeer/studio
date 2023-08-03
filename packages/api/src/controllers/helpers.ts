@@ -299,12 +299,47 @@ export async function sendgridEmail({
 export async function sendgridEmailPaymentFailed({
   email,
   sendgridApiKey,
-  userId,
+  user,
   invoiceId,
+  invoiceUrl,
+  templateId,
 }) {
+  // If user.lastPaymentFailed is newer than 3 days, don't send email
+  if (
+    user.lastPaymentFailed &&
+    user.lastPaymentFailed > Date.now() - 3 * 24 * 60 * 60 * 1000
+  ) {
+    return false;
+  }
+
   const [supportName, supportEmail] = email;
+
+  let subject: string;
+  let text: string;
+
+  if (!invoiceId) {
+    subject = `Free tier user reached usage limit`;
+    text = `User ${user.email} reached usage limit`;
+  } else {
+    subject = `Payment failed for invoice ${invoiceId} for user ${email}`;
+    text = `User ${user.email} failed to pay invoice ${invoiceId}`;
+  }
+
   const msg = {
-    text: `User ${userId} failed to pay invoice ${invoiceId}`,
+    personalizations: [
+      {
+        to: [{ email }],
+        bcc: undefined,
+        dynamicTemplateData: {
+          subject,
+          preheader: `Stripe payment failed`,
+          text,
+          buttonText: `View invoice`,
+          buttonUrl: invoiceUrl,
+          unsubscribe: invoiceUrl,
+        },
+      },
+    ],
     from: {
       email: supportEmail,
       name: supportName,
@@ -313,10 +348,13 @@ export async function sendgridEmailPaymentFailed({
       email: supportEmail,
       name: supportName,
     },
+    // email template id: https://mc.sendgrid.com/dynamic-templates
+    templateId: templateId,
   };
 
   SendgridMail.setApiKey(sendgridApiKey);
   await SendgridMail.send(msg);
+  return true;
 }
 
 export function sendgridValidateEmail(email: string, validationApiKey: string) {
