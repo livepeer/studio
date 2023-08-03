@@ -102,8 +102,10 @@ const Billing = () => {
       const overusage = await calculateOverUsage(usage);
       if (overusage) {
         const oBill = await calculateOverUsageBill(overusage);
+        console.log(oBill);
         setOverUsageBill(oBill);
         let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
+        console.log(uInvoice);
         setUpcomingInvoice(uInvoice?.invoices);
         setUpcomingInvoiceTotal((uInvoice?.invoices.total / 100) | 0);
       }
