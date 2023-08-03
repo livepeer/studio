@@ -1288,6 +1288,13 @@ app.patch(
     }
 
     let { record, suspended, multistream, playbackPolicy, creatorId } = payload;
+    if (stream.isActive && stream.record != record) {
+      res.status(400);
+      return res.json({
+        errors: ["cannot change 'record' field while stream is active"],
+      });
+    }
+
     let patch: StreamPatchPayload & Partial<DBStream> = {
       record,
       suspended,
@@ -1337,9 +1344,16 @@ app.patch("/:id/record", authorizer({}), async (req, res) => {
     res.status(400);
     return res.json({ errors: ["can't set for session"] });
   }
+  const record = req.body.record;
   if (req.body.record === undefined) {
     res.status(400);
     return res.json({ errors: ["record field required"] });
+  }
+  if (stream.isActive && stream.record != record) {
+    res.status(400);
+    return res.json({
+      errors: ["cannot change 'record' field while stream is active"],
+    });
   }
   console.log(`set stream ${id} record ${req.body.record}`);
 

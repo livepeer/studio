@@ -610,7 +610,7 @@ describe("controllers/stream", () => {
         expect(updatedStream.mistHost).toEqual(setActivePayload.hostName);
       });
 
-      it("should allos changing the mist host as well", async () => {
+      it("should allow changing the mist host as well", async () => {
         const stream = await createAndActivateStream();
 
         const setActivePayload = {
@@ -623,6 +623,24 @@ describe("controllers/stream", () => {
         expect(updatedStream.isActive).toBe(true);
         expect(updatedStream.lastSeen).toBeGreaterThan(stream.lastSeen);
         expect(updatedStream.mistHost).toEqual(setActivePayload.hostName);
+      });
+
+      it("should disallow changing record when steam is active", async () => {
+        const stream = await createAndActivateStream();
+
+        let res = await client.patch(`/stream/${stream.id}`, {
+          record: false,
+        });
+        expect(res.status).toBe(400);
+        let json = await res.json();
+        expect(json.errors[0]).toContain("cannot change 'record' field");
+
+        res = await client.patch(`/stream/${stream.id}/record`, {
+          record: false,
+        });
+        expect(res.status).toBe(400);
+        json = await res.json();
+        expect(json.errors[0]).toContain("cannot change 'record' field");
       });
     });
 
