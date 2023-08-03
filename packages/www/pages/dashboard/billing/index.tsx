@@ -93,14 +93,14 @@ const Billing = () => {
       let [res, billingUsage] = await getBillingUsage(fromTime, toTime);
 
       if (res.status == 200) {
-        setUsage(usage);
-        await doCalculateOverUsage(usage);
+        setUsage(billingUsage);
+        await doCalculateOverUsage(billingUsage);
       }
     };
 
-    const doCalculateOverUsage = async (usage) => {
-      console.log(usage);
-      const overusage = await calculateOverUsage(usage);
+    const doCalculateOverUsage = async (u) => {
+      console.log(u);
+      const overusage = await calculateOverUsage(u);
       if (overusage) {
         console.log(overusage);
         const oBill = await calculateOverUsageBill(overusage);
@@ -113,7 +113,7 @@ const Billing = () => {
       }
     };
 
-    const calculateOverUsage = async (usage) => {
+    const calculateOverUsage = async (u) => {
       const product = getUserProduct(user);
       const limits = {
         transcoding: product?.usage[0].limit,
@@ -122,12 +122,9 @@ const Billing = () => {
       };
 
       const overUsage = {
-        TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
-        DeliveryUsageMins: Math.max(
-          usage?.DeliveryUsageMins - limits.streaming,
-          0
-        ),
-        StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
+        TotalUsageMins: Math.max(u?.TotalUsageMins - limits.transcoding, 0),
+        DeliveryUsageMins: Math.max(u?.DeliveryUsageMins - limits.streaming, 0),
+        StorageUsageMins: Math.max(u?.StorageUsageMins - limits.storage, 0),
       };
 
       return overUsage;
