@@ -99,8 +99,10 @@ const Billing = () => {
     };
 
     const doCalculateOverUsage = async (usage) => {
+      console.log(usage);
       const overusage = await calculateOverUsage(usage);
       if (overusage) {
+        console.log(overusage);
         const oBill = await calculateOverUsageBill(overusage);
         console.log(oBill);
         setOverUsageBill(oBill);
