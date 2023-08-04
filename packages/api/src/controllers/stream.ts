@@ -1383,7 +1383,7 @@ app.patch("/:id/record", authorizer({}), async (req, res) => {
     return res.json({ errors: ["can't set for session"] });
   }
   const record = req.body.record;
-  if (req.body.record === undefined) {
+  if (typeof record !== 'boolean') {
     res.status(400);
     return res.json({ errors: ["record field required"] });
   }
