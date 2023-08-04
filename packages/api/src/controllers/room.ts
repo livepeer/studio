@@ -3,6 +3,7 @@ import {
   AccessToken,
   EgressClient,
   EgressInfo,
+  ParticipantPermission,
   RoomServiceClient,
   StreamOutput,
   StreamProtocol,
@@ -19,7 +20,6 @@ import {
 } from "../store/errors";
 import { Room } from "../schema/types";
 import { EgressStatus } from "livekit-server-sdk/dist/proto/livekit_egress";
-import { isInteger } from "lodash";
 
 const app = Router();
 
@@ -225,6 +225,7 @@ app.post(
       roomJoin: true,
       room: req.params.roomId,
       canPublish: req.body.canPublish ?? true,
+      canPublishData: req.body.canPublishData ?? true,
     });
     const token = at.toJwt();
 
@@ -276,6 +277,7 @@ app.get("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
     name: participant.name,
     permission: {
       canPublish: participant.permission.canPublish,
+      canPublishData: participant.permission.canPublishData,
     },
     isPublisher: participant.isPublisher,
     metadata: participant.metadata,
@@ -294,13 +296,17 @@ app.put(
       req.config.livekitApiKey,
       req.config.livekitSecret
     );
+
+    const permissions: Partial<ParticipantPermission> = {
+      canPublishData: req?.body?.canPublishData ?? true,
+      canPublish: req?.body?.canPublish ?? true,
+    };
+
     await svc.updateParticipant(
       req.params.roomId,
       req.params.participantId,
       req.body.metadata,
-      req.body.canPublish !== undefined
-        ? ({ canPublish: req.body.canPublish } as any)
-        : undefined
+      permissions as ParticipantPermission
     );
     res.status(204).end();
   }
