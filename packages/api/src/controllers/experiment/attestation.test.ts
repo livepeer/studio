@@ -59,80 +59,6 @@ beforeAll(async () => {
   server = await serverPromise;
 });
 
-beforeEach(async () => {
-  let client: TestClient;
-  ({ client, adminApiKey } = await setupUsers(
-    server,
-    {
-      email: "user_admin@gmail.com",
-      password: "x".repeat(64),
-    },
-    {
-      email: "user_non_admin@gmail.com",
-      password: "y".repeat(64),
-    }
-  ));
-  client.apiKey = adminApiKey;
-
-  let res = await client.post(`/experiment`, {
-    name: "attestation",
-    audienceAllowAll: true,
-  });
-  expect(res.status).toBe(201);
-  res = await client.post(`/experiment/attestation/audience`, {
-    allowAll: true,
-  });
-  expect(res.status).toBe(204);
-
-  client = new TestClient({ server });
-  res = await client.post("/experiment/-/attestation", {
-    primaryType: "VideoAttestation",
-    domain: {
-      name: "Verifiable Video",
-      version: "1",
-    },
-    message: {
-      video:
-        "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
-      attestations: [
-        {
-          role: "creator",
-          address: "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC",
-        },
-      ],
-      signer: "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC",
-      timestamp: NOW,
-    },
-    signature:
-      "0xa76d8f101cb89e5f5e32550308a263f9c6bfef2a01eb7e74a46e6eb5bc1c696c0a7378ed79db55e556fc8e9a18dd1417d4c82eafa133515b3f0358a7baa337971c",
-  });
-  expect(res.status).toBe(201);
-  id = (await res.json()).id;
-
-  res = await client.post("/experiment/-/attestation", {
-    primaryType: "VideoAttestation",
-    domain: {
-      name: "Verifiable Video",
-      version: "1",
-    },
-    message: {
-      video:
-        "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
-      attestations: [
-        {
-          role: "creator",
-          address: "0xED0B4b69e7199C18A9674e8678B708Cd371a638A",
-        },
-      ],
-      signer: "0xED0B4b69e7199C18A9674e8678B708Cd371a638A",
-      timestamp: NOW - HOUR,
-    },
-    signature:
-      "0xdb7057384dde4a98ce7dd73b56e231a7d11dbad0bae41e6d4891c491527e3af32e2516fb50320b16f0074c4dfb94c2448243db2bec2a50e0aea42749aac648291b",
-  });
-  expect(res.status).toBe(201);
-});
-
 afterEach(async () => {
   clearDatabase(server);
 });
@@ -143,7 +69,80 @@ afterAll(() => {
 
 describe("Attestation API", () => {
   let client: TestClient;
+
   beforeEach(async () => {
+    let client: TestClient;
+    ({ client, adminApiKey } = await setupUsers(
+      server,
+      {
+        email: "user_admin@gmail.com",
+        password: "x".repeat(64),
+      },
+      {
+        email: "user_non_admin@gmail.com",
+        password: "y".repeat(64),
+      }
+    ));
+    client.apiKey = adminApiKey;
+
+    let res = await client.post(`/experiment`, {
+      name: "attestation",
+      audienceAllowAll: true,
+    });
+    expect(res.status).toBe(201);
+    res = await client.post(`/experiment/attestation/audience`, {
+      allowAll: true,
+    });
+    expect(res.status).toBe(204);
+
+    client = new TestClient({ server });
+    res = await client.post("/experiment/-/attestation", {
+      primaryType: "VideoAttestation",
+      domain: {
+        name: "Verifiable Video",
+        version: "1",
+      },
+      message: {
+        video:
+          "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
+        attestations: [
+          {
+            role: "creator",
+            address: "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC",
+          },
+        ],
+        signer: "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC",
+        timestamp: NOW,
+      },
+      signature:
+        "0xa76d8f101cb89e5f5e32550308a263f9c6bfef2a01eb7e74a46e6eb5bc1c696c0a7378ed79db55e556fc8e9a18dd1417d4c82eafa133515b3f0358a7baa337971c",
+    });
+    expect(res.status).toBe(201);
+    id = (await res.json()).id;
+
+    res = await client.post("/experiment/-/attestation", {
+      primaryType: "VideoAttestation",
+      domain: {
+        name: "Verifiable Video",
+        version: "1",
+      },
+      message: {
+        video:
+          "ipfs://bafybeihhhndfxtursaadlvhuptet6zqni4uhg7ornjtlp5qwngv33ipv6m",
+        attestations: [
+          {
+            role: "creator",
+            address: "0xED0B4b69e7199C18A9674e8678B708Cd371a638A",
+          },
+        ],
+        signer: "0xED0B4b69e7199C18A9674e8678B708Cd371a638A",
+        timestamp: NOW - HOUR,
+      },
+      signature:
+        "0xdb7057384dde4a98ce7dd73b56e231a7d11dbad0bae41e6d4891c491527e3af32e2516fb50320b16f0074c4dfb94c2448243db2bec2a50e0aea42749aac648291b",
+    });
+    expect(res.status).toBe(201);
+
     client = new TestClient({ server });
   });
 
