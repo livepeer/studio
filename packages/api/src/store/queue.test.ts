@@ -8,14 +8,13 @@ describe("Queue", () => {
   let queue: RabbitQueue;
   let vhost: string;
   beforeEach(async () => {
-    try {
+    const setup = async () => {
       vhost = `test_${Date.now()}`;
       await rabbitMgmt.createVhost(vhost);
-      queue = await RabbitQueue.connect(`amqp://localhost:5672/${vhost}`);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
+      queue = await RabbitQueue.connect(`amqp://127.0.0.1:5672/${vhost}`);
+      return 0;
+    };
+    await expect(setup()).resolves.toBe(0);
   });
 
   afterEach(async () => {

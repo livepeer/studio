@@ -98,7 +98,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "url of a postgres database",
         type: "string",
         demandOption: true,
-        default: "postgresql://postgres@localhost/livepeer",
+        default: "postgresql://postgres@127.0.0.1/livepeer",
       },
       "postgres-replica-url": {
         describe: "url of a postgres read replica database",
@@ -292,7 +292,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       catalystBaseUrl: {
         describe: "base URL of Catalyst",
         type: "string",
-        default: "http://localhost:7979",
+        default: "http://127.0.0.1:7979",
       },
       googleCloudUrlSigningKeyName: {
         describe:
@@ -435,7 +435,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "stream-info-service: broadcaster host:port to fetch info from",
         type: "string",
-        default: "localhost:7935",
+        default: "127.0.0.1:7935",
       },
     })
     .usage(

@@ -34,7 +34,7 @@ describe("DB", () => {
   let table: Table<TestObject>;
   beforeEach(async () => {
     db = new DB();
-    await db.start({ postgresUrl: `postgresql://postgres@localhost/test` });
+    await db.start({ postgresUrl: `postgresql://postgres@127.0.0.1/test` });
     table = new Table<TestObject>({ db, schema: testSchema });
     await table.ensureTable();
   });
@@ -42,7 +42,7 @@ describe("DB", () => {
   afterEach(async () => {
     await db.close();
     const pool = new Pool({
-      connectionString: `postgresql://postgres@localhost/postgres`,
+      connectionString: `postgresql://postgres@127.0.0.1/postgres`,
       connectionTimeoutMillis: 5000,
     });
     await pool.query("DROP DATABASE test");

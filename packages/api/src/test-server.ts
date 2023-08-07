@@ -93,4 +93,14 @@ afterAll(async () => {
 });
 
 export type TestServer = Awaited<ReturnType<typeof setupServer>>;
-export default Promise.resolve().then(setupServer);
+
+export default (async () => {
+  const serverProm = setupServer();
+  await expect(serverProm).resolves.toMatchObject({
+    host: expect.any(String),
+    store: expect.any(Object),
+    db: expect.any(Object),
+    queue: expect.any(Object),
+  });
+  return await serverProm;
+})();
