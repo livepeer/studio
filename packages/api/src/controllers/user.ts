@@ -905,61 +905,10 @@ app.post(
       payload.stripeCustomerSubscriptionId
     );
 
-    // Temporarily skip updating the subscription if user is selecting a new plan
-    /*if (
-      payload.stripeProductId !== "prod_0" &&
-      payload.stripeProductId !== "prod_1" &&
-      payload.stripeProductId !== "prod_2"
-    ) {
-      // Update user's product subscription in our db
-      await db.user.update(user.id, {
-        newStripeProductId: payload.stripeProductId,
-        planChangedAt: Date.now(),
-      });
-      res.send(subscription);
-      return;
-    }*/
-
     // Get the prices associated with the subscription
     const subscriptionItems = await req.stripe.subscriptionItems.list({
       subscription: payload.stripeCustomerSubscriptionId,
     });
-
-    // Temporarily commenting out usage - TODO june new billing
-    /*
-    // Get the customer's usage
-    const usageRes = await db.stream.usage(
-      user.id,
-      subscription.current_period_start,
-      subscription.current_period_end,
-      {
-        useReplica: false,
-      }
-    );
-
-    // Update the customer's invoice items based on its usage
-    await Promise.all(
-      products[user.stripeProductId].usage.map(async (product) => {
-        if (product.name === "Transcoding") {
-          const durMins = usageRes.sourceSegmentsDuration / 60;
-          let quantity = Math.round(parseFloat(durMins.toFixed(2)));
-          await req.stripe.invoiceItems.create({
-            customer: payload.stripeCustomerId,
-            currency: "usd",
-            period: {
-              start: subscription.current_period_start,
-              end: subscription.current_period_end,
-            },
-            unit_amount_decimal: (product.price * 100).toString(),
-            subscription: payload.stripeCustomerSubscriptionId,
-            quantity,
-            description: product.description,
-          });
-        }
-      })
-    );
-
-    */
 
     let updatedSubscription;
     if (products[payload.stripeProductId].deprecated) {

@@ -87,14 +87,9 @@ const List = ({ children, ...props }) => (
 type PlanProps = {
   dashboard?: boolean;
   stripeProductId?: string;
-  newStripeProductId?: string;
 };
 
-const Plans = ({
-  dashboard = false,
-  stripeProductId,
-  newStripeProductId,
-}: PlanProps) => {
+const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [isTourOpen, setIsTourOpen] = useState(false);
