@@ -342,6 +342,34 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   res.json({ id, status });
 });
 
+app.post("/:id/events", authorizer({ anyAdmin: true }), async (req, res) => {
+  // TODO validate post
+  const { id } = req.params;
+  const task = await db.task.get(id, { useReplica: false });
+  if (!task) {
+    return res.status(404).json({ errors: ["not found"] });
+  } else if (!["waiting", "running"].includes(task.status?.phase)) {
+    return res
+      .status(400)
+      .json({ errors: ["task is not in an executable state"] });
+  }
+
+  const user = await db.user.get(task.userId);
+  if (!user) {
+    return res.status(500).json({ errors: ["user not found"] });
+  }
+
+  if (!task.events) {
+    task.events = [];
+  }
+  task.events = task.events.concat(req.body);
+
+  await db.task.update(id, {
+    events: task.events,
+  });
+  return res.status(204).end();
+});
+
 app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   const task = await db.task.get(id);

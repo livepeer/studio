@@ -970,6 +970,19 @@ components:
           description: |
             Timestamp (in milliseconds) at which source playback was ready (for upload tasks only).
           example: 1587667174725
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              type:
+                type: string
+                example: event type
+              timestamp:
+                type: integer
+                description: Event timestamp (in milliseconds)
+                example: 1587667174725
     user:
       table: users
       properties:
