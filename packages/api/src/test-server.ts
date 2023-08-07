@@ -51,7 +51,7 @@ params.ingest = [
     origin: "http://test",
   },
 ];
-params.amqpUrl = `amqp://localhost:5672/${testId}`;
+params.amqpUrl = `amqp://127.0.0.1:5672/${testId}`;
 if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();
 }
