@@ -53,6 +53,8 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: yarn tests without coverage
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: yarn run test
 
       - name: yarn tests with coverage
