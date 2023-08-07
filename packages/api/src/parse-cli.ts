@@ -86,7 +86,7 @@ yargs.options = function (arg) {
 };
 
 export default function parseCli(argv?: string | readonly string[]) {
-  const parsed = yargs
+  const parsedProm = yargs
     .options({
       port: {
         describe: "port to listen on",
@@ -457,10 +457,14 @@ export default function parseCli(argv?: string | readonly string[]) {
     )
     .help()
     .parse(argv);
-  const mistOutput = yargsToMist(args);
+  // yargs returns a Promise even tho we don't have any async middlewares
+  const parsed = parsedProm as Awaited<typeof parsedProm>;
+
   if (parsed.json === true) {
+    const mistOutput = yargsToMist(args);
     console.log(JSON.stringify(mistOutput));
     process.exit(0);
   }
+
   return parsed as any as CamelKeys<typeof parsed>;
 }

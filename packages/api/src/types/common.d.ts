@@ -132,5 +132,3 @@ type Camel<T extends string> = T extends `${infer Left}-${infer Right}`
 export type CamelKeys<T> = {
   [K in keyof T as K extends string ? Camel<K> : K]: T[K];
 };
-
-export type UnboxPromise<T> = T extends Promise<infer U> ? U : T;

@@ -8,7 +8,6 @@ import os from "os";
 
 import makeApp, { AppServer } from "./index";
 import argParser from "./parse-cli";
-import { UnboxPromise } from "./types/common";
 import { rabbitMgmt } from "./test-helpers";
 
 const dbPath = path.resolve(os.tmpdir(), "livepeer", uuid());
@@ -93,5 +92,5 @@ afterAll(async () => {
   await rabbitMgmt.deleteVhost(testId);
 });
 
-export type TestServer = UnboxPromise<ReturnType<typeof setupServer>>;
+export type TestServer = Awaited<ReturnType<typeof setupServer>>;
 export default Promise.resolve().then(setupServer);

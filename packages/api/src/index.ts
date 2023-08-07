@@ -9,10 +9,9 @@ import { collectDefaultMetrics, Gauge } from "prom-client";
 import appRouter from "./app-router";
 import logger from "./logger";
 import { CliArgs } from "./parse-cli";
-import { UnboxPromise } from "./types/common";
 import tracking from "./middleware/tracking";
 
-export type AppServer = UnboxPromise<ReturnType<typeof makeApp>>;
+export type AppServer = Awaited<ReturnType<typeof makeApp>>;
 
 const prefix = "livepeer_api_";
 collectDefaultMetrics({ prefix });
