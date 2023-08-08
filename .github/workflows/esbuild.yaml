@@ -1,0 +1,48 @@
+# Just exists to make sure that the esbuild works and we haven't broken anything
+name: Verify esbuild build still works
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - dev
+    tags:
+      - "v*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: Do an esbuild build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          # Check https://github.com/livepeer/go-livepeer/pull/1891
+          # for ref value discussion
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+
+      - name: yarn install
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: build api dependency
+        run: cd packages/api && yarn run esbuild && cd -
+
+      # make still it still runs with no node_modules and stuff
+      - name: copy it to a new directory and test
+        run: |-
+          mkdir -p /tmp/esbuild-test \
+          && cp ./packages/api/dist-esbuild/api.js /tmp/esbuild-test/api.js \
+          && cd /tmp/esbuild-test \
+          && node api.js --help
