@@ -119,6 +119,8 @@ describe("controllers/room", () => {
           identity: resp.id,
           name: "name",
           someOtherProp: "foo",
+          permission: {},
+          joinedAt: 1,
         })
       );
       res = await client.get(`/room/${roomId}/user/${resp.id}`);
@@ -127,6 +129,8 @@ describe("controllers/room", () => {
       expect(participantResp).toStrictEqual({
         id: resp.id,
         name: "name",
+        permission: {},
+        joinedAt: 1000,
       });
 
       res = await client.put(`/room/${roomId}/user/${resp.id}`, {
@@ -160,6 +164,8 @@ describe("controllers/room", () => {
       mockStopEgress.mockReturnValueOnce(Promise.resolve(undefined));
       let mockListEgress = jest.spyOn(egressClient, "listEgress");
       mockListEgress.mockReturnValueOnce(Promise.resolve([]));
+      const mockListRooms = jest.spyOn(roomServiceClient, "listRooms");
+      mockListRooms.mockReturnValueOnce(Promise.resolve([{ name: "roomId" }]));
 
       let res = await client.delete(`/room/${roomId}/egress`);
       expect(res.status).toBe(400);
