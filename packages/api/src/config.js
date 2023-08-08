@@ -1,4 +1,4 @@
-exports.products = {
+export const products = {
   prod_0: {
     deprecated: true,
     order: 0,
