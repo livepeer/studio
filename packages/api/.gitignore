@@ -11,3 +11,4 @@ src/schema/validators
 test-build
 .env.*
 !.env.local.example
+dist-esbuild
