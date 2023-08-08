@@ -84,6 +84,64 @@ export const fetchWithTimeout = (
     );
   });
 
+export const fetchWithTimeoutAndRedirects = async (
+  url: string,
+  options: RequestInitWithTimeout,
+  redirectCount = 5
+): Promise<Response> => {
+  // Throw error if maximum number of redirects has been exceeded
+  if (redirectCount < 0) {
+    throw new Error("Maximum number of redirects exceeded");
+  }
+
+  options = { ...options, redirect: "manual" };
+
+  return new Promise<Response>((resolve, reject) => {
+    let timeout = setTimeout(() => {
+      timeout = null;
+      reject("timeout");
+    }, options.timeout || 10 * 1000);
+
+    fetch(url, options).then(
+      async (response) => {
+        if (timeout === null) {
+          // already timed out
+          return;
+        }
+
+        clearTimeout(timeout);
+
+        // Handle redirects
+        if (response.status >= 300 && response.status < 400) {
+          const newUrl = response.headers.get("location");
+          if (!newUrl) {
+            reject("Redirect with no location");
+            return;
+          }
+
+          const newResponse = await fetchWithTimeoutAndRedirects(
+            newUrl,
+            options,
+            redirectCount - 1
+          );
+          resolve(newResponse);
+        } else {
+          resolve(response);
+        }
+      },
+      (rejectReason) => {
+        if (timeout === null) {
+          // already timed out
+          return;
+        }
+
+        clearTimeout(timeout);
+        reject(rejectReason);
+      }
+    );
+  });
+};
+
 // turns foo-bar-baz into fooBarBaz
 export const kebabToCamel = (str: string) => {
   let out = "";
