@@ -67,7 +67,6 @@ export const reportUsage = async (req: Request, adminToken: string) => {
       `);
       updatedUsers.push({
         id: user.id,
-        email: user.email,
         usageReported: false,
         error: e.message,
       });
@@ -87,9 +86,9 @@ async function reportUsageForUser(
   if (user.email.endsWith("@livepeer.org") || user.admin) {
     return {
       id: user.id,
-      email: user.email,
       overUsage: {},
       usage: {},
+      isLivepeer: true,
       usageReported: true,
     };
   }
@@ -129,7 +128,9 @@ async function reportUsageForUser(
         overUsage.DeliveryUsageMins > 0 ||
         overUsage.StorageUsageMins > 0)
     ) {
-      // If they don't have a card and in overusage, send a notification email
+      console.log(`
+        User=${user.id} is in overusage but doesn't have a payment method, notyfing support team
+      `);
       let emailSent = await sendgridEmailPaymentFailed({
         email: "help@livepeer.org",
         sendgridApiKey: req.config.sendgridApiKey,
@@ -167,9 +168,9 @@ async function reportUsageForUser(
 
   return {
     id: user.id,
-    email: user.email,
     overUsage: overUsage,
     usage: billingUsage,
+    isLivepeer: false,
     usageReported: true,
   };
 }
@@ -347,7 +348,10 @@ app.post("/webhook", async (req, res) => {
 
     const user = users[0];
 
-    // notify help@livepeer.org
+    console.log(`
+       invoice=${invoice.id} payment failed for user=${user.id} notifying support team
+    `);
+
     let emailSent = await sendgridEmailPaymentFailed({
       email: "help@livepeer.org",
       sendgridApiKey: req.config.sendgridApiKey,

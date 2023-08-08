@@ -310,6 +310,9 @@ export async function sendgridEmailPaymentFailed({
     user.lastEmailAboutPaymentFailure &&
     user.lastEmailAboutPaymentFailure > Date.now() - PAYMENT_FAILED_TIMEFRAME
   ) {
+    console.log(`
+      not sending payment failed email to=${email} because last email was sent less than 3 days ago for user=${user.id}
+    `);
     return false;
   }
 
@@ -353,8 +356,15 @@ export async function sendgridEmailPaymentFailed({
     templateId: templateId,
   };
 
+  console.log(`
+    sending payment failed email to=${email} for user=${
+    user.id
+  } message=${JSON.stringify(msg)}
+  `);
+
   SendgridMail.setApiKey(sendgridApiKey);
   await SendgridMail.send(msg);
+
   return true;
 }
 
