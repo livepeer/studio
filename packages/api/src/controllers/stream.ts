@@ -1327,7 +1327,7 @@ app.patch(
     }
 
     let { record, suspended, multistream, playbackPolicy, creatorId } = payload;
-    if (stream.isActive && stream.record != record) {
+    if (record != undefined && stream.isActive && stream.record != record) {
       res.status(400);
       return res.json({
         errors: ["cannot change 'record' field while stream is active"],
