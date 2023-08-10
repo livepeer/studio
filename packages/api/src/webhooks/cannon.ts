@@ -83,7 +83,7 @@ export default class WebhookCannon {
     let event: messages.WebhookEvent;
     try {
       event = JSON.parse(data.content.toString());
-      console.log("events: got event message", event);
+      console.log("events: got event message", JSON.stringify(event));
     } catch (err) {
       console.log("events: error parsing message", err);
       this.queue.ack(data);
@@ -136,7 +136,7 @@ export default class WebhookCannon {
 
     console.log(
       `fetched webhooks. userId=${userId} event=${event} webhooks=`,
-      webhooks
+      JSON.stringify(webhooks)
     );
     if (webhooks.length === 0) {
       return true;
@@ -197,7 +197,10 @@ export default class WebhookCannon {
     let trigger: messages.WebhookTrigger;
     try {
       trigger = JSON.parse(data.content.toString());
-      console.log("webhookCannon: got trigger message", trigger);
+      console.log(
+        "webhookCannon: got trigger message",
+        JSON.stringify(trigger)
+      );
     } catch (err) {
       console.log("webhookCannon: error parsing message", err);
       this.queue.ack(data);
