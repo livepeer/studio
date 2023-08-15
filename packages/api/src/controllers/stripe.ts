@@ -490,7 +490,6 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
         subscription = await req.stripe.subscriptions.update(
           user.stripeCustomerSubscriptionId,
           {
-            billing_cycle_anchor: "now",
             cancel_at_period_end: false,
             items: [
               ...subscriptionItems.data.map((item) => {
@@ -656,7 +655,6 @@ app.post("/migrate-pro-user", async (req, res) => {
       subscription = await req.stripe.subscriptions.update(
         user.stripeCustomerSubscriptionId,
         {
-          billing_cycle_anchor: "now",
           cancel_at_period_end: false,
           items: [
             ...subscriptionItems.data.map((item) => {
