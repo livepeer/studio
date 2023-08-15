@@ -299,6 +299,7 @@ export async function sendgridEmail({
 
 export async function sendgridEmailPaymentFailed({
   email,
+  supportAddr,
   sendgridApiKey,
   user,
   invoiceId,
@@ -316,7 +317,7 @@ export async function sendgridEmailPaymentFailed({
     return false;
   }
 
-  const [supportName, supportEmail] = email;
+  const [supportName, supportEmail] = supportAddr;
 
   let subject: string;
   let text: string;

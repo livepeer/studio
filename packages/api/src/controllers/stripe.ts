@@ -133,6 +133,7 @@ async function reportUsageForUser(
       `);
       let emailSent = await sendgridEmailPaymentFailed({
         email: "help@livepeer.org",
+        supportAddr: req.config.supportAddr,
         sendgridApiKey: req.config.sendgridApiKey,
         user,
         invoiceId: null,
@@ -354,6 +355,7 @@ app.post("/webhook", async (req, res) => {
 
     let emailSent = await sendgridEmailPaymentFailed({
       email: "help@livepeer.org",
+      supportAddr: req.config.supportAddr,
       sendgridApiKey: req.config.sendgridApiKey,
       user,
       invoiceId: invoice.id,
