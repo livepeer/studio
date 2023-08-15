@@ -33,16 +33,14 @@ app.post(
   validatePost("usage"),
   async (req, res) => {
     let { fromTime, toTime } = req.query;
-
-    /* New usage report for billing
-    let token = req.token;
-    // New automated billing usage report
-    let result = await reportUsage(req, token);
-
-    res.status(200);
-    res.json(result);
-    let { fromTime, toTime } = req.query;
-    */
+    let billingUsageReport = {};
+    try {
+      const token = req.token;
+      billingUsageReport = await reportUsage(req, token);
+    } catch (e) {
+      // If billing usage report is failing, keep going to report legacy usage
+      console.log(`failed to report usage to stripe - error=${e.message}`);
+    }
 
     // if time range isn't specified return all usage
     if (!fromTime) {
@@ -80,7 +78,10 @@ app.post(
     }
 
     res.status(200);
-    res.json(usageHistory);
+    res.json({
+      usageHistory,
+      billingUsageReport,
+    });
   }
 );
 
