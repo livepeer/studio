@@ -217,11 +217,14 @@ async function getRecordingUrls(
   // Recording V2
   if (session.version === "v2") {
     const asset = await db.asset.getBySessionId(session.id);
-    if (!asset || ["waiting", "processing"].includes(asset.status?.phase)) {
-      // Recording processing in progress
+    if (!asset) {
       return;
     }
     const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
+    if (!assetWithPlayback.playbackUrl) {
+      // Recording processing in progress
+      return;
+    }
     return {
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
@@ -447,9 +450,6 @@ export async function getRecordingFields(
   const isUnused = !session.lastSeen && session.createdAt < readyThreshold;
 
   const recordingStatus = isReady ? "ready" : isUnused ? "none" : "waiting";
-  if (!isReady && !forceUrl) {
-    return { recordingStatus };
-  }
   const recordingUrls = await getRecordingUrls(config, ingest, session);
   if (!recordingUrls) {
     return { recordingStatus: "waiting" };
