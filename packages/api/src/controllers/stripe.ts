@@ -51,7 +51,20 @@ export const reportUsage = async (req: Request, adminToken: string) => {
   const cutOffDate = currentDateMillis - oneMonthMillis;
 
   const [hackerUsers] = await db.user.find([
-    sql`users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW') AND (users.data->>'lastStreamedAt')::bigint > ${cutOffDate}`,
+    sql`
+      LEFT JOIN asset a
+      ON u.data->>'id' = a.data->>'userId'
+      AND CAST(a.data->>'createdAt' AS bigint) > ${cutOffDate}
+
+      WHERE 
+      (
+          a.data->>'createdAt' IS NOT NULL 
+          OR 
+          CAST(u.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
+      )
+      AND
+      u.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW');
+  `,
   ]);
 
   const payAsYouGoUsers = [...users, ...oldProPlanUsers, ...hackerUsers];
@@ -490,6 +503,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
         subscription = await req.stripe.subscriptions.update(
           user.stripeCustomerSubscriptionId,
           {
+            billing_cycle_anchor: "unchanged",
             proration_behavior: "none",
             cancel_at_period_end: false,
             items: [
@@ -656,6 +670,7 @@ app.post("/migrate-pro-user", async (req, res) => {
       subscription = await req.stripe.subscriptions.update(
         user.stripeCustomerSubscriptionId,
         {
+          billing_cycle_anchor: "unchanged",
           proration_behavior: "none",
           cancel_at_period_end: false,
           items: [
