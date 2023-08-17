@@ -45,6 +45,7 @@ namespace messages {
     stream?: DBStream;
     retries?: number;
     lastInterval?: number;
+    lastFailureNotification?: number;
   }
 
   export type TaskInfo = {
