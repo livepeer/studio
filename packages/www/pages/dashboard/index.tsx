@@ -10,6 +10,7 @@ import Banner from "components/Banner";
 
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
+import { shouldStripe } from "lib/utils";
 
 const Dashboard = () => {
   const { user, verifyEmail, getUserProduct } = useApi();
@@ -84,9 +85,13 @@ const Dashboard = () => {
       <Box css={{ mb: "$9" }}>
         <GettingStarted firstName={user?.firstName} />
       </Box>
-      <Box css={{ mb: "100px" }}>
-        <UsageSummary />
-      </Box>
+
+      {shouldStripe() && (
+        <Box css={{ mb: "100px" }}>
+          <UsageSummary />
+        </Box>
+      )}
+
       <Box css={{ mb: "$8" }}>
         <StreamsTable
           title="Streams"
