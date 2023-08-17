@@ -162,7 +162,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <Tooltip
                     multiline
-                    content=" Create multiple versions of your source stream for different
+                    content="Create multiple versions of your source stream for different
                     devices in real time.">
                     <Text
                       size="3"
@@ -206,7 +206,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <Tooltip
                     multiline
-                    content=" Deliver high-quality playback on whatever device or bandwidth the
+                    content="Deliver high-quality playback on whatever device or bandwidth the
                     end viewer is watching.">
                     <Text
                       size="3"

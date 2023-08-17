@@ -231,7 +231,7 @@ const UsageSummary = () => {
             <Flex align="center" css={{ mr: "$3" }}>
               <Tooltip
                 multiline
-                content=" Usage minutes may take up to an hour to be reflected.">
+                content="Usage minutes may take up to an hour to be reflected.">
                 <Help />
               </Tooltip>
             </Flex>
