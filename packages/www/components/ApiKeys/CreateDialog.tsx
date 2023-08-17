@@ -185,7 +185,7 @@ const CreateDialog = ({
                       align="center">
                       <Label htmlFor="allowCors">Allow CORS access</Label>
                       <Link
-                        href="https://docs.livepeer.studio/quickstart/#create-api-key"
+                        href="https://docs.livepeer.org/guides/developing/quickstart.en-US#create-an-api-key-in-livepeer-studio"
                         target="_blank">
                         <Warning />
                       </Link>
