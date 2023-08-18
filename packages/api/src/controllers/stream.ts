@@ -209,40 +209,6 @@ export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `webrtc`, stream.playbackId);
 }
 
-async function getRecordingUrls(
-  config: CliArgs,
-  ingest: string,
-  session: DBSession
-): Promise<{ recordingUrl: string; mp4Url: string }> {
-  // Recording V2
-  if (session.version === "v2") {
-    const asset = await db.asset.getBySessionId(session.id);
-    if (!asset) {
-      return;
-    }
-    const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
-    if (!assetWithPlayback.playbackUrl) {
-      // Recording processing in progress
-      return;
-    }
-    return {
-      recordingUrl: assetWithPlayback.playbackUrl,
-      mp4Url: assetWithPlayback.downloadUrl,
-    };
-  }
-
-  // Backwards-compatibility for Recording V1
-  const base = pathJoin(
-    ingest,
-    `recordings`,
-    session.lastSessionId ?? session.id
-  );
-  return {
-    recordingUrl: pathJoin(base, "index.m3u8"),
-    mp4Url: pathJoin(base, "source.mp4"),
-  };
-}
-
 /**
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
@@ -445,19 +411,42 @@ export async function getRecordingFields(
     return {};
   }
 
+  // Recording V2
+  if (session.version === "v2") {
+    const asset = await db.asset.getBySessionId(session.id);
+    if (!asset) {
+      return { recordingStatus: "waiting" };
+    }
+    const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
+    const assetPhase = assetWithPlayback.status?.phase;
+    return {
+      recordingStatus:
+        assetPhase == "ready"
+          ? "ready"
+          : assetPhase == "failed"
+          ? "none"
+          : "waiting",
+      recordingUrl: assetWithPlayback.playbackUrl,
+      mp4Url: assetWithPlayback.downloadUrl,
+    };
+  }
+
+  // Backwards-compatibility for Recording V1
   const readyThreshold = Date.now() - USER_SESSION_TIMEOUT;
   const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
   const isUnused = !session.lastSeen && session.createdAt < readyThreshold;
 
   const recordingStatus = isReady ? "ready" : isUnused ? "none" : "waiting";
-  const recordingUrls = await getRecordingUrls(config, ingest, session);
-  if (!recordingUrls) {
-    return { recordingStatus: "waiting" };
-  }
-  if (!recordingUrls.recordingUrl) {
-    return { recordingStatus: "none" };
-  }
-  return { recordingStatus, ...recordingUrls };
+  const base = pathJoin(
+    ingest,
+    `recordings`,
+    session.lastSessionId ?? session.id
+  );
+  return {
+    recordingStatus: recordingStatus,
+    recordingUrl: pathJoin(base, "index.m3u8"),
+    mp4Url: pathJoin(base, "source.mp4"),
+  };
 }
 
 export async function withRecordingFields(
