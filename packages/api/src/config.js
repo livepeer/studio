@@ -321,31 +321,8 @@ export const products = {
     ],
     monthlyPrice: 0,
   },
-  prod_OTTwpzjA4U8B2P: {
-    order: 12,
-    name: "Enterprise",
-    lookupKeys: ["enterprise_plan_1"],
-    usage: [
-      {
-        name: "Transcoding",
-        description: "Transcoding (minutes)",
-        price: 0,
-      },
-      {
-        name: "Delivery",
-        description: "Delivery (minutes)",
-        price: 0,
-      },
-      {
-        name: "Storage",
-        description: "Storage (minutes)",
-        price: 0,
-      },
-    ],
-    monthlyPrice: 0,
-  },
   prod_OTTbwpzxNLMNSh: {
-    order: 12,
+    order: 13,
     name: "Enterprise",
     lookupKeys: ["enterprise_plan_1"],
     usage: [
