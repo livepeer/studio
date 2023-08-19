@@ -444,8 +444,12 @@ export async function getRecordingFields(
   );
   return {
     recordingStatus: recordingStatus,
-    recordingUrl: pathJoin(base, "index.m3u8"),
-    mp4Url: pathJoin(base, "source.mp4"),
+    ...(!isReady && !forceUrl
+      ? null
+      : {
+          recordingUrl: pathJoin(base, "index.m3u8"),
+          mp4Url: pathJoin(base, "source.mp4"),
+        }),
   };
 }
 
