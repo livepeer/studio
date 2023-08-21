@@ -300,7 +300,7 @@ export const products = {
   },
   prod_OTTwpzjA4U8B2P: {
     order: 12,
-    name: "Enterprise",
+    name: "Enterprise (Staging)",
     lookupKeys: ["enterprise_plan_1"],
     usage: [
       {
