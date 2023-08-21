@@ -237,6 +237,7 @@ export default async function makeApp(params: CliArgs) {
     geolocateMiddleware({}),
     getBroadcasterHandler
   );
+  prefixRouter.use(errorHandler());
   for (const [name, controller] of Object.entries(controllers)) {
     // if we're operating in api-region mode, only handle geolocation traffic, forward the rest on
     if (
