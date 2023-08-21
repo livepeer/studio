@@ -229,6 +229,8 @@ components:
             - prod_O9XtHhI6rbTT1B
             - prod_O9XtcfOSMjSD5L
             - prod_O9XuWMU1Up6QKf
+            - prod_OTTbwpzxNLMNSh
+            - prod_OTTwpzjA4U8B2P
     update-subscription:
       type: object
       required:
@@ -264,6 +266,8 @@ components:
             - prod_O9XtHhI6rbTT1B
             - prod_O9XtcfOSMjSD5L
             - prod_O9XuWMU1Up6QKf
+            - prod_OTTbwpzxNLMNSh
+            - prod_OTTwpzjA4U8B2P
     update-customer-payment-method:
       type: object
       required:
@@ -995,6 +999,8 @@ components:
             - prod_O9XtHhI6rbTT1B
             - prod_O9XtcfOSMjSD5L
             - prod_O9XuWMU1Up6QKf
+            - prod_OTTbwpzxNLMNSh
+            - prod_OTTwpzjA4U8B2P
         toMigrate:
           type: boolean
           default: true
