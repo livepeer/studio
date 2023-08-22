@@ -8,7 +8,8 @@ import os from "os";
 
 import makeApp, { AppServer } from "./index";
 import argParser from "./parse-cli";
-import { rabbitMgmt } from "./test-helpers";
+import { rabbitMgmt, startAuxTestServer } from "./test-helpers";
+import bodyParser from "body-parser";
 
 const dbPath = path.resolve(os.tmpdir(), "livepeer", uuid());
 const clientId = "EXPECTED_AUDIENCE";
@@ -59,12 +60,20 @@ params.listen = true;
 params.requireEmailVerification = true;
 params.livekitHost = "livekit";
 params.frontend = false;
+params.catalystBaseUrl = "http://127.0.0.1:7171";
+
 let server: AppServer & { host?: string };
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
 async function setupServer() {
   await rabbitMgmt.createVhost(testId);
+
+  const catalystServer = await startAuxTestServer(7171);
+  catalystServer.app.post("/api/events", (req, res) => {
+    res.status(200).end();
+  });
+
   server = await makeApp(params);
 
   server.host = `http://127.0.0.1:${server.port}`;
