@@ -45,6 +45,9 @@ app.post(
     if (outputs.mp4?.path != null && !outputs.mp4.path.startsWith("/")) {
       outputs.mp4.path = "/" + outputs.mp4.path;
     }
+    if (outputs.fmp4?.path != null && !outputs.fmp4.path.startsWith("/")) {
+      outputs.fmp4.path = "/" + outputs.fmp4.path;
+    }
 
     const task = await req.taskScheduler.createAndScheduleTask(
       "transcode-file",
