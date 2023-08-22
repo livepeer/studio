@@ -58,6 +58,7 @@ if (!params.insecureTestToken) {
 params.listen = true;
 params.requireEmailVerification = true;
 params.livekitHost = "livekit";
+params.frontend = false;
 let server: AppServer & { host?: string };
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
