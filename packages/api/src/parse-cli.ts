@@ -1,4 +1,4 @@
-import yargs from "yargs";
+import Yargs, { Options, Argv } from "yargs";
 import yargsToMist from "./yargs-to-mist";
 import {
   CamelKeys,
@@ -13,6 +13,8 @@ const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://arweave.net/",
   "https://gateway.arweave.net/",
 ];
+
+const yargs = Yargs() as unknown as Argv;
 
 function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
@@ -78,14 +80,19 @@ export type CliArgs = ReturnType<typeof parseCli>;
 // before passing it to yargs completely breaks type inference, which is a huge shame.
 // So... this monkeypatches yargs to capture that variable. If you know of a more
 // elegant way, I'd love to hear it!
-let args;
+let allOptions: { [key: string]: Options };
 const originalOpts = yargs.options;
-yargs.options = function (arg) {
-  args = arg;
-  return originalOpts.call(this, arg);
+yargs.options = function (...args) {
+  if (!allOptions) {
+    allOptions = args[0];
+  }
+  return originalOpts.call(this, ...args);
 };
 
 export default function parseCli(argv?: string | readonly string[]) {
+  if (!argv) {
+    argv = process.argv.slice(2);
+  }
   const parsedProm = yargs
     .options({
       port: {
@@ -459,9 +466,8 @@ export default function parseCli(argv?: string | readonly string[]) {
     .parse(argv);
   // yargs returns a Promise even tho we don't have any async middlewares
   const parsed = parsedProm as Awaited<typeof parsedProm>;
-
+  const mistOutput = yargsToMist(allOptions);
   if (parsed.json === true) {
-    const mistOutput = yargsToMist(args);
     console.log(JSON.stringify(mistOutput));
     process.exit(0);
   }

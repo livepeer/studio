@@ -24,10 +24,8 @@ import {
 import Spinner from "components/Spinner";
 
 import { useApi } from "../../../hooks";
-import { useToggleState } from "hooks/use-toggle-state";
 import { MultistreamTarget, Stream } from "@livepeer.studio/api";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
-import ErrorDialog from "../../ErrorDialog";
 
 const DisableDialog = ({
   onDialogAction,
@@ -49,9 +47,7 @@ const DisableDialog = ({
           <Text
             size="3"
             variant="neutral"
-            css={{ mt: "$2", lineHeight: "22px" }}>
-            Changes will take effect when the next stream session is started.
-          </Text>
+            css={{ mt: "$2", lineHeight: "22px" }}></Text>
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
@@ -117,8 +113,7 @@ const DeleteDialog = ({
             size="3"
             variant="neutral"
             css={{ mt: "$2", lineHeight: "22px" }}>
-            Deleting a target cannot be undone. Any active sessions will
-            continue to be multistreamed to this destination.
+            Deleting a target cannot be undone.
           </Text>
         </AlertDialogDescription>
 
@@ -180,7 +175,6 @@ const Toolbox = ({
   invalidateStream: (optm?: Stream) => Promise<void>;
 }) => {
   const { patchMultistreamTarget } = useApi();
-  const errorRecordDialogState = useToggleState();
   const [openSnackbar] = useSnackbar();
 
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
@@ -219,9 +213,7 @@ const Toolbox = ({
         checked={!target?.disabled}
         value={`${!target?.disabled}`}
         onCheckedChange={useCallback(async () => {
-          if (stream.isActive) {
-            errorRecordDialogState.onOn();
-          } else if (target?.disabled) {
+          if (target?.disabled) {
             await setTargetDisabled(false);
           } else {
             setDisableDialogOpen(true);
@@ -245,32 +237,18 @@ const Toolbox = ({
           <DropdownMenuGroup>
             <DropdownMenuItem
               disabled={!target}
-              onSelect={() =>
-                stream.isActive
-                  ? errorRecordDialogState.onOn()
-                  : setSaveDialogOpen(true)
-              }>
+              onSelect={() => setSaveDialogOpen(true)}>
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={!target}
-              onSelect={() =>
-                stream.isActive
-                  ? errorRecordDialogState.onOn()
-                  : setDeleteDialogOpen(true)
-              }
+              onSelect={() => setDeleteDialogOpen(true)}
               color="red">
               Delete
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <ErrorDialog
-        isOpen={errorRecordDialogState.on}
-        onOpenChange={errorRecordDialogState.onToggle}
-        description="You cannot change multistream preferences while a session is active"
-      />
 
       <DisableDialog
         onDialogAction={useCallback(

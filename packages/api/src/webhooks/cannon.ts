@@ -245,7 +245,7 @@ export default class WebhookCannon {
         `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
       );
       try {
-        this.notifyFailedWebhook(trigger, webhookPayload, err);
+        trigger = webhookFailNotification(trigger, webhookPayload, err);
       } catch (err) {
         console.error(
           `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
@@ -611,6 +611,28 @@ export async function storeTriggerStatus(
       `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
     );
   }
+}
+
+export function webhookFailNotification(
+  trigger: messages.WebhookTrigger,
+  webhookPayload: RequestInitWithTimeout,
+  err: Error
+): messages.WebhookTrigger {
+  const lastFailureNotification = trigger?.lastFailureNotification;
+  const currentTime = Date.now();
+  if (
+    !lastFailureNotification ||
+    currentTime - lastFailureNotification > 24 * 60 * 60 * 1000
+  ) {
+    this.notifyFailedWebhook(trigger, webhookPayload, err);
+  }
+
+  trigger = {
+    ...trigger,
+    lastFailureNotification: currentTime,
+  };
+
+  return trigger;
 }
 
 export function signatureHeaders(

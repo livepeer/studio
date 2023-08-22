@@ -7,7 +7,6 @@ import makeStore from "./store";
 import {
   errorHandler,
   healthCheck,
-  kubernetes,
   subgraph,
   hardcodedNodes,
   insecureTest,
@@ -195,19 +194,6 @@ export default async function makeApp(params: CliArgs) {
       throw new Error("tried to set insecureTestToken in production!");
     }
     app.use(`/${insecureTestToken}`, insecureTest());
-  }
-
-  // Populate Kubernetes getOrchestrators and getBroadcasters is provided
-  if (kubeNamespace) {
-    app.use(
-      kubernetes({
-        kubeNamespace,
-        kubeBroadcasterService,
-        kubeOrchestratorService,
-        kubeBroadcasterTemplate,
-        kubeOrchestratorTemplate,
-      })
-    );
   }
 
   app.use(hardcodedNodes({ orchestrators, broadcasters, ingest, prices }));

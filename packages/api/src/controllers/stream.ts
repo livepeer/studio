@@ -43,6 +43,7 @@ import {
   FieldsMap,
   toStringValues,
   mapInputCreatorId,
+  triggerCatalystStreamUpdated,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -1326,7 +1327,7 @@ app.patch(
     }
 
     let { record, suspended, multistream, playbackPolicy, creatorId } = payload;
-    if (stream.isActive && stream.record != record) {
+    if (record != undefined && stream.isActive && stream.record != record) {
       res.status(400);
       return res.json({
         errors: ["cannot change 'record' field while stream is active"],
@@ -1364,6 +1365,10 @@ app.patch(
     if (patch.suspended) {
       // kill live stream
       await terminateStreamReq(req, stream);
+    }
+
+    if (multistream) {
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
     res.status(204);

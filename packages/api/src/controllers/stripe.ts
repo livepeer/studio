@@ -8,6 +8,7 @@ import qs from "qs";
 import { sendgridEmailPaymentFailed } from "./helpers";
 import { WithID } from "../store/types";
 import { User } from "../schema/types";
+import { authorizer } from "../middleware";
 
 const app = Router();
 
@@ -67,7 +68,6 @@ export const reportUsage = async (req: Request, adminToken: string) => {
       `);
       updatedUsers.push({
         id: user.id,
-        email: user.email,
         usageReported: false,
         error: e.message,
       });
@@ -87,9 +87,9 @@ async function reportUsageForUser(
   if (user.email.endsWith("@livepeer.org") || user.admin) {
     return {
       id: user.id,
-      email: user.email,
       overUsage: {},
       usage: {},
+      isLivepeer: true,
       usageReported: true,
     };
   }
@@ -129,9 +129,12 @@ async function reportUsageForUser(
         overUsage.DeliveryUsageMins > 0 ||
         overUsage.StorageUsageMins > 0)
     ) {
-      // If they don't have a card and in overusage, send a notification email
+      console.log(`
+        User=${user.id} is in overusage but doesn't have a payment method, notyfing support team
+      `);
       let emailSent = await sendgridEmailPaymentFailed({
         email: "help@livepeer.org",
+        supportAddr: req.config.supportAddr,
         sendgridApiKey: req.config.sendgridApiKey,
         user,
         invoiceId: null,
@@ -167,9 +170,9 @@ async function reportUsageForUser(
 
   return {
     id: user.id,
-    email: user.email,
     overUsage: overUsage,
     usage: billingUsage,
+    isLivepeer: false,
     usageReported: true,
   };
 }
@@ -347,9 +350,13 @@ app.post("/webhook", async (req, res) => {
 
     const user = users[0];
 
-    // notify help@livepeer.org
+    console.log(`
+       invoice=${invoice.id} payment failed for user=${user.id} notifying support team
+    `);
+
     let emailSent = await sendgridEmailPaymentFailed({
       email: "help@livepeer.org",
+      supportAddr: req.config.supportAddr,
       sendgridApiKey: req.config.sendgridApiKey,
       user,
       invoiceId: invoice.id,
@@ -484,7 +491,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
         subscription = await req.stripe.subscriptions.update(
           user.stripeCustomerSubscriptionId,
           {
-            billing_cycle_anchor: "now",
+            proration_behavior: "none",
             cancel_at_period_end: false,
             items: [
               ...subscriptionItems.data.map((item) => {
@@ -650,7 +657,7 @@ app.post("/migrate-pro-user", async (req, res) => {
       subscription = await req.stripe.subscriptions.update(
         user.stripeCustomerSubscriptionId,
         {
-          billing_cycle_anchor: "now",
+          proration_behavior: "none",
           cancel_at_period_end: false,
           items: [
             ...subscriptionItems.data.map((item) => {
@@ -692,5 +699,123 @@ app.post("/migrate-pro-user", async (req, res) => {
     result: "Migrated pro user with email " + user.email + " to hacker plan",
   });
 });
+
+app.post(
+  "/subscribe-to-enterprise",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    let enterprisePlan = "prod_OTTbwpzxNLMNSh";
+
+    if (req.body.staging === true) {
+      enterprisePlan = "prod_OTTwpzjA4U8B2P";
+    }
+
+    const userId = req.body.userId;
+
+    const [users] = await db.user.find([sql`users.id = ${userId}`], {
+      limit: 1,
+      useReplica: false,
+    });
+
+    if (users.length == 0) {
+      res.json({
+        errors: ["no users found"],
+      });
+      return;
+    }
+
+    let user = users[0];
+
+    const { data } = await req.stripe.customers.list({
+      email: user.email,
+    });
+
+    if (data.length > 0) {
+      const items = await req.stripe.prices.list({
+        lookup_keys: products[enterprisePlan].lookupKeys,
+      });
+
+      let subscription;
+
+      try {
+        subscription = await req.stripe.subscriptions.retrieve(
+          user.stripeCustomerSubscriptionId
+        );
+      } catch (e) {
+        console.log(`
+            error- subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
+          `);
+        await db.user.update(user.id, {
+          isActiveSubscription: false,
+        });
+        res.json({
+          errors: [
+            `error - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+          ],
+        });
+        return;
+      }
+
+      const subscriptionItems = await req.stripe.subscriptionItems.list({
+        subscription: user.stripeCustomerSubscriptionId,
+      });
+
+      if (!req.body.actually_migrate) {
+        res.json({
+          migrating_user: {
+            email: user.email,
+            stripe_customer_id: user.stripeCustomerId,
+            id: user.id,
+          },
+          from_product: user.stripeProductId,
+          pay_as_you_go_items_to_apply: [],
+          subscription_items_to_apply: items,
+        });
+        return;
+      }
+
+      subscription = await req.stripe.subscriptions.update(
+        user.stripeCustomerSubscriptionId,
+        {
+          proration_behavior: "none",
+          cancel_at_period_end: false,
+          items: [
+            ...subscriptionItems.data.map((item) => {
+              const isMetered = item.price.recurring.usage_type === "metered";
+              return {
+                id: item.id,
+                deleted: true,
+                clear_usage: isMetered ? true : undefined,
+                price: item.price.id,
+              };
+            }),
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+          ],
+        }
+      );
+
+      await db.user.update(user.id, {
+        stripeCustomerId: user.stripeCustomerId,
+        stripeProductId:
+          req.body.staging === true
+            ? "prod_OTTwpzjA4U8B2P"
+            : "prod_OTTbwpzxNLMNSh",
+        stripeCustomerSubscriptionId: subscription.id,
+      });
+    } else {
+      res.json({
+        errors: [
+          `Unable to migrate user - customer not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
+        ],
+      });
+      return;
+    }
+    res.json({
+      result: "Migrated user with email " + user.email + " to enterprise plan",
+    });
+  }
+);
 
 export default app;

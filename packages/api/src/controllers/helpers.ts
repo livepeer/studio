@@ -299,6 +299,7 @@ export async function sendgridEmail({
 
 export async function sendgridEmailPaymentFailed({
   email,
+  supportAddr,
   sendgridApiKey,
   user,
   invoiceId,
@@ -310,10 +311,13 @@ export async function sendgridEmailPaymentFailed({
     user.lastEmailAboutPaymentFailure &&
     user.lastEmailAboutPaymentFailure > Date.now() - PAYMENT_FAILED_TIMEFRAME
   ) {
+    console.log(`
+      not sending payment failed email to=${email} because last email was sent less than 3 days ago for user=${user.id}
+    `);
     return false;
   }
 
-  const [supportName, supportEmail] = email;
+  const [supportName, supportEmail] = supportAddr;
 
   let subject: string;
   let text: string;
@@ -353,8 +357,15 @@ export async function sendgridEmailPaymentFailed({
     templateId: templateId,
   };
 
+  console.log(`
+    sending payment failed email to=${email} for user=${
+    user.id
+  } message=${JSON.stringify(msg)}
+  `);
+
   SendgridMail.setApiKey(sendgridApiKey);
   await SendgridMail.send(msg);
+
   return true;
 }
 
@@ -583,6 +594,27 @@ export function isValidBase64(str: string) {
     // If there's an error during decoding, it's not a valid base64 string
     return false;
   }
+}
+
+export async function triggerCatalystStreamUpdated(
+  req: Request,
+  playbackId: string
+) {
+  const { catalystBaseUrl } = req.config;
+
+  let url = `${catalystBaseUrl}/api/events`;
+  let options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      resource: "stream",
+      playback_id: playbackId,
+    }),
+  };
+
+  return await fetch(url, options);
 }
 
 export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {

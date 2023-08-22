@@ -51,6 +51,8 @@ const Billing = () => {
     null
   );
 
+  const standardProducts = ["Hacker", "Growth", "Scale"];
+
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
       const [_res, paymentMethod] = await getPaymentMethod(
@@ -375,10 +377,11 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          {!products[user.stripeProductId]?.order ? (
+          {!standardProducts.includes(products[user.stripeProductId]?.name) ? (
             <Text variant="neutral">
-              The Hacker plan is free of charge up to 1000 minutes per month and
-              limited to 10 concurrent viewers per account.
+              You are subscribed to a custom plan, and you will be invoiced
+              according to the terms of that agreement. Please reach out to
+              contact@livepeer.org with any questions.
             </Text>
           ) : (
             subscription && (
