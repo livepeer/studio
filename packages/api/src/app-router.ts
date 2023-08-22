@@ -237,7 +237,6 @@ export default async function makeApp(params: CliArgs) {
     geolocateMiddleware({}),
     getBroadcasterHandler
   );
-  prefixRouter.use(errorHandler());
   for (const [name, controller] of Object.entries(controllers)) {
     // if we're operating in api-region mode, only handle geolocation traffic, forward the rest on
     if (
@@ -253,7 +252,6 @@ export default async function makeApp(params: CliArgs) {
   prefixRouter.use((req, res, next) => {
     throw new NotFoundError("not found");
   });
-  prefixRouter.use(errorHandler());
   app.use(httpPrefix, prefixRouter);
   // Special case: handle /stream proxies off that endpoint
   app.use("/stream", streamProxy);
@@ -268,10 +266,19 @@ export default async function makeApp(params: CliArgs) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
+
+  let wwwHandler;
   if (frontend) {
-    const wwwHandler = await createFrontend();
-    app.use(wwwHandler);
+    wwwHandler = await createFrontend();
   }
+  const errHandler = errorHandler();
+
+  app.use((err, _req, res, _next) => {
+    if (frontend && !_req.path.startsWith(httpPrefix)) {
+      wwwHandler(_req, res, _next);
+    }
+    errHandler(err, _req, res, _next);
+  });
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
   await fcl.config({
