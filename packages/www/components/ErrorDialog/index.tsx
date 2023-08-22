@@ -21,8 +21,7 @@ const ErrorDialog = ({
 }) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4", zIndex: 1 }}>
+      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4", zIndex: 1 }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Error</Heading>
         </AlertDialogTitle>
