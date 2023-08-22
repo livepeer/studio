@@ -320,7 +320,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       vodMaxScheduledTasksPerUser: {
         describe:
           "maximum number of tasks that can be in the VOD execution queue for a given user",
-        default: 100,
+        default: 25,
         type: "number",
       },
       "ingest-region": {
