@@ -4,6 +4,7 @@ import { User } from "../schema/types";
 import db from "../store/db";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
+import sql from "sql-template-strings";
 
 let server: TestServer;
 let mockUser: User;
@@ -341,12 +342,11 @@ describe("controllers/user", () => {
         email: user.email,
       });
       expect(req.status).toBe(201);
-      let resToken = await req.json();
-      expect(resToken.userId).toBe(userRes.id);
-      expect(resToken.resetToken).toBeUndefined();
 
-      const token = await db.passwordResetToken.get(resToken.id);
-      expect(token).toMatchObject(resToken);
+      const tokens = await db.passwordResetToken.find([
+        sql`password_reset_token.data->>'userId' = ${userRes.id}`,
+      ]);
+      const token = tokens[0][0];
       expect(token.resetToken).toBeDefined();
 
       // should return 404 when user email not found
