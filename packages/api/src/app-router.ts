@@ -64,11 +64,6 @@ export default async function makeApp(params: CliArgs) {
     vodObjectStoreId,
     vodCatalystObjectStoreId,
     recordCatalystObjectStoreId,
-    kubeNamespace,
-    kubeBroadcasterService,
-    kubeBroadcasterTemplate,
-    kubeOrchestratorService,
-    kubeOrchestratorTemplate,
     ownRegion,
     subgraphUrl,
     fallbackProxy,
@@ -257,13 +252,13 @@ export default async function makeApp(params: CliArgs) {
   if (frontend) {
     wwwHandler = await createFrontend();
   }
-  const errHandler = errorHandler();
+  const apiErrorHandler = errorHandler();
 
   app.use((err, _req, res, _next) => {
     if (frontend && !_req.path.startsWith(httpPrefix)) {
-      wwwHandler(_req, res, _next);
+      wwwHandler(err, _req, res, _next);
     }
-    errHandler(err, _req, res, _next);
+    apiErrorHandler(err, _req, res, _next);
   });
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
