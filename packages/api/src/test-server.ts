@@ -62,13 +62,14 @@ params.livekitHost = "livekit";
 params.frontend = false;
 
 let server: AppServer & { host?: string };
+let catalystServer;
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
 async function setupServer() {
   await rabbitMgmt.createVhost(testId);
 
-  const catalystServer = await startAuxTestServer();
+  catalystServer = await startAuxTestServer();
   catalystServer.app.post("/api/events", (req, res) => {
     res.status(200).end();
   });
@@ -97,6 +98,9 @@ afterAll(async () => {
     await server.queue.close();
     await server.close();
     server = null;
+  }
+  if (catalystServer) {
+    catalystServer.close();
   }
   fs.removeSync(dbPath);
   await rabbitMgmt.deleteVhost(testId);
