@@ -9,7 +9,7 @@ import fs from "fs";
 import jwt, { VerifyOptions } from "jsonwebtoken";
 
 const vhostUrl = (vhost: string) =>
-  `http://guest:guest@localhost:15672/api/vhosts/${vhost}`;
+  `http://guest:guest@127.0.0.1:15672/api/vhosts/${vhost}`;
 
 export const rabbitMgmt = {
   createVhost: (vhost: string) => fetch(vhostUrl(vhost), { method: "PUT" }),

@@ -102,12 +102,12 @@ describe("webhook cannon", () => {
       kind: "webhook",
       createdAt: Date.now(),
       events: ["stream.started"],
-      url: "http://localhost:30000/webhook",
+      url: "http://127.0.0.1:30000/webhook",
       sharedSecret: "keyboardCat",
     };
 
     webhookServer = await startAuxTestServer(30000);
-    testHost = `http://localhost:${webhookServer.port}`;
+    testHost = `http://127.0.0.1:${webhookServer.port}`;
     console.log("beforeALL done");
   });
 

@@ -53,10 +53,14 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: yarn tests without coverage
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: yarn run test
 
       - name: yarn tests with coverage
-        run: export NODE_OPTIONS=--max_old_space_size=8192 && yarn run coverage
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+        run: yarn run coverage
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3

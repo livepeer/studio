@@ -93,7 +93,7 @@ export default function parseCli(argv?: string | readonly string[]) {
   if (!argv) {
     argv = process.argv.slice(2);
   }
-  const parsed = yargs
+  const parsedProm = yargs
     .options({
       port: {
         describe: "port to listen on",
@@ -105,7 +105,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "url of a postgres database",
         type: "string",
         demandOption: true,
-        default: "postgresql://postgres@localhost/livepeer",
+        default: "postgresql://postgres@127.0.0.1/livepeer",
       },
       "postgres-replica-url": {
         describe: "url of a postgres read replica database",
@@ -442,7 +442,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "stream-info-service: broadcaster host:port to fetch info from",
         type: "string",
-        default: "localhost:7935",
+        default: "127.0.0.1:7935",
       },
     })
     .usage(
@@ -464,10 +464,13 @@ export default function parseCli(argv?: string | readonly string[]) {
     )
     .help()
     .parse(argv);
+  // yargs returns a Promise even tho we don't have any async middlewares
+  const parsed = parsedProm as Awaited<typeof parsedProm>;
   const mistOutput = yargsToMist(allOptions);
   if (parsed.json === true) {
     console.log(JSON.stringify(mistOutput));
     process.exit(0);
   }
+
   return parsed as any as CamelKeys<typeof parsed>;
 }

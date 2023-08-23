@@ -64,11 +64,6 @@ export default async function makeApp(params: CliArgs) {
     vodObjectStoreId,
     vodCatalystObjectStoreId,
     recordCatalystObjectStoreId,
-    kubeNamespace,
-    kubeBroadcasterService,
-    kubeBroadcasterTemplate,
-    kubeOrchestratorService,
-    kubeOrchestratorTemplate,
     ownRegion,
     subgraphUrl,
     fallbackProxy,
@@ -238,7 +233,6 @@ export default async function makeApp(params: CliArgs) {
   prefixRouter.use((req, res, next) => {
     throw new NotFoundError("not found");
   });
-  prefixRouter.use(errorHandler());
   app.use(httpPrefix, prefixRouter);
   // Special case: handle /stream proxies off that endpoint
   app.use("/stream", streamProxy);
@@ -253,10 +247,19 @@ export default async function makeApp(params: CliArgs) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
+
+  let wwwHandler;
   if (frontend) {
-    const wwwHandler = await createFrontend();
-    app.use(wwwHandler);
+    wwwHandler = await createFrontend();
   }
+  const apiErrorHandler = errorHandler();
+
+  app.use((err, _req, res, _next) => {
+    if (frontend && !_req.path.startsWith(httpPrefix)) {
+      wwwHandler(err, _req, res, _next);
+    }
+    apiErrorHandler(err, _req, res, _next);
+  });
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
   await fcl.config({

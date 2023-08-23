@@ -40,14 +40,13 @@ describe("scheduler handle tasks", () => {
       await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     client.jwtAuth = nonAdminToken;
 
-    try {
+    const setup = async () => {
       vhost = `test_${Date.now()}`;
       await rabbitMgmt.createVhost(vhost);
-      queue = await RabbitQueue.connect(`amqp://localhost:5672/${vhost}`);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
+      queue = await RabbitQueue.connect(`amqp://127.0.0.1:5672/${vhost}`);
+      return 0;
+    };
+    await expect(setup()).resolves.toBe(0);
 
     taskScheduler = new TaskScheduler();
     taskScheduler.queue = queue;
