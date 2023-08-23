@@ -100,7 +100,7 @@ afterAll(async () => {
     server = null;
   }
   if (catalystServer) {
-    catalystServer.close();
+    await catalystServer.close();
   }
   fs.removeSync(dbPath);
   await rabbitMgmt.deleteVhost(testId);
