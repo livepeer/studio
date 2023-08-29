@@ -1,10 +1,15 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import { Request, RequestHandler, Router } from "express";
+import { Request, RequestHandler, Router, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
-import mung from "express-mung";
-import tus from "tus-node-server";
+import {
+  Server as TusServer,
+  EVENTS as TUS_EVENTS,
+  Upload as TusUpload,
+} from "@tus/server";
+import { S3Store as TusS3Store } from "@tus/s3-store";
+import { FileStore as TusFileStore } from "@tus/file-store";
 import _ from "lodash";
 import {
   makeNextHREF,
@@ -47,6 +52,7 @@ import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
 import os from "os";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
+import mung from "express-mung";
 
 const app = Router();
 
@@ -959,7 +965,7 @@ app.post(
   }
 );
 
-let tusServer: tus.Server;
+let tusServer: TusServer;
 
 export const setupTus = async (objectStoreId: string): Promise<void> => {
   tusServer = await createTusServer(objectStoreId);
@@ -968,16 +974,16 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 async function createTusServer(objectStoreId: string) {
   const os = await getActiveObjectStore(objectStoreId);
   const s3config = await getObjectStoreS3Config(os);
-  const tusServer = new tus.Server({
+  const datastore = new TusS3Store({
+    partSize: 8 * 1024 * 1024,
+    s3ClientConfig: s3config,
+  });
+  const tusServer = new TusServer({
+    datastore,
     path: "/upload/tus",
     namingFunction,
   });
-  tusServer.datastore = new tus.S3Store({
-    ...s3config,
-    partSize: 8 * 1024 * 1024,
-    tmpDirPrefix: "tus-tmp-files",
-  });
-  tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(false));
+  tusServer.on(TUS_EVENTS.POST_FINISH, onTusUploadComplete(false));
   return tusServer;
 }
 
@@ -986,15 +992,17 @@ export const setupTestTus = async (): Promise<void> => {
 };
 
 async function createTestTusServer() {
-  const tusTestServer = new tus.Server({
+  const datastore = new TusFileStore({
+    directory: os.tmpdir(),
+  });
+  const tusTestServer = new TusServer({
+    datastore: datastore,
     path: "/upload/tus",
     namingFunction: (req: Request) =>
       req.res.getHeader("livepeer-playback-id").toString(),
   });
-  tusTestServer.datastore = new tus.FileStore({
-    directory: os.tmpdir(),
-  });
-  tusTestServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(true));
+
+  tusTestServer.on(TUS_EVENTS.POST_FINISH, onTusUploadComplete(true));
   return tusTestServer;
 }
 
@@ -1006,15 +1014,8 @@ const namingFunction = (req: Request) => {
   return `directUpload/${playbackId}`;
 };
 
-type TusFileMetadata = {
-  id: string;
-  upload_length: `${number}`;
-  upload_metadata: string;
-};
-
 const onTusUploadComplete =
-  (isTest: boolean) =>
-  async ({ file }: { file: TusFileMetadata }) => {
+  (isTest: boolean) => async (req: Request, res: Response, file: TusUpload) => {
     const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
     await onUploadComplete(playbackId);
   };
