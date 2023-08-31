@@ -46,7 +46,7 @@
     "flow-bin": "^0.97.0",
     "husky": "^4.2.5",
     "lcov-result-merger": "^3.0.0",
-    "lerna": "^3.13.3",
+    "lerna": "^7.2.0",
     "prettier": "^2.6.2",
     "pretty-quick": "^3.1.0",
     "vercel": "^19.2.0"
@@ -57,7 +57,6 @@
     }
   },
   "dependencies": {
-    "@cloudflare/wrangler": "^1.4.0",
     "cross-env": "^5.2.0",
     "lint-staged": "^10.1.7"
   },

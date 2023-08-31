@@ -45,7 +45,6 @@
     "@aws-sdk/s3-request-presigner": "^3.48.0",
     "@cloudflare/json-schema-walker": "^0.1.1",
     "@cloudflare/kv-asset-handler": "^0.0.11",
-    "@cloudflare/wrangler": "^1.8.4",
     "@lit-protocol/sdk-nodejs": "^1.1.241",
     "@livepeer.studio/www": "^0.15.3",
     "@livepeer/sdk": "1.0.0-alpha.7",
@@ -149,8 +148,7 @@
     "prettier": "^2.6.2",
     "redoc-cli": "^0.8.3",
     "tus-js-client": "^3.0.0-0",
-    "typescript": "^4.3.4",
-    "wrangler": "^0.0.2"
+    "typescript": "^4.3.4"
   },
   "homepage": "https://livepeer.org",
   "repository": {
