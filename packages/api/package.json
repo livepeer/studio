@@ -35,7 +35,7 @@
     "test": "jest -i --silent \"${PWD}/src\"",
     "test:dev": "jest \"${PWD}/src\" -i --silent --watch",
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
-    "coverage": "yarn run test --coverage",
+    "coverage": "yarn run test --coverage --verbose",
     "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
     "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node18-${os.platform()}-${os.arch()}`')",
     "esbuild": "yarn run compile-schemas && node esbuild.mjs"
