@@ -386,6 +386,12 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
   }
   let migration = [];
 
+  let hackerPlan = "prod_O9XuIjn7EqYRVW";
+
+  if (req.body.staging === true) {
+    hackerPlan = "hacker_1";
+  }
+
   let user;
 
   if (req.body.userId) {
@@ -394,7 +400,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
   } else {
     const [users] = await db.user.find(
       [
-        sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' 
+        sql`users.data->>'stripeProductId' = '${hackerPlan}' 
             AND (users.data->>'migrated' = 'false' OR users.data->>'migrated' IS NULL)`,
       ],
       {
@@ -422,12 +428,12 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
   });
 
   if (data.length > 0) {
-    if (user.stripeProductId === "prod_O9XuIjn7EqYRVW") {
+    if (user.stripeProductId === hackerPlan) {
       migration.push(
         `User ${user.email} is subscribing to pay as you go from ${user.stripeProductId}`
       );
       const items = await req.stripe.prices.list({
-        lookup_keys: products["prod_O9XuIjn7EqYRVW"].lookupKeys,
+        lookup_keys: products[hackerPlan].lookupKeys,
       });
       let subscription;
 
@@ -537,7 +543,8 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
 
         await db.user.update(user.id, {
           stripeCustomerId: user.stripeCustomerId,
-          stripeProductId: "prod_O9XuIjn7EqYRVW",
+          stripeProductId:
+            req.body.staging === true ? "hacker_1" : "prod_O9XuIjn7EqYRVW",
           stripeCustomerSubscriptionId: subscription.id,
           migrated: true,
         });
@@ -557,6 +564,16 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         });
         return;
       }
+    } else {
+      res.json({
+        errors: [
+          `Unable to subscribe hacker user - user is already subscribed to ${user.stripeProductId}`,
+        ],
+      });
+      await db.user.update(user.id, {
+        migrated: true,
+      });
+      return;
     }
   } else {
     res.json({
