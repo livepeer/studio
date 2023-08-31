@@ -7,8 +7,6 @@
   },
   "lerna": "2.9.0",
   "npmClient": "yarn",
-  "packages": [
-    "packages/**"
-  ],
-  "version": "0.15.3"
+  "packages": ["packages/**"],
+  "version": "0.15.4"
 }
