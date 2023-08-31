@@ -38,6 +38,7 @@ const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
+const freePlan = "prod_O9XuIjn7EqYRVW";
 
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
@@ -121,7 +122,7 @@ export async function terminateUserStreams(
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
 
-const defaultProductId: StripeProductIDs = "prod_O9XuIjn7EqYRVW";
+const defaultProductId: StripeProductIDs = freePlan;
 
 async function getOrCreateCustomer(stripe: Stripe, email: string) {
   const existing = await stripe.customers.list({ email });
@@ -134,7 +135,8 @@ async function getOrCreateCustomer(stripe: Stripe, email: string) {
 async function createSubscription(
   stripe: Stripe,
   stripeProductId: StripeProductIDs,
-  stripeCustomerId: string
+  stripeCustomerId: string,
+  withPayAsYouGo: boolean
 ) {
   const existing = await stripe.subscriptions.list({
     customer: stripeCustomerId,
@@ -147,10 +149,24 @@ async function createSubscription(
     lookup_keys: products[stripeProductId].lookupKeys,
   });
 
+  let payAsYouGoItems = [];
+
+  if (withPayAsYouGo) {
+    const payAsYouGoPrices = await stripe.prices.list({
+      lookup_keys: products["pay_as_you_go_1"].lookupKeys,
+    });
+    payAsYouGoItems = payAsYouGoPrices.data.map((item) => ({
+      price: item.id,
+    }));
+  }
+
   return await stripe.subscriptions.create({
     cancel_at_period_end: false,
     customer: stripeCustomerId,
-    items: prices.data.map((item) => ({ price: item.id })),
+    items: [
+      ...prices.data.map((item) => ({ price: item.id })),
+      ...payAsYouGoItems,
+    ],
     expand: ["latest_invoice.payment_intent"],
   });
 }
@@ -313,7 +329,8 @@ app.post("/", validatePost("user"), async (req, res) => {
     const subscription = await createSubscription(
       req.stripe,
       defaultProductId,
-      customer.id
+      customer.id,
+      true
     );
     if (!subscription) {
       res.status(400);
@@ -831,7 +848,8 @@ app.post(
     const subscription = await createSubscription(
       req.stripe,
       stripeProductId,
-      stripeCustomerId
+      stripeCustomerId,
+      false
     );
     if (!subscription) {
       return res

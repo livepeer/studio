@@ -1001,9 +1001,9 @@ components:
             - prod_O9XuWMU1Up6QKf
             - prod_OTTbwpzxNLMNSh
             - prod_OTTwpzjA4U8B2P
-        toMigrate:
+        migrated:
           type: boolean
-          default: true
+          default: false
         lastEmailAboutPaymentFailure:
           type: number
           example: 1587667174725

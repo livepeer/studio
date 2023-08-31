@@ -82,7 +82,8 @@ export const reportUsage = async (req: Request, adminToken: string) => {
 async function reportUsageForUser(
   req: Request,
   user: WithID<User>,
-  adminToken: string
+  adminToken: string,
+  actuallyReport: boolean = true
 ) {
   if (user.email.endsWith("@livepeer.org") || user.admin) {
     return {
@@ -120,7 +121,7 @@ async function reportUsageForUser(
   });
 
   if (
-    user.stripeProductId.includes("hacker_1") ||
+    (actuallyReport && user.stripeProductId.includes("hacker_1")) ||
     user.stripeProductId.includes("prod_O9XuIjn7EqYRVW")
   ) {
     if (
@@ -152,28 +153,31 @@ async function reportUsageForUser(
     // If they have a card and in overusage, report the usage
   }
 
-  // create a map of subscription items by their lookup keys
-  const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
-    (acc, item) => {
-      acc[item.price.lookup_key] = item.id;
-      return acc;
-    },
-    {} as Record<string, string>
-  );
-
-  await sendUsageRecordToStripe(
-    user,
-    req,
-    subscriptionItemsByLookupKey,
-    overUsage
-  );
+  if (actuallyReport) {
+    // create a map of subscription items by their lookup keys
+    const subscriptionItemsByLookupKey = subscriptionItems.data.reduce(
+      (acc, item) => {
+        acc[item.price.lookup_key] = item.id;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+    await sendUsageRecordToStripe(
+      user,
+      req,
+      subscriptionItemsByLookupKey,
+      overUsage
+    );
+  }
 
   return {
     id: user.id,
     overUsage: overUsage,
     usage: billingUsage,
     isLivepeer: false,
-    usageReported: true,
+    billingCycleStart,
+    billingCycleEnd,
+    usageReported: actuallyReport,
   };
 }
 
@@ -375,34 +379,41 @@ app.post("/webhook", async (req, res) => {
   return res.sendStatus(200);
 });
 
-app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
+app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
   if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
   let migration = [];
 
-  const [users] = await db.user.find(
-    [
-      sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' 
-          AND (users.data->>'toMigrate' = 'true' OR users.data->>'toMigrate' IS NULL)`,
-    ],
-    {
-      limit: 1,
-      useReplica: false,
+  let user;
+
+  if (req.body.userId) {
+    user = await db.user.get(req.body.userId);
+    migration.push(`Select migration for user ${user.email}`);
+  } else {
+    const [users] = await db.user.find(
+      [
+        sql`users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' 
+            AND (users.data->>'migrated' = 'false' OR users.data->>'migrated' IS NULL)`,
+      ],
+      {
+        limit: 1,
+        useReplica: false,
+      }
+    );
+
+    if (users.length == 0) {
+      res.json({
+        errors: ["no users found"],
+      });
+      return;
     }
-  );
 
-  if (users.length == 0) {
-    res.json({
-      errors: ["no users found"],
-    });
-    return;
+    migration.push(`Found ${users.length} users to migrate`);
+
+    user = users[0];
   }
-
-  migration.push(`Found ${users.length} users to migrate`);
-
-  let user = users[0];
 
   migration.push(`Migrating user ${user.email}`);
 
@@ -432,7 +443,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
               Unable to subscribe hacker user  to pay as you go plans - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
             `);
         await db.user.update(user.id, {
-          toMigrate: false,
+          migrated: true,
         });
         res.json({
           errors: [
@@ -447,7 +458,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
               Unable to subscribe hacker user to pay as you go plans - user=${user.id} has a status=${subscription.status} subscription
             `);
         await db.user.update(user.id, {
-          toMigrate: false,
+          migrated: true,
         });
         res.json({
           errors: [
@@ -473,6 +484,13 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
           price: item.id,
         }));
 
+        let usageReport = await reportUsageForUser(
+          req,
+          user,
+          req.body.token,
+          false
+        );
+
         if (!req.body.actually_migrate) {
           res.json({
             user: {
@@ -484,6 +502,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
             subscriptionItems,
             items,
             payAsYouGoItems,
+            usageReport,
           });
           return;
         }
@@ -520,7 +539,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
           stripeCustomerId: user.stripeCustomerId,
           stripeProductId: "prod_O9XuIjn7EqYRVW",
           stripeCustomerSubscriptionId: subscription.id,
-          toMigrate: false,
+          migrated: true,
         });
 
         migration.push(`User ${user.email} has been updated in the database`);
@@ -533,6 +552,9 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
             `Unable to subscribe hacker user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
           ],
         });
+        await db.user.update(user.id, {
+          migrated: true,
+        });
         return;
       }
     }
@@ -543,10 +565,13 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
       ],
     });
     await db.user.update(user.id, {
-      isActiveSubscription: false,
+      migrated: true,
     });
     return;
   }
+
+  let usageReport = await reportUsageForUser(req, user, req.body.token, true);
+
   migration.push(
     `User ${user.email} has been subscribed to pay as you go plans`
   );
@@ -554,6 +579,7 @@ app.post("/subscribe-hackers-to-pay-as-you-go", async (req, res) => {
     result:
       "Subscribed user with email " + user.email + " to pay as you go plans",
     migration: migration,
+    usageReport,
   });
 });
 
