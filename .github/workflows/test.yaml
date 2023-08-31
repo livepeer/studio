@@ -57,17 +57,17 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=8192"
         run: yarn run test
 
-      - name: yarn tests with coverage
-        env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
-        run: yarn run coverage
+      # - name: yarn tests with coverage
+      #   env:
+      #     NODE_OPTIONS: "--max-old-space-size=8192"
+      #   run: yarn run coverage
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/lcov.info
-          name: ${{ github.event.repository.name }}
-          verbose: true
+      # - name: Upload coverage reports
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: ./coverage/lcov.info
+      #     name: ${{ github.event.repository.name }}
+      #     verbose: true
 
   codeql:
     name: Perform CodeQL analysis
