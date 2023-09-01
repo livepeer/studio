@@ -1004,6 +1004,9 @@ components:
         migrated:
           type: boolean
           default: false
+        migrationInvoice:
+          type: boolean
+          default: false
         lastEmailAboutPaymentFailure:
           type: number
           example: 1587667174725

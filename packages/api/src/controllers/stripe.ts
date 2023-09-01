@@ -358,7 +358,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
       const [users] = await db.user.find(
         [
           sql`(users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' OR users.data->>'stripeProductId' = 'hacker_1') 
-              AND (users.data->>'migrated' = 'true'`,
+          AND (users.data->>'migrationInvoice' = 'false' OR users.data->>'migrationInvoice' IS NULL)`,
         ],
         {
           limit: 1,
@@ -541,18 +541,23 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           }
         );
 
-        let migrated = true;
-        if (invoiceUsage) {
-          migrated = false;
+        if (!invoiceUsage) {
+          await db.user.update(user.id, {
+            stripeCustomerId: user.stripeCustomerId,
+            stripeProductId:
+              req.body.staging === true ? "hacker_1" : "prod_O9XuIjn7EqYRVW",
+            stripeCustomerSubscriptionId: subscription.id,
+            migrated: true,
+          });
+        } else {
+          await db.user.update(user.id, {
+            stripeCustomerId: user.stripeCustomerId,
+            stripeProductId:
+              req.body.staging === true ? "hacker_1" : "prod_O9XuIjn7EqYRVW",
+            stripeCustomerSubscriptionId: subscription.id,
+            migrationInvoice: true,
+          });
         }
-
-        await db.user.update(user.id, {
-          stripeCustomerId: user.stripeCustomerId,
-          stripeProductId:
-            req.body.staging === true ? "hacker_1" : "prod_O9XuIjn7EqYRVW",
-          stripeCustomerSubscriptionId: subscription.id,
-          migrated,
-        });
 
         migration.push(`User ${user.email} has been updated in the database`);
       } catch (e) {
