@@ -254,12 +254,16 @@ export default async function makeApp(params: CliArgs) {
   }
   const apiErrorHandler = errorHandler();
 
-  app.use((err, _req, res, _next) => {
-    if (frontend && !_req.path.startsWith(httpPrefix)) {
-      wwwHandler(err, _req, res, _next);
-    }
-    apiErrorHandler(err, _req, res, _next);
-  });
+  if (frontend) {
+    app.use((req, res, next) => {
+      if (!req.path.startsWith(httpPrefix)) {
+        return wwwHandler(req, res, next);
+      }
+      next();
+    });
+  }
+
+  app.use(apiErrorHandler);
 
   // These parameters are required to use the fcl library, even though we don't use on-chain verification
   await fcl.config({
