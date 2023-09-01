@@ -60,20 +60,19 @@ params.listen = true;
 params.requireEmailVerification = true;
 params.livekitHost = "livekit";
 params.frontend = false;
+params.catalystBaseUrl = "http://127.0.0.1:7171";
 
 let server: AppServer & { host?: string };
-let catalystServer;
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
 async function setupServer() {
   await rabbitMgmt.createVhost(testId);
 
-  catalystServer = await startAuxTestServer();
+  const catalystServer = await startAuxTestServer(7171);
   catalystServer.app.post("/api/events", (req, res) => {
     res.status(200).end();
   });
-  params.catalystBaseUrl = `http://127.0.0.1:${catalystServer.port}`;
 
   server = await makeApp(params);
 
@@ -98,9 +97,6 @@ afterAll(async () => {
     await server.queue.close();
     await server.close();
     server = null;
-  }
-  if (catalystServer) {
-    await catalystServer.close();
   }
   fs.removeSync(dbPath);
   await rabbitMgmt.deleteVhost(testId);
