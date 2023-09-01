@@ -45,3 +45,6 @@ bin
 
 # Sentry
 .sentryclirc
+
+# Sitemap
+public/sitemap-0.xml
