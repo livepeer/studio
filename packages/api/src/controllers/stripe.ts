@@ -85,7 +85,9 @@ async function reportUsageForUser(
   user: WithID<User>,
   adminToken: string,
   actuallyReport: boolean = true,
-  forceReport: boolean = false
+  forceReport: boolean = false,
+  from?: number,
+  to?: number
 ) {
   if (!forceReport && (user.email.endsWith("@livepeer.org") || user.admin)) {
     return {
@@ -101,8 +103,13 @@ async function reportUsageForUser(
     user.stripeCustomerSubscriptionId
   );
 
-  const billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
-  const billingCycleEnd = userSubscription.current_period_end * 1000; // 1687989600000 // Test date
+  let billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
+  let billingCycleEnd = userSubscription.current_period_end * 1000; // 1687989600000 // Test date
+
+  if (from && to) {
+    billingCycleStart = from;
+    billingCycleEnd = to;
+  }
 
   const ingests = await req.getIngest();
   const billingUsage = await getBillingUsage(
@@ -375,6 +382,8 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
     email: user.email,
   });
 
+  let subscription;
+
   if (data.length > 0) {
     if (user.stripeProductId == hackerPlan || req.body.userId != null) {
       migration.push(
@@ -383,7 +392,6 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
       const items = await req.stripe.prices.list({
         lookup_keys: products[hackerPlan].lookupKeys,
       });
-      let subscription;
 
       try {
         subscription = await req.stripe.subscriptions.retrieve(
@@ -446,7 +454,13 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             user,
             req.body.token,
             false,
-            req.body.staging === true ? true : false
+            req.body.staging === true ? true : false,
+            req.body.staging === true
+              ? 1690848000000
+              : subscription.current_period_start,
+            req.body.staging === true
+              ? 1693526400000
+              : subscription.current_period_end
           );
         }
 
@@ -546,7 +560,13 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
       user,
       req.body.token,
       true,
-      req.body.staging === true ? true : false
+      req.body.staging === true ? true : false,
+      req.body.staging === true
+        ? 1690848000000
+        : subscription.current_period_start,
+      req.body.staging === true
+        ? 1693526400000
+        : subscription.current_period_end
     );
   }
 
