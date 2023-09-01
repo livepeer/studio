@@ -982,6 +982,7 @@ async function createTusServer(objectStoreId: string) {
     datastore,
     path: "/upload/tus",
     namingFunction,
+    respectForwardedHeaders: true,
   });
   tusServer.on(TUS_EVENTS.POST_FINISH, onTusUploadComplete(false));
   return tusServer;
@@ -1000,6 +1001,7 @@ async function createTestTusServer() {
     path: "/upload/tus",
     namingFunction: (req: Request) =>
       req.res.getHeader("livepeer-playback-id").toString(),
+    respectForwardedHeaders: true,
   });
 
   tusTestServer.on(TUS_EVENTS.POST_FINISH, onTusUploadComplete(true));
