@@ -519,32 +519,15 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         }
 
         let subItems = [];
-        if (!invoiceUsage) {
-          subItems = subscriptionItems.data.map((item) => {
-            const isMetered = item.price.recurring.usage_type === "metered";
-            return {
-              id: item.id,
-              deleted: true,
-              clear_usage: isMetered ? true : undefined,
-              price: item.price.id,
-            };
-          });
-          migration.push(
-            `User ${user.email} has been updated to ${subscription.id}`
-          );
-        } else {
-          subItems = subscriptionItems.data.map((item) => {
-            return {
-              id: item.id,
-              deleted: true,
-              clear_usage: false,
-              price: item.price.id,
-            };
-          });
-          migration.push(
-            `User ${user.email} has been invoiced for usage ${subscription.id}`
-          );
-        }
+        subItems = subscriptionItems.data.map((item) => {
+          const isMetered = item.price.recurring.usage_type === "metered";
+          return {
+            id: item.id,
+            deleted: true,
+            clear_usage: isMetered ? true : undefined,
+            price: item.price.id,
+          };
+        });
 
         subscription = await req.stripe.subscriptions.update(
           user.stripeCustomerSubscriptionId,
@@ -569,6 +552,9 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             stripeCustomerSubscriptionId: subscription.id,
             migrated: true,
           });
+          migration.push(
+            `User ${user.email} has been updated to ${subscription.id}`
+          );
         } else {
           await db.user.update(user.id, {
             stripeCustomerId: user.stripeCustomerId,
@@ -577,6 +563,9 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             stripeCustomerSubscriptionId: subscription.id,
             migrationInvoice: true,
           });
+          migration.push(
+            `User ${user.email} has been invoiced for usage ${subscription.id}`
+          );
         }
 
         migration.push(`User ${user.email} has been updated in the database`);
