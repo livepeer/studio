@@ -25,7 +25,7 @@
     "lerna-run": "lerna run --stream",
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
-    "test": "lerna run --stream test --no-sort --concurrency=999 --ignore @livepeer.studio/www --",
+    "test": "cd packages/api && yarn run test",
     "dev": "touch .env.local && cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
     "updated": "lerna updated --json",
     "postinstall": "lerna run --stream postinstall",
