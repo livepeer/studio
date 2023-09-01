@@ -514,6 +514,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         }
 
         let subscriptionDate = subscription.current_period_start;
+        let billingCycleAnchor = subscription.current_period_end;
 
         let deletedSubscription = await req.stripe.subscriptions.del(
           user.stripeCustomerSubscriptionId
@@ -526,6 +527,8 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           customer: user.stripeCustomerId,
           backdate_start_date:
             req.body.staging === true ? 1690934400 : subscriptionDate,
+          billing_cycle_anchor:
+            req.body.staging === true ? 1693612800 : billingCycleAnchor,
           items: [
             ...items.data.map((item) => ({
               price: item.id,
