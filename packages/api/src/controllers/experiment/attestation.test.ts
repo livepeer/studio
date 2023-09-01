@@ -134,7 +134,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  clearDatabase(server);
+  await clearDatabase(server);
 });
 
 afterAll(() => {
