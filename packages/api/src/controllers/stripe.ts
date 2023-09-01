@@ -335,10 +335,10 @@ app.post("/webhook", async (req, res) => {
 });
 
 app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
-  /*if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
+  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
-  }*/
+  }
   let migration = [];
 
   let hackerPlan = "prod_O9XuIjn7EqYRVW";
