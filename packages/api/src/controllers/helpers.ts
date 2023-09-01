@@ -8,6 +8,7 @@ import express, { Request } from "express";
 import sql, { SQLStatement } from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
+import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
 import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
@@ -188,9 +189,11 @@ export function deleteCredentials(objectStoreUrl: string): string {
     .replace(secretAccessKey, "***");
 }
 
-export type OSS3Config = S3ClientConfig & {
-  bucket: string;
-};
+export type OSS3Config = S3ClientConfig &
+  Pick<TusS3Opts, "region" | "bucket"> & {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
 
 export async function getObjectStoreS3Config(
   os: ObjectStore
@@ -214,6 +217,7 @@ export async function getObjectStoreS3Config(
     secretAccessKey: decodeURIComponent(url.password),
   };
   return {
+    ...credentials, // inline credentials for tus config
     credentials,
     region,
     bucket,
