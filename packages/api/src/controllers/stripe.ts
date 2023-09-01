@@ -340,6 +340,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
     return res.json({ errors: ["unauthorized"] });
   }
   let migration = [];
+  let invoiceUsage = req.body.invoiceUsage;
 
   let hackerPlan = "prod_O9XuIjn7EqYRVW";
 
@@ -353,30 +354,54 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
     user = await db.user.get(req.body.userId);
     migration.push(`Select migration for user ${user.email}`);
   } else {
-    const [users] = await db.user.find(
-      [
-        sql`(users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' OR users.data->>'stripeProductId' = 'hacker_1') 
-            AND (users.data->>'migrated' = 'false' OR users.data->>'migrated' IS NULL)`,
-      ],
-      {
-        limit: 1,
-        useReplica: false,
+    if (invoiceUsage) {
+      const [users] = await db.user.find(
+        [
+          sql`(users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' OR users.data->>'stripeProductId' = 'hacker_1') 
+              AND (users.data->>'migrated' = 'true'`,
+        ],
+        {
+          limit: 1,
+          useReplica: false,
+        }
+      );
+
+      if (users.length == 0) {
+        res.json({
+          errors: ["no users found"],
+        });
+        return;
       }
-    );
 
-    if (users.length == 0) {
-      res.json({
-        errors: ["no users found"],
-      });
-      return;
+      migration.push(`Found ${users.length} users to invoice`);
+
+      user = users[0];
+      migration.push(`Invoicing user ${user.email}`);
+    } else {
+      const [users] = await db.user.find(
+        [
+          sql`(users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' OR users.data->>'stripeProductId' = 'hacker_1') 
+              AND (users.data->>'migrated' = 'false' OR users.data->>'migrated' IS NULL)`,
+        ],
+        {
+          limit: 1,
+          useReplica: false,
+        }
+      );
+
+      if (users.length == 0) {
+        res.json({
+          errors: ["no users found"],
+        });
+        return;
+      }
+
+      migration.push(`Found ${users.length} users to migrate`);
+
+      user = users[0];
+      migration.push(`Migrating user ${user.email}`);
     }
-
-    migration.push(`Found ${users.length} users to migrate`);
-
-    user = users[0];
   }
-
-  migration.push(`Migrating user ${user.email}`);
 
   const { data } = await req.stripe.customers.list({
     email: user.email,
@@ -448,7 +473,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
 
         let usageReport;
 
-        if (req.body.usageReport) {
+        if (req.body.usageReport && !invoiceUsage) {
           usageReport = await reportUsageForUser(
             req,
             user,
@@ -476,8 +501,29 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             items,
             payAsYouGoItems,
             usageReport,
+            invoiceUsage,
           });
           return;
+        }
+
+        let subItems;
+        if (!invoiceUsage) {
+          subItems = subscriptionItems.data.map((item) => {
+            const isMetered = item.price.recurring.usage_type === "metered";
+            return {
+              id: item.id,
+              deleted: true,
+              clear_usage: isMetered ? true : undefined,
+              price: item.price.id,
+            };
+          });
+          migration.push(
+            `User ${user.email} has been updated to ${subscription.id}`
+          );
+        } else {
+          migration.push(
+            `User ${user.email} has been invoiced for usage ${subscription.id}`
+          );
         }
 
         subscription = await req.stripe.subscriptions.update(
@@ -486,15 +532,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             billing_cycle_anchor: "now",
             cancel_at_period_end: false,
             items: [
-              ...subscriptionItems.data.map((item) => {
-                const isMetered = item.price.recurring.usage_type === "metered";
-                return {
-                  id: item.id,
-                  deleted: true,
-                  clear_usage: isMetered ? true : undefined,
-                  price: item.price.id,
-                };
-              }),
+              ...subItems,
               ...items.data.map((item) => ({
                 price: item.id,
               })),
@@ -503,16 +541,17 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           }
         );
 
-        migration.push(
-          `User ${user.email} has been updated to ${subscription.id}`
-        );
+        let migrated = true;
+        if (invoiceUsage) {
+          migrated = false;
+        }
 
         await db.user.update(user.id, {
           stripeCustomerId: user.stripeCustomerId,
           stripeProductId:
             req.body.staging === true ? "hacker_1" : "prod_O9XuIjn7EqYRVW",
           stripeCustomerSubscriptionId: subscription.id,
-          migrated: true,
+          migrated,
         });
 
         migration.push(`User ${user.email} has been updated in the database`);
@@ -554,7 +593,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
 
   let usageReport;
 
-  if (req.body.usageReport) {
+  if (req.body.usageReport && !invoiceUsage) {
     usageReport = await reportUsageForUser(
       req,
       user,
@@ -568,16 +607,18 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         ? 1693526400000
         : subscription.current_period_end
     );
+
+    migration.push(
+      `User ${user.email} has been subscribed to pay as you go plans`
+    );
   }
 
-  migration.push(
-    `User ${user.email} has been subscribed to pay as you go plans`
-  );
   res.json({
     result:
       "Subscribed user with email " + user.email + " to pay as you go plans",
     migration: migration,
     usageReport,
+    invoiceUsage,
   });
 });
 
