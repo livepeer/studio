@@ -37,7 +37,7 @@
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
     "coverage": "yarn run test --coverage",
     "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
-    "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node18-${os.platform()}-${os.arch()}`')",
+    "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node18-${process.env.GOOS ?? os.platform()}-${process.env.GOARCH ?? os.arch()}`')",
     "esbuild": "yarn run compile-schemas && node esbuild.mjs"
   },
   "dependencies": {
