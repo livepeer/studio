@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { DB } from "./db";
+import { DB, CONNECT_TIMEOUT } from "./db";
 import Table from "./table";
 import { Pool } from "pg";
 
@@ -43,7 +43,7 @@ describe("DB", () => {
     await db.close();
     const pool = new Pool({
       connectionString: `postgresql://postgres@127.0.0.1/postgres`,
-      connectionTimeoutMillis: 5000,
+      connectionTimeoutMillis: CONNECT_TIMEOUT,
     });
     await pool.query("DROP DATABASE test");
     await pool.end();

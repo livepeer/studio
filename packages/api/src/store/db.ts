@@ -33,7 +33,8 @@ import ExperimentTable from "./experiment-table";
 import AttestationTable from "./attestation-table";
 
 // Should be configurable, perhaps?
-const CONNECT_TIMEOUT = 5000;
+export const CONNECT_TIMEOUT =
+  parseInt(process.env.POSTGRES_CONNECT_TIMEOUT) ?? 5000;
 
 export interface PostgresParams {
   postgresUrl: string;
