@@ -335,10 +335,10 @@ app.post("/webhook", async (req, res) => {
 });
 
 app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
-  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
+  /*if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
-  }
+  }*/
   let migration = [];
 
   let hackerPlan = "prod_O9XuIjn7EqYRVW";
@@ -355,7 +355,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
   } else {
     const [users] = await db.user.find(
       [
-        sql`users.data->>'stripeProductId' = '${hackerPlan}' 
+        sql`(users.data->>'stripeProductId' = 'prod_O9XuIjn7EqYRVW' OR users.data->>'stripeProductId' = 'hacker_1') 
             AND (users.data->>'migrated' = 'false' OR users.data->>'migrated' IS NULL)`,
       ],
       {
