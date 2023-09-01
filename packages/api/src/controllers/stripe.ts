@@ -438,13 +438,17 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           price: item.id,
         }));
 
-        let usageReport = await reportUsageForUser(
-          req,
-          user,
-          req.body.token,
-          false,
-          req.body.staging === true ? true : false
-        );
+        let usageReport;
+
+        if (req.body.usageReport) {
+          usageReport = await reportUsageForUser(
+            req,
+            user,
+            req.body.token,
+            false,
+            req.body.staging === true ? true : false
+          );
+        }
 
         if (!req.body.actually_migrate) {
           res.json({
@@ -462,30 +466,20 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           return;
         }
 
-        let subscriptionDate = subscription.current_period_start;
-        let billingCycleAnchor = subscription.current_period_end;
-
-        let deletedSubscription = await req.stripe.subscriptions.del(
-          user.stripeCustomerSubscriptionId
+        subscription = await req.stripe.subscriptions.update(
+          user.stripeCustomerSubscriptionId,
+          {
+            billing_cycle_anchor: "now",
+            cancel_at_period_end: false,
+            items: [
+              ...items.data.map((item) => ({
+                price: item.id,
+              })),
+              ...payAsYouGoItems,
+            ],
+            expand: ["latest_invoice.payment_intent"],
+          }
         );
-
-        migration.push(deletedSubscription);
-
-        subscription = await req.stripe.subscriptions.create({
-          cancel_at_period_end: false,
-          customer: user.stripeCustomerId,
-          backdate_start_date:
-            req.body.staging === true ? 1690934400 : subscriptionDate,
-          billing_cycle_anchor:
-            req.body.staging === true ? 1693612800 : billingCycleAnchor,
-          items: [
-            ...items.data.map((item) => ({
-              price: item.id,
-            })),
-            ...payAsYouGoItems,
-          ],
-          expand: ["latest_invoice.payment_intent"],
-        });
 
         migration.push(
           `User ${user.email} has been updated to ${subscription.id}`
@@ -535,13 +529,17 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
     return;
   }
 
-  let usageReport = await reportUsageForUser(
-    req,
-    user,
-    req.body.token,
-    true,
-    req.body.staging === true ? true : false
-  );
+  let usageReport;
+
+  if (req.body.usageReport) {
+    usageReport = await reportUsageForUser(
+      req,
+      user,
+      req.body.token,
+      true,
+      req.body.staging === true ? true : false
+    );
+  }
 
   migration.push(
     `User ${user.email} has been subscribed to pay as you go plans`
