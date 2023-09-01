@@ -436,7 +436,7 @@ const PlanForm = ({
                     You are currently using the{" "}
                     {products[stripeProductId]?.name} plan. Do you want to{" "}
                     {products[stripeProductId].order <
-                    products[stripeProductId]?.order
+                    products[user.stripeProductId]?.order
                       ? "downgrade"
                       : "upgrade"}{" "}
                     to the {products[stripeProductId].name} plan?
