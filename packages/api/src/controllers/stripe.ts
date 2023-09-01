@@ -87,7 +87,7 @@ async function reportUsageForUser(
   actuallyReport: boolean = true,
   forceReport: boolean = false
 ) {
-  if (user.email.endsWith("@livepeer.org") || (user.admin && !forceReport)) {
+  if (!forceReport && (user.email.endsWith("@livepeer.org") || user.admin)) {
     return {
       id: user.id,
       overUsage: {},

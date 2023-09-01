@@ -106,7 +106,7 @@ app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     ingests[0].origin,
-    req.token
+    req.token.id
   );
 
   res.status(200);
@@ -141,7 +141,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     ingests[0].origin,
-    req.token
+    req.token.id
   );
 
   const overage = await calculateOverUsage(
