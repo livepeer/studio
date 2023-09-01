@@ -472,12 +472,20 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             billing_cycle_anchor: "now",
             cancel_at_period_end: false,
             items: [
+              ...subscriptionItems.data.map((item) => {
+                const isMetered = item.price.recurring.usage_type === "metered";
+                return {
+                  id: item.id,
+                  deleted: true,
+                  clear_usage: isMetered ? true : undefined,
+                  price: item.price.id,
+                };
+              }),
               ...items.data.map((item) => ({
                 price: item.id,
               })),
               ...payAsYouGoItems,
             ],
-            expand: ["latest_invoice.payment_intent"],
           }
         );
 
@@ -495,6 +503,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
 
         migration.push(`User ${user.email} has been updated in the database`);
       } catch (e) {
+        console.log(e);
         console.log(`
               Unable to subscribe hacker user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
             `);
