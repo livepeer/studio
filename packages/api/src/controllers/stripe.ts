@@ -9,6 +9,7 @@ import { sendgridEmailPaymentFailed } from "./helpers";
 import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { authorizer } from "../middleware";
+import { getBillingUsage, calculateOverUsage } from "./usage";
 
 const app = Router();
 
@@ -83,9 +84,10 @@ async function reportUsageForUser(
   req: Request,
   user: WithID<User>,
   adminToken: string,
-  actuallyReport: boolean = true
+  actuallyReport: boolean = true,
+  forceReport: boolean = false
 ) {
-  if (user.email.endsWith("@livepeer.org") || user.admin) {
+  if (user.email.endsWith("@livepeer.org") || (user.admin && !forceReport)) {
     return {
       id: user.id,
       overUsage: {},
@@ -220,60 +222,6 @@ const sendUsageRecordToStripe = async (
       }
     })
   );
-};
-
-const calculateOverUsage = async (product, usage) => {
-  let limits: any = {};
-
-  if (product?.usage) {
-    product.usage.forEach((item) => {
-      if (item.name.toLowerCase() === "transcoding")
-        limits.transcoding = item.limit;
-      if (item.name.toLowerCase() === "delivery") limits.streaming = item.limit;
-      if (item.name.toLowerCase() === "storage") limits.storage = item.limit;
-    });
-  }
-
-  const overUsage = {
-    TotalUsageMins: Math.max(
-      usage?.TotalUsageMins - (limits.transcoding || 0),
-      0
-    ),
-    DeliveryUsageMins: Math.max(
-      usage?.DeliveryUsageMins - (limits.streaming || 0),
-      0
-    ),
-    StorageUsageMins: Math.max(
-      usage?.StorageUsageMins - (limits.storage || 0),
-      0
-    ),
-  };
-
-  return overUsage;
-};
-
-const getBillingUsage = async (
-  userId,
-  fromTime,
-  toTime,
-  baseUrl,
-  adminToken
-) => {
-  // Fetch usage data from /data/usage endpoint
-  const usage = await fetch(
-    `${baseUrl}/api/data/usage/query?${qs.stringify({
-      from: fromTime,
-      to: toTime,
-      userId: userId,
-    })}`,
-    {
-      headers: {
-        Authorization: `Bearer ${adminToken}`,
-      },
-    }
-  ).then((res) => res.json());
-
-  return usage;
 };
 
 // Webhook handler for asynchronous events called by stripe on invoice generation
@@ -494,7 +442,8 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           req,
           user,
           req.body.token,
-          false
+          false,
+          req.body.staging === true ? true : false
         );
 
         if (!req.body.actually_migrate) {
@@ -586,7 +535,13 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
     return;
   }
 
-  let usageReport = await reportUsageForUser(req, user, req.body.token, true);
+  let usageReport = await reportUsageForUser(
+    req,
+    user,
+    req.body.token,
+    true,
+    req.body.staging === true ? true : false
+  );
 
   migration.push(
     `User ${user.email} has been subscribed to pay as you go plans`
