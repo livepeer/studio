@@ -429,9 +429,15 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         console.log(`
               Unable to subscribe hacker user  to pay as you go plans - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
             `);
-        await db.user.update(user.id, {
-          migrated: true,
-        });
+        if (invoiceUsage) {
+          await db.user.update(user.id, {
+            migrationInvoice: true,
+          });
+        } else {
+          await db.user.update(user.id, {
+            migrated: true,
+          });
+        }
         res.json({
           errors: [
             `Unable to subscribe hacker user  to pay as you go plans - subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
@@ -444,9 +450,15 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         console.log(`
               Unable to subscribe hacker user to pay as you go plans - user=${user.id} has a status=${subscription.status} subscription
             `);
-        await db.user.update(user.id, {
-          migrated: true,
-        });
+        if (invoiceUsage) {
+          await db.user.update(user.id, {
+            migrationInvoice: true,
+          });
+        } else {
+          await db.user.update(user.id, {
+            migrated: true,
+          });
+        }
         res.json({
           errors: [
             `Unable to subscribe hacker user  to pay as you go plans - user=${user.id} has a status=${subscription.status} subscription`,
@@ -506,7 +518,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           return;
         }
 
-        let subItems;
+        let subItems = [];
         if (!invoiceUsage) {
           subItems = subscriptionItems.data.map((item) => {
             const isMetered = item.price.recurring.usage_type === "metered";
@@ -521,6 +533,14 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             `User ${user.email} has been updated to ${subscription.id}`
           );
         } else {
+          subItems = subscriptionItems.data.map((item) => {
+            return {
+              id: item.id,
+              deleted: true,
+              clear_usage: false,
+              price: item.price.id,
+            };
+          });
           migration.push(
             `User ${user.email} has been invoiced for usage ${subscription.id}`
           );
@@ -570,18 +590,30 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
             `Unable to subscribe hacker user - cannot update the user subscription or update the user data user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
           ],
         });
-        await db.user.update(user.id, {
-          migrated: true,
-        });
+        if (invoiceUsage) {
+          await db.user.update(user.id, {
+            migrationInvoice: true,
+          });
+        } else {
+          await db.user.update(user.id, {
+            migrated: true,
+          });
+        }
         return;
       }
     } else {
       res.json({
         errors: [`Unable to subscribe hacker user - user is not a hacker user`],
       });
-      await db.user.update(user.id, {
-        migrated: true,
-      });
+      if (invoiceUsage) {
+        await db.user.update(user.id, {
+          migrationInvoice: true,
+        });
+      } else {
+        await db.user.update(user.id, {
+          migrated: true,
+        });
+      }
       return;
     }
   } else {
@@ -590,9 +622,15 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
         `Unable to migrate personal user - customer not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}`,
       ],
     });
-    await db.user.update(user.id, {
-      migrated: true,
-    });
+    if (invoiceUsage) {
+      await db.user.update(user.id, {
+        migrationInvoice: true,
+      });
+    } else {
+      await db.user.update(user.id, {
+        migrated: true,
+      });
+    }
     return;
   }
 
