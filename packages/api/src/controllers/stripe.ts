@@ -428,7 +428,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
   });
 
   if (data.length > 0) {
-    if (user.stripeProductId === hackerPlan) {
+    if (user.stripeProductId == hackerPlan || req.body.userId != null) {
       migration.push(
         `User ${user.email} is subscribing to pay as you go from ${user.stripeProductId}`
       );
@@ -513,29 +513,27 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
           return;
         }
 
-        subscription = await req.stripe.subscriptions.update(
-          user.stripeCustomerSubscriptionId,
-          {
-            proration_behavior: "none",
-            cancel_at_period_end: false,
-            items: [
-              ...subscriptionItems.data.map((item) => {
-                // Check if the item is metered
-                const isMetered = item.price.recurring.usage_type === "metered";
-                return {
-                  id: item.id,
-                  deleted: true,
-                  clear_usage: isMetered ? true : undefined, // If metered, clear usage
-                  price: item.price.id,
-                };
-              }),
-              ...items.data.map((item) => ({
-                price: item.id,
-              })),
-              ...payAsYouGoItems,
-            ],
-          }
+        let subscriptionDate = subscription.current_period_start;
+
+        let deletedSubscription = await req.stripe.subscriptions.del(
+          user.stripeCustomerSubscriptionId
         );
+
+        migration.push(deletedSubscription);
+
+        subscription = await req.stripe.subscriptions.create({
+          cancel_at_period_end: false,
+          customer: user.stripeCustomerId,
+          backdate_start_date:
+            req.body.staging === true ? 1690934400 : subscriptionDate,
+          items: [
+            ...items.data.map((item) => ({
+              price: item.id,
+            })),
+            ...payAsYouGoItems,
+          ],
+          expand: ["latest_invoice.payment_intent"],
+        });
 
         migration.push(
           `User ${user.email} has been updated to ${subscription.id}`
@@ -566,9 +564,7 @@ app.post("/hacker/migration/pay-as-you-go", async (req, res) => {
       }
     } else {
       res.json({
-        errors: [
-          `Unable to subscribe hacker user - user is already subscribed to ${user.stripeProductId}`,
-        ],
+        errors: [`Unable to subscribe hacker user - user is not a hacker user`],
       });
       await db.user.update(user.id, {
         migrated: true,
