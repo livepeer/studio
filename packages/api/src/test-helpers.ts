@@ -23,7 +23,9 @@ export async function clearDatabase(server: TestServer) {
   const tables = Object.values(schema.components.schemas)
     .map((s) => ("table" in s ? s.table : null))
     .filter((t) => !!t);
-  await Promise.all(tables.map((t) => server.db.query(`TRUNCATE TABLE ${t}`)));
+  await Promise.all(
+    tables.map((t) => server?.db?.query(`TRUNCATE TABLE ${t}`))
+  );
 }
 
 export function verifyJwt(
