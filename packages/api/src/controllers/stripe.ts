@@ -330,7 +330,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 app.post(
-  "/subscribe-to-enterprise",
+  "/user/subscribe/enterprise",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
     let enterprisePlan = "prod_OTTbwpzxNLMNSh";
