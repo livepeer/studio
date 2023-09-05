@@ -46,6 +46,7 @@ export default class WebhookCannon {
   supportAddr: [string, string];
   vodCatalystObjectStoreId: string;
   recordCatalystObjectStoreId: string;
+  secondaryRecordObjectStoreId: string;
   resolver: any;
   queue: Queue;
   constructor({
@@ -56,6 +57,7 @@ export default class WebhookCannon {
     supportAddr,
     vodCatalystObjectStoreId,
     recordCatalystObjectStoreId,
+    secondaryRecordObjectStoreId,
     verifyUrls,
     queue,
   }) {
@@ -68,6 +70,7 @@ export default class WebhookCannon {
     this.supportAddr = supportAddr;
     this.vodCatalystObjectStoreId = vodCatalystObjectStoreId;
     this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
+    this.secondaryRecordObjectStoreId = secondaryRecordObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
@@ -558,16 +561,44 @@ export default class WebhookCannon {
 
       const os = await db.objectStore.get(this.recordCatalystObjectStoreId);
       // we can't rate limit this task because it's not a user action
+      let url = pathJoin(
+        os.publicUrl,
+        session.playbackId,
+        session.id,
+        "output.m3u8"
+      );
+
+      const secondaryOs = await db.objectStore.get(
+        this.secondaryRecordObjectStoreId
+      );
+      if (secondaryOs) {
+        let params = {
+          method: "GET",
+          timeout: 5 * 1000,
+        };
+        const resp = await fetchWithTimeout(url, params);
+        // TODO remove
+        console.log("check recording url", "url", url, "status", resp.status);
+        if (resp.status != 200) {
+          url = pathJoin(
+            secondaryOs.publicUrl,
+            session.playbackId,
+            session.id,
+            "output.m3u8"
+          );
+        }
+      } else {
+        // TODO remove
+        console.log("secondary os not found");
+      }
+      // TODO remove
+      console.log("using recording url", "url", url);
+
       await taskScheduler.createAndScheduleTask(
         "upload",
         {
           upload: {
-            url: pathJoin(
-              os.publicUrl,
-              session.playbackId,
-              session.id,
-              "output.m3u8"
-            ),
+            url: url,
           },
         },
         undefined,
