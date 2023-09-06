@@ -282,7 +282,7 @@ export const makeUserEnterprise = async (
 ): Promise<[Response, User | ApiError]> => {
   const [res, body] = await context.fetch("/stripe/user/subscribe/enterprise", {
     method: "POST",
-    body: JSON.stringify({ userId: userId }),
+    body: JSON.stringify({ userId: userId, actually_migrate: true }),
     headers: {
       "content-type": "application/json",
     },
