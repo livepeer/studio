@@ -594,6 +594,7 @@ export async function storeTriggerStatus(
 ): Promise<void> {
   try {
     let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+    let encodedResponseBody = Buffer.from(responseBody).toString("base64");
     if (statusCode >= 300 || !statusCode) {
       status = {
         ...status,
@@ -601,7 +602,7 @@ export async function storeTriggerStatus(
           timestamp: triggerTime,
           statusCode,
           error: errorMessage,
-          response: responseBody,
+          response: encodedResponseBody,
         },
       };
     }
