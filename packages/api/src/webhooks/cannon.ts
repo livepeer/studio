@@ -469,6 +469,8 @@ export default class WebhookCannon {
   ) {
     try {
       const hrDuration = process.hrtime(startTime);
+      let encodedResponseBody = Buffer.from(responseBody).toString("base64");
+
       await this.db.webhookResponse.create({
         id: uuid(),
         webhookId: webhook.id,
@@ -477,7 +479,7 @@ export default class WebhookCannon {
         duration: hrDuration[0] + hrDuration[1] / 1e9,
         statusCode: resp.status,
         response: {
-          body: responseBody,
+          body: encodedResponseBody,
           headers: resp.headers.raw(),
           redirected: resp.redirected,
           status: resp.status,
