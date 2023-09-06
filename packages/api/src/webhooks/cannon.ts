@@ -572,14 +572,8 @@ export default class WebhookCannon {
         this.secondaryRecordObjectStoreId
       );
       if (secondaryOs) {
-        let params = {
-          method: "GET",
-          timeout: 5 * 1000,
-        };
-        const resp = await fetchWithTimeout(url, params);
-        // TODO remove
-        console.log("check recording url", "url", url, "status", resp.status);
-        if (resp.status != 200) {
+        const exists = await checkUrlExists(url);
+        if (!exists) {
           url = pathJoin(
             secondaryOs.publicUrl,
             session.playbackId,
@@ -587,12 +581,7 @@ export default class WebhookCannon {
             "output.m3u8"
           );
         }
-      } else {
-        // TODO remove
-        console.log("secondary os not found");
       }
-      // TODO remove
-      console.log("using recording url", "url", url);
 
       await taskScheduler.createAndScheduleTask(
         "upload",
@@ -614,6 +603,24 @@ export default class WebhookCannon {
       }
     }
   }
+}
+
+async function checkUrlExists(url) {
+  try {
+    let params = {
+      method: "HEAD",
+      timeout: 5 * 1000,
+    };
+    const resp = await fetchWithTimeout(url, params);
+
+    if (resp.status == 200) {
+      return true;
+    }
+  } catch (e) {
+    console.log("error fetching " + url, e);
+    return false;
+  }
+  return false;
 }
 
 export async function storeTriggerStatus(
