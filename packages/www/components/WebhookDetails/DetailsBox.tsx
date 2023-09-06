@@ -8,6 +8,21 @@ const Cell = styled(Text, {
   fontSize: "$3",
 });
 
+function base64Decode(input: string) {
+  const base64Pattern =
+    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+  if (base64Pattern.test(input)) {
+    try {
+      if (typeof window !== "undefined" && typeof window.atob === "function") {
+        return window.atob(input);
+      }
+    } catch (e) {
+      console.error("Failed to decode base64 string", e);
+    }
+  }
+  return input; // return the original string if not base64 or if decoding fails
+}
+
 const DetailsBox = ({ data }) => (
   <Box
     css={{
@@ -91,7 +106,7 @@ const DetailsBox = ({ data }) => (
           css={{
             fontFamily: "monospace",
           }}>
-          {data.status.lastFailure.response}
+          {base64Decode(data.status.lastFailure.response)}
         </Cell>
       </>
     ) : (
