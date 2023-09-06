@@ -259,6 +259,9 @@ app.post(
     try {
       const triggerTime = response.createdAt ?? Date.now();
       let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+      let responseBody = response.response.body;
+      let encodedResponseBody = Buffer.from(responseBody).toString("base64");
+
       if (
         response.statusCode >= 300 ||
         !response.statusCode ||
@@ -270,7 +273,7 @@ app.post(
             error: errorMessage,
             timestamp: triggerTime,
             statusCode: response.statusCode,
-            response: response.response.body,
+            response: encodedResponseBody,
           },
         };
       }
