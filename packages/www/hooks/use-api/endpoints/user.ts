@@ -277,6 +277,26 @@ export const makeUserAdmin = async (
   return res;
 };
 
+export const makeUserEnterprise = async (
+  userId
+): Promise<[Response, User | ApiError]> => {
+  const [res, body] = await context.fetch("/stripe/user/subscribe/enterprise", {
+    method: "POST",
+    body: JSON.stringify({ userId: userId }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  setState((state) => ({ ...state, userRefresh: Date.now() }));
+
+  if (res.status !== 201) {
+    return body;
+  }
+
+  return res;
+};
+
 export const setUserSuspended = async (
   userId: string,
   payload: SuspendUserPayload
