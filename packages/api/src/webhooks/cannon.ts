@@ -568,9 +568,9 @@ export default class WebhookCannon {
         "output.m3u8"
       );
 
-      const secondaryOs = await db.objectStore.get(
-        this.secondaryRecordObjectStoreId
-      );
+      const secondaryOs = this.secondaryRecordObjectStoreId
+        ? await db.objectStore.get(this.secondaryRecordObjectStoreId)
+        : undefined;
       if (secondaryOs) {
         const exists = await checkUrlExists(url);
         if (!exists) {
