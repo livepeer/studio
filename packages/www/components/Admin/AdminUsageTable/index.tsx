@@ -95,22 +95,43 @@ const Index = ({ id }: { id: string }, children) => {
           Get usage
         </Button>
       </Box>
-      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto" }}>
+      <Table
+        sx={{
+          border: "1px solid #e0e0e0",
+          gridTemplateColumns: "auto auto auto auto auto",
+          gap: "1rem",
+        }}>
         <>
-          <TableRow variant={TableRowVariant.Header} key="usage header">
+          <TableRow
+            variant={TableRowVariant.Header}
+            key="usage header"
+            sx={{ background: "#f7f7f7", fontWeight: "bold" }}>
             <>
-              <Box></Box>
-              <Box>Transcoding</Box>
-              <Box>Delivery</Box>
-              <Box>Storage</Box>
+              <Box sx={{ padding: "0.5rem" }}>Category</Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "center" }}>
+                Transcoding
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "center" }}>
+                Delivery
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "center" }}>Storage</Box>
             </>
           </TableRow>
-          <TableRow key="just one row for now" variant={TableRowVariant.Normal}>
+          <TableRow
+            key="just one row for now"
+            variant={TableRowVariant.Normal}
+            sx={{ borderBottom: "1px solid #e0e0e0" }}>
             <>
-              <Box></Box>
-              <Box>{usage && usage.TotalUsageMins}</Box>
-              <Box>{usage && usage.DeliveryUsageMins}</Box>
-              <Box>{usage && usage.StorageUsageMins}</Box>
+              <Box sx={{ padding: "0.5rem" }}>Values</Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "right" }}>
+                {usage && usage.TotalUsageMins}
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "right" }}>
+                {usage && usage.DeliveryUsageMins}
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "right" }}>
+                {usage && usage.StorageUsageMins}
+              </Box>
             </>
           </TableRow>
         </>
