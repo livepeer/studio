@@ -259,6 +259,7 @@ app.post(
     try {
       const triggerTime = response.createdAt ?? Date.now();
       let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+
       if (
         response.statusCode >= 300 ||
         !response.statusCode ||

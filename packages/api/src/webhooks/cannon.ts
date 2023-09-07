@@ -472,6 +472,8 @@ export default class WebhookCannon {
   ) {
     try {
       const hrDuration = process.hrtime(startTime);
+      let encodedResponseBody = Buffer.from(responseBody).toString("base64");
+
       await this.db.webhookResponse.create({
         id: uuid(),
         webhookId: webhook.id,
@@ -480,7 +482,7 @@ export default class WebhookCannon {
         duration: hrDuration[0] + hrDuration[1] / 1e9,
         statusCode: resp.status,
         response: {
-          body: responseBody,
+          body: encodedResponseBody,
           headers: resp.headers.raw(),
           redirected: resp.redirected,
           status: resp.status,
@@ -619,6 +621,7 @@ export async function storeTriggerStatus(
 ): Promise<void> {
   try {
     let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+    let encodedResponseBody = Buffer.from(responseBody).toString("base64");
     if (statusCode >= 300 || !statusCode) {
       status = {
         ...status,
@@ -626,7 +629,7 @@ export async function storeTriggerStatus(
           timestamp: triggerTime,
           statusCode,
           error: errorMessage,
-          response: responseBody,
+          response: encodedResponseBody,
         },
       };
     }
