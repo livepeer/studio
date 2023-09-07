@@ -46,6 +46,7 @@ export default class WebhookCannon {
   supportAddr: [string, string];
   vodCatalystObjectStoreId: string;
   recordCatalystObjectStoreId: string;
+  secondaryRecordObjectStoreId: string;
   resolver: any;
   queue: Queue;
   constructor({
@@ -56,6 +57,7 @@ export default class WebhookCannon {
     supportAddr,
     vodCatalystObjectStoreId,
     recordCatalystObjectStoreId,
+    secondaryRecordObjectStoreId,
     verifyUrls,
     queue,
   }) {
@@ -68,6 +70,7 @@ export default class WebhookCannon {
     this.supportAddr = supportAddr;
     this.vodCatalystObjectStoreId = vodCatalystObjectStoreId;
     this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
+    this.secondaryRecordObjectStoreId = secondaryRecordObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
@@ -558,16 +561,38 @@ export default class WebhookCannon {
 
       const os = await db.objectStore.get(this.recordCatalystObjectStoreId);
       // we can't rate limit this task because it's not a user action
+      let url = pathJoin(
+        os.publicUrl,
+        session.playbackId,
+        session.id,
+        "output.m3u8"
+      );
+
+      const secondaryOs = this.secondaryRecordObjectStoreId
+        ? await db.objectStore.get(this.secondaryRecordObjectStoreId)
+        : undefined;
+      if (secondaryOs) {
+        let params = {
+          method: "HEAD",
+          timeout: 5 * 1000,
+        };
+        const resp = await fetchWithTimeout(url, params);
+
+        if (resp.status != 200) {
+          url = pathJoin(
+            secondaryOs.publicUrl,
+            session.playbackId,
+            session.id,
+            "output.m3u8"
+          );
+        }
+      }
+
       await taskScheduler.createAndScheduleTask(
         "upload",
         {
           upload: {
-            url: pathJoin(
-              os.publicUrl,
-              session.playbackId,
-              session.id,
-              "output.m3u8"
-            ),
+            url: url,
           },
         },
         undefined,

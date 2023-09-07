@@ -296,6 +296,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "object store ID used by Catalyst to store recordings",
         type: "string",
       },
+      secondaryRecordObjectStoreId: {
+        describe:
+          "secondary object store ID used by Catalyst to store recordings",
+        type: "string",
+      },
       catalystBaseUrl: {
         describe: "base URL of Catalyst",
         type: "string",
