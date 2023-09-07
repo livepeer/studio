@@ -216,7 +216,8 @@ export const getBillingUsage = async (
   fromTime: number,
   toTime: number,
   creatorId?: number,
-  timeStep?: string
+  timeStep?: string,
+  userId?: string
 ): Promise<[Response, BillingUsageData | ApiError]> => {
   let [res, usage] = await context.fetch(
     `/data/usage/query?${qs.stringify({
@@ -224,6 +225,7 @@ export const getBillingUsage = async (
       to: toTime,
       creatorId,
       timeStep,
+      userId,
     })}`,
     {}
   );

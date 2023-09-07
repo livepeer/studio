@@ -20,7 +20,7 @@ const Index = ({ id }: { id: string }, children) => {
   const [toTime, setToTime] = useState("");
   const [usage, setUsage] = useState(null);
   const [users, setUsers] = useState([]);
-  const { getUsers, getUsage } = useApi();
+  const { getUsers, getUsage, getBillingUsage } = useApi();
   useEffect(() => {
     getUsers(10000)
       .then((result) => {
@@ -49,7 +49,7 @@ const Index = ({ id }: { id: string }, children) => {
       setMessage(`Invalid date ${toTime}`);
       return;
     }
-    const [res, usage] = await getUsage(ftd, ttd, userId);
+    const [res, usage] = await getBillingUsage(ftd, ttd, null, null, userId);
     if (res.status == 200) {
       console.log(`got usage data:`, usage);
       setUsage(usage);
@@ -100,19 +100,17 @@ const Index = ({ id }: { id: string }, children) => {
           <TableRow variant={TableRowVariant.Header} key="usage header">
             <>
               <Box></Box>
-              <Box>Source seconds</Box>
-              <Box>Transcoded seconds</Box>
-              <Box>Source segments</Box>
-              <Box>Transcoded segments</Box>
+              <Box>Transcoding</Box>
+              <Box>Delivery</Box>
+              <Box>Storage</Box>
             </>
           </TableRow>
           <TableRow key="just one row for now" variant={TableRowVariant.Normal}>
             <>
               <Box></Box>
-              <Box>{dur2str(usage && usage.sourceSegmentsDuration)}</Box>
-              <Box>{dur2str(usage && usage.transcodedSegmentsDuration)}</Box>
-              <Box>{usage && usage.sourceSegments}</Box>
-              <Box>{usage && usage.transcodedSegments}</Box>
+              <Box>{usage && usage.TotalUsageMins}</Box>
+              <Box>{usage && usage.DeliveryUsageMins}</Box>
+              <Box>{usage && usage.StorageUsageMins}</Box>
             </>
           </TableRow>
         </>
