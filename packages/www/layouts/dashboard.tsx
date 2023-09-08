@@ -11,7 +11,6 @@ import { useEffect, useMemo } from "react";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
-import { DashboardRedirect } from "components/Redirect";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -94,7 +93,6 @@ function DashboardLayout({
 
   return (
     <>
-      {requireLoggedIn && <DashboardRedirect />}
       <Box className="dashboard">
         <Elements stripe={stripePromise}>
           <Head>
