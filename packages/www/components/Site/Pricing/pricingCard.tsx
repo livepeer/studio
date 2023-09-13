@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ReactNode } from "react";
 import { Box, Flex, Text, Button, Link as A } from "@livepeer/design-system";
 
