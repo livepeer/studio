@@ -87,7 +87,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             }}>
             Create an account.
           </Text>
-          <BroadcastingProvider />
+
           <Text
             variant="neutral"
             size={1}

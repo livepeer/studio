@@ -2,7 +2,7 @@ import { Global } from "@emotion/core";
 import React, { memo } from "react";
 import { useThemeUI, ThemeProvider as TP, Styled } from "theme-ui";
 
-export const DEFAULT_THEME = "system";
+export const DEFAULT_THEME = "light";
 
 export const theme = {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],

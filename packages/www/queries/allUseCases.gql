@@ -1,5 +1,5 @@
-query allUseCase($where: UseCaseFilter) {
-  allUseCase(where: $where) {
+query allUseCase {
+  allUseCase {
     _id
     title
     slug {

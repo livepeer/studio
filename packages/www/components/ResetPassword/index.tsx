@@ -75,33 +75,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
               textTransform: "uppercase",
               fontWeight: 600,
             }}>
-            Broadcasting provider
-          </Text>
-          <TextField
-            readOnly
-            size="3"
-            id="email"
-            css={{
-              width: "100%",
-              bc: "$neutral2",
-              mb: "$4",
-              color: "$neutral11",
-              fontSize: "$2",
-            }}
-            name="broadcastingProvider"
-            type="text"
-            required
-            value="Livepeer Inc"
-          />
-          <Text
-            variant="neutral"
-            size={1}
-            css={{
-              mb: "$1",
-              fontSize: "11px",
-              textTransform: "uppercase",
-              fontWeight: 600,
-            }}>
             Password
           </Text>
           <Box css={{ position: "relative", width: "100%" }}>

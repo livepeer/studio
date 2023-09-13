@@ -1,4 +1,10 @@
-import { Box, Flex, Link as A, Container } from "@livepeer/design-system";
+import {
+  Box,
+  Button,
+  Flex,
+  Link as A,
+  Container,
+} from "@livepeer/design-system";
 import { useApi } from "hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import Menu from "./mobile/menu";
@@ -68,14 +74,8 @@ const NavigationBase = ({
         <Box
           css={{
             position: "relative",
-            mt: navBackgroundColor === "transparent" ? 0 : "$3",
-            borderRadius: 40,
-            "@bp1": {
-              mt: "$3",
-            },
             ...css,
           }}>
-          <CutOut backgroundColor={navBackgroundColor} />
           <Box
             css={{
               mx: "$3",
@@ -103,7 +103,7 @@ const NavigationBase = ({
                     justifyContent: "flex-end",
                     minWidth: sidesWidth,
                     lineHeight: 1,
-                    mr: 42,
+                    mr: 20,
                   }}>
                   {links.map((link, i) => {
                     return (
@@ -116,96 +116,28 @@ const NavigationBase = ({
                           target={link.isExternal ? "_blank" : null}
                           css={{
                             display: "block",
-                            fontSize: "$4",
+                            fontSize: "$3",
                             fontWeight: 500,
                             textDecoration: "none",
                             mx: "$3",
                             lineHeight: 1,
-                            color:
-                              navBackgroundColor === "transparent"
-                                ? "$hiContrast"
-                                : "$loContrast",
-                            textTransform: "uppercase",
+                            color: "$hiContrast",
                           }}>
                           {link.children}
                         </A>
                       </Link>
                     );
                   })}
-                  <Box css={{ mx: "$3" }}>
-                    <RegionSelector navBackgroundColor={navBackgroundColor} />
-                  </Box>
                 </Flex>
 
                 <Flex>
                   {!loggedIn && (
                     <>
-                      <Link href="/" passHref legacyBehavior>
-                        <A
-                          css={{
-                            fontSize: "$4",
-                            fontWeight: 500,
-                            textDecoration: "none",
-                            textTransform: "uppercase",
-                            display: "none",
-                            position: "relative",
-                            "@bp2": {
-                              display: "block",
-                            },
-                            "&:hover": {
-                              textDecoration: "none",
-                            },
-                            "&:after": {
-                              content: '""',
-                              position: "absolute",
-                              left: -14,
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 12,
-                              borderBottomLeftRadius: 4,
-                              borderBottomRightRadius: 4,
-                              zIndex: 1,
-                              top: -14,
-                              bc: "#fff",
-                              height: 48,
-                              width: 80,
-                              transform: "skew(35deg)",
-                              display:
-                                navBackgroundColor === "transparent"
-                                  ? "block"
-                                  : "none",
-                            },
-                            "&:before": {
-                              content: '""',
-                              position: "absolute",
-                              left: 22,
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 12,
-                              borderBottomLeftRadius: 4,
-                              borderBottomRightRadius: 4,
-                              zIndex: 1,
-                              top: -14,
-                              bc: "#fff",
-                              height: 48,
-                              width: 110,
-                              display:
-                                navBackgroundColor === "transparent"
-                                  ? "block"
-                                  : "none",
-                            },
-                          }}>
-                          <Box
-                            css={{
-                              color:
-                                navBackgroundColor === "transparent"
-                                  ? "$loContrast"
-                                  : "$hiContrast",
-                              position: "relative",
-                              zIndex: 2,
-                              width: 122,
-                              textAlign: "center",
-                            }}>
-                            Let's go
-                          </Box>
+                      <Link href="/login" passHref legacyBehavior>
+                        <A>
+                          <Button variant="green" size={3}>
+                            Sign in
+                          </Button>
                         </A>
                       </Link>
                     </>

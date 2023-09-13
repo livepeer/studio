@@ -6,7 +6,7 @@
 
 const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
 const defaultDescription =
-  "Your all-in-one dashboard for building, broadcasting, and publishing video on the open internet with Livepeer Protocol. Effortlessly manage livestreams, video uploads, API keys, network usage, billing, and more.";
+  "Your video streaming platform for building, broadcasting, and publishing video on the open internet with Livepeer Protocol. Effortlessly manage livestreams, video uploads, API keys, network usage, billing, and more.";
 const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
 
 // Main website

@@ -82,6 +82,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             key={`video-swapper-item-${i}`}
             ref={(el) => (videosRef.current[i] = el)}
             css={{
+              filter: "grayscale(75%)",
               position: "absolute",
               top: 0,
               left: 0,
@@ -146,14 +147,14 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               },
               "&:focus": {
                 outline: "none",
-                boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+                boxShadow: "0px 0px 0px 3px $green11",
                 borderColor: "$blue9",
               },
             }}
           />
           <Box
             css={{
-              background: "linear-gradient(180deg, #BD90F2 0%, #6e56cf 100%)",
+              background: "linear-gradient(180deg, $green8 0%, $green11 100%)",
               borderRadius: "50%",
               color: "$primary7",
               height: "42px",

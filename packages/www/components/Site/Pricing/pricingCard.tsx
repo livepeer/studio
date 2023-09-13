@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
-import Button from "components/Site/Button";
-import { justifyContent } from "styled-system";
+import { Box, Flex, Text, Button, Link as A } from "@livepeer/design-system";
 
-export type PricingCard = {
+export type PricingCardProps = {
   pricingTitle: string;
   titleColor?: string;
-  cardBg: string;
-  pricingDescription: string;
-  btn: { href: string; display: string; bg?: string; color?: string };
+  bc: string;
+  pricingDescription: ReactNode | string;
+  btn: { href: string; display: string; bc?: string; color?: string };
   children: ReactNode;
   className?: string;
   color?: string;
@@ -17,73 +15,47 @@ export type PricingCard = {
 
 export type PricingCardContentProps = {
   children?: ReactNode;
-  comingSoon?: boolean;
-  color?: string;
-  customPricing?: boolean;
-  borderColor?: string;
 };
 
-export const PricingCardContent = ({
-  children,
-  comingSoon,
-  customPricing,
-  color = "$hiContrast",
-}: PricingCardContentProps) => {
+export const PricingCardContent = ({ children }: PricingCardContentProps) => {
   return (
     <Box
       css={{
+        position: "relative",
         display: "flex",
         flexDirection: "column",
-        minHeight: "128px",
-        py: "$4",
+        minHeight: 76,
+        py: "$3",
         justifyContent: "center",
         borderTop: `1px solid`,
-        borderColor: "rgba(255,255,255, .15)",
-        color,
+        borderColor: "rgba(255,255,255, .45)",
+        color: "$hiContrast",
       }}>
       {children}
-      {comingSoon ? (
-        <Box
-          css={{
-            fontSize: "$5",
-          }}>
-          Coming soon
-        </Box>
-      ) : customPricing ? (
-        <Box css={{ display: "flex", alignItems: "center" }}>
-          <Box
-            css={{
-              fontSize: "$5",
-              color,
-            }}>
-            Custom pricing
-          </Box>
-        </Box>
-      ) : null}
     </Box>
   );
 };
 
 const PricingCard = ({
   pricingTitle,
-  cardBg,
+  bc,
   pricingDescription,
   btn,
   children,
-  className,
   color = "$hiContrast",
-}: PricingCard) => {
+}: PricingCardProps) => {
   return (
     <Box
-      className={className}
       css={{
         display: "flex",
         width: "100%",
         flexDirection: "column",
-        px: "25px",
-        paddingTop: "25px",
+        px: "16px",
+        pt: "$5",
+        pb: "$7",
         borderRadius: "16px",
-        background: cardBg,
+        bc: bc,
+        textAlign: "center",
       }}>
       <Flex direction="column">
         <Text
@@ -95,31 +67,32 @@ const PricingCard = ({
           {pricingTitle}
         </Text>
         <Text
-          size="4"
+          size="3"
           css={{
             mb: "$4",
             color,
+            fontSize: "$3",
           }}>
           {pricingDescription}
         </Text>
-        <Link href={btn.href} passHref legacyBehavior>
+        <Box as={A} href={btn.href} target="_blank">
           <Button
-            as="a"
-            arrow
+            size={3}
             css={{
-              background: btn.bg,
+              background: btn.bc,
               color: btn.color,
               fontSize: "$3",
               fontWeight: 500,
+              width: "100%",
               "&:hover": {
                 boxShadow: "none",
-                background: btn.bg,
+                background: btn.bc,
                 color: btn.color,
               },
             }}>
             {btn.display}
           </Button>
-        </Link>
+        </Box>
       </Flex>
       <Box css={{ display: "flex", flexDirection: "column" }}>{children}</Box>
     </Box>

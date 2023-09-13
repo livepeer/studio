@@ -305,23 +305,8 @@ let config = {
         permanent: false,
       },
       {
-        source: "/login",
-        destination: "https://livepeer.studio",
-        permanent: false,
-      },
-      {
         source: "/blog",
         destination: "https://medium.com/livepeer-blog",
-        permanent: false,
-      },
-      {
-        source: "/pricing",
-        destination: "https://livepeer.org/pricing",
-        permanent: false,
-      },
-      {
-        source: "/pricing-faq",
-        destination: "https://livepeer.org/pricing",
         permanent: false,
       },
       {

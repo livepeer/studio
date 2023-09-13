@@ -62,19 +62,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
         position: "relative",
         width: "100%",
       }}>
-      <Text
-        variant="neutral"
-        size={4}
-        css={{
-          maxWidth: 490,
-          textAlign: "center",
-          mx: "auto",
-          mb: "$7",
-        }}>
-        Your all-in-one dashboard for building, broadcasting, and publishing
-        video on the open internet with Livepeer Protocol. Effortlessly manage
-        livestreams, video uploads, API keys, network usage, billing, and more.
-      </Text>
       <Box
         css={{
           width: "100%",
@@ -86,7 +73,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           maxWidth: 500,
         }}>
         <form id={id} onSubmit={submit}>
-          <BroadcastingProvider />
           <Text
             variant="neutral"
             size={1}
