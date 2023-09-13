@@ -1,5 +1,5 @@
-import PricingCard, { PricingCardContent } from "./PricingCard";
 import { Box, Grid, Flex, Text, Tooltip } from "@livepeer/design-system";
+import PricingCard, { PricingCardContent } from "components/Site/PricingCard";
 
 const PricingCardsContainer = () => {
   return (
