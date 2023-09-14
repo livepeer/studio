@@ -296,13 +296,6 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Text variant="neutral" css={{ display: "flex", ai: "center" }}>
-          <StyledUpcomingIcon />
-          Upcoming invoice:{" "}
-          <Box css={{ ml: "$1", fontWeight: 600 }}>
-            {usage && `$${upcomingInvoiceTotal}`}
-          </Box>
-        </Text>
         <Link href="/dashboard/billing" passHref legacyBehavior>
           <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
