@@ -114,12 +114,12 @@ const TT = ({ title, value }) => (
       fontSize: "$2",
       fontWeight: 600,
       color: "#71717a",
-      p: "$2",
+      p: "$3",
       cursor: "pointer",
       minWidth: 110,
       "@bp1": {
         fontSize: "$4",
-        p: "$4",
+        p: "$5",
         minWidth: 130,
       },
     }}
@@ -129,18 +129,22 @@ const TT = ({ title, value }) => (
 );
 
 export const StartBuilding = ({ backgroundColor = "$loContrast" }) => (
-  <Box id="start-building" css={{ position: "relative" }}>
+  <Box css={{ position: "relative" }}>
     <Guides backgroundColor={backgroundColor} />
     <Container size={3} css={{ pt: 100, pb: 50, position: "relative" }}>
       <Box css={{ textAlign: "center" }}>
         <Text
-          size={9}
           css={{
-            marginBottom: "$5",
-            maxWidth: 700,
+            mb: "$7",
+            maxWidth: 880,
             mx: "auto",
             lineHeight: 1,
             fontWeight: 700,
+            fontSize: "$8",
+            "@bp2": {
+              fontSize: 50,
+              letterSpacing: "-2px",
+            },
           }}>
           One API for all your video workflows
         </Text>
