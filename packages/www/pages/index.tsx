@@ -19,9 +19,7 @@ const benefitsListItems = [
       <Box>
         Save up to 90% on costs with{" "}
         <Link href="/pricing" passHref legacyBehavior>
-          <A variant="primary" css={{ textDecoration: "underline" }}>
-            streamlined pricing
-          </A>
+          <A variant="primary">streamlined pricing</A>
         </Link>{" "}
         that takes advantage of the Livepeer Network's open marketplace of
         infrastructure providers representing access to 70k+ GPUs.
@@ -99,7 +97,7 @@ const HomePage = () => {
       <Investors backgroundColor="rgb(30 30 33)" />
       <Testimonials /> */}
 
-      <Contact backgroundColor="$panel" />
+      {/* <Contact backgroundColor="$panel" /> */}
       <Prefooter />
     </Layout>
   );

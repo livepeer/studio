@@ -43,9 +43,9 @@ const Why = ({
       <Box
         css={{
           position: "relative",
-          py: 60,
+          pt: 60,
           "@bp2": {
-            py: 120,
+            pt: 120,
           },
         }}>
         <Container

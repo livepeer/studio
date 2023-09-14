@@ -65,29 +65,15 @@ const ContactPage = () => {
               css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}>
               <Box css={{ mb: "$5", textAlign: "center" }}>
                 <Text
-                  size="8"
-                  as="h1"
-                  css={{
-                    textTransform: "uppercase",
-                    mb: "$5",
-                    fontWeight: 700,
-                    width: 150,
-                    mx: "auto",
-                    lineHeight: "30px",
-                    textAlign: "center",
-                  }}>
-                  Livepeer Studio
-                </Text>
-                <Text
                   variant="neutral"
-                  size={6}
+                  size={8}
                   css={{
                     maxWidth: 460,
                     textAlign: "center",
                     mx: "auto",
                     mb: "$7",
                   }}>
-                  Get in touch.
+                  Speak with a Livepeer expert
                 </Text>
               </Box>
               <Grid
