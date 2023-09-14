@@ -491,7 +491,7 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
           );
         } else if (fv.type === "full-text") {
           q.push(
-            sql``.append(fv.val).append(sql` LIKE ${"%" + filter.value + "%"}`)
+            sql``.append(fv.val).append(sql` ILIKE ${"%" + filter.value + "%"}`)
           );
         } else if (isObject(filter.value)) {
           // if value is a dictionary
