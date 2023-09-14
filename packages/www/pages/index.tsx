@@ -21,7 +21,7 @@ const benefitsListItems = [
       <Box>
         Save up to 90% on costs with{" "}
         <Link href="/pricing">
-          <A>streamlined pricing</A>
+          <A variant="primary">streamlined pricing</A>
         </Link>{" "}
         that takes advantage of the Livepeer Network's open marketplace of
         infrastructure providers representing access to 70k+ GPUs.
