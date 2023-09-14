@@ -68,19 +68,6 @@ const ForgotPasswordPage = () => {
                 flexGrow: 1,
                 flexDirection: "column",
               }}>
-              <Text
-                size="8"
-                as="h1"
-                css={{
-                  textTransform: "uppercase",
-                  mb: "$6",
-                  fontWeight: 700,
-                  width: 150,
-                  lineHeight: "30px",
-                  textAlign: "center",
-                }}>
-                Livepeer Studio
-              </Text>
               <ForgotPassword
                 id="forgot-password"
                 buttonText="Email reset link"
@@ -127,5 +114,5 @@ const ForgotPasswordPage = () => {
   );
 };
 
-ForgotPasswordPage.theme = "dark-theme-green";
+ForgotPasswordPage.theme = "light-theme-green";
 export default ForgotPasswordPage;

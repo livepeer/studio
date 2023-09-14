@@ -52,7 +52,7 @@ const VerifyPage = () => {
   );
 };
 
-VerifyPage.theme = "dark-theme-green";
+VerifyPage.theme = "light-theme-green";
 export default VerifyPage;
 
 const Verify = ({

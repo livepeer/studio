@@ -101,7 +101,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
           css={{
             width: "100%",
             mb: "$4",
-            maxWidth: 700,
+            maxWidth: 960,
             mx: "auto",
             pt: 48,
             textAlign: "center",
@@ -123,7 +123,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 mb: "$5",
                 mt: 0,
                 mx: "auto",
-                maxWidth: 900,
+                maxWidth: 700,
                 fontWeight: 700,
                 letterSpacing: "-2px",
                 "@bp1": {
@@ -156,13 +156,12 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 lineHeight: 1.6,
                 mb: "$5",
-                maxWidth: 750,
+                maxWidth: 780,
                 mx: "auto",
               }}>
-              Livepeer Studio is a high-performance and highly affordable
-              end-to-end video streaming platform. Upload, store, transcode, and
-              deliver live and on-demand video with one API, without configuring
-              or maintaining infrastructure.
+              Livepeer Studio is a high-performance video streaming platform
+              that enables developers to build unique live and on-demand video
+              experiences with up to 90% cost savings.
             </Text>
             <Flex align="center" css={{ justifyContent: "center" }}>
               <Link href="/register" passHref>

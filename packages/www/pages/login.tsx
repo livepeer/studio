@@ -56,7 +56,7 @@ const LoginPage = () => {
               flexDirection: "column",
             }}>
             <Text
-              size="7"
+              size="8"
               as="h1"
               css={{
                 mb: "$7",
@@ -112,5 +112,5 @@ const LoginPage = () => {
   );
 };
 
-LoginPage.theme = "dark-theme-green";
+LoginPage.theme = "light-theme-green";
 export default LoginPage;

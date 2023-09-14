@@ -77,15 +77,15 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
         }}>
         <form id={id} onSubmit={submit}>
           <Text
-            variant="neutral"
-            size={5}
+            size="8"
+            as="h1"
             css={{
-              maxWidth: 500,
+              mb: "$7",
+              fontWeight: 500,
+              lineHeight: "30px",
               textAlign: "center",
-              mx: "auto",
-              mb: "$6",
             }}>
-            Create an account.
+            Create an account
           </Text>
 
           <Text

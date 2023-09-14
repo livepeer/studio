@@ -174,5 +174,5 @@ const ContactPage = () => {
   );
 };
 
-ContactPage.theme = "dark-theme-green";
+ContactPage.theme = "light-theme-green";
 export default ContactPage;

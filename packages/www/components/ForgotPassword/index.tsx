@@ -39,16 +39,17 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
         width: "100%",
       }}>
       <Text
-        variant="neutral"
-        size={5}
+        size="8"
+        as="h1"
         css={{
-          maxWidth: 425,
-          textAlign: "center",
-          mx: "auto",
           mb: "$7",
+          fontWeight: 500,
+          lineHeight: "30px",
+          textAlign: "center",
         }}>
         Reset your password.
       </Text>
+
       <Box
         css={{
           width: "100%",
