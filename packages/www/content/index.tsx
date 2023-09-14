@@ -6,7 +6,7 @@
 
 const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
 const defaultDescription =
-  "Your video streaming platform for building, broadcasting, and publishing video on the open internet with Livepeer Protocol. Effortlessly manage livestreams, video uploads, API keys, network usage, billing, and more.";
+  "Livepeer Studio is a high-performance video streaming platform that enables developers to build unique live and on-demand video experiences with up to 90% cost savings.";
 const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
 
 // Main website
