@@ -106,7 +106,7 @@ const App = ({ Component, pageProps }) => {
       <DesignSystemProvider>
         <Theme appearance="light">
           <ThemeProvider
-            forcedTheme={Component.theme || undefined}
+            forcedTheme={DEFAULT_THEME}
             disableTransitionOnChange
             attribute="class"
             defaultTheme={DEFAULT_THEME}

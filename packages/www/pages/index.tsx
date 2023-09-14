@@ -1,8 +1,6 @@
 import Layout from "layouts/main";
 import Prefooter from "components/Site/Prefooter";
 import HomeHero from "components/Site/HomeHero";
-import Investors from "components/Site/Investors";
-import Testimonials from "components/Site/Testimonials";
 import Contact from "components/Site/Contact";
 import Why from "components/Site/Why";
 import OneAPI from "components/Site/OneAPI";
@@ -20,8 +18,10 @@ const benefitsListItems = [
     description: (
       <Box>
         Save up to 90% on costs with{" "}
-        <Link href="/pricing">
-          <A variant="primary">streamlined pricing</A>
+        <Link href="/pricing" passHref legacyBehavior>
+          <A variant="primary" css={{ textDecoration: "underline" }}>
+            streamlined pricing
+          </A>
         </Link>{" "}
         that takes advantage of the Livepeer Network's open marketplace of
         infrastructure providers representing access to 70k+ GPUs.
