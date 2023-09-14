@@ -244,6 +244,23 @@ app.get("/:id", authorizer({ allowUnverified: true }), async (req, res) => {
   res.json(cleanUserFields(user, req.user.admin));
 });
 
+app.delete("/:id", authorizer({ admin: true }), async (req, res) => {
+  const { id } = req.params;
+  const user = await db.user.get(id);
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["user not found"] });
+  }
+  await db.user.delete(id);
+
+  // TODO: remove all streams owned by user
+  // TODO: remove all assets owned by user
+  // TODO: remove the stripe account
+
+  res.status(204);
+  res.end();
+});
+
 app.post("/", validatePost("user"), async (req, res) => {
   const {
     email,
