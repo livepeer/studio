@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import Link from "next/link";
 import { FiChevronDown, FiArrowUpRight } from "react-icons/fi";
+import Guides from "components/Site/Guides";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -71,10 +72,26 @@ const NavigationBase = ({
   }, [token]);
 
   return (
-    <Box css={{ mx: "$3" }}>
+    <Box
+      css={{
+        position: "sticky",
+        pt: 1,
+        zIndex: 100,
+        top: 0,
+        bc: "white",
+        // boxShadow:
+        //   "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px",
+      }}>
+      <Guides backgroundColor={navBackgroundColor} />
       <Container
         size="5"
-        css={{ width: "100%", padding: 0, position: "relative", zIndex: 11 }}>
+        css={{
+          width: "100%",
+          px: "$2",
+          py: 0,
+          position: "relative",
+          zIndex: 11,
+        }}>
         <Box
           css={{
             position: "relative",
@@ -86,7 +103,7 @@ const NavigationBase = ({
             }}>
             <Flex
               css={{
-                pt: "$4",
+                py: "$4",
                 justifyContent: "space-between",
                 ai: "center",
               }}>
@@ -96,7 +113,7 @@ const NavigationBase = ({
                   breadcrumb={breadcrumb}
                 />
               </Box>
-              <Flex align="center" css={{ mt: -6 }}>
+              <Flex align="center">
                 <Flex
                   css={{
                     display: "none",
