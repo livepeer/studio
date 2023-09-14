@@ -4,21 +4,31 @@ const defaultNavProps = {
   links: [
     {
       href: "https://docs.livepeer.studio",
-      children: "Docs",
+      label: "Docs",
       isExternal: true,
     },
     {
+      label: "Use Cases",
       href: "/use-cases",
-      children: "Use Cases",
+      children: [
+        {
+          href: "/social-media",
+          label: "Social Apps",
+        },
+        {
+          href: "/creator-economy",
+          label: "Creator Economy",
+        },
+      ],
     },
     {
       href: "/pricing",
-      children: "Pricing",
+      label: "Pricing",
     },
     {
       isExternal: true,
       href: "https://livepeer.typeform.com/to/HTuUHdDR#lead_source=Website%20-%20Contact%20an%20Expert&contact_owner=xxxxx",
-      children: "Talk to an expert",
+      label: "Talk to an expert",
     },
   ],
 };

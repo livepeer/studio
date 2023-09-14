@@ -21,10 +21,14 @@ const TopNotification = ({ title, link }: TopNotificationProps) => (
       bc: "$neutral3",
       zIndex: 1,
       textAlign: "center",
-      display: "flex",
+      alignItems: "center",
       justifyContent: "center",
+      display: "none",
       py: "$2",
       gap: "$4",
+      "@bp1": {
+        display: "flex",
+      },
     }}>
     {title && <Text sx={{ display: "inline" }}>{title}</Text>}
     {link.isExternal ? (

@@ -1,12 +1,12 @@
 import Layout from "layouts/main";
 import Prefooter from "components/Site/Prefooter";
 import HomeHero from "components/Site/HomeHero";
-import Contact from "components/Site/Contact";
 import Why from "components/Site/Why";
 import OneAPI from "components/Site/OneAPI";
 import { Home as Content } from "content";
 import Link from "next/link";
-import { Box, Link as A } from "@livepeer/design-system";
+import { Button, Box, Link as A } from "@livepeer/design-system";
+import { FiArrowUpRight } from "react-icons/fi";
 
 const benefitsListItems = [
   {
@@ -92,6 +92,13 @@ const HomePage = () => {
           </Box>
         }
         reasons={benefitsListItems}
+        ctas={
+          <Link href="https://livepeer.org" target="_blank">
+            <Button variant="green" size="4" css={{ gap: "$1" }}>
+              Learn more <FiArrowUpRight />
+            </Button>
+          </Link>
+        }
       />
       {/* 
       <Investors backgroundColor="rgb(30 30 33)" />

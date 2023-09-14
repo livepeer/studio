@@ -99,11 +99,12 @@ const Menu = ({
                     mb: "$4",
                     fontSize: "$8",
                     textDecoration: "none",
+                    display: link.children ? "none" : "block",
                     "&:last-of-type": {
                       mb: 0,
                     },
                   }}>
-                  {link.children}
+                  {link.label}
                 </A>
               </Link>
             );

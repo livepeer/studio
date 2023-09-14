@@ -36,17 +36,15 @@ const Why = ({
   heading,
   description = null,
   reasons,
+  ctas,
 }) => {
   return (
-    <Box css={{ position: "relative" }}>
-      <Guides backgroundColor={backgroundColor} />
+    <Box css={{ position: "relative", bc: backgroundColor }}>
+      {/* <Guides backgroundColor={backgroundColor} /> */}
       <Box
         css={{
           position: "relative",
-          pt: 60,
-          "@bp2": {
-            pt: 120,
-          },
+          py: 60,
         }}>
         <Container
           size="3"
@@ -86,11 +84,7 @@ const Why = ({
                 {heading}
               </Heading>
             </Flex>
-            <Link href="https://livepeer.org" target="_blank">
-              <Button variant="green" size="4" css={{ gap: "$1" }}>
-                Learn more <FiArrowUpRight />
-              </Button>
-            </Link>
+            {ctas && ctas}
           </Flex>
           {description && (
             <Text
@@ -161,15 +155,15 @@ const Why = ({
                     position: "relative",
                     fontWeight: 500,
                     mb: "$2",
-                    "&:before": {
-                      position: "absolute",
-                      top: "4px",
-                      left: "-$space$3",
-                      width: "1px",
-                      height: "$3",
-                      backgroundColor: "$green9",
-                      content: '""',
-                    },
+                    // "&:before": {
+                    //   position: "absolute",
+                    //   top: "4px",
+                    //   left: "-$space$3",
+                    //   width: "1px",
+                    //   height: "$3",
+                    //   backgroundColor: "$green9",
+                    //   content: '""',
+                    // },
                   }}>
                   {reason.title}
                 </Text>

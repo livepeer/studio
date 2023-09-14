@@ -7,9 +7,49 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allUseCases from "../../queries/allUseCases.gql";
 import { useRouter } from "next/router";
-import { Box } from "@livepeer/design-system";
+import { Box, Flex, Button, Link as A } from "@livepeer/design-system";
 import { client } from "../../lib/client";
 import imageUrlBuilder from "@sanity/image-url";
+import Link from "next/link";
+import { FiArrowUpRight } from "react-icons/fi";
+
+const ctas = (
+  <Flex
+    align="center"
+    css={{ gap: "$4", ml: "$8", display: "none", "@bp2": { display: "flex" } }}>
+    <Link
+      href="https://livepeer.studio/register"
+      passHref
+      legacyBehavior
+      css={{
+        mb: "$8",
+        textDecoration: "none",
+        "&:hover": {
+          textDecoration: "none",
+        },
+      }}>
+      <Button as={A} variant="green" size="4" css={{ gap: "$2" }}>
+        Start building
+        <FiArrowUpRight />
+      </Button>
+    </Link>
+    <Link
+      href="https://docs.livepeer.org"
+      target="_blank"
+      css={{
+        mb: "$8",
+        textDecoration: "none",
+        "&:hover": {
+          textDecoration: "none",
+        },
+      }}>
+      <Button ghost size="4" css={{ gap: "$2" }}>
+        Read the docs
+        <FiArrowUpRight />
+      </Button>
+    </Link>
+  </Flex>
+);
 
 const UseCase = ({
   metaTitle,
@@ -19,6 +59,7 @@ const UseCase = ({
   hero,
   noindex = false,
   why,
+  features,
   caseStudy,
   preview,
 }) => {
@@ -60,32 +101,39 @@ const UseCase = ({
         tagline="Use cases"
         heading={hero.heading}
         description={hero.description}
-        image={hero.image.asset.url}
+        image={hero.image}
         imageType="rectangle"
         ctas={[
           {
             href: "/register",
-            children: "Start now",
+            children: "Get started",
           },
           {
             href: "/contact",
-            children: "Get in touch",
+            children: "Talk to an expert",
           },
         ]}
       />
       <Why
         backgroundColor="$panel"
-        title="Why Livepeer"
+        title="Why Livepeer Studio"
         heading={why.heading}
         reasons={why.reasons}
+        ctas={ctas}
+      />
+      <Why
+        title="Features"
+        heading={features.heading}
+        reasons={features.reasons}
+        ctas={ctas}
       />
       {caseStudy.heading && (
         <CaseStudy
+          backgroundColor="$panel"
           heading={caseStudy.heading}
           about={caseStudy.about}
           problem={caseStudy.problem}
           solution={caseStudy.solution}
-          image={caseStudy.image?.asset.url}
           testimonial={caseStudy?.testimonial}
           internalLink={caseStudy.internalLink}
         />

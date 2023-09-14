@@ -9,28 +9,20 @@ export const Button = React.forwardRef(
       css={{
         display: "flex",
         ai: "center",
-        borderRadius: 1000,
-        color: "white",
-        background:
-          "linear-gradient(to right, $colors$green9, $colors$green10)",
         boxShadow: "none",
         cursor: "pointer",
         textDecoration: "none",
         p: 0,
         "&:hover": {
           textDecoration: "none",
-          background:
-            "linear-gradient(to right, $colors$green9, $colors$green10)",
-          color: "white",
           boxShadow: "none",
         },
         "&:disabled": {
           background: "none",
-          color: "$mauve8",
           pointerEvents: "none",
-          boxShadow: "inset 0 0 0 1px $colors$mauve7",
+          boxShadow: "inset 0 0 0 1px $colors$gray7",
           "&:hover": {
-            boxShadow: "inset 0 0 0 1px $colors$mauve7",
+            boxShadow: "inset 0 0 0 1px $colors$gray7",
             color: "$mauve8",
             background: "none",
           },

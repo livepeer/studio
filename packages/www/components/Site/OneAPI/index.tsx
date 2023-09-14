@@ -137,7 +137,7 @@ export const StartBuilding = ({ backgroundColor = "$loContrast" }) => (
           size={9}
           css={{
             marginBottom: "$5",
-            maxWidth: 600,
+            maxWidth: 700,
             mx: "auto",
             lineHeight: 1,
             fontWeight: 700,

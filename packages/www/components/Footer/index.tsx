@@ -16,6 +16,11 @@ const Footer = () => {
             Documentation
           </A>
         </Link>
+        <Link href="/compare" passHref legacyBehavior>
+          <A css={{ fontSize: 10 }} variant="subtle">
+            Compare Livepeer Studio
+          </A>
+        </Link>
         <Link
           href="https://livepeer.studio/terms-of-service"
           passHref

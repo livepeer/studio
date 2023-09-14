@@ -159,9 +159,9 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 maxWidth: 780,
                 mx: "auto",
               }}>
-              Livepeer Studio is a high-performance video streaming platform
-              that enables developers to build unique live and on-demand video
-              experiences with up to 90% cost savings.
+              Livepeer Studio is a high-performance video streaming platform for
+              developers. It's scalable, reliable, and delivers up to{" "}
+              <strong>90% cost savings</strong>.
             </Text>
             <Flex align="center" css={{ justifyContent: "center" }}>
               <Link href="/register" passHref>

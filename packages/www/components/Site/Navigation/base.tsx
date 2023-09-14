@@ -4,6 +4,11 @@ import {
   Flex,
   Link as A,
   Container,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuGroup,
 } from "@livepeer/design-system";
 import { useApi } from "hooks";
 import React, { useCallback, useEffect, useState } from "react";
@@ -11,8 +16,7 @@ import Menu from "./mobile/menu";
 import { useRouter } from "next/router";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import Link from "next/link";
-import CutOut from "components/Site/CutOut";
-import RegionSelector from "components/Site/RegionSelector";
+import { FiChevronDown, FiArrowUpRight } from "react-icons/fi";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -106,7 +110,71 @@ const NavigationBase = ({
                     mr: 20,
                   }}>
                   {links.map((link, i) => {
-                    return (
+                    return link?.children ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <A
+                            as={Box}
+                            css={{
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              fontSize: "$3",
+                              fontWeight: 500,
+                              textDecoration: "none",
+                              mx: "$3",
+                              color: "$hiContrast",
+                              "&:hover": {
+                                textDecoration: "none",
+                              },
+                            }}>
+                            {link.label}
+                            <FiChevronDown />
+                          </A>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuGroup>
+                            {link.children.map((child) => {
+                              return (
+                                <DropdownMenuItem
+                                  css={{
+                                    height: 40,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    p: 0,
+                                    "&[data-highlighted]": {
+                                      bc: "transparent",
+                                    },
+                                  }}>
+                                  <Link
+                                    href={`${link.href}${child.href}`}
+                                    passHref
+                                    legacyBehavior>
+                                    <A
+                                      css={{
+                                        display: "flex",
+                                        px: 30,
+                                        width: "100%",
+                                        height: "100%",
+                                        fontSize: "$3",
+                                        textDecoration: "none",
+                                        "&:hover": {
+                                          bc: "$green3",
+                                          textDecoration: "none",
+                                        },
+                                      }}>
+                                      {child.label}
+                                    </A>
+                                  </Link>
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
                       <Link
                         href={link.href}
                         key={`nav-link-${i}`}
@@ -115,7 +183,7 @@ const NavigationBase = ({
                         <A
                           target={link.isExternal ? "_blank" : null}
                           css={{
-                            display: "block",
+                            display: "flex",
                             fontSize: "$3",
                             fontWeight: 500,
                             textDecoration: "none",
@@ -123,7 +191,8 @@ const NavigationBase = ({
                             lineHeight: 1,
                             color: "$hiContrast",
                           }}>
-                          {link.children}
+                          {link.label}
+                          {link.isExternal && <FiArrowUpRight />}
                         </A>
                       </Link>
                     );
@@ -132,7 +201,13 @@ const NavigationBase = ({
 
                 <Flex>
                   {!loggedIn && (
-                    <>
+                    <Box
+                      css={{
+                        display: "none",
+                        "@bp2": {
+                          display: "block",
+                        },
+                      }}>
                       <Link href="/login" passHref legacyBehavior>
                         <A>
                           <Button variant="green" size={3}>
@@ -140,7 +215,7 @@ const NavigationBase = ({
                           </Button>
                         </A>
                       </Link>
-                    </>
+                    </Box>
                   )}
                   {loggedIn && (
                     <Box

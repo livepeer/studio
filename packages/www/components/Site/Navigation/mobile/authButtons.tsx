@@ -18,7 +18,7 @@ const AuthButtons = ({
           onClick={() => setMobileMenuIsOpen(false)}
           arrow
           css={{ mt: "$7", mr: "$3" }}>
-          Let's Go
+          Get Started
         </Button>
       </Link>
     );
