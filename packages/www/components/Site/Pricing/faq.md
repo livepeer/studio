@@ -38,8 +38,8 @@ at [help@livepeer.org](mailto:help@livepeer.org)
 ### **How are transcoding, storage, and delivery minutes derived?**
 
 For transcode and storage, Livepeer Studio uses the duration of the source
-asset, and for delivery, it uses 70 minutes viewed per 1 GB delivered; These
-assumptions are based on usage characteristics of the median builder.
+asset, and for delivery, we estimate the minutes viewed based on the average
+bitrate and the total amount of data used.
 
 If you have further questions about these calculations or feel that they do not
 accurately reflect the characteristics of your project's usage, you may reach

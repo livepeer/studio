@@ -3,11 +3,6 @@ import NavigationBase from "./base";
 const defaultNavProps = {
   links: [
     {
-      href: "https://docs.livepeer.studio",
-      label: "Docs",
-      isExternal: true,
-    },
-    {
       label: "Use Cases",
       href: "/use-cases",
       children: [
@@ -24,6 +19,11 @@ const defaultNavProps = {
     {
       href: "/pricing",
       label: "Pricing",
+    },
+    {
+      href: "https://docs.livepeer.studio",
+      label: "Docs",
+      isExternal: true,
     },
     {
       isExternal: true,

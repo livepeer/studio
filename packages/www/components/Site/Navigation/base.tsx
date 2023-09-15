@@ -149,13 +149,13 @@ const NavigationBase = ({
                             <FiChevronDown />
                           </A>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" css={{ p: "$2" }}>
                           <DropdownMenuGroup>
                             {link.children.map((child) => {
                               return (
                                 <DropdownMenuItem
                                   css={{
-                                    height: 40,
+                                    height: 54,
                                     display: "flex",
                                     alignItems: "center",
                                     position: "relative",
