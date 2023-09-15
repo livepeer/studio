@@ -1,4 +1,4 @@
-import { Box, Flex, Container, Text } from "@livepeer/design-system";
+import { Box, Heading, Flex, Container, Text } from "@livepeer/design-system";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "components/Site/Button";
@@ -15,15 +15,19 @@ const Hero = ({
   ctas = [],
 }) => {
   return (
-    <Box>
+    <Box
+      css={{
+        pt: 80,
+        "@bp2": {
+          pt: 0,
+        },
+      }}>
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
           css={{
-            px: "$4",
             mx: "$4",
             "@bp3": {
-              px: "$4",
               mx: "auto",
             },
           }}>
@@ -41,29 +45,45 @@ const Hero = ({
             <Flex direction="column" css={{ maxWidth: 768 }}>
               {tagline && (
                 <Text
-                  variant="primary"
                   size="5"
-                  css={{ fontWeight: 600, mb: "$5" }}>
+                  css={{
+                    fontWeight: 600,
+                    mb: "$1",
+                    "@bp2": {
+                      mb: "$5",
+                    },
+                  }}>
                   {tagline}
                 </Text>
               )}
-              <Text variant="neutral" size="9">
+              <Heading
+                as="h2"
+                size="4"
+                css={{
+                  maxWidth: 550,
+                  lineHeight: 1.4,
+                  fontWeight: 700,
+                  mb: "$4",
+                }}>
                 {heading}
-              </Text>
+              </Heading>
+
               <Text
                 variant="neutral"
-                size="4"
-                css={{ mb: "$6", lineHeight: 1.6 }}>
+                size="5"
+                css={{ maxWidth: 550, mb: "$6", lineHeight: 1.6 }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (
                 <Flex align="center" justify={centered ? "center" : "start"}>
                   <Link href={ctas[0].href} passHref legacyBehavior>
-                    <Button as="a" arrow css={{ mr: "$4" }}>
+                    <Button size={4} as="a" arrow css={{ mr: "$4" }}>
                       {ctas[0].children}
                     </Button>
                   </Link>
-                  <ArrowLink href={ctas[1].href}>{ctas[1].children}</ArrowLink>
+                  <ArrowLink css={{ fontSize: "$4" }} href={ctas[1].href}>
+                    {ctas[1].children}
+                  </ArrowLink>
                 </Flex>
               )}
             </Flex>
@@ -75,7 +95,8 @@ const Hero = ({
                   mr: -120,
                   display: "none",
                   "@bp2": {
-                    display: "block",
+                    display: "flex",
+                    alignItems: "center",
                   },
                 }}>
                 {imageType === "rectangle" ? (
@@ -85,7 +106,13 @@ const Hero = ({
                       transform: "translate(-50%)",
                       left: "50%",
                     }}>
-                    {/* <Image src={image} width={542 / 2} height={1096 / 2} /> */}
+                    <Image
+                      style={{ objectFit: "contain" }}
+                      alt="Livepeer Studio - Creator Economy"
+                      src={image.asset.url}
+                      width={500}
+                      height={500}
+                    />
                   </Box>
                 ) : (
                   <Box
@@ -113,7 +140,7 @@ const Hero = ({
                     minHeight: 545,
                     borderRadius: 1000,
                     background:
-                      "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
+                      "linear-gradient(90deg, $green2 0%, $green6 100%)",
                   }}
                 />
               </Box>

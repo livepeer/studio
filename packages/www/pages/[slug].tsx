@@ -137,5 +137,5 @@ export async function getStaticProps({ params, locale }) {
   };
 }
 
-Page.theme = "dark-theme-green";
+Page.theme = "light-theme-green";
 export default Page;

@@ -3,23 +3,36 @@ import NavigationBase from "./base";
 const defaultNavProps = {
   links: [
     {
-      href: "/#featured",
-      children: "Featured",
+      label: "Use Cases",
+      href: "/use-cases",
+      children: [
+        {
+          href: "/social-media",
+          label: "Social Apps",
+        },
+        {
+          href: "/creator-economy",
+          label: "Creator Economy",
+        },
+      ],
     },
-
     {
-      href: "/blog",
-      children: "Blog",
+      href: "/compare",
+      label: "Compare",
+    },
+    {
+      href: "/pricing",
+      label: "Pricing",
     },
     {
       href: "https://docs.livepeer.studio",
-      children: "Docs",
+      label: "Docs",
       isExternal: true,
     },
     {
-      href: "https://discord.gg/7D6hGG6dCZ",
-      children: "Join Discord",
       isExternal: true,
+      href: "https://livepeer.typeform.com/to/HTuUHdDR#lead_source=Website%20-%20Contact%20an%20Expert&contact_owner=xxxxx",
+      label: "Talk to an expert",
     },
   ],
 };

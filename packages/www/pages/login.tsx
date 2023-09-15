@@ -1,35 +1,31 @@
 import Layout from "layouts/main";
-import ResetPassword from "components/ResetPassword";
-import Link from "next/link";
+import Login from "components/Login";
 import {
-  Button,
   Flex,
   Box,
+  Button,
   Container,
   Text,
   Link as A,
 } from "@livepeer/design-system";
 import { useState } from "react";
-import { useApi, useLoggedIn } from "hooks";
-import { useRouter } from "next/router";
-import { ResetPassword as Content } from "content";
+import { useApi } from "../hooks";
+import Link from "next/link";
+import { Home as Content } from "content";
 
-const ResetPasswordPage = () => {
-  useLoggedIn(false);
+const LoginPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { resetPassword } = useApi();
-  const router = useRouter();
-  const { email, resetToken } = router.query;
+  const { login } = useApi();
 
-  const onSubmit = async ({ password }) => {
+  const onSubmit = async ({ email, password }) => {
     setLoading(true);
     setErrors([]);
-    const res = await resetPassword(email, resetToken, password);
+    const res = await login(email, password);
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
-      setLoading(false);
       setErrors(res.errors);
+      setLoading(false);
     }
   };
 
@@ -46,6 +42,7 @@ const ResetPasswordPage = () => {
           size="3"
           css={{
             px: "$3",
+            py: "$6",
             width: "100%",
             "@bp3": {
               px: "$4",
@@ -57,25 +54,23 @@ const ResetPasswordPage = () => {
               justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
-              py: "$5",
             }}>
             <Text
               size="8"
               as="h1"
               css={{
-                textTransform: "uppercase",
-                mb: "$6",
-                fontWeight: 700,
-                width: 150,
+                mb: "$7",
+                fontWeight: 500,
                 lineHeight: "30px",
                 textAlign: "center",
               }}>
-              Livepeer Studio
+              Sigin in to your account
             </Text>
-            <ResetPassword
-              id="reset-password"
+
+            <Login
+              id="login"
               onSubmit={onSubmit}
-              buttonText="Reset password"
+              buttonText="Sign in"
               errors={errors}
               loading={loading}
             />
@@ -89,7 +84,7 @@ const ResetPasswordPage = () => {
                     "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
-              <Link href="/" passHref legacyBehavior>
+              <Link href="/register" passHref legacyBehavior>
                 <A
                   css={{
                     "&:hover": {
@@ -105,7 +100,7 @@ const ResetPasswordPage = () => {
                         textDecoration: "none",
                       },
                     }}>
-                    Nevermind! Take me back to sign in
+                    Create new account
                   </Button>
                 </A>
               </Link>
@@ -117,5 +112,5 @@ const ResetPasswordPage = () => {
   );
 };
 
-ResetPasswordPage.theme = "light-theme-green";
-export default ResetPasswordPage;
+LoginPage.theme = "light-theme-green";
+export default LoginPage;

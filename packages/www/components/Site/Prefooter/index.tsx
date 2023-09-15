@@ -5,9 +5,10 @@ import {
   Flex,
   Box,
   Link as A,
+  Button,
 } from "@livepeer/design-system";
-import Button from "components/Site/Button";
-import Guides from "components/Site/Guides";
+import { FiArrowUpRight } from "react-icons/fi";
+import Guides from "../Guides";
 import Link from "next/link";
 
 const Prefooter = ({ backgroundColor = "$loContrast" }) => (
@@ -34,33 +35,33 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
           borderRadius: 24,
           color: "white",
           background:
-            "linear-gradient(90deg, $colors$blue9 0%, $colors$blue10 33%,  $colors$blue11 66%, $colors$blue11 100%);",
+            "linear-gradient(90deg, $colors$green5 0%, $colors$green8 33%,  $colors$green9 66%, $colors$green11 100%);",
           backgroundSize: "cover",
           "@bp2": {
             px: 72,
-            py: 126,
+            py: 90,
           },
         }}>
         <Heading
           size="4"
-          as="h2"
           css={{
             color: "white",
             fontWeight: 700,
             mb: "$6",
+            letterSpacing: "-1px",
           }}>
           Ready to get started?
         </Heading>
         <Text
-          variant="neutral"
-          size="4"
+          size="6"
           css={{
             color: "white",
             mb: "$7",
             maxWidth: "700px",
             mx: "auto",
           }}>
-          Contact us anytime about custom pricing for your business.
+          Experience the world's open video infrastructure. Stream your first
+          video in just a few clicks.
         </Text>
         <Flex
           css={{
@@ -71,69 +72,48 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
               flexDirection: "row",
             },
           }}>
-          <Link href="/register" passHref legacyBehavior>
+          <Flex
+            align="center"
+            gap={1}
+            css={{
+              flexDirection: "column",
+              "@bp2": {
+                flexDirection: "row",
+              },
+            }}>
+            <Link href="/register">
+              <Button
+                size={4}
+                as={A}
+                css={{
+                  mr: "$2",
+                  display: "flex",
+                  gap: "$2",
+                }}
+                variant="green">
+                Get Started
+              </Button>
+            </Link>
+
             <Button
-              size="4"
-              as="a"
-              arrow
+              href="https://livepeer.typeform.com/to/HTuUHdDR#lead_source=Website%20-%20Contact%20an%20Expert&contact_owner=xxxxx"
+              as={A}
+              target="_blank"
+              ghost
+              size={4}
               css={{
-                mr: "$4",
-                mb: "$3",
-                "@bp2": {
-                  mb: 0,
-                },
-              }}>
-              Sign up for free
-            </Button>
-          </Link>
-          <Link href="/contact" passHref legacyBehavior>
-            <A
-              css={{
+                mr: "$2",
+                gap: "$2",
                 textDecoration: "none",
-                fontWeight: 500,
-                display: "flex",
                 color: "white",
-                ai: "center",
-                ".HoverArrow": {
-                  position: "relative",
-                  top: "1px",
-                  marginLeft: "4px",
-                  strokeWidth: "2",
-                  fill: "none",
-                  stroke: "currentColor",
-                },
-                ".HoverArrow__linePath": {
-                  opacity: "0",
-                  transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s",
-                },
-                ".HoverArrow__tipPath": {
-                  transition:
-                    "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s",
-                },
-                "&:hover .HoverArrow": {
-                  transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
-                  ".HoverArrow__linePath": {
-                    opacity: 1,
-                  },
-                  ".HoverArrow__tipPath": {
-                    transform: "translateX(3px)",
-                  },
+                "&:hover": {
+                  bc: "transparent",
                 },
               }}>
-              <Box>Contact us</Box>
-              <svg
-                className="HoverArrow"
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                aria-hidden="true">
-                <g fillRule="evenodd">
-                  <path className="HoverArrow__linePath" d="M0 5h7" />
-                  <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
-                </g>
-              </svg>
-            </A>
-          </Link>
+              Talk to a Livepeer expert
+              <FiArrowUpRight />
+            </Button>
+          </Flex>
         </Flex>
       </Box>
     </Container>

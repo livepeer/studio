@@ -178,7 +178,7 @@ const Footer = () => {
                                 mr: "$3",
                               },
                             }}>
-                            Let's Go
+                            Get started
                           </Button>
                         </Link>
                       </Flex>

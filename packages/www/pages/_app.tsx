@@ -5,8 +5,8 @@ import { ApiProvider } from "hooks/use-api";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MetaMaskProvider } from "metamask-react";
-import "../css/recaptcha.css";
 import React from "react";
+import { Theme } from "@radix-ui/themes";
 import {
   globalCss,
   getThemes,
@@ -24,6 +24,10 @@ import {
 import "../css/hubspot.scss";
 import { isStaging } from "lib/utils";
 import { getEndpoint } from "../hooks/use-api";
+
+import "../css/recaptcha.css";
+import "../css/markdown.css";
+import "@radix-ui/themes/styles.css";
 
 const queryClient = new QueryClient();
 
@@ -100,33 +104,35 @@ const App = ({ Component, pageProps }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <DesignSystemProvider>
-        <ThemeProvider
-          forcedTheme={Component.theme || undefined}
-          disableTransitionOnChange
-          attribute="class"
-          defaultTheme={DEFAULT_THEME}
-          value={{
-            ...themeMap,
-            dark: "dark-theme-green",
-            light: "light-theme-green",
-          }}>
-          <SnackbarProvider>
-            <QueryClientProvider client={queryClient}>
-              <MetaMaskProvider>
-                <ApiProvider>
-                  <AnalyzerProvider>
-                    <LivepeerConfig
-                      theme={livepeerTheme}
-                      client={livepeerClient}>
-                      <DefaultSeo {...SEO} />
-                      <Component {...pageProps} />
-                    </LivepeerConfig>
-                  </AnalyzerProvider>
-                </ApiProvider>
-              </MetaMaskProvider>
-            </QueryClientProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
+        <Theme appearance="light">
+          <ThemeProvider
+            forcedTheme={DEFAULT_THEME}
+            disableTransitionOnChange
+            attribute="class"
+            defaultTheme={DEFAULT_THEME}
+            value={{
+              ...themeMap,
+              dark: "dark-theme-green",
+              light: "light-theme-green",
+            }}>
+            <SnackbarProvider>
+              <QueryClientProvider client={queryClient}>
+                <MetaMaskProvider>
+                  <ApiProvider>
+                    <AnalyzerProvider>
+                      <LivepeerConfig
+                        theme={livepeerTheme}
+                        client={livepeerClient}>
+                        <DefaultSeo {...SEO} />
+                        <Component {...pageProps} />
+                      </LivepeerConfig>
+                    </AnalyzerProvider>
+                  </ApiProvider>
+                </MetaMaskProvider>
+              </QueryClientProvider>
+            </SnackbarProvider>
+          </ThemeProvider>
+        </Theme>
       </DesignSystemProvider>
     </>
   );

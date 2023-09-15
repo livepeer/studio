@@ -1,14 +1,14 @@
 export default {
   title: "Livepeer Studio",
   description:
-    "Your all-in-one dashboard for building, broadcasting, and publishing video on the open internet with Livepeer Protocol. Effortlessly manage livestreams, video uploads, API keys, network usage, billing, and more.",
+    "Livepeer Studio is a high-performance video streaming platform that enables developers to build unique live and on-demand video experiences with up to 90% cost savings.",
   openGraph: {
     type: "website",
     locale: "en_IE",
     url: "https://livepeer.studio",
     title: "Livepeer Studio",
     description:
-      "Your all-in-one dashboard for building, broadcasting, and publishing video on the open internet with Livepeer Protocol. Effortlessly manage livestreams, video uploads, API keys, network usage, billing, and more.",
+      "Livepeer Studio is a high-performance video streaming platform that enables developers to build unique live and on-demand video experiences with up to 90% cost savings.",
     defaultImageWidth: 1200,
     defaultImageHeight: 642,
     images: [

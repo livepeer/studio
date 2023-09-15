@@ -5,7 +5,16 @@ import { FaTwitter, FaDiscord, FaMedium, FaGithub } from "react-icons/fa";
 const Footer = () => {
   return (
     <Flex direction="column" gap={4}>
-      <Flex align="center" justify="center" gap={5}>
+      <Flex
+        align="center"
+        justify="center"
+        gap={5}
+        css={{
+          flexDirection: "column",
+          "@bp2": {
+            flexDirection: "row",
+          },
+        }}>
         <Link href="https://livepeer.org" passHref legacyBehavior>
           <A target="_blank" css={{ fontSize: 11 }} variant="subtle">
             Livepeer.org
@@ -14,6 +23,11 @@ const Footer = () => {
         <Link href="https://docs.livepeer.org" passHref legacyBehavior>
           <A target="_blank" css={{ fontSize: 11 }} variant="subtle">
             Documentation
+          </A>
+        </Link>
+        <Link href="/compare" passHref legacyBehavior>
+          <A css={{ fontSize: 10 }} variant="subtle">
+            Compare Livepeer Studio
           </A>
         </Link>
         <Link

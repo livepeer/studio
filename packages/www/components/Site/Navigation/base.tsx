@@ -1,12 +1,23 @@
-import { Box, Flex, Link as A, Container } from "@livepeer/design-system";
+import {
+  Box,
+  Button,
+  Flex,
+  Link as A,
+  Container,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuGroup,
+} from "@livepeer/design-system";
 import { useApi } from "hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import Menu from "./mobile/menu";
 import { useRouter } from "next/router";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import Link from "next/link";
-import CutOut from "components/Site/CutOut";
-import RegionSelector from "components/Site/RegionSelector";
+import { FiChevronDown, FiArrowUpRight } from "react-icons/fi";
+import Guides from "components/Site/Guides";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -61,28 +72,38 @@ const NavigationBase = ({
   }, [token]);
 
   return (
-    <Box css={{ mx: "$3" }}>
+    <Box
+      css={{
+        position: "sticky",
+        pt: 1,
+        zIndex: 100,
+        top: 0,
+        bc: "white",
+        // boxShadow:
+        //   "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px",
+      }}>
+      <Guides backgroundColor={navBackgroundColor} />
       <Container
         size="5"
-        css={{ width: "100%", padding: 0, position: "relative", zIndex: 11 }}>
+        css={{
+          width: "100%",
+          px: "$2",
+          py: 0,
+          position: "relative",
+          zIndex: 11,
+        }}>
         <Box
           css={{
             position: "relative",
-            mt: navBackgroundColor === "transparent" ? 0 : "$3",
-            borderRadius: 40,
-            "@bp1": {
-              mt: "$3",
-            },
             ...css,
           }}>
-          <CutOut backgroundColor={navBackgroundColor} />
           <Box
             css={{
               mx: "$3",
             }}>
             <Flex
               css={{
-                pt: "$4",
+                py: "$4",
                 justifyContent: "space-between",
                 ai: "center",
               }}>
@@ -92,7 +113,7 @@ const NavigationBase = ({
                   breadcrumb={breadcrumb}
                 />
               </Box>
-              <Flex align="center" css={{ mt: -6 }}>
+              <Flex align="center">
                 <Flex
                   css={{
                     display: "none",
@@ -103,10 +124,74 @@ const NavigationBase = ({
                     justifyContent: "flex-end",
                     minWidth: sidesWidth,
                     lineHeight: 1,
-                    mr: 42,
+                    mr: 20,
                   }}>
                   {links.map((link, i) => {
-                    return (
+                    return link?.children ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <A
+                            as={Box}
+                            css={{
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              fontSize: "$3",
+                              fontWeight: 500,
+                              textDecoration: "none",
+                              mx: "$3",
+                              color: "$hiContrast",
+                              "&:hover": {
+                                textDecoration: "none",
+                              },
+                            }}>
+                            {link.label}
+                            <FiChevronDown />
+                          </A>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" css={{ p: "$2" }}>
+                          <DropdownMenuGroup>
+                            {link.children.map((child) => {
+                              return (
+                                <DropdownMenuItem
+                                  css={{
+                                    height: 54,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    p: 0,
+                                    "&[data-highlighted]": {
+                                      bc: "transparent",
+                                    },
+                                  }}>
+                                  <Link
+                                    href={`${link.href}${child.href}`}
+                                    passHref
+                                    legacyBehavior>
+                                    <A
+                                      css={{
+                                        display: "flex",
+                                        px: 30,
+                                        width: "100%",
+                                        height: "100%",
+                                        fontSize: "$3",
+                                        textDecoration: "none",
+                                        "&:hover": {
+                                          bc: "$green3",
+                                          textDecoration: "none",
+                                        },
+                                      }}>
+                                      {child.label}
+                                    </A>
+                                  </Link>
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
                       <Link
                         href={link.href}
                         key={`nav-link-${i}`}
@@ -115,100 +200,56 @@ const NavigationBase = ({
                         <A
                           target={link.isExternal ? "_blank" : null}
                           css={{
-                            display: "block",
-                            fontSize: "$4",
+                            display: "flex",
+                            fontSize: "$3",
                             fontWeight: 500,
                             textDecoration: "none",
                             mx: "$3",
                             lineHeight: 1,
-                            color:
-                              navBackgroundColor === "transparent"
-                                ? "$hiContrast"
-                                : "$loContrast",
-                            textTransform: "uppercase",
+                            color: "$hiContrast",
                           }}>
-                          {link.children}
+                          {link.label}
+                          {link.isExternal && <FiArrowUpRight />}
                         </A>
                       </Link>
                     );
                   })}
-                  <Box css={{ mx: "$3" }}>
-                    <RegionSelector navBackgroundColor={navBackgroundColor} />
-                  </Box>
                 </Flex>
 
                 <Flex>
                   {!loggedIn && (
-                    <>
-                      <Link href="/" passHref legacyBehavior>
-                        <A
-                          css={{
-                            fontSize: "$4",
-                            fontWeight: 500,
-                            textDecoration: "none",
-                            textTransform: "uppercase",
-                            display: "none",
-                            position: "relative",
-                            "@bp2": {
-                              display: "block",
-                            },
-                            "&:hover": {
-                              textDecoration: "none",
-                            },
-                            "&:after": {
-                              content: '""',
-                              position: "absolute",
-                              left: -14,
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 12,
-                              borderBottomLeftRadius: 4,
-                              borderBottomRightRadius: 4,
-                              zIndex: 1,
-                              top: -14,
-                              bc: "#fff",
-                              height: 48,
-                              width: 80,
-                              transform: "skew(35deg)",
-                              display:
-                                navBackgroundColor === "transparent"
-                                  ? "block"
-                                  : "none",
-                            },
-                            "&:before": {
-                              content: '""',
-                              position: "absolute",
-                              left: 22,
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 12,
-                              borderBottomLeftRadius: 4,
-                              borderBottomRightRadius: 4,
-                              zIndex: 1,
-                              top: -14,
-                              bc: "#fff",
-                              height: 48,
-                              width: 110,
-                              display:
-                                navBackgroundColor === "transparent"
-                                  ? "block"
-                                  : "none",
-                            },
-                          }}>
-                          <Box
-                            css={{
-                              color:
-                                navBackgroundColor === "transparent"
-                                  ? "$loContrast"
-                                  : "$hiContrast",
-                              position: "relative",
-                              zIndex: 2,
-                              width: 122,
-                              textAlign: "center",
-                            }}>
-                            Let's go
-                          </Box>
+                    <Box
+                      css={{
+                        display: "none",
+                        "@bp2": {
+                          display: "block",
+                        },
+                      }}>
+                      <Link href="/login" passHref legacyBehavior>
+                        <A>
+                          <Button variant="neutral" css={{ mr: "$3" }} size={3}>
+                            Sign in
+                          </Button>
                         </A>
                       </Link>
-                    </>
+                    </Box>
+                  )}
+                  {!loggedIn && (
+                    <Box
+                      css={{
+                        display: "none",
+                        "@bp2": {
+                          display: "block",
+                        },
+                      }}>
+                      <Link href="/register" passHref legacyBehavior>
+                        <A>
+                          <Button variant="green" size={3}>
+                            Sign Up
+                          </Button>
+                        </A>
+                      </Link>
+                    </Box>
                   )}
                   {loggedIn && (
                     <Box
@@ -234,71 +275,10 @@ const NavigationBase = ({
 
                       {!isDashboard && (
                         <Link href="/dashboard" passHref legacyBehavior>
-                          <A
-                            css={{
-                              fontSize: "$4",
-                              fontWeight: 500,
-                              textDecoration: "none",
-                              textTransform: "uppercase",
-                              display: "none",
-                              position: "relative",
-                              "@bp2": {
-                                display: "block",
-                              },
-                              "&:hover": {
-                                textDecoration: "none",
-                              },
-                              "&:after": {
-                                content: '""',
-                                position: "absolute",
-                                left: -14,
-                                borderTopLeftRadius: 10,
-                                borderTopRightRadius: 12,
-                                borderBottomLeftRadius: 4,
-                                borderBottomRightRadius: 4,
-                                zIndex: 1,
-                                top: -14,
-                                bc: "#fff",
-                                height: 48,
-                                width: 80,
-                                transform: "skew(35deg)",
-                                display:
-                                  navBackgroundColor === "transparent"
-                                    ? "block"
-                                    : "none",
-                              },
-                              "&:before": {
-                                content: '""',
-                                position: "absolute",
-                                left: 22,
-                                borderTopLeftRadius: 10,
-                                borderTopRightRadius: 12,
-                                borderBottomLeftRadius: 4,
-                                borderBottomRightRadius: 4,
-                                zIndex: 1,
-                                top: -14,
-                                bc: "#fff",
-                                height: 48,
-                                width: 110,
-                                display:
-                                  navBackgroundColor === "transparent"
-                                    ? "block"
-                                    : "none",
-                              },
-                            }}>
-                            <Box
-                              css={{
-                                color:
-                                  navBackgroundColor === "transparent"
-                                    ? "$loContrast"
-                                    : "$hiContrast",
-                                position: "relative",
-                                zIndex: 2,
-                                width: 122,
-                                textAlign: "center",
-                              }}>
+                          <A>
+                            <Button variant="green" size={3}>
                               Dashboard
-                            </Box>
+                            </Button>
                           </A>
                         </Link>
                       )}

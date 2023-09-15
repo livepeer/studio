@@ -20,7 +20,7 @@ const Notch = () => (
     xmlns="http://www.w3.org/2000/svg"
     css={{
       position: "absolute",
-      top: "50%",
+      top: "calc(50%)",
       zIndex: notchZIndex,
       transform: "translateY(-50%)",
       width: "4%",

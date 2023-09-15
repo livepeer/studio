@@ -39,16 +39,17 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
         width: "100%",
       }}>
       <Text
-        variant="neutral"
-        size={5}
+        size="8"
+        as="h1"
         css={{
-          maxWidth: 425,
-          textAlign: "center",
-          mx: "auto",
           mb: "$7",
+          fontWeight: 500,
+          lineHeight: "30px",
+          textAlign: "center",
         }}>
         Reset your password.
       </Text>
+
       <Box
         css={{
           width: "100%",
@@ -60,33 +61,6 @@ const ForgotPassword = ({ id, buttonText, onSubmit, loading, errors }) => {
           maxWidth: 500,
         }}>
         <form id={id} onSubmit={submit}>
-          <Text
-            variant="neutral"
-            size={1}
-            css={{
-              mb: "$1",
-              fontSize: "11px",
-              textTransform: "uppercase",
-              fontWeight: 600,
-            }}>
-            Broadcasting provider
-          </Text>
-          <TextField
-            readOnly
-            size="3"
-            id="email"
-            css={{
-              width: "100%",
-              bc: "$neutral2",
-              mb: "$4",
-              color: "$neutral11",
-              fontSize: "$2",
-            }}
-            name="broadcastingProvider"
-            type="text"
-            required
-            value="Livepeer Inc"
-          />
           <Text
             variant="neutral"
             size={1}

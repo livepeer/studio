@@ -9,6 +9,10 @@ import Footer from "components/Footer";
 import Spinner from "components/Spinner";
 import { useLoggedIn } from "hooks";
 import Fade from "react-reveal/Fade";
+import { DefaultNav } from "components/Site/Navigation";
+import TopNotification, {
+  TopNotificationProps,
+} from "components/Site/TopNotification";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -87,11 +91,26 @@ function Layout({
     seo["canonical"] = canonical;
   }
 
+  const topNotification: TopNotificationProps = {
+    title: (
+      <Box>
+        💰 Switch to Livepeer Studio by October 13th for{" "}
+        <span css={{ fontWeight: "bold" }}>up to six months free</span> 💰
+      </Box>
+    ),
+    link: {
+      label: "Learn more",
+      href: "https://livepeer.typeform.com/to/shoMCvCl#lead_source=xxxxx&contact_owner=xxxxx",
+      isExternal: true,
+    },
+  };
+
   return (
     <>
       <NextSeo {...seo} />
       <GoogleTagManager />
       <Fade big when={isLoggedIn === false}>
+        {topNotification && <TopNotification {...topNotification} />}
         <Flex
           className="main"
           css={{
@@ -146,6 +165,7 @@ function Layout({
             </Flex>
           ) : (
             <>
+              <DefaultNav />
               {children}
               <Flex
                 align="center"

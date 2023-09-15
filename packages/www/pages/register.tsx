@@ -117,23 +117,10 @@ const RegisterPage = () => {
               flexDirection: "column",
               py: "$3",
             }}>
-            <Text
-              size="8"
-              as="h1"
-              css={{
-                textTransform: "uppercase",
-                mb: "$5",
-                fontWeight: 700,
-                width: 150,
-                lineHeight: "30px",
-                textAlign: "center",
-              }}>
-              Livepeer Studio
-            </Text>
             <Register
               id="register"
               onSubmit={onSubmit}
-              buttonText="Create account with Livepeer Inc"
+              buttonText="Create account"
               loading={loading}
               errors={errors}
             />
@@ -147,7 +134,7 @@ const RegisterPage = () => {
                     "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
-              <Link href="/" passHref legacyBehavior>
+              <Link href="/login" passHref legacyBehavior>
                 <A
                   css={{
                     cursor: "default",
@@ -159,7 +146,6 @@ const RegisterPage = () => {
                     size="4"
                     css={{
                       width: "100%",
-                      fontSize: "$3",
                     }}>
                     Sign in instead
                   </Button>
@@ -174,6 +160,6 @@ const RegisterPage = () => {
 };
 
 const RegisterPageWithRecaptcha: any = withRecaptcha(RegisterPage);
-RegisterPageWithRecaptcha.theme = "dark-theme-green";
+RegisterPageWithRecaptcha.theme = "light-theme-green";
 
 export default RegisterPageWithRecaptcha;

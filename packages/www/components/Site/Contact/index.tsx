@@ -8,12 +8,13 @@ import {
   Heading,
   TextArea,
   Link as A,
+  Button,
 } from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
-import Button from "components/Site/Button";
 import Fade from "react-reveal/Fade";
+import Guides from "../Guides";
 
-const Contact = () => {
+const Contact = ({ backgroundColor }) => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -36,6 +37,7 @@ const Contact = () => {
 
   return (
     <Box css={{ position: "relative" }}>
+      <Guides backgroundColor={backgroundColor} />
       <Container
         size="3"
         css={{ py: 88, px: 0, width: "100%", position: "relative" }}>
@@ -53,7 +55,7 @@ const Contact = () => {
               css={{
                 fontWeight: 700,
                 color: "$hiContrast",
-                fontSize: "$8",
+                fontSize: "$9",
                 mb: "$5",
               }}>
               Get in touch
@@ -126,7 +128,10 @@ const Contact = () => {
               required
             />
             <Box css={{ textAlign: "center" }}>
-              <Button arrow css={{ mx: "auto", mt: "$4", px: "$4" }}>
+              <Button
+                variant="green"
+                size={4}
+                css={{ mx: "auto", mt: "$4", px: "$4" }}>
                 Submit
               </Button>
 

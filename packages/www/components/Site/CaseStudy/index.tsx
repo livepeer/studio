@@ -13,11 +13,11 @@ import Link from "next/link";
 const CaseStudy = ({
   heading,
   about,
-  image,
   testimonial,
   problem,
   solution,
-  internalLink,
+  externalLink = null,
+  internalLink = null,
   backgroundColor = "$loContrast",
 }) => {
   return (
@@ -34,10 +34,7 @@ const CaseStudy = ({
                 mx: "auto",
               },
             }}>
-            <Text
-              variant="primary"
-              size="5"
-              css={{ fontWeight: 600, mb: "$4" }}>
+            <Text size="5" css={{ fontWeight: 600, mb: "$4" }}>
               Case Study
             </Text>
             <Grid
@@ -53,9 +50,8 @@ const CaseStudy = ({
                 as="h2"
                 css={{
                   maxWidth: 600,
-                  lineHeight: 1.4,
                   fontWeight: 700,
-                  "@bp2": { lineHeight: 1.4, letterSpacing: 0, mb: "$7" },
+                  "@bp2": { letterSpacing: 0, mb: "$7" },
                 }}>
                 {heading}
               </Heading>
@@ -99,10 +95,10 @@ const CaseStudy = ({
                       "&:before": {
                         position: "absolute",
                         top: "4px",
-                        left: "-20px",
+                        left: "-15px",
                         width: "1px",
                         height: "$3",
-                        backgroundColor: "$blue9",
+                        backgroundColor: "$green9",
                         content: '""',
                       },
                     }}>
@@ -133,10 +129,10 @@ const CaseStudy = ({
                       "&:before": {
                         position: "absolute",
                         top: "4px",
-                        left: "-20px",
+                        left: "-15px",
                         width: "1px",
                         height: "$3",
-                        backgroundColor: "$blue9",
+                        backgroundColor: "$green9",
                         content: '""',
                       },
                     }}>
@@ -145,6 +141,19 @@ const CaseStudy = ({
                   <Text variant="neutral" css={{ lineHeight: 1.6, mb: "$3" }}>
                     {solution}
                   </Text>
+                  {externalLink && (
+                    <Link
+                      href={externalLink.slug.current}
+                      passHref
+                      legacyBehavior>
+                      <A
+                        target="_blank"
+                        css={{ fontSize: "$3" }}
+                        variant="primary">
+                        Read the full story
+                      </A>
+                    </Link>
+                  )}
                   {internalLink && (
                     <Link
                       href={`/blog/${internalLink.slug.current}`}

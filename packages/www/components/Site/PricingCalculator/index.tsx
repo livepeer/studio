@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calculator, Preview } from "./pricingCalculatorComponents";
+import { Calculator, Preview } from "./Calculator";
 import { Box, Grid, Heading, Text } from "@livepeer/design-system";
 
 const PricingCalculator = () => {
