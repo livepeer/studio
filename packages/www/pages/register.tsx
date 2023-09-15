@@ -146,7 +146,6 @@ const RegisterPage = () => {
                     size="4"
                     css={{
                       width: "100%",
-                      fontSize: "$3",
                     }}>
                     Sign in instead
                   </Button>

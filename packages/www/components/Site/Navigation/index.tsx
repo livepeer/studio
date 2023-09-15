@@ -17,6 +17,10 @@ const defaultNavProps = {
       ],
     },
     {
+      href: "/compare",
+      label: "Compare",
+    },
+    {
       href: "/pricing",
       label: "Pricing",
     },

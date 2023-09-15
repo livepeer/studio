@@ -227,8 +227,25 @@ const NavigationBase = ({
                       }}>
                       <Link href="/login" passHref legacyBehavior>
                         <A>
-                          <Button variant="green" size={3}>
+                          <Button variant="neutral" css={{ mr: "$3" }} size={3}>
                             Sign in
+                          </Button>
+                        </A>
+                      </Link>
+                    </Box>
+                  )}
+                  {!loggedIn && (
+                    <Box
+                      css={{
+                        display: "none",
+                        "@bp2": {
+                          display: "block",
+                        },
+                      }}>
+                      <Link href="/register" passHref legacyBehavior>
+                        <A>
+                          <Button variant="green" size={3}>
+                            Sign Up
                           </Button>
                         </A>
                       </Link>
@@ -258,71 +275,10 @@ const NavigationBase = ({
 
                       {!isDashboard && (
                         <Link href="/dashboard" passHref legacyBehavior>
-                          <A
-                            css={{
-                              fontSize: "$4",
-                              fontWeight: 500,
-                              textDecoration: "none",
-                              textTransform: "uppercase",
-                              display: "none",
-                              position: "relative",
-                              "@bp2": {
-                                display: "block",
-                              },
-                              "&:hover": {
-                                textDecoration: "none",
-                              },
-                              "&:after": {
-                                content: '""',
-                                position: "absolute",
-                                left: -14,
-                                borderTopLeftRadius: 10,
-                                borderTopRightRadius: 12,
-                                borderBottomLeftRadius: 4,
-                                borderBottomRightRadius: 4,
-                                zIndex: 1,
-                                top: -14,
-                                bc: "#fff",
-                                height: 48,
-                                width: 80,
-                                transform: "skew(35deg)",
-                                display:
-                                  navBackgroundColor === "transparent"
-                                    ? "block"
-                                    : "none",
-                              },
-                              "&:before": {
-                                content: '""',
-                                position: "absolute",
-                                left: 22,
-                                borderTopLeftRadius: 10,
-                                borderTopRightRadius: 12,
-                                borderBottomLeftRadius: 4,
-                                borderBottomRightRadius: 4,
-                                zIndex: 1,
-                                top: -14,
-                                bc: "#fff",
-                                height: 48,
-                                width: 110,
-                                display:
-                                  navBackgroundColor === "transparent"
-                                    ? "block"
-                                    : "none",
-                              },
-                            }}>
-                            <Box
-                              css={{
-                                color:
-                                  navBackgroundColor === "transparent"
-                                    ? "$loContrast"
-                                    : "$hiContrast",
-                                position: "relative",
-                                zIndex: 2,
-                                width: 122,
-                                textAlign: "center",
-                              }}>
+                          <A>
+                            <Button variant="green" size={3}>
                               Dashboard
-                            </Box>
+                            </Button>
                           </A>
                         </Link>
                       )}
