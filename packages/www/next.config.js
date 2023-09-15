@@ -27,6 +27,7 @@ let config = {
     hideSourceMaps: true,
   },
   images: {
+    unoptimized: true,
     domains: ["cdn.sanity.io", "picsum.photos"],
   },
   async redirects() {
