@@ -179,4 +179,5 @@ export async function getStaticProps({ params }) {
   };
 }
 
+UseCase.theme = "light-theme-green";
 export default UseCase;
