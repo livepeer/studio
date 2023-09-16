@@ -62,4 +62,5 @@ const Compare = () => {
   );
 };
 
+Compare.theme = "light-theme-green";
 export default Compare;
