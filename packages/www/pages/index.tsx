@@ -110,4 +110,5 @@ const HomePage = () => {
   );
 };
 
+HomePage.theme = "light-theme-green";
 export default HomePage;

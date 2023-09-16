@@ -94,4 +94,5 @@ export async function getStaticProps() {
   };
 }
 
+PricingPage.theme = "light-theme-green";
 export default PricingPage;
