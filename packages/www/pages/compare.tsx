@@ -1,11 +1,8 @@
 import Layout from "layouts/main";
 import CompareHero from "components/Site/Compare/Hero";
 import CompareTable from "components/Site/Compare/Table";
-import { Container, Flex, Box, Button } from "@livepeer/design-system";
-import { FiArrowUpRight } from "react-icons/fi";
-import Link from "next/link";
+import { Container, Flex, Box, Text } from "@livepeer/design-system";
 import Prefooter from "components/Site/Prefooter";
-import { Callout } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Contact as Content } from "content";
 
@@ -34,16 +31,14 @@ const Compare = () => {
           }}>
           <Container size={3}>
             <CompareTable />
-            <Box css={{ mt: "$4" }}>
-              <Callout.Root>
-                <Callout.Icon>
-                  <InfoCircledIcon />
-                </Callout.Icon>
-                <Callout.Text>
+            <Box css={{ mt: "$6" }}>
+              <Flex align="center" gap={2}>
+                <InfoCircledIcon />
+                <Text size={2}>
                   All feature and pricing information is sourced from available
                   online information as of 7/28/2023.
-                </Callout.Text>
-              </Callout.Root>
+                </Text>
+              </Flex>
             </Box>
           </Container>
         </Box>

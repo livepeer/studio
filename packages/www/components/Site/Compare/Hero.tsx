@@ -13,7 +13,7 @@ import Link from "next/link";
 const CompareHero = () => {
   return (
     <Box>
-      <Container>
+      <Container css={{ p: 0 }}>
         <Flex
           css={{
             pb: 0,
