@@ -3,7 +3,6 @@ import {
   Flex,
   Heading,
   Text,
-  Grid,
   Container,
   Button,
 } from "@livepeer/design-system";
@@ -28,7 +27,8 @@ const CompareHero = () => {
                 mb: "$5",
                 fontWeight: 700,
               }}>
-              Compare Studio
+              Compare <br />
+              Livepeer Studio
             </Heading>
             <Text
               variant="neutral"
