@@ -162,27 +162,6 @@ export class TaskScheduler {
         });
         await this.triggerRecordingReadyWebhook(task);
         break;
-      case "transcode":
-        assetSpec = event.output?.transcode?.asset?.assetSpec;
-        if (!assetSpec) {
-          const error = "bad task output: missing assetSpec";
-          console.error(
-            `task event process error: err=${error} taskId=${event.task.id}`
-          );
-          await this.failTask(task, error, event.output);
-          return true;
-        }
-        await this.updateAsset(task.outputAssetId, {
-          size: assetSpec.size,
-          hash: assetSpec.hash,
-          videoSpec: assetSpec.videoSpec,
-          playbackRecordingId: assetSpec.playbackRecordingId,
-          status: {
-            phase: "ready",
-            updatedAt: Date.now(),
-          },
-        });
-        break;
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
         if (inputAsset.storage?.status?.tasks.pending === task.id) {

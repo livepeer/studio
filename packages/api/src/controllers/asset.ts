@@ -304,7 +304,6 @@ export function getStaticPlaybackInfo(
 }
 
 export function getPlaybackUrl(
-  { vodCatalystObjectStoreId }: CliArgs,
   ingest: string,
   asset: WithID<Asset>,
   os: ObjectStore
@@ -321,17 +320,7 @@ export function getPlaybackUrl(
     (f) => f.type === "catalyst_hls_manifest"
   );
   if (catalystManifest) {
-    if (os.id !== vodCatalystObjectStoreId) {
-      return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
-    }
-    // TODO: Set up Catalyst playback or a CDN in front of the default object store.
     return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
-    // return pathJoin(
-    //   "https://playback.livepeer.monster:10443/", // TODO: Make this a cli arg
-    //   "hls",
-    //   `asset+${asset.playbackId}`,
-    //   "index.m3u8"
-    // );
   }
   return undefined;
 }
@@ -380,7 +369,7 @@ export async function withPlaybackUrls(
     ...(asset.status.phase === "ready" && {
       downloadUrl: getDownloadUrl(config, ingest, asset, os),
     }),
-    playbackUrl: getPlaybackUrl(config, ingest, asset, os),
+    playbackUrl: getPlaybackUrl(ingest, asset, os),
   };
 }
 
@@ -822,73 +811,6 @@ app.post(
   authorizer({}),
   validatePost("new-asset-payload"),
   uploadWithUrlHandler
-);
-
-// /:id/transcode and /transcode routes registered right below
-const transcodeAssetHandler: RequestHandler = async (req, res) => {
-  if (!req.params?.id && !req.body.assetId) {
-    // called from the old `/api/asset/transcode` endpoint
-    throw new BadRequestError(
-      "Missing `assetId` payload field of the input asset"
-    );
-  }
-  if (req.params?.id && req.body.assetId) {
-    // called from the new `/api/asset/:assetId/transcode` endpoint
-    throw new BadRequestError(
-      "Field `assetId` is not allowed in payload when included in the URL"
-    );
-  }
-  const assetId = req.params?.id || req.body.assetId;
-
-  const inputAsset = await db.asset.get(assetId);
-  if (!inputAsset) {
-    throw new NotFoundError(`asset not found`);
-  }
-
-  const id = uuid();
-  const playbackId = await generateUniquePlaybackId(id);
-  let outputAsset = await validateAssetPayload(
-    id,
-    playbackId,
-    req.user.id,
-    Date.now(),
-    defaultObjectStoreId(req, true), // transcode only in old pipeline for now
-    req.config,
-    {
-      name: req.body.name ?? inputAsset.name,
-    },
-    { type: "transcode", inputAssetId: inputAsset.id }
-  );
-  outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
-
-  await ensureQueueCapacity(req.config, req.user.id);
-  outputAsset = await createAsset(outputAsset, req.queue);
-
-  const task = await req.taskScheduler.createAndScheduleTask(
-    "transcode",
-    {
-      transcode: {
-        profile: req.body.profile,
-      },
-    },
-    inputAsset,
-    outputAsset
-  );
-  res.status(201);
-  res.json({ asset: outputAsset, task: { id: task.id } });
-};
-app.post(
-  "/:id/transcode",
-  authorizer({}),
-  validatePost("transcode-asset-payload"),
-  transcodeAssetHandler
-);
-// TODO: Remove this at some point. Registered only for backward compatibility.
-app.post(
-  "/transcode",
-  authorizer({}),
-  validatePost("transcode-asset-payload"),
-  transcodeAssetHandler
 );
 
 app.post(

@@ -84,7 +84,7 @@ const getAssetPlaybackInfo = async (
     return null;
   }
 
-  const playbackUrl = assetPlaybackUrl(config, ingest, asset, os);
+  const playbackUrl = assetPlaybackUrl(ingest, asset, os);
 
   if (!playbackUrl) {
     return null;
