@@ -74,7 +74,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
   return true;
 }
 
-function defaultObjectStoreId(
+export function defaultObjectStoreId(
   { config, body }: Request,
   isOldPipeline?: boolean
 ): string {
@@ -161,7 +161,7 @@ function parseUrlToDStorageUrl(
   return null;
 }
 
-async function validateAssetPayload(
+export async function validateAssetPayload(
   id: string,
   playbackId: string,
   userId: string,
