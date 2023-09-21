@@ -413,8 +413,6 @@ app.post("/", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user not created"] });
   }
 
-  let response = user;
-
   if (req.config.requireEmailVerification && !user.emailValid) {
     res.status(403);
     return res.json({ errors: ["we just sent you a verification email"] });
