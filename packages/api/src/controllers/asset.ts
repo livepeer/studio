@@ -56,7 +56,7 @@ import mung from "express-mung";
 
 const app = Router();
 
-function catalystPipelineStrategy(req: Request) {
+export function catalystPipelineStrategy(req: Request) {
   let { catalystPipelineStrategy } = req.body as NewAssetPayload;
   if (!req.user.admin && !req.user.isTestUser) {
     catalystPipelineStrategy = undefined;
