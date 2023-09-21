@@ -64,7 +64,7 @@ const LoginPage = () => {
                 lineHeight: "30px",
                 textAlign: "center",
               }}>
-              Sigin in to your account
+              Signin in to your account
             </Text>
 
             <Login
