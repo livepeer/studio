@@ -296,7 +296,11 @@ app.post("/", validatePost("user"), async (req, res) => {
   const isEmailRegisteredAlready = await isEmailRegistered(email);
   if (isEmailRegisteredAlready) {
     res.status(409);
-    res.json({ errors: ["email already registered"] });
+    res.json({
+      errors: [
+        "email already registered - please sign in instead or check your verification email",
+      ],
+    });
     return;
   }
 
@@ -409,6 +413,13 @@ app.post("/", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user not created"] });
   }
 
+  let response = user;
+
+  if (req.config.requireEmailVerification && !user.emailValid) {
+    res.status(403);
+    return res.json({ errors: ["we just sent you a verification email"] });
+  }
+
   res.status(201);
   res.json(user);
 });
@@ -508,6 +519,15 @@ app.post("/token", validatePost("user"), async (req, res) => {
       algorithm: "HS256",
     }
   );
+
+  if (req.config.requireEmailVerification && !user.emailValid) {
+    res.status(403);
+    return res.json({
+      errors: [
+        "user has not been verified - please check your inbox for verification email",
+      ],
+    });
+  }
   res.status(201);
   res.json({ id: user.id, email: user.email, token: token });
 });
