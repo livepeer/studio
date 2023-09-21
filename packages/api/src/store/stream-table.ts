@@ -304,6 +304,16 @@ export default class StreamTable extends Table<DBStream> {
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
+  async getLastSessionFromSessionsTable(id: string, opts?: QueryOptions) {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT * FROM session  WHERE data->>'parentId'=${id} ORDER BY data->>'createdAt' DESC LIMIT 1`.setName(
+        `${this.name}_by_parentid_last_session`
+      ),
+      opts
+    );
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
+  }
+
   async getActiveSessions(
     id: string,
     opts?: QueryOptions

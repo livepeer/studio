@@ -22,9 +22,8 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   const id = uuid();
   let uPlaybackId = await generateUniquePlaybackId(id);
 
-  const content =
-    (await db.stream.getByPlaybackId(playbackId)) ||
-    (await db.asset.getByPlaybackId(playbackId));
+  const content = await db.stream.getByPlaybackId(playbackId); //||
+  //(await db.asset.getByPlaybackId(playbackId));
 
   let isStream: boolean;
   if (content && "streamKey" in content) {
@@ -62,13 +61,25 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   let url: string;
 
   if (isStream) {
-    console.log(`fetching last session for stream ${content.id}`);
-    let session = await db.stream.getLastSession(content.id);
+    if (!content.record) {
+      res
+        .status(400)
+        .json({
+          errors: [
+            "Recording must be enabled on a live stream to create clips",
+          ],
+        });
+    }
+    let session = await db.stream.getLastSessionFromSessionsTable(content.id);
     const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
     url = pathJoin(os.publicUrl, session.playbackId, session.id, "output.m3u8");
   } else {
-    const os = await db.objectStore.get(req.config.vodCatalystObjectStoreId);
-    url = pathJoin(os.publicUrl, content.playbackId, content.id, "index.m3u8");
+    res
+      .status(400)
+      .json({ errors: ["Clipping for assets is not implemented yet"] });
+    return;
+    //const os = await db.objectStore.get(req.config.vodCatalystObjectStoreId);
+    //url = pathJoin(os.publicUrl, content.playbackId, content.id, "index.m3u8");
   }
 
   asset = await createAsset(asset, req.queue);
