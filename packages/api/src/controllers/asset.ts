@@ -77,7 +77,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
   return true;
 }
 
-const secondaryStorageExperiment = "secondary_vod_storage";
+const secondaryStorageExperiment = "secondary-vod-storage";
 
 async function defaultObjectStoreId(
   { config, body, user }: Request,
@@ -95,11 +95,10 @@ async function defaultObjectStoreId(
     secondaryStorageExperiment,
     user.id
   );
-  const secondaryjObjectStoreId = secondaryStorageEnabled
-    ? config.secondaryVodObjectStoreId
-    : undefined;
+  const secondaryObjectStoreId =
+    secondaryStorageEnabled && config.secondaryVodObjectStoreId;
   return (
-    secondaryjObjectStoreId ||
+    secondaryObjectStoreId ||
     config.vodCatalystObjectStoreId ||
     config.vodObjectStoreId
   );
