@@ -50,7 +50,10 @@ import { WithID } from "../store/types";
 import Queue from "../store/queue";
 import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
 import os from "os";
-import { ensureExperimentSubject } from "../store/experiment-table";
+import {
+  ensureExperimentSubject,
+  isExperimentSubject,
+} from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
 
@@ -74,10 +77,12 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
   return true;
 }
 
-function defaultObjectStoreId(
-  { config, body }: Request,
+const secondaryStorageExperiment = "secondary_vod_storage";
+
+async function defaultObjectStoreId(
+  { config, body, user }: Request,
   isOldPipeline?: boolean
-): string {
+): Promise<string> {
   if (isOldPipeline) {
     return config.vodObjectStoreId;
   }
@@ -85,7 +90,19 @@ function defaultObjectStoreId(
   if (isPrivatePlaybackPolicy(body.playbackPolicy)) {
     return config.vodCatalystPrivateAssetsObjectStoreId;
   }
-  return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
+
+  const secondaryStorageEnabled = await isExperimentSubject(
+    secondaryStorageExperiment,
+    user.id
+  );
+  const secondaryjObjectStoreId = secondaryStorageEnabled
+    ? config.secondaryVodObjectStoreId
+    : undefined;
+  return (
+    secondaryjObjectStoreId ||
+    config.vodCatalystObjectStoreId ||
+    config.vodObjectStoreId
+  );
 }
 
 export function assetEncryptionWithoutKey(
@@ -771,7 +788,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     playbackId,
     req.user.id,
     Date.now(),
-    defaultObjectStoreId(req),
+    await defaultObjectStoreId(req),
     req.config,
     req.body,
     { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
@@ -852,7 +869,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     playbackId,
     req.user.id,
     Date.now(),
-    defaultObjectStoreId(req, true), // transcode only in old pipeline for now
+    await defaultObjectStoreId(req, true), // transcode only in old pipeline for now
     req.config,
     {
       name: req.body.name ?? inputAsset.name,
@@ -916,7 +933,7 @@ app.post(
       playbackId,
       req.user.id,
       Date.now(),
-      defaultObjectStoreId(req),
+      await defaultObjectStoreId(req),
       req.config,
       req.body,
       {
