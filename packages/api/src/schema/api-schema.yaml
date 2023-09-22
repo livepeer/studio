@@ -2098,6 +2098,30 @@ components:
                   bitrate:
                     type: number
                     example: 449890
+            recordings:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required:
+                  - hrn
+                  - type
+                  - url
+                properties:
+                  hrn:
+                    type: string
+                    example: MP4
+                    enum:
+                      - HLS (TS)
+                  type:
+                    type: string
+                    example: html5/video/mp4
+                    enum:
+                      - html5/application/vnd.apple.mpegurl
+                  url:
+                    type: string
+                    example: >-
+                      https://asset-cdn.lp-playback.monster/hls/1bde4o2i6xycudoy/static360p0.mp4
             attestation:
               $ref: "#/components/schemas/attestation"
     attestation:
