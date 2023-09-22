@@ -1556,6 +1556,12 @@ components:
                     - background_mist
                     - fallback_external
                     - external
+                sessionId:
+                  type: string
+                  description: ID of the session
+                inputId:
+                  type: string
+                  description: ID of the input asset or stream
         status:
           readOnly: true
           type: object
