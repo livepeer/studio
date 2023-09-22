@@ -96,7 +96,7 @@ async function isEmailRegistered(
   return users?.length > 0;
 }
 
-const frontendUrl = (
+export const frontendUrl = (
   {
     headers: { "x-forwarded-proto": proto },
     config: { frontendDomain },
@@ -104,7 +104,7 @@ const frontendUrl = (
   path: string
 ) => `${proto || "https"}://${frontendDomain}${path}`;
 
-const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
+export const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
 
 export async function terminateUserStreams(
   req: Request,

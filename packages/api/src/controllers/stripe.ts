@@ -1,54 +1,22 @@
 import { Router, Request } from "express";
 import { db } from "../store";
-import Stripe from "stripe";
 import { products } from "../config";
 import sql from "sql-template-strings";
-import fetch from "node-fetch";
-import qs from "qs";
 import { sendgridEmailPaymentFailed } from "./helpers";
 import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { authorizer } from "../middleware";
-import { getBillingUsage, calculateOverUsage } from "./usage";
+import { getUsageData } from "./usage";
+import {
+  notifyUser,
+  getUsageNotifications,
+  notifyMissingPaymentMethod,
+} from "./notification";
 
 const app = Router();
 
 export const reportUsage = async (req: Request, adminToken: string) => {
-  const [users] = await db.user.find(
-    [
-      sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
-    ],
-    {
-      limit: 9999999999,
-      useReplica: true,
-    }
-  );
-
-  // This is for old users who are on the pro plan
-  // They are on the hacker plan after migration, with pay as you go enabled
-  // We need to report usage for them as well
-  const [oldProPlanUsers] = await db.user.find(
-    [
-      sql`users.data->>'oldProPlan' = 'true' AND users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW')`,
-    ],
-    {
-      limit: 9999999999,
-      useReplica: true,
-    }
-  );
-
-  // Current date in milliseconds
-  const currentDateMillis = new Date().getTime();
-  const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
-
-  // One month ago unix millis timestamp
-  const cutOffDate = currentDateMillis - oneMonthMillis;
-
-  const [hackerUsers] = await db.user.find([
-    sql`users.data->>'stripeProductId' IN ('hacker_1','prod_O9XuIjn7EqYRVW') AND (users.data->>'lastStreamedAt')::bigint > ${cutOffDate}`,
-  ]);
-
-  const payAsYouGoUsers = [...users, ...oldProPlanUsers, ...hackerUsers];
+  let payAsYouGoUsers = await getPayAsYouGoUsers();
 
   let updatedUsers = [];
   for (const user of payAsYouGoUsers) {
@@ -71,6 +39,45 @@ export const reportUsage = async (req: Request, adminToken: string) => {
     updatedUsers: updatedUsers,
   };
 };
+
+async function getPayAsYouGoUsers() {
+  const [users] = await db.user.find(
+    [
+      sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
+    ],
+    {
+      limit: 9999999999,
+      useReplica: true,
+    }
+  );
+
+  // Current date in milliseconds
+  const currentDateMillis = new Date().getTime();
+  const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
+
+  // One month ago unix millis timestamp
+  const cutOffDate = currentDateMillis - oneMonthMillis;
+
+  const [hackerUsers] = await db.user.find([
+    sql`
+      LEFT JOIN asset a
+      ON u.data->>'id' = a.data->>'userId'
+      AND CAST(a.data->>'createdAt' AS bigint) > ${cutOffDate}
+
+      WHERE 
+      (
+          a.data->>'createdAt' IS NOT NULL 
+          OR 
+          CAST(u.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
+      )
+      AND
+      u.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW');
+  `,
+  ]);
+
+  const payAsYouGoUsers = [...users, ...hackerUsers];
+  return payAsYouGoUsers;
+}
 
 async function reportUsageForUser(
   req: Request,
@@ -104,17 +111,13 @@ async function reportUsageForUser(
   }
 
   const ingests = await req.getIngest();
-  const billingUsage = await getBillingUsage(
-    user.id,
+
+  const usageData = await getUsageData(
+    user,
     billingCycleStart,
     billingCycleEnd,
-    ingests[0].origin,
+    ingests,
     adminToken
-  );
-
-  const overUsage = await calculateOverUsage(
-    products[user.stripeProductId],
-    billingUsage
   );
 
   const subscriptionItems = await req.stripe.subscriptionItems.list({
@@ -127,31 +130,21 @@ async function reportUsageForUser(
   ) {
     if (
       !user.stripeCustomerPaymentMethodId &&
-      (overUsage.TotalUsageMins > 0 ||
-        overUsage.DeliveryUsageMins > 0 ||
-        overUsage.StorageUsageMins > 0)
+      (usageData.overUsage.TotalUsageMins > 0 ||
+        usageData.overUsage.DeliveryUsageMins > 0 ||
+        usageData.overUsage.StorageUsageMins > 0)
     ) {
-      console.log(`
-        User=${user.id} is in overusage but doesn't have a payment method, notyfing support team
-      `);
-      let emailSent = await sendgridEmailPaymentFailed({
-        email: "help@livepeer.org",
-        supportAddr: req.config.supportAddr,
-        sendgridApiKey: req.config.sendgridApiKey,
-        user,
-        invoiceId: null,
-        invoiceUrl: null,
-        templateId: req.config.sendgridTemplateId,
-      });
-
-      if (emailSent) {
-        await db.user.update(user.id, {
-          lastEmailAboutPaymentFailure: Date.now(),
-        });
-      }
-      return {};
+      await notifyMissingPaymentMethod(user, req);
     }
-    // If they have a card and in overusage, report the usage
+  }
+
+  const usageNotifications = await getUsageNotifications(
+    usageData.usagePercentages,
+    user
+  );
+
+  if (usageNotifications.length > 0) {
+    await notifyUser(usageNotifications, user, req.config);
   }
 
   if (actuallyReport) {
@@ -167,14 +160,13 @@ async function reportUsageForUser(
       user,
       req,
       subscriptionItemsByLookupKey,
-      overUsage
+      usageData.overUsage
     );
   }
 
   return {
     id: user.id,
-    overUsage: overUsage,
-    usage: billingUsage,
+    usageData,
     isLivepeer: false,
     billingCycleStart,
     billingCycleEnd,
@@ -308,20 +300,43 @@ app.post("/webhook", async (req, res) => {
        invoice=${invoice.id} payment failed for user=${user.id} notifying support team
     `);
 
-    let emailSent = await sendgridEmailPaymentFailed({
-      email: "help@livepeer.org",
-      supportAddr: req.config.supportAddr,
-      sendgridApiKey: req.config.sendgridApiKey,
-      user,
-      invoiceId: invoice.id,
-      invoiceUrl: invoiceUrl,
-      templateId: req.config.sendgridTemplateId,
-    });
+    try {
+      // Try catch to still respond to stripe even if email fails
+      let lastNotification = user.notifications?.lastEmailAboutPaymentFailure;
 
-    if (emailSent) {
-      await db.user.update(user.id, {
-        lastEmailAboutPaymentFailure: Date.now(),
+      if (lastNotification) {
+        let now = Date.now();
+        let diff = now - lastNotification;
+        let days = diff / (1000 * 60 * 60 * 24);
+        if (days < 7) {
+          console.log(`
+            Not sending email for payment failure of user=${user.id} because team was notified less than 7 days ago
+          `);
+          return res.sendStatus(200);
+        }
+      }
+
+      let emailSent = await sendgridEmailPaymentFailed({
+        email: "help@livepeer.org",
+        supportAddr: req.config.supportAddr,
+        sendgridApiKey: req.config.sendgridApiKey,
+        user,
+        invoiceId: invoice.id,
+        invoiceUrl: invoiceUrl,
+        templateId: req.config.sendgridTemplateId,
       });
+
+      if (emailSent) {
+        await db.user.update(user.id, {
+          notifications: {
+            lastEmailAboutPaymentFailure: Date.now(),
+          },
+        });
+      }
+    } catch (e) {
+      console.log(`
+        Failed to send email for payment failure of user=${user.id} with error=${e.message}
+      `);
     }
   }
 
@@ -406,6 +421,7 @@ app.post(
       subscription = await req.stripe.subscriptions.update(
         user.stripeCustomerSubscriptionId,
         {
+          billing_cycle_anchor: "unchanged",
           proration_behavior: "none",
           cancel_at_period_end: false,
           items: [
