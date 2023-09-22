@@ -12,6 +12,7 @@ import {
 } from "./asset";
 import { generateUniquePlaybackId } from "./generate-keys";
 import { v4 as uuid } from "uuid";
+import { DBSession } from "../store/db";
 
 const app = Router();
 
@@ -60,17 +61,14 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
 
   let url: string;
 
+  let session: DBSession;
   if (isStream) {
     if (!content.record) {
-      res
-        .status(400)
-        .json({
-          errors: [
-            "Recording must be enabled on a live stream to create clips",
-          ],
-        });
+      res.status(400).json({
+        errors: ["Recording must be enabled on a live stream to create clips"],
+      });
     }
-    let session = await db.stream.getLastSessionFromSessionsTable(content.id);
+    session = await db.stream.getLastSessionFromSessionsTable(content.id);
     const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
     url = pathJoin(os.publicUrl, session.playbackId, session.id, "output.m3u8");
   } else {
@@ -95,6 +93,8 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
         },
         catalystPipelineStrategy: catalystPipelineStrategy(req),
         url,
+        sessionId: session.id,
+        inputId: content.id,
       },
     },
     null,
