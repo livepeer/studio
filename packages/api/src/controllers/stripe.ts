@@ -12,6 +12,7 @@ import {
   getUsageNotifications,
   notifyMissingPaymentMethod,
 } from "./notification";
+import { sleep } from "../util";
 
 const app = Router();
 
@@ -163,6 +164,9 @@ async function reportUsageForUser(
       usageData.overUsage
     );
   }
+
+  // Sleep to avoid to incur into stripe rate limits
+  await sleep(100);
 
   return {
     id: user.id,
