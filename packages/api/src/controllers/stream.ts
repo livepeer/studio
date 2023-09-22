@@ -401,6 +401,21 @@ app.get("/", authorizer({}), async (req, res) => {
   );
 });
 
+export async function getRecordingPlaybackUrl(
+  stream: DBStream,
+  objectStoreId: string
+) {
+  const session = await db.stream.getLastSessionFromSessionsTable(stream.id);
+  const os = await db.objectStore.get(objectStoreId);
+  const url = pathJoin(
+    os.publicUrl,
+    session.playbackId,
+    session.id,
+    "output.m3u8"
+  );
+  return url;
+}
+
 export async function getRecordingFields(
   config: CliArgs,
   ingest: string,
