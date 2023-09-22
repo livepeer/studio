@@ -522,7 +522,7 @@ app.post("/token", validatePost("user"), async (req, res) => {
     res.status(403);
     return res.json({
       errors: [
-        "user has not been verified - please check your inbox for verification email",
+        "This account has not been verified - please check your inbox for a verification email.",
       ],
     });
   }
