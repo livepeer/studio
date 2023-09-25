@@ -1,5 +1,5 @@
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { Request, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import { NotFoundError } from "../store/errors";
@@ -108,9 +108,9 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   });
 });
 
-async function getRecordingUrl(content: DBStream) {
+async function getRecordingUrl(content: DBStream, req: Request) {
   const session = await db.stream.getLastSessionFromSessionsTable(content.id);
-  const os = await db.objectStore.get(this.recordCatalystObjectStoreId);
+  const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
 
   let url = pathJoin(
     os.publicUrl,
@@ -126,8 +126,8 @@ async function getRecordingUrl(content: DBStream) {
   let resp = await fetchWithTimeout(url, params);
 
   if (resp.status != 200) {
-    const secondaryOs = this.secondaryRecordObjectStoreId
-      ? await db.objectStore.get(this.secondaryRecordObjectStoreId)
+    const secondaryOs = req.config.secondaryRecordObjectStoreId
+      ? await db.objectStore.get(req.config.secondaryRecordObjectStoreId)
       : undefined;
     url = pathJoin(
       secondaryOs.publicUrl,
