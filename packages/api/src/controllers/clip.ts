@@ -70,7 +70,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
         errors: ["Recording must be enabled on a live stream to create clips"],
       });
     }
-    url = await getRecordingUrl(content);
+    url = await getRecordingUrl(content, req);
   } else {
     res
       .status(400)
