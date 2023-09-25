@@ -405,14 +405,24 @@ export async function getRecordingPlaybackUrl(
   stream: DBStream,
   objectStoreId: string
 ) {
-  const session = await db.stream.getLastSessionFromSessionsTable(stream.id);
-  const os = await db.objectStore.get(objectStoreId);
-  const url = pathJoin(
-    os.publicUrl,
-    session.playbackId,
-    session.id,
-    "output.m3u8"
-  );
+  let url: string;
+
+  try {
+    const session = await db.stream.getLastSessionFromSessionsTable(stream.id);
+
+    if (!session) {
+      return null;
+    }
+
+    const os = await db.objectStore.get(objectStoreId);
+    url = pathJoin(os.publicUrl, session.playbackId, session.id, "output.m3u8");
+  } catch (e) {
+    console.log(`
+      Error getting recording playback url: ${e}
+    `);
+    return null;
+  }
+
   return url;
 }
 
