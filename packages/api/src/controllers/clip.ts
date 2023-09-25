@@ -70,7 +70,9 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
         errors: ["Recording must be enabled on a live stream to create clips"],
       });
     }
-    url = await getRecordingUrl(content, req);
+    let recordingResponse = await getRecordingUrl(content, req);
+    url = recordingResponse.url;
+    session = recordingResponse.session;
   } else {
     res
       .status(400)
@@ -143,7 +145,10 @@ async function getRecordingUrl(content: DBStream, req: Request) {
     throw new Error("Recording not found");
   }*/
 
-  return url;
+  return {
+    url,
+    session,
+  };
 }
 
 export default app;
