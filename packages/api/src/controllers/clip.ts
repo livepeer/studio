@@ -70,9 +70,10 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
         errors: ["Recording must be enabled on a live stream to create clips"],
       });
     }
-    let recordingResponse = await getRecordingUrl(content, req);
-    url = recordingResponse.url;
-    session = recordingResponse.session;
+    let runningRecording = await getRunningRecording(content, req);
+    url = runningRecording.url;
+    session = runningRecording.session;
+    asset.objectStoreId = runningRecording.objectStoreId;
   } else {
     res
       .status(400)
@@ -110,7 +111,9 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   });
 });
 
-async function getRecordingUrl(content: DBStream, req: Request) {
+async function getRunningRecording(content: DBStream, req: Request) {
+  let objectStoreId: string;
+
   const session = await db.stream.getLastSessionFromSessionsTable(content.id);
   const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
 
@@ -137,17 +140,22 @@ async function getRecordingUrl(content: DBStream, req: Request) {
       session.id,
       "output.m3u8"
     );
+    /*
+    TODO: Enable to check if recording is running on the secondary one 
+    resp = await fetchWithTimeout(url, params);
+
+    if (resp.status != 200) {
+      throw new Error("Recording not found");
+    }*/
+    objectStoreId = req.config.secondaryRecordObjectStoreId;
+  } else {
+    objectStoreId = req.config.recordCatalystObjectStoreId;
   }
-
-  /*resp = await fetchWithTimeout(url, params);
-
-  if (resp.status != 200) {
-    throw new Error("Recording not found");
-  }*/
 
   return {
     url,
     session,
+    objectStoreId,
   };
 }
 
