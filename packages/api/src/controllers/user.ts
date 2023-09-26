@@ -413,7 +413,12 @@ app.post("/", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user not created"] });
   }
 
-  if (req.config.requireEmailVerification && !user.emailValid) {
+  if (
+    req.config.requireEmailVerification &&
+    !user.emailValid &&
+    !user.admin &&
+    !req.config.isTest
+  ) {
     res.status(403);
     return res.json({ errors: ["we just sent you a verification email"] });
   }
@@ -518,7 +523,12 @@ app.post("/token", validatePost("user"), async (req, res) => {
     }
   );
 
-  if (req.config.requireEmailVerification && !user.emailValid) {
+  if (
+    req.config.requireEmailVerification &&
+    !user.emailValid &&
+    !user.admin &&
+    !req.config.isTest
+  ) {
     res.status(403);
     return res.json({
       errors: [
