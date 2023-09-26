@@ -48,15 +48,16 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   }
 
   let url: string;
-
   let session: DBSession;
+  let objectStoreId: string;
+
   if (isStream) {
     if (!content.record) {
       res.status(400).json({
         errors: ["Recording must be enabled on a live stream to create clips"],
       });
     }
-    ({ url, session } = await getRunningRecording(content, req));
+    ({ url, session, objectStoreId } = await getRunningRecording(content, req));
   } else {
     res
       .status(400)
@@ -99,6 +100,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
         url,
         sessionId: session.id,
         inputId: content.id,
+        sourceObjectStoreId: objectStoreId,
       },
     },
     null,
@@ -148,11 +150,16 @@ async function getRunningRecording(content: DBStream, req: Request) {
     if (resp.status != 200) {
       throw new Error("Recording not found");
     }*/
+
+    objectStoreId = req.config.secondaryRecordObjectStoreId;
+  } else {
+    objectStoreId = req.config.recordCatalystObjectStoreId;
   }
 
   return {
     url,
     session,
+    objectStoreId,
   };
 }
 
