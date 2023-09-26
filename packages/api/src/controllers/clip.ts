@@ -73,7 +73,6 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     let runningRecording = await getRunningRecording(content, req);
     url = runningRecording.url;
     session = runningRecording.session;
-    asset.objectStoreId = runningRecording.objectStoreId;
   } else {
     res
       .status(400)
