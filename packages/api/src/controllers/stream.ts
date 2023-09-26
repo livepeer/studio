@@ -20,7 +20,7 @@ import {
   User,
 } from "../schema/types";
 import { db } from "../store";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 import {
   BadRequestError,
   InternalServerError,
@@ -408,7 +408,7 @@ export async function getRecordingPlaybackUrl(
   let url: string;
 
   try {
-    const session = await db.stream.getLastSessionFromSessionsTable(stream.id);
+    const session = await db.session.getLastSession(stream.id);
 
     if (!session) {
       return null;

@@ -19,10 +19,7 @@ import {
   Attestation,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
-import StreamTable, {
-  DeprecatedStreamFields,
-  StreamStats,
-} from "./stream-table";
+import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
@@ -31,6 +28,7 @@ import AssetTable from "./asset-table";
 import TaskTable from "./task-table";
 import ExperimentTable from "./experiment-table";
 import AttestationTable from "./attestation-table";
+import SessionTable, { DBSession } from "./session-table";
 
 // Should be configurable, perhaps?
 export const CONNECT_TIMEOUT =
@@ -41,8 +39,6 @@ export interface PostgresParams {
   postgresReplicaUrl?: string;
   appName?: string;
 }
-
-export type DBSession = WithID<Session> & StreamStats & DeprecatedStreamFields;
 
 type Table<T> = BaseTable<WithID<T>>;
 
@@ -78,7 +74,7 @@ export class DB {
   webhookResponse: Table<WebhookResponse>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
-  session: Table<DBSession>;
+  session: SessionTable;
   room: Table<Room>;
 
   postgresUrl: string;
@@ -184,7 +180,7 @@ export class DB {
       db: this,
       schema: schemas["webhook-response"],
     });
-    this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
+    this.session = new SessionTable({ db: this, schema: schemas["session"] });
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
 
     const tables = Object.entries(schema.components.schemas).filter(

@@ -12,7 +12,7 @@ import {
   StaticPlaybackInfo,
 } from "./asset";
 import { CliArgs } from "../parse-cli";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
