@@ -12,7 +12,7 @@ import {
 } from "./asset";
 import { generateUniquePlaybackId } from "./generate-keys";
 import { v4 as uuid } from "uuid";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 import { fetchWithTimeout } from "../util";
 import { DBStream } from "../store/stream-table";
 
@@ -117,7 +117,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
 async function getRunningRecording(content: DBStream, req: Request) {
   let objectStoreId: string;
 
-  const session = await db.stream.getLastSessionFromSessionsTable(content.id);
+  const session = await db.session.getLastSession(content.id);
   const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
 
   let url = pathJoin(
@@ -144,7 +144,7 @@ async function getRunningRecording(content: DBStream, req: Request) {
       "output.m3u8"
     );
     /*
-    TODO: Enable to check if recording is running on the secondary one 
+    TODO: Enable to check if recording is running on the secondary one
     resp = await fetchWithTimeout(url, params);
 
     if (resp.status != 200) {
