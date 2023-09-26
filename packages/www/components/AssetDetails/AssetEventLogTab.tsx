@@ -30,7 +30,16 @@ const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
               task.outputAssetId === asset.id || task.inputAssetId === asset.id
           )
           ?.map((task) => ({
-            type: task?.params?.export?.["ipfs"] ? "ipfs-upload" : "other",
+            type:
+              asset.source?.type == "url"
+                ? "url-import"
+                : asset.source?.type == "directUpload"
+                ? "file-import"
+                : asset.source?.type == "recording"
+                ? "recorded-session"
+                : task?.params?.export?.["ipfs"]
+                ? "ipfs-upload"
+                : "other",
             timestamp: task?.createdAt ?? Date.now(),
           }));
 
