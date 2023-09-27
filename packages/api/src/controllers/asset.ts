@@ -177,7 +177,7 @@ function parseUrlToDStorageUrl(
   return null;
 }
 
-async function validateAssetPayload(
+export async function validateAssetPayload(
   id: string,
   playbackId: string,
   userId: string,

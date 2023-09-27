@@ -798,8 +798,13 @@ components:
                   type: string
                   enum:
                     - directUpload
+                    - clip
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
+                sourceId:
+                  type: string
+                  description:
+                    ID of the asset or stream from which this asset was created
         creatorId:
           $ref: "#/components/schemas/creator-id"
         storage:
@@ -1380,6 +1385,7 @@ components:
             - export
             - export-data
             - transcode-file
+            - clip
         createdAt:
           readOnly: true
           type: number
@@ -1436,6 +1442,23 @@ components:
                 id:
                   type: string
                   description: Optional ID of the content
+            clip:
+              additionalProperties: false
+              description: Parameters for the clip task
+              properties:
+                startTime:
+                  type: number
+                  description: |
+                    Start time of the clip in milliseconds.
+                endTime:
+                  type: number
+                  description: |
+                    End time of the clip in milliseconds. If not provided, the clip
+                    will end at the end of the input asset.
+                playbackId:
+                  type: string
+                  description: |
+                    Playback ID of the input asset.
             transcode-file:
               type: object
               additionalProperties: false
