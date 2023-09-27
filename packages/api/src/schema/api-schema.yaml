@@ -1377,10 +1377,8 @@ components:
           description: Type of the task
           enum:
             - upload
-            - import
             - export
             - export-data
-            - transcode
             - transcode-file
         createdAt:
           readOnly: true
@@ -1418,14 +1416,6 @@ components:
                   example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
-                recordedSessionId:
-                  type: string
-                  description: |
-                    ID of the original recorded session to avoid re-transcoding
-                    of the same content. Only used for import task.
-                  example: 78df0075-b5f3-4683-a618-1086faca35dc
-            import:
-              $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:
               $ref: "#/components/schemas/export-task-params"
             exportData:
@@ -1446,12 +1436,6 @@ components:
                 id:
                   type: string
                   description: Optional ID of the content
-            transcode:
-              additionalProperties: false
-              description: Parameters for the transcode task
-              properties:
-                profile:
-                  $ref: "#/components/schemas/ffmpeg-profile"
             transcode-file:
               type: object
               additionalProperties: false
@@ -1567,8 +1551,6 @@ components:
                   writeOnly: true
                 assetSpec:
                   $ref: "#/components/schemas/asset"
-            import:
-              $ref: "#/components/schemas/task/properties/output/properties/upload"
             export:
               type: object
               additionalProperties: false
@@ -1621,21 +1603,6 @@ components:
                     cid:
                       type: string
                       description: IPFS CID of the exported data
-            transcode:
-              type: object
-              additionalProperties: false
-              properties:
-                asset:
-                  type: object
-                  additionalProperties: true
-                  properties:
-                    videoFilePath:
-                      type: string
-                    metadataFilePath:
-                      type: string
-                    assetSpec:
-                      type: object
-                      $ref: "#/components/schemas/asset"
     input-creator-id:
       oneOf:
         - $ref: "#/components/schemas/creator-id"
@@ -3730,7 +3697,7 @@ paths:
       description: |
         Retrieves the details of a Task, including progress updates and status.
         Supply the unique Task ID that was returned from your previous request
-        or from an Asset import or export.
+        or from an Asset export.
       parameters:
         - in: path
           name: taskId

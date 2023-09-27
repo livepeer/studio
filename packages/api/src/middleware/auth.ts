@@ -210,8 +210,6 @@ export const corsApiKeyAccessRules: AuthRule[] = [
     resources: [
       "/asset/upload/url",
       "/asset/request-upload",
-      "/asset/:id/transcode",
-      "/asset/transcode", // legacy, remove
       "/asset/:id/export",
     ],
   },
