@@ -33,6 +33,7 @@ import {
   FieldsMap,
 } from "./helpers";
 import { terminateStreamReq } from "./stream";
+import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -417,7 +418,8 @@ app.post("/", validatePost("user"), async (req, res) => {
     req.config.requireEmailVerification &&
     !user.emailValid &&
     !user.admin &&
-    !req.config.isTest
+    !req.config.isTest &&
+    user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
   ) {
     res.status(403);
     return res.json({ errors: ["we just sent you a verification email"] });
@@ -527,7 +529,8 @@ app.post("/token", validatePost("user"), async (req, res) => {
     req.config.requireEmailVerification &&
     !user.emailValid &&
     !user.admin &&
-    !req.config.isTest
+    !req.config.isTest &&
+    user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
   ) {
     res.status(403);
     return res.json({
