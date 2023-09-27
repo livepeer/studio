@@ -129,6 +129,8 @@ export class TaskScheduler {
 
     let assetSpec: Asset;
     switch (task.type) {
+      case "import":
+      case "clip":
       case "upload":
         assetSpec = event.output?.[task.type]?.assetSpec;
         if (!assetSpec) {

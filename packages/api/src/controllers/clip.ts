@@ -56,9 +56,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
         errors: ["Recording must be enabled on a live stream to create clips"],
       });
     }
-    let runningRecording = await getRunningRecording(content, req);
-    url = runningRecording.url;
-    session = runningRecording.session;
+    ({ url, session } = await getRunningRecording(content, req));
   } else {
     res
       .status(400)
@@ -150,15 +148,11 @@ async function getRunningRecording(content: DBStream, req: Request) {
     if (resp.status != 200) {
       throw new Error("Recording not found");
     }*/
-    objectStoreId = req.config.secondaryRecordObjectStoreId;
-  } else {
-    objectStoreId = req.config.recordCatalystObjectStoreId;
   }
 
   return {
     url,
     session,
-    objectStoreId,
   };
 }
 
