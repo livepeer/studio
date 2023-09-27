@@ -33,6 +33,7 @@ import {
   FieldsMap,
 } from "./helpers";
 import { terminateStreamReq } from "./stream";
+import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -296,7 +297,11 @@ app.post("/", validatePost("user"), async (req, res) => {
   const isEmailRegisteredAlready = await isEmailRegistered(email);
   if (isEmailRegisteredAlready) {
     res.status(409);
-    res.json({ errors: ["email already registered"] });
+    res.json({
+      errors: [
+        "email already registered - please sign in instead or check your verification email",
+      ],
+    });
     return;
   }
 
@@ -409,6 +414,20 @@ app.post("/", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user not created"] });
   }
 
+  let isTest =
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+
+  if (
+    req.config.requireEmailVerification &&
+    !user.emailValid &&
+    !user.admin &&
+    !isTest &&
+    user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
+  ) {
+    res.status(403);
+    return res.json({ errors: ["we just sent you a verification email"] });
+  }
+
   res.status(201);
   res.json(user);
 });
@@ -508,6 +527,24 @@ app.post("/token", validatePost("user"), async (req, res) => {
       algorithm: "HS256",
     }
   );
+
+  let isTest =
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+
+  if (
+    req.config.requireEmailVerification &&
+    !user.emailValid &&
+    !user.admin &&
+    !isTest &&
+    user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
+  ) {
+    res.status(403);
+    return res.json({
+      errors: [
+        "This account has not been verified - please check your inbox for a verification email.",
+      ],
+    });
+  }
   res.status(201);
   res.json({ id: user.id, email: user.email, token: token });
 });

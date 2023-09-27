@@ -14,6 +14,8 @@ import tracking from "./tracking";
 
 type AuthScheme = "jwt" | "bearer" | "basic";
 
+export const EMAIL_VERIFICATION_CUTOFF_DATE = 1695765600000;
+
 function parseAuthHeader(authHeader: string) {
   const match = authHeader?.match(/^\s*(\w+)\s+(.+)$/);
   if (!match) return {};
@@ -289,7 +291,9 @@ function authorizer(params: AuthzParams): RequestHandler {
     }
 
     const verifyEmail =
-      req.config.requireEmailVerification && !params.allowUnverified;
+      req.config.requireEmailVerification &&
+      !params.allowUnverified &&
+      user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE;
     if (verifyEmail && !user.emailValid) {
       throw new ForbiddenError(
         `user ${user.email} has not been verified. please check your inbox for verification email.`
