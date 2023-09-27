@@ -15,8 +15,38 @@ import { v4 as uuid } from "uuid";
 import { DBSession } from "../store/session-table";
 import { fetchWithTimeout } from "../util";
 import { DBStream } from "../store/stream-table";
+import { toExternalAsset } from "./asset";
+import { toStringValues } from "./helpers";
+import mung from "express-mung";
+import { Asset } from "../schema/types";
+import { WithID } from "../store/types";
 
 const app = Router();
+
+app.use(
+  mung.jsonAsync(async function cleanWriteOnlyResponses(
+    data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
+    req
+  ) {
+    const { details } = toStringValues(req.query);
+    const toExternalAssetFunc = (a: Asset) =>
+      toExternalAsset(a, req.config, !!details, req.user.admin);
+
+    if (Array.isArray(data)) {
+      return Promise.all(data.map(toExternalAssetFunc));
+    }
+    if ("id" in data) {
+      return toExternalAssetFunc(data);
+    }
+    if ("asset" in data) {
+      return {
+        ...data,
+        asset: await toExternalAssetFunc(data.asset),
+      };
+    }
+    return data;
+  })
+);
 
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
