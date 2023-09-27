@@ -414,11 +414,14 @@ app.post("/", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user not created"] });
   }
 
+  let isTest =
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+
   if (
     req.config.requireEmailVerification &&
     !user.emailValid &&
     !user.admin &&
-    !req.config.isTest &&
+    !isTest &&
     user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
   ) {
     res.status(403);
@@ -525,11 +528,14 @@ app.post("/token", validatePost("user"), async (req, res) => {
     }
   );
 
+  let isTest =
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+
   if (
     req.config.requireEmailVerification &&
     !user.emailValid &&
     !user.admin &&
-    !req.config.isTest &&
+    !isTest &&
     user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
   ) {
     res.status(403);

@@ -58,7 +58,6 @@ if (!params.insecureTestToken) {
 }
 params.listen = true;
 params.requireEmailVerification = true;
-params.isTest = true;
 params.livekitHost = "livekit";
 params.frontend = false;
 
