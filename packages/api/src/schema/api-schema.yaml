@@ -1442,23 +1442,6 @@ components:
                 id:
                   type: string
                   description: Optional ID of the content
-            clip:
-              additionalProperties: false
-              description: Parameters for the clip task
-              properties:
-                startTime:
-                  type: number
-                  description: |
-                    Start time of the clip in milliseconds.
-                endTime:
-                  type: number
-                  description: |
-                    End time of the clip in milliseconds. If not provided, the clip
-                    will end at the end of the input asset.
-                playbackId:
-                  type: string
-                  description: |
-                    Playback ID of the input asset.
             transcode-file:
               type: object
               additionalProperties: false
@@ -1520,6 +1503,43 @@ components:
                     be
                 creatorId:
                   $ref: "#/components/schemas/input-creator-id"
+            clip:
+              properties:
+                url:
+                  type: string
+                  description: URL of the asset to "clip"
+                clipStrategy:
+                  type: object
+                  description: >-
+                    Strategy to use for clipping the asset. If not specified,
+                    the default strategy that Catalyst is configured for will be
+                    used. This field only available for admin users, and is only
+                    used for E2E testing.
+                  additionalProperties: false
+                  properties:
+                    startTime:
+                      type: number
+                      description: Start time of the clip in milliseconds
+                    endTime:
+                      type: number
+                      description: End time of the clip in milliseconds
+                    playbackId:
+                      type: string
+                      description: Playback ID of the stream or asset to clip
+                catalystPipelineStrategy:
+                  type: string
+                  description: >-
+                    Force to use a specific strategy in the Catalyst pipeline.
+                    If not specified, the default strategy that Catalyst is
+                    configured for will be used. This field only available for
+                    admin users, and is only used for E2E testing.
+                  enum:
+                    - catalyst
+                    - catalyst_ffmpeg
+                    - background_external
+                    - background_mist
+                    - fallback_external
+                    - external
         status:
           readOnly: true
           type: object

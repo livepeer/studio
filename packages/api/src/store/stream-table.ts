@@ -296,7 +296,7 @@ export default class StreamTable extends Table<DBStream> {
 
   async getLastSession(id: string, opts?: QueryOptions): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
-      sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->'createdAt' DESC LIMIT 1`.setName(
+      sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->>'createdAt' DESC LIMIT 1`.setName(
         `${this.name}_by_parentid_last_session`
       ),
       opts
