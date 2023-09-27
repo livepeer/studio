@@ -74,7 +74,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     uPlaybackId,
     content.userId,
     Date.now(),
-    defaultObjectStoreId(req),
+    await defaultObjectStoreId(req),
     req.config,
     {
       name: req.body.name || `clip-${uPlaybackId}`,

@@ -79,7 +79,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
 
 const secondaryStorageExperiment = "secondary-vod-storage";
 
-async function defaultObjectStoreId(
+export async function defaultObjectStoreId(
   { config, body, user }: Request,
   isOldPipeline?: boolean
 ): Promise<string> {
