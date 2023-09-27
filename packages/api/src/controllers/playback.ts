@@ -4,6 +4,7 @@ import {
   getHLSPlaybackUrl,
   getWebRTCPlaybackUrl,
   getRecordingFields,
+  getRecordingPlaybackUrl,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
@@ -11,7 +12,7 @@ import {
   StaticPlaybackInfo,
 } from "./asset";
 import { CliArgs } from "../parse-cli";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
@@ -36,7 +37,8 @@ function newPlaybackInfo(
   webRtcUrl?: string | null,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
-  live?: PlaybackInfo["meta"]["live"]
+  live?: PlaybackInfo["meta"]["live"],
+  recordingUrl?: string
 ): PlaybackInfo {
   let playbackInfo: PlaybackInfo = {
     type,
@@ -69,6 +71,14 @@ function newPlaybackInfo(
       hrn: "WebRTC (H264)",
       type: "html5/video/h264",
       url: webRtcUrl,
+    });
+  }
+  if (recordingUrl) {
+    playbackInfo.meta.dvrPlayback = [];
+    playbackInfo.meta.dvrPlayback.push({
+      hrn: "HLS (TS)",
+      type: "html5/application/vnd.apple.mpegurl",
+      url: recordingUrl,
     });
   }
   return playbackInfo;
@@ -183,7 +193,9 @@ async function getPlaybackInfo(
   ingest: string,
   id: string,
   isCrossUserQuery: boolean,
-  origin: string
+  origin: string,
+  withRecordings?: boolean,
+  recordCatalystObjectStoreId?: string
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let { stream, asset, session } = await getResourceByPlaybackId(
@@ -206,13 +218,21 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
+    let recordingPlaybackUrl: string;
+    if (withRecordings) {
+      recordingPlaybackUrl = await getRecordingPlaybackUrl(
+        stream,
+        recordCatalystObjectStoreId
+      );
+    }
     return newPlaybackInfo(
       "live",
       getHLSPlaybackUrl(ingest, stream),
       getWebRTCPlaybackUrl(ingest, stream),
       stream.playbackPolicy,
       null,
-      stream.isActive ? 1 : 0
+      stream.isActive ? 1 : 0,
+      recordingPlaybackUrl
     );
   }
 
@@ -242,6 +262,8 @@ app.get("/:id", async (req, res) => {
   const ingest = ingests[0].base;
 
   let { id } = req.params;
+  const withRecordings = req.query.recordings === "true";
+
   const origin = req.headers["origin"] ?? "";
   const isEmbeddablePlayer = embeddablePlayerOrigin.test(origin);
 
@@ -250,7 +272,9 @@ app.get("/:id", async (req, res) => {
     ingest,
     id,
     isEmbeddablePlayer,
-    origin
+    origin,
+    withRecordings,
+    req.config.recordCatalystObjectStoreId
   );
   if (!info) {
     throw new NotFoundError(`No playback URL found for ${id}`);

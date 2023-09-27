@@ -4,7 +4,7 @@ import { Attestation, Experiment, Asset, User } from "../schema/types";
 import { WithID } from "../store/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 
 const EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE = Date.parse(
   "2023-06-06T00:00:00.000Z"

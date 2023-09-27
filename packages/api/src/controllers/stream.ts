@@ -20,7 +20,7 @@ import {
   User,
 } from "../schema/types";
 import { db } from "../store";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 import {
   BadRequestError,
   InternalServerError,
@@ -400,6 +400,31 @@ app.get("/", authorizer({}), async (req, res) => {
     )
   );
 });
+
+export async function getRecordingPlaybackUrl(
+  stream: DBStream,
+  objectStoreId: string
+) {
+  let url: string;
+
+  try {
+    const session = await db.session.getLastSession(stream.id);
+
+    if (!session) {
+      return null;
+    }
+
+    const os = await db.objectStore.get(objectStoreId);
+    url = pathJoin(os.publicUrl, session.playbackId, session.id, "output.m3u8");
+  } catch (e) {
+    console.log(`
+      Error getting recording playback url: ${e}
+    `);
+    return null;
+  }
+
+  return url;
+}
 
 export async function getRecordingFields(
   config: CliArgs,

@@ -4,7 +4,7 @@ import sql from "sql-template-strings";
 import { authorizer } from "../middleware";
 import { User } from "../schema/types";
 import { db } from "../store";
-import { DBSession } from "../store/db";
+import { DBSession } from "../store/session-table";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { CliArgs } from "../parse-cli";
