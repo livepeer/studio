@@ -1,10 +1,12 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import sql from "sql-template-strings";
 
 import { authorizer } from "../middleware";
 import { User } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
+import { pathJoin } from "../controllers/helpers";
+import { fetchWithTimeout } from "../util";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { CliArgs } from "../parse-cli";
@@ -186,5 +188,57 @@ function removePrivateFields(obj: DBSession) {
 const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 
 const privateFields: (keyof DBSession)[] = ["recordObjectStoreId", "version"];
+
+export async function getRunningRecording(content: DBStream, req: Request) {
+  let objectStoreId: string;
+
+  const session = await db.session.getLastSession(content.id);
+  const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
+
+  let url = pathJoin(
+    os.publicUrl,
+    session.playbackId,
+    session.id,
+    "output.m3u8"
+  );
+
+  let params = {
+    method: "HEAD",
+    timeout: 5 * 1000,
+  };
+  let resp = await fetchWithTimeout(url, params);
+
+  if (resp.status != 200) {
+    const secondaryOs = req.config.secondaryRecordObjectStoreId
+      ? await db.objectStore.get(req.config.secondaryRecordObjectStoreId)
+      : undefined;
+    url = pathJoin(
+      secondaryOs.publicUrl,
+      session.playbackId,
+      session.id,
+      "output.m3u8"
+    );
+
+    objectStoreId = req.config.secondaryRecordObjectStoreId;
+
+    resp = await fetchWithTimeout(url, params);
+
+    if (resp.status != 200) {
+      return {
+        url: null,
+        session,
+        objectStoreId,
+      };
+    }
+  } else {
+    objectStoreId = req.config.recordCatalystObjectStoreId;
+  }
+
+  return {
+    url,
+    session,
+    objectStoreId,
+  };
+}
 
 export default app;
