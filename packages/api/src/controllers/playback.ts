@@ -74,8 +74,8 @@ function newPlaybackInfo(
     });
   }
   if (recordingUrl) {
-    playbackInfo.meta.recordings = [];
-    playbackInfo.meta.recordings.push({
+    playbackInfo.meta.dvrPlayback = [];
+    playbackInfo.meta.dvrPlayback.push({
       hrn: "HLS (TS)",
       type: "html5/application/vnd.apple.mpegurl",
       url: recordingUrl,
@@ -195,7 +195,7 @@ async function getPlaybackInfo(
   isCrossUserQuery: boolean,
   origin: string,
   withRecordings?: boolean,
-  recordingObjectStoreId?: string
+  recordCatalystObjectStoreId?: string
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let { stream, asset, session } = await getResourceByPlaybackId(
@@ -222,7 +222,7 @@ async function getPlaybackInfo(
     if (withRecordings) {
       recordingPlaybackUrl = await getRecordingPlaybackUrl(
         stream,
-        recordingObjectStoreId
+        recordCatalystObjectStoreId
       );
     }
     return newPlaybackInfo(

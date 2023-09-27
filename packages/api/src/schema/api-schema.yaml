@@ -805,6 +805,13 @@ components:
                   type: string
                   description:
                     ID of the asset or stream from which this asset was created
+                sessionId:
+                  type: string
+                  description:
+                    ID of the session from which this asset was created
+                assetId:
+                  type: string
+                  description: ID of the asset from which this asset was created
         creatorId:
           $ref: "#/components/schemas/creator-id"
         storage:
@@ -2098,7 +2105,7 @@ components:
                   bitrate:
                     type: number
                     example: 449890
-            recordings:
+            dvrPlayback:
               type: array
               items:
                 type: object

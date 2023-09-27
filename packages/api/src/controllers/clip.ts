@@ -47,20 +47,6 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     throw new NotFoundError("Content not found");
   }
 
-  let asset = await validateAssetPayload(
-    id,
-    uPlaybackId,
-    content.userId,
-    Date.now(),
-    defaultObjectStoreId(req),
-    req.config,
-    {
-      name: req.body.name || `clip_${uPlaybackId}`,
-    },
-    // TODO: actual type `clip` - currently something's wrong with the types when setting up the schema
-    { type: "directUpload", sourceId: content.id }
-  );
-
   let url: string;
 
   let session: DBSession;
@@ -78,9 +64,27 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
       .status(400)
       .json({ errors: ["Clipping for assets is not implemented yet"] });
     return;
-    //const os = await db.objectStore.get(req.config.vodCatalystObjectStoreId);
-    //url = pathJoin(os.publicUrl, content.playbackId, content.id, "index.m3u8");
   }
+
+  if (!session) {
+    throw new Error("Recording session not found");
+  }
+
+  let asset = await validateAssetPayload(
+    id,
+    uPlaybackId,
+    content.userId,
+    Date.now(),
+    defaultObjectStoreId(req),
+    req.config,
+    {
+      name: req.body.name || `clip-${uPlaybackId}`,
+    },
+    {
+      type: "clip",
+      ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
+    }
+  );
 
   asset = await createAsset(asset, req.queue);
 
@@ -105,7 +109,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   );
 
   res.json({
-    task,
+    task: { id: task.id },
     asset,
   });
 });
