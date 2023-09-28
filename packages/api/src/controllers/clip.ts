@@ -23,6 +23,7 @@ import { WithID } from "../store/types";
 import { getRunningRecording } from "./session";
 
 const app = Router();
+const LVPR_SDK_EMAIL = "livepeerjs@livepeer.org";
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -70,7 +71,10 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
 
   const user = await db.user.get(content.userId);
 
-  if (!user || userId !== content.userId) {
+  if (
+    (!user || userId !== content.userId) &&
+    req.user.email !== LVPR_SDK_EMAIL
+  ) {
     throw new NotFoundError("Content not found");
   }
 
