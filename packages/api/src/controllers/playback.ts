@@ -19,6 +19,7 @@ import { WithID } from "../store/types";
 import { NotFoundError, UnprocessableEntityError } from "../store/errors";
 import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
+import { getRunningRecording } from "./session";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -38,7 +39,9 @@ function newPlaybackInfo(
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   live?: PlaybackInfo["meta"]["live"],
-  recordingUrl?: string
+  recordingUrl?: string,
+  withRecordings?: boolean,
+  streamRecord?: boolean
 ): PlaybackInfo {
   let playbackInfo: PlaybackInfo = {
     type,
@@ -73,14 +76,25 @@ function newPlaybackInfo(
       url: webRtcUrl,
     });
   }
-  if (recordingUrl) {
+  if (withRecordings) {
     playbackInfo.meta.dvrPlayback = [];
-    playbackInfo.meta.dvrPlayback.push({
-      hrn: "HLS (TS)",
-      type: "html5/application/vnd.apple.mpegurl",
-      url: recordingUrl,
-    });
+    if (!streamRecord) {
+      playbackInfo.meta.dvrPlayback.push({
+        error: "recording is not enabled for this stream.",
+      });
+    } else if (recordingUrl) {
+      playbackInfo.meta.dvrPlayback.push({
+        hrn: "HLS (TS)",
+        type: "html5/application/vnd.apple.mpegurl",
+        url: recordingUrl,
+      });
+    } else {
+      playbackInfo.meta.dvrPlayback.push({
+        error: "no running recordings available for this stream.",
+      });
+    }
   }
+
   return playbackInfo;
 }
 
@@ -189,24 +203,23 @@ async function getAttestationPlaybackInfo(
 }
 
 async function getPlaybackInfo(
-  { config, user }: Request,
+  req: Request,
   ingest: string,
   id: string,
   isCrossUserQuery: boolean,
   origin: string,
-  withRecordings?: boolean,
-  recordCatalystObjectStoreId?: string
+  withRecordings?: boolean
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let { stream, asset, session } = await getResourceByPlaybackId(
     id,
-    user,
+    req.user,
     cutoffDate,
     origin
   );
 
   if (asset) {
-    return await getAssetPlaybackInfo(config, ingest, asset);
+    return await getAssetPlaybackInfo(req.config, ingest, asset);
   }
 
   // Streams represent "transcoding sessions" when they are a child stream, in
@@ -218,12 +231,9 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
-    let recordingPlaybackUrl: string;
+    let url: string;
     if (withRecordings) {
-      recordingPlaybackUrl = await getRecordingPlaybackUrl(
-        stream,
-        recordCatalystObjectStoreId
-      );
+      ({ url } = await getRunningRecording(stream, req));
     }
     return newPlaybackInfo(
       "live",
@@ -232,13 +242,15 @@ async function getPlaybackInfo(
       stream.playbackPolicy,
       null,
       stream.isActive ? 1 : 0,
-      recordingPlaybackUrl
+      url,
+      withRecordings,
+      stream.record
     );
   }
 
   if (session) {
     const { recordingUrl } = await getRecordingFields(
-      config,
+      req.config,
       ingest,
       session,
       false
@@ -248,7 +260,13 @@ async function getPlaybackInfo(
     }
   }
 
-  return await getAttestationPlaybackInfo(config, ingest, id, user, cutoffDate);
+  return await getAttestationPlaybackInfo(
+    req.config,
+    ingest,
+    id,
+    req.user,
+    cutoffDate
+  );
 }
 
 const app = Router();
@@ -273,8 +291,7 @@ app.get("/:id", async (req, res) => {
     id,
     isEmbeddablePlayer,
     origin,
-    withRecordings,
-    req.config.recordCatalystObjectStoreId
+    withRecordings
   );
   if (!info) {
     throw new NotFoundError(`No playback URL found for ${id}`);

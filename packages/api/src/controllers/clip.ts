@@ -20,6 +20,7 @@ import { toStringValues } from "./helpers";
 import mung from "express-mung";
 import { Asset } from "../schema/types";
 import { WithID } from "../store/types";
+import { getRunningRecording } from "./session";
 
 const app = Router();
 
@@ -143,54 +144,5 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     asset,
   });
 });
-
-async function getRunningRecording(content: DBStream, req: Request) {
-  let objectStoreId: string;
-
-  const session = await db.session.getLastSession(content.id);
-  const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
-
-  let url = pathJoin(
-    os.publicUrl,
-    session.playbackId,
-    session.id,
-    "output.m3u8"
-  );
-
-  let params = {
-    method: "HEAD",
-    timeout: 5 * 1000,
-  };
-  let resp = await fetchWithTimeout(url, params);
-
-  if (resp.status != 200) {
-    const secondaryOs = req.config.secondaryRecordObjectStoreId
-      ? await db.objectStore.get(req.config.secondaryRecordObjectStoreId)
-      : undefined;
-    url = pathJoin(
-      secondaryOs.publicUrl,
-      session.playbackId,
-      session.id,
-      "output.m3u8"
-    );
-    /*
-    TODO: Enable to check if recording is running on the secondary one
-    resp = await fetchWithTimeout(url, params);
-
-    if (resp.status != 200) {
-      throw new Error("Recording not found");
-    }*/
-
-    objectStoreId = req.config.secondaryRecordObjectStoreId;
-  } else {
-    objectStoreId = req.config.recordCatalystObjectStoreId;
-  }
-
-  return {
-    url,
-    session,
-    objectStoreId,
-  };
-}
 
 export default app;

@@ -2110,10 +2110,6 @@ components:
               items:
                 type: object
                 additionalProperties: false
-                required:
-                  - hrn
-                  - type
-                  - url
                 properties:
                   hrn:
                     type: string
@@ -2129,6 +2125,8 @@ components:
                     type: string
                     example: >-
                       https://asset-cdn.lp-playback.monster/hls/1bde4o2i6xycudoy/static360p0.mp4
+                  error:
+                    type: string
             attestation:
               $ref: "#/components/schemas/attestation"
     attestation:
