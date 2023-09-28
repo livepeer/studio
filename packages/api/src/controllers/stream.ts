@@ -1785,12 +1785,20 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     )}`
   );
 
+  // Inject H264ConstrainedHigh profile for no B-Frames in livestreams unless the user has set it manually
+  const constrainedProfiles = stream.profiles.map((profile) => {
+    return {
+      ...profile,
+      profile: profile.profile ?? "H264ConstrainedHigh",
+    };
+  });
+
   res.json({
     manifestID,
     streamID: stream.parentId ?? streamId,
     sessionID: streamId,
     presets: stream.presets,
-    profiles: stream.profiles,
+    profiles: constrainedProfiles,
     objectStore,
     recordObjectStore,
     recordObjectStoreUrl,
