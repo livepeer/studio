@@ -200,6 +200,18 @@ export async function getRunningRecording(content: DBStream, req: Request) {
   let objectStoreId: string;
 
   const session = await db.session.getLastSession(content.id);
+
+  if (!session) {
+    console.log(`
+      session: get last running session: no sessions found for stream ${content.id}
+    `);
+    return {
+      url: null,
+      session: null,
+      objectStoreId: null,
+    };
+  }
+
   const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
 
   let url = pathJoin(
