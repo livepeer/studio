@@ -2125,7 +2125,7 @@ components:
                     type: string
                     example: >-
                       https://asset-cdn.lp-playback.monster/hls/1bde4o2i6xycudoy/static360p0.mp4
-                  message:
+                  error:
                     type: string
             attestation:
               $ref: "#/components/schemas/attestation"

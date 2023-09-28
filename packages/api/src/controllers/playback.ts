@@ -80,7 +80,7 @@ function newPlaybackInfo(
     playbackInfo.meta.dvrPlayback = [];
     if (!streamRecord) {
       playbackInfo.meta.dvrPlayback.push({
-        message: "Error: Recording is not enabled for this stream.",
+        error: "recording is not enabled for this stream.",
       });
     } else if (recordingUrl) {
       playbackInfo.meta.dvrPlayback.push({
@@ -90,7 +90,7 @@ function newPlaybackInfo(
       });
     } else {
       playbackInfo.meta.dvrPlayback.push({
-        message: "Error: No running recordings available.",
+        error: "no running recordings available.",
       });
     }
   }
@@ -203,24 +203,23 @@ async function getAttestationPlaybackInfo(
 }
 
 async function getPlaybackInfo(
-  { config, user }: Request,
+  req: Request,
   ingest: string,
   id: string,
   isCrossUserQuery: boolean,
   origin: string,
-  withRecordings?: boolean,
-  req?: Request
+  withRecordings?: boolean
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   let { stream, asset, session } = await getResourceByPlaybackId(
     id,
-    user,
+    req.user,
     cutoffDate,
     origin
   );
 
   if (asset) {
-    return await getAssetPlaybackInfo(config, ingest, asset);
+    return await getAssetPlaybackInfo(req.config, ingest, asset);
   }
 
   // Streams represent "transcoding sessions" when they are a child stream, in
@@ -252,7 +251,7 @@ async function getPlaybackInfo(
 
   if (session) {
     const { recordingUrl } = await getRecordingFields(
-      config,
+      req.config,
       ingest,
       session,
       false
@@ -262,7 +261,13 @@ async function getPlaybackInfo(
     }
   }
 
-  return await getAttestationPlaybackInfo(config, ingest, id, user, cutoffDate);
+  return await getAttestationPlaybackInfo(
+    req.config,
+    ingest,
+    id,
+    req.user,
+    cutoffDate
+  );
 }
 
 const app = Router();
@@ -287,8 +292,7 @@ app.get("/:id", async (req, res) => {
     id,
     isEmbeddablePlayer,
     origin,
-    withRecordings,
-    req
+    withRecordings
   );
   if (!info) {
     throw new NotFoundError(`No playback URL found for ${id}`);
