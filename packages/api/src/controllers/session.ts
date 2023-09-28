@@ -190,6 +190,13 @@ const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 const privateFields: (keyof DBSession)[] = ["recordObjectStoreId", "version"];
 
 export async function getRunningRecording(content: DBStream, req: Request) {
+  if (!content.record) {
+    return {
+      url: null,
+      session: null,
+      objectStoreId: null,
+    };
+  }
   let objectStoreId: string;
 
   const session = await db.session.getLastSession(content.id);

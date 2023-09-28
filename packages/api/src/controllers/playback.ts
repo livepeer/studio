@@ -90,7 +90,7 @@ function newPlaybackInfo(
       });
     } else {
       playbackInfo.meta.dvrPlayback.push({
-        error: "no running recordings available.",
+        error: "no running recordings available for this stream.",
       });
     }
   }
@@ -232,8 +232,7 @@ async function getPlaybackInfo(
 
   if (stream) {
     let url: string;
-    let fetchRunningRecording = withRecordings && stream.record;
-    if (fetchRunningRecording) {
+    if (withRecordings) {
       ({ url } = await getRunningRecording(stream, req));
     }
     return newPlaybackInfo(
@@ -244,7 +243,7 @@ async function getPlaybackInfo(
       null,
       stream.isActive ? 1 : 0,
       url,
-      fetchRunningRecording,
+      withRecordings,
       stream.record
     );
   }
