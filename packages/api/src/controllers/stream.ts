@@ -59,15 +59,6 @@ export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
 
-const DEFAULT_STREAM_FIELDS: Partial<DBStream> = {
-  profiles: [
-    { name: "240p0", fps: 0, bitrate: 250000, width: 426, height: 240 },
-    { name: "360p0", fps: 0, bitrate: 800000, width: 640, height: 360 },
-    { name: "480p0", fps: 0, bitrate: 1600000, width: 854, height: 480 },
-    { name: "720p0", fps: 0, bitrate: 3000000, width: 1280, height: 720 },
-  ],
-};
-
 const app = Router();
 const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
   if (
@@ -973,7 +964,7 @@ app.post(
     }
 
     let doc: DBStream = {
-      ...DEFAULT_STREAM_FIELDS,
+      profiles: req.config.defaultStreamProfiles,
       ...payload,
       kind: "stream",
       userId: req.user.id,
@@ -1794,12 +1785,20 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     )}`
   );
 
+  // Inject H264ConstrainedHigh profile for no B-Frames in livestreams unless the user has set it manually
+  const constrainedProfiles = stream.profiles.map((profile) => {
+    return {
+      ...profile,
+      profile: profile.profile ?? "H264ConstrainedHigh",
+    };
+  });
+
   res.json({
     manifestID,
     streamID: stream.parentId ?? streamId,
     sessionID: streamId,
     presets: stream.presets,
-    profiles: stream.profiles,
+    profiles: constrainedProfiles,
     objectStore,
     recordObjectStore,
     recordObjectStoreUrl,

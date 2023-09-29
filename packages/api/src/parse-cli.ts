@@ -8,6 +8,9 @@ import {
   Price,
 } from "./types/common";
 import { defaultTaskExchange } from "./store/queue";
+import { FfmpegProfile } from "./schema/types";
+import profileValidator from "./schema/validators/ffmpeg-profile";
+import { ValidateFunction, ErrorObject } from "ajv";
 
 const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://arweave.net/",
@@ -70,6 +73,34 @@ function coerceJsonValue<T>(flagName: string) {
     } catch (err) {
       throw new Error(`Error in CLI flag --${flagName}: ${err.message}`);
     }
+  };
+}
+
+function coerceJsonProfileArr(flagName: string) {
+  return (str: string): FfmpegProfile[] => {
+    let profiles;
+    const validator = profileValidator as ValidateFunction;
+    try {
+      profiles = JSON.parse(str);
+    } catch (e) {
+      throw new Error(`--${flagName} JSON parsing error: ${e.message}`);
+    }
+    if (!Array.isArray(profiles)) {
+      throw new Error(`--${flagName} must be a JSON array`);
+    }
+    const errors: ErrorObject[] = [];
+    for (const profile of profiles) {
+      const valid = validator(profile);
+      if (!valid) {
+        errors.push(...validator.errors);
+      }
+    }
+    if (errors.length > 0) {
+      throw new Error(
+        `--${flagName} validation error: ${JSON.stringify(errors)}`
+      );
+    }
+    return profiles;
   };
 }
 
@@ -452,6 +483,45 @@ export default function parseCli(argv?: string | readonly string[]) {
           "stream-info-service: broadcaster host:port to fetch info from",
         type: "string",
         default: "127.0.0.1:7935",
+      },
+      "default-stream-profiles": {
+        describe: "default stream transcoding profiles if none are provided",
+        type: "string",
+        default: JSON.stringify([
+          {
+            name: "240p0",
+            fps: 0,
+            bitrate: 250000,
+            width: 426,
+            height: 240,
+            profile: "H264ConstrainedHigh",
+          },
+          {
+            name: "360p0",
+            fps: 0,
+            bitrate: 800000,
+            width: 640,
+            height: 360,
+            profile: "H264ConstrainedHigh",
+          },
+          {
+            name: "480p0",
+            fps: 0,
+            bitrate: 1600000,
+            width: 854,
+            height: 480,
+            profile: "H264ConstrainedHigh",
+          },
+          {
+            name: "720p0",
+            fps: 0,
+            bitrate: 3000000,
+            width: 1280,
+            height: 720,
+            profile: "H264ConstrainedHigh",
+          },
+        ] as FfmpegProfile[]),
+        coerce: coerceJsonProfileArr("default-stream-profiles"),
       },
     })
     .usage(
