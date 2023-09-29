@@ -1385,7 +1385,14 @@ describe("controllers/stream", () => {
         });
         expect(hookRes.status).toBe(200);
         const hookData = await hookRes.json();
-        expect(hookData.profiles).toEqual(testStream.profiles);
+        expect(hookData.profiles).toEqual(
+          testStream.profiles.map((profile) => {
+            return {
+              profile: "H264ConstrainedHigh",
+              ...profile,
+            };
+          })
+        );
       }
     });
 
