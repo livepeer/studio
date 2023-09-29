@@ -518,6 +518,20 @@ components:
             Name of template to send to the users regarding the suspension.
           enum:
             - copyright
+    disable-user-payload:
+      type: object
+      additionalProperties: false
+      required:
+        - disabled
+      properties:
+        disabled:
+          $ref: "#/components/schemas/user/properties/disabled"
+        emailTemplate:
+          type: string
+          description:
+            Name of template to send to the users regarding the suspension.
+          enum:
+            - copyright
     webhook:
       table: webhook
       properties:
