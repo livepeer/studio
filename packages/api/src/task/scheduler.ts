@@ -428,7 +428,10 @@ export class TaskScheduler {
     };
 
     task = await this.updateTask(task, { status });
-    await sleep(retries * TASK_RETRY_BASE_DELAY);
+    // increase sleep for final retry
+    const sleepDur =
+      (retries == MAX_RETRIES ? retries + 1 : retries) * TASK_RETRY_BASE_DELAY;
+    await sleep(sleepDur);
     await this.scheduleTask(task, retries);
   }
 
