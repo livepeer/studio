@@ -145,7 +145,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     },
     null,
     asset,
-    userId
+    clipperUserId
   );
 
   res.json({
