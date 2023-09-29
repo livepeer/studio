@@ -63,6 +63,7 @@ export type SidebarId =
   // /dashboard/stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
+  | "assets/clips"
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
@@ -179,13 +180,27 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               </Box>
             )}
           </Box>
-
-          <Link href="/dashboard/assets" passHref legacyBehavior>
-            <NavLink active={id === "assets"}>
-              <AssetsIcon active={id === "assets"} />
-              Assets
-            </NavLink>
-          </Link>
+          <Box>
+            <Link href="/dashboard/assets" passHref legacyBehavior>
+              <NavLink active={id === "assets"}>
+                <AssetsIcon active={id === "assets"} />
+                Assets
+              </NavLink>
+            </Link>
+            {id?.split("/")[0] === "assets" && (
+              <Box
+                css={{
+                  a: { pl: 35 },
+                  "> :first-child": {
+                    mt: "$1",
+                  },
+                }}>
+                <Link href="/dashboard/clips" passHref legacyBehavior>
+                  <NavLink active={id === "assets/clips"}>Clips</NavLink>
+                </Link>
+              </Box>
+            )}
+          </Box>
 
           <Box>
             <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
