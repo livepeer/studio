@@ -76,6 +76,34 @@ function coerceJsonValue<T>(flagName: string) {
   };
 }
 
+function coerceJsonProfileArr(flagName: string) {
+  return (str: string): FfmpegProfile[] => {
+    let profiles;
+    const validator = profileValidator as ValidateFunction;
+    try {
+      profiles = JSON.parse(str);
+    } catch (e) {
+      throw new Error(`--${flagName} JSON parsing error: ${e.message}`);
+    }
+    if (!Array.isArray(profiles)) {
+      throw new Error(`--${flagName} must be a JSON array`);
+    }
+    const errors: ErrorObject[] = [];
+    for (const profile of profiles) {
+      const valid = validator(profile);
+      if (!valid) {
+        errors.push(...validator.errors);
+      }
+    }
+    if (errors.length > 0) {
+      throw new Error(
+        `--${flagName} validation error: ${JSON.stringify(errors)}`
+      );
+    }
+    return profiles;
+  };
+}
+
 export type CliArgs = ReturnType<typeof parseCli>;
 
 // Hack alert! We need to capture the args passed to yarns.options to generate the
@@ -493,35 +521,7 @@ export default function parseCli(argv?: string | readonly string[]) {
             profile: "H264ConstrainedHigh",
           },
         ] as FfmpegProfile[]),
-        coerce: (str: string): FfmpegProfile[] => {
-          let profiles;
-          const validator = profileValidator as ValidateFunction;
-          try {
-            profiles = JSON.parse(str);
-          } catch (e) {
-            throw new Error(
-              `default-stream-profiles JSON parsing error: ${e.message}`
-            );
-          }
-          if (!Array.isArray(profiles)) {
-            throw new Error("default-stream-profiles must be a JSON array");
-          }
-          const errors: ErrorObject[] = [];
-          for (const profile of profiles) {
-            const valid = validator(profile);
-            if (!valid) {
-              errors.push(...validator.errors);
-            }
-          }
-          if (errors.length > 0) {
-            throw new Error(
-              `default-stream-profiles validation error: ${JSON.stringify(
-                errors
-              )}`
-            );
-          }
-          return profiles;
-        },
+        coerce: coerceJsonProfileArr("default-stream-profiles"),
       },
     })
     .usage(
