@@ -52,7 +52,7 @@ app.use(
 
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
-  const clipperUserId = req.user.id;
+  const clippingUser = req.user;
 
   const id = uuid();
   let uPlaybackId = await generateUniquePlaybackId(id);
@@ -71,14 +71,20 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
 
   const owner = await db.user.get(content.userId);
 
+  if (!owner) {
+    throw new NotFoundError(
+      "Content not found - unable to find owner of content"
+    );
+  }
+
   // If the user is neither an admin, nor part of LVPR_SDK_EMAILS and doesn't own the content, throw an error.
   if (
-    !req.user.admin &&
-    !LVPR_SDK_EMAILS.includes(req.user.email) &&
-    (!owner || clipperUserId !== owner.id)
+    !clippingUser.admin &&
+    !LVPR_SDK_EMAILS.includes(clippingUser.email) &&
+    clippingUser.id !== owner.id
   ) {
     console.log(`
-        clip: user=${req.user.email} does not have permission to clip stream=${content.id} - owner=${owner?.id}
+        clip: user=${clippingUser.email} does not have permission to clip stream=${content.id} - owner=${owner?.id}
       `);
     throw new ForbiddenError("You do not have permission to clip this stream");
   }
@@ -112,7 +118,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   let asset = await validateAssetPayload(
     id,
     uPlaybackId,
-    content.userId,
+    owner.id,
     Date.now(),
     await defaultObjectStoreId(req),
     req.config,
