@@ -2,7 +2,7 @@ import { validatePost } from "../middleware";
 import { Request, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
-import { NotFoundError } from "../store/errors";
+import { ForbiddenError, NotFoundError } from "../store/errors";
 import { pathJoin } from "../controllers/helpers";
 import {
   createAsset,
@@ -23,7 +23,7 @@ import { WithID } from "../store/types";
 import { getRunningRecording } from "./session";
 
 const app = Router();
-const LVPR_SDK_EMAIL = "livepeerjs@livepeer.org";
+const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org", "chase@livepeer.org"];
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -69,13 +69,14 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     throw new NotFoundError("Content not found");
   }
 
-  const user = await db.user.get(content.userId);
+  const owner = await db.user.get(content.userId);
 
   if (
-    (!user || userId !== content.userId) &&
-    req.user.email !== LVPR_SDK_EMAIL
+    (!owner || userId !== content.userId) &&
+    LVPR_SDK_EMAILS.includes(req.user.email) &&
+    !req.user.admin
   ) {
-    throw new NotFoundError("Content not found");
+    throw new ForbiddenError("You do not have permission to clip this stream");
   }
 
   if ("suspended" in content && content.suspended) {
