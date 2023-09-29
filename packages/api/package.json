@@ -41,7 +41,7 @@
     "esbuild": "yarn run compile-schemas && node esbuild.mjs"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.48.0",
+    "@aws-sdk/client-s3": "^3.421.0",
     "@aws-sdk/s3-request-presigner": "^3.48.0",
     "@cloudflare/json-schema-walker": "^0.1.1",
     "@cloudflare/kv-asset-handler": "^0.0.11",
