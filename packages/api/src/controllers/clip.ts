@@ -16,11 +16,17 @@ import { DBSession } from "../store/session-table";
 import { fetchWithTimeout } from "../util";
 import { DBStream } from "../store/stream-table";
 import { toExternalAsset } from "./asset";
-import { toStringValues } from "./helpers";
 import mung from "express-mung";
 import { Asset } from "../schema/types";
 import { WithID } from "../store/types";
 import { getRunningRecording } from "./session";
+import {
+  toStringValues,
+  parseFilters,
+  parseOrder,
+  makeNextHREF,
+} from "./helpers";
+import sql from "sql-template-strings";
 
 const app = Router();
 const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org", "chase@livepeer.org"];
@@ -158,6 +164,102 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     task: { id: task.id },
     asset,
   });
+});
+
+const fieldsMap = {
+  id: `asset.ID`,
+  createdAt: { val: `asset.data->'createdAt'`, type: "int" },
+  updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
+  userId: `asset.data->>'userId'`,
+  playbackId: `asset.data->>'playbackId'`,
+  sourceType: `asset.data->'source'->>'type'`,
+  sourceSessionId: `asset.data->'source'->>'sessionId'`,
+  sourceAssetId: `asset.data->'source'->>'assetId'`,
+} as const;
+
+app.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
+    toStringValues(req.query);
+
+  if (!order) {
+    order = "updatedAt-true,createdAt-true";
+  }
+
+  const query = [...parseFilters(fieldsMap, filters)];
+
+  if (!req.user.admin || !all || all === "false") {
+    query.push(sql`asset.data->>'deleted' IS NULL`);
+  }
+
+  let output: WithID<Asset>[];
+  let newCursor: string;
+
+  query.push(sql`asset.data->>'userId' = ${req.user.id}`);
+
+  const content =
+    (await db.asset.getByPlaybackId(id)) ||
+    (await db.session.get(id)) ||
+    (await db.asset.get(id)) ||
+    (await db.stream.getByIdOrPlaybackId(id));
+
+  if (!content) {
+    throw new NotFoundError("Content not found");
+  }
+
+  let contentType: string;
+
+  if ("objectStoreId" in content) {
+    contentType = "asset";
+  } else if ("streamKey" in content) {
+    contentType = "stream";
+  } else {
+    contentType = "session";
+  }
+
+  query.push(sql`asset.data->'source'->>'type' = 'clip'`);
+  switch (contentType) {
+    case "asset":
+      query.push(sql`asset.data->'source'->>'assetId' = ${content.id}`);
+      break;
+    case "session":
+      query.push(sql`asset.data->'source'->>'sessionId' = ${content.id}`);
+      break;
+    case "stream":
+      const sessionQuery = [];
+      sessionQuery.push(sql`data->>'parentId' = ${content.id}`);
+      const [sessions] = await db.session.find(sessionQuery, {
+        order: `data->>'lastSeen' DESC NULLS LAST`,
+        cursor,
+      });
+
+      break;
+  }
+
+  let fields = " asset.id as id, asset.data as data";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
+  [output, newCursor] = await db.asset.find(query, {
+    limit,
+    cursor,
+    fields,
+    order: parseOrder(fieldsMap, order),
+    process: ({ data, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
+      return data;
+    },
+  });
+
+  res.status(200);
+  if (output.length > 0 && newCursor) {
+    res.links({ next: makeNextHREF(req, newCursor) });
+  }
+
+  return res.json(output);
 });
 
 export default app;
