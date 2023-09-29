@@ -52,7 +52,7 @@ app.use(
 
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
-  const userId = req.user.id;
+  const clipperUserId = req.user.id;
 
   const id = uuid();
   let uPlaybackId = await generateUniquePlaybackId(id);
@@ -71,11 +71,15 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
 
   const owner = await db.user.get(content.userId);
 
+  // If the user is neither an admin, nor part of LVPR_SDK_EMAILS and doesn't own the content, throw an error.
   if (
-    (!owner || userId !== content.userId) &&
-    LVPR_SDK_EMAILS.includes(req.user.email) &&
-    !req.user.admin
+    !req.user.admin &&
+    !LVPR_SDK_EMAILS.includes(req.user.email) &&
+    (!owner || clipperUserId !== owner.id)
   ) {
+    console.log(`
+        clip: user=${req.user.email} does not have permission to clip stream=${content.id} - owner=${owner?.id}
+      `);
     throw new ForbiddenError("You do not have permission to clip this stream");
   }
 
