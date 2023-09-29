@@ -13,8 +13,7 @@ import {
 import { generateUniquePlaybackId } from "./generate-keys";
 import { v4 as uuid } from "uuid";
 import { DBSession } from "../store/session-table";
-import { fetchWithTimeout } from "../util";
-import { DBStream } from "../store/stream-table";
+import { authorizer } from "../middleware";
 import { toExternalAsset } from "./asset";
 import mung from "express-mung";
 import { Asset } from "../schema/types";
@@ -177,7 +176,7 @@ const fieldsMap = {
   sourceAssetId: `asset.data->'source'->>'assetId'`,
 } as const;
 
-app.get("/:id", async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
 
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
