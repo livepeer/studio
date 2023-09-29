@@ -13,3 +13,4 @@ packages/api/docs
 packages/api/src/schema/validators
 packages/api/src/schema/types.d.ts
 .env
+packages/api/src/schema/schema.yaml
