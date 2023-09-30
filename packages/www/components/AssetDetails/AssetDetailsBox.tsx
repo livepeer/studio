@@ -15,7 +15,7 @@ const Cell = ({ children, css = {} }) => {
 };
 
 export type AssetDetailsBoxProps = {
-  asset?: any;
+  asset?: Asset;
 };
 
 const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
