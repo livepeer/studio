@@ -1,5 +1,5 @@
 import { fileUploadProgressForAsset } from "components/AssetsTable/helpers";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import { Badge, Box, Flex, Tooltip } from "@livepeer/design-system";
 import { UploadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";

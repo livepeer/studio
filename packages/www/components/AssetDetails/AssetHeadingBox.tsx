@@ -1,6 +1,6 @@
 import { Box, Heading, Flex, Tooltip } from "@livepeer/design-system";
 import { PlayIcon, CalendarIcon } from "@radix-ui/react-icons";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import RelativeTime from "../RelativeTime";
 
 export type AssetHeadingBoxProps = {

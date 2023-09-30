@@ -1,6 +1,5 @@
 import { Box, Flex, Heading } from "@livepeer/design-system";
-import { Asset, getStreamSession } from "livepeer";
-import { Asset as ApiAsset, Task } from "@livepeer.studio/api";
+import { Asset } from "@livepeer.studio/api";
 import numeral from "numeral";
 import RelativeTime from "../RelativeTime";
 import ShowURL from "../ShowURL";
@@ -16,7 +15,7 @@ const Cell = ({ children, css = {} }) => {
 };
 
 export type AssetDetailsBoxProps = {
-  asset?: ApiAsset;
+  asset?: any;
 };
 
 const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
@@ -25,15 +24,15 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
     [asset?.videoSpec]
   );
 
-  const isClip = asset.source?.type ? asset.source.type === "clip" : false;
+  const isClip = asset?.source?.type ? asset?.source.type === "clip" : false;
   let sourceSessionId: string;
   let sourceAssetId: string;
-  if (asset.source?.type === "clip") {
-    if (asset.source?.sessionId) {
-      sourceSessionId = asset.source?.sessionId;
+  if (isClip) {
+    if ("sessionId" in asset?.source) {
+      sourceSessionId = asset?.source?.sessionId;
     }
-    if (asset.source?.assetId) {
-      sourceAssetId = asset.source?.assetId;
+    if ("assetId" in asset?.source) {
+      sourceAssetId = asset?.source?.assetId;
     }
   }
 

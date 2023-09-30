@@ -1,4 +1,4 @@
-import { Asset, getStreamSession } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import { Asset as ApiAsset, Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import { FileUpload } from "hooks/use-api/types";

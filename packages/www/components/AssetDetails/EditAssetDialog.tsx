@@ -1,4 +1,4 @@
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import {
   AlertDialog,
   AlertDialogCancel,

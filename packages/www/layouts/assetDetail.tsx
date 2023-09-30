@@ -10,7 +10,7 @@ import { Box, Flex } from "@livepeer/design-system";
 import Spinner from "components/Spinner";
 import { useApi, useLoggedIn } from "hooks";
 import Layout, { Breadcrumb } from "layouts/dashboard";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import {
   Dispatch,
   SetStateAction,
