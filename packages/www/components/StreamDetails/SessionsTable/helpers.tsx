@@ -2,7 +2,8 @@ import DateCell, { DateCellProps } from "components/Table/cells/date";
 import DurationCell, {
   DurationCellProps,
 } from "components/Table/cells/duration";
-import { TextCellProps } from "components/Table/cells/text";
+import TextCell, { TextCellProps } from "components/Table/cells/text";
+import ClipsCell, { ClipsCellProps } from "./ClipsCell";
 import { dateSort, numberSort } from "components/Table/sorts";
 import {
   FilterItem,
@@ -58,6 +59,13 @@ export const makeColumns = () => [
       ),
   },
   {
+    Header: "Clips",
+    accessor: "clips",
+    Cell: ClipsCell,
+    disableSortBy: true,
+    width: 50,
+  },
+  {
     Header: "Recording URL",
     accessor: "recordingUrl",
     Cell: RecordingUrlCell,
@@ -69,6 +77,7 @@ export const rowsPageFromState = async (
   state: State<SessionsTableData>,
   streamId: string,
   getStreamSessions: Function,
+  getClipsBySessionId: Function,
   openSnackbar: Function
 ): Promise<RowsPageFromStateResult<SessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessions(
@@ -80,6 +89,17 @@ export const rowsPageFromState = async (
     }),
     true
   );
+
+  const clipsPromises = streams.map((stream: any) =>
+    getClipsBySessionId(stream.id, null, 100, null, null, 1)
+  );
+
+  const clipsCounts = await Promise.all(clipsPromises);
+
+  streams.forEach((stream: any, index: number) => {
+    stream.clipsCounts = clipsCounts[index][2];
+  });
+
   return {
     nextCursor,
     count,
@@ -136,6 +156,12 @@ export const rowsPageFromState = async (
               <Box>—</Box>
             ),
           mp4Url: stream.mp4Url ?? stream.mp4Url,
+        },
+        clips: {
+          id: stream.id,
+          children: <Box></Box>,
+          sessionId: stream.id,
+          clipsCounts: stream.clipsCounts,
         },
         sourceSegmentsDuration: {
           sourceSegmentsDuration: stream.sourceSegmentsDuration || 0,

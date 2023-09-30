@@ -1,5 +1,5 @@
 import qs from "qs";
-import { Stream } from "@livepeer.studio/api";
+import { Session, Stream } from "@livepeer.studio/api";
 import { ApiState } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
@@ -37,6 +37,29 @@ export const getStreamSessions = async (
   const nextCursor = getCursor(res.headers.get("link"));
   const c = res.headers.get("X-Total-Count");
   return [streams, nextCursor, c];
+};
+
+export const getSession = async (
+  id: string,
+  cursor?: string,
+  limit: number = 20,
+  filters?: Array<{ id: string; value: string | object }>,
+  count?: boolean
+): Promise<[Session, string, number]> => {
+  const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+  const uri = `/session/${id}?${qs.stringify({
+    limit,
+    cursor,
+    filters: stringifiedFilters,
+    count,
+  })}`;
+  const [res, session] = await context.fetch(uri);
+  if (res.status !== 200) {
+    throw new Error(session);
+  }
+  const nextCursor = getCursor(res.headers.get("link"));
+  const c = res.headers.get("X-Total-Count");
+  return [session, nextCursor, c];
 };
 
 export const getStreamSessionsByUserId = async (

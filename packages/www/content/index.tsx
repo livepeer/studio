@@ -148,14 +148,6 @@ export const DashboardAPIKeys = {
   },
 };
 
-export const DashboardClips = {
-  metaData: {
-    title: makeCompleteTitle("Clips"),
-    description: defaultDescription,
-    url: makeCompleteUrl(),
-  },
-};
-
 export const DashboardSigningKeys = {
   metaData: {
     title: makeCompleteTitle("Signing Keys"),

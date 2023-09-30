@@ -1,5 +1,5 @@
 import qs from "qs";
-import { Stream } from "@livepeer.studio/api";
+import { Stream, Asset } from "@livepeer.studio/api";
 import { ApiState } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
@@ -15,52 +15,27 @@ export const setSharedScope = (
   setState = _setState;
 };
 
-export const getClips = async (
-  id,
-  cursor?: string,
-  limit: number = 20,
-  filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
-): Promise<[Array<Stream>, string, number]> => {
-  const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
-  const uri = `/session?${qs.stringify({
-    limit,
-    cursor,
-    parentId: id,
-    filters: stringifiedFilters,
-    count,
-  })}`;
-  const [res, streams] = await context.fetch(uri);
-  if (res.status !== 200) {
-    throw new Error(streams);
-  }
-  const nextCursor = getCursor(res.headers.get("link"));
-  const c = res.headers.get("X-Total-Count");
-  return [streams, nextCursor, c];
-};
-
-export const getClipsByUserId = async (
-  userId,
+export const getClipsBySessionId = async (
+  sessionId: string,
   cursor?: string,
   limit: number = 20,
   order?: string,
   filters?: Array<{ id: string; value: string | object }>,
   count?: boolean
-): Promise<[Array<Stream>, string, number]> => {
+): Promise<[Array<Asset>, string, number]> => {
   const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
-  const uri = `/session?${qs.stringify({
+  const uri = `/clip/${sessionId}?${qs.stringify({
     limit,
     cursor,
     order,
-    userId,
     filters: stringifiedFilters,
     count,
   })}`;
-  const [res, streams] = await context.fetch(uri);
+  const [res, clips] = await context.fetch(uri);
   if (res.status !== 200) {
-    throw new Error(streams);
+    throw new Error(clips);
   }
   const nextCursor = getCursor(res.headers.get("link"));
   const c = res.headers.get("X-Total-Count");
-  return [streams, nextCursor, c];
+  return [clips, nextCursor, c];
 };

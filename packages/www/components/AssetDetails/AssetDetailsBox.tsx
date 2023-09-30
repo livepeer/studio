@@ -1,5 +1,6 @@
 import { Box, Flex, Heading } from "@livepeer/design-system";
-import { Asset } from "livepeer";
+import { Asset, getStreamSession } from "livepeer";
+import { Asset as ApiAsset, Task } from "@livepeer.studio/api";
 import numeral from "numeral";
 import RelativeTime from "../RelativeTime";
 import ShowURL from "../ShowURL";
@@ -15,7 +16,7 @@ const Cell = ({ children, css = {} }) => {
 };
 
 export type AssetDetailsBoxProps = {
-  asset?: Asset;
+  asset?: ApiAsset;
 };
 
 const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
@@ -23,6 +24,18 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
     () => asset?.videoSpec?.tracks?.find((t) => t?.type === "video"),
     [asset?.videoSpec]
   );
+
+  const isClip = asset.source?.type ? asset.source.type === "clip" : false;
+  let sourceSessionId: string;
+  let sourceAssetId: string;
+  if (asset.source?.type === "clip") {
+    if (asset.source?.sessionId) {
+      sourceSessionId = asset.source?.sessionId;
+    }
+    if (asset.source?.assetId) {
+      sourceAssetId = asset.source?.assetId;
+    }
+  }
 
   return (
     <>
@@ -127,6 +140,22 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
                 {"x"}
                 {videoTrack.height}
               </Cell>
+            </>
+          )}
+          {isClip && sourceSessionId && (
+            <>
+              <Cell css={{ color: "$hiContrast" }}>Type</Cell>
+              <Cell>Clip</Cell>
+              <Cell css={{ color: "$hiContrast" }}>Parent session</Cell>
+              <Cell>
+                <ClipButton value={sourceSessionId} text={sourceSessionId} />
+              </Cell>
+            </>
+          )}
+          {isClip && sourceAssetId && (
+            <>
+              <Cell css={{ color: "$hiContrast" }}>Parent asset</Cell>
+              <Cell>{sourceAssetId}</Cell>
             </>
           )}
         </Box>

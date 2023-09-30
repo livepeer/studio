@@ -1,4 +1,4 @@
-import { Asset } from "livepeer";
+import { Asset, getStreamSession } from "livepeer";
 import { Asset as ApiAsset, Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import { FileUpload } from "hooks/use-api/types";
@@ -23,12 +23,15 @@ export const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
   { label: "Created", id: "createdAt", type: "date" },
   { label: "Updated", id: "updatedAt", type: "date" },
+  { label: "Source", id: "sourceSessionId", type: "text" },
+  { label: "Source Type", id: "sourceType", type: "text" },
 ];
 
 export type AssetsTableData = {
   id: string;
   name: NameCellProps;
-  source: TextCellProps;
+  type: TextCellProps;
+  sessionId: TextCellProps;
   createdAt: CreatedAtCellProps;
   updatedAt: DateCellProps;
   action: ActionCellProps;
@@ -57,8 +60,14 @@ export const makeColumns = () => [
       dateSort("original.updatedAt.date", ...params),
   },
   {
+    Header: "Source Type",
+    accessor: "type",
+    Cell: TextCell,
+    disableSortBy: true,
+  },
+  {
     Header: "Source",
-    accessor: "source",
+    accessor: "sessionId",
     Cell: TextCell,
     disableSortBy: true,
   },
@@ -71,7 +80,7 @@ export const makeColumns = () => [
   },
 ];
 
-const hasLivestreamImportTask = (tasks: Task[], assetId: string) => {
+export const hasLivestreamImportTask = (tasks: Task[], assetId: string) => {
   try {
     const task: Task =
       tasks && tasks.find((task: Task) => task.outputAssetId === assetId);
@@ -113,6 +122,11 @@ export const rowsPageFromState = async (
       const isLiveStream = asset.source?.type
         ? asset.source.type === "recording"
         : hasLivestreamImportTask(tasks, asset.id);
+      const isClip = asset.source?.type ? asset.source.type === "clip" : false;
+      let sessionId: string;
+      if (asset.source?.type === "clip") {
+        sessionId = asset.source?.sessionId;
+      }
       const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
@@ -125,10 +139,19 @@ export const rowsPageFromState = async (
           isStatusFailed,
           errorMessage,
         },
-        source: {
-          children: <Box>{isLiveStream ? "Live Stream" : "Upload"}</Box>,
+        type: {
+          children: (
+            <Box>
+              {isLiveStream ? "Live Stream" : isClip ? "Clip" : "Upload"}
+            </Box>
+          ),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/assets/${asset.id}`,
+        },
+        sessionId: {
+          children: <Box>{isClip ? sessionId : ""}</Box>,
+          fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+          href: `/dashboard/sessions?sessionId=${sessionId}`,
         },
         createdAt: {
           id: asset.id,
