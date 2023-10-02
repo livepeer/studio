@@ -245,7 +245,7 @@ app.get("/:id", authorizer({ allowUnverified: true }), async (req, res) => {
   res.json(cleanUserFields(user, req.user.admin));
 });
 
-app.delete("/:id", authorizer({ admin: true }), async (req, res) => {
+app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   const user = await db.user.get(id);
   if (!user) {
