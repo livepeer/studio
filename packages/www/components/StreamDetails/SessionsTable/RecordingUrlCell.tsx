@@ -1,6 +1,6 @@
 import { CellComponentProps, TableData } from "components/Table/types";
 import { Box, Flex, Link } from "@livepeer/design-system";
-import { DownloadIcon } from "@radix-ui/react-icons";
+import { DownloadIcon, ScissorsIcon } from "@radix-ui/react-icons";
 import { truncate } from "../../../lib/utils";
 
 function makeMP4Url(url: string, profileName: string): string {

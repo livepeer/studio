@@ -1,9 +1,8 @@
 import { validatePost } from "../middleware";
-import { Request, Router } from "express";
+import { Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import { ForbiddenError, NotFoundError } from "../store/errors";
-import { pathJoin } from "../controllers/helpers";
 import {
   createAsset,
   validateAssetPayload,

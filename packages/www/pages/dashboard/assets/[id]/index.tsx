@@ -5,7 +5,7 @@ import { useApi } from "hooks";
 import AssetDetail from "layouts/assetDetail";
 import AssetOverviewTab from "components/AssetDetails/AssetOverviewTab";
 import AssetEventLogTab from "components/AssetDetails/AssetEventLogTab";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 
 const refetchInterval = 5 * 1000;
 

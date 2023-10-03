@@ -27,7 +27,7 @@ const SessionsTable = ({
   border?: boolean;
   tableLayout?: string;
 }) => {
-  const { user, getStreamSessions } = useApi();
+  const { user, getStreamSessions, getClipsBySessionId } = useApi();
   const { state, stateSetter } = useTableState<SessionsTableData>({
     tableId: "streamSessionsTable",
     initialOrder: sortByToString(DefaultSortBy),
@@ -37,7 +37,13 @@ const SessionsTable = ({
 
   const fetcher: Fetcher<SessionsTableData> = useCallback(
     async (state) =>
-      rowsPageFromState(state, streamId, getStreamSessions, openSnackbar),
+      rowsPageFromState(
+        state,
+        streamId,
+        getStreamSessions,
+        getClipsBySessionId,
+        openSnackbar
+      ),
     [getStreamSessions, user.id]
   );
 

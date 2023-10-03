@@ -179,14 +179,12 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               </Box>
             )}
           </Box>
-
           <Link href="/dashboard/assets" passHref legacyBehavior>
             <NavLink active={id === "assets"}>
               <AssetsIcon active={id === "assets"} />
               Assets
             </NavLink>
           </Link>
-
           <Box>
             <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
               <NavLink>

@@ -601,6 +601,9 @@ const fieldsMap = {
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
   sourceUrl: `asset.data->'source'->>'url'`,
+  sourceSessionId: `asset.data->'source'->>'sessionId'`,
+  sourceAssetId: `asset.data->'source'->>'assetId'`,
+  sourceType: `asset.data->'source'->>'type'`,
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {

@@ -13,6 +13,7 @@ import * as ingestEndpointsFunctions from "./endpoints/ingest";
 import * as multistreamEndpointsFunctions from "./endpoints/multistream";
 import * as objectStoreEndpointsFunctions from "./endpoints/objectStore";
 import * as sessionEndpointsFunctions from "./endpoints/session";
+import * as clipEndpointsFunctions from "./endpoints/clip";
 import * as streamEndpointsFunctions from "./endpoints/stream";
 import * as taskEndpointsFunctions from "./endpoints/task";
 import * as userEndpointsFunctions from "./endpoints/user";
@@ -78,6 +79,7 @@ const makeContext = (
     ...multistreamEndpointsFunctions,
     ...objectStoreEndpointsFunctions,
     ...sessionEndpointsFunctions,
+    ...clipEndpointsFunctions,
     ...streamEndpointsFunctions,
     ...taskEndpointsFunctions,
     ...userEndpointsFunctions,
@@ -94,6 +96,7 @@ const makeContext = (
   multistreamEndpointsFunctions.setSharedScope(context, setState);
   objectStoreEndpointsFunctions.setSharedScope(context, setState);
   sessionEndpointsFunctions.setSharedScope(context, setState);
+  clipEndpointsFunctions.setSharedScope(context, setState);
   streamEndpointsFunctions.setSharedScope(context, setState);
   taskEndpointsFunctions.setSharedScope(context, setState);
   userEndpointsFunctions.setSharedScope(context, setState);

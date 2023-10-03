@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useApi from "hooks/use-api";
 import { fileUploadProgressForAsset } from "components/AssetsTable/helpers";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import Progress from "./Progress";
 
 const FileUploadingProgress = ({ asset }: { asset?: Asset }) => {
