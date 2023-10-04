@@ -37,6 +37,7 @@ function sqlQueryGroup(values: string[]) {
 
 const MAX_RETRIES = 2;
 const TASK_RETRY_BASE_DELAY = 30 * 1000;
+const TASK_FINAL_RETRY_DELAY = 3 * 60 * 1000;
 
 export class TaskScheduler {
   config: CliArgs;
@@ -428,7 +429,12 @@ export class TaskScheduler {
     };
 
     task = await this.updateTask(task, { status });
-    await sleep(retries * TASK_RETRY_BASE_DELAY);
+    // increase sleep for final retry
+    const sleepDur =
+      retries == MAX_RETRIES
+        ? TASK_FINAL_RETRY_DELAY
+        : retries * TASK_RETRY_BASE_DELAY;
+    await sleep(sleepDur);
     await this.scheduleTask(task, retries);
   }
 
