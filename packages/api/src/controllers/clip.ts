@@ -145,6 +145,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
           playbackId,
           startTime: req.body.startTime,
           endTime: req.body.endTime,
+          offset: req.body.offset,
         },
         catalystPipelineStrategy: catalystPipelineStrategy(req),
         url,
