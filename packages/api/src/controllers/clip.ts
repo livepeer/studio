@@ -81,6 +81,21 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     );
   }
 
+  if (
+    !(
+      (req.body.startTime && req.body.offset) ||
+      (req.body.endTime && req.body.offset) ||
+      (req.body.endTime && req.body.startTime)
+    )
+  ) {
+    res.status(400).json({
+      errors: [
+        "Either (startTime + offset), (endTime + offset), or (endTime + startTime) must be provided",
+      ],
+    });
+    return;
+  }
+
   // If the user is neither an admin, nor part of LVPR_SDK_EMAILS and doesn't own the content, throw an error.
   if (
     !clippingUser.admin &&

@@ -26,7 +26,6 @@ components:
       additionalProperties: false
       required:
         - playbackId
-        - startTime
       properties:
         playbackId:
           type: string
@@ -37,6 +36,9 @@ components:
         endTime:
           type: number
           description: End time of the clip in milliseconds
+        offset:
+          type: number
+          description: Offset of the clip in milliseconds
         name:
           type: string
           description: Name of the clip
