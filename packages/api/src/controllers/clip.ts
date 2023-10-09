@@ -1,5 +1,5 @@
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import { ForbiddenError, NotFoundError } from "../store/errors";
@@ -25,9 +25,13 @@ import {
   makeNextHREF,
 } from "./helpers";
 import sql from "sql-template-strings";
+import { DBStream } from "../store/stream-table";
 
 const app = Router();
-const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org", "chase@livepeer.org"];
+export const LVPR_SDK_EMAILS = [
+  "livepeerjs@livepeer.org",
+  "chase@livepeer.org",
+];
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -176,8 +180,28 @@ const fieldsMap = {
 } as const;
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id;
 
+  const content =
+    (await db.session.get(id)) ||
+    (await db.stream.getByIdOrPlaybackId(id)) ||
+    (await db.asset.getByPlaybackId(id)) ||
+    (await db.asset.get(id)) ||
+    (await db.asset.getByIpfsCid(id));
+
+  if (!content) {
+    throw new NotFoundError("Content not found");
+  }
+
+  let response = await getClips(content, req, res);
+  return response;
+});
+
+export const getClips = async (
+  content: DBSession | DBStream | WithID<Asset>,
+  req: Request,
+  res: Response
+) => {
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
 
@@ -195,12 +219,6 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let newCursor: string;
 
   query.push(sql`asset.data->>'userId' = ${req.user.id}`);
-
-  const content =
-    (await db.asset.getByPlaybackId(id)) ||
-    (await db.session.get(id)) ||
-    (await db.asset.get(id)) ||
-    (await db.stream.getByIdOrPlaybackId(id));
 
   if (!content) {
     throw new NotFoundError("Content not found");
@@ -258,6 +276,6 @@ app.get("/:id", authorizer({}), async (req, res) => {
   }
 
   return res.json(output);
-});
+};
 
 export default app;

@@ -50,6 +50,7 @@ import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
 import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
+import { getClips } from "./clip";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -1618,6 +1619,19 @@ export async function terminateStreamReq(
   );
   return { status: 200, result: nukeRes };
 }
+
+app.get("/:id/clips", authorizer({}), async (req, res) => {
+  const id = req.params.id;
+
+  const stream = await db.stream.getByIdOrPlaybackId(id);
+
+  if (!stream) {
+    throw new NotFoundError("Stream not found");
+  }
+
+  let response = await getClips(stream, req, res);
+  return response;
+});
 
 // Hooks
 

@@ -56,6 +56,7 @@ import {
 } from "../store/experiment-table";
 import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
+import { getClips } from "./clip";
 
 const app = Router();
 
@@ -1149,6 +1150,20 @@ app.patch(
     res.status(200).json(updated);
   }
 );
+
+app.get("/:id/clips", authorizer({}), async (req, res) => {
+  const id = req.params.id;
+
+  const asset =
+    (await db.asset.getByPlaybackId(id)) || (await db.asset.get(id));
+
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
+  }
+
+  let response = await getClips(asset, req, res);
+  return response;
+});
 
 // TODO: create migration API to parse and migrate gateway URL of existing
 // assets in the DB.

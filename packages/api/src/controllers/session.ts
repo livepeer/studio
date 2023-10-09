@@ -22,6 +22,8 @@ import {
   getCombinedStats,
   withRecordingFields,
 } from "./stream";
+import { getClips } from "./clip";
+import { NotFoundError } from "../store/errors";
 
 const app = Router();
 
@@ -160,6 +162,19 @@ app.get("/:id", authorizer({}), async (req, res) => {
     req.user.admin
   );
   res.json(session);
+});
+
+app.get("/:id/clips", authorizer({}), async (req, res) => {
+  const id = req.params.id;
+
+  const session = await db.session.get(id);
+
+  if (!session) {
+    throw new NotFoundError("Session not found");
+  }
+
+  let response = await getClips(session, req, res);
+  return response;
 });
 
 export async function toExternalSession(
