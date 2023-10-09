@@ -101,7 +101,14 @@ app.delete("/:roomId", authorizer({}), async (req, res) => {
     req.config.livekitApiKey,
     req.config.livekitSecret
   );
-  await svc.deleteRoom(req.params.roomId);
+  try {
+    await svc.deleteRoom(req.params.roomId);
+  } catch (err) {
+    if (err.response?.status != 404) {
+      throw err;
+    }
+    // we don't need to delete the room on livekit's side if it doesn't exist
+  }
 
   await db.room.update(room.id, { deleted: true, deletedAt: Date.now() });
 
@@ -121,7 +128,9 @@ app.post(
       req.config.livekitApiKey,
       req.config.livekitSecret
     );
-    const currentEgress = await egressClient.listEgress(req.params.roomId);
+    const currentEgress = await egressClient.listEgress({
+      roomName: req.params.roomId,
+    });
     for (const egress of currentEgress) {
       if (isEgressRunning(egress)) {
         throw new BadRequestError("egress already running");
@@ -176,7 +185,9 @@ app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
     req.config.livekitApiKey,
     req.config.livekitSecret
   );
-  const currentEgress = await egressClient.listEgress(req.params.roomId);
+  const currentEgress = await egressClient.listEgress({
+    roomName: req.params.roomId,
+  });
 
   let found = false;
   for (const egress of currentEgress) {
@@ -251,7 +262,14 @@ app.delete("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
     req.config.livekitApiKey,
     req.config.livekitSecret
   );
-  await svc.removeParticipant(req.params.roomId, req.params.participantId);
+  try {
+    await svc.removeParticipant(req.params.roomId, req.params.participantId);
+  } catch (err) {
+    if (err.response?.status != 404) {
+      throw err;
+    }
+    // we don't need to delete the participant on livekit's side if the room/participant doesn't exist
+  }
 
   res.status(204).end();
 });
