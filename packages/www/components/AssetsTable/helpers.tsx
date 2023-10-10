@@ -123,8 +123,11 @@ export const rowsPageFromState = async (
         ? asset.source.type === "recording"
         : hasLivestreamImportTask(tasks, asset.id);
       const isClip = asset.source?.type ? asset.source.type === "clip" : false;
-      let sessionId: string;
+      let sessionId: string = "";
       if (asset.source?.type === "clip") {
+        sessionId = asset.source?.sessionId;
+      }
+      if (asset.source?.type === "recording") {
         sessionId = asset.source?.sessionId;
       }
       const isStatusFailed = asset.status?.phase === "failed";
@@ -149,7 +152,7 @@ export const rowsPageFromState = async (
           href: `/dashboard/assets/${asset.id}`,
         },
         sessionId: {
-          children: <Box>{isClip ? sessionId : ""}</Box>,
+          children: <Box>{sessionId}</Box>,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/sessions?sessionId=${sessionId}`,
         },
