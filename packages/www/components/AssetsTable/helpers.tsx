@@ -127,6 +127,9 @@ export const rowsPageFromState = async (
       if (asset.source?.type === "clip") {
         sessionId = asset.source?.sessionId;
       }
+      if (asset.source?.type === "recording") {
+        sessionId = asset.source?.sessionId;
+      }
       const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
