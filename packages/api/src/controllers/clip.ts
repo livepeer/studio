@@ -233,7 +233,6 @@ export const getClips = async (
   } else {
     contentType = "session";
   }
-
   query.push(sql`asset.data->'source'->>'type' = 'clip'`);
   switch (contentType) {
     case "asset":
@@ -249,6 +248,18 @@ export const getClips = async (
         order: `data->>'lastSeen' DESC NULLS LAST`,
         cursor,
       });
+
+      if (sessions.length === 0) {
+        return res.json([]);
+      }
+
+      const sessionIds = sessions.map((s) => `${s.id}`);
+
+      query.push(
+        sql`asset.data->'source'->>'sessionId' IN `.append(
+          sqlQueryGroup(sessionIds)
+        )
+      );
 
       break;
   }
@@ -277,5 +288,15 @@ export const getClips = async (
 
   return res.json(output);
 };
+
+function sqlQueryGroup(values: string[]) {
+  const query = sql`(`;
+  values.forEach((value, i) => {
+    if (i) query.append(`, `);
+    query.append(sql`${value}`);
+  });
+  query.append(`)`);
+  return query;
+}
 
 export default app;
