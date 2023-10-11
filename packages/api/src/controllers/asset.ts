@@ -88,14 +88,17 @@ export async function defaultObjectStoreId(
     return config.vodObjectStoreId;
   }
 
-  if (isPrivatePlaybackPolicy(body.playbackPolicy)) {
-    return config.vodCatalystPrivateAssetsObjectStoreId;
-  }
-
   const secondaryStorageEnabled = await isExperimentSubject(
     secondaryStorageExperiment,
     user.id
   );
+
+  if (isPrivatePlaybackPolicy(body.playbackPolicy)) {
+    const secondaryPrivateId =
+      secondaryStorageEnabled && config.secondaryVodPrivateAssetsObjectStoreId;
+    return secondaryPrivateId || config.vodCatalystPrivateAssetsObjectStoreId;
+  }
+
   const secondaryObjectStoreId =
     secondaryStorageEnabled && config.secondaryVodObjectStoreId;
   return (

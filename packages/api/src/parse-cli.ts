@@ -320,11 +320,16 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
       },
       secondaryVodObjectStoreId: {
-        describe: "Secondary object store ID for Catalyst VOD",
+        describe: "secondary object store ID for Catalyst VOD",
         type: "string",
       },
       vodCatalystPrivateAssetsObjectStoreId: {
         describe: "object store ID to use for private assets in Catalyst VOD",
+        type: "string",
+      },
+      secondaryVodPrivateAssetsObjectStoreId: {
+        describe:
+          "secondary object store ID to use for private assets in Catalyst VOD",
         type: "string",
       },
       recordCatalystObjectStoreId: {
