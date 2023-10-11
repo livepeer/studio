@@ -22,7 +22,7 @@
     "@emotion/styled": "^10.0.23",
     "@livepeer.studio/api": "^0.15.5",
     "@livepeer/design-system": "^1.1.0",
-    "@livepeer/react": "^2.8.6",
+    "@livepeer/react": "^2.8.8",
     "@mdx-js/loader": "^1.6.16",
     "@mdx-js/mdx": "^1.6.16",
     "@mdx-js/react": "^1.6.16",

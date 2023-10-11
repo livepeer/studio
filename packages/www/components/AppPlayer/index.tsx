@@ -1,6 +1,6 @@
 import { Player } from "@livepeer/react";
 import mux from "mux-embed";
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
 
 type AppPlayerProps = {
   playbackUrl?: string;
