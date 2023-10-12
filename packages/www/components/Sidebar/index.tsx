@@ -79,7 +79,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         backgroundColor: "$panel",
         borderRight: "1px solid",
         borderColor: "$neutral6",
-        zIndex: 10,
         maxWidth: 270,
         width: 270,
         top: 0,
