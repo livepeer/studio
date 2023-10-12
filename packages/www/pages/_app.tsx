@@ -53,6 +53,10 @@ const globalStyles = globalCss({
   "#hubspot-messages-iframe-container iframe": {
     colorScheme: "auto",
   },
+
+  'div[role="alertdialog"]': {
+    zIndex: 100,
+  },
 });
 
 const themes: any = getThemes();
