@@ -897,7 +897,7 @@ app.post(
     // compatibility with /setactive recordging/webhooks handling)
     const issues =
       payload.is_active && !payload.is_healthy
-        ? payload.human_issues || (payload.issues ? [payload.issues] : null)
+        ? payload.human_issues || (payload.issues ? [payload.issues] : [])
         : null;
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : null,
