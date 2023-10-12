@@ -1101,7 +1101,7 @@ describe("controllers/stream", () => {
         const updatedStream = await sendStreamHealthHook(payload);
 
         expect(updatedStream.isHealthy).toBe(true);
-        expect(updatedStream.issues).toBeUndefined();
+        expect(updatedStream.issues).toBeNull();
       });
 
       it("clears stream's isHealthy and issues fields when is_active is false", async () => {
@@ -1111,8 +1111,8 @@ describe("controllers/stream", () => {
         payload = samplePayload(false, false);
         const updatedStream = await sendStreamHealthHook(payload);
 
-        expect(updatedStream.isHealthy).toBeUndefined();
-        expect(updatedStream.issues).toBeUndefined();
+        expect(updatedStream.isHealthy).toBeNull();
+        expect(updatedStream.issues).toBeNull();
       });
 
       it("updates the stream's lastSeen field", async () => {
