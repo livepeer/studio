@@ -351,7 +351,10 @@ function getDownloadUrl(
   asset: WithID<Asset>,
   os: ObjectStore
 ): string {
-  if (asset.source?.type === "recording" && !asset.playbackRecordingId) {
+  if (
+    (asset.source?.type === "recording" || asset.source?.type === "clip") &&
+    !asset.playbackRecordingId
+  ) {
     // Recording V2
     const staticPlaybackInfos = getStaticPlaybackInfo(asset, os);
     if (staticPlaybackInfos.length > 0) {
