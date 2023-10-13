@@ -17,7 +17,7 @@ import { toExternalAsset } from "./asset";
 import mung from "express-mung";
 import { Asset } from "../schema/types";
 import { WithID } from "../store/types";
-import { getRunningRecording } from "./session";
+import { buildRecordingUrl, getRunningRecording } from "./session";
 import {
   toStringValues,
   parseFilters,
@@ -106,9 +106,22 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   let objectStoreId: string;
 
   if (isStream) {
-    ({ url, session, objectStoreId } = await getRunningRecording(content, req));
-    if (!url || !session || !objectStoreId) {
-      throw new NotFoundError("Running recording not found for this stream");
+    if (req.body.sessionId) {
+      session = await db.session.get(req.body.sessionId);
+      if (!session) {
+        throw new NotFoundError("Session not found");
+      }
+      if (session.parentId !== content.id) {
+        throw new NotFoundError(
+          "The provided session id does not belong to this stream"
+        );
+      }
+      ({ url, objectStoreId } = await buildRecordingUrl(session, req));
+    } else {
+      ({ url, session, objectStoreId } = await getRunningRecording(
+        content,
+        req
+      ));
     }
   } else {
     res

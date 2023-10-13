@@ -22,7 +22,7 @@ import {
   getCombinedStats,
   withRecordingFields,
 } from "./stream";
-import { getClips } from "./clip";
+import { LVPR_SDK_EMAILS, getClips } from "./clip";
 import { NotFoundError } from "../store/errors";
 
 const app = Router();
@@ -145,13 +145,24 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
-    ((session.userId !== req.user.id || session.deleted) && !req.user.admin)
+    ((session.userId !== req.user.id || session.deleted) &&
+      !req.user.admin &&
+      !LVPR_SDK_EMAILS.includes(req.user.email))
   ) {
     // do not reveal that session exists
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
+
+  let originalRecordingUrl: string | null = null;
+
+  if (req.query.sourceRecording === "true") {
+    const { url } = await buildRecordingUrl(session, req);
+    originalRecordingUrl = url;
+    session.sourceRecordingUrl = originalRecordingUrl;
+  }
+
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
   session = await toExternalSession(
@@ -161,6 +172,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     false,
     req.user.admin
   );
+
   res.json(session);
 });
 
@@ -205,8 +217,6 @@ const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 const privateFields: (keyof DBSession)[] = ["recordObjectStoreId", "version"];
 
 export async function getRunningRecording(content: DBStream, req: Request) {
-  let objectStoreId: string;
-
   const session = await db.session.getLastSession(content.id);
 
   if (!session) {
@@ -220,6 +230,11 @@ export async function getRunningRecording(content: DBStream, req: Request) {
     };
   }
 
+  return await buildRecordingUrl(session, req);
+}
+
+export async function buildRecordingUrl(session: DBSession, req: Request) {
+  let objectStoreId: string;
   const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
 
   let url = pathJoin(
@@ -267,5 +282,4 @@ export async function getRunningRecording(content: DBStream, req: Request) {
     objectStoreId,
   };
 }
-
 export default app;
