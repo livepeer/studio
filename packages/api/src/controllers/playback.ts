@@ -40,8 +40,7 @@ function newPlaybackInfo(
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   live?: PlaybackInfo["meta"]["live"],
   recordingUrl?: string,
-  withRecordings?: boolean,
-  streamRecord?: boolean
+  withRecordings?: boolean
 ): PlaybackInfo {
   let playbackInfo: PlaybackInfo = {
     type,
@@ -78,11 +77,7 @@ function newPlaybackInfo(
   }
   if (withRecordings) {
     playbackInfo.meta.dvrPlayback = [];
-    if (!streamRecord) {
-      playbackInfo.meta.dvrPlayback.push({
-        error: "recording is not enabled for this stream.",
-      });
-    } else if (recordingUrl) {
+    if (recordingUrl) {
       playbackInfo.meta.dvrPlayback.push({
         hrn: "HLS (TS)",
         type: "html5/application/vnd.apple.mpegurl",
@@ -243,8 +238,7 @@ async function getPlaybackInfo(
       null,
       stream.isActive ? 1 : 0,
       url,
-      withRecordings,
-      stream.record
+      withRecordings
     );
   }
 
