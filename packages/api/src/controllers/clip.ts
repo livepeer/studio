@@ -106,11 +106,6 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   let objectStoreId: string;
 
   if (isStream) {
-    if (!content.record) {
-      res.status(400).json({
-        errors: ["Recording must be enabled on a live stream to create clips"],
-      });
-    }
     if (req.body.sessionId) {
       session = await db.session.get(req.body.sessionId);
       if (!session) {
