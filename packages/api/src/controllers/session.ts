@@ -22,7 +22,7 @@ import {
   getCombinedStats,
   withRecordingFields,
 } from "./stream";
-import { getClips } from "./clip";
+import { LVPR_SDK_EMAILS, getClips } from "./clip";
 import { NotFoundError } from "../store/errors";
 
 const app = Router();
@@ -145,7 +145,9 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
-    ((session.userId !== req.user.id || session.deleted) && !req.user.admin)
+    ((session.userId !== req.user.id || session.deleted) &&
+      !req.user.admin &&
+      !LVPR_SDK_EMAILS.includes(req.user.email))
   ) {
     // do not reveal that session exists
     res.status(404);
