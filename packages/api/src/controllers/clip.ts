@@ -17,7 +17,7 @@ import { toExternalAsset } from "./asset";
 import mung from "express-mung";
 import { Asset } from "../schema/types";
 import { WithID } from "../store/types";
-import { getRunningRecording, getSourceRecordingBySessionId } from "./session";
+import { buildRecordingUrl, getRunningRecording } from "./session";
 import {
   toStringValues,
   parseFilters,
@@ -121,10 +121,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
           "The provided session id does not belong to this stream"
         );
       }
-      ({ url, objectStoreId } = await getSourceRecordingBySessionId(
-        session.id,
-        req
-      ));
+      ({ url, objectStoreId } = await buildRecordingUrl(session, req));
     } else {
       ({ url, session, objectStoreId } = await getRunningRecording(
         content,
