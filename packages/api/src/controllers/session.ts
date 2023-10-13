@@ -152,6 +152,15 @@ app.get("/:id", authorizer({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
+
+  let originalRecordingUrl: string | null = null;
+
+  if (req.query.sourceRecording == "true") {
+    const { url } = await getSourceRecordingBySessionId(req.params.id, req);
+    originalRecordingUrl = url;
+    session.sourceRecordingUrl = originalRecordingUrl;
+  }
+
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
   session = await toExternalSession(
@@ -161,6 +170,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     false,
     req.user.admin
   );
+
   res.json(session);
 });
 
@@ -204,6 +214,26 @@ const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 
 const privateFields: (keyof DBSession)[] = ["recordObjectStoreId", "version"];
 
+export async function getSourceRecordingBySessionId(
+  sessionId: string,
+  req: Request
+) {
+  const session = await db.session.get(sessionId);
+
+  if (!session) {
+    console.log(`
+      session: recording by session id: no recording found for session ${sessionId}
+    `);
+    return {
+      url: null,
+      session: null,
+      objectStoreId: null,
+    };
+  }
+
+  return await buildRecordingUrl(session, req);
+}
+
 export async function getRunningRecording(content: DBStream, req: Request) {
   let objectStoreId: string;
 
@@ -220,6 +250,11 @@ export async function getRunningRecording(content: DBStream, req: Request) {
     };
   }
 
+  return await buildRecordingUrl(session, req);
+}
+
+async function buildRecordingUrl(session: DBSession, req: Request) {
+  let objectStoreId: string;
   const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
 
   let url = pathJoin(
@@ -267,5 +302,4 @@ export async function getRunningRecording(content: DBStream, req: Request) {
     objectStoreId,
   };
 }
-
 export default app;

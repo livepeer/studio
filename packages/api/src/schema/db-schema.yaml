@@ -40,6 +40,9 @@ components:
         name:
           type: string
           description: Name of the clip
+        sessionId:
+          type: string
+          description: Session ID of the stream to clip
     experiment-audience-payload:
       type: object
       additionalProperties: false
@@ -787,6 +790,9 @@ components:
         broadcasterHost:
           type: string
           description: Hostname of the broadcaster that transcodes that stream
+        sourceRecordingUrl:
+          type: string
+          description: URL of the recording of the source stream
     multistream-target:
       table: multistream_target
       properties:
