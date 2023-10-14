@@ -480,6 +480,109 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
+app.patch("/", authorizer({}), async (req, res) => {
+  const { email } = req.body;
+  const userId = req.user.id;
+
+  // Validate the new email
+  const emailValid = validator.validate(email);
+  if (!emailValid) {
+    return res.status(422).json({ errors: ["Invalid email"] });
+  }
+
+  const isEmailRegisteredAlready = await isEmailRegistered(email);
+  if (isEmailRegisteredAlready) {
+    return res.status(409).json({
+      errors: ["This email is already registered. Please choose another one."],
+    });
+  }
+
+  const emailValidToken = uuid();
+
+  if (req.user.admin) {
+    if (!req.body.userId) {
+      console.log(`
+        Admin user ${req.user.id} attempted to change email without providing userId
+      `);
+      return res
+        .status(400)
+        .json({ errors: ["userId is required for admins"] });
+    }
+
+    const user = await db.user.get(req.body.userId);
+
+    if (user.admin) {
+      return res
+        .status(400)
+        .json({ errors: ["Cannot change email of admins"] });
+    }
+
+    if (!user) {
+      return res.status(404).json({ errors: ["User not found"] });
+    }
+
+    await db.user.update(req.body.userId, {
+      email: email,
+    });
+
+    res.status(200);
+    return res.json({ message: "Email updated successfully." });
+  }
+
+  // Update user with newEmail (temporary field) and emailValidToken in database
+  await db.user.update(userId, {
+    newEmail: email,
+    emailValidToken: emailValidToken,
+  });
+
+  try {
+    await sendgridEmail({
+      email: email,
+      supportAddr: req.config.supportAddr,
+      sendgridTemplateId: req.config.sendgridTemplateId,
+      sendgridApiKey: req.config.sendgridApiKey,
+      subject: "Verify Your New Email Address for Livepeer Studio",
+      preheader: "Email Verification Needed!",
+      buttonText: "Verify Email",
+      buttonUrl: frontendUrl(
+        req,
+        `/verify-new-email?${qs.stringify({
+          emailValidToken,
+        })}`
+      ),
+      unsubscribe: unsubscribeUrl(req),
+      text: ["Please verify your new email address."].join("\n\n"),
+    });
+
+    res.status(200).json({ message: "Verification email sent." });
+  } catch (err) {
+    res.status(400).json({ errors: [`Error sending email: ${err}`] });
+  }
+});
+
+app.get("/verify/new-email", async (req, res) => {
+  const { emailValidToken } = req.query;
+
+  // Find user with matching emailValidToken
+  const [[user]] = await db.user.find({ emailValidToken });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ errors: ["Invalid or expired verification token."] });
+  }
+
+  // Update user's email field with the newEmail and remove newEmail field and emailValidToken
+  await db.user.update(user.id, {
+    email: user.newEmail,
+    newEmail: null,
+    emailValidToken: null,
+  });
+
+  // Redirect or send a response
+  res.status(200).json({ message: "Email updated successfully." });
+});
+
 const suspensionEmailText = (
   emailTemplate: SuspendUserPayload["emailTemplate"]
 ) => {

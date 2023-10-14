@@ -1840,6 +1840,9 @@ components:
           type: string
           description: user email address
           example: useremail@gmail.com
+        newEmail:
+          type: string
+          description: temporary field for email change
         password:
           type: string
           example: thisisapassword
