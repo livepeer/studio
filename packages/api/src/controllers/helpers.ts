@@ -223,13 +223,22 @@ export async function getObjectStoreS3Config(
   };
 }
 
-export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
+export async function getS3PresignedUrl(
+  os: ObjectStore,
+  objectKey: string,
+  contentLength?: number
+) {
   const config = await getObjectStoreS3Config(os);
   const s3 = new S3Client(config);
-  const putCommand = new PutObjectCommand({
+  let putCommandConfig = {
     Bucket: config.bucket,
     Key: objectKey,
-  });
+    ContentLength: null,
+  };
+  if (contentLength) {
+    putCommandConfig.ContentLength = contentLength;
+  }
+  const putCommand = new PutObjectCommand(putCommandConfig);
   const expiresIn = 12 * 60 * 60; // 12h in seconds
   return getSignedUrl(s3, putCommand, { expiresIn });
 }
