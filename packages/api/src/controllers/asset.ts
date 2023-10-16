@@ -611,6 +611,7 @@ const fieldsMap = {
   sourceSessionId: `asset.data->'source'->>'sessionId'`,
   sourceAssetId: `asset.data->'source'->>'assetId'`,
   sourceType: `asset.data->'source'->>'type'`,
+  sourcePlaybackId: `asset.data->'source'->>'playbackId'`,
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
