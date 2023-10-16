@@ -28,10 +28,8 @@ import sql from "sql-template-strings";
 import { DBStream } from "../store/stream-table";
 
 const app = Router();
-export const LVPR_SDK_EMAILS = [
-  "livepeerjs@livepeer.org",
-  "chase@livepeer.org",
-];
+const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
+const MAX_PROCESSING_CLIPS = 10;
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -57,6 +55,18 @@ app.use(
     return data;
   })
 );
+
+async function getProcessingClipsByPlaybackId(
+  playbackId: string
+): Promise<WithID<Asset>[]> {
+  const assets = await db.asset.find([
+    sql`data->'source'->>'playbackId' = ${playbackId}`,
+    sql`data->'source'->>'type' = 'clip'`,
+    sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'waiting'`,
+  ]);
+
+  return assets[0];
+}
 
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
@@ -99,6 +109,14 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
 
   if ("suspended" in content && content.suspended) {
     throw new NotFoundError("Content not found");
+  }
+
+  const processingClips = await getProcessingClipsByPlaybackId(playbackId);
+
+  if (processingClips.length >= MAX_PROCESSING_CLIPS) {
+    throw new ForbiddenError(
+      "Too many clips are being processed for this playback ID"
+    );
   }
 
   let url: string;
@@ -146,6 +164,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     },
     {
       type: "clip",
+      playbackId,
       ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
     }
   );
