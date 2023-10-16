@@ -64,7 +64,7 @@ async function getProcessingClipsByRequesterId(
   requesterId: string
 ): Promise<WithID<Asset>[]> {
   const assets = await db.asset.find([
-    sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'waiting'`,
+    sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'running' OR data->'status'->>'phase' = 'waiting'`,
     sql`data->'source'->>'requesterId' = ${requesterId}`,
   ]);
 
