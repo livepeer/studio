@@ -32,6 +32,9 @@ const app = Router();
 export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
 const MAX_PROCESSING_CLIPS = 5;
 
+// Generate a salt on server startup, so that we can hash the origin of the requester
+const REQUESTER_SALT = crypto.randomBytes(32).toString("hex");
+
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
@@ -76,13 +79,16 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   const clippingUser = req.user;
   const origin = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   let requesterId: string = null;
+
   if (!origin) {
     console.log(`
       clip: unable to determine origin of requester for user=${clippingUser.id} when clipping playbackId=${playbackId}
     `);
     requesterId = "UNKNOWN";
   } else {
-    const originString = Array.isArray(origin) ? origin.join(",") : origin;
+    let originString = Array.isArray(origin) ? origin.join(",") : origin;
+    originString = originString + REQUESTER_SALT;
+
     // hash the origin to anonymize it
     requesterId = crypto
       .createHash("sha256")
