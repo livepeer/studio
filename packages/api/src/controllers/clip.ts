@@ -76,28 +76,21 @@ async function getProcessingClipsByRequesterId(
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
   const clippingUser = req.user;
-  const origin = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
+  const origin =
+    req.headers["CF-Connecting-IP"] ||
+    req.headers["True-Client-IP"] ||
+    req.headers["X-Forwarded-For"];
   let requesterId: string = null;
 
   if (!origin) {
-    //TODO: remove - staging debug log
     console.log(`
       clip: unable to determine origin of requester for user=${clippingUser.id} when clipping playbackId=${playbackId}
-    `);
-    console.log(`
-      clip: socket.address=${JSON.stringify(
-        req.socket.address()
-      )} socket.remoteAddress=${req.socket.remoteAddress}
     `);
     requesterId = "UNKNOWN";
   } else {
     //TODO: remove - staging debug log
     console.log(`
-      clip: socket.address=${JSON.stringify(
-        req.socket.address()
-      )} socket.remoteAddress=${req.socket.remoteAddress} xforwardedfor=${
-      req.headers["x-forwarded-for"]
-    } xrealip=${req.headers["x-real-ip"]}
+      clip: cf-connecting-ip=${req.headers["CF-Connecting-IP"]} true-client-ip=${req.headers["True-Client-IP"]} xforwardedfor=${req.headers["x-forwarded-for"]}
     `);
     console.log(`
        clip: user=${clippingUser.id} is clipping playbackId=${playbackId} from origin=${origin}
