@@ -63,9 +63,11 @@ app.use(
 async function getProcessingClipsByRequesterId(
   requesterId: string
 ): Promise<WithID<Asset>[]> {
+  const createdAfter = Date.now() - 10 * 60 * 1000;
   const assets = await db.asset.find([
-    sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'running' OR data->'status'->>'phase' = 'waiting'`,
+    sql`data->'status'->>'phase' IN ('waiting', 'processing', 'running')`,
     sql`data->'source'->>'requesterId' = ${requesterId}`,
+    sql`coalesce((data->>'createdAt')::bigint, 0) > ${createdAfter}`,
   ]);
 
   return assets[0];
