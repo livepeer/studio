@@ -26,10 +26,11 @@ import {
 } from "./helpers";
 import sql from "sql-template-strings";
 import { DBStream } from "../store/stream-table";
+import crypto from "crypto";
 
 const app = Router();
-const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
-const MAX_PROCESSING_CLIPS = 10;
+export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
+const MAX_PROCESSING_CLIPS = 5;
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -57,12 +58,14 @@ app.use(
 );
 
 async function getProcessingClipsByPlaybackId(
-  playbackId: string
+  playbackId: string,
+  requesterId: string
 ): Promise<WithID<Asset>[]> {
   const assets = await db.asset.find([
     sql`data->'source'->>'playbackId' = ${playbackId}`,
     sql`data->'source'->>'type' = 'clip'`,
     sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'waiting'`,
+    sql`data->'source'->>'requesterId' = ${requesterId}`,
   ]);
 
   return assets[0];
@@ -71,6 +74,21 @@ async function getProcessingClipsByPlaybackId(
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
   const clippingUser = req.user;
+  const origin = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  let requesterId: string = null;
+  if (!origin) {
+    console.log(`
+      clip: unable to determine origin of requester for user=${clippingUser.id} when clipping playbackId=${playbackId}
+    `);
+    requesterId = "UNKNOWN";
+  } else {
+    const originString = Array.isArray(origin) ? origin.join(",") : origin;
+    // hash the origin to anonymize it
+    requesterId = crypto
+      .createHash("sha256")
+      .update(originString)
+      .digest("hex");
+  }
 
   const id = uuid();
   let uPlaybackId = await generateUniquePlaybackId(id);
@@ -111,12 +129,13 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     throw new NotFoundError("Content not found");
   }
 
-  const processingClips = await getProcessingClipsByPlaybackId(playbackId);
+  const processingClips = await getProcessingClipsByPlaybackId(
+    playbackId,
+    requesterId
+  );
 
   if (processingClips.length >= MAX_PROCESSING_CLIPS) {
-    throw new ForbiddenError(
-      "Too many clips are being processed for this playback ID"
-    );
+    throw new ForbiddenError("Too many clips are being processed.");
   }
 
   let url: string;
@@ -165,6 +184,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     {
       type: "clip",
       playbackId,
+      requesterId,
       ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
     }
   );

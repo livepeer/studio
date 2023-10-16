@@ -814,6 +814,10 @@ components:
                   description:
                     Playback ID of the asset or stream from which this asset was
                     created
+                requesterId:
+                  type: string
+                  description:
+                    ID of the requester from which this asset was created
                 assetId:
                   type: string
                   description: ID of the asset from which this asset was created
