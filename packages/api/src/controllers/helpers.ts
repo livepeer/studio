@@ -592,9 +592,17 @@ export function isValidBase64(str: string) {
   }
 }
 
-export async function triggerCatalystStreamUpdated(
+export const triggerCatalystStreamNuke = (req: Request, playback_id: string) =>
+  triggerCatalystEvent(req, { resource: "nuke", playback_id });
+
+export const triggerCatalystStreamUpdated = (
   req: Request,
-  playbackId: string
+  playback_id: string
+) => triggerCatalystEvent(req, { resource: "stream", playback_id });
+
+async function triggerCatalystEvent(
+  req: Request,
+  payload: { resource: "stream" | "nuke"; playback_id: string }
 ) {
   const { catalystBaseUrl } = req.config;
 
@@ -604,10 +612,7 @@ export async function triggerCatalystStreamUpdated(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      resource: "stream",
-      playback_id: playbackId,
-    }),
+    body: JSON.stringify(payload),
   };
 
   return await fetch(url, options);

@@ -31,8 +31,9 @@ import {
   sendgridValidateEmail,
   toStringValues,
   FieldsMap,
+  triggerCatalystStreamUpdated,
+  triggerCatalystStreamNuke,
 } from "./helpers";
-import { terminateStreamReq } from "./stream";
 import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
@@ -112,7 +113,8 @@ export async function terminateUserStreams(
   const [streams] = await db.stream.find({ userId });
   for (const stream of streams) {
     try {
-      await terminateStreamReq(req, stream);
+      // we don't want to update all user stream objects, so trigger a manual nuke
+      await triggerCatalystStreamNuke(req, stream.playbackId);
     } catch (err) {
       logger.error(
         `error suspending stream id=${stream.id} userId=${userId} err=${err}`
