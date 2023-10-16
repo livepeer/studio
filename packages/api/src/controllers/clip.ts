@@ -60,13 +60,10 @@ app.use(
   })
 );
 
-async function getProcessingClipsByPlaybackId(
-  playbackId: string,
+async function getProcessingClipsByRequesterId(
   requesterId: string
 ): Promise<WithID<Asset>[]> {
   const assets = await db.asset.find([
-    sql`data->'source'->>'playbackId' = ${playbackId}`,
-    sql`data->'source'->>'type' = 'clip'`,
     sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'waiting'`,
     sql`data->'source'->>'requesterId' = ${requesterId}`,
   ]);
@@ -86,6 +83,10 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     `);
     requesterId = "UNKNOWN";
   } else {
+    //TODO: remove - staging debug log
+    console.log(`
+       clip: user=${clippingUser.id} is clipping playbackId=${playbackId} from origin=${origin}
+    `);
     let originString = Array.isArray(origin) ? origin.join(",") : origin;
     originString = originString + REQUESTER_SALT;
 
@@ -135,10 +136,7 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     throw new NotFoundError("Content not found");
   }
 
-  const processingClips = await getProcessingClipsByPlaybackId(
-    playbackId,
-    requesterId
-  );
+  const processingClips = await getProcessingClipsByRequesterId(requesterId);
 
   if (processingClips.length >= MAX_PROCESSING_CLIPS) {
     throw new ForbiddenError("Too many clips are being processed.");
