@@ -33,7 +33,7 @@ export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
 const MAX_PROCESSING_CLIPS = 5;
 
 // Generate a salt on server startup, so that we can hash the origin of the requester
-const REQUESTER_SALT = crypto.randomBytes(32).toString("hex");
+const SALT = crypto.randomBytes(32).toString("hex");
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -63,9 +63,11 @@ app.use(
 async function getProcessingClipsByRequesterId(
   requesterId: string
 ): Promise<WithID<Asset>[]> {
+  const createdAfter = Date.now() - 10 * 60 * 1000;
   const assets = await db.asset.find([
-    sql`data->'status'->>'phase' = 'processing' OR data->'status'->>'phase' = 'running' OR data->'status'->>'phase' = 'waiting'`,
+    sql`data->'status'->>'phase' IN ('waiting', 'processing', 'running')`,
     sql`data->'source'->>'requesterId' = ${requesterId}`,
+    sql`coalesce((data->>'createdAt')::bigint, 0) > ${createdAfter}`,
   ]);
 
   return assets[0];
@@ -74,7 +76,10 @@ async function getProcessingClipsByRequesterId(
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
   const clippingUser = req.user;
-  const origin = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const origin =
+    req.headers["CF-Connecting-IP"] ||
+    req.headers["True-Client-IP"] ||
+    req.headers["X-Forwarded-For"];
   let requesterId: string = null;
 
   if (!origin) {
@@ -85,10 +90,13 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   } else {
     //TODO: remove - staging debug log
     console.log(`
+      clip: cf-connecting-ip=${req.headers["CF-Connecting-IP"]} true-client-ip=${req.headers["True-Client-IP"]} xforwardedfor=${req.headers["x-forwarded-for"]}
+    `);
+    console.log(`
        clip: user=${clippingUser.id} is clipping playbackId=${playbackId} from origin=${origin}
     `);
     let originString = Array.isArray(origin) ? origin.join(",") : origin;
-    originString = originString + REQUESTER_SALT;
+    originString = originString + SALT + playbackId;
 
     // hash the origin to anonymize it
     requesterId = crypto
