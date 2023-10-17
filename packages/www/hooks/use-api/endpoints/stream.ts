@@ -126,16 +126,13 @@ export const terminateStream = async (id: string): Promise<boolean> => {
   const [res, body] = await context.fetch(`/stream/${id}/terminate`, {
     method: "DELETE",
   });
-  if (res.status !== 200) {
+  if (!res.ok) {
     if (body && body.errors) {
       throw new Error(body.errors);
     }
     throw new Error(body);
   }
-  if (body && body.errors) {
-    throw new Error(body.errors);
-  }
-  return body.result;
+  return true;
 };
 
 export const deleteStream = async (id: string): Promise<void> => {

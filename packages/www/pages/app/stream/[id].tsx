@@ -378,7 +378,7 @@ const ID = () => {
             onAction={() => {
               terminateStream(stream.id)
                 .then((res) => {
-                  setResultText(`sucess: ${res}`);
+                  setResultText(`Success: ${res}`);
                 })
                 .catch((e) => {
                   console.error(e);
