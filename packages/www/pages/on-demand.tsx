@@ -1,15 +1,20 @@
-import imageUrlBuilder from "@sanity/image-url";
-import { useRouter } from "next/router";
-import { client } from "lib/client";
 import Layout from "layouts/main";
 import {
   Box,
   Flex,
   Button,
-  Container,
+  Heading,
   Text,
+  Container,
   Link as A,
 } from "@livepeer/design-system";
+import Pricing from "components/Site/Pricing";
+import ReactMarkdown from "react-markdown";
+import { promises as fs } from "fs";
+import path from "path";
+import { Contact as Content } from "content";
+import { Callout } from "@radix-ui/themes";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
 import Why from "components/Site/Why";
@@ -79,64 +84,9 @@ const benefitsListItems = [
   },
 ];
 
-const ProductPage = ({
-  title,
-  metaTitle,
-  metaDescription,
-  metaUrl,
-  openGraphImage,
-  content,
-  noindex = false,
-  preview,
-}) => {
-  const router = useRouter();
-  const builder = imageUrlBuilder(client as any);
-
-  if (router.isFallback) {
-    return (
-      <Layout>
-        <Box
-          css={{
-            py: "$5",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100vh",
-          }}>
-          Loading...
-        </Box>
-      </Layout>
-    );
-  }
-
-  if (!content || !title) {
-    return (
-      <Layout>
-        <Box
-          css={{
-            py: "$5",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100vh",
-          }}>
-          Error
-        </Box>
-      </Layout>
-    );
-  }
-
+const OnDemandPage = () => {
   return (
-    <Layout
-      title={metaTitle}
-      description={metaDescription}
-      noindex={noindex}
-      image={{
-        url: builder.image(openGraphImage).url(),
-        alt: openGraphImage?.asset?.altText,
-      }}
-      url={metaUrl}
-      preview={preview}>
+    <Layout {...Content.metaData}>
       <Box css={{ position: "relative" }}>
         <Container
           size="4"
@@ -202,34 +152,12 @@ const ProductPage = ({
   );
 };
 
-export async function getStaticPaths() {
-  const queryForPaths = `*[_type=='page' && defined(slug.current)][].slug.current`;
-  const data: string[] = (await client.fetch(queryForPaths)) ?? [];
-  const paths = data
-    .filter((path) => path !== "jobs" && path !== "team")
-    .map((path) => ({ params: { slug: path } }));
+export async function getStaticProps() {
   return {
-    fallback: true,
-    paths,
+    props: {},
+    revalidate: 1,
   };
 }
 
-export async function getStaticProps({ params, locale }) {
-  const { slug } = params;
-  const queryParams = {
-    slug,
-  };
-
-  const query = `*[_type=="page" && slug.current == $slug][0]`;
-  const pageData = (await client.fetch(query, queryParams)) ?? {};
-
-  return {
-    props: {
-      ...pageData,
-    },
-    revalidate: 86400,
-  };
-}
-
-ProductPage.theme = "light-theme-green";
-export default ProductPage;
+OnDemandPage.theme = "light-theme-green";
+export default OnDemandPage;

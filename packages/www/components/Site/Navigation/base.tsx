@@ -128,7 +128,7 @@ const NavigationBase = ({
                   }}>
                   {links.map((link, i) => {
                     return link?.children ? (
-                      <DropdownMenu>
+                      <DropdownMenu key={`dropdown-menu-${i}`}>
                         <DropdownMenuTrigger asChild>
                           <A
                             as={Box}
@@ -151,9 +151,10 @@ const NavigationBase = ({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" css={{ p: "$2" }}>
                           <DropdownMenuGroup>
-                            {link.children.map((child) => {
+                            {link.children.map((child, i) => {
                               return (
                                 <DropdownMenuItem
+                                  key={`dropdown-menu-item-${i}`}
                                   css={{
                                     height: 54,
                                     display: "flex",

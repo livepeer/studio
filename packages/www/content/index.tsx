@@ -89,6 +89,15 @@ export const Blog = {
   },
 };
 
+export const Customers = {
+  metaData: {
+    title: makeCompleteTitle("Customers"),
+    description:
+      "Livepeer Studio empowers visionary video product teams, supporting next-generation startups aiming for the stars, as well as established industry leaders shaping the future.",
+    url: makeCompleteUrl("customers"),
+  },
+};
+
 export const Jobs = {
   metaData: {
     title: makeCompleteTitle("Jobs"),

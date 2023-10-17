@@ -33,7 +33,7 @@ const getIconProvider = (provider) => {
 const Why = ({
   backgroundColor = "$loContrast",
   title = null,
-  heading,
+  heading = null,
   description = null,
   reasons,
   ctas,
@@ -55,37 +55,39 @@ const Why = ({
               px: "$3",
             },
           }}>
-          <Flex
-            css={{
-              ai: "flex-start",
-              flexDirection: "column",
-              width: "100%",
-              mb: "$7",
-              "@bp2": {
-                mb: "$2",
-                ai: "center",
-                flexDirection: "row",
-              },
-            }}>
-            <Flex direction="column">
-              <Text size="5" css={{ fontWeight: 600, mb: "$4" }}>
-                {title}
-              </Text>
-              <Heading
-                as="h2"
-                size="4"
-                css={{
-                  maxWidth: 550,
-                  lineHeight: 1.4,
-                  fontWeight: 700,
-                  mb: "$4",
-                  mr: "$6",
-                }}>
-                {heading}
-              </Heading>
+          {heading && (
+            <Flex
+              css={{
+                ai: "flex-start",
+                flexDirection: "column",
+                width: "100%",
+                mb: "$7",
+                "@bp2": {
+                  mb: "$2",
+                  ai: "center",
+                  flexDirection: "row",
+                },
+              }}>
+              <Flex direction="column">
+                <Text size="5" css={{ fontWeight: 600, mb: "$4" }}>
+                  {title}
+                </Text>
+                <Heading
+                  as="h2"
+                  size="4"
+                  css={{
+                    maxWidth: 550,
+                    lineHeight: 1.4,
+                    fontWeight: 700,
+                    mb: "$4",
+                    mr: "$6",
+                  }}>
+                  {heading}
+                </Heading>
+              </Flex>
+              {ctas && ctas}
             </Flex>
-            {ctas && ctas}
-          </Flex>
+          )}
           {description && (
             <Text
               css={{ fontWeight: 500, mb: "$6", maxWidth: 700 }}
