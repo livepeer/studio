@@ -15,7 +15,7 @@ import { DBSession } from "../store/session-table";
 import { authorizer } from "../middleware";
 import { toExternalAsset } from "./asset";
 import mung from "express-mung";
-import { Asset } from "../schema/types";
+import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { buildRecordingUrl, getRunningRecording } from "./session";
 import {
@@ -23,17 +23,14 @@ import {
   parseFilters,
   parseOrder,
   makeNextHREF,
+  generateRequesterId,
 } from "./helpers";
 import sql from "sql-template-strings";
 import { DBStream } from "../store/stream-table";
-import crypto from "crypto";
 
 const app = Router();
 export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
 const MAX_PROCESSING_CLIPS = 5;
-
-// Generate a salt on server startup, so that we can hash the origin of the requester
-const SALT = crypto.randomBytes(32).toString("hex");
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -63,20 +60,22 @@ app.use(
 async function getProcessingClipsByRequesterId(
   requesterId: string,
   ownerId: string
-): Promise<WithID<Asset>[]> {
-  const createdAfter = Date.now() - 5 * 60 * 1000;
-  const [assets] = await db.asset.find([
+): Promise<WithID<Task>[]> {
+  const scheduledAt = Date.now() - 5 * 60 * 1000;
+  const [tasks] = await db.task.find([
     sql`data->>'userId' = ${ownerId}`,
-    sql`coalesce((data->>'createdAt')::bigint, 0) > ${createdAfter}`,
+    sql`coalesce((data->>'scheduledAt')::bigint, 0) > ${scheduledAt}`,
   ]);
-
-  const runningClips: WithID<Asset>[] = [];
-  assets.forEach((asset) => {
-    if (
-      asset.source?.type === "clip" &&
-      asset.source?.requesterId === requesterId
-    ) {
-      runningClips.push(asset);
+  let runningClips: WithID<Task>[] = [];
+  const tasksByRequester = tasks.filter((t) => t.requesterId === requesterId);
+  tasksByRequester.forEach((task) => {
+    if (task.type === "clip") {
+      if (
+        task.status.phase === "running" ||
+        task.status.phase === "pending" ||
+        task.status.phase === "waiting"
+      )
+        runningClips.push(task);
     }
   });
 
@@ -86,34 +85,8 @@ async function getProcessingClipsByRequesterId(
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
   const clippingUser = req.user;
-  const origin =
-    req.headers["cf-connecting-ip"] ||
-    req.headers["true-client-ip"] ||
-    req.headers["x-forwarded-for"];
-  let requesterId: string = null;
 
-  if (!origin) {
-    console.log(`
-      clip: unable to determine origin of requester for user=${clippingUser.id} when clipping playbackId=${playbackId}
-    `);
-    requesterId = `UNKNOWN-${playbackId}`;
-  } else {
-    //TODO: remove - staging debug log
-    console.log(`
-      clip: cf-connecting-ip=${req.headers["cf-connecting-ip"]} true-client-ip=${req.headers["true-client-ip"]} xforwardedfor=${req.headers["x-forwarded-for"]}
-    `);
-    console.log(`
-       clip: user=${clippingUser.id} is clipping playbackId=${playbackId} from origin=${origin}
-    `);
-    let originString = Array.isArray(origin) ? origin.join(",") : origin;
-    originString = originString + SALT + playbackId;
-
-    // hash the origin to anonymize it
-    requesterId = crypto
-      .createHash("sha256")
-      .update(originString)
-      .digest("hex");
-  }
+  const requesterId = await generateRequesterId(req, playbackId);
 
   const id = uuid();
   let uPlaybackId = await generateUniquePlaybackId(id);
@@ -209,7 +182,6 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     {
       type: "clip",
       playbackId,
-      requesterId,
       ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
     }
   );
@@ -234,7 +206,8 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     },
     null,
     asset,
-    owner.id
+    owner.id,
+    requesterId
   );
 
   res.json({

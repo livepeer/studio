@@ -12,6 +12,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
 import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
 import { BadRequestError } from "../store/errors";
+import * as nativeCrypto from "crypto";
+
+const SALT = nativeCrypto.randomBytes(32).toString("hex");
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
@@ -232,6 +235,35 @@ export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
   });
   const expiresIn = 12 * 60 * 60; // 12h in seconds
   return getSignedUrl(s3, putCommand, { expiresIn });
+}
+
+export async function generateRequesterId(req: Request, playbackId: string) {
+  const origin =
+    req.headers["cf-connecting-ip"] ||
+    req.headers["true-client-ip"] ||
+    req.headers["x-forwarded-for"];
+
+  let requesterId: string;
+  if (!origin) {
+    console.log(`
+        unable to determine origin of requester for user=${req.user.id} when clipping playbackId=${playbackId}
+    `);
+    requesterId = `UNKNOWN-${playbackId}`;
+  } else {
+    console.log(`
+         user=${req.user.id} requesterId generated for playbackId=${playbackId} from origin=${origin}
+    `);
+    let originString = Array.isArray(origin) ? origin.join(",") : origin;
+    originString = originString + SALT + playbackId;
+
+    // hash the origin to anonymize it
+    requesterId = nativeCrypto
+      .createHash("sha256")
+      .update(originString)
+      .digest("hex");
+  }
+
+  return requesterId;
 }
 
 type EmailParams = {

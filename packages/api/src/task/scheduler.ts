@@ -343,14 +343,16 @@ export class TaskScheduler {
     params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset,
-    userId?: string
+    userId?: string,
+    requesterId?: string
   ) {
     const task = await this.createTask(
       type,
       params,
       inputAsset,
       outputAsset,
-      userId
+      userId,
+      requesterId
     );
     await this.scheduleTask(task);
     return task;
@@ -361,7 +363,8 @@ export class TaskScheduler {
     params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset,
-    userId?: string
+    userId?: string,
+    requesterId?: string
   ) {
     const task = await db.task.create({
       id: uuid(),
@@ -375,6 +378,7 @@ export class TaskScheduler {
         phase: "pending",
         updatedAt: Date.now(),
       },
+      requesterId,
     });
     await this.queue.publishWebhook("events.task.spawned", {
       type: "webhook_event",
