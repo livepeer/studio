@@ -1539,6 +1539,9 @@ components:
                     endTime:
                       type: number
                       description: End time of the clip in milliseconds
+                    offset:
+                      type: number
+                      description: Offset of the clip in milliseconds
                     playbackId:
                       type: string
                       description: Playback ID of the stream or asset to clip
