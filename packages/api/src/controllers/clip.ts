@@ -77,20 +77,20 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
   const clippingUser = req.user;
   const origin =
-    req.headers["CF-Connecting-IP"] ||
-    req.headers["True-Client-IP"] ||
-    req.headers["X-Forwarded-For"];
+    req.headers["cf-connecting-ip"] ||
+    req.headers["true-client-ip"] ||
+    req.headers["x-forwarded-for"];
   let requesterId: string = null;
 
   if (!origin) {
     console.log(`
       clip: unable to determine origin of requester for user=${clippingUser.id} when clipping playbackId=${playbackId}
     `);
-    requesterId = "UNKNOWN";
+    requesterId = `UNKNOWN-${playbackId}`;
   } else {
     //TODO: remove - staging debug log
     console.log(`
-      clip: cf-connecting-ip=${req.headers["CF-Connecting-IP"]} true-client-ip=${req.headers["True-Client-IP"]} xforwardedfor=${req.headers["x-forwarded-for"]}
+      clip: cf-connecting-ip=${req.headers["cf-connecting-ip"]} true-client-ip=${req.headers["true-client-ip"]} xforwardedfor=${req.headers["x-forwarded-for"]}
     `);
     console.log(`
        clip: user=${clippingUser.id} is clipping playbackId=${playbackId} from origin=${origin}
