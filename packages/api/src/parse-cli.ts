@@ -474,6 +474,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://meet.livekit.io/custom",
       },
+      saltForRequesterId: {
+        describe: "Salt for generating requesterId",
+        type: "string",
+        default: "",
+      },
       frontend: {
         describe: "serve the embedded @livepeer/www Next.js frontend",
         type: "boolean",

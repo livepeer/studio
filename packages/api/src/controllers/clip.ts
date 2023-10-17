@@ -15,7 +15,7 @@ import { DBSession } from "../store/session-table";
 import { authorizer } from "../middleware";
 import { toExternalAsset } from "./asset";
 import mung from "express-mung";
-import { Asset } from "../schema/types";
+import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { buildRecordingUrl, getRunningRecording } from "./session";
 import {
@@ -23,17 +23,16 @@ import {
   parseFilters,
   parseOrder,
   makeNextHREF,
+  generateRequesterId,
+  sqlQueryGroup,
 } from "./helpers";
 import sql from "sql-template-strings";
 import { DBStream } from "../store/stream-table";
-import crypto from "crypto";
+import { getProcessingTasksByRequesterId } from "./task";
 
 const app = Router();
 export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
 const MAX_PROCESSING_CLIPS = 5;
-
-// Generate a salt on server startup, so that we can hash the origin of the requester
-const SALT = crypto.randomBytes(32).toString("hex");
 
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
@@ -60,50 +59,11 @@ app.use(
   })
 );
 
-async function getProcessingClipsByRequesterId(
-  requesterId: string
-): Promise<WithID<Asset>[]> {
-  const createdAfter = Date.now() - 10 * 60 * 1000;
-  const assets = await db.asset.find([
-    sql`data->'status'->>'phase' IN ('waiting', 'processing', 'running')`,
-    sql`data->'source'->>'requesterId' = ${requesterId}`,
-    sql`coalesce((data->>'createdAt')::bigint, 0) > ${createdAfter}`,
-  ]);
-
-  return assets[0];
-}
-
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
   const clippingUser = req.user;
-  const origin =
-    req.headers["cf-connecting-ip"] ||
-    req.headers["true-client-ip"] ||
-    req.headers["x-forwarded-for"];
-  let requesterId: string = null;
 
-  if (!origin) {
-    console.log(`
-      clip: unable to determine origin of requester for user=${clippingUser.id} when clipping playbackId=${playbackId}
-    `);
-    requesterId = `UNKNOWN-${playbackId}`;
-  } else {
-    //TODO: remove - staging debug log
-    console.log(`
-      clip: cf-connecting-ip=${req.headers["cf-connecting-ip"]} true-client-ip=${req.headers["true-client-ip"]} xforwardedfor=${req.headers["x-forwarded-for"]}
-    `);
-    console.log(`
-       clip: user=${clippingUser.id} is clipping playbackId=${playbackId} from origin=${origin}
-    `);
-    let originString = Array.isArray(origin) ? origin.join(",") : origin;
-    originString = originString + SALT + playbackId;
-
-    // hash the origin to anonymize it
-    requesterId = crypto
-      .createHash("sha256")
-      .update(originString)
-      .digest("hex");
-  }
+  const requesterId = await generateRequesterId(req, playbackId);
 
   const id = uuid();
   let uPlaybackId = await generateUniquePlaybackId(id);
@@ -144,9 +104,14 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     throw new NotFoundError("Content not found");
   }
 
-  const processingClips = await getProcessingClipsByRequesterId(requesterId);
+  const processingClips = await getProcessingTasksByRequesterId(
+    requesterId,
+    req.user.id,
+    "clip",
+    5
+  );
 
-  if (processingClips.length >= MAX_PROCESSING_CLIPS) {
+  if (processingClips.length >= MAX_PROCESSING_CLIPS && !clippingUser.admin) {
     throw new ForbiddenError("Too many clips are being processed.");
   }
 
@@ -196,7 +161,6 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     {
       type: "clip",
       playbackId,
-      requesterId,
       ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
     }
   );
@@ -221,7 +185,8 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     },
     null,
     asset,
-    owner.id
+    owner.id,
+    requesterId
   );
 
   res.json({
@@ -350,15 +315,5 @@ export const getClips = async (
 
   return res.json(output);
 };
-
-function sqlQueryGroup(values: string[]) {
-  const query = sql`(`;
-  values.forEach((value, i) => {
-    if (i) query.append(`, `);
-    query.append(sql`${value}`);
-  });
-  query.append(`)`);
-  return query;
-}
 
 export default app;

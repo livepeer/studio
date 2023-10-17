@@ -12,6 +12,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
 import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
 import { BadRequestError } from "../store/errors";
+import * as nativeCrypto from "crypto";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
@@ -82,6 +83,16 @@ export function toStringValues(obj: Record<string, any>) {
     strObj[key] = value.toString();
   }
   return strObj;
+}
+
+export function sqlQueryGroup(values: string[]) {
+  const query = sql`(`;
+  values.forEach((value, i) => {
+    if (i) query.append(`, `);
+    query.append(sql`${value}`);
+  });
+  query.append(`)`);
+  return query;
 }
 
 export function reqUseReplica(req: Request) {
@@ -232,6 +243,32 @@ export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
   });
   const expiresIn = 12 * 60 * 60; // 12h in seconds
   return getSignedUrl(s3, putCommand, { expiresIn });
+}
+
+export async function generateRequesterId(req: Request, playbackId: string) {
+  const ip =
+    req.headers["cf-connecting-ip"] ||
+    req.headers["true-client-ip"] ||
+    req.headers["x-forwarded-for"];
+
+  let requesterId: string;
+  if (!ip) {
+    console.log(`
+        unable to determine ip of requester for user=${req.user.id} when clipping playbackId=${playbackId}
+    `);
+    requesterId = `UNKNOWN-${playbackId}`;
+  } else {
+    let originString = Array.isArray(ip) ? ip.join(",") : ip;
+    originString = originString + req.config.saltForRequesterId + playbackId;
+
+    // hash the origin to anonymize it
+    requesterId = nativeCrypto
+      .createHash("sha256")
+      .update(originString)
+      .digest("hex");
+  }
+
+  return requesterId;
 }
 
 type EmailParams = {

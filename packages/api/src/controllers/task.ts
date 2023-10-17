@@ -12,6 +12,7 @@ import {
   FieldsMap,
   reqUseReplica,
   deleteCredentials,
+  sqlQueryGroup,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -92,6 +93,29 @@ export function taskParamsWithoutCredentials(
       break;
   }
   return result;
+}
+
+export async function getProcessingTasksByRequesterId(
+  requesterId: string,
+  ownerId: string,
+  taskType?: string,
+  timeFrame?: number // in minutes
+): Promise<WithID<Task>[]> {
+  if (!timeFrame) {
+    timeFrame = 60;
+  }
+  const scheduledAt = Date.now() - timeFrame * 60 * 1000;
+  const phases = ["running", "pending", "waiting"];
+  const typeCondition = taskType ? sql`data->>'type' = ${taskType}` : "true";
+
+  const [tasks] = await db.task.find([
+    sql`data->>'userId' = ${ownerId}`,
+    sql`coalesce((data->>'scheduledAt')::bigint, 0) > ${scheduledAt}`,
+    sql`data->'status'->>'phase' IN `.append(sqlQueryGroup(phases)),
+    typeCondition,
+  ]);
+
+  return tasks.filter((task) => task.requesterId === requesterId);
 }
 
 const fieldsMap: FieldsMap = {
