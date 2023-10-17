@@ -14,8 +14,6 @@ import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
 import { BadRequestError } from "../store/errors";
 import * as nativeCrypto from "crypto";
 
-const SALT = nativeCrypto.randomBytes(32).toString("hex");
-
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
 
@@ -254,7 +252,7 @@ export async function generateRequesterId(req: Request, playbackId: string) {
          user=${req.user.id} requesterId generated for playbackId=${playbackId} from origin=${origin}
     `);
     let originString = Array.isArray(origin) ? origin.join(",") : origin;
-    originString = originString + SALT + playbackId;
+    originString = originString + req.config.saltForRequesterId + playbackId;
 
     // hash the origin to anonymize it
     requesterId = nativeCrypto
