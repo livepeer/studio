@@ -110,7 +110,7 @@ function Layout({
       <NextSeo {...seo} />
       <GoogleTagManager />
       <Fade big when={isLoggedIn === false}>
-        {topNotification && <TopNotification {...topNotification} />}
+        {/* {topNotification && <TopNotification {...topNotification} />} */}
         <Flex
           className="main"
           css={{
