@@ -1,4 +1,4 @@
-import { Box, Container, Grid } from "@livepeer/design-system";
+import { Box, Container, Text } from "@livepeer/design-system";
 import { useRouter } from "next/router";
 import BlogPostCard, {
   FeaturedBlogPostCard,
@@ -41,56 +41,109 @@ const CustomersPage = ({ customers }) => {
         <Container
           size="4"
           css={{
-            px: "$3",
-            py: "$2",
+            maxWidth: "1245px",
+            px: "$6",
+            py: "$7",
             width: "100%",
-            "@bp2": {
+            "@bp3": {
+              pt: "$6",
+              pb: "$8",
               px: "$4",
             },
           }}>
-          <Box
-            css={{
-              textAlign: "left",
-              mt: 60,
-              mb: 60,
-              "@bp2": {
-                mt: 110,
-                mb: 120,
-              },
-            }}>
+          <Box css={{ textAlign: "center", maxWidth: 890, m: "0 auto" }}>
             <Box
               as="h1"
               css={{
-                textTransform: "uppercase",
                 fontSize: 70,
-                fontWeight: 500,
-                lineHeight: "82px",
-                mx: 0,
-                mt: 0,
-                letterSpacing: "-4px",
-                "@bp2": { fontSize: 130 },
+                lineHeight: "60px",
+                fontWeight: 600,
+                letterSpacing: "-1px",
+                mb: "$6",
+                textTransform: "uppercase",
               }}>
               Customers
             </Box>
+            <Text size={5} css={{ lineHeight: 1.7, mb: "$5" }}>
+              Livepeer Studio empowers visionary video product teams, supporting
+              next-generation startups and established industry leaders shaping
+              the future.
+            </Text>
           </Box>
-
-          <Grid
-            gap={4}
+        </Container>
+        <Box css={{ mb: 200, position: "relative", bc: "$neutral2", py: "$6" }}>
+          <Box
             css={{
-              mb: 100,
-              gridTemplateColumns: "repeat(1,1fr)",
-              "@bp2": {
-                gridTemplateColumns: "repeat(2,1fr)",
+              display: "grid",
+              grid: "1fr/repeat(1,1fr)",
+              position: "relative",
+              height: "100%",
+              maxWidth: "1145px",
+              gap: 20,
+              margin: "0 auto",
+              "@bp1": {
+                grid: "1fr/repeat(2,1fr)",
               },
               "@bp3": {
-                gridTemplateColumns: "repeat(3,1fr)",
+                grid: "1fr/repeat(3,1fr)",
               },
             }}>
-            {customers.map((p, i) => (
-              <Box key={`post-${i}`}>{i}</Box>
-            ))}
-          </Grid>
-        </Container>
+            {customers.map((customer, i) => {
+              return (
+                <Box
+                  key={i}
+                  css={{
+                    bc: "white",
+                    py: "$4",
+                    pl: "$6",
+                    pr: "$6",
+                    width: "100%",
+                    borderRadius: "$4",
+                    "@bp1": {
+                      pl: "$3",
+                      "&:nth-child(odd)": {
+                        pl: "$6",
+                      },
+                    },
+                    "@bp3": {
+                      "&:nth-child(odd)": {
+                        pl: "$3",
+                      },
+                    },
+                  }}>
+                  {/* {item?.icon?.provider && (
+                  <Box
+                    css={{
+                      mb: "$3",
+                      width: 44,
+                      height: 44,
+                      minWidth: 44,
+                      minHeight: 44,
+                      borderRadius: 1000,
+                      display: "flex",
+                      ai: "center",
+                      color: "$hiContrast",
+                      jc: "center",
+                      background:
+                        "linear-gradient(90deg, $green4 0%, $green5 100%)",
+                    }}>
+                    {getIconProvider(item.icon.provider)[item.icon.name]()}
+                  </Box>
+                )} */}
+                  <Text
+                    css={{
+                      position: "relative",
+                      fontWeight: 600,
+                      mb: "$2",
+                      fontSize: "$5",
+                    }}>
+                    {customer.title}
+                  </Text>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
       </Box>
     </Layout>
   );

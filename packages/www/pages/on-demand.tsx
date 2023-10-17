@@ -17,7 +17,7 @@ import { Callout } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
-import Why from "components/Site/Why";
+import Cards from "components/Site/Cards";
 
 const benefitsListItems = [
   {
@@ -132,21 +132,18 @@ const OnDemandPage = () => {
             </Flex>
           </Box>
         </Container>
-        <Box css={{ bc: "$neutral3" }}>
-          <Container>
-            <Why
-              backgroundColor="$neutral3"
-              reasons={benefitsListItems}
-              ctas={
-                <Link href="https://livepeer.org" target="_blank">
-                  <Button variant="green" size="4" css={{ gap: "$1" }}>
-                    Learn more <FiArrowUpRight />
-                  </Button>
-                </Link>
-              }
-            />
-          </Container>
-        </Box>
+
+        <Cards
+          backgroundColor="$neutral2"
+          items={benefitsListItems}
+          ctas={
+            <Link href="https://livepeer.org" target="_blank">
+              <Button variant="green" size="4" css={{ gap: "$1" }}>
+                Learn more <FiArrowUpRight />
+              </Button>
+            </Link>
+          }
+        />
       </Box>
     </Layout>
   );

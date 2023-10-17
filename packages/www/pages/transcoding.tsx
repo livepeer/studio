@@ -43,12 +43,11 @@ const TranscodingPage = () => {
                 letterSpacing: "-1px",
                 mb: "$6",
               }}>
-              VIDEO ENCODING, EVOLVED
+              VIDEO TRANSCODING, EVOLVED
             </Box>
             <Text size={5} css={{ lineHeight: 1.7, mb: "$5" }}>
               Livepeer Studio is powered by the Livepeer Network, the most
-              advanced transcoding infrastructure for on-demand and live
-              streaming video.
+              advanced transcoding infrastructure for on-demand and live video.
             </Text>
             <Flex align="center" justify="center">
               <Link href="/register" passHref>

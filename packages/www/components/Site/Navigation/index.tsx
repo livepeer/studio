@@ -3,6 +3,24 @@ import NavigationBase from "./base";
 const defaultNavProps = {
   links: [
     {
+      label: "Product",
+      href: "",
+      children: [
+        {
+          href: "/on-demand",
+          label: "On-demand",
+        },
+        {
+          href: "/live",
+          label: "Live",
+        },
+        {
+          href: "/transcoding",
+          label: "Transcoding",
+        },
+      ],
+    },
+    {
       label: "Use Cases",
       href: "/use-cases",
       children: [
