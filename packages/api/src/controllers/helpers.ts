@@ -615,7 +615,14 @@ async function triggerCatalystEvent(
     body: JSON.stringify(payload),
   };
 
-  return await fetch(url, options);
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(
+      `error dispatching event to catalyst url=${url} payload=${payload} status=${
+        res.status
+      } error=${await res.text()}`
+    );
+  }
 }
 
 export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
