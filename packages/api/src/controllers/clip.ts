@@ -24,9 +24,11 @@ import {
   parseOrder,
   makeNextHREF,
   generateRequesterId,
+  sqlQueryGroup,
 } from "./helpers";
 import sql from "sql-template-strings";
 import { DBStream } from "../store/stream-table";
+import { getProcessingTasksByRequesterId } from "./task";
 
 const app = Router();
 export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
@@ -56,31 +58,6 @@ app.use(
     return data;
   })
 );
-
-async function getProcessingClipsByRequesterId(
-  requesterId: string,
-  ownerId: string
-): Promise<WithID<Task>[]> {
-  const scheduledAt = Date.now() - 5 * 60 * 1000;
-  const [tasks] = await db.task.find([
-    sql`data->>'userId' = ${ownerId}`,
-    sql`coalesce((data->>'scheduledAt')::bigint, 0) > ${scheduledAt}`,
-  ]);
-  let runningClips: WithID<Task>[] = [];
-  const tasksByRequester = tasks.filter((t) => t.requesterId === requesterId);
-  tasksByRequester.forEach((task) => {
-    if (task.type === "clip") {
-      if (
-        task.status.phase === "running" ||
-        task.status.phase === "pending" ||
-        task.status.phase === "waiting"
-      )
-        runningClips.push(task);
-    }
-  });
-
-  return runningClips;
-}
 
 app.post("/", validatePost("clip-payload"), async (req, res) => {
   const playbackId = req.body.playbackId;
@@ -127,12 +104,14 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
     throw new NotFoundError("Content not found");
   }
 
-  const processingClips = await getProcessingClipsByRequesterId(
+  const processingClips = await getProcessingTasksByRequesterId(
     requesterId,
-    req.user.id
+    req.user.id,
+    "clip",
+    5
   );
 
-  if (processingClips.length >= MAX_PROCESSING_CLIPS) {
+  if (processingClips.length >= MAX_PROCESSING_CLIPS && !clippingUser.admin) {
     throw new ForbiddenError("Too many clips are being processed.");
   }
 
@@ -336,15 +315,5 @@ export const getClips = async (
 
   return res.json(output);
 };
-
-function sqlQueryGroup(values: string[]) {
-  const query = sql`(`;
-  values.forEach((value, i) => {
-    if (i) query.append(`, `);
-    query.append(sql`${value}`);
-  });
-  query.append(`)`);
-  return query;
-}
 
 export default app;

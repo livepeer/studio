@@ -85,6 +85,16 @@ export function toStringValues(obj: Record<string, any>) {
   return strObj;
 }
 
+export function sqlQueryGroup(values: string[]) {
+  const query = sql`(`;
+  values.forEach((value, i) => {
+    if (i) query.append(`, `);
+    query.append(sql`${value}`);
+  });
+  query.append(`)`);
+  return query;
+}
+
 export function reqUseReplica(req: Request) {
   if (!req.user.admin) {
     return true;
@@ -236,22 +246,19 @@ export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
 }
 
 export async function generateRequesterId(req: Request, playbackId: string) {
-  const origin =
+  const ip =
     req.headers["cf-connecting-ip"] ||
     req.headers["true-client-ip"] ||
     req.headers["x-forwarded-for"];
 
   let requesterId: string;
-  if (!origin) {
+  if (!ip) {
     console.log(`
-        unable to determine origin of requester for user=${req.user.id} when clipping playbackId=${playbackId}
+        unable to determine ip of requester for user=${req.user.id} when clipping playbackId=${playbackId}
     `);
     requesterId = `UNKNOWN-${playbackId}`;
   } else {
-    console.log(`
-         user=${req.user.id} requesterId generated for playbackId=${playbackId} from origin=${origin}
-    `);
-    let originString = Array.isArray(origin) ? origin.join(",") : origin;
+    let originString = Array.isArray(ip) ? ip.join(",") : ip;
     originString = originString + req.config.saltForRequesterId + playbackId;
 
     // hash the origin to anonymize it
