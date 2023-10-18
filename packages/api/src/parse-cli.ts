@@ -405,19 +405,6 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "url of the Consul agent",
         type: "string",
       },
-      "mist-port": {
-        describe: "port of the Mist server",
-        default: 4242,
-        type: "number",
-      },
-      "mist-username": {
-        describe: "username for Mist server",
-        type: "string",
-      },
-      "mist-password": {
-        describe: "password for Mist server",
-        type: "string",
-      },
       "stripe-secret-key": {
         describe: "Stripe secret key",
         type: "string",

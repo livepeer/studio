@@ -44,8 +44,8 @@ import {
   toStringValues,
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
+  triggerCatalystStreamNuke,
 } from "./helpers";
-import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
 import { toExternalSession } from "./session";
@@ -1371,12 +1371,9 @@ app.patch(
     }
 
     await db.stream.update(stream.id, patch);
-    if (patch.suspended) {
-      // kill live stream
-      await terminateStreamReq(req, stream);
-    }
 
-    if (multistream) {
+    if (multistream || patch.suspended) {
+      // update or nuke the livestream
       await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
@@ -1430,8 +1427,10 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   await db.stream.update(stream.id, {
     deleted: true,
   });
+
   // now kill live stream
-  await terminateStreamReq(req, stream);
+  await triggerCatalystStreamUpdated(req, stream.playbackId);
+
   res.status(204);
   res.end();
 });
@@ -1537,7 +1536,7 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   await db.stream.update(stream.id, { suspended });
   if (suspended) {
     // now kill live stream
-    await terminateStreamReq(req, stream);
+    await triggerCatalystStreamUpdated(req, stream.playbackId);
   }
   res.status(204);
   res.end();
@@ -1553,71 +1552,13 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  const { status, result, errors } = await terminateStreamReq(req, stream);
-  res.status(status);
-  return res.json({ result, errors });
+
+  // we don't want to update the stream object on the `/terminate` API, so we
+  // just throw a single nuke
+  await triggerCatalystStreamNuke(req, stream.playbackId);
+
+  res.status(204).end();
 });
-
-export async function terminateStreamReq(
-  req: Request,
-  stream: DBStream
-): Promise<{ status: number; errors?: string[]; result?: boolean | any }> {
-  if (!stream.isActive) {
-    return { status: 410, errors: ["not active"] };
-  }
-  if (!stream.region) {
-    return { status: 400, errors: ["region not found"] };
-  }
-  if (!stream.mistHost) {
-    return { status: 400, errors: ["Mist host not found"] };
-  }
-
-  const mistHost = stream.mistHost;
-  const { ownRegion, mistUsername, mistPassword, mistPort } = req.config;
-  if (!ownRegion || !mistPassword || !mistUsername) {
-    return { status: 500, errors: ["server not properly configured"] };
-  }
-  if (stream.region != ownRegion) {
-    // redirect request to other region
-    const protocol =
-      req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-
-    const backendDomain = req.frontendDomain.replace(
-      "livepeer.studio",
-      "livepeer.com"
-    );
-    const regionalUrl = `${protocol}://${stream.region}.${backendDomain}/api/stream/${stream.id}/terminate`;
-    const redRes = await fetch(regionalUrl, {
-      method: "DELETE",
-      headers: {
-        "content-type": "application/json",
-        authorization: req.headers.authorization,
-      },
-    });
-    const body = await redRes.json();
-    const { result, errors } = body;
-    return { status: redRes.status, result, errors };
-  }
-  const streams: string[] = await listActiveStreams(
-    mistHost,
-    mistPort,
-    mistUsername,
-    mistPassword
-  );
-  const mistStreamName = streams.find((sn) => sn.endsWith(stream.playbackId));
-  if (!mistStreamName) {
-    return { status: 200, result: false, errors: ["not found on Mist"] };
-  }
-
-  const nukeRes: boolean = await terminateStream(
-    mistHost,
-    mistPort,
-    mistStreamName,
-    mistUsername,
-    mistPassword
-  );
-  return { status: 200, result: nukeRes };
-}
 
 app.get("/:id/clips", authorizer({}), async (req, res) => {
   const id = req.params.id;
