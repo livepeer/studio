@@ -31,7 +31,7 @@ import {
   sendgridValidateEmail,
   toStringValues,
   FieldsMap,
-  triggerCatalystStreamNuke
+  triggerCatalystStreamNuke,
 } from "./helpers";
 import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 import sql from "sql-template-strings";
