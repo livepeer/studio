@@ -178,7 +178,17 @@ const ID = () => {
   const userIsAdmin = user && user.admin;
   const router = useRouter();
   const { query } = router;
-  const id = query.id?.toString();
+  const id = useMemo(() => {
+    let id = query.id?.toString() ?? "";
+
+    // trim a potential `video(rec)+` prefix from the playback ID
+    const plusSign = id.indexOf("+");
+    if (plusSign >= 0 && plusSign < id.length - 1) {
+      id = id.substring(plusSign + 1);
+    }
+
+    return id;
+  }, [query.id]);
   const [stream, setStream] = useState<Stream>(null);
   const [streamOwner, setStreamOwner] = useState<User>(null);
   const [ingest, setIngest] = useState([]);
