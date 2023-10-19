@@ -977,6 +977,9 @@ components:
                     - background_mist
                     - fallback_external
                     - external
+                thumbnails:
+                  type: boolean
+                  description: whether thumbnails should be generated
             clip:
               properties:
                 clipStrategy:
