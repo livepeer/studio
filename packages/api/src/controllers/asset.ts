@@ -816,6 +816,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
         url,
         catalystPipelineStrategy: catalystPipelineStrategy(req),
         encryption,
+        thumbnails: await isExperimentSubject("vod-thumbs", req.user.id),
       },
     },
     undefined,
