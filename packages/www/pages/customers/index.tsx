@@ -34,7 +34,6 @@ const CustomersPage = ({ customers }) => {
             url: customer.metaUrl,
           }))?.[0];
 
-  console.log(customers);
   return (
     <Layout {...seoData}>
       <Box css={{ position: "relative" }}>
@@ -60,14 +59,13 @@ const CustomersPage = ({ customers }) => {
                 fontWeight: 600,
                 letterSpacing: "-1px",
                 mb: "$6",
-                textTransform: "uppercase",
               }}>
               Customers
             </Box>
             <Text size={5} css={{ lineHeight: 1.7, mb: "$5" }}>
-              Livepeer Studio empowers visionary video product teams, supporting
-              next-generation startups and established industry leaders shaping
-              the future.
+              Livepeer Studio empowers visionary product teams shaping the
+              future of video, supporting next-generation startups and
+              established industry leaders.
             </Text>
           </Box>
         </Container>

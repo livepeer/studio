@@ -101,17 +101,23 @@ const OnDemandPage = () => {
               px: "$4",
             },
           }}>
-          <Box css={{ textAlign: "center", maxWidth: 890, m: "0 auto" }}>
+          <Box
+            css={{
+              textAlign: "center",
+              maxWidth: 890,
+              m: "0 auto",
+            }}>
             <Box
               as="h1"
               css={{
+                textTransform: "uppercase",
                 fontSize: 70,
                 lineHeight: "60px",
                 fontWeight: 600,
                 letterSpacing: "-1px",
                 mb: "$6",
               }}>
-              BUILD ON-DEMAND VIDEO IN MINUTES
+              Build on-demand video in minutes
             </Box>
             <Text size={5} css={{ lineHeight: 1.7, mb: "$5" }}>
               Livepeer Studio enables you to build video into your product super

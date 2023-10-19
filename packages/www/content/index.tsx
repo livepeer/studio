@@ -93,7 +93,16 @@ export const Customers = {
   metaData: {
     title: makeCompleteTitle("Customers"),
     description:
-      "Livepeer Studio empowers visionary video product teams, supporting next-generation startups aiming for the stars, as well as established industry leaders shaping the future.",
+      "Livepeer Studio empowers visionary product teams shaping the future of video, supporting next-generation startups aiming for the stars, as well as established industry leaders.",
+    url: makeCompleteUrl("customers"),
+  },
+};
+
+export const Compare = {
+  metaData: {
+    title: makeCompleteTitle("Compare Livepeer Studio"),
+    description:
+      "Livepeer Studio is a new approach to video infrastructure. Learn how its features and pricing compare to other video infrastructure providers.",
     url: makeCompleteUrl("customers"),
   },
 };

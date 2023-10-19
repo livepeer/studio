@@ -1,4 +1,11 @@
-import { Box, Container, Flex, Grid, Link as A } from "@livepeer/design-system";
+import {
+  Box,
+  Container,
+  Text,
+  Flex,
+  Grid,
+  Link as A,
+} from "@livepeer/design-system";
 import { print } from "graphql/language/printer";
 import { request } from "graphql-request";
 import { useRouter } from "next/router";
@@ -14,6 +21,7 @@ import { Blog as BlogContent } from "content";
 import { client } from "lib/client";
 
 const BlogIndex = ({ categories, posts }) => {
+  console.log(posts);
   const router = useRouter();
   const {
     query: { slug },
@@ -58,40 +66,37 @@ const BlogIndex = ({ categories, posts }) => {
         <Container
           size="4"
           css={{
-            px: "$3",
-            py: "$2",
+            px: "$5",
+            py: "$4",
             width: "100%",
-            "@bp2": {
-              px: "$4",
-            },
           }}>
-          <Box
-            css={{
-              textAlign: "left",
-              mt: 60,
-              mb: 60,
-              "@bp2": {
-                mt: 110,
-                mb: 120,
-              },
-            }}>
+          <Box css={{ textAlign: "left", m: "0 auto" }}>
             <Box
               as="h1"
               css={{
-                textTransform: "uppercase",
-                fontSize: 70,
-                fontWeight: 500,
-                lineHeight: "82px",
-                mx: 0,
-                mt: 0,
-                letterSpacing: "-4px",
-                "@bp2": { fontSize: 130 },
+                fontSize: 60,
+                lineHeight: "60px",
+                fontWeight: 600,
+                letterSpacing: "-1px",
+                mb: "$4",
               }}>
               Blog
             </Box>
           </Box>
-
-          {featuredPost && (
+        </Container>
+        <Container
+          size="4"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              pt: "$6",
+              pb: "$8",
+              px: "$4",
+            },
+          }}>
+          {/* {featuredPost && (
             <Box
               css={{
                 mb: 80,
@@ -102,8 +107,8 @@ const BlogIndex = ({ categories, posts }) => {
               }}>
               <FeaturedBlogPostCard post={featuredPost} />
             </Box>
-          )}
-          <Flex
+          )} */}
+          {/* <Flex
             css={{
               borderBottom: "1px solid $colors$neutral5",
               alignItems: "center",
@@ -148,7 +153,7 @@ const BlogIndex = ({ categories, posts }) => {
                 </Link>
               );
             })}
-          </Flex>
+          </Flex> */}
           <Grid
             gap={4}
             css={{
@@ -183,7 +188,7 @@ const BlogIndex = ({ categories, posts }) => {
 export async function getStaticProps() {
   // const client = getClient();
 
-  const postsQuery = `*[_type=="post" && defined(hide) && hide ==false ]{
+  const postsQuery = `*[_type=="post" && defined(hide) && hide ==false && !(_id in path('drafts.**'))]{
     ...,
     author->{...},
     category->{...},

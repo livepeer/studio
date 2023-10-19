@@ -9,7 +9,10 @@ import {
 import { FiArrowUpRight } from "react-icons/fi";
 import Link from "next/link";
 
-const CompareHero = () => {
+const CompareHero = ({
+  title = "Compare Livepeer Studio",
+  comparison = null,
+}: any) => {
   return (
     <Box>
       <Container css={{ p: 0 }}>
@@ -23,12 +26,12 @@ const CompareHero = () => {
           <Box>
             <Heading
               size="4"
+              as="h1"
               css={{
                 mb: "$5",
                 fontWeight: 700,
               }}>
-              Compare <br />
-              Livepeer Studio
+              {title}
             </Heading>
             <Text
               variant="neutral"
@@ -37,8 +40,7 @@ const CompareHero = () => {
                 mb: "$6",
               }}>
               Livepeer Studio is a new approach to video infrastructure. Learn
-              how its features and pricing compare to other video infrastructure
-              providers.
+              how its features and pricing compare to {comparison}.
             </Text>
             <Flex align="center" gap={1}>
               <Link href="/register" passHref>

@@ -1,5 +1,7 @@
 import React from "react";
 import NavigationBase from "./base";
+import { FiPlay, FiServer, FiVideo } from "react-icons/fi";
+
 const defaultNavProps = {
   links: [
     {
@@ -9,35 +11,45 @@ const defaultNavProps = {
         {
           href: "/on-demand",
           label: "On-demand",
+          excerpt: "Build video into your product",
+          icon: <FiPlay />,
         },
         {
           href: "/live",
           label: "Live",
+          excerpt: "Livestream to millions",
+          icon: <FiVideo />,
         },
         {
           href: "/transcoding",
           label: "Transcoding",
+          excerpt: "Affordable and scalable transcoding",
+          icon: <FiServer />,
         },
       ],
     },
     {
-      label: "Use Cases",
-      href: "/use-cases",
-      children: [
-        {
-          href: "/social-media",
-          label: "Social Apps",
-        },
-        {
-          href: "/creator-economy",
-          label: "Creator Economy",
-        },
-      ],
+      label: "Customers",
+      href: "/customers",
     },
-    {
-      href: "/compare",
-      label: "Compare",
-    },
+    // {
+    //   label: "Use Cases",
+    //   href: "/use-cases",
+    //   children: [
+    //     {
+    //       href: "/social-media",
+    //       label: "Social Apps",
+    //     },
+    //     {
+    //       href: "/creator-economy",
+    //       label: "Creator Economy",
+    //     },
+    //   ],
+    // },
+    // {
+    //   href: "/compare",
+    //   label: "Compare",
+    // },
     {
       href: "/pricing",
       label: "Pricing",
@@ -46,6 +58,10 @@ const defaultNavProps = {
       href: "https://docs.livepeer.studio",
       label: "Docs",
       isExternal: true,
+    },
+    {
+      label: "Blog",
+      href: "/blog",
     },
     {
       isExternal: true,
