@@ -560,6 +560,8 @@ app.post("/token", validatePost("user"), async (req, res) => {
     !isTest &&
     user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE
   ) {
+    // Resend the verification email
+    await sendVerificationEmail(req, user, user.stripeProductId);
     res.status(403);
     return res.json({
       errors: [
@@ -617,9 +619,17 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
   const { selectedPlan } = req.query;
   const user = await findUserByEmail(req.body.email);
-  const { emailValid, email, emailValidToken } = user;
 
-  if (emailValid) {
+  const emailSent = await sendVerificationEmail(req, user, selectedPlan);
+
+  res.status(200).json({ emailSent });
+});
+
+async function sendVerificationEmail(req: Request, user: User, selectedPlan) {
+  const { email, emailValidToken } = user;
+
+  const emailValid = validator.validate(email);
+  if (emailValid || req.user.admin) {
     const {
       supportAddr,
       sendgridTemplateId,
@@ -628,7 +638,10 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
     } = req.config;
 
     try {
+      // This is a test of the Sendgrid email validation API. Remove this
+      // if we decide not to use it and revert to more basic Sendgrid plan.
       sendgridValidateEmail(email, sendgridValidationApiKey);
+      // send email verification message to user using SendGrid
       await sendgridEmail({
         email,
         supportAddr,
@@ -646,17 +659,12 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
           "Please verify your email address to ensure that you can change your password or receive updates from us.",
         ].join("\n\n"),
       });
+      return true;
     } catch (err) {
-      res.status(400);
-      return res.json({
-        errors: [
-          `error sending confirmation email to ${req.body.email}: error: ${err}`,
-        ],
-      });
+      return false;
     }
   }
-  res.status(200).json({});
-});
+}
 
 app.post(
   "/password/reset",
