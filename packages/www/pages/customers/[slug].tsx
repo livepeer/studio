@@ -58,10 +58,19 @@ const Customer = ({
               px: "$3",
             },
           }}>
-          <Flex css={{ gap: 200 }}>
-            <Link href="/customers" passHref legacyBehavior>
-              <A variant="contrast">← Back</A>
-            </Link>
+          <Flex
+            css={{
+              gap: 200,
+              flexDirection: "column",
+              "@bp2": {
+                flexDirection: "row",
+              },
+            }}>
+            <Box css={{ display: "none", "@bp2": { display: "block" } }}>
+              <Link href="/customers" passHref legacyBehavior>
+                <A variant="contrast">← Back</A>
+              </Link>
+            </Box>
             <Box>
               <Box
                 css={{
@@ -70,6 +79,10 @@ const Customer = ({
                   borderBottom: "1px solid $neutral4",
                   pb: "$6",
                   mb: "$6",
+                  textAlign: "center",
+                  "@bp2": {
+                    textAlign: "left",
+                  },
                 }}>
                 <Text size="3" variant="neutral" css={{ mb: "$2" }}>
                   Customer Story
