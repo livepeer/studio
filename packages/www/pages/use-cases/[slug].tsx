@@ -106,11 +106,11 @@ const UseCase = ({
         ctas={[
           {
             href: "/register",
-            children: "Get started",
+            title: "Get started",
           },
           {
             href: "/contact",
-            children: "Talk to an expert",
+            title: "Talk to an expert",
           },
         ]}
       />

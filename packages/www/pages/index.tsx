@@ -92,13 +92,13 @@ const HomePage = () => {
           </Box>
         }
         reasons={benefitsListItems}
-        ctas={
-          <Link href="https://livepeer.org" target="_blank">
-            <Button variant="green" size="4" css={{ gap: "$1" }}>
-              Learn more <FiArrowUpRight />
-            </Button>
-          </Link>
-        }
+        ctas={[
+          {
+            title: "Learn more",
+            href: "https://livepeer.org/primer",
+            isExternal: true,
+          },
+        ]}
       />
       {/* 
       <Investors backgroundColor="rgb(30 30 33)" />

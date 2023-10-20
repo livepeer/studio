@@ -1,8 +1,16 @@
-import { Box, Heading, Flex, Container, Text } from "@livepeer/design-system";
+import {
+  Box,
+  Heading,
+  Flex,
+  Container,
+  Text,
+  Link as A,
+} from "@livepeer/design-system";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "components/Site/Button";
 import ArrowLink from "components/Site/ArrowLink";
+import Guides from "components/Site/Guides";
 
 const Hero = ({
   heading,
@@ -13,20 +21,18 @@ const Hero = ({
   image,
   imageType = "rectangle",
   ctas = [],
+  backgroundColor = "inherit",
 }) => {
+  console.log(ctas);
   return (
-    <Box
-      css={{
-        pt: 80,
-        "@bp2": {
-          pt: 0,
-        },
-      }}>
+    <Box css={{ position: "relative", bc: backgroundColor }}>
+      <Guides backgroundColor={backgroundColor} />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
           css={{
             mx: "$4",
+            py: "$8",
             "@bp3": {
               mx: "auto",
             },
@@ -38,11 +44,8 @@ const Hero = ({
               textAlign: centered ? "center" : "left",
               mb: skinny ? 0 : 50,
               width: "100%",
-              "@bp2": {
-                height: skinny ? 200 : "calc(100vh - 180px)",
-              },
             }}>
-            <Flex direction="column" css={{ maxWidth: 768 }}>
+            <Flex direction="column" css={{ maxWidth: 960, mx: "auto" }}>
               {tagline && (
                 <Text
                   size="5"
@@ -60,7 +63,8 @@ const Hero = ({
                 as="h2"
                 size="4"
                 css={{
-                  maxWidth: 550,
+                  maxWidth: 660,
+                  mx: "auto",
                   lineHeight: 1.4,
                   fontWeight: 700,
                   mb: "$4",
@@ -71,19 +75,21 @@ const Hero = ({
               <Text
                 variant="neutral"
                 size="5"
-                css={{ maxWidth: 550, mb: "$6", lineHeight: 1.6 }}>
+                css={{ maxWidth: 550, mx: "auto", mb: "$6", lineHeight: 1.6 }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (
                 <Flex align="center" justify={centered ? "center" : "start"}>
                   <Link href={ctas[0].href} passHref legacyBehavior>
                     <Button size={4} as="a" arrow css={{ mr: "$4" }}>
-                      {ctas[0].children}
+                      {ctas[0].title}
                     </Button>
                   </Link>
-                  <ArrowLink css={{ fontSize: "$4" }} href={ctas[1].href}>
-                    {ctas[1].children}
-                  </ArrowLink>
+                  {ctas[1] && (
+                    <ArrowLink css={{ fontSize: "$4" }} href={ctas[1]?.href}>
+                      {ctas[1]?.title}
+                    </ArrowLink>
+                  )}
                 </Flex>
               )}
             </Flex>

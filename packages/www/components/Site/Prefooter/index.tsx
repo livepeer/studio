@@ -11,7 +11,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 import Guides from "../Guides";
 import Link from "next/link";
 
-const Prefooter = ({ backgroundColor = "$loContrast" }) => (
+const Prefooter = ({ backgroundColor = "inherit" }) => (
   <Box css={{ position: "relative" }}>
     <Guides backgroundColor={backgroundColor} />
     <Container
