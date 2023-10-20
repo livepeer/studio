@@ -146,7 +146,7 @@ All of the types outlined in [How You Can Help](#how-you-can-help).
 ### What happens if my suggestion or PR is not accepted?
 
 While it's unlikely, sometimes there's no acceptable way to implement a
-suggestion or merge a PR. If that happens, maintainer will still...
+suggestion or merge a PR. If that happens, a maintainer will still...
 
 - Thank you for your contribution.
 - Explain why it doesn’t fit into the scope of the project and offer clear
