@@ -11,23 +11,6 @@ import { FiArrowUpRight } from "react-icons/fi";
 const networkFeatures = [
   {
     icon: {
-      provider: "mdi",
-      name: "MdMoneyOff",
-    },
-    title: "Affordable",
-    description: (
-      <Box>
-        Save up to 90% on costs with{" "}
-        <Link href="/pricing" passHref legacyBehavior>
-          <A variant="primary">streamlined pricing</A>
-        </Link>{" "}
-        that takes advantage of the Livepeer Network's open marketplace of
-        infrastructure providers representing access to 70k+ GPUs.
-      </Box>
-    ),
-  },
-  {
-    icon: {
       provider: "fi",
       name: "FiSmile",
     },
@@ -42,7 +25,24 @@ const networkFeatures = [
     },
     title: "Scalable",
     description:
-      "The Livepeer Network harnesses the power of cryptoeconomic incentives, drawing a global network of providers to process and deliver video, enabling near-infinite scalability.",
+      "Livepeer Studio harnesses the power the Livepeer Network, drawing a global network of providers to process and deliver video, enabling near-infinite scalability.",
+  },
+  {
+    icon: {
+      provider: "mdi",
+      name: "MdMoneyOff",
+    },
+    title: "Affordable",
+    description: (
+      <Box>
+        Save up to 90% on costs with{" "}
+        <Link href="/pricing" passHref legacyBehavior>
+          <A variant="primary">streamlined pricing</A>
+        </Link>{" "}
+        that takes advantage of the Livepeer Network's open marketplace of
+        infrastructure providers representing access to 70k+ GPUs.
+      </Box>
+    ),
   },
   {
     icon: {
@@ -76,6 +76,15 @@ const networkFeatures = [
 const benefits = [
   {
     icon: {
+      provider: "fi",
+      name: "FiMove",
+    },
+    title: "Scalable",
+    description:
+      "Livepeer Studio harnesses the power of the Livepeer Network, drawing a global network of providers to process and deliver video and enabling near-infinite scalability.",
+  },
+  {
+    icon: {
       provider: "mdi",
       name: "MdMoneyOff",
     },
@@ -102,15 +111,6 @@ const benefits = [
   },
   {
     icon: {
-      provider: "fi",
-      name: "FiMove",
-    },
-    title: "Scalable",
-    description:
-      "The Livepeer Network harnesses the power of cryptoeconomic incentives, drawing a global network of providers to process and deliver video, enabling near-infinite scalability.",
-  },
-  {
-    icon: {
       provider: "mdi",
       name: "MdVerified",
     },
@@ -125,7 +125,7 @@ const benefits = [
     },
     title: "Performant",
     description:
-      "Deliver outstanding performance by leveraging the network's highly competitive infrastructure providers transmitting high-quality video at astonishing speeds.",
+      "Deliver outstanding performance by leveraging the Livepeer Network's highly competitive infrastructure providers transmitting high-quality video at astonishing speeds.",
   },
   {
     icon: {
@@ -134,7 +134,7 @@ const benefits = [
     },
     title: "Open",
     description:
-      "The Livepeer Network runs on open source software. Tap into a worldwide network of Livepeer experts committed to driving value and solutions.",
+      "Livepeer Studio runs on open source software. Tap into a worldwide network of Livepeer experts committed to driving value and solutions.",
   },
 ];
 
