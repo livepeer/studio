@@ -106,11 +106,11 @@ const UseCase = ({
         ctas={[
           {
             href: "/register",
-            children: "Get started",
+            title: "Get started",
           },
           {
             href: "/contact",
-            children: "Talk to an expert",
+            title: "Talk to an expert",
           },
         ]}
       />
@@ -125,7 +125,17 @@ const UseCase = ({
         title="Features"
         heading={features.heading}
         reasons={features.reasons}
-        ctas={ctas}
+        ctas={[
+          {
+            href: "/register",
+            title: "Start Building",
+          },
+          {
+            href: "https://docs.livepeer.org",
+            title: "Read the docs",
+            isExternal: true,
+          },
+        ]}
       />
       {caseStudy.heading && (
         <CaseStudy

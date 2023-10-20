@@ -18,7 +18,7 @@ const Page = ({
 }) => {
   const router = useRouter();
   const builder = imageUrlBuilder(client as any);
-
+  console.log(title, content);
   if (router.isFallback) {
     return (
       <Layout>
@@ -64,52 +64,24 @@ const Page = ({
       }}
       url={metaUrl}
       preview={preview}>
-      <Container
-        size="3"
+      <Box
         css={{
-          px: "$3",
-          py: "$7",
-          width: "100%",
-          "@bp3": {
-            px: "$4",
+          ".pageComponent:nth-child(even)": {
+            bc: "$neutral2",
           },
         }}>
-        <Text
-          size="8"
-          as="h1"
-          css={{
-            textTransform: "uppercase",
-            mb: "$7",
-            fontWeight: 700,
-            width: 150,
-            lineHeight: "30px",
-            textAlign: "center",
-            mx: "auto",
-          }}>
-          Livepeer Studio
-        </Text>
-        <Box
-          css={{
-            width: "100%",
-            maxWidth: 600,
-            height: "1px",
-            mb: "$3",
-            mx: "auto",
-            mt: "$4",
-            background:
-              "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
-          }}
-        />
         {content.map((component, i) => (
-          <Fade key={i}>{getComponent(component)}</Fade>
+          <Box className="pageComponent" key={i}>
+            {getComponent(component)}
+          </Box>
         ))}
-      </Container>
+      </Box>
     </Layout>
   );
 };
 
 export async function getStaticPaths() {
-  const queryForPaths = `*[_type=='page' && defined(slug.current)][].slug.current`;
+  const queryForPaths = `*[_type in ["page", "solution"] && defined(slug.current)][].slug.current`;
   const data: string[] = (await client.fetch(queryForPaths)) ?? [];
   const paths = data
     .filter((path) => path !== "jobs" && path !== "team")
@@ -126,7 +98,7 @@ export async function getStaticProps({ params, locale }) {
     slug,
   };
 
-  const query = `*[_type=="page" && slug.current == $slug][0]`;
+  const query = `*[_type in ["page", "solution"]  && slug.current == $slug][0]`;
   const pageData = (await client.fetch(query, queryParams)) ?? {};
 
   return {

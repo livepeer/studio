@@ -1,25 +1,55 @@
 import React from "react";
 import NavigationBase from "./base";
+import { FiPlay, FiServer, FiVideo } from "react-icons/fi";
+
 const defaultNavProps = {
   links: [
     {
-      label: "Use Cases",
-      href: "/use-cases",
+      label: "Product",
+      href: "",
       children: [
         {
-          href: "/social-media",
-          label: "Social Apps",
+          href: "/on-demand",
+          label: "On-demand",
+          excerpt: "Build video into your product",
+          icon: <FiPlay />,
         },
         {
-          href: "/creator-economy",
-          label: "Creator Economy",
+          href: "/live",
+          label: "Live",
+          excerpt: "Livestream to millions",
+          icon: <FiVideo />,
+        },
+        {
+          href: "/transcoding",
+          label: "Transcoding",
+          excerpt: "Affordable and scalable transcoding",
+          icon: <FiServer />,
         },
       ],
     },
     {
-      href: "/compare",
-      label: "Compare",
+      label: "Customers",
+      href: "/customers",
     },
+    // {
+    //   label: "Use Cases",
+    //   href: "/use-cases",
+    //   children: [
+    //     {
+    //       href: "/social-media",
+    //       label: "Social Apps",
+    //     },
+    //     {
+    //       href: "/creator-economy",
+    //       label: "Creator Economy",
+    //     },
+    //   ],
+    // },
+    // {
+    //   href: "/compare",
+    //   label: "Compare",
+    // },
     {
       href: "/pricing",
       label: "Pricing",
@@ -29,6 +59,10 @@ const defaultNavProps = {
       label: "Docs",
       isExternal: true,
     },
+    // {
+    //   label: "Blog",
+    //   href: "/blog",
+    // },
     {
       isExternal: true,
       href: "https://livepeer.typeform.com/to/HTuUHdDR#lead_source=Website%20-%20Contact%20an%20Expert&contact_owner=xxxxx",

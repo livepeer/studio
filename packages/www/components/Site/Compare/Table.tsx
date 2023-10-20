@@ -30,12 +30,18 @@ const Check = () => {
     </Flex>
   );
 };
-const CompareTable = () => {
+const CompareTable = ({ comparison = "mux" }) => {
   return (
     <Box
       css={{
         position: "relative",
         overflow: "scroll",
+        ".mux": {
+          display: comparison !== "mux" && "none",
+        },
+        ".cloudflare-stream": {
+          display: comparison !== "cloudflare-stream" && "none",
+        },
       }}>
       <Table
         css={{
@@ -54,7 +60,8 @@ const CompareTable = () => {
                 Livepeer Studio
               </Flex>
             </Th>
-            <Th>
+
+            <Th className="mux">
               <Flex
                 align="center"
                 gap={2}
@@ -63,7 +70,8 @@ const CompareTable = () => {
                 Mux
               </Flex>
             </Th>
-            <Th>
+
+            <Th className="cloudflare-stream">
               <Flex
                 align="center"
                 gap={2}
@@ -83,8 +91,8 @@ const CompareTable = () => {
               </Box>
             </Th>
             <Th></Th>
-            <Th></Th>
-            <Th></Th>
+            <Th className="mux"></Th>
+            <Th className="cloudflare-stream"></Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -103,13 +111,13 @@ const CompareTable = () => {
             <Td>
               <Text>$500</Text>
             </Td>
-            <Td>
+            <Td className="mux">
               <Text css={{ gap: "$2", display: "flex", alignItems: "center" }}>
                 $1212
                 <Badge variant="green">+140%</Badge>
               </Text>
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Text css={{ gap: "$2", display: "flex", alignItems: "center" }}>
                 $750 <Badge variant="green">+50%</Badge>
               </Text>
@@ -130,8 +138,8 @@ const CompareTable = () => {
               </Flex>
             </Th>
             <Th></Th>
-            <Th></Th>
-            <Th></Th>
+            <Th className="mux"></Th>
+            <Th className="cloudflare-stream"></Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -142,10 +150,10 @@ const CompareTable = () => {
             <Td>
               <Text>0.5 - 3s</Text>
             </Td>
-            <Td>
+            <Td className="mux">
               <Text>4s</Text>
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Text>0.5 - 3s</Text>
             </Td>
           </Tr>
@@ -156,10 +164,10 @@ const CompareTable = () => {
             <Td>
               <Text>0.2s</Text>
             </Td>
-            <Td>
+            <Td className="mux">
               <Text>0.4s</Text>
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Text>0.2s</Text>
             </Td>
           </Tr>
@@ -170,10 +178,10 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -187,8 +195,8 @@ const CompareTable = () => {
               </Box>
             </Th>
             <Th></Th>
-            <Th></Th>
-            <Th></Th>
+            <Th className="mux"></Th>
+            <Th className="cloudflare-stream"></Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -201,8 +209,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>—</Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
 
           <Tr>
@@ -212,8 +220,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>—</Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
           <Tr>
             <Th>
@@ -222,8 +230,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -234,10 +242,10 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>
+            <Td className="mux">
               <Text>Available at additional cost</Text>
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -248,10 +256,10 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
           <Tr>
             <Th>
@@ -260,10 +268,10 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -274,8 +282,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -286,10 +294,10 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
 
           <Tr>
@@ -299,10 +307,10 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -311,10 +319,10 @@ const CompareTable = () => {
               <Text>Video clipping</Text>
             </Th>
             <Td>ETA Sept. 2023</Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -323,10 +331,10 @@ const CompareTable = () => {
               <Text>Thumbnails</Text>
             </Th>
             <Td>ETA Sept. 2023</Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -335,10 +343,10 @@ const CompareTable = () => {
               <Text>Captions</Text>
             </Th>
             <Td>ETA Sept. 2023</Td>
-            <Td>
+            <Td className="mux">
               <Check />
             </Td>
-            <Td>
+            <Td className="cloudflare-stream">
               <Check />
             </Td>
           </Tr>
@@ -352,8 +360,8 @@ const CompareTable = () => {
               </Box>
             </Th>
             <Th></Th>
-            <Th></Th>
-            <Th></Th>
+            <Th className="mux"></Th>
+            <Th className="cloudflare-stream"></Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -364,8 +372,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>—</Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
           <Tr>
             <Th>
@@ -374,8 +382,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>—</Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
           <Tr>
             <Th>
@@ -384,8 +392,8 @@ const CompareTable = () => {
             <Td>
               <Check />
             </Td>
-            <Td>—</Td>
-            <Td>—</Td>
+            <Td className="mux">—</Td>
+            <Td className="cloudflare-stream">—</Td>
           </Tr>
         </Tbody>
       </Table>

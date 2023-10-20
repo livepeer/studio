@@ -4,7 +4,7 @@ import Pricing from "components/Site/Pricing";
 import ReactMarkdown from "react-markdown";
 import { promises as fs } from "fs";
 import path from "path";
-import { Contact as Content } from "content";
+import { Pricing as Content } from "content";
 import { Callout } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 

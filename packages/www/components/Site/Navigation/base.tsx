@@ -16,7 +16,7 @@ import Menu from "./mobile/menu";
 import { useRouter } from "next/router";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import Link from "next/link";
-import { FiChevronDown, FiArrowUpRight } from "react-icons/fi";
+import { FiChevronDown, FiChevronRight, FiArrowUpRight } from "react-icons/fi";
 import Guides from "components/Site/Guides";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
@@ -71,6 +71,19 @@ const NavigationBase = ({
     }
   }, [token]);
 
+  const ChevronLinkStyles = {
+    display: "flex",
+    gap: "$1",
+    ai: "center",
+    "&:hover": {
+      ".chevronRight": {
+        paddingLeft: "3px",
+        transition: ".2s",
+      },
+      textDecoration: "none",
+    },
+  };
+
   return (
     <Box
       css={{
@@ -113,22 +126,28 @@ const NavigationBase = ({
                   breadcrumb={breadcrumb}
                 />
               </Box>
-              <Flex align="center">
+              <Flex
+                css={{
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                }}>
                 <Flex
                   css={{
                     display: "none",
                     "@bp2": {
                       display: "flex",
                     },
-                    ai: "center",
+                    alignItems: "center",
                     justifyContent: "flex-end",
                     minWidth: sidesWidth,
                     lineHeight: 1,
                     mr: 20,
+                    ml: "$6",
                   }}>
                   {links.map((link, i) => {
                     return link?.children ? (
-                      <DropdownMenu>
+                      <DropdownMenu key={`dropdown-menu-${i}`}>
                         <DropdownMenuTrigger asChild>
                           <A
                             as={Box}
@@ -149,46 +168,210 @@ const NavigationBase = ({
                             <FiChevronDown />
                           </A>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" css={{ p: "$2" }}>
-                          <DropdownMenuGroup>
-                            {link.children.map((child) => {
-                              return (
-                                <DropdownMenuItem
-                                  css={{
-                                    height: 54,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    position: "relative",
-                                    overflow: "hidden",
-                                    p: 0,
-                                    "&[data-highlighted]": {
-                                      bc: "transparent",
-                                    },
-                                  }}>
-                                  <Link
-                                    href={`${link.href}${child.href}`}
-                                    passHref
-                                    legacyBehavior>
-                                    <A
-                                      css={{
-                                        display: "flex",
-                                        px: 30,
-                                        width: "100%",
-                                        height: "100%",
-                                        fontSize: "$3",
-                                        textDecoration: "none",
-                                        "&:hover": {
-                                          bc: "$green3",
-                                          textDecoration: "none",
-                                        },
-                                      }}>
-                                      {child.label}
-                                    </A>
-                                  </Link>
-                                </DropdownMenuItem>
-                              );
-                            })}
-                          </DropdownMenuGroup>
+                        <DropdownMenuContent
+                          align="start"
+                          css={{
+                            p: 0,
+                            mt: "$2",
+                            border: "1px solid $neutral6",
+                          }}>
+                          <Flex css={{ borderRadius: "$4" }}>
+                            <DropdownMenuGroup
+                              css={{
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-around",
+                              }}>
+                              {link.children.map((child, i) => {
+                                return (
+                                  <DropdownMenuItem
+                                    key={`dropdown-menu-item-${i}`}
+                                    css={{
+                                      mx: "$2",
+                                      borderRadius: "$4",
+                                      height: 54,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      position: "relative",
+                                      overflow: "hidden",
+                                      py: "$1",
+                                      px: "$3",
+                                      "&[data-highlighted]": {
+                                        bc: "transparent",
+                                      },
+                                    }}>
+                                    <Link
+                                      href={`${link.href}${child.href}`}
+                                      passHref
+                                      legacyBehavior>
+                                      <Flex
+                                        align="center"
+                                        css={{
+                                          fontSize: "$3",
+                                          gap: "$3",
+                                          cursor: "pointer",
+                                          "&:hover": {
+                                            ".chevronRight": {
+                                              paddingLeft: "3px",
+                                              transition: ".2s",
+                                            },
+                                            textDecoration: "none",
+                                          },
+                                        }}>
+                                        <Flex
+                                          justify="center"
+                                          align="center"
+                                          css={{
+                                            border: "1px solid $neutral6",
+                                            borderRadius: "$4",
+                                            color: "$neutral12",
+                                            bc: "$neutral4",
+                                            minWidth: 38,
+                                            minHeight: 38,
+                                          }}>
+                                          {child.icon}
+                                        </Flex>
+                                        <Box>
+                                          <Flex
+                                            align="center"
+                                            gap="1"
+                                            css={{ mb: "$1" }}>
+                                            {child.label}
+                                            <FiChevronRight
+                                              className="chevronRight"
+                                              style={{
+                                                position: "relative",
+                                                transition: ".2s",
+                                              }}
+                                            />
+                                          </Flex>
+                                          <Box
+                                            css={{
+                                              color: "$neutral10",
+                                              fontSize: "$2",
+                                            }}>
+                                            {child.excerpt}
+                                          </Box>
+                                        </Box>
+                                      </Flex>
+                                    </Link>
+                                  </DropdownMenuItem>
+                                );
+                              })}
+                            </DropdownMenuGroup>
+                            <Flex
+                              direction="column"
+                              css={{
+                                borderLeft: "1px solid $neutral6",
+                                bc: "$neutral3",
+                                borderTopRightRadius: "$3",
+                                borderBottomRightRadius: "$3",
+                                p: "$4",
+                                minWidth: 296,
+                              }}>
+                              <Box
+                                css={{
+                                  fontSize: "$2",
+                                  textTransform: "uppercase",
+                                  color: "$neutral9",
+                                  mb: "$4",
+                                }}>
+                                Use Cases
+                              </Box>
+                              <Flex
+                                direction="column"
+                                gap={2}
+                                css={{
+                                  fontSize: "$2",
+                                  mb: "$6",
+                                  color: "$neutral12",
+                                  a: {
+                                    textDecoration: "none",
+                                  },
+                                }}>
+                                <Link
+                                  href="/use-cases/social-media"
+                                  passHref
+                                  legacyBehavior>
+                                  <A css={{ ...ChevronLinkStyles }}>
+                                    Social Apps{" "}
+                                    <FiChevronRight
+                                      className="chevronRight"
+                                      style={{
+                                        position: "relative",
+                                        transition: ".2s",
+                                      }}
+                                    />
+                                  </A>
+                                </Link>
+                                <Link
+                                  href="/use-cases/creator-economy"
+                                  passHref
+                                  legacyBehavior>
+                                  <A css={{ ...ChevronLinkStyles }}>
+                                    Creator Economy{" "}
+                                    <FiChevronRight
+                                      className="chevronRight"
+                                      style={{
+                                        position: "relative",
+                                        transition: ".2s",
+                                      }}
+                                    />
+                                  </A>
+                                </Link>
+                              </Flex>
+                              <Box
+                                css={{
+                                  fontSize: "$2",
+                                  textTransform: "uppercase",
+                                  color: "$neutral9",
+                                  mb: "$4",
+                                }}>
+                                Compare Livepeer Studio
+                              </Box>
+                              <Flex
+                                direction="column"
+                                gap={2}
+                                css={{
+                                  fontSize: "$2",
+                                  color: "$neutral12",
+                                  a: {
+                                    textDecoration: "none",
+                                  },
+                                }}>
+                                <Link
+                                  href="/compare/livepeer-studio-vs-mux"
+                                  passHref
+                                  legacyBehavior>
+                                  <A css={{ ...ChevronLinkStyles }}>
+                                    Livepeer Studio Vs Mux
+                                    <FiChevronRight
+                                      className="chevronRight"
+                                      style={{
+                                        position: "relative",
+                                        transition: ".2s",
+                                      }}
+                                    />
+                                  </A>
+                                </Link>
+                                <Link
+                                  href="/compare/livepeer-studio-vs-cloudflare-stream"
+                                  passHref
+                                  legacyBehavior>
+                                  <A css={{ ...ChevronLinkStyles }}>
+                                    Livepeer Studio Vs Cloudflare Stream
+                                    <FiChevronRight
+                                      className="chevronRight"
+                                      style={{
+                                        position: "relative",
+                                        transition: ".2s",
+                                      }}
+                                    />
+                                  </A>
+                                </Link>
+                              </Flex>
+                            </Flex>
+                          </Flex>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     ) : (
@@ -215,7 +398,6 @@ const NavigationBase = ({
                     );
                   })}
                 </Flex>
-
                 <Flex>
                   {!loggedIn && (
                     <Box
@@ -285,6 +467,8 @@ const NavigationBase = ({
                     </Box>
                   )}
                 </Flex>
+              </Flex>
+              <Flex>
                 <Flex
                   css={{
                     textTransform: "uppercase",
