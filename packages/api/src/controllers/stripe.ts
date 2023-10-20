@@ -452,6 +452,7 @@ app.post(
             ? "prod_OTTwpzjA4U8B2P"
             : "prod_OTTbwpzxNLMNSh",
         stripeCustomerSubscriptionId: subscription.id,
+        disabled: false,
       });
     } else {
       res.json({

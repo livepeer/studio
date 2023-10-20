@@ -1114,6 +1114,15 @@ app.post(
       );
     }
 
+    if (
+      products[payload.stripeProductId].name == "Growth" ||
+      products[payload.stripeProductId].name == "Scale"
+    ) {
+      await db.user.update(user.id, {
+        disabled: false,
+      });
+    }
+
     // Update user's product subscription in our db
     await db.user.update(user.id, {
       stripeProductId: payload.stripeProductId,
