@@ -686,7 +686,6 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
 // returns stream by steamKey
 app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
-  console.log(`headers:`, req.headers);
   const {
     data: [stream],
   } = await req.store.queryObjects<DBStream>({
