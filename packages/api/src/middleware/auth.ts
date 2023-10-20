@@ -118,12 +118,6 @@ function authenticator(): RequestHandler {
       throw new ForbiddenError(`user is suspended`);
     }
 
-    if (user.disabled) {
-      throw new ForbiddenError(
-        `user is disabled - you maxed out your usage for the month, please input a payment method`
-      );
-    }
-
     req.user = user;
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";

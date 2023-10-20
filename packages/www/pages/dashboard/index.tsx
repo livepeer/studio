@@ -17,7 +17,7 @@ const Dashboard = () => {
 
   const [loading, setLoading] = useState(false);
   const product = getUserProduct(user);
-  const showPromo = !product.order;
+  const showPromo = user.disabled;
   const [openSnackbar] = useSnackbar();
 
   const resendVerificationEmail = async () => {
@@ -66,7 +66,7 @@ const Dashboard = () => {
       {showPromo && (
         <Banner
           title="Upgrade"
-          description="Upgrade to the Growth plan, Scale plan, or Enterprise plan to suit your needs."
+          description="Your free tier usage limit has been reached. Upgrade to our Growth or Scale plans to continue using Livepeer Studio."
           button={
             <Link href="/dashboard/billing/plans" passHref legacyBehavior>
               <Button

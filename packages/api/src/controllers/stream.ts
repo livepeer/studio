@@ -1650,6 +1650,11 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
+  if (user.disabled) {
+    res.status(403);
+    return res.json({ errors: ["user is disabled"] });
+  }
+
   let objectStore: string,
     recordObjectStore: string,
     recordObjectStoreUrl: string;
