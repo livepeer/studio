@@ -232,7 +232,7 @@ export class DB {
       queryLog = JSON.stringify(query);
     }
     let result: QueryResult;
-    logger.info(`runQuery phase=start query=${queryLog}`);
+    logger.debug(`runQuery phase=start query=${queryLog}`);
     const start = Date.now();
     try {
       result = await pool.query(query, values);
@@ -244,7 +244,7 @@ export class DB {
       );
       throw e;
     }
-    logger.info(
+    logger.debug(
       `runQuery phase=success elapsed=${Date.now() - start}ms rows=${
         result?.rowCount
       } query=${queryLog}`
