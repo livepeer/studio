@@ -32,7 +32,7 @@ const Why = ({
   reasons = null,
   columns = 3,
   alignment = "left",
-  ctas = [],
+  ctas = null,
 }) => {
   return (
     <Box css={{ position: "relative", bc: backgroundColor }}>
