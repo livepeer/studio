@@ -44,22 +44,16 @@ class Tracker {
     if (!id) {
       return;
     }
-    let apiToken = await db.apiToken.get(id);
-    if (apiToken) {
-      try {
-        await table.update(
-          [
-            sql`id = ${id}`,
-            sql`coalesce((data->'lastSeen')::bigint, 0) < ${lastSeen}`,
-          ],
-          { lastSeen }
-        );
-      } catch (err) {
-        console.log(
-          `error saving last seen: table=${table?.name} id=${id} err=`,
-          err
-        );
-      }
+    try {
+      await table.update(
+        [
+          sql`id = ${id}`,
+          sql`coalesce((data->'lastSeen')::bigint, 0) < ${lastSeen}`,
+        ],
+        { lastSeen }
+      );
+    } catch (err) {
+      console.log(`error saving last seen: table=${table?.name} id=${id}`);
     }
   }
 
