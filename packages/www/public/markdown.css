@@ -66,6 +66,7 @@
   font-size: 16px;
   word-wrap: break-word;
   overflow: hidden;
+  line-height: 2;
 }
 
 .markdown-body details {
@@ -245,6 +246,7 @@
 .markdown-body p {
   margin-top: 0;
   margin-bottom: 10px;
+  line-height: 1.5;
 }
 
 .markdown-body blockquote {

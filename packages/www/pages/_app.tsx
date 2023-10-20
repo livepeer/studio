@@ -6,6 +6,7 @@ import { AnalyzerProvider } from "hooks/use-analyzer";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MetaMaskProvider } from "metamask-react";
 import "../css/recaptcha.css";
+import "../css/markdown.css";
 import React from "react";
 import {
   globalCss,

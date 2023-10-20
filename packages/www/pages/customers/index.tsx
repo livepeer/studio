@@ -1,8 +1,5 @@
-import { Box, Container, Text } from "@livepeer/design-system";
+import { Box, Container, Text, Link as A } from "@livepeer/design-system";
 import { useRouter } from "next/router";
-import BlogPostCard, {
-  FeaturedBlogPostCard,
-} from "components/Site/BlogPostCard";
 import Layout from "layouts/main";
 import Link from "next/link";
 import { Customers as CustomersContent } from "content";
@@ -22,7 +19,7 @@ const CustomersPage = ({ customers }) => {
       </Layout>
     );
   }
-
+  console.log(customers);
   const seoData =
     asPath === "/customers"
       ? CustomersContent.metaData
@@ -54,22 +51,33 @@ const CustomersPage = ({ customers }) => {
             <Box
               as="h1"
               css={{
-                fontSize: 70,
+                fontSize: 56,
                 lineHeight: "60px",
-                fontWeight: 600,
-                letterSpacing: "-1px",
-                mb: "$6",
+                fontWeight: 700,
+                letterSpacing: "-2px",
+                mb: "$3",
+                textTransform: "uppercase",
               }}>
-              Customers
+              Customer Stories
             </Box>
-            <Text size={5} css={{ lineHeight: 1.7, mb: "$5" }}>
+            <Text
+              size={5}
+              variant="neutral"
+              css={{ lineHeight: 1.7, mb: "$5" }}>
               Livepeer Studio empowers visionary product teams shaping the
               future of video, supporting next-generation startups and
               established industry leaders.
             </Text>
           </Box>
         </Container>
-        <Box css={{ mb: 200, position: "relative", bc: "$neutral2", py: "$6" }}>
+        <Box
+          css={{
+            mb: 200,
+            position: "relative",
+            bc: "$neutral2",
+            py: "$6",
+            borderTop: "1px solid $neutral4",
+          }}>
           <Box
             css={{
               display: "grid",
@@ -88,56 +96,61 @@ const CustomersPage = ({ customers }) => {
             }}>
             {customers.map((customer, i) => {
               return (
-                <Box
+                <Link
                   key={i}
-                  css={{
-                    bc: "white",
-                    py: "$4",
-                    pl: "$6",
-                    pr: "$6",
-                    width: "100%",
-                    borderRadius: "$4",
-                    "@bp1": {
-                      pl: "$3",
-                      "&:nth-child(odd)": {
-                        pl: "$6",
-                      },
-                    },
-                    "@bp3": {
-                      "&:nth-child(odd)": {
-                        pl: "$3",
-                      },
-                    },
-                  }}>
-                  {/* {item?.icon?.provider && (
+                  href={`/customers/${customer.slug.current}`}
+                  passHref
+                  legacyBehavior>
                   <Box
+                    as={A}
                     css={{
-                      mb: "$3",
-                      width: 44,
-                      height: 44,
-                      minWidth: 44,
-                      minHeight: 44,
-                      borderRadius: 1000,
+                      transform: "scale(1)",
+                      transition: ".1s",
+                      bc: "$neutral12",
+                      py: 100,
+                      px: "$6",
+                      color: "white",
+                      width: "100%",
+                      borderRadius: 20,
+                      border: "1px solid $neutral4",
+                      textAlign: "center",
+                      textDecoration: "none",
                       display: "flex",
                       ai: "center",
-                      color: "$hiContrast",
-                      jc: "center",
-                      background:
-                        "linear-gradient(90deg, $green4 0%, $green5 100%)",
-                    }}>
-                    {getIconProvider(item.icon.provider)[item.icon.name]()}
-                  </Box>
-                )} */}
-                  <Text
-                    css={{
+                      justifyContent: "center",
                       position: "relative",
                       fontWeight: 600,
-                      mb: "$2",
-                      fontSize: "$5",
+                      fontSize: "$7",
+                      "&:hover": {
+                        textDecoration: "none",
+                        transform: "scale(1.02)",
+                        transition: ".1s",
+                      },
+                      "@bp1": {
+                        pl: "$3",
+                        "&:nth-child(odd)": {
+                          pl: "$6",
+                        },
+                      },
+                      "@bp3": {
+                        "&:nth-child(odd)": {
+                          pl: "$3",
+                        },
+                      },
                     }}>
-                    {customer.title}
-                  </Text>
-                </Box>
+                    {customer?.companyLogo ? (
+                      <img
+                        width={180}
+                        height={180}
+                        style={{ objectFit: "contain", filter: "invert(1)" }}
+                        src={customer?.companyLogo.asset.url}
+                        alt={customer.title}
+                      />
+                    ) : (
+                      customer.title
+                    )}
+                  </Box>
+                </Link>
               );
             })}
           </Box>
@@ -148,14 +161,13 @@ const CustomersPage = ({ customers }) => {
 };
 
 export async function getStaticProps() {
-  // const client = getClient();
-
-  const customersQuery = `*[_type=="customer" ]{
+  const customersQuery = `*[_type=="customer" && !(_id in path('drafts.**'))]{
     ...,
     title->{...},
     companyLogo{
       asset->{...}
-  }}`;
+    }
+  }`;
   const customers = await client.fetch(customersQuery);
   return {
     props: {

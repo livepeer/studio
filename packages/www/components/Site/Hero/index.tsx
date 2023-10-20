@@ -75,13 +75,22 @@ const Hero = ({
               <Text
                 variant="neutral"
                 size="5"
-                css={{ maxWidth: 550, mx: "auto", mb: "$6", lineHeight: 1.6 }}>
+                css={{
+                  maxWidth: 550,
+                  mx: centered ? "auto" : 0,
+                  mb: "$6",
+                  lineHeight: 1.6,
+                }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (
                 <Flex align="center" justify={centered ? "center" : "start"}>
                   <Link href={ctas[0].href} passHref legacyBehavior>
-                    <Button size={4} as="a" arrow css={{ mr: "$4" }}>
+                    <Button
+                      size={4}
+                      as="a"
+                      arrow
+                      css={{ mr: ctas?.length > 1 ? "$4" : 0 }}>
                       {ctas[0].title}
                     </Button>
                   </Link>
