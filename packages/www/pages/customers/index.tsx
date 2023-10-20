@@ -19,7 +19,6 @@ const CustomersPage = ({ customers }) => {
       </Layout>
     );
   }
-  console.log(customers);
   const seoData =
     asPath === "/customers"
       ? CustomersContent.metaData
@@ -91,7 +90,7 @@ const CustomersPage = ({ customers }) => {
                 grid: "1fr/repeat(2,1fr)",
               },
               "@bp3": {
-                grid: "1fr/repeat(3,1fr)",
+                grid: "1fr/repeat(4,1fr)",
               },
             }}>
             {customers.map((customer, i) => {
@@ -107,7 +106,8 @@ const CustomersPage = ({ customers }) => {
                       transform: "scale(1)",
                       transition: ".1s",
                       bc: "$neutral12",
-                      py: 100,
+                      py: 20,
+                      minHeight: 300,
                       px: "$6",
                       color: "white",
                       width: "100%",

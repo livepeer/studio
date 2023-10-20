@@ -29,9 +29,10 @@ const Why = ({
   title = null,
   heading = null,
   description = null,
-  reasons,
+  reasons = null,
   columns = 3,
-  ctas,
+  alignment = "left",
+  ctas = [],
 }) => {
   return (
     <Box css={{ position: "relative", bc: backgroundColor }}>
@@ -61,10 +62,17 @@ const Why = ({
                   mb: "$2",
                   ai: "center",
                   flexDirection: "row",
+                  justifyContent: alignment === "left" ? "left" : "center",
                 },
               }}>
               <Flex direction="column">
-                <Text size="4" css={{ fontWeight: 600, mb: "$2" }}>
+                <Text
+                  size="4"
+                  css={{
+                    fontWeight: 600,
+                    mb: "$2",
+                    textAlign: alignment === "left" ? "left" : "center",
+                  }}>
                   {title}
                 </Text>
                 <Heading
@@ -72,6 +80,7 @@ const Why = ({
                   size="3"
                   css={{
                     maxWidth: 600,
+                    mx: alignment === "left" ? 0 : "auto",
                     lineHeight: 2,
                     fontWeight: 700,
                     mb: "$2",
@@ -84,14 +93,25 @@ const Why = ({
           )}
           {description && (
             <Text
-              css={{ fontWeight: 500, mb: "$6", maxWidth: 600 }}
+              css={{
+                fontWeight: 500,
+                mb: "$6",
+                maxWidth: 600,
+                mx: alignment === "left" ? 0 : "auto",
+                textAlign: alignment === "left" ? "left" : "center",
+              }}
               variant="neutral"
               size={5}>
               {description}
             </Text>
           )}
-          {ctas?.length > 0 && (
-            <Flex align="center" justify={"start"} css={{ mb: "$4" }}>
+          {ctas && ctas?.length > 0 && (
+            <Flex
+              align="center"
+              css={{
+                mb: "$4",
+                justifyContent: alignment === "left" ? "flex-start" : "center",
+              }}>
               <Link href={ctas[0].href} passHref legacyBehavior>
                 <Button
                   size={4}
