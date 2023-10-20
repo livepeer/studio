@@ -172,6 +172,7 @@ const NavigationBase = ({
                           align="start"
                           css={{
                             p: 0,
+                            mt: "$2",
                             border: "1px solid $neutral6",
                           }}>
                           <Flex css={{ borderRadius: "$4" }}>
