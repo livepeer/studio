@@ -11,7 +11,7 @@ import {
   notifyUser,
   getUsageNotifications,
   notifyMissingPaymentMethod,
-} from "./notification";
+} from "./utils/notification";
 import { sleep } from "../util";
 
 const app = Router();
