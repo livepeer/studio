@@ -1088,6 +1088,8 @@ components:
                   type: boolean
                 notification90:
                   type: boolean
+                notification100:
+                  type: boolean
         oldProPlan:
           type: boolean
           default: false

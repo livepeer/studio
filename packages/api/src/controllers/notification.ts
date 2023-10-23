@@ -6,8 +6,14 @@ import { WithID } from "../store/types";
 import { Request } from "express";
 import { User } from "../schema/types";
 
+export const HACKER_DISABLE_CUTOFF_DATE = 1697752800000;
+
 export const getUsageNotifications = async (
-  usagePercentages,
+  usagePercentages: {
+    TotalUsageMins: number;
+    DeliveryUsageMins: number;
+    StorageUsageMins: number;
+  },
   user: WithID<User>
 ) => {
   let notifications = [];
@@ -27,13 +33,21 @@ export const getUsageNotifications = async (
     usagePercentages.DeliveryUsageMins > 75 ||
     usagePercentages.StorageUsageMins > 75
   ) {
-    await db.user.update(user.id, {
-      notifications: {
-        usage: {
-          notification75: true,
-        },
-      },
+    notifications.push({
+      type: "notification75",
+      title: "Usage Warning",
+      message: `Your usage is over 75% of your limit.`,
     });
+  } else if (usagePercentages.TotalUsageMins >= 100) {
+    notifications.push({
+      type: "notification100",
+      title: "Usage Warning",
+      message: `You have exceeded your usage limit.`,
+    });
+
+    if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
+      // disable user
+    }
   } else {
     if (
       user.notifications?.usage?.notification75 ||
@@ -44,6 +58,7 @@ export const getUsageNotifications = async (
           usage: {
             notification75: false,
             notification90: false,
+            notification100: false,
           },
         },
       });

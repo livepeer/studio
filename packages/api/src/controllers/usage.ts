@@ -66,7 +66,7 @@ export const calculateOverUsage = async (product, usage) => {
 };
 
 export const getUsagePercentageOfLimit = async (product, usage) => {
-  let limits: any = {};
+  let limits: Record<string, number> = {};
 
   if (product?.usage) {
     product.usage.forEach((item) => {
@@ -78,18 +78,20 @@ export const getUsagePercentageOfLimit = async (product, usage) => {
   }
 
   const usagePercentageOfLimit = {
-    TotalUsageMins: Math.max(
-      (usage?.TotalUsageMins / (limits.transcoding || 0)) * 100,
-      0
-    ),
-    DeliveryUsageMins: Math.max(
-      (usage?.DeliveryUsageMins / (limits.streaming || 0)) * 100,
-      0
-    ),
-    StorageUsageMins: Math.max(
-      (usage?.StorageUsageMins / (limits.storage || 0)) * 100,
-      0
-    ),
+    TotalUsageMins:
+      limits.transcoding && limits.transcoding !== 0
+        ? Math.max((usage?.TotalUsageMins / limits.transcoding) * 100, 0)
+        : 0,
+
+    DeliveryUsageMins:
+      limits.streaming && limits.streaming !== 0
+        ? Math.max((usage?.DeliveryUsageMins / limits.streaming) * 100, 0)
+        : 0,
+
+    StorageUsageMins:
+      limits.storage && limits.storage !== 0
+        ? Math.max((usage?.StorageUsageMins / limits.storage) * 100, 0)
+        : 0,
   };
 
   return usagePercentageOfLimit;
