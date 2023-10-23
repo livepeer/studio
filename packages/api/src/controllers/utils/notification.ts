@@ -17,28 +17,14 @@ export const getUsageNotifications = async (
   user: WithID<User>
 ) => {
   let notifications = [];
+  const { TotalUsageMins, DeliveryUsageMins, StorageUsageMins } =
+    usagePercentages;
 
   if (
-    usagePercentages.TotalUsageMins > 90 ||
-    usagePercentages.DeliveryUsageMins > 90 ||
-    usagePercentages.StorageUsageMins > 90
+    [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
+      (min) => min > 90
+    )
   ) {
-    notifications.push({
-      type: "notification90",
-      title: "Usage Warning",
-      message: `Your usage is over 90% of your limit.`,
-    });
-  } else if (
-    usagePercentages.TotalUsageMins > 75 ||
-    usagePercentages.DeliveryUsageMins > 75 ||
-    usagePercentages.StorageUsageMins > 75
-  ) {
-    notifications.push({
-      type: "notification75",
-      title: "Usage Warning",
-      message: `Your usage is over 75% of your limit.`,
-    });
-  } else if (usagePercentages.TotalUsageMins >= 100) {
     notifications.push({
       type: "notification100",
       title: "Usage Warning",
@@ -46,12 +32,33 @@ export const getUsageNotifications = async (
     });
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
-      // disable user
+      // TODO: disable user as soon as the disabled field pr is merged
     }
+  } else if (
+    [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
+      (min) => min > 90
+    )
+  ) {
+    notifications.push({
+      type: "notification90",
+      title: "Usage Warning",
+      message: `Your usage is over 90% of your limit.`,
+    });
+  } else if (
+    [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
+      (min) => min > 75
+    )
+  ) {
+    notifications.push({
+      type: "notification75",
+      title: "Usage Warning",
+      message: `Your usage is over 75% of your limit.`,
+    });
   } else {
     if (
       user.notifications?.usage?.notification75 ||
-      user.notifications?.usage?.notification90
+      user.notifications?.usage?.notification90 ||
+      user.notifications?.usage?.notification100
     ) {
       await db.user.update(user.id, {
         notifications: {
