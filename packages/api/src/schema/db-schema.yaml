@@ -1072,9 +1072,24 @@ components:
         migrationInvoice:
           type: boolean
           default: false
-        lastEmailAboutPaymentFailure:
-          type: number
-          example: 1587667174725
+        notifications:
+          type: object
+          writeOnly: true
+          additionalProperties: false
+          properties:
+            lastEmailAboutPaymentFailure:
+              type: number
+              example: 1587667174725
+            usage:
+              type: object
+              additionalProperties: false
+              properties:
+                notification75:
+                  type: boolean
+                notification90:
+                  type: boolean
+                notification100:
+                  type: boolean
         oldProPlan:
           type: boolean
           default: false

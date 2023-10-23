@@ -2,10 +2,12 @@ import Router from "express/lib/router";
 import { db } from "../store";
 import { authorizer, validatePost } from "../middleware";
 import { products } from "../config";
-import { reportUsage } from "./stripe";
 import fetch from "node-fetch";
 import qs from "qs";
 import { NotFoundError } from "../store/errors";
+import { WithID } from "../store/types";
+import { User } from "../schema/types";
+import { Ingest } from "../types/common";
 
 const app = Router();
 
@@ -62,6 +64,70 @@ export const calculateOverUsage = async (product, usage) => {
 
   return overUsage;
 };
+
+export const getUsagePercentageOfLimit = async (product, usage) => {
+  let limits: Record<string, number> = {};
+
+  if (product?.usage) {
+    product.usage.forEach((item) => {
+      if (item.name.toLowerCase() === "transcoding")
+        limits.transcoding = item.limit;
+      if (item.name.toLowerCase() === "delivery") limits.streaming = item.limit;
+      if (item.name.toLowerCase() === "storage") limits.storage = item.limit;
+    });
+  }
+
+  const usagePercentageOfLimit = {
+    TotalUsageMins:
+      limits.transcoding && limits.transcoding !== 0
+        ? Math.max((usage?.TotalUsageMins / limits.transcoding) * 100, 0)
+        : 0,
+
+    DeliveryUsageMins:
+      limits.streaming && limits.streaming !== 0
+        ? Math.max((usage?.DeliveryUsageMins / limits.streaming) * 100, 0)
+        : 0,
+
+    StorageUsageMins:
+      limits.storage && limits.storage !== 0
+        ? Math.max((usage?.StorageUsageMins / limits.storage) * 100, 0)
+        : 0,
+  };
+
+  return usagePercentageOfLimit;
+};
+
+export async function getUsageData(
+  user: WithID<User>,
+  billingCycleStart: number,
+  billingCycleEnd: number,
+  ingests: Ingest[],
+  adminToken: string
+) {
+  const billingUsage = await getBillingUsage(
+    user.id,
+    billingCycleStart,
+    billingCycleEnd,
+    ingests[0].origin,
+    adminToken
+  );
+
+  const overUsage = await calculateOverUsage(
+    products[user.stripeProductId],
+    billingUsage
+  );
+
+  const usagePercentages = await getUsagePercentageOfLimit(
+    products[user.stripeProductId],
+    billingUsage
+  );
+
+  return {
+    billingUsage,
+    overUsage,
+    usagePercentages,
+  };
+}
 
 app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
   let { fromTime, toTime } = req.query;
@@ -149,8 +215,13 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
     usage
   );
 
+  const usagePercentages = await getUsagePercentageOfLimit(
+    products[user.stripeProductId],
+    usage
+  );
+
   res.status(200);
-  res.json(overage);
+  res.json(overage, usagePercentages);
 });
 
 app.post(
