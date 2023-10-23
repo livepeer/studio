@@ -78,7 +78,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
   return true;
 }
 
-const secondaryStorageExperiment = "secondary-vod-storage";
+const primaryStorageExperiment = "primary-vod-storage";
 
 export async function defaultObjectStoreId(
   { config, body, user }: Request,
@@ -88,10 +88,10 @@ export async function defaultObjectStoreId(
     return config.vodObjectStoreId;
   }
 
-  const secondaryStorageEnabled = await isExperimentSubject(
-    secondaryStorageExperiment,
+  const secondaryStorageEnabled = !(await isExperimentSubject(
+    primaryStorageExperiment,
     user.id
-  );
+  ));
 
   if (isPrivatePlaybackPolicy(body.playbackPolicy)) {
     const secondaryPrivateId =
