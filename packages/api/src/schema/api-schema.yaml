@@ -1089,6 +1089,9 @@ components:
               description: >-
                 Encryption key used to encrypt the asset. Only writable in the
                 upload asset endpoints and cannot be retrieved back.
+        c2pa:
+          type: boolean
+          description: Decides if the output video should include C2PA signature
     room-user-payload:
       type: object
       required:
@@ -1384,6 +1387,9 @@ components:
             How many seconds the duration of each output segment should be
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
+        c2pa:
+          type: boolean
+          description: Decides if the output video should include C2PA signature
     task:
       type: object
       additionalProperties: false
@@ -1441,6 +1447,10 @@ components:
                   example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
+                c2pa:
+                  type: boolean
+                  description:
+                    Decides if the output video should include C2PA signature
             export:
               $ref: "#/components/schemas/export-task-params"
             exportData:
@@ -1522,6 +1532,10 @@ components:
                     be
                 creatorId:
                   $ref: "#/components/schemas/input-creator-id"
+                c2pa:
+                  type: boolean
+                  description:
+                    Decides if the output video should include C2PA signature
             clip:
               properties:
                 url:
