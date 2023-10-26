@@ -764,7 +764,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, encryption } = req.body as NewAssetPayload;
+  let { url, encryption, c2pa } = req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -814,6 +814,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     {
       upload: {
         url,
+        c2pa,
         catalystPipelineStrategy: catalystPipelineStrategy(req),
         encryption,
         thumbnails: await isExperimentSubject("vod-thumbs", req.user.id),
@@ -850,7 +851,7 @@ app.post(
     let playbackId = await generateUniquePlaybackId(id);
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
-    const { encryption } = req.body as NewAssetPayload;
+    const { encryption, c2pa } = req.body as NewAssetPayload;
     if (encryption) {
       if (encryption.encryptedKey) {
         if (!isValidBase64(encryption.encryptedKey)) {
@@ -905,6 +906,7 @@ app.post(
           url: downloadUrl,
           catalystPipelineStrategy: catalystPipelineStrategy(req),
           encryption,
+          c2pa,
         },
       },
       null,

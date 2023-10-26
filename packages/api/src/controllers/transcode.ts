@@ -63,6 +63,7 @@ app.post(
           profiles: params.profiles,
           targetSegmentSizeSecs: params.targetSegmentSizeSecs,
           creatorId: params.creatorId,
+          c2pa: params.c2pa,
           catalystPipelineStrategy,
         },
       },
