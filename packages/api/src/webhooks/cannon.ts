@@ -575,34 +575,11 @@ export default class WebhookCannon {
         this.queue
       );
 
-      const os = await db.objectStore.get(this.recordCatalystObjectStoreId);
-      // we can't rate limit this task because it's not a user action
-      let url = pathJoin(
-        os.publicUrl,
-        session.playbackId,
-        session.id,
-        "output.m3u8"
+      const { url } = await buildRecordingUrl(
+        session,
+        this.recordCatalystObjectStoreId,
+        this.secondaryRecordObjectStoreId
       );
-
-      const secondaryOs = this.secondaryRecordObjectStoreId
-        ? await db.objectStore.get(this.secondaryRecordObjectStoreId)
-        : undefined;
-      if (secondaryOs) {
-        let params = {
-          method: "HEAD",
-          timeout: 5 * 1000,
-        };
-        const resp = await fetchWithTimeout(url, params);
-
-        if (resp.status != 200) {
-          url = pathJoin(
-            secondaryOs.publicUrl,
-            session.playbackId,
-            session.id,
-            "output.m3u8"
-          );
-        }
-      }
 
       await taskScheduler.createAndScheduleTask(
         "upload",

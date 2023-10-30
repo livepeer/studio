@@ -158,7 +158,11 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let originalRecordingUrl: string | null = null;
 
   if (req.query.sourceRecording === "true") {
-    const { url } = await buildRecordingUrl(session, req);
+    const { url } = await buildRecordingUrl(
+      session,
+      req.config.recordCatalystObjectStoreId,
+      req.config.secondaryRecordObjectStoreId
+    );
     originalRecordingUrl = url;
     session.sourceRecordingUrl = originalRecordingUrl;
   }
@@ -230,56 +234,58 @@ export async function getRunningRecording(content: DBStream, req: Request) {
     };
   }
 
-  return await buildRecordingUrl(session, req);
+  return await buildRecordingUrl(
+    session,
+    req.config.recordCatalystObjectStoreId,
+    req.config.secondaryRecordObjectStoreId
+  );
 }
 
-export async function buildRecordingUrl(session: DBSession, req: Request) {
-  let objectStoreId: string;
-  const os = await db.objectStore.get(req.config.recordCatalystObjectStoreId);
+export async function buildRecordingUrl(
+  session: DBSession,
+  recordCatalystObjectStoreId: string,
+  secondaryRecordObjectStoreId: string
+) {
+  const os = await db.objectStore.get(recordCatalystObjectStoreId);
 
-  let url = pathJoin(
-    os.publicUrl,
-    session.playbackId,
-    session.id,
-    "output.m3u8"
-  );
+  let urlPrefix = pathJoin(os.publicUrl, session.playbackId, session.id);
+  let manifestUrl = pathJoin(urlPrefix, "output.m3u8");
 
   let params = {
     method: "HEAD",
     timeout: 5 * 1000,
   };
-  let resp = await fetchWithTimeout(url, params);
+  let resp = await fetchWithTimeout(manifestUrl, params);
+  if (resp.status == 200) {
+    return {
+      url: manifestUrl,
+      session,
+      objectStoreId: recordCatalystObjectStoreId,
+      thumbUrl: pathJoin(urlPrefix, "source", "latest.jpg"),
+    };
+  }
+
+  const secondaryOs = await db.objectStore.get(secondaryRecordObjectStoreId);
+  urlPrefix = pathJoin(secondaryOs.publicUrl, session.playbackId, session.id);
+  manifestUrl = pathJoin(urlPrefix, "output.m3u8");
+
+  const objectStoreId = secondaryRecordObjectStoreId;
+
+  resp = await fetchWithTimeout(manifestUrl, params);
 
   if (resp.status != 200) {
-    const secondaryOs = req.config.secondaryRecordObjectStoreId
-      ? await db.objectStore.get(req.config.secondaryRecordObjectStoreId)
-      : undefined;
-    url = pathJoin(
-      secondaryOs.publicUrl,
-      session.playbackId,
-      session.id,
-      "output.m3u8"
-    );
-
-    objectStoreId = req.config.secondaryRecordObjectStoreId;
-
-    resp = await fetchWithTimeout(url, params);
-
-    if (resp.status != 200) {
-      return {
-        url: null,
-        session,
-        objectStoreId,
-      };
-    }
-  } else {
-    objectStoreId = req.config.recordCatalystObjectStoreId;
+    return {
+      url: null,
+      session,
+      objectStoreId,
+    };
   }
 
   return {
-    url,
+    url: manifestUrl,
     session,
     objectStoreId,
+    thumbUrl: pathJoin(urlPrefix, "source", "latest.jpg"),
   };
 }
 export default app;
