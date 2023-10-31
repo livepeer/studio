@@ -32,7 +32,9 @@ export const getUsageNotifications = async (
     });
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
-      // TODO: disable user as soon as the disabled field pr is merged
+      await db.user.update(user.id, {
+        disabled: true,
+      });
     }
   } else if (
     [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(

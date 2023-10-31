@@ -464,6 +464,8 @@ const suspensionEmailText = (
         "We were notified that your stream contained illegal or copyrighted content. We have suspended your account.",
         "Please note that you cannot use Livepeer to stream copyrighted content. Any copyrighted content will be taken down and your account will be suspended.",
       ].join("\n\n");
+    case "disabled":
+      return "Your account has been disabled. You reached your monthly usage limit for the free tier. Please upgrade your plan.";
     default:
       return "Your account has been suspended. Please contact us for more information.";
   }
@@ -575,7 +577,7 @@ app.patch(
           buttonText: "Appeal",
           buttonUrl: frontendUrl(req, "/contact"),
           unsubscribe: unsubscribeUrl(req),
-          text: suspensionEmailText(emailTemplate),
+          text: suspensionEmailText("disabled"),
         });
       } catch (err) {
         logger.error(

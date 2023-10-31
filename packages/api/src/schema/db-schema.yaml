@@ -518,6 +518,7 @@ components:
             Name of template to send to the users regarding the suspension.
           enum:
             - copyright
+            - disabled
     disable-user-payload:
       type: object
       additionalProperties: false
@@ -532,6 +533,7 @@ components:
             Name of template to send to the users regarding the suspension.
           enum:
             - copyright
+            - disabled
     webhook:
       table: webhook
       properties:
