@@ -63,16 +63,16 @@ async function getPayAsYouGoUsers() {
     sql`
       LEFT JOIN asset a
       ON users.data->>'id' = a.data->>'userId'
-      AND CAST(a.data->>'createdAt' AS bigint) > ${cutOffDate}
-
+      AND CAST(users.data->>'createdAt' AS bigint) > ${cutOffDate}
       WHERE 
       (
-          a.data->>'createdAt' IS NOT NULL 
-          OR 
-          CAST(users.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
+        a.data->>'createdAt' IS NOT NULL 
+        OR 
+        CAST(users.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
       )
       AND
-      users.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW');
+      users.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW')
+      GROUP BY users.id;
   `,
   ]);
 
