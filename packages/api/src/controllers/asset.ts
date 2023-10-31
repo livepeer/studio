@@ -78,7 +78,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
   return true;
 }
 
-const primaryStorageExperiment = "primary-vod-storage";
+export const primaryStorageExperiment = "primary-vod-storage";
 
 export async function defaultObjectStoreId(
   { config, body, user }: Request,

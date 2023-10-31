@@ -14,12 +14,13 @@ import logger from "../logger";
 import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
-import { createAsset } from "../controllers/asset";
+import { createAsset, primaryStorageExperiment } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import { db } from "../store";
 import { buildRecordingUrl } from "../controllers/session";
+import { isExperimentSubject } from "../store/experiment-table";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -47,6 +48,7 @@ export default class WebhookCannon {
   sendgridApiKey: string;
   supportAddr: [string, string];
   vodCatalystObjectStoreId: string;
+  secondaryVodObjectStoreId: string;
   recordCatalystObjectStoreId: string;
   secondaryRecordObjectStoreId: string;
   resolver: any;
@@ -58,6 +60,7 @@ export default class WebhookCannon {
     sendgridApiKey,
     supportAddr,
     vodCatalystObjectStoreId,
+    secondaryVodObjectStoreId,
     recordCatalystObjectStoreId,
     secondaryRecordObjectStoreId,
     verifyUrls,
@@ -71,6 +74,7 @@ export default class WebhookCannon {
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
     this.vodCatalystObjectStoreId = vodCatalystObjectStoreId;
+    this.secondaryVodObjectStoreId = secondaryVodObjectStoreId;
     this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
     this.secondaryRecordObjectStoreId = secondaryRecordObjectStoreId;
     this.resolver = new dns.Resolver();
@@ -544,6 +548,13 @@ export default class WebhookCannon {
     const id = session.id;
     const playbackId = await generateUniquePlaybackId(id);
 
+    const secondaryStorageEnabled = !(await isExperimentSubject(
+      primaryStorageExperiment,
+      session.userId
+    ));
+    const secondaryObjectStoreId =
+      secondaryStorageEnabled && this.secondaryVodObjectStoreId;
+
     // trim the second precision from the time string
     var startedAt = new Date(session.createdAt).toISOString();
     startedAt = startedAt.substring(0, startedAt.length - 8) + "Z";
@@ -558,7 +569,8 @@ export default class WebhookCannon {
           source: { type: "recording", sessionId: session.id },
           status: { phase: "waiting", updatedAt: Date.now() },
           name: `live-${startedAt}`,
-          objectStoreId: this.vodCatalystObjectStoreId,
+          objectStoreId:
+            secondaryObjectStoreId || this.vodCatalystObjectStoreId,
         },
         this.queue
       );
