@@ -125,20 +125,6 @@ async function reportUsageForUser(
     subscription: user.stripeCustomerSubscriptionId,
   });
 
-  if (
-    (actuallyReport && user.stripeProductId.includes("hacker_1")) ||
-    user.stripeProductId.includes("prod_O9XuIjn7EqYRVW")
-  ) {
-    if (
-      !user.stripeCustomerPaymentMethodId &&
-      (usageData.overUsage.TotalUsageMins > 0 ||
-        usageData.overUsage.DeliveryUsageMins > 0 ||
-        usageData.overUsage.StorageUsageMins > 0)
-    ) {
-      await notifyMissingPaymentMethod(user, req);
-    }
-  }
-
   const usageNotifications = await getUsageNotifications(
     usageData.usagePercentages,
     user
