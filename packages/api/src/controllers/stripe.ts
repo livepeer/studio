@@ -62,17 +62,17 @@ async function getPayAsYouGoUsers() {
   const [hackerUsers] = await db.user.find([
     sql`
       LEFT JOIN asset a
-      ON u.data->>'id' = a.data->>'userId'
+      ON users.data->>'id' = a.data->>'userId'
       AND CAST(a.data->>'createdAt' AS bigint) > ${cutOffDate}
 
       WHERE 
       (
           a.data->>'createdAt' IS NOT NULL 
           OR 
-          CAST(u.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
+          CAST(users.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
       )
       AND
-      u.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW');
+      users.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW');
   `,
   ]);
 
