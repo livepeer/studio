@@ -28,11 +28,13 @@ export const getUsageNotifications = async (
     notifications.push({
       type: "notification100",
       title: "Usage Warning",
-      message: `You have exceeded your usage limit.`,
+      message: `You have exceeded your usage limit. Please upgrade your plan.`,
     });
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
-      // TODO: disable user as soon as the disabled field pr is merged
+      await db.user.update(user.id, {
+        disabled: true,
+      });
     }
   } else if (
     [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
@@ -107,7 +109,7 @@ export const notifyMissingPaymentMethod = async (
   req: Request
 ) => {
   console.log(`
-        User=${user.id} is in overusage but doesn't have a payment method, notyfing support team
+        User=${user.id} is in overusage but doesn't have a payment method, notifying support team
       `);
   let emailSent = await sendgridEmailPaymentFailed({
     email: "help@livepeer.org",

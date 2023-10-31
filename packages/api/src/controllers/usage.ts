@@ -8,6 +8,7 @@ import { NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { Ingest } from "../types/common";
+import { reportUsage } from "./stripe";
 
 const app = Router();
 
@@ -229,17 +230,17 @@ app.post(
   authorizer({ anyAdmin: true }),
   validatePost("usage"),
   async (req, res) => {
-    let { fromTime, toTime } = req.query;
+    let { fromTime, toTime, newUsageReport } = req.query;
 
-    /* New usage report for billing
-    let token = req.token;
-    // New automated billing usage report
-    let result = await reportUsage(req, token);
+    let newUsageResult = null;
 
-    res.status(200);
-    res.json(result);
-    let { fromTime, toTime } = req.query;
-    */
+    if (newUsageReport === "true") {
+      let token = req.token;
+      // New automated billing usage report
+      newUsageResult = await reportUsage(req, token);
+      res.status(200);
+      res.json(newUsageResult);
+    }
 
     // if time range isn't specified return all usage
     if (!fromTime) {
