@@ -345,6 +345,14 @@ export function getPlaybackUrl(
   return undefined;
 }
 
+export function getThumbsVTTUrl(asset: WithID<Asset>, os: ObjectStore): string {
+  const thumb = asset.files?.find((f) => f.type === "thumbnails_vtt");
+  if (thumb) {
+    return pathJoin(os.publicUrl, asset.playbackId, thumb.path);
+  }
+  return undefined;
+}
+
 function getDownloadUrl(
   { vodObjectStoreId }: Request["config"],
   ingest: string,

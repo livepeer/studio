@@ -9,6 +9,7 @@ import {
 import {
   getPlaybackUrl as assetPlaybackUrl,
   getStaticPlaybackInfo,
+  getThumbsVTTUrl,
   StaticPlaybackInfo,
 } from "./asset";
 import { CliArgs } from "../parse-cli";
@@ -38,6 +39,7 @@ function newPlaybackInfo(
   webRtcUrl?: string | null,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
+  thumbsVTT?: string,
   live?: PlaybackInfo["meta"]["live"],
   recordingUrl?: string,
   withRecordings?: boolean,
@@ -97,6 +99,13 @@ function newPlaybackInfo(
       url: thumbUrl,
     });
   }
+  if (thumbsVTT) {
+    playbackInfo.meta.source.push({
+      hrn: "Thumbnails",
+      type: "text/vtt",
+      url: thumbsVTT,
+    });
+  }
 
   return playbackInfo;
 }
@@ -122,7 +131,8 @@ const getAssetPlaybackInfo = async (
     playbackUrl,
     null,
     asset.playbackPolicy || null,
-    getStaticPlaybackInfo(asset, os)
+    getStaticPlaybackInfo(asset, os),
+    getThumbsVTTUrl(asset, os)
   );
 };
 
@@ -248,6 +258,7 @@ async function getPlaybackInfo(
       getWebRTCPlaybackUrl(ingest, stream),
       stream.playbackPolicy,
       null,
+      undefined,
       stream.isActive ? 1 : 0,
       url,
       withRecordings,
