@@ -354,6 +354,12 @@ export class TaskScheduler {
       userId,
       requesterId
     );
+    const user = await db.user.get(
+      inputAsset?.userId || outputAsset?.userId || userId
+    );
+    if (user.disabled) {
+      throw new Error("user is disabled");
+    }
     await this.scheduleTask(task);
     return task;
   }

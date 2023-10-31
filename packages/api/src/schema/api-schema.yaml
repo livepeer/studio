@@ -1812,6 +1812,8 @@ components:
           example: true
         suspended:
           type: boolean
+        disabled:
+          type: boolean
         salt:
           type: string
           example: E1F53135E559C253

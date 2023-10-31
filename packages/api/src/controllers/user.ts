@@ -18,6 +18,7 @@ import {
   UpdateSubscription,
   User,
   SuspendUserPayload,
+  DisableUserPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -519,6 +520,66 @@ app.patch(
       } catch (err) {
         logger.error(
           `error sending suspension email to user=${email} err=${err}`
+        );
+      }
+    }
+
+    res.status(204);
+    res.end();
+  }
+);
+
+app.patch(
+  "/:id/disabled",
+  validatePost("disable-user-payload"),
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    const { disabled, emailTemplate } = req.body as DisableUserPayload;
+    const { id } = req.params;
+    if (id === req.user?.id) {
+      return res.status(400).json({ errors: ["cannot disable own user"] });
+    }
+    const user = await db.user.get(id);
+    if (!user) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+    const { email, disabled: wasDisabled } = user;
+
+    logger.info(`set user ${id} (${email}) disabled ${disabled}`);
+    await db.user.update(id, { disabled });
+
+    if (disabled) {
+      terminateUserStreams(req, id).catch((err) => {
+        logger.error(
+          `error terminating user streams id=${id} email=${email} err=${err}`
+        );
+      });
+    }
+
+    if (disabled && !wasDisabled) {
+      const {
+        frontendDomain,
+        supportAddr,
+        sendgridTemplateId,
+        sendgridApiKey,
+      } = req.config;
+      try {
+        await sendgridEmail({
+          email,
+          bcc: infraEmail,
+          supportAddr,
+          sendgridTemplateId,
+          sendgridApiKey,
+          subject: "Account Disabled",
+          preheader: `Your ${frontendDomain} account has been disabled. You reached your monthly usage limit.`,
+          buttonText: "Appeal",
+          buttonUrl: frontendUrl(req, "/contact"),
+          unsubscribe: unsubscribeUrl(req),
+          text: suspensionEmailText(emailTemplate),
+        });
+      } catch (err) {
+        logger.error(
+          `error sending disabled email to user=${email} err=${err}`
         );
       }
     }
@@ -1051,6 +1112,15 @@ app.post(
           ],
         }
       );
+    }
+
+    if (
+      products[payload.stripeProductId].name == "Growth" ||
+      products[payload.stripeProductId].name == "Scale"
+    ) {
+      await db.user.update(user.id, {
+        disabled: false,
+      });
     }
 
     // Update user's product subscription in our db
