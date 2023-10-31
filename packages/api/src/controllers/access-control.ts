@@ -21,6 +21,7 @@ import fetch from "node-fetch";
 import { WithID } from "../store/types";
 import { DBStream } from "../store/stream-table";
 import { getViewers } from "./usage";
+import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const app = Router();
@@ -119,12 +120,15 @@ app.post(
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
+    if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
+      let limitReached = await freeTierLimitReached(content, user, req);
+      if (limitReached) {
+        throw new ForbiddenError("Free tier user reached viewership limit");
+      }
+    }
+
     switch (playbackPolicyType) {
       case "public":
-        let limitReached = await freeTierLimitReached(content, user, req);
-        if (limitReached) {
-          throw new ForbiddenError("Free tier user reached viewership limit");
-        }
         res.status(204);
         return res.end();
       case "jwt":
