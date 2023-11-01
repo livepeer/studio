@@ -283,11 +283,6 @@ async function freeTierLimitReached(
     isStream = true;
   }
 
-  if (!isStream) {
-    // Do not enforce concurrent views for VODs
-    return false;
-  }
-
   // Register a hit for the given playbackId
   const now = Date.now();
   const playbackId = content.playbackId;
