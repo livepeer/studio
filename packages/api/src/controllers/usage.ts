@@ -60,6 +60,45 @@ export const getRecentlyActiveUsers = async (
   return users;
 };
 
+export const getViewers = async (
+  streamId: string,
+  fromTime: number,
+  toTime: number,
+  baseUrl: string,
+  adminToken: string
+) => {
+  try {
+    // Fetch viewership data from /data/views endpoint
+    const response = await fetch(
+      `${baseUrl}/api/data/views/query?${qs.stringify({
+        from: fromTime,
+        to: toTime,
+        streamId: streamId,
+      })}`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      }
+    ).then((res) => res.json());
+
+    let viewers = 0;
+
+    if (!Array.isArray(response)) {
+      return viewers;
+    }
+
+    if (response.length > 0) {
+      viewers = response[0].viewCount;
+    }
+
+    return viewers;
+  } catch (e) {
+    console.log(`error fetching viewers for stream=${streamId}`);
+    return 0;
+  }
+};
+
 export const calculateOverUsage = async (product, usage) => {
   let limits: any = {};
 
