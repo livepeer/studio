@@ -22,6 +22,7 @@ import { WithID } from "../store/types";
 import { DBStream } from "../store/stream-table";
 import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
+import { isFreeTierUser } from "./helpers";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
@@ -274,7 +275,7 @@ async function freeTierLimitReached(
   user: User,
   req: Request
 ): Promise<boolean> {
-  if (user.stripeProductId !== "prod_O9XuIjn7EqYRVW") {
+  if (!isFreeTierUser(user)) {
     return false;
   }
 
