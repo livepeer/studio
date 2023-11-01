@@ -1,6 +1,6 @@
 import signingKeyApp from "./signing-key";
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { Request, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -13,11 +13,14 @@ import {
 } from "../store/errors";
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
-import { PlaybackPolicy } from "../schema/types";
+import { Asset, PlaybackPolicy, User } from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeoutAndRedirects } from "../util";
 import fetch from "node-fetch";
+import { WithID } from "../store/types";
+import { DBStream } from "../store/stream-table";
+import { getViewers } from "./usage";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const app = Router();
@@ -118,6 +121,10 @@ app.post(
 
     switch (playbackPolicyType) {
       case "public":
+        let limitReached = await freeTierLimitReached(content, user, req);
+        if (limitReached) {
+          throw new ForbiddenError("Free tier user reached viewership limit");
+        }
         res.status(204);
         return res.end();
       case "jwt":
@@ -250,5 +257,42 @@ app.get("/public-key", async (req, res) => {
       res.status(500).json({ error: "Unable to retrieve public key" });
     });
 });
+
+async function freeTierLimitReached(
+  content: DBStream | WithID<Asset>,
+  user: User,
+  req: Request
+) {
+  if (user.stripeProductId !== "prod_O9XuIjn7EqYRVW") {
+    return false;
+  }
+
+  let isStream: boolean = false;
+  if (content && "streamKey" in content) {
+    isStream = true;
+  }
+
+  if (!isStream) {
+    // Do not enforce concurrent views for VODs
+    return false;
+  }
+
+  const now = Date.now();
+  const tenMinutesAgo = now - 10 * 60 * 1000;
+  const ingests = await req.getIngest();
+  const viewers = await getViewers(
+    content.id,
+    tenMinutesAgo,
+    now,
+    ingests[0].origin,
+    req.token.id
+  );
+
+  if (viewers > 30) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 export default app;
