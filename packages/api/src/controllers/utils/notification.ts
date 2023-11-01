@@ -28,10 +28,13 @@ export const getUsageNotifications = async (
     notifications.push({
       type: "notification100",
       title: "Usage Warning",
-      message: `You have exceeded your usage limit. Please upgrade your plan.`,
+      message: `You have exceeded the usage limit for your plan.`,
     });
 
-    if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
+    if (
+      user.createdAt > HACKER_DISABLE_CUTOFF_DATE &&
+      user.stripeProductId === "prod_O9XuIjn7EqYRVW"
+    ) {
       console.log(`
         usage: user=${user.id} is in overusage, disabling account
       `);
@@ -47,7 +50,7 @@ export const getUsageNotifications = async (
     notifications.push({
       type: "notification90",
       title: "Usage Warning",
-      message: `Your usage is over 90% of your limit.`,
+      message: `Your usage is over 90% of your limit for your plan`,
     });
   } else if (
     [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
@@ -57,7 +60,7 @@ export const getUsageNotifications = async (
     notifications.push({
       type: "notification75",
       title: "Usage Warning",
-      message: `Your usage is over 75% of your limit.`,
+      message: `Your usage is over 75% of your limit for your plan`,
     });
   } else {
     if (
