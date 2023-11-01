@@ -85,7 +85,7 @@ export const getUsageNotifications = async (
 
 export const notifyUser = async (notifications, user: User, req: Request) => {
   for (let notification of notifications) {
-    if (user.notifications?.[notification.type]) {
+    if (user.notifications?.usage?.[notification.type]) {
       continue;
     }
     console.log(`
