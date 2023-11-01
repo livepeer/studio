@@ -293,7 +293,7 @@ async function freeTierLimitReached(
 
   // Remove hits that are older than one minute
   playbackHits[playbackId] = playbackHits[playbackId].filter(
-    (hit) => now - hit.timestamp < 60 * 1000
+    (hit) => now - hit.timestamp < 60 * 3 * 1000
   );
 
   // Add a new hit record
