@@ -24,6 +24,7 @@ import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
+const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
 const app = Router();
 
 interface HitRecord {
@@ -127,10 +128,10 @@ app.post(
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
     if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
-      /*let limitReached = await freeTierLimitReached(content, user, req);
+      let limitReached = await freeTierLimitReached(content, user, req);
       if (limitReached) {
         throw new ForbiddenError("Free tier user reached viewership limit");
-      }*/
+      }
     }
 
     switch (playbackPolicyType) {
@@ -304,7 +305,7 @@ async function freeTierLimitReached(
   playbackHits[playbackId].push({ timestamp: now });
 
   // Check if the number of hits in the last minute exceeds the threshold
-  if (playbackHits[playbackId].length > 30) {
+  if (playbackHits[playbackId].length > MAX_ALLOWED_VIEWERS_FOR_FREE_TIER) {
     return true;
   } else {
     return false;
