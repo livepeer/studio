@@ -121,6 +121,9 @@ async function reportUsageForUser(
       },
       {} as Record<string, string>
     );
+    console.log(`
+      usage: reporting usage to stripe for user=${user.id} email=${user.email} from=${billingCycleStart} to=${billingCycleEnd}
+    `);
     await sendUsageRecordToStripe(
       user,
       req,
