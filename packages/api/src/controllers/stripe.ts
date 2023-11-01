@@ -315,6 +315,60 @@ app.post("/webhook", async (req, res) => {
   return res.sendStatus(200);
 });
 
+app.patch(
+  "/user/subscription",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    const {
+      userId,
+      stripeProductId,
+      stripeCustomerSubscriptionId,
+      stripeCustomerId,
+    } = req.body;
+
+    const user = await db.user.get(userId);
+
+    if (!user) {
+      res.status(404);
+      return res.json({ errors: ["user not found"] });
+    }
+
+    if (stripeCustomerSubscriptionId) {
+      const subscription = await req.stripe.subscriptions.retrieve(
+        stripeCustomerSubscriptionId
+      );
+
+      if (!subscription) {
+        res.status(404);
+        return res.json({ errors: ["subscription not found"] });
+      }
+
+      if (subscription.status === "canceled") {
+        res.status(400);
+        return res.json({ errors: ["subscription is canceled"] });
+      }
+    }
+
+    if (stripeCustomerId) {
+      const customer = await req.stripe.customers.retrieve(stripeCustomerId);
+
+      if (!customer) {
+        res.status(404);
+        return res.json({ errors: ["customer not found"] });
+      }
+    }
+
+    await db.user.update(user.id, {
+      stripeProductId,
+      stripeCustomerSubscriptionId,
+      stripeCustomerId,
+    });
+
+    res.status(200);
+    return res.json({ result: "user subscription updated" });
+  }
+);
+
 app.post(
   "/user/subscribe/enterprise",
   authorizer({ anyAdmin: true }),
