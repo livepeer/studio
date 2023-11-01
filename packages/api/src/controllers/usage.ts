@@ -9,6 +9,8 @@ import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { Ingest } from "../types/common";
 import { reportUsage } from "./stripe";
+import sql from "sql-template-strings";
+import { Request } from "express";
 
 const app = Router();
 
@@ -34,6 +36,28 @@ export const getBillingUsage = async (
   ).then((res) => res.json());
 
   return usage;
+};
+
+export const getRecentlyActiveUsers = async (
+  fromTime: number,
+  toTime: number,
+  baseUrl: string,
+  adminToken: string
+) => {
+  // Fetch usage data from /data/usage endpoint
+  const users = await fetch(
+    `${baseUrl}/api/data/usage/query/active?${qs.stringify({
+      from: fromTime,
+      to: toTime,
+    })}`,
+    {
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    }
+  ).then((res) => res.json());
+
+  return users;
 };
 
 export const calculateOverUsage = async (product, usage) => {
@@ -98,6 +122,38 @@ export const getUsagePercentageOfLimit = async (product, usage) => {
   return usagePercentageOfLimit;
 };
 
+export async function getRecentlyActiveHackers(req: Request) {
+  // Current date in milliseconds
+  const currentDateMillis = new Date().getTime();
+  const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
+
+  // One month ago unix millis timestamp
+  const cutOffDate = currentDateMillis - oneMonthMillis;
+
+  const ingests = await req.getIngest();
+
+  const users = await getRecentlyActiveUsers(
+    cutOffDate,
+    currentDateMillis,
+    ingests[0].origin,
+    req.token.id
+  );
+
+  let activeHackers = [];
+  for (var i = 0; i < users.length; i++) {
+    const user = await db.user.get(users[i].userId);
+    if (
+      user &&
+      (user?.stripeProductId === "hacker_1" ||
+        user?.stripeProductId === "prod_O9XuIjn7EqYRVW")
+    ) {
+      activeHackers.push(user);
+    }
+  }
+
+  return activeHackers;
+}
+
 export async function getUsageData(
   user: WithID<User>,
   billingCycleStart: number,
@@ -150,6 +206,17 @@ app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
   res.status(200);
   res.json(cachedUsageHistory);
 });
+
+app.get(
+  "/recently-active",
+  authorizer({ anyAdmin: true }),
+  async (req: Request, res) => {
+    const recentlyActiveHackers = await getRecentlyActiveHackers(req);
+
+    res.status(200);
+    res.json(recentlyActiveHackers);
+  }
+);
 
 app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
   let { fromTime, toTime } = req.query;
@@ -235,7 +302,7 @@ app.post(
     let newUsageResult = null;
 
     if (newUsageReport === "true") {
-      let token = req.token;
+      let token = req.token.id;
       // New automated billing usage report
       newUsageResult = await reportUsage(req, token);
       res.status(200);
