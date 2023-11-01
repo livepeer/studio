@@ -6,7 +6,7 @@ import { sendgridEmailPaymentFailed } from "./helpers";
 import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { authorizer } from "../middleware";
-import { getUsageData } from "./usage";
+import { getRecentlyActiveHackers, getUsageData } from "./usage";
 import {
   notifyUser,
   getUsageNotifications,
@@ -17,7 +17,7 @@ import { sleep } from "../util";
 const app = Router();
 
 export const reportUsage = async (req: Request, adminToken: string) => {
-  let payAsYouGoUsers = await getPayAsYouGoUsers();
+  let payAsYouGoUsers = await getPayAsYouGoUsers(req);
 
   let updatedUsers = [];
   for (const user of payAsYouGoUsers) {
@@ -41,7 +41,7 @@ export const reportUsage = async (req: Request, adminToken: string) => {
   };
 };
 
-async function getPayAsYouGoUsers() {
+async function getPayAsYouGoUsers(req: Request) {
   const [users] = await db.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
@@ -52,29 +52,7 @@ async function getPayAsYouGoUsers() {
     }
   );
 
-  // Current date in milliseconds
-  const currentDateMillis = new Date().getTime();
-  const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
-
-  // One month ago unix millis timestamp
-  const cutOffDate = currentDateMillis - oneMonthMillis;
-
-  const [hackerUsers] = await db.user.find([
-    sql`
-      LEFT JOIN asset a
-      ON users.data->>'id' = a.data->>'userId'
-      AND CAST(a.data->>'createdAt' AS bigint) > ${cutOffDate}
-
-      WHERE 
-      (
-          a.data->>'createdAt' IS NOT NULL 
-          OR 
-          CAST(users.data->>'lastStreamedAt' AS bigint) > ${cutOffDate}
-      )
-      AND
-      users.data->>'stripeProductId' IN ('hacker_1', 'prod_O9XuIjn7EqYRVW');
-  `,
-  ]);
+  const hackerUsers = await getRecentlyActiveHackers(req);
 
   const payAsYouGoUsers = [...users, ...hackerUsers];
   return payAsYouGoUsers;
