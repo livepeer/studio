@@ -121,10 +121,10 @@ app.post(
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
     if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
-      let limitReached = await freeTierLimitReached(content, user, req);
+      /*let limitReached = await freeTierLimitReached(content, user, req);
       if (limitReached) {
         throw new ForbiddenError("Free tier user reached viewership limit");
-      }
+      }*/
     }
 
     switch (playbackPolicyType) {
