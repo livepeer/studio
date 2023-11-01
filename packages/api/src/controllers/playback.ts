@@ -234,7 +234,10 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
-    const thumbsEnabled = await isExperimentSubject("live-thumbs", req.user.id);
+    const thumbsEnabled = await isExperimentSubject(
+      "live-thumbs",
+      req?.user?.id
+    );
     let url: string;
     let thumbUrl: string;
     if (withRecordings || thumbsEnabled) {
