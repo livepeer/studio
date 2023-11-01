@@ -140,14 +140,16 @@ export async function getRecentlyActiveHackers(req: Request) {
   );
 
   let activeHackers = [];
-  for (var i = 0; i < users.length; i++) {
-    const user = await db.user.get(users[i].userId);
-    if (
-      user &&
-      (user?.stripeProductId === "hacker_1" ||
-        user?.stripeProductId === "prod_O9XuIjn7EqYRVW")
-    ) {
-      activeHackers.push(user);
+  if (users) {
+    for (var i = 0; i < users.length; i++) {
+      const user = await db.user.get(users[i].userId);
+      if (
+        user &&
+        (user?.stripeProductId === "hacker_1" ||
+          user?.stripeProductId === "prod_O9XuIjn7EqYRVW")
+      ) {
+        activeHackers.push(user);
+      }
     }
   }
 
