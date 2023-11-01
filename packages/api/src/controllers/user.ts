@@ -566,6 +566,9 @@ app.patch(
         sendgridApiKey,
       } = req.config;
       try {
+        console.log(`
+          sending disabled email to user=${email} emailTemplate=${emailTemplate}
+        `);
         await sendgridEmail({
           email,
           bcc: infraEmail,
