@@ -32,6 +32,9 @@ export const getUsageNotifications = async (
     });
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
+      console.log(`
+        usage: user=${user.id} is in overusage, disabling account
+      `);
       await db.user.update(user.id, {
         disabled: true,
       });
@@ -77,16 +80,19 @@ export const getUsageNotifications = async (
   return notifications;
 };
 
-export const notifyUser = async (notifications, user, req) => {
+export const notifyUser = async (notifications, user: User, req: Request) => {
   for (let notification of notifications) {
     if (user.notifications?.[notification.type]) {
       continue;
     }
+    console.log(`
+        usage: sending notification=${notification.type} to user=${user.email}
+    `);
     await sendgridEmail({
       email: user.email,
       supportAddr: req.config.supportAddr,
       sendgridTemplateId: req.config.sendgridTemplateId,
-      sendgridApiKey: req.sendgridApiKey,
+      sendgridApiKey: req.config.sendgridApiKey,
       subject: notification.title,
       buttonText: "View Dashboard",
       buttonUrl: frontendUrl(req, `/dashboard?`),
@@ -109,8 +115,8 @@ export const notifyMissingPaymentMethod = async (
   req: Request
 ) => {
   console.log(`
-        User=${user.id} is in overusage but doesn't have a payment method, notifying support team
-      `);
+    usage: user=${user.id} is in overusage but doesn't have a payment method, notifying support team
+  `);
   let emailSent = await sendgridEmailPaymentFailed({
     email: "help@livepeer.org",
     supportAddr: req.config.supportAddr,

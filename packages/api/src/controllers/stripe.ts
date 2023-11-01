@@ -26,7 +26,7 @@ export const reportUsage = async (req: Request, adminToken: string) => {
       updatedUsers.push(userUpdated);
     } catch (e) {
       console.log(`
-        Failed to create usage record for user=${user.id} with error=${e.message} - it's pay as you go subscription probably needs to get migrated
+        Failed to create usage record for user=${user.id} with error=${e.message} 
       `);
       updatedUsers.push({
         id: user.id,
@@ -109,7 +109,7 @@ async function reportUsageForUser(
   );
 
   if (usageNotifications.length > 0) {
-    await notifyUser(usageNotifications, user, req.config);
+    await notifyUser(usageNotifications, user, req);
   }
 
   if (actuallyReport) {
