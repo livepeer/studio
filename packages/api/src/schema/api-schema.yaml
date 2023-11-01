@@ -2110,7 +2110,6 @@ components:
                       - HLS (TS)
                       - MP4
                       - WebRTC (H264)
-                      - Thumbnail
                   type:
                     type: string
                     example: html5/video/mp4
@@ -2118,7 +2117,6 @@ components:
                       - html5/application/vnd.apple.mpegurl
                       - html5/video/mp4
                       - html5/video/h264
-                      - image/jpeg
                   url:
                     type: string
                     example: >-

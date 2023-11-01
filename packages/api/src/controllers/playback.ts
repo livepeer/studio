@@ -40,8 +40,7 @@ function newPlaybackInfo(
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   live?: PlaybackInfo["meta"]["live"],
   recordingUrl?: string,
-  withRecordings?: boolean,
-  thumbUrl?: string
+  withRecordings?: boolean
 ): PlaybackInfo {
   let playbackInfo: PlaybackInfo = {
     type,
@@ -89,13 +88,6 @@ function newPlaybackInfo(
         error: "no running recordings available for this stream.",
       });
     }
-  }
-  if (thumbUrl) {
-    playbackInfo.meta.source.push({
-      hrn: "Thumbnail",
-      type: "image/jpeg",
-      url: thumbUrl,
-    });
   }
 
   return playbackInfo;
@@ -234,13 +226,10 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
-    const thumbsEnabled = await isExperimentSubject("live-thumbs", req.user.id);
     let url: string;
-    let thumbUrl: string;
-    if (withRecordings || thumbsEnabled) {
-      ({ url, thumbUrl } = await getRunningRecording(stream, req));
+    if (withRecordings) {
+      ({ url } = await getRunningRecording(stream, req));
     }
-
     return newPlaybackInfo(
       "live",
       getHLSPlaybackUrl(ingest, stream),
@@ -249,8 +238,7 @@ async function getPlaybackInfo(
       null,
       stream.isActive ? 1 : 0,
       url,
-      withRecordings,
-      thumbsEnabled && thumbUrl
+      withRecordings
     );
   }
 
