@@ -22,9 +22,17 @@ import { WithID } from "../store/types";
 import { DBStream } from "../store/stream-table";
 import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
+import { isFreeTierUser } from "./helpers";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
+const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
 const app = Router();
+
+interface HitRecord {
+  timestamp: number;
+}
+
+const playbackHits: Record<string, HitRecord[]> = {};
 
 async function fireGateWebhook(
   webhook: DBWebhook,
@@ -121,10 +129,10 @@ app.post(
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
     if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
-      /*let limitReached = await freeTierLimitReached(content, user, req);
+      let limitReached = await freeTierLimitReached(content, user, req);
       if (limitReached) {
         throw new ForbiddenError("Free tier user reached viewership limit");
-      }*/
+      }
     }
 
     switch (playbackPolicyType) {
@@ -266,33 +274,29 @@ async function freeTierLimitReached(
   content: DBStream | WithID<Asset>,
   user: User,
   req: Request
-) {
-  if (user.stripeProductId !== "prod_O9XuIjn7EqYRVW") {
+): Promise<boolean> {
+  if (!isFreeTierUser(user)) {
     return false;
   }
 
-  let isStream: boolean = false;
-  if (content && "streamKey" in content) {
-    isStream = true;
-  }
-
-  if (!isStream) {
-    // Do not enforce concurrent views for VODs
-    return false;
-  }
-
+  // Register a hit for the given playbackId
   const now = Date.now();
-  const tenMinutesAgo = now - 10 * 60 * 1000;
-  const ingests = await req.getIngest();
-  const viewers = await getViewers(
-    content.id,
-    tenMinutesAgo,
-    now,
-    ingests[0].origin,
-    req.token.id
+  const playbackId = content.playbackId;
+
+  if (!playbackHits[playbackId]) {
+    playbackHits[playbackId] = [];
+  }
+
+  // Remove hits that are older than three minutes
+  playbackHits[playbackId] = playbackHits[playbackId].filter(
+    (hit) => now - hit.timestamp < 60 * 3 * 1000
   );
 
-  if (viewers > 30) {
+  // Add a new hit record
+  playbackHits[playbackId].push({ timestamp: now });
+
+  // Check if the number of hits in the last minute exceeds the threshold
+  if (playbackHits[playbackId].length > MAX_ALLOWED_VIEWERS_FOR_FREE_TIER) {
     return true;
   } else {
     return false;

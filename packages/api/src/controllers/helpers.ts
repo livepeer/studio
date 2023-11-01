@@ -10,7 +10,7 @@ import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import base64url from "base64url";
-import { CreatorId, InputCreatorId, ObjectStore } from "../schema/types";
+import { CreatorId, InputCreatorId, ObjectStore, User } from "../schema/types";
 import { BadRequestError } from "../store/errors";
 import * as nativeCrypto from "crypto";
 
@@ -585,6 +585,13 @@ export function pathJoin2(p1: string, p2: string) {
 
 export function pathJoin(...items: string[]) {
   return items.reduce(pathJoin2, "");
+}
+
+export function isFreeTierUser(user: User) {
+  return (
+    user.stripeProductId === "hacker_1" ||
+    user.stripeProductId === "prod_O9XuIjn7EqYRVW"
+  );
 }
 
 export function trimPathPrefix(prefix: string, path: string) {
