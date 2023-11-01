@@ -26,6 +26,12 @@ import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const app = Router();
 
+interface HitRecord {
+  timestamp: number;
+}
+
+const playbackHits: Record<string, HitRecord[]> = {};
+
 async function fireGateWebhook(
   webhook: DBWebhook,
   plabackPolicy: PlaybackPolicy,
@@ -266,7 +272,7 @@ async function freeTierLimitReached(
   content: DBStream | WithID<Asset>,
   user: User,
   req: Request
-) {
+): Promise<boolean> {
   if (user.stripeProductId !== "prod_O9XuIjn7EqYRVW") {
     return false;
   }
@@ -281,18 +287,24 @@ async function freeTierLimitReached(
     return false;
   }
 
+  // Register a hit for the given playbackId
   const now = Date.now();
-  const tenMinutesAgo = now - 10 * 60 * 1000;
-  const ingests = await req.getIngest();
-  const viewers = await getViewers(
-    content.id,
-    tenMinutesAgo,
-    now,
-    ingests[0].origin,
-    req.token.id
+  const playbackId = content.playbackId;
+
+  if (!playbackHits[playbackId]) {
+    playbackHits[playbackId] = [];
+  }
+
+  // Remove hits that are older than one minute
+  playbackHits[playbackId] = playbackHits[playbackId].filter(
+    (hit) => now - hit.timestamp < 60 * 1000
   );
 
-  if (viewers > 30) {
+  // Add a new hit record
+  playbackHits[playbackId].push({ timestamp: now });
+
+  // Check if the number of hits in the last minute exceeds the threshold
+  if (playbackHits[playbackId].length > 30) {
     return true;
   } else {
     return false;
