@@ -278,11 +278,6 @@ async function freeTierLimitReached(
     return false;
   }
 
-  let isStream: boolean = false;
-  if (content && "streamKey" in content) {
-    isStream = true;
-  }
-
   // Register a hit for the given playbackId
   const now = Date.now();
   const playbackId = content.playbackId;
