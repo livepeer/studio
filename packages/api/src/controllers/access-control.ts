@@ -291,7 +291,7 @@ async function freeTierLimitReached(
     playbackHits[playbackId] = [];
   }
 
-  // Remove hits that are older than one minute
+  // Remove hits that are older than three minutes
   playbackHits[playbackId] = playbackHits[playbackId].filter(
     (hit) => now - hit.timestamp < 60 * 3 * 1000
   );
