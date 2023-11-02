@@ -6,20 +6,20 @@ import { useCallback } from "react";
 const ActiveStreamsBadge = () => {
   const { user, getStreams } = useApi();
   const fetcher = useCallback(async () => {
-    const [, , count] = await getStreams(user.id, {
+    const [streams] = await getStreams(user.id, {
       count: true,
       active: true,
     });
-    return { count };
+    return { streams };
   }, [user.id]);
 
   const { isLoading, data } = useQuery("activeStreams", () => fetcher());
-  if (isLoading || !data?.count) {
+  if (isLoading || !(data?.streams?.length > 0)) {
     return null;
   }
   return (
     <Badge size="1" variant="primary" css={{ letterSpacing: 0, mt: "7px" }}>
-      {data?.count} active right now
+      {data?.streams?.length} active right now
     </Badge>
   );
 };
