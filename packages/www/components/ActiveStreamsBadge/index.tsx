@@ -6,7 +6,7 @@ import { useCallback } from "react";
 const ActiveStreamsBadge = () => {
   const { user, getStreams } = useApi();
   const fetcher = useCallback(async () => {
-    const [streams] = await getStreams(user.id, {
+    const [streams, nextCursor, count] = await getStreams(user.id, {
       count: true,
       active: true,
     });
