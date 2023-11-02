@@ -896,17 +896,18 @@ app.post(
     // compatibility with /setactive recordging/webhooks handling)
     const issues =
       payload.is_active && !payload.is_healthy
-        ? payload.human_issues || (payload.issues ? [payload.issues] : [])
-        : null;
+        ? payload.human_issues ||
+          (payload.issues ? [payload.issues] : undefined)
+        : undefined;
     const patch: Partial<DBSession & DBStream> = {
-      isHealthy: payload.is_active ? payload.is_healthy : null,
+      isHealthy: payload.is_active ? payload.is_healthy : undefined,
       issues,
       // do not clear the `lastSeen` field when the stream is not active
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
 
     // Since we might need to delete some fields, use replace instead of update
-    await db.stream.update(stream.id, patch);
+    await db.stream.replace({ ...stream, ...patch });
 
     if (payload.session_id) {
       const session = await db.session.get(payload.session_id, {
