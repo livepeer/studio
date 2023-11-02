@@ -233,7 +233,7 @@ const SaveTargetDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent
-        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4", zIndex: 1 }}
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
         onOpenAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogTitle asChild>
           <Heading size="1">
