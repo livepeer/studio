@@ -43,6 +43,8 @@ const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
 const freePlan = "prod_O9XuIjn7EqYRVW";
 
+const TEMP_EMAIL_DOMAINS = ["gufum.com", "mailinator.com", "guerrillamail.com"];
+
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
     delete obj[f];
@@ -308,6 +310,14 @@ app.post("/", validatePost("user"), async (req, res) => {
         errors: [`Recaptcha error: ${error}`],
       });
     }
+  }
+
+  const emailDomain = email.split("@")[1];
+  if (TEMP_EMAIL_DOMAINS.includes(emailDomain)) {
+    res.status(400);
+    return res.json({
+      errors: [`Please use a different email address.`],
+    });
   }
 
   const emailValid = validator.validate(email);

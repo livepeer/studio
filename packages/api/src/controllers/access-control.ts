@@ -126,11 +126,18 @@ app.post(
       throw new NotFoundError("Content not found");
     }
 
+    console.log(
+      `access-control: gate: checking access for contentId=${content.id} playbackId=${playbackId} user=${user.id}`
+    );
+
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
     if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
       let limitReached = await freeTierLimitReached(content, user, req);
       if (limitReached) {
+        console.log(`
+          access-control: gate: disallowing playback for contentId=${content.id} with playbackId=${playbackId} user=${user.id} reached viewership limit
+        `);
         throw new ForbiddenError("Free tier user reached viewership limit");
       }
     }
