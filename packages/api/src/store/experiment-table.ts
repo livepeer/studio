@@ -6,7 +6,7 @@ import { ForbiddenError, NotFoundError } from "./errors";
 import Table from "./table";
 import { WithID } from "./types";
 
-export async function isExperimentSubject(experiment: string, userId: string) {
+export async function isExperimentSubject(experiment: string, userId?: string) {
   try {
     const { audienceUserIds, audienceAllowAll } =
       await db.experiment.getByNameOrId(experiment);
