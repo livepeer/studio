@@ -18,18 +18,16 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
     if (shouldBeLoggedIn === true) {
       if (!token) {
         router.replace("/login");
-      } else if (emailVerificationMode && user && user.emailValid === false) {
+      } else if (emailVerificationMode && user?.emailValid === false) {
         router.replace("/verify");
       }
     }
     console.log(shouldBeLoggedIn, user);
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
-      console.log("reached");
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
-        console.log("what");
         router.replace(next ? next.toString() : "/dashboard");
       }
     }
