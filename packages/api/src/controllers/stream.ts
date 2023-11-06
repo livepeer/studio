@@ -1002,6 +1002,20 @@ app.post(
   }
 );
 
+// Refreshes the 'lastSeen' field of a stream
+app.post("/:id/heartbeat", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  logger.info(`got /heartbeat for stream=${id}`);
+
+  const stream = await db.stream.get(id, { useReplica: false });
+  if (!stream || (stream.deleted && !req.user.admin)) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+  await db.stream.update(stream.id, { lastSeen: Date.now() });
+  res.status(204).end();
+});
+
 app.put(
   "/:id/setactive",
   authorizer({ anyAdmin: true }),
