@@ -130,7 +130,11 @@ app.post("/", validatePost("clip-payload"), async (req, res) => {
           "The provided session id does not belong to this stream"
         );
       }
-      ({ url, objectStoreId } = await buildRecordingUrl(session, req));
+      ({ url, objectStoreId } = await buildRecordingUrl(
+        session,
+        req.config.recordCatalystObjectStoreId,
+        req.config.secondaryRecordObjectStoreId
+      ));
     } else {
       ({ url, session, objectStoreId } = await getRunningRecording(
         content,
