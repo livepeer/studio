@@ -14,8 +14,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
-import useApi from "../hooks/use-api";
 import Link from "next/link";
+import { useApi, useLoggedIn } from "../hooks";
 
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
@@ -23,6 +23,7 @@ const emailVerificationMode =
 const shouldRecaptcha = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 const RegisterPage = () => {
+  useLoggedIn(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();

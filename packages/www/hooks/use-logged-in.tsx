@@ -17,28 +17,21 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   useEffect(() => {
     if (shouldBeLoggedIn === true) {
       if (!token) {
-        setIsLoggedIn(false);
-        router.replace("/");
-      }
-      if (emailVerificationMode && user?.emailValid === false) {
+        router.replace("/login");
+      } else if (emailVerificationMode && user && user.emailValid === false) {
         router.replace("/verify");
       }
-      if (user?.emailValid) {
-        setIsLoggedIn(true);
-      }
     }
+    console.log(shouldBeLoggedIn, user);
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
+      console.log("reached");
       if (emailVerificationMode && user.emailValid === false) {
-        setIsLoggedIn(false);
         router.replace("/verify");
       } else {
-        setIsLoggedIn(true);
+        console.log("what");
         router.replace(next ? next.toString() : "/dashboard");
       }
-    }
-    if (shouldBeLoggedIn === false && !token) {
-      setIsLoggedIn(false);
     }
   }, [user, token, next]);
 
