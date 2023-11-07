@@ -1078,6 +1078,30 @@ app.put("/upload/direct", async (req, res) => {
 
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
+  const { userId } = req.query;
+
+  if (userId && userId !== req.user.id && !req.user.admin) {
+    throw new ForbiddenError(`users may only delete their own assets`);
+  }
+
+  if (userId) {
+    const [assets] = await db.asset.find([
+      sql`data->>'userId' = ${userId}`,
+      sql`data->>'deleted' IS NULL`,
+    ]);
+
+    if (!assets.length) {
+      throw new NotFoundError(`assets not found for user userId=${userId}`);
+    }
+
+    for (let i = 0; i < assets.length; i++) {
+      await req.taskScheduler.deleteAsset(assets[i]);
+    }
+
+    res.status(204);
+    res.end();
+  }
+
   const asset = await db.asset.get(id);
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
