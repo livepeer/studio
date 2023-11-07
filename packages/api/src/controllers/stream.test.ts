@@ -654,6 +654,17 @@ describe("controllers/stream", () => {
         json = await res.json();
         expect(json.errors[0]).toContain("cannot change 'record' field");
       });
+
+      it("should disallow changing profiles when steam is active", async () => {
+        const stream = await createAndActivateStream();
+
+        let res = await client.patch(`/stream/${stream.id}`, {
+          profiles: [],
+        });
+        expect(res.status).toBe(400);
+        let json = await res.json();
+        expect(json.errors[0]).toContain("cannot change 'profiles' field");
+      });
     });
 
     describe("stream patch", () => {
@@ -782,6 +793,11 @@ describe("controllers/stream", () => {
       it("should patch record field", async () => {
         await testPatchField({ record: true });
       });
+
+      it("should patch profiles field", async () => {
+        await testPatchField({ profiles: [] });
+      });
+
       it("should patch suspended field", async () => {
         await testPatchField({ suspended: true });
       });

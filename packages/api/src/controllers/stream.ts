@@ -1349,16 +1349,34 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, multistream, playbackPolicy, creatorId } = payload;
+    let {
+      record,
+      suspended,
+      multistream,
+      playbackPolicy,
+      creatorId,
+      profiles,
+    } = payload;
     if (record != undefined && stream.isActive && stream.record != record) {
       res.status(400);
       return res.json({
         errors: ["cannot change 'record' field while stream is active"],
       });
     }
+    if (
+      profiles != undefined &&
+      stream.isActive &&
+      stream.profiles != profiles
+    ) {
+      res.status(400);
+      return res.json({
+        errors: ["cannot change 'profiles' field while stream is active"],
+      });
+    }
 
     let patch: StreamPatchPayload & Partial<DBStream> = {
       record,
+      profiles,
       suspended,
       creatorId: mapInputCreatorId(creatorId),
     };

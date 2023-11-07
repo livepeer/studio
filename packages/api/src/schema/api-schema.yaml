@@ -467,6 +467,8 @@ components:
           $ref: "#/components/schemas/stream/properties/multistream"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        profiles:
+          $ref: "#/components/schemas/stream/properties/profiles"
     stream-health-payload:
       type: object
       description: |
