@@ -3081,6 +3081,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  /clip:
+    post:
+      summary: Create a clip
+      description: |
+        Create a clip from a livestream
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/clip-payload"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - asset
+                  - task
+                properties:
+                  asset:
+                    $ref: "#/components/schemas/asset"
+                  task:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 34d7618e-fd42-4798-acf5-19504616a11e
+          default:
+            description: Error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/error"
+  "/stream/{id}/clips":
+    get:
+      summary: Retrieve clips of a livestream
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: ID of the parent stream or playbackId of parent stream
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/asset"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/session/{id}/clips":
+    get:
+      summary: Retrieve clips of a session
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: ID of the parent session
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/asset"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /room:
     post:
       summary: Create a room
