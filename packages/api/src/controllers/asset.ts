@@ -1078,6 +1078,7 @@ app.put("/upload/direct", async (req, res) => {
 
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
+
   const asset = await db.asset.get(id);
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
@@ -1086,6 +1087,40 @@ app.delete("/:id", authorizer({}), async (req, res) => {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
   await req.taskScheduler.deleteAsset(asset);
+  res.status(204);
+  res.end();
+});
+
+app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
+  if (req.query.userId && req.query.userId !== req.user.id && !req.user.admin) {
+    throw new ForbiddenError(`users may only delete their own assets`);
+  }
+
+  if (!req.query.userId) {
+    throw new BadRequestError(`userId is required`);
+  }
+
+  const userId: string = req.query.userId.toString();
+
+  const user = await db.user.get(userId);
+
+  if (!user) {
+    throw new NotFoundError(`user not found`);
+  }
+
+  const [assets] = await db.asset.find([
+    sql`data->>'userId' = ${userId}`,
+    sql`data->>'deleted' IS NULL`,
+  ]);
+
+  if (!assets.length) {
+    throw new NotFoundError(`assets not found for user userId=${userId}`);
+  }
+
+  for (let i = 0; i < assets.length; i++) {
+    await req.taskScheduler.deleteAsset(assets[i]);
+  }
+
   res.status(204);
   res.end();
 });
