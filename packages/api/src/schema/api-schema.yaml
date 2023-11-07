@@ -3063,6 +3063,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+    patch:
+      summary: Patch an asset
+      parameters:
+        - in: path
+          name: assetId
+          schema:
+            type: string
+          description: ID of the asset
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/asset-patch-payload"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
     delete:
       summary: Delete an asset
       parameters:
