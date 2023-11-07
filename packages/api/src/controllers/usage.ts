@@ -338,17 +338,7 @@ app.post(
   authorizer({ anyAdmin: true }),
   validatePost("usage"),
   async (req, res) => {
-    let { fromTime, toTime, newUsageReport } = req.query;
-
-    let newUsageResult = null;
-
-    if (newUsageReport === "true") {
-      let token = req.token.id;
-      // New automated billing usage report
-      newUsageResult = await reportUsage(req, token);
-      res.status(200);
-      res.json(newUsageResult);
-    }
+    let { fromTime, toTime } = req.query;
 
     // if time range isn't specified return all usage
     if (!fromTime) {
@@ -384,6 +374,10 @@ app.post(
         await req.store.create({ kind: "usage", ...row });
       }
     }
+
+    // New automated billing usage report
+    let token = req.token.id;
+    await reportUsage(req, token);
 
     res.status(200);
     res.json(usageHistory);
