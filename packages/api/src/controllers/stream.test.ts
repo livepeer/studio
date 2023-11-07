@@ -506,7 +506,7 @@ describe("controllers/stream", () => {
       }
     });
 
-    describe("set active", () => {
+    describe("set active and heartbeat", () => {
       const callSetActive = async (
         streamId: string,
         payload: StreamSetActivePayload
@@ -608,6 +608,18 @@ describe("controllers/stream", () => {
         expect(updatedStream.isActive).toBe(true);
         expect(updatedStream.lastSeen).toBeGreaterThan(timeBeforeBump);
         expect(updatedStream.mistHost).toEqual(setActivePayload.hostName);
+      });
+
+      it("heartbeat should bump the last seen value", async () => {
+        const stream = await createAndActivateStream();
+        const timeBeforeBump = Date.now();
+        expect(stream.lastSeen).toBeLessThan(timeBeforeBump);
+
+        const res = await client.post(`/stream/${stream.id}/heartbeat`);
+
+        expect(res.status).toBe(204);
+        const updatedStream = await server.db.stream.get(stream.id);
+        expect(updatedStream.lastSeen).toBeGreaterThan(timeBeforeBump);
       });
 
       it("should allow changing the mist host as well", async () => {
