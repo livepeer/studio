@@ -902,7 +902,6 @@ app.post(
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : undefined,
       issues,
-      isActive: payload.is_active,
       // do not clear the `lastSeen` field when the stream is not active
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
