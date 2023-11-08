@@ -32,6 +32,7 @@ const PlanForm = ({
   color,
 }) => {
   const { user, updateSubscription } = useApi();
+  const { applyCoupon } = useApi();
   const [status, setStatus] = useState("initial");
   const stripe = useStripe();
   const elements = useElements();
@@ -46,6 +47,7 @@ const PlanForm = ({
 
   function createPaymentMethod({
     cardElement,
+    coupon,
     stripeCustomerId,
     stripeCustomerSubscriptionId,
     stripeProductId,
@@ -63,6 +65,14 @@ const PlanForm = ({
           console.log(result.error);
           setStatus("error");
         } else {
+          if (coupon && coupon !== "") {
+            applyCoupon({
+              stripeCustomerId,
+              stripeCustomerSubscriptionId,
+              stripeProductId,
+              coupon,
+            });
+          }
           updateSubscription({
             stripeCustomerId,
             stripeCustomerPaymentMethodId: paymentMethod.id,
@@ -171,6 +181,7 @@ const PlanForm = ({
         cardElement,
         stripeCustomerId: user.stripeCustomerId,
         stripeCustomerSubscriptionId: user.stripeCustomerSubscriptionId,
+        coupon: data.coupon,
         stripeProductId,
         billingDetails: {
           name: data.name,
@@ -376,7 +387,23 @@ const PlanForm = ({
                       />
                     </Box>
                   </Grid>
-
+                  <Box>
+                    <Label
+                      css={{ mb: "$1", display: "block" }}
+                      htmlFor="coupon">
+                      Promo code
+                    </Label>
+                    <TextField
+                      size="2"
+                      ref={register({ required: false })}
+                      placeholder="Promo code"
+                      id="coupon"
+                      name="coupon"
+                      type="text"
+                      css={{ width: "100%", mb: "$2" }}
+                      required
+                    />
+                  </Box>
                   <Box
                     css={{
                       fontSize: "$1",

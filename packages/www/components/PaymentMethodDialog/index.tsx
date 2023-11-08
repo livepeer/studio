@@ -258,7 +258,6 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   />
                 </Box>
               </Grid>
-
               <Box
                 css={{
                   fontSize: "$1",

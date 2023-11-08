@@ -438,7 +438,9 @@ app.post("/", validatePost("user"), async (req, res) => {
   }
 
   let isTest =
-    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+    process.env.NODE_ENV === "test" ||
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "staging";
 
   if (
     req.config.requireEmailVerification &&
@@ -617,7 +619,9 @@ app.post("/token", validatePost("user"), async (req, res) => {
   );
 
   let isTest =
-    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+    process.env.NODE_ENV === "test" ||
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "staging";
 
   if (
     req.config.requireEmailVerification &&

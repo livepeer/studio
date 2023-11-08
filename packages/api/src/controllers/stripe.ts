@@ -1,4 +1,4 @@
-import { Router, Request } from "express";
+import { Router, Request, Response } from "express";
 import { db } from "../store";
 import { products } from "../config";
 import sql from "sql-template-strings";
@@ -185,6 +185,67 @@ const sendUsageRecordToStripe = async (
     })
   );
 };
+
+app.post("/apply-coupon", async (req: Request, res: Response) => {
+  const { coupon, stripeCustomerId, stripeCustomerSubscriptionId } = req.body;
+
+  const user = req.user;
+
+  if (
+    user.stripeCustomerId != stripeCustomerId ||
+    user.stripeCustomerSubscriptionId != stripeCustomerSubscriptionId
+  ) {
+    res.status(400);
+    return res.json({ errors: ["invalid customer or subscription"] });
+  }
+
+  const customer = await req.stripe.customers.retrieve(stripeCustomerId);
+
+  if (!customer) {
+    res.status(404);
+    return res.json({ errors: ["customer not found"] });
+  }
+
+  const subscription = await req.stripe.subscriptions.retrieve(
+    stripeCustomerSubscriptionId
+  );
+
+  if (!subscription) {
+    res.status(404);
+    return res.json({ errors: ["subscription not found"] });
+  }
+
+  if (subscription.status === "canceled") {
+    res.status(400);
+    return res.json({ errors: ["subscription is canceled"] });
+  }
+
+  const couponRes = await req.stripe.coupons.retrieve(coupon);
+
+  if (!couponRes) {
+    res.status(404);
+    return res.json({ errors: ["coupon not found"] });
+  }
+
+  const subscriptionWithCoupon = await req.stripe.subscriptions.update(
+    stripeCustomerSubscriptionId,
+    {
+      coupon: coupon,
+    }
+  );
+
+  if (!subscriptionWithCoupon) {
+    res.status(400);
+    return res.json({ errors: ["failed to apply coupon"] });
+  }
+
+  await db.user.update(user.id, {
+    stripeAppliedCouponId: coupon,
+  });
+
+  res.status(200);
+  return res.json(user);
+});
 
 // Webhook handler for asynchronous events called by stripe on invoice generation
 // https://stripe.com/docs/billing/subscriptions/webhooks

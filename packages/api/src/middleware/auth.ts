@@ -290,9 +290,15 @@ function authorizer(params: AuthzParams): RequestHandler {
       );
     }
 
+    let isTest =
+      process.env.NODE_ENV === "test" ||
+      process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "staging";
+
     const verifyEmail =
       req.config.requireEmailVerification &&
       !params.allowUnverified &&
+      !isTest &&
       user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE;
     if (verifyEmail && !user.emailValid) {
       throw new ForbiddenError(
