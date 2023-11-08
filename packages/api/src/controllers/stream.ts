@@ -1363,11 +1363,7 @@ app.patch(
         errors: ["cannot change 'record' field while stream is active"],
       });
     }
-    if (
-      profiles != undefined &&
-      stream.isActive &&
-      stream.profiles != profiles
-    ) {
+    if (profiles != undefined && stream.isActive) {
       res.status(400);
       return res.json({
         errors: ["cannot change 'profiles' field while stream is active"],
