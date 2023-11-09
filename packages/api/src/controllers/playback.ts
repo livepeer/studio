@@ -92,7 +92,7 @@ function newPlaybackInfo(
   }
   if (thumbUrl) {
     playbackInfo.meta.source.push({
-      hrn: "Thumbnail",
+      hrn: "Thumbnail (JPEG)",
       type: "image/jpeg",
       url: thumbUrl,
     });
@@ -236,7 +236,11 @@ async function getPlaybackInfo(
   if (stream) {
     let url: string;
     let thumbUrl: string;
-    ({ url, thumbUrl } = await getRunningRecording(stream, req));
+    try {
+      ({ url, thumbUrl } = await getRunningRecording(stream, req));
+    } catch (e) {
+      logger.error("Error while getting recording", e);
+    }
 
     return newPlaybackInfo(
       "live",
