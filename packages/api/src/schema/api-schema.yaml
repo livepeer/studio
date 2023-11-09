@@ -883,6 +883,8 @@ components:
                 - processing
                 - ready
                 - failed
+                - deleting
+                - deleted
             updatedAt:
               type: number
               description:
@@ -1408,6 +1410,7 @@ components:
             - upload
             - export
             - export-data
+            - delete
             - transcode-file
             - clip
         createdAt:
@@ -1473,6 +1476,16 @@ components:
                 id:
                   type: string
                   description: Optional ID of the content
+            delete:
+              type: object
+              additionalProperties: false
+              description: Parameters for the delete asset task
+              required:
+                - assetId
+              properties:
+                assetId:
+                  type: string
+                  description: ID of the asset to delete
             transcode-file:
               type: object
               additionalProperties: false
