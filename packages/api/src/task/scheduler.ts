@@ -198,6 +198,18 @@ export class TaskScheduler {
           });
         }
         break;
+      case "delete":
+        const deletingAsset = await db.asset.get(task.inputAssetId);
+        if (task.params.delete.assetId === deletingAsset.id) {
+          await this.updateAsset(deletingAsset, {
+            deletedAt: Date.now(),
+            deleted: true,
+            status: {
+              phase: "deleted",
+              updatedAt: Date.now(),
+            },
+          });
+        }
     }
     await this.updateTask(task, {
       status: {
@@ -526,10 +538,20 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
+    const task = await taskScheduler.createAndScheduleTask(
+      "delete",
+      {
+        delete: {
+          assetId: asset.id,
+        },
+      },
+      asset
+    );
     await this.updateAsset(asset, {
-      deleted: true,
-      deletedAt: Date.now(),
-      status: asset.status, // prevent updatedAt from being bumped
+      status: {
+        phase: "deleting",
+        updatedAt: Date.now(),
+      },
     });
   }
 
