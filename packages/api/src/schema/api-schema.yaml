@@ -688,10 +688,10 @@ components:
               - user not found
     multistream-target-input:
       oneOf:
-        - $ref: "#/multistream-target"
+        - $ref: "#/components/schemas/multistream-target"
         - type: array
           items:
-            $ref: "#/multistream-target"
+            $ref: "#/components/schemas/multistream-target"
     multistream-target:
       type: object
       required:
