@@ -1113,16 +1113,20 @@ app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
     sql`data->>'deleted' IS NULL`,
   ]);
 
-  if (!assets.length) {
-    throw new NotFoundError(`assets not found for user userId=${userId}`);
+  let deletedCount = 0;
+  for (const asset of assets) {
+    let deleted = await req.taskScheduler.deleteAsset(asset);
+
+    if (deleted) {
+      deletedCount++;
+    }
   }
 
-  for (let i = 0; i < assets.length; i++) {
-    await req.taskScheduler.deleteAsset(assets[i]);
-  }
-
-  res.status(204);
-  res.end();
+  res.status(200);
+  res.json({
+    found: assets.length,
+    deleted: deletedCount,
+  });
 });
 
 app.patch(

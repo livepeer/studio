@@ -523,14 +523,19 @@ export class TaskScheduler {
   }
 
   async deleteAsset(asset: string | Asset) {
-    if (typeof asset === "string") {
-      asset = await db.asset.get(asset);
+    try {
+      if (typeof asset === "string") {
+        asset = await db.asset.get(asset);
+      }
+      await this.updateAsset(asset, {
+        deleted: true,
+        deletedAt: Date.now(),
+        status: asset.status, // prevent updatedAt from being bumped
+      });
+      return true;
+    } catch (e) {
+      return false;
     }
-    await this.updateAsset(asset, {
-      deleted: true,
-      deletedAt: Date.now(),
-      status: asset.status, // prevent updatedAt from being bumped
-    });
   }
 
   async updateAsset(
