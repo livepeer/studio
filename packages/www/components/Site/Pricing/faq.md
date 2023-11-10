@@ -22,12 +22,19 @@ A credit card is not required to create an account.
 
 Yes.
 
-There are monthly caps for storage (1,000 minutes), transcode (1,000 minutes), and delivery (10,000 minutes) usage; after these limits are reached in any month, you will not be able to ingest or deliver any additional video until you select a plan. Please note that transcode and delivery usage is calculated on a monthly basis, but storage carries over from month to month unless you explicitly delete stored assets (i.e., if you store 500 minutes of video in one month, you will start the next month with 500 minutes already stored). 
+There are monthly caps for storage (1,000 minutes), transcode (1,000 minutes),
+and delivery (10,000 minutes) usage; after these limits are reached in any
+month, you will not be able to ingest or deliver any additional video until you
+select a plan. Please note that transcode and delivery usage is calculated on a
+monthly basis, but storage carries over from month to month unless you
+explicitly delete stored assets (i.e., if you store 500 minutes of video in one
+month, you will start the next month with 500 minutes already stored).
 
-Hacker tier users will receive email notifications at 75%, 90%, and 100% of usage.
+Hacker tier users will receive email notifications at 75%, 90%, and 100% of
+usage.
 
-Additionally, Hacker plans are limited to 30 concurrent viewers per stream. This is a hard cap and cannot be exceeded.
-
+Additionally, Hacker plans are limited to 30 concurrent viewers per stream. This
+is a hard cap and cannot be exceeded.
 
 ### **What happens if I exceed the allotted minutes for the Hacker plan?**
 
