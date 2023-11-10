@@ -2107,12 +2107,13 @@ components:
                 properties:
                   hrn:
                     type: string
+                    description: Human Readable Name
                     example: MP4
                     enum:
                       - HLS (TS)
                       - MP4
                       - WebRTC (H264)
-                      - Thumbnail
+                      - Thumbnail (JPEG)
                   type:
                     type: string
                     example: html5/video/mp4
