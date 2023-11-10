@@ -906,7 +906,6 @@ app.post(
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
 
-    // Since we might need to delete some fields, use replace instead of update
     await db.stream.update(stream.id, patch);
 
     if (payload.session_id) {
