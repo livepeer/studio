@@ -284,6 +284,7 @@ const fieldsMap: FieldsMap = {
   isActive: { val: `stream.data->'isActive'`, type: "boolean" },
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
+  playbackId: `stream.data->>'playbackId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
   suspended: { val: `stream.data->'suspended'`, type: "boolean" },
   sourceSegmentsDuration: {

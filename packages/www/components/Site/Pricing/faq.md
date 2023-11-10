@@ -18,15 +18,21 @@ on [Discord](https://discord.gg/livepeer).
 
 A credit card is not required to create an account.
 
+### **Are there usage limits for the Hacker plan?**
+
+Yes.
+
+There are monthly caps for storage (1,000 minutes), transcode (1,000 minutes), and delivery (10,000 minutes) usage; after these limits are reached in any month, you will not be able to ingest or deliver any additional video until you select a plan. Please note that transcode and delivery usage is calculated on a monthly basis, but storage carries over from month to month unless you explicitly delete stored assets (i.e., if you store 500 minutes of video in one month, you will start the next month with 500 minutes already stored). 
+
+Hacker tier users will receive email notifications at 75%, 90%, and 100% of usage.
+
+Additionally, Hacker plans are limited to 30 concurrent viewers per stream. This is a hard cap and cannot be exceeded.
+
+
 ### **What happens if I exceed the allotted minutes for the Hacker plan?**
 
 If you exceed the allotted minutes for storage, transcode, or delivery usage on
-a Hacker account, you will be responsible for paying the overage according to
-our pay-as-you go unit pricing. At the end of the billing cycle when you exceed
-the Hacker plan limits, you will receive an email indicating that you must enter
-payment information within 3 days. If your invoice is not paid and we have not
-heard from you by the end of that period, your account will be suspended and you
-can reach out to support@livepeer.org to start the reactivation process.
+a Hacker account, your account will be disabled until you select a paid plan.
 
 ### **What currencies does Livepeer Studio accept?**
 
