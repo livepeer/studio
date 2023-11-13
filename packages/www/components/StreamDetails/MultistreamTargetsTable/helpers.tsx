@@ -90,6 +90,7 @@ export const makeTableData = (
             children: (
               <Toolbox
                 target={target}
+                targetId={ref.id}
                 stream={stream}
                 invalidateTargetId={invalidateTargetId}
                 invalidateStream={invalidateStream}
