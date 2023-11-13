@@ -17,6 +17,12 @@ let mockNonAdminUserInput: User;
 let mockAdminUserInput2: User;
 let mockNonAdminUserInput2: User;
 
+const mockVodStore = {
+  id: "mock_vod_store",
+  url: "s3+http://user:password@localhost:8080/us-east-1/vod",
+  publicUrl: "http://localhost/bucket/vod",
+};
+
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
@@ -65,11 +71,7 @@ describe("controllers/playback", () => {
 
     beforeEach(async () => {
       const sessionId = "5b12c779-efc3-42ba-83d9-c590955556b0";
-      await db.objectStore.create({
-        id: "mock_vod_store",
-        url: "s3+http://user:password@localhost:8080/us-east-1/vod",
-        publicUrl: "http://localhost/bucket/vod",
-      });
+      await db.objectStore.create(mockVodStore);
 
       ({ client, nonAdminToken } = await setupUsers(
         server,
@@ -214,6 +216,37 @@ describe("controllers/playback", () => {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
                 url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
+
+      it("should return VTT thumbnails URL when available", async () => {
+        asset.files = [
+          {
+            type: "thumbnails_vtt",
+            path: "thumbs.vtt",
+          },
+        ];
+        await db.asset.update(asset.id, {
+          files: asset.files,
+        });
+        const res = await client.get(`/playback/${asset.playbackId}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+              },
+              {
+                hrn: "Thumbnails",
+                type: "text/vtt",
+                url: `${mockVodStore.publicUrl}/${asset.playbackId}/thumbs.vtt`,
               },
             ],
           },
