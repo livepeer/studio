@@ -2114,6 +2114,7 @@ components:
                       - MP4
                       - WebRTC (H264)
                       - Thumbnail (JPEG)
+                      - Thumbnails
                   type:
                     type: string
                     example: html5/video/mp4
@@ -2122,6 +2123,7 @@ components:
                       - html5/video/mp4
                       - html5/video/h264
                       - image/jpeg
+                      - text/vtt
                   url:
                     type: string
                     example: >-
