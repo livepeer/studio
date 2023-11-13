@@ -13,6 +13,7 @@ import { HealthStatus } from "hooks/use-analyzer";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 import { makeColumns, makeTableData, TargetsTableData } from "./helpers";
 import { makeCreateAction } from "components/Table/helpers";
+import { getMultistreamTarget } from "hooks/use-api/endpoints/multistream";
 
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
