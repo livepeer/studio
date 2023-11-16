@@ -33,11 +33,7 @@ const AssetHeadingBox = ({ asset, totalViews }: AssetHeadingBoxProps) => {
         {totalViews != undefined ? (
           <Tooltip
             css={{ bc: "$neutral3", color: "$neutral3" }}
-            content={
-              <Box css={{ color: "$hiContrast" }}>
-                Views are defined as at least 1 second of watch time.
-              </Box>
-            }>
+            content="Views are defined as at least 1 second of watch time.">
             <Flex align="center" css={{ mr: "$3", fontSize: "$2" }}>
               <Box as={PlayIcon} css={{ mr: "$1" }} /> {totalViews} views
             </Flex>

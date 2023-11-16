@@ -46,6 +46,7 @@
     "@theme-ui/color": "0.3.1",
     "@theme-ui/components": "0.3.1",
     "@theme-ui/presets": "0.3.0",
+    "@vercel/analytics": "^1.1.1",
     "codesandbox": "^2.2.3",
     "date-fns": "^2.16.1",
     "eslint-config-next": "^13.0.2",
