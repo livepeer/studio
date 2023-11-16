@@ -56,13 +56,9 @@ const ProcessingProgress = ({ progress, playbackUrl }) => (
     {playbackUrl && (
       <Tooltip
         multiline
-        content={
-          <Box>
-            Your video can now be played. In the background, it is converted
-            into several quality levels so that it can be played smoothly by all
-            viewers.
-          </Box>
-        }>
+        content="Your video can now be played. In the background, it is converted
+        into several quality levels so that it can be played smoothly by all
+        viewers.">
         <Help />
       </Tooltip>
     )}
