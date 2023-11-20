@@ -1208,6 +1208,39 @@ app.patch(
   }
 );
 
+app.post("/:id/retry", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
+  }
+  if (asset.status.phase !== "failed") {
+    throw new BadRequestError(`Asset is not failed`);
+  }
+
+  const [tasks] = await db.task.find({ outputAssetId: asset.id });
+  if (!tasks.length) {
+    throw new NotFoundError(`Task not found`);
+  }
+
+  const task = tasks[0];
+
+  if (!task) {
+    return res.status(404).json({ errors: ["task not found"] });
+  } else if (!["failed", "cancelled"].includes(task.status?.phase)) {
+    return res
+      .status(400)
+      .json({ errors: ["task is not in a retryable state"] });
+  }
+
+  await req.taskScheduler.retryTask(task, "retry requested by user");
+
+  res.status(204);
+  res.json({
+    task: { id: task.id },
+  });
+});
+
 app.get("/:id/clips", authorizer({}), async (req, res) => {
   const id = req.params.id;
 
