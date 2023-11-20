@@ -13158,6 +13158,11 @@ eyes@^0.1.8:
   resolved "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
   integrity sha512-GipyPsXO1anza0AOZdy69Im7hGFCNB7Y/NGjDlZGJ3GJJLtwNSb2vrzYrTYJRrRloVx7pl+bhUaTB8yiccPvFQ==
 
+fakefilter@^0.1.663:
+  version "0.1.663"
+  resolved "https://registry.yarnpkg.com/fakefilter/-/fakefilter-0.1.663.tgz#68903a8a45d2ec0b6d18a6ed408eea515927f22d"
+  integrity sha512-0cLVuCX0y1LR9NBT+aOhPJFkYqA9VIooDwLtrlkV2QgWXjyj93E7Nh7sDON+oDyd51HvdBDKnDdO5kZflHFxvQ==
+
 falafel@^2.1.0:
   version "2.2.5"
   resolved "https://registry.npmjs.org/falafel/-/falafel-2.2.5.tgz"

@@ -10,6 +10,7 @@ import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
 import { authorizer, validatePost } from "../middleware";
+import { isFakeEmail } from "fakefilter";
 import {
   CreateCustomer,
   CreateSubscription,
@@ -42,8 +43,6 @@ const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
 const freePlan = "prod_O9XuIjn7EqYRVW";
-
-const TEMP_EMAIL_DOMAINS = ["gufum.com", "mailinator.com", "guerrillamail.com"];
 
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
@@ -312,16 +311,14 @@ app.post("/", validatePost("user"), async (req, res) => {
     }
   }
 
-  const emailDomain = email.split("@")[1];
-  if (TEMP_EMAIL_DOMAINS.includes(emailDomain)) {
-    res.status(400);
-    return res.json({
-      errors: [`Please use a different email address.`],
-    });
-  }
-
   const emailValid = validator.validate(email);
   if (!emailValid) {
+    res.status(422);
+    res.json({ errors: ["invalid email"] });
+    return;
+  }
+
+  if (isFakeEmail(email)) {
     res.status(422);
     res.json({ errors: ["invalid email"] });
     return;
