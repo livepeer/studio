@@ -22,7 +22,6 @@ import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { TooManyRequestsError } from "../store/errors";
 import { CliArgs } from "../parse-cli";
-import { taskScheduler } from "../task/scheduler";
 
 const app = Router();
 
@@ -302,7 +301,7 @@ app.post("/:id/retry", authorizer({ anyAdmin: true }), async (req, res) => {
     });
   }
 
-  await taskScheduler.retryTask(task, "retry requested by user");
+  await req.taskScheduler.retryTask(task, "retry requested by user");
 
   res.status(200);
   res.json({ id });
