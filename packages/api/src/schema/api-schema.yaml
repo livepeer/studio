@@ -2544,6 +2544,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  "/stream/{id}/terminate":
+    parameters:
+      - name: id
+        description: ID of the stream
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      summary: Terminates a live stream
+      description: |
+        `DELETE /stream/{id}/terminate` can be used to terminate an ongoing
+        session on a live stream. Unlike suspending the stream, it allows the
+        streamer to restart streaming even immediately, but it will force
+        terminate the current session and stop the recording.
+        \
+        \
+        A 204 No Content status response indicates the stream was successfully
+        terminated.
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
