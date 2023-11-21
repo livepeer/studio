@@ -1208,9 +1208,14 @@ app.patch(
   }
 );
 
-app.post("/:id/retry", authorizer({ anyAdmin: true }), async (req, res) => {
+app.post("/:id/retry", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const asset = await db.asset.get(id);
+
+  if (!req.user.admin && asset.userId !== req.user.id) {
+    throw new ForbiddenError(`users may only retry their own assets`);
+  }
+
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
   }
