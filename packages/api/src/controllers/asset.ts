@@ -1233,7 +1233,7 @@ app.post("/:id/retry", authorizer({ anyAdmin: true }), async (req, res) => {
       .json({ errors: ["task is not in a retryable state"] });
   }
 
-  await req.taskScheduler.retryTask(task, "retry requested by user");
+  await req.taskScheduler.retryTask(task, task.status?.errorMessage, true);
 
   res.status(204);
   res.json({

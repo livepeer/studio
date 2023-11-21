@@ -279,7 +279,7 @@ app.post(
   }
 );
 
-app.post("/:id/retry", authorizer({ anyAdmin: true }), async (req, res) => {
+app.post("/:id/retry", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const task = await db.task.get(id, { useReplica: false });
   if (!task) {
@@ -301,7 +301,7 @@ app.post("/:id/retry", authorizer({ anyAdmin: true }), async (req, res) => {
     });
   }
 
-  await req.taskScheduler.retryTask(task, "retry requested by user");
+  await req.taskScheduler.retryTask(task, task.status?.errorMessage, true);
 
   res.status(200);
   res.json({ id });
