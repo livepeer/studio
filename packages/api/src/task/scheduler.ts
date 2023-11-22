@@ -434,8 +434,15 @@ export class TaskScheduler {
     }
   }
 
-  async retryTask(task: WithID<Task>, errorMessage: string) {
+  async retryTask(
+    task: WithID<Task>,
+    errorMessage: string,
+    forceRetry?: boolean
+  ) {
     let retries = (task.status.retries ?? 0) + 1;
+    if (forceRetry) {
+      retries = 0;
+    }
     const status: Task["status"] = {
       phase: "waiting",
       updatedAt: Date.now(),
@@ -444,7 +451,11 @@ export class TaskScheduler {
     };
 
     task = await this.updateTask(task, { status });
-    // increase sleep for final retry
+    if (forceRetry) {
+      await this.scheduleTask(task, retries);
+      return;
+    }
+
     const sleepDur =
       retries == MAX_RETRIES
         ? TASK_FINAL_RETRY_DELAY
