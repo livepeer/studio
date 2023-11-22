@@ -673,6 +673,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+        subSessionIds:
+          type: array
     error:
       required:
         - errors

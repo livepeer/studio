@@ -818,41 +818,62 @@ app.post(
         `user session re-used for session.id=${sessionId} stream.id=${stream.id} stream.name='${stream.name}' playbackid=${stream.playbackId}`
       );
     } else {
-      const session: DBSession = {
-        id: sessionId,
-        parentId: stream.id,
-        playbackId: stream.playbackId,
-        userId: stream.userId,
-        kind: "session",
-        version: "v2",
-        name: req.body.name,
-        createdAt,
-        lastSeen: 0,
-        sourceSegments: 0,
-        transcodedSegments: 0,
-        sourceSegmentsDuration: 0,
-        transcodedSegmentsDuration: 0,
-        sourceBytes: 0,
-        transcodedBytes: 0,
-        ingestRate: 0,
-        outgoingRate: 0,
-        deleted: false,
-        profiles: childStream.profiles,
-        record,
-        recordObjectStoreId,
-        recordingStatus: record ? "waiting" : undefined,
-      };
-      await db.session.create(session);
-      if (record) {
-        const ingest = await getIngestBase(req);
-        await publishRecordingStartedHook(
-          req.config,
-          session,
-          req.queue,
-          ingest
-        ).catch((err) => {
-          logger.error("Error sending recording.started hook err=", err);
+      logger.info("HELLO try to get last session");
+      const lastSession = await db.session.getLastSession(stream.id);
+      logger.info(
+        "HELLO lastsession " +
+          lastSession.lastSeen +
+          " " +
+          createdAt +
+          " " +
+          lastSession.id
+      );
+
+      if (Math.abs(lastSession.lastSeen - createdAt) < 10000) {
+        logger.info("HELLO reusing session " + lastSession.id);
+        await db.session.update(lastSession.id, {
+          subSessionIds: lastSession.subSessionIds.push(sessionId),
         });
+      } else {
+        const parentSessionID = uuid();
+        logger.info("HELLO creating new session " + parentSessionID);
+        const session: DBSession = {
+          id: parentSessionID,
+          subSessionIds: [sessionId],
+          parentId: stream.id,
+          playbackId: stream.playbackId,
+          userId: stream.userId,
+          kind: "session",
+          version: "v2",
+          name: req.body.name,
+          createdAt,
+          lastSeen: 0,
+          sourceSegments: 0,
+          transcodedSegments: 0,
+          sourceSegmentsDuration: 0,
+          transcodedSegmentsDuration: 0,
+          sourceBytes: 0,
+          transcodedBytes: 0,
+          ingestRate: 0,
+          outgoingRate: 0,
+          deleted: false,
+          profiles: childStream.profiles,
+          record,
+          recordObjectStoreId,
+          recordingStatus: record ? "waiting" : undefined,
+        };
+        await db.session.create(session);
+        if (record) {
+          const ingest = await getIngestBase(req);
+          await publishRecordingStartedHook(
+            req.config,
+            session,
+            req.queue,
+            ingest
+          ).catch((err) => {
+            logger.error("Error sending recording.started hook err=", err);
+          });
+        }
       }
     }
 
