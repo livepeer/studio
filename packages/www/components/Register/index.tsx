@@ -50,7 +50,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
     const [hashedPassword] = await hash(password, FRONTEND_SALT);
     // hash password, then
-    onSubmit({
+    return onSubmit({
       email,
       password: hashedPassword,
       firstName,
@@ -126,6 +126,19 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+          />
+          <TextField
+            size="3"
+            id="organization"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="organization"
+            type="text"
+            placeholder="Company name"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
           />
           <TextField
             size="3"
