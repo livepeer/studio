@@ -1,4 +1,11 @@
-import { TextField, Button, Box, Text } from "@livepeer/design-system";
+import {
+  TextField,
+  Button,
+  Box,
+  Text,
+  Flex,
+  Checkbox,
+} from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
@@ -9,7 +16,7 @@ import BroadcastingProvider from "../Login/BroadcastingProvider";
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
 
-const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
+const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -17,6 +24,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isCompanyAffiliated, setIsCompanyAffiliated] = useState(true);
 
   const { handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -99,68 +107,104 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             }}>
             Account details
           </Text>
-          <TextField
-            size="3"
-            id="firstName"
-            css={{
-              width: "100%",
-              mb: "$2",
-            }}
-            name="firstName"
-            type="text"
-            placeholder="First name"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <TextField
-            size="3"
-            id="lastName"
-            css={{
-              width: "100%",
-              mb: "$2",
-            }}
-            name="lastName"
-            type="text"
-            placeholder="Last name"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <TextField
-            size="3"
-            id="organization"
-            css={{
-              width: "100%",
-              mb: "$2",
-            }}
-            name="organization"
-            type="text"
-            placeholder="Company name"
-            value={organization}
-            onChange={(e) => setOrganization(e.target.value)}
-          />
-          <TextField
-            size="3"
-            id="email"
-            css={{
-              width: "100%",
-              mb: "$2",
-            }}
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <Flex gap={2}>
+            <TextField
+              size="3"
+              id="firstName"
+              css={{
+                width: "100%",
+                mb: "$2",
+              }}
+              name="firstName"
+              type="text"
+              placeholder="First name"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <TextField
+              size="3"
+              id="lastName"
+              css={{
+                width: "100%",
+                mb: "$4",
+              }}
+              name="lastName"
+              type="text"
+              placeholder="Last name"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </Flex>
+
+          <Flex
+            css={{ alignItems: "center", justifyContent: "center", mb: "$4" }}>
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setIsCompanyAffiliated(checked === true)
+              }
+              checked={isCompanyAffiliated}
+            />
+            <Box css={{ ml: "$1" }}>Are you using Studio for work?</Box>
+          </Flex>
+
+          {isCompanyAffiliated ? (
+            <>
+              <TextField
+                size="3"
+                id="organization"
+                css={{
+                  width: "100%",
+                  mb: "$2",
+                }}
+                name="organization"
+                type="text"
+                placeholder="Organization name"
+                required
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
+              />
+              <TextField
+                size="3"
+                id="email"
+                css={{
+                  width: "100%",
+                  mb: "$2",
+                }}
+                name="email"
+                type="email"
+                placeholder="you@company.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              <TextField
+                size="3"
+                id="email"
+                css={{
+                  width: "100%",
+                  mb: "$2",
+                }}
+                name="email"
+                type="email"
+                placeholder="you@gmail.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </>
+          )}
 
           <TextField
             size="3"
             id="password"
             css={{
               width: "100%",
-              mx: 0,
+              mb: "$2",
             }}
             name="password"
             type="password"
@@ -191,4 +235,4 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
   );
 };
 
-export default Login;
+export default Register;
