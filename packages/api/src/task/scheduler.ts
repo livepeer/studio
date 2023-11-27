@@ -406,15 +406,25 @@ export class TaskScheduler {
 
   async scheduleTask(task: WithID<Task>, retries = 0) {
     const timestamp = Date.now();
-    await this.updateTask(task, {
-      // only update scheduledAt on the first schedule (retries == 0)
-      scheduledAt: retries ? undefined : timestamp,
-      status: {
-        phase: "waiting",
-        updatedAt: timestamp,
-        retries,
-      },
-    });
+    try {
+      await this.updateTask(task, {
+        // only update scheduledAt on the first schedule (retries == 0)
+        scheduledAt: retries ? undefined : timestamp,
+        status: {
+          phase: "waiting",
+          updatedAt: timestamp,
+          retries,
+        },
+      });
+    } catch (err) {
+      this.failTask(task, "Failed to update task to waiting").catch((err) =>
+        console.error(
+          `Error failing task after task update error: taskId=${task.id} err=`,
+          err
+        )
+      );
+      throw err;
+    }
     try {
       await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
         type: "task_trigger",
