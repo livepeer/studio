@@ -4,7 +4,7 @@ import RelativeTime from "../RelativeTime";
 import ShowURL from "../ShowURL";
 import Record from "./Record";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
-import { Stream } from "livepeer";
+import { Stream } from "@livepeer.studio/api";
 
 const Cell = ({ children, css = {} }) => {
   return (
