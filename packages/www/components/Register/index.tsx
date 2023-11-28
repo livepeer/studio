@@ -96,48 +96,6 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             Create an account
           </Text>
 
-          <Text
-            variant="neutral"
-            size={1}
-            css={{
-              fontWeight: 600,
-              mb: "$1",
-              fontSize: "11px",
-              textTransform: "uppercase",
-            }}>
-            Account details
-          </Text>
-          <Flex gap={2}>
-            <TextField
-              size="3"
-              id="firstName"
-              css={{
-                width: "100%",
-                mb: "$2",
-              }}
-              name="firstName"
-              type="text"
-              placeholder="First name"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <TextField
-              size="3"
-              id="lastName"
-              css={{
-                width: "100%",
-                mb: "$4",
-              }}
-              name="lastName"
-              type="text"
-              placeholder="Last name"
-              required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </Flex>
-
           <Flex
             css={{ alignItems: "center", justifyContent: "center", mb: "$4" }}>
             <Checkbox
