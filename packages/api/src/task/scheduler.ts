@@ -416,16 +416,7 @@ export class TaskScheduler {
           retries,
         },
       });
-    } catch (err) {
-      this.failTask(task, "Failed to update task to waiting").catch((err) =>
-        console.error(
-          `Error failing task after task update error: taskId=${task.id} err=`,
-          err
-        )
-      );
-      throw err;
-    }
-    try {
+
       await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
         type: "task_trigger",
         id: uuid(),
