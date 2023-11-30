@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import frontend from "/home/iameli/code/studio/packages/www/static-manifest.js";
+import frontend from "../../www/static-build";
 import mime from "mime";
 
 const resolveFile = (inputPath: string): string | null => {
