@@ -7,7 +7,7 @@
     "dev": "next",
     "dev:staging": "NEXT_PUBLIC_USE_STAGING_ENDPOINT=true yarn dev",
     "build": "next build",
-    "static": "STATIC_BUILD=true next build && STATIC_BUILD=true next export",
+    "static": "STATIC_BUILD=true next build",
     "start": "next start -p 3012",
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
