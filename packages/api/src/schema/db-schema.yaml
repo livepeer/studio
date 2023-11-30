@@ -21,28 +21,18 @@ components:
         accessKey:
           type: string
           description: Access key used for access-control verification
-    clip-payload:
+    object-store-patch-payload:
       type: object
       additionalProperties: false
-      required:
-        - playbackId
-        - startTime
       properties:
-        playbackId:
-          type: string
-          description: Playback ID of the stream or asset to clip
-        startTime:
-          type: number
-          description: Start time of the clip in milliseconds
-        endTime:
-          type: number
-          description: End time of the clip in milliseconds
         name:
-          type: string
-          description: Name of the clip
-        sessionId:
-          type: string
-          description: Session ID of the stream to clip
+          $ref: "#/components/schemas/object-store/properties/name"
+        disabled:
+          $ref: "#/components/schemas/object-store/properties/disabled"
+        url:
+          $ref: "#/components/schemas/object-store/properties/url"
+        publicUrl:
+          $ref: "#/components/schemas/object-store/properties/publicUrl"
     experiment-audience-payload:
       type: object
       additionalProperties: false
