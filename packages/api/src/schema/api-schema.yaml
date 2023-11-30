@@ -3570,12 +3570,16 @@ paths:
   /access-control/signing-key:
     post:
       summary: Create a signing key
-      description: |
+      description: >
 
-        The publicKey is a representation of the public key, encoded as base
-        64 and is passed as a string, and  the privateKey is displayed only on creation. This is the only moment
-        where the client can save the private key, otherwise it will be lost.
-        Remember to decode your string when signing JWTs.
+        The publicKey is a representation of the public key, encoded as base 64
+        and is passed as a string, and  the privateKey is displayed only on
+        creation. This is the only moment where the client can save the private
+        key, otherwise it will be lost. Remember to decode your string when
+        signing JWTs.
+
+        Up to 10 signing keys can be generated, after that you must delete at
+        least one signing key to create a new one.
 
       responses:
         "200":
