@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'packages/api/src/schema/api-schema.yaml'
+      - "packages/api/src/schema/api-schema.yaml"
 
 jobs:
   dispatch:
