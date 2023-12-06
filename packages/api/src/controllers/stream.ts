@@ -1327,6 +1327,83 @@ app.patch(
   }
 );
 
+app.post(
+  "/:id/multistream",
+  authorizer({}),
+  validatePost("target-add-payload"),
+  async (req, res) => {
+    const payload = req.body;
+
+    const stream = await db.stream.get(req.params.id);
+
+    if (!stream || stream.deleted) {
+      res.status(404);
+      return res.json({ errors: ["stream not found"] });
+    }
+
+    if (stream.userId !== req.user.id) {
+      res.status(403);
+      return res.json({ errors: ["stream not found"] });
+    }
+    let streamTargets = stream.multistream;
+
+    let multistream: DBStream["multistream"];
+
+    multistream = streamTargets;
+    multistream.targets.push(payload);
+    multistream = await validateMultistreamOpts(
+      req.user.id,
+      stream.profiles,
+      multistream
+    );
+
+    let patch: StreamPatchPayload & Partial<DBStream> = {
+      multistream,
+    };
+
+    await db.stream.update(stream.id, patch);
+
+    res.status(204);
+    res.end();
+  }
+);
+
+app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
+  const { id, targetId } = req.params;
+
+  const stream = await db.stream.get(id);
+
+  if (!stream || stream.deleted) {
+    res.status(404);
+    return res.json({ errors: ["stream not found"] });
+  }
+
+  if (stream.userId !== req.user.id) {
+    res.status(403);
+    return res.json({ errors: ["stream not found"] });
+  }
+  let streamTargets = stream.multistream;
+
+  let multistream: DBStream["multistream"];
+
+  multistream = streamTargets;
+  multistream.targets = multistream.targets.filter((t) => t.id !== targetId);
+  multistream = await validateMultistreamOpts(
+    req.user.id,
+    stream.profiles,
+    multistream
+  );
+
+  let patch: StreamPatchPayload & Partial<DBStream> = {
+    multistream,
+  };
+
+  await db.stream.update(stream.id, patch);
+
+  res.status(204);
+  res.end();
+});
+
 app.patch(
   "/:id",
   authorizer({}),

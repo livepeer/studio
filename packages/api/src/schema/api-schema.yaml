@@ -273,6 +273,44 @@ components:
         sessionId:
           type: string
           description: Session ID of the stream to clip
+    target:
+      type: object
+      required:
+        - profile
+      additionalProperties: false
+      properties:
+        profile:
+          type: string
+          description: |
+            Name of transcoding profile that should be sent. Use
+            "source" for pushing source stream data
+          minLength: 1
+          maxLength: 500
+          example: 720p
+        videoOnly:
+          type: boolean
+          description: |
+            If true, the stream audio will be muted and only silent
+            video will be pushed to the target.
+          default: false
+        id:
+          type: string
+          description: ID of multistream target object where to push this stream
+        spec:
+          type: object
+          writeOnly: true
+          description: |
+            Inline multistream target object. Will automatically
+            create the target resource to be used by the created
+            stream.
+          required:
+            - url
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+            url:
+              $ref: "#/components/schemas/multistream-target/properties/url"
     stream:
       type: object
       required:
@@ -395,43 +433,7 @@ components:
                 streamed to
               items:
                 type: object
-                required:
-                  - profile
-                additionalProperties: false
-                properties:
-                  profile:
-                    type: string
-                    description: |
-                      Name of transcoding profile that should be sent. Use
-                      "source" for pushing source stream data
-                    minLength: 1
-                    maxLength: 500
-                    example: 720p
-                  videoOnly:
-                    type: boolean
-                    description: |
-                      If true, the stream audio will be muted and only silent
-                      video will be pushed to the target.
-                    default: false
-                  id:
-                    type: string
-                    description:
-                      ID of multistream target object where to push this stream
-                  spec:
-                    type: object
-                    writeOnly: true
-                    description: |
-                      Inline multistream target object. Will automatically
-                      create the target resource to be used by the created
-                      stream.
-                    required:
-                      - url
-                    additionalProperties: false
-                    properties:
-                      name:
-                        type: string
-                      url:
-                        $ref: "#/components/schemas/multistream-target/properties/url"
+                $ref: "#/components/schemas/target"
         suspended:
           type: boolean
           description: If currently suspended
@@ -504,6 +506,10 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           $ref: "#/components/schemas/stream/properties/profiles"
+    target-add-payload:
+      type: object
+      additionalProperties: false
+      $ref: "#/components/schemas/target"
     stream-health-payload:
       type: object
       description: |
