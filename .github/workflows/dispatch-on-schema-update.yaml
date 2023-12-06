@@ -1,0 +1,40 @@
+name: Dispatch Event on Schema Update
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "packages/api/src/schema/api-schema.yaml"
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Event to JS SDK Repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: livepeer/livepeer-js
+          event-type: update-schema
+
+      - name: Dispatch Event to Go SDK Repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: livepeer/livepeer-go
+          event-type: update-schema
+
+      - name: Dispatch Event to Python SDK Repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: livepeer/livepeer-python
+          event-type: update-schema
+
+      - name: Dispatch Event to Ruby SDK Repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: livepeer/livepeer-ruby
+          event-type: update-schema
