@@ -182,7 +182,8 @@
       "../../node_modules/dom-helpers/**/*",
       "../../node_modules/react-icons/**/*",
       "../../node_modules/next-mdx-remote/**/*",
-      "../../node_modules/livekit-server-sdk/**/*"
+      "../../node_modules/livekit-server-sdk/**/*",
+      "../../node_modules/@vercel/analytics/**/*"
     ]
   },
   "jest": {
