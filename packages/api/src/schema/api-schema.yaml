@@ -3015,6 +3015,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  "/stream/{id}/create-multistream-target":
+    post:
+      summary: Add a multistream target
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: ID of the parent stream
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/target-add-payload"
+      responses:
+        "204":
+          description: Success (No content)
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/stream/{id}/multistream/{targetId}":
+    delete:
+      summary: Remove a multistream target
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: ID of the parent stream
+          required: true
+        - in: path
+          name: targetId
+          schema:
+            type: string
+          description: ID of the multistream target
+          required: true
+      responses:
+        "204":
+          description: Success (No content)
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   "/session/{id}/clips":
     get:
       summary: Retrieve clips of a session
