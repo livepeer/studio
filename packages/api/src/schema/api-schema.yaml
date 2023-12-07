@@ -432,7 +432,6 @@ components:
                 References to targets where this stream will be simultaneously
                 streamed to
               items:
-                type: object
                 $ref: "#/components/schemas/target"
         suspended:
           type: boolean
