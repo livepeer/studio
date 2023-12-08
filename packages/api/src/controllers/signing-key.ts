@@ -244,7 +244,7 @@ signingKeyApp.patch(
 
 signingKeyApp.get(
   "/jwt/:playbackId",
-  authorizer({ anyAdmin: true, noApiToken: true }),
+  authorizer({ admin: true }),
   async (req, res) => {
     let { playbackId } = req.params;
 
@@ -282,7 +282,7 @@ signingKeyApp.get(
 
     const token = sign(payload, adminKey, options);
 
-    return res.send(token);
+    return res.send({ token });
   }
 );
 

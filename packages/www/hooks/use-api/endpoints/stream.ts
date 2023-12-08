@@ -114,7 +114,12 @@ export const generateJwt = async (playbackId: string): Promise<string> => {
   if (res.status !== 200) {
     throw new Error(jwt);
   }
-  return jwt;
+
+  // Get json and get jsonRes.token
+  let resJson = await jwt.json();
+  let token = resJson.token;
+
+  return token;
 };
 
 export const createStream = async (params): Promise<Stream> => {
