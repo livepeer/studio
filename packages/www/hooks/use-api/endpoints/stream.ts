@@ -107,6 +107,16 @@ export const getAdminStreams = async ({
   return [streams, nextCursor, res];
 };
 
+export const generateJwt = async (playbackId: string): Promise<string> => {
+  const [res, jwt] = await context.fetch(
+    `/access-control/signing-key/jwt/${playbackId}`
+  );
+  if (res.status !== 200) {
+    throw new Error(jwt);
+  }
+  return jwt;
+};
+
 export const createStream = async (params): Promise<Stream> => {
   const [res, stream] = await context.fetch(`/stream`, {
     method: "POST",

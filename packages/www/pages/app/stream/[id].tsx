@@ -173,6 +173,7 @@ const ID = () => {
     getIngest,
     patchStream,
     getAdminStreams,
+    generateJwt,
     terminateStream,
   } = useApi();
   const userIsAdmin = user && user.admin;
@@ -191,6 +192,7 @@ const ID = () => {
   }, [query.id]);
   const [stream, setStream] = useState<Stream>(null);
   const [streamOwner, setStreamOwner] = useState<User>(null);
+  const [jwt, setJwt] = useState<string>(null);
   const [ingest, setIngest] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [terminateModal, setTerminateModal] = useState(false);
@@ -257,6 +259,10 @@ const ID = () => {
         throw new Error(info.errors.toString());
       }
       setStream(info.stream);
+      if (stream.playbackPolicy?.type != "public" && info.stream.playbackId) {
+        const streamJwt = await generateJwt(info.stream.playbackId);
+        setJwt(streamJwt);
+      }
       setStreamOwner(info.user);
     } catch (err) {
       console.error(err); // todo: surface this
@@ -289,6 +295,9 @@ const ID = () => {
     }
     const autoplay = query.autoplay?.toString() ?? "0";
     let url = `https://lvpr.tv/?v=${stream?.playbackId}&autoplay=${autoplay}`;
+    if (jwt) {
+      url += `&jwt=${jwt}`;
+    }
     if (isStaging() || isDevelopment()) {
       url += "&monster";
     }
@@ -918,6 +927,10 @@ const ID = () => {
                           sx={{ userSelect: "all" }}>
                           {stream.id}
                         </Box>
+                      </Cell>
+                      <Cell>JWT for gated stream</Cell>
+                      <Cell>
+                        <Box>{jwt}</Box>
                       </Cell>
                       <Cell>Region/Broadcaster</Cell>
                       <Cell>

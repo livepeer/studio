@@ -18,6 +18,7 @@ import {
   SigningKeyResponsePayload,
 } from "../schema/types";
 import { WithID } from "../store/types";
+import { SignOptions, sign } from "jsonwebtoken";
 
 const fieldsMap: FieldsMap = {
   id: `signing_key.ID`,
@@ -238,6 +239,50 @@ signingKeyApp.patch(
     );
     await db.signingKey.update(id, payload);
     res.status(204).end();
+  }
+);
+
+signingKeyApp.get(
+  "/jwt/:playbackId",
+  authorizer({ anyAdmin: true, noApiToken: true }),
+  async (req, res) => {
+    let { playbackId } = req.params;
+
+    const adminKey = Buffer.from(
+      req.config.accessControlAdminPrivkey,
+      "base64"
+    );
+
+    const pubkey = req.config.accessControlAdminPubkey;
+
+    if (!adminKey) {
+      throw new Error("Error importing private key.");
+    }
+
+    if (!playbackId) {
+      throw new Error("playback ID was not provided");
+    }
+
+    const issuedAtSec = Date.now() / 1000;
+    const expirationSec = issuedAtSec + 600;
+
+    const payload = {
+      action: "pull",
+      iss: "Livepeer",
+      pub: pubkey,
+      sub: playbackId,
+      video: "none",
+      exp: Math.floor(expirationSec),
+      iat: Math.floor(issuedAtSec),
+    };
+
+    const options: SignOptions = {
+      algorithm: "ES256",
+    };
+
+    const token = sign(payload, adminKey, options);
+
+    return res.send(token);
   }
 );
 
