@@ -173,6 +173,7 @@ const ID = () => {
     getIngest,
     patchStream,
     getAdminStreams,
+    generateJwt,
     terminateStream,
   } = useApi();
   const userIsAdmin = user && user.admin;
@@ -191,6 +192,7 @@ const ID = () => {
   }, [query.id]);
   const [stream, setStream] = useState<Stream>(null);
   const [streamOwner, setStreamOwner] = useState<User>(null);
+  const [jwt, setJwt] = useState<string>(null);
   const [ingest, setIngest] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [terminateModal, setTerminateModal] = useState(false);
@@ -262,6 +264,17 @@ const ID = () => {
       console.error(err); // todo: surface this
     }
   }, [id]);
+  const fetchJwt = useCallback(async () => {
+    if (
+      stream?.playbackPolicy?.type != "public" &&
+      stream?.playbackId &&
+      user.admin &&
+      !jwt
+    ) {
+      const streamJwt = await generateJwt(stream.playbackId);
+      setJwt(streamJwt);
+    }
+  }, [stream]);
   useEffect(() => {
     fetchStream();
   }, [fetchStream]);
@@ -270,9 +283,13 @@ const ID = () => {
     if (!isVisible || notFound) {
       return;
     }
-    const interval = setInterval(fetchStream, 5000);
+    const interval = setInterval(function () {
+      fetchJwt();
+      fetchStream();
+    }, 5000);
+
     return () => clearInterval(interval);
-  }, [fetchStream, isVisible, notFound]);
+  }, [fetchStream, fetchJwt, isVisible, notFound]);
   const userField = useMemo(() => {
     let value = streamOwner?.email;
     if (streamOwner?.admin) {
@@ -289,6 +306,9 @@ const ID = () => {
     }
     const autoplay = query.autoplay?.toString() ?? "0";
     let url = `https://lvpr.tv/?v=${stream?.playbackId}&autoplay=${autoplay}`;
+    if (jwt) {
+      url += `&jwt=${jwt}`;
+    }
     if (isStaging() || isDevelopment()) {
       url += "&monster";
     }
@@ -918,6 +938,10 @@ const ID = () => {
                           sx={{ userSelect: "all" }}>
                           {stream.id}
                         </Box>
+                      </Cell>
+                      <Cell>JWT for gated stream</Cell>
+                      <Cell>
+                        <Box>{jwt}</Box>
                       </Cell>
                       <Cell>Region/Broadcaster</Cell>
                       <Cell>
