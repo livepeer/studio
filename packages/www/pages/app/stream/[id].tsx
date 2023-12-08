@@ -268,6 +268,7 @@ const ID = () => {
     if (
       stream?.playbackPolicy?.type != "public" &&
       stream?.playbackId &&
+      user.admin &&
       !jwt
     ) {
       const streamJwt = await generateJwt(stream.playbackId);
