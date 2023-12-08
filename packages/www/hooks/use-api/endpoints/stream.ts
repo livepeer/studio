@@ -108,15 +108,15 @@ export const getAdminStreams = async ({
 };
 
 export const generateJwt = async (playbackId: string): Promise<string> => {
-  const [res, jwt] = await context.fetch(
+  const [res] = await context.fetch(
     `/access-control/signing-key/jwt/${playbackId}`
   );
   if (res.status !== 200) {
-    throw new Error(jwt);
+    throw new Error(JSON.stringify(res.body));
   }
 
   // Get json and get jsonRes.token
-  let resJson = await jwt.json();
+  let resJson = await res.json();
   let token = resJson.token;
 
   return token;

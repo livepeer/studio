@@ -259,15 +259,21 @@ const ID = () => {
         throw new Error(info.errors.toString());
       }
       setStream(info.stream);
-      if (stream.playbackPolicy?.type != "public" && info.stream.playbackId) {
-        const streamJwt = await generateJwt(info.stream.playbackId);
-        setJwt(streamJwt);
-      }
       setStreamOwner(info.user);
     } catch (err) {
       console.error(err); // todo: surface this
     }
   }, [id]);
+  const fetchJwt = useCallback(async () => {
+    if (
+      stream?.playbackPolicy?.type != "public" &&
+      stream?.playbackId &&
+      !jwt
+    ) {
+      const streamJwt = await generateJwt(stream.playbackId);
+      setJwt(streamJwt);
+    }
+  }, [stream]);
   useEffect(() => {
     fetchStream();
   }, [fetchStream]);
@@ -276,9 +282,13 @@ const ID = () => {
     if (!isVisible || notFound) {
       return;
     }
-    const interval = setInterval(fetchStream, 5000);
+    const interval = setInterval(function () {
+      fetchJwt();
+      fetchStream();
+    }, 5000);
+
     return () => clearInterval(interval);
-  }, [fetchStream, isVisible, notFound]);
+  }, [fetchStream, fetchJwt, isVisible, notFound]);
   const userField = useMemo(() => {
     let value = streamOwner?.email;
     if (streamOwner?.admin) {
