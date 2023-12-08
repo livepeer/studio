@@ -137,7 +137,9 @@ app.post(
 
     if (
       playbackPolicyType !== "public" &&
-      req.body.pub === req.config.accessControlAdminPubkey
+      req.body.pub === req.config.accessControlAdminPubkey &&
+      req.body.pub !== "" &&
+      req.body.pub
     ) {
       res.status(204);
       return res.end();
