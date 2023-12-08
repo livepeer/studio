@@ -135,6 +135,13 @@ app.post(
       }
     }
 
+    if (req.body.pub && playbackPolicyType !== "public") {
+      if (req.body.pub === req.config.accessControlAdminPublicKey) {
+        res.status(204);
+        return res.end();
+      }
+    }
+
     switch (playbackPolicyType) {
       case "public":
         res.status(204);
