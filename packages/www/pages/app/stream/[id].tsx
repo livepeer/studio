@@ -369,6 +369,12 @@ const ID = () => {
     broadcasterPlaybackUrl = `https://${lastSession.region}.livepeer.${domain}/stream/${playbackId}.m3u8`;
   }
 
+  let streamAccessToken;
+
+  if (stream && jwt) {
+    streamAccessToken = jwt;
+  }
+
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
       <Container>
@@ -940,9 +946,7 @@ const ID = () => {
                         </Box>
                       </Cell>
                       <Cell>JWT for gated stream</Cell>
-                      <Cell>
-                        <Box>{jwt}</Box>
-                      </Cell>
+                      <Cell>{streamAccessToken}</Cell>
                       <Cell>Region/Broadcaster</Cell>
                       <Cell>
                         {region}{" "}
