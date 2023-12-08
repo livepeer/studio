@@ -255,12 +255,12 @@ signingKeyApp.get(
 
     const pubkey = req.config.accessControlAdminPubkey;
 
-    if (!adminKey) {
-      throw new Error("Error importing private key.");
+    if (!adminKey || !pubkey) {
+      throw new Error("jwt: error importing signing keys");
     }
 
     if (!playbackId) {
-      throw new Error("playback ID was not provided");
+      throw new Error("jwt: playback ID was not provided");
     }
 
     const issuedAtSec = Date.now() / 1000;
