@@ -1016,6 +1016,22 @@ app.post("/:id/heartbeat", authorizer({ anyAdmin: true }), async (req, res) => {
 });
 
 app.put(
+  "/:id/cdn",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    const { id } = req.params;
+    const stream = await db.stream.get(id, { useReplica: false });
+
+    await db.stream.update(id, {
+      routeToCDN: true
+    })
+
+    await triggerCatalystStreamUpdated(req, stream.playbackId)
+    res.status(204).end();
+  }
+)
+
+app.put(
   "/:id/setactive",
   authorizer({ anyAdmin: true }),
   validatePost("stream-set-active-payload"),

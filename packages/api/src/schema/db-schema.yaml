@@ -715,6 +715,9 @@ components:
         deleted:
           type: boolean
           description: Set to true when stream deleted
+        routeToCDN:
+          type: boolean
+          description: If stream should be routed through CDN
     new-stream-payload:
       properties:
         wowza:
