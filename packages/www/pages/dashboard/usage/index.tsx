@@ -230,7 +230,11 @@ const Usage = () => {
                 <Flex align="center">
                   <LPTooltip
                     multiline
-                    content="Usage minutes may take up to an hour to be reflected.">
+                    content={
+                      <Box>
+                        Usage minutes may take up to an hour to be reflected.
+                      </Box>
+                    }>
                     <Help />
                   </LPTooltip>
                 </Flex>

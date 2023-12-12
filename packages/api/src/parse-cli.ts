@@ -413,6 +413,14 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "Stripe webhook secret",
         type: "string",
       },
+      "access-control-admin-pubkey": {
+        describe: "Access Control Admin signing public key",
+        type: "string",
+      },
+      "access-control-admin-privkey": {
+        describe: "Access Control Admin signing private key",
+        type: "string",
+      },
       "verification-frequency": {
         describe: "verificationFreq field to return from stream/hook",
         default: 0,

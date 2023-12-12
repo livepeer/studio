@@ -25,7 +25,6 @@ import {
 import "../css/hubspot.scss";
 import { isStaging } from "lib/utils";
 import { getEndpoint } from "../hooks/use-api";
-import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient();
 
@@ -126,7 +125,6 @@ const App = ({ Component, pageProps }) => {
                       client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
-                      <Analytics />
                     </LivepeerConfig>
                   </AnalyzerProvider>
                 </ApiProvider>

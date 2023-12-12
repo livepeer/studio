@@ -478,7 +478,7 @@ describe("controllers/stream", () => {
       });
     });
 
-    it("should create a stream, delete it, and error when attempting additional detele or replace", async () => {
+    it("should create a stream, delete it, and error when attempting additional delete or replace", async () => {
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
@@ -504,6 +504,26 @@ describe("controllers/stream", () => {
       } catch (err) {
         expect(err.status).toBe(404);
       }
+    });
+
+    it("should create a stream and add a multistream target for it", async () => {
+      const res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      expect(stream.id).toBeDefined();
+
+      const document = await server.store.get(`stream/${stream.id}`);
+      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+
+      const res2 = await client.post(
+        `/stream/${stream.id}/create-multistream-target`,
+        {
+          profile: "source",
+          videoOnly: false,
+          spec: { name: "target-name", url: "rtmp://test/test" },
+        }
+      );
+      expect(res2.status).toBe(204);
     });
 
     describe("set active and heartbeat", () => {
