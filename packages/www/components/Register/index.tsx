@@ -104,7 +104,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
               }
               checked={isCompanyAffiliated}
             />
-            <Box css={{ ml: "$1" }}>Are you using Studio for work?</Box>
+            <Box css={{ ml: "$1" }}>I am using Livepeer Studio for work</Box>
           </Flex>
 
           {isCompanyAffiliated ? (
