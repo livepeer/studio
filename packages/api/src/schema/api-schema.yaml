@@ -90,6 +90,10 @@ components:
         bitrate:
           type: integer
           minimum: 400
+        quality:
+          type: integer
+          minimum: 0
+          maximum: 44
         fps:
           type: integer
           minimum: 0
