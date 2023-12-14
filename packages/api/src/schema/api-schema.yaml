@@ -53,6 +53,10 @@ components:
         fpsDen:
           type: integer
           minimum: 1
+        quality:
+          type: integer
+          minimum: 0
+          maximum: 44
         gop:
           type: string
         profile:
