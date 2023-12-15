@@ -508,7 +508,7 @@ app.patch("/:id", authorizer({}), async (req, res) => {
   const emailValidToken = uuid();
 
   if (req.user.admin) {
-    if (!req.body.userId) {
+    if (!req.params.id) {
       console.log(`
         Admin user ${req.user.id} attempted to change email without providing userId
       `);
