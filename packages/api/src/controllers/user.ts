@@ -556,6 +556,7 @@ app.patch("/:id", authorizer({}), async (req, res) => {
         req,
         `/verify-new-email?${qs.stringify({
           emailValidToken,
+          email: lowerCaseEmail,
         })}`
       ),
       unsubscribe: unsubscribeUrl(req),
@@ -921,7 +922,19 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 // resend verify email
 app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
   const { selectedPlan } = req.query;
-  const user = await findUserByEmail(req.body.email);
+  let user = await findUserByEmail(req.body.email);
+
+  if (!user) {
+    let [newEmailUser] = await db.user.find({ newEmail: req.body.email });
+    if (newEmailUser.length > 0) {
+      user = newEmailUser[0];
+    }
+  }
+
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["user not found"] });
+  }
 
   const emailSent = await sendVerificationEmail(req, user, selectedPlan);
 
