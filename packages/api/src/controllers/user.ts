@@ -480,17 +480,25 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
-app.patch("/", authorizer({}), async (req, res) => {
+app.patch("/:id", authorizer({}), async (req, res) => {
   const { email } = req.body;
   const userId = req.user.id;
 
+  if (userId !== req.params.id && !req.user.admin) {
+    return res.status(403).json({
+      errors: ["user can only update their own user object"],
+    });
+  }
+
+  const lowerCaseEmail: string = email.toLowerCase();
+
   // Validate the new email
-  const emailValid = validator.validate(email);
+  const emailValid = validator.validate(lowerCaseEmail);
   if (!emailValid) {
     return res.status(422).json({ errors: ["Invalid email"] });
   }
 
-  const isEmailRegisteredAlready = await isEmailRegistered(email);
+  const isEmailRegisteredAlready = await isEmailRegistered(lowerCaseEmail);
   if (isEmailRegisteredAlready) {
     return res.status(409).json({
       errors: ["This email is already registered. Please choose another one."],
@@ -522,7 +530,7 @@ app.patch("/", authorizer({}), async (req, res) => {
     }
 
     await db.user.update(req.body.userId, {
-      email: email,
+      email: lowerCaseEmail,
     });
 
     res.status(200);
@@ -531,13 +539,13 @@ app.patch("/", authorizer({}), async (req, res) => {
 
   // Update user with newEmail (temporary field) and emailValidToken in database
   await db.user.update(userId, {
-    newEmail: email,
+    newEmail: lowerCaseEmail,
     emailValidToken: emailValidToken,
   });
 
   try {
     await sendgridEmail({
-      email: email,
+      email: lowerCaseEmail,
       supportAddr: req.config.supportAddr,
       sendgridTemplateId: req.config.sendgridTemplateId,
       sendgridApiKey: req.config.sendgridApiKey,
