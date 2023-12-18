@@ -59,145 +59,152 @@ app.use(
   })
 );
 
-app.post("/", validatePost("clip-payload"), async (req, res) => {
-  const playbackId = req.body.playbackId;
-  const clippingUser = req.user;
+app.post(
+  "/",
+  authorizer({}),
+  validatePost("clip-payload"),
+  async (req, res) => {
+    const playbackId = req.body.playbackId;
+    const clippingUser = req.user;
 
-  const requesterId = await generateRequesterId(req, playbackId);
+    const requesterId = await generateRequesterId(req, playbackId);
 
-  const id = uuid();
-  let uPlaybackId = await generateUniquePlaybackId(id);
+    const id = uuid();
+    let uPlaybackId = await generateUniquePlaybackId(id);
 
-  const content = await db.stream.getByPlaybackId(playbackId); //||
-  //(await db.asset.getByPlaybackId(playbackId));
+    const content = await db.stream.getByPlaybackId(playbackId); //||
+    //(await db.asset.getByPlaybackId(playbackId));
 
-  let isStream: boolean;
-  if (content && "streamKey" in content) {
-    isStream = true;
-  }
+    let isStream: boolean;
+    if (content && "streamKey" in content) {
+      isStream = true;
+    }
 
-  if (!content) {
-    throw new NotFoundError("Content not found");
-  }
+    if (!content) {
+      throw new NotFoundError("Content not found");
+    }
 
-  const owner = await db.user.get(content.userId);
+    const owner = await db.user.get(content.userId);
 
-  if (!owner) {
-    throw new NotFoundError(
-      "Content not found - unable to find owner of content"
-    );
-  }
+    if (!owner) {
+      throw new NotFoundError(
+        "Content not found - unable to find owner of content"
+      );
+    }
 
-  // If the user is neither an admin, nor part of LVPR_SDK_EMAILS and doesn't own the content, throw an error.
-  if (
-    !clippingUser.admin &&
-    !LVPR_SDK_EMAILS.includes(clippingUser.email) &&
-    clippingUser.id !== owner.id
-  ) {
-    console.log(`
+    // If the user is neither an admin, nor part of LVPR_SDK_EMAILS and doesn't own the content, throw an error.
+    if (
+      !clippingUser.admin &&
+      !LVPR_SDK_EMAILS.includes(clippingUser.email) &&
+      clippingUser.id !== owner.id
+    ) {
+      console.log(`
         clip: user=${clippingUser.email} does not have permission to clip stream=${content.id} - owner=${owner?.id}
       `);
-    throw new ForbiddenError("You do not have permission to clip this stream");
-  }
+      throw new ForbiddenError(
+        "You do not have permission to clip this stream"
+      );
+    }
 
-  if ("suspended" in content && content.suspended) {
-    throw new NotFoundError("Content not found");
-  }
+    if ("suspended" in content && content.suspended) {
+      throw new NotFoundError("Content not found");
+    }
 
-  const processingClips = await getProcessingTasksByRequesterId(
-    requesterId,
-    req.user.id,
-    "clip",
-    5
-  );
+    const processingClips = await getProcessingTasksByRequesterId(
+      requesterId,
+      req.user.id,
+      "clip",
+      5
+    );
 
-  if (processingClips.length >= MAX_PROCESSING_CLIPS && !clippingUser.admin) {
-    throw new ForbiddenError("Too many clips are being processed.");
-  }
+    if (processingClips.length >= MAX_PROCESSING_CLIPS && !clippingUser.admin) {
+      throw new ForbiddenError("Too many clips are being processed.");
+    }
 
-  let url: string;
-  let session: DBSession;
-  let objectStoreId: string;
+    let url: string;
+    let session: DBSession;
+    let objectStoreId: string;
 
-  if (isStream) {
-    if (req.body.sessionId) {
-      session = await db.session.get(req.body.sessionId);
-      if (!session) {
-        throw new NotFoundError("Session not found");
+    if (isStream) {
+      if (req.body.sessionId) {
+        session = await db.session.get(req.body.sessionId);
+        if (!session) {
+          throw new NotFoundError("Session not found");
+        }
+        if (session.parentId !== content.id) {
+          throw new NotFoundError(
+            "The provided session id does not belong to this stream"
+          );
+        }
+        ({ url, objectStoreId } = await buildRecordingUrl(
+          session,
+          req.config.recordCatalystObjectStoreId,
+          req.config.secondaryRecordObjectStoreId
+        ));
+      } else {
+        ({ url, session, objectStoreId } = await getRunningRecording(
+          content,
+          req
+        ));
       }
-      if (session.parentId !== content.id) {
-        throw new NotFoundError(
-          "The provided session id does not belong to this stream"
-        );
-      }
-      ({ url, objectStoreId } = await buildRecordingUrl(
-        session,
-        req.config.recordCatalystObjectStoreId,
-        req.config.secondaryRecordObjectStoreId
-      ));
     } else {
-      ({ url, session, objectStoreId } = await getRunningRecording(
-        content,
-        req
-      ));
+      res
+        .status(400)
+        .json({ errors: ["Clipping for assets is not implemented yet"] });
+      return;
     }
-  } else {
-    res
-      .status(400)
-      .json({ errors: ["Clipping for assets is not implemented yet"] });
-    return;
-  }
 
-  if (!session) {
-    throw new Error("Recording session not found");
-  }
-
-  let asset = await validateAssetPayload(
-    id,
-    uPlaybackId,
-    owner.id,
-    Date.now(),
-    await defaultObjectStoreId(req),
-    req.config,
-    {
-      name: req.body.name || `clip-${uPlaybackId}`,
-    },
-    {
-      type: "clip",
-      playbackId,
-      ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
+    if (!session) {
+      throw new Error("Recording session not found");
     }
-  );
 
-  asset = await createAsset(asset, req.queue);
-
-  const task = await req.taskScheduler.createAndScheduleTask(
-    "clip",
-    {
-      clip: {
-        clipStrategy: {
-          playbackId,
-          startTime: req.body.startTime,
-          endTime: req.body.endTime,
-        },
-        catalystPipelineStrategy: catalystPipelineStrategy(req),
-        url,
-        sessionId: session.id,
-        inputId: content.id,
-        sourceObjectStoreId: objectStoreId,
+    let asset = await validateAssetPayload(
+      id,
+      uPlaybackId,
+      owner.id,
+      Date.now(),
+      await defaultObjectStoreId(req),
+      req.config,
+      {
+        name: req.body.name || `clip-${uPlaybackId}`,
       },
-    },
-    null,
-    asset,
-    owner.id,
-    requesterId
-  );
+      {
+        type: "clip",
+        playbackId,
+        ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
+      }
+    );
 
-  res.json({
-    task: { id: task.id },
-    asset,
-  });
-});
+    asset = await createAsset(asset, req.queue);
+
+    const task = await req.taskScheduler.createAndScheduleTask(
+      "clip",
+      {
+        clip: {
+          clipStrategy: {
+            playbackId,
+            startTime: req.body.startTime,
+            endTime: req.body.endTime,
+          },
+          catalystPipelineStrategy: catalystPipelineStrategy(req),
+          url,
+          sessionId: session.id,
+          inputId: content.id,
+          sourceObjectStoreId: objectStoreId,
+        },
+      },
+      null,
+      asset,
+      owner.id,
+      requesterId
+    );
+
+    res.json({
+      task: { id: task.id },
+      asset,
+    });
+  }
+);
 
 const fieldsMap = {
   id: `asset.ID`,
