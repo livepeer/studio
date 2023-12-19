@@ -296,6 +296,20 @@ app.post("/suspend/:key", authorizer({ anyAdmin: true }), async (req, res) => {
   res.status(200).json({ id: keys[0].id, suspended: !keys[0].suspended });
 });
 
+app.get("/suspended/:key", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { key } = req.params;
+
+  const [keys] = await db.accessControlKey.find({
+    key,
+  });
+
+  if (!keys[0]) {
+    res.status(200).json({ suspended: false });
+  }
+
+  res.status(200).json({ suspended: keys[0].suspended });
+});
+
 app.get("/public-key", async (req, res) => {
   const { catalystBaseUrl } = req.config;
 
