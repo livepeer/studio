@@ -120,9 +120,7 @@ app.post(
       throw new NotFoundError("Content not found");
     }
 
-    let user = await cacheGetOrSet(`user-${content.userId}`, async () => {
-      return await db.user.get(content.userId);
-    });
+    let user = await db.user.get(content.userId, { cache: true });
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
       const contentLog = JSON.stringify(JSON.stringify(content));

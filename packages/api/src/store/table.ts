@@ -14,6 +14,7 @@ import {
   DBLegacyObject,
   FieldSpec,
 } from "./types";
+import { cacheGetOrSet } from "./cache";
 
 const DEFAULT_SORT = "id ASC";
 
@@ -48,25 +49,36 @@ export default class Table<T extends DBObject> {
     if (!id) {
       throw new Error("missing id");
     }
-    let res: QueryResult<DBLegacyObject>;
+    const doQuery = async () => {
+      let res: QueryResult<DBLegacyObject>;
+      if (!opts.useReplica) {
+        res = await this.db.query(
+          sql`SELECT data FROM `
+            .append(this.name)
+            .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
+        );
+      } else {
+        res = await this.db.replicaQuery(
+          sql`SELECT data FROM `
+            .append(this.name)
+            .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
+        );
+      }
+
+      if (res.rowCount < 1) {
+        return null;
+      }
+      return res.rows[0].data as T;
+    };
+
+    if (!opts.cache) {
+      return doQuery();
+    }
     if (!opts.useReplica) {
-      res = await this.db.query(
-        sql`SELECT data FROM `
-          .append(this.name)
-          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
-      );
-    } else {
-      res = await this.db.replicaQuery(
-        sql`SELECT data FROM `
-          .append(this.name)
-          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
-      );
+      throw new Error("can't cache a non-replica query");
     }
 
-    if (res.rowCount < 1) {
-      return null;
-    }
-    return res.rows[0].data as T;
+    return cacheGetOrSet(`db-get-${this.name}-by-id-${id}`, doQuery);
   }
 
   async getMany(
