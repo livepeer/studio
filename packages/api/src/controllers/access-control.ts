@@ -223,7 +223,7 @@ app.post(
         }
 
         const [keys] = await db.accessControlKey.find({
-          key: req.body.jwt,
+          key: req.body.accessKey,
         });
         if (keys[0]) {
           if (keys[0].suspended) {
