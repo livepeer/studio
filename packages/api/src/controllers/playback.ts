@@ -148,16 +148,6 @@ export async function getResourceByPlaybackId(
   user?: User,
   cutoffDate?: number
 ): Promise<PlaybackResource> {
-  const asset =
-    (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
-    (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
-
-  if (asset && !asset.deleted) {
-    return { asset };
-  }
-
   let stream = await db.stream.getByPlaybackId(id);
   if (!stream) {
     const streamById = await db.stream.get(id);
@@ -168,6 +158,16 @@ export async function getResourceByPlaybackId(
   }
   if (stream && !stream.deleted && !stream.suspended) {
     return { stream };
+  }
+
+  const asset =
+    (await db.asset.getByPlaybackId(id)) ??
+    (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
+
+  if (asset && !asset.deleted) {
+    return { asset };
   }
 
   const session = await db.session.get(id);
