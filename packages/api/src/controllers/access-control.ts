@@ -279,8 +279,9 @@ app.post("/suspend/:key", authorizer({ anyAdmin: true }), async (req, res) => {
   });
 
   if (!keys[0]) {
+    let id = uuid();
     let doc = await db.accessControlKey.create({
-      id: uuid(),
+      id,
       key,
       suspended: true,
     });

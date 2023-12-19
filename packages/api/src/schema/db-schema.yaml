@@ -1158,6 +1158,7 @@ components:
       properties:
         id:
           index: true
+          type: string
         key:
           index: true
           unique: true
