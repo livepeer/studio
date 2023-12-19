@@ -116,7 +116,7 @@ const getAssetPlaybackInfo = async (
   ingest: string,
   asset: WithID<Asset>
 ) => {
-  const os = await db.objectStore.get(asset.objectStoreId);
+  const os = await db.objectStore.get(asset.objectStoreId, { cache: true });
   if (!os || os.deleted || os.disabled) {
     return null;
   }
@@ -146,8 +146,7 @@ type PlaybackResource = {
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
-  cutoffDate?: number,
-  origin?: string
+  cutoffDate?: number
 ): Promise<PlaybackResource> {
   const asset =
     (await db.asset.getByPlaybackId(id)) ??
@@ -224,7 +223,7 @@ async function getPlaybackInfo(
   const cacheKey = `playbackInfo-${id}-user-${req.user?.id}-cutoff-${cutoffDate}`;
   let resource = cacheGet<PlaybackResource>(cacheKey);
   if (!resource) {
-    resource = await getResourceByPlaybackId(id, req.user, cutoffDate, origin);
+    resource = await getResourceByPlaybackId(id, req.user, cutoffDate);
 
     const ttl =
       resource.asset && resource.asset.status.phase !== "ready" ? 5 : 120;
