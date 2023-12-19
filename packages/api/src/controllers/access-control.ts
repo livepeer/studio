@@ -1,5 +1,5 @@
 import signingKeyApp from "./signing-key";
-import { validatePost } from "../middleware";
+import { authorizer, validatePost } from "../middleware";
 import { Request, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
@@ -23,6 +23,7 @@ import { DBStream } from "../store/stream-table";
 import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
+import { v4 as uuid } from "uuid";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
@@ -150,6 +151,16 @@ app.post(
         res.status(204);
         return res.end();
       case "jwt":
+        if (req.body.jwt) {
+          const [res] = await db.accessControlKey.find({
+            key: req.body.jwt,
+          });
+          if (res[0]) {
+            if (res[0].suspended) {
+              throw new ForbiddenError("Jwt is suspended");
+            }
+          }
+        }
         if (!req.body.pub) {
           console.log(`
             access-control: gate: no pub provided for playbackId=${playbackId}, disallowing playback
@@ -210,6 +221,16 @@ app.post(
             "Content is gated and requires an access key"
           );
         }
+
+        const [keys] = await db.accessControlKey.find({
+          key: req.body.jwt,
+        });
+        if (keys[0]) {
+          if (keys[0].suspended) {
+            throw new ForbiddenError("Access key is suspended");
+          }
+        }
+
         const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
         if (!webhook) {
           console.log(`
@@ -249,6 +270,30 @@ app.post(
     }
   }
 );
+
+app.post("/suspend/:key", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { key } = req.params;
+
+  const [keys] = await db.accessControlKey.find({
+    key,
+  });
+
+  if (!keys[0]) {
+    let doc = await db.accessControlKey.create({
+      id: uuid(),
+      key,
+      suspended: true,
+    });
+
+    res.status(200).json({ id: doc.id });
+  }
+
+  await db.accessControlKey.update(keys[0].id, {
+    suspended: !keys[0].suspended,
+  });
+
+  res.status(200).json({ success: true });
+});
 
 app.get("/public-key", async (req, res) => {
   const { catalystBaseUrl } = req.config;

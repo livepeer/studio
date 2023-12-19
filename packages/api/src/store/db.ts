@@ -17,6 +17,7 @@ import {
   SigningKey,
   Room,
   Attestation,
+  AccessControlKey,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
@@ -65,6 +66,7 @@ export class DB {
   asset: AssetTable;
   task: TaskTable;
   signingKey: Table<SigningKey>;
+  accessControlKey: Table<AccessControlKey>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   experiment: ExperimentTable;

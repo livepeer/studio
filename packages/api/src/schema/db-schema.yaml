@@ -21,6 +21,9 @@ components:
         accessKey:
           type: string
           description: Access key used for access-control verification
+        jwt:
+          type: string
+          description: JWT used for access-control verification
     object-store-patch-payload:
       type: object
       additionalProperties: false
@@ -1148,6 +1151,19 @@ components:
           type: string
           example: 78df0075-b5f3-4683-a618-1086faca35dc
         deleted:
+          type: boolean
+          default: false
+    access-control-key:
+      table: access_control_key
+      properties:
+        id:
+          index: true
+        key:
+          index: true
+          unique: true
+          description: jwt or access key
+          type: string
+        suspended:
           type: boolean
           default: false
     usage:
