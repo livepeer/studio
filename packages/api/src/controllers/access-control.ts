@@ -20,7 +20,6 @@ import { fetchWithTimeoutAndRedirects } from "../util";
 import fetch from "node-fetch";
 import { WithID } from "../store/types";
 import { DBStream } from "../store/stream-table";
-import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
 import { cacheGetOrSet } from "../store/cache";

@@ -124,10 +124,13 @@ function authenticator(): RequestHandler {
       throw new ForbiddenError(`user is suspended`);
     }
 
-    req.user = user;
+    // make copies in case someone mutates these
+    req.token = { ...tokenObject };
+    req.user = { ...user };
+
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
-    req.token = tokenObject;
+
     return next();
   };
 }
