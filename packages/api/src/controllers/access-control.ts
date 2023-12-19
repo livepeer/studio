@@ -285,14 +285,14 @@ app.post("/suspend/:key", authorizer({ anyAdmin: true }), async (req, res) => {
       suspended: true,
     });
 
-    res.status(200).json({ id: doc.id });
+    res.status(200).json({ id: doc.id, suspended: true });
   }
 
   await db.accessControlKey.update(keys[0].id, {
     suspended: !keys[0].suspended,
   });
 
-  res.status(200).json({ success: true });
+  res.status(200).json({ id: keys[0].id, suspended: !keys[0].suspended });
 });
 
 app.get("/public-key", async (req, res) => {

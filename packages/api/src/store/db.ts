@@ -161,6 +161,10 @@ export class DB {
       db: this,
       schema: schemas["signing-key"],
     });
+    this.accessControlKey = makeTable<AccessControlKey>({
+      db: this,
+      schema: schemas["access-control-key"],
+    });
     this.user = makeTable<User>({ db: this, schema: schemas["user"] });
     this.experiment = new ExperimentTable({
       db: this,
