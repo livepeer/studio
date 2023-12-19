@@ -11,6 +11,7 @@ import { ForbiddenError, UnauthorizedError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
+import { cacheGetOrSet } from "../store/cache";
 
 type AuthScheme = "jwt" | "bearer" | "basic";
 
@@ -83,7 +84,9 @@ function authenticator(): RequestHandler {
       if (!tokenId) {
         throw new UnauthorizedError(`no authorization token provided`);
       }
-      tokenObject = await db.apiToken.get(tokenId);
+      tokenObject = await cacheGetOrSet(`token-${tokenId}`, async () => {
+        return await db.apiToken.get(tokenId);
+      });
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
         throw new UnauthorizedError(`no token ${tokenId} found`);
@@ -108,7 +111,10 @@ function authenticator(): RequestHandler {
       );
     }
 
-    user = await db.user.get(userId);
+    user = await cacheGetOrSet(`user-${userId}`, async () => {
+      return await db.user.get(userId);
+    });
+
     if (!user) {
       throw new UnauthorizedError(
         `no user found from authorization header: ${authHeader}`

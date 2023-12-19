@@ -23,6 +23,7 @@ import { DBStream } from "../store/stream-table";
 import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
+import { cacheGetOrSet } from "../store/cache";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
@@ -102,9 +103,13 @@ app.post(
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace(/^\w+\+/, "");
-    const content =
-      (await db.stream.getByPlaybackId(playbackId)) ||
-      (await db.asset.getByPlaybackId(playbackId));
+
+    let content = await cacheGetOrSet(`acl-content-${playbackId}`, async () => {
+      return (
+        (await db.stream.getByPlaybackId(playbackId)) ||
+        (await db.asset.getByPlaybackId(playbackId))
+      );
+    });
 
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
@@ -116,7 +121,9 @@ app.post(
       throw new NotFoundError("Content not found");
     }
 
-    const user = await db.user.get(content.userId);
+    let user = await cacheGetOrSet(`user-${content.userId}`, async () => {
+      return await db.user.get(content.userId);
+    });
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
       const contentLog = JSON.stringify(JSON.stringify(content));
