@@ -21,6 +21,7 @@ import { NotFoundError, UnprocessableEntityError } from "../store/errors";
 import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
+import { cacheGet, cacheSet } from "../store/cache";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -136,29 +137,25 @@ const getAssetPlaybackInfo = async (
   );
 };
 
+type PlaybackResource = {
+  stream?: DBStream;
+  session?: DBSession;
+  asset?: WithID<Asset>;
+};
+
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
   cutoffDate?: number,
   origin?: string
-): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
-  let asset =
+): Promise<PlaybackResource> {
+  const asset =
     (await db.asset.getByPlaybackId(id)) ??
     (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
     (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
     (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
 
   if (asset && !asset.deleted) {
-    if (asset.status.phase !== "ready" && !asset.sourcePlaybackReady) {
-      throw new UnprocessableEntityError("asset is not ready for playback");
-    }
-    if (asset.userId !== user?.id && cutoffDate) {
-      console.log(
-        `Returning cross-user asset for playback. ` +
-          `userId=${user?.id} userEmail=${user?.email} origin=${origin} ` +
-          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
-      );
-    }
     return { asset };
   }
 
@@ -224,14 +221,30 @@ async function getPlaybackInfo(
   withRecordings?: boolean
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
-  let { stream, asset, session } = await getResourceByPlaybackId(
-    id,
-    req.user,
-    cutoffDate,
-    origin
-  );
+  const cacheKey = `playbackInfo-${id}-user-${req.user?.id}-cutoff-${cutoffDate}`;
+  let resource = cacheGet<PlaybackResource>(cacheKey);
+  if (!resource) {
+    resource = await getResourceByPlaybackId(id, req.user, cutoffDate, origin);
+
+    const ttl =
+      resource.asset && resource.asset.status.phase !== "ready" ? 5 : 120;
+    cacheSet(cacheKey, resource, ttl);
+  }
+
+  let { stream, asset, session } = resource;
 
   if (asset) {
+    if (asset.status.phase !== "ready" && !asset.sourcePlaybackReady) {
+      throw new UnprocessableEntityError("asset is not ready for playback");
+    }
+    if (asset.userId !== req.user?.id && cutoffDate) {
+      console.log(
+        `Returning cross-user asset for playback. ` +
+          `userId=${req.user?.id} userEmail=${req.user?.email} origin=${origin} ` +
+          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
+      );
+    }
+
     return await getAssetPlaybackInfo(req.config, ingest, asset);
   }
 
