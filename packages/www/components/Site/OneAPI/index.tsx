@@ -21,7 +21,7 @@ const workflows = [
     title: "🔴 Live",
     description: (
       <Text size={7} css={{ maxWidth: 520, mx: "auto" }}>
-        Build live video experiences with just few lines of code — affordably,
+        Build live video experiences with just a few lines of code — affordably,
         at scale, and with no vendor lock-in.
       </Text>
     ),
