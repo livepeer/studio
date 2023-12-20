@@ -45,13 +45,16 @@ export default class Table<T extends DBObject> {
   }
 
   // get a single document by id
-  async get(id: string, opts: GetOptions = { useReplica: true }): Promise<T> {
+  async get(
+    id: string,
+    { useReplica = true, cache }: GetOptions = {}
+  ): Promise<T> {
     if (!id) {
       throw new Error("missing id");
     }
     const doQuery = async () => {
       let res: QueryResult<DBLegacyObject>;
-      if (!opts.useReplica) {
+      if (!useReplica) {
         res = await this.db.query(
           sql`SELECT data FROM `
             .append(this.name)
@@ -71,10 +74,9 @@ export default class Table<T extends DBObject> {
       return res.rows[0].data as T;
     };
 
-    if (!opts.cache) {
+    if (!cache) {
       return doQuery();
-    }
-    if (!opts.useReplica) {
+    } else if (!useReplica) {
       throw new Error("can't cache a non-replica query");
     }
 
