@@ -229,5 +229,60 @@ describe("controllers/signing-key", () => {
       });
       expect(res2.status).toBe(403);
     });
+
+    it("should not allow playback if webhook does not exist", async () => {
+      client.jwtAuth = adminToken;
+      gatedAsset.playbackPolicy.type = "webhook";
+      gatedAsset.playbackPolicy.webhookId = "00000-000000-000000-00000";
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: signingKey.publicKey,
+      });
+      expect(res.status).toBe(500);
+    });
+
+    it("shout not allow playback if accessKey is missing", async () => {
+      const webhook = await db.webhook.create({
+        id: uuid(),
+        name: "test",
+        url: `http://localhost:3004/api/access-control/webhook-test`,
+        events: ["playback.accessControl"],
+      });
+      gatedAsset.playbackPolicy.webhookId = webhook.id;
+      gatedAsset.playbackPolicy.type = "webhook";
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+      });
+      expect(res.status).toBe(403);
+    });
+    it("should not allow playback if origin is not in playback.allowedOrigins", async () => {
+      const webhook = await db.webhook.create({
+        id: uuid(),
+        name: "test",
+        url: `http://localhost:3004/api/access-control/webhook-test`,
+        events: ["playback.accessControl"],
+      });
+      gatedAsset.playbackPolicy.webhookId = webhook.id;
+      gatedAsset.playbackPolicy.type = "webhook";
+      gatedAsset.playbackPolicy.allowedOrigins = ["http://localhost:3000"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      const res3 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: signingKey.publicKey,
+        origin: "https://example.com",
+      });
+      expect(res3.status).toBe(403);
+    });
   });
 });

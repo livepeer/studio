@@ -21,6 +21,9 @@ components:
         accessKey:
           type: string
           description: Access key used for access-control verification
+        origin:
+          type: string
+          description: Origin url requesting playback
     object-store-patch-payload:
       type: object
       additionalProperties: false
