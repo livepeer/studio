@@ -160,6 +160,16 @@ app.post(
           );
         }
 
+        if (req.body.origin) {
+          if (allowedOrigins.length > 0) {
+            if (!allowedOrigins.includes(req.body.origin)) {
+              throw new ForbiddenError(
+                "Content is gated and origin not in allowed origins"
+              );
+            }
+          }
+        }
+
         const query = [];
         query.push(sql`signing_key.data->>'publicKey' = ${req.body.pub}`);
         const [signingKeyOutput] = await db.signingKey.find(query, {
