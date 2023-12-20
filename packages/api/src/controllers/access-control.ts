@@ -145,6 +145,8 @@ app.post(
       return res.end();
     }
 
+    // Key management
+
     switch (playbackPolicyType) {
       case "public":
         res.status(204);
