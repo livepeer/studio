@@ -280,6 +280,24 @@ async function validateAssetPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
+    const allowedOrigins = playbackPolicy.allowedOrigins;
+    if (allowedOrigins) {
+      if (allowedOrigins.length > 0) {
+        const allowedOriginsValid = allowedOrigins.every((origin) => {
+          const url = new URL(origin);
+          return (
+            ["http:", "https:"].includes(url.protocol) &&
+            url.hostname &&
+            url.port
+          );
+        });
+        if (!allowedOriginsValid) {
+          throw new BadRequestError(
+            `allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>`
+          );
+        }
+      }
+    }
   }
   if (encryption?.encryptedKey) {
     if (!playbackPolicy) {
