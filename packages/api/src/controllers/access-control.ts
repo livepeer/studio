@@ -146,6 +146,16 @@ app.post(
       return res.end();
     }
 
+    if (req.body.origin) {
+      if (allowedOrigins.length > 0) {
+        if (!allowedOrigins.includes(req.body.origin)) {
+          throw new ForbiddenError(
+            "Content is gated and origin not in allowed origins"
+          );
+        }
+      }
+    }
+
     switch (playbackPolicyType) {
       case "public":
         res.status(204);
@@ -158,16 +168,6 @@ app.post(
           throw new ForbiddenError(
             "Content is gated and requires a public key"
           );
-        }
-
-        if (req.body.origin) {
-          if (allowedOrigins.length > 0) {
-            if (!allowedOrigins.includes(req.body.origin)) {
-              throw new ForbiddenError(
-                "Content is gated and origin not in allowed origins"
-              );
-            }
-          }
         }
 
         const query = [];
@@ -221,15 +221,7 @@ app.post(
             "Content is gated and requires an access key"
           );
         }
-        if (req.body.origin) {
-          if (allowedOrigins.length > 0) {
-            if (!allowedOrigins.includes(req.body.origin)) {
-              throw new ForbiddenError(
-                "Content is gated and origin not in allowed origins"
-              );
-            }
-          }
-        }
+
         const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
         if (!webhook) {
           console.log(`
