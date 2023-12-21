@@ -51,36 +51,42 @@ export default class Table<T extends DBObject> {
   ): Promise<T> {
     if (!id) {
       throw new Error("missing id");
-    }
-    const doQuery = async () => {
-      let res: QueryResult<DBLegacyObject>;
-      if (!useReplica) {
-        res = await this.db.query(
-          sql`SELECT data FROM `
-            .append(this.name)
-            .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
-        );
-      } else {
-        res = await this.db.replicaQuery(
-          sql`SELECT data FROM `
-            .append(this.name)
-            .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
-        );
-      }
-
-      if (res.rowCount < 1) {
-        return null;
-      }
-      return res.rows[0].data as T;
-    };
-
-    if (!useCache) {
-      return doQuery();
-    } else if (!useReplica) {
+    } else if (useCache && !useReplica) {
       throw new Error("can't cache a non-replica query");
     }
 
-    return cache.getOrSet(`db-get-${this.name}-by-id-${id}`, doQuery);
+    const cacheKey = this.rowCacheKey(id);
+    if (useCache) {
+      const cached = cache.get<T>(cacheKey);
+      if (cached) {
+        return cached as T;
+      }
+    }
+
+    let res: QueryResult<DBLegacyObject>;
+    if (!useReplica) {
+      res = await this.db.query(
+        sql`SELECT data FROM `
+          .append(this.name)
+          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
+      );
+    } else {
+      res = await this.db.replicaQuery(
+        sql`SELECT data FROM `
+          .append(this.name)
+          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
+      );
+    }
+
+    if (res.rowCount < 1) {
+      return null;
+    }
+
+    const data = res.rows[0].data as T;
+    // always cache on read, even if not returning from cache
+    cache.set(cacheKey, data);
+
+    return data;
   }
 
   async getMany(
@@ -210,6 +216,8 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`);
     }
+
+    cache.set(this.rowCacheKey(doc.id), doc);
   }
 
   async update(
@@ -234,6 +242,10 @@ export default class Table<T extends DBObject> {
     }
 
     const res = await this.db.query(q);
+
+    if (typeof query === "string") {
+      cache.delete(this.rowCacheKey(query));
+    }
 
     if (res.rowCount < 1 && throwIfEmpty) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`);
@@ -409,5 +421,9 @@ export default class Table<T extends DBObject> {
       return;
     }
     logger.info(`Created ${unique} index ${indexName} on ${this.name}`);
+  }
+
+  private rowCacheKey(id: string) {
+    return `db-get-${this.name}-by-id-${id}`;
   }
 }

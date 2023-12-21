@@ -1,14 +1,22 @@
+import _ from "lodash";
 import NodeCache from "node-cache";
 
 class Cache {
   storage = new NodeCache({ stdTTL: 120 });
 
   get<T>(cacheKey: string) {
-    return this.storage.get(cacheKey) as T;
+    const content = this.storage.get(cacheKey) as T;
+    // always make copies in case caller mutates the object (yeah we still have that)
+    return content && _.cloneDeep(content);
   }
 
   set<T>(cacheKey: string, content: T, ttl?: string | number) {
+    content = _.cloneDeep(content);
     this.storage.set(cacheKey, content, ttl);
+  }
+
+  delete(cacheKey: string) {
+    this.storage.del(cacheKey);
   }
 
   async getOrSet<T>(
