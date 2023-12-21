@@ -140,10 +140,7 @@ describe("auth middleware", () => {
     const setAccess = async (
       token: string,
       rules?: ApiToken["access"]["rules"]
-    ) => {
-      await db.apiToken.update(token, { access: { rules } });
-      cache.flush();
-    };
+    ) => db.apiToken.update(token, { access: { rules } });
 
     const fetchStatus = async (method: string, path: string) => {
       const res = await client.fetch(path, { method });
@@ -381,10 +378,8 @@ describe("auth middleware", () => {
       } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     });
 
-    const setAccess = async (token: string, access?: ApiToken["access"]) => {
-      await db.apiToken.update(token, { access });
-      cache.flush();
-    };
+    const setAccess = async (token: string, access?: ApiToken["access"]) =>
+      db.apiToken.update(token, { access });
 
     const expectResponse = (res: Response) =>
       expect(res.json().then((body) => ({ status: res.status, body })))
