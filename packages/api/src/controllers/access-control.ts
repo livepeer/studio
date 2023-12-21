@@ -22,7 +22,7 @@ import { WithID } from "../store/types";
 import { DBStream } from "../store/stream-table";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
-import { cacheGetOrSet } from "../store/cache";
+import { cache } from "../store/cache";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
@@ -103,12 +103,15 @@ app.post(
   async (req, res) => {
     const playbackId = req.body.stream.replace(/^\w+\+/, "");
 
-    let content = await cacheGetOrSet(`acl-content-${playbackId}`, async () => {
-      return (
-        (await db.stream.getByPlaybackId(playbackId)) ||
-        (await db.asset.getByPlaybackId(playbackId))
-      );
-    });
+    let content = await cache.getOrSet(
+      `acl-content-${playbackId}`,
+      async () => {
+        return (
+          (await db.stream.getByPlaybackId(playbackId)) ||
+          (await db.asset.getByPlaybackId(playbackId))
+        );
+      }
+    );
 
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
@@ -120,7 +123,7 @@ app.post(
       throw new NotFoundError("Content not found");
     }
 
-    let user = await db.user.get(content.userId, { cache: true });
+    let user = await db.user.get(content.userId, { useCache: true });
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
       const contentLog = JSON.stringify(JSON.stringify(content));

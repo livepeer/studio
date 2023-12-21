@@ -15,7 +15,7 @@ import serverPromise, { TestServer } from "../test-server";
 import { authenticator, corsApiKeyAccessRules } from "./auth";
 import { AuthPolicy } from "./authPolicy";
 import errorHandler from "./errorHandler";
-import { cacheFlush } from "../store/cache";
+import { cache } from "../store/cache";
 
 let server: TestServer;
 let mockAdminUserInput: User;
@@ -142,7 +142,7 @@ describe("auth middleware", () => {
       rules?: ApiToken["access"]["rules"]
     ) => {
       await db.apiToken.update(token, { access: { rules } });
-      cacheFlush();
+      cache.flush();
     };
 
     const fetchStatus = async (method: string, path: string) => {
@@ -383,7 +383,7 @@ describe("auth middleware", () => {
 
     const setAccess = async (token: string, access?: ApiToken["access"]) => {
       await db.apiToken.update(token, { access });
-      cacheFlush();
+      cache.flush();
     };
 
     const expectResponse = (res: Response) =>

@@ -14,7 +14,7 @@ import {
   DBLegacyObject,
   FieldSpec,
 } from "./types";
-import { cacheGetOrSet } from "./cache";
+import { cache } from "./cache";
 
 const DEFAULT_SORT = "id ASC";
 
@@ -47,7 +47,7 @@ export default class Table<T extends DBObject> {
   // get a single document by id
   async get(
     id: string,
-    { useReplica = true, cache }: GetOptions = {}
+    { useReplica = true, useCache }: GetOptions = {}
   ): Promise<T> {
     if (!id) {
       throw new Error("missing id");
@@ -74,13 +74,13 @@ export default class Table<T extends DBObject> {
       return res.rows[0].data as T;
     };
 
-    if (!cache) {
+    if (!useCache) {
       return doQuery();
     } else if (!useReplica) {
       throw new Error("can't cache a non-replica query");
     }
 
-    return cacheGetOrSet(`db-get-${this.name}-by-id-${id}`, doQuery);
+    return cache.getOrSet(`db-get-${this.name}-by-id-${id}`, doQuery);
   }
 
   async getMany(

@@ -83,7 +83,7 @@ function authenticator(): RequestHandler {
       if (!tokenId) {
         throw new UnauthorizedError(`no authorization token provided`);
       }
-      tokenObject = await db.apiToken.get(tokenId, { cache: true });
+      tokenObject = await db.apiToken.get(tokenId, { useCache: true });
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
         throw new UnauthorizedError(`no token ${tokenId} found`);
@@ -108,7 +108,7 @@ function authenticator(): RequestHandler {
       );
     }
 
-    user = await db.user.get(userId, { cache: true });
+    user = await db.user.get(userId, { useCache: true });
 
     if (!user) {
       throw new UnauthorizedError(

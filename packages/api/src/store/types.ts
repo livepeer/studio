@@ -42,7 +42,7 @@ export interface FindOptions<T = never> extends QueryOptions {
 
 export interface GetOptions {
   useReplica?: boolean;
-  cache?: boolean;
+  useCache?: boolean;
 }
 
 export interface UpdateOptions {

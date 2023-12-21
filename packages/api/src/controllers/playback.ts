@@ -21,7 +21,7 @@ import { NotFoundError, UnprocessableEntityError } from "../store/errors";
 import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
-import { cacheGet, cacheSet } from "../store/cache";
+import { cache } from "../store/cache";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -116,7 +116,7 @@ const getAssetPlaybackInfo = async (
   ingest: string,
   asset: WithID<Asset>
 ) => {
-  const os = await db.objectStore.get(asset.objectStoreId, { cache: true });
+  const os = await db.objectStore.get(asset.objectStoreId, { useCache: true });
   if (!os || os.deleted || os.disabled) {
     return null;
   }
@@ -221,13 +221,13 @@ async function getPlaybackInfo(
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   const cacheKey = `playbackInfo-${id}-user-${req.user?.id}-cutoff-${cutoffDate}`;
-  let resource = cacheGet<PlaybackResource>(cacheKey);
+  let resource = cache.get<PlaybackResource>(cacheKey);
   if (!resource) {
     resource = await getResourceByPlaybackId(id, req.user, cutoffDate);
 
     const ttl =
       resource.asset && resource.asset.status.phase !== "ready" ? 5 : 120;
-    cacheSet(cacheKey, resource, ttl);
+    cache.set(cacheKey, resource, ttl);
   }
 
   let { stream, asset, session } = resource;
