@@ -6,6 +6,7 @@ import { Asset } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { db } from "../store";
 import { generateUniquePlaybackId } from "./generate-keys";
+import { cacheFlush } from "../store/cache";
 
 // includes auth file tests
 
@@ -195,6 +196,8 @@ describe("controllers/signing-key", () => {
       });
       expect(res.status).toBe(204);
       await db.user.update(gatedAsset.userId, { suspended: true });
+      cacheFlush();
+
       const res2 = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "jwt",

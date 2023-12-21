@@ -5,6 +5,7 @@ import { WithID } from "../store/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBSession } from "../store/session-table";
+import { cacheFlush } from "../store/cache";
 
 const EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE = Date.parse(
   "2023-06-06T00:00:00.000Z"
@@ -525,6 +526,7 @@ describe("controllers/playback", () => {
         await db.asset.update(asset2.id, {
           createdAt: EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE - 1000,
         });
+        cacheFlush();
       });
 
       it("should return playback URL asset of user from CID", async () => {

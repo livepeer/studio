@@ -5,6 +5,7 @@ import db from "../store/db";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import sql from "sql-template-strings";
+import { cacheFlush } from "../store/cache";
 
 let server: TestServer;
 let mockUser: User;
@@ -434,6 +435,7 @@ describe("controllers/user", () => {
 
       // adding emailValid true to user
       await db.user.update(nonAdminUser.id, { emailValid: true });
+      cacheFlush();
 
       // should return admin priviledges error
       client.apiKey = nonAdminApiKey;

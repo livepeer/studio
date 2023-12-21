@@ -120,7 +120,7 @@ function authenticator(): RequestHandler {
     }
 
     // make copies in case someone mutates these
-    req.token = { ...tokenObject };
+    req.token = tokenObject && { ...tokenObject };
     req.user = { ...user };
 
     // UI admins must have a JWT

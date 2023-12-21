@@ -26,3 +26,8 @@ export async function cacheGetOrSet<T>(
   }
   return content;
 }
+
+// Test helper to clear the cache
+export function cacheFlush() {
+  cache.flushAll();
+}
