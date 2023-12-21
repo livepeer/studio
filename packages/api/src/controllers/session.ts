@@ -246,7 +246,9 @@ export async function buildRecordingUrl(
   recordCatalystObjectStoreId: string,
   secondaryRecordObjectStoreId: string
 ) {
-  const os = await db.objectStore.get(recordCatalystObjectStoreId);
+  const os = await db.objectStore.get(recordCatalystObjectStoreId, {
+    useCache: true,
+  });
 
   let urlPrefix = pathJoin(os.publicUrl, session.playbackId, session.id);
   let manifestUrl = pathJoin(urlPrefix, "output.m3u8");
@@ -265,7 +267,9 @@ export async function buildRecordingUrl(
     };
   }
 
-  const secondaryOs = await db.objectStore.get(secondaryRecordObjectStoreId);
+  const secondaryOs = await db.objectStore.get(secondaryRecordObjectStoreId, {
+    useCache: true,
+  });
   urlPrefix = pathJoin(secondaryOs.publicUrl, session.playbackId, session.id);
   manifestUrl = pathJoin(urlPrefix, "output.m3u8");
 

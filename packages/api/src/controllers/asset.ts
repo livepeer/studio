@@ -292,7 +292,7 @@ async function validateAssetPlaybackPolicy(
 }
 
 async function getActiveObjectStore(id: string) {
-  const os = await db.objectStore.get(id);
+  const os = await db.objectStore.get(id, { useCache: true });
   if (!os || os.deleted || os.disabled) {
     throw new Error("Object store not found or disabled");
   }

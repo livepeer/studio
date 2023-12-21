@@ -177,6 +177,7 @@ export async function getResourceByPlaybackId(
 
   return {};
 }
+
 async function getAttestationPlaybackInfo(
   config: CliArgs,
   ingest: string,
