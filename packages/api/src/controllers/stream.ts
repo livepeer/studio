@@ -407,7 +407,7 @@ export async function getRecordingPlaybackUrl(
       return null;
     }
 
-    const os = await db.objectStore.get(objectStoreId);
+    const os = await db.objectStore.get(objectStoreId, { useCache: true });
     url = pathJoin(os.publicUrl, session.playbackId, session.id, "output.m3u8");
   } catch (e) {
     console.log(`

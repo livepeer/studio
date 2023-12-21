@@ -83,7 +83,7 @@ function authenticator(): RequestHandler {
       if (!tokenId) {
         throw new UnauthorizedError(`no authorization token provided`);
       }
-      tokenObject = await db.apiToken.get(tokenId);
+      tokenObject = await db.apiToken.get(tokenId, { useCache: true });
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
         throw new UnauthorizedError(`no token ${tokenId} found`);
@@ -108,7 +108,8 @@ function authenticator(): RequestHandler {
       );
     }
 
-    user = await db.user.get(userId);
+    user = await db.user.get(userId, { useCache: true });
+
     if (!user) {
       throw new UnauthorizedError(
         `no user found from authorization header: ${authHeader}`
@@ -118,10 +119,12 @@ function authenticator(): RequestHandler {
       throw new ForbiddenError(`user is suspended`);
     }
 
+    req.token = tokenObject;
     req.user = user;
+
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
-    req.token = tokenObject;
+
     return next();
   };
 }

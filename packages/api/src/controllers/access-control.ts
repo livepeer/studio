@@ -20,9 +20,9 @@ import { fetchWithTimeoutAndRedirects } from "../util";
 import fetch from "node-fetch";
 import { WithID } from "../store/types";
 import { DBStream } from "../store/stream-table";
-import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
+import { cache } from "../store/cache";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
@@ -102,9 +102,16 @@ app.post(
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace(/^\w+\+/, "");
-    const content =
-      (await db.stream.getByPlaybackId(playbackId)) ||
-      (await db.asset.getByPlaybackId(playbackId));
+
+    let content = await cache.getOrSet(
+      `acl-content-${playbackId}`,
+      async () => {
+        return (
+          (await db.stream.getByPlaybackId(playbackId)) ||
+          (await db.asset.getByPlaybackId(playbackId))
+        );
+      }
+    );
 
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
@@ -116,7 +123,7 @@ app.post(
       throw new NotFoundError("Content not found");
     }
 
-    const user = await db.user.get(content.userId);
+    let user = await db.user.get(content.userId, { useCache: true });
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
       const contentLog = JSON.stringify(JSON.stringify(content));
@@ -129,7 +136,7 @@ app.post(
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
     if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
-      let limitReached = await freeTierLimitReached(content, user, req);
+      let limitReached = freeTierLimitReached(content, user, req);
       if (limitReached) {
         throw new ForbiddenError("Free tier user reached viewership limit");
       }
@@ -159,11 +166,15 @@ app.post(
           );
         }
 
-        const query = [];
-        query.push(sql`signing_key.data->>'publicKey' = ${req.body.pub}`);
-        const [signingKeyOutput] = await db.signingKey.find(query, {
-          limit: 2,
-        });
+        const [signingKeyOutput] = await cache.getOrSet(
+          `acl-signing-key-pub-${req.body.pub}`,
+          () => {
+            const query = [
+              sql`signing_key.data->>'publicKey' = ${req.body.pub}`,
+            ];
+            return db.signingKey.find(query, { limit: 2 });
+          }
+        );
 
         if (signingKeyOutput.length == 0) {
           console.log(`
@@ -210,7 +221,9 @@ app.post(
             "Content is gated and requires an access key"
           );
         }
-        const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
+        const webhook = await db.webhook.get(content.playbackPolicy.webhookId, {
+          useCache: true,
+        });
         if (!webhook) {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but corresponding webhook not found for webhookId=${content.playbackPolicy.webhookId}, disallowing playback
@@ -280,11 +293,11 @@ app.get("/public-key", async (req, res) => {
     });
 });
 
-async function freeTierLimitReached(
+function freeTierLimitReached(
   content: DBStream | WithID<Asset>,
   user: User,
   req: Request
-): Promise<boolean> {
+): boolean {
   if (!isFreeTierUser(user)) {
     return false;
   }

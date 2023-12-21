@@ -136,8 +136,10 @@ describe("auth middleware", () => {
     let nonAdminApiKey: string;
     let client: TestClient;
 
-    const setAccess = (token: string, rules?: ApiToken["access"]["rules"]) =>
-      db.apiToken.update(token, { access: { rules } });
+    const setAccess = async (
+      token: string,
+      rules?: ApiToken["access"]["rules"]
+    ) => db.apiToken.update(token, { access: { rules } });
 
     const fetchStatus = async (method: string, path: string) => {
       const res = await client.fetch(path, { method });
@@ -375,7 +377,7 @@ describe("auth middleware", () => {
       } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     });
 
-    const setAccess = (token: string, access?: ApiToken["access"]) =>
+    const setAccess = async (token: string, access?: ApiToken["access"]) =>
       db.apiToken.update(token, { access });
 
     const expectResponse = (res: Response) =>

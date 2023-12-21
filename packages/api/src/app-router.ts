@@ -27,6 +27,7 @@ import { setupTus, setupTestTus } from "./controllers/asset";
 import * as fcl from "@onflow/fcl";
 import createFrontend from "@livepeer.studio/www";
 import { NotFoundError } from "./store/errors";
+import { cache } from "./store/cache";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -57,6 +58,7 @@ export default async function makeApp(params: CliArgs) {
     httpPrefix,
     postgresUrl,
     postgresReplicaUrl,
+    defaultCacheTtl,
     frontendDomain,
     supportAddr,
     sendgridTemplateId,
@@ -98,6 +100,9 @@ export default async function makeApp(params: CliArgs) {
     postgresReplicaUrl,
     appName: ownRegion ? `${ownRegion}-api` : "api",
   });
+  if (defaultCacheTtl > 0) {
+    cache.init({ stdTTL: defaultCacheTtl });
+  }
 
   // RabbitMQ
   const queue: Queue = amqpUrl

@@ -195,6 +195,7 @@ describe("controllers/signing-key", () => {
       });
       expect(res.status).toBe(204);
       await db.user.update(gatedAsset.userId, { suspended: true });
+
       const res2 = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "jwt",

@@ -142,6 +142,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "url of a postgres read replica database",
         type: "string",
       },
+      "default-cache-ttl": {
+        describe: "default TTL for entries cached in memory, in seconds",
+        type: "number",
+        default: 120,
+      },
       "amqp-url": {
         describe: "the RabbitMQ Url",
         type: "string",
