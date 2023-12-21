@@ -15,7 +15,6 @@ import serverPromise, { TestServer } from "../test-server";
 import { authenticator, corsApiKeyAccessRules } from "./auth";
 import { AuthPolicy } from "./authPolicy";
 import errorHandler from "./errorHandler";
-import { cache } from "../store/cache";
 
 let server: TestServer;
 let mockAdminUserInput: User;
