@@ -55,6 +55,8 @@ components:
           minimum: 1
         quality:
           type: integer
+          description: |
+            Restricts the size of the output video using the constant quality feature. Increasing this value will result in a lower quality video. Note that this parameter might not work if the transcoder lacks support for it.
           minimum: 0
           maximum: 44
         gop:
@@ -96,6 +98,8 @@ components:
           minimum: 400
         quality:
           type: integer
+          description: |
+            Restricts the size of the output video using the constant quality feature. Increasing this value will result in a lower quality video. Note that this parameter might not work if the transcoder lacks support for it.
           minimum: 0
           maximum: 44
         fps:
