@@ -268,16 +268,20 @@ async function buildSingleRecordingUrl(
   const urlPrefix = pathJoin(os.publicUrl, session.playbackId, session.id);
   const manifestUrl = pathJoin(urlPrefix, "output.m3u8");
 
-  const exists = await cache.getOrSet(
-    `manifest-check-${manifestUrl}`,
-    async () => {
-      let resp = await fetchWithTimeout(manifestUrl, {
-        method: "HEAD",
-        timeout: 5 * 1000,
-      });
-      return resp.status === 200;
-    }
-  );
+  const cacheKey = `manifest-check-${manifestUrl}`;
+  let exists = cache.get<boolean>(cacheKey);
+  if (typeof exists === "undefined") {
+    const resp = await fetchWithTimeout(manifestUrl, {
+      method: "HEAD",
+      timeout: 5 * 1000,
+    });
+    exists = resp.status === 200;
+
+    // cache only for 15 seconds if it doesn't exist, in case stream is starting
+    const ttl = exists ? 120 : 15;
+    cache.set(cacheKey, exists, ttl);
+  }
+
   if (!exists) {
     return null;
   }
