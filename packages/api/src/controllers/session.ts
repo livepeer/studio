@@ -24,6 +24,7 @@ import {
 } from "./stream";
 import { LVPR_SDK_EMAILS, getClips } from "./clip";
 import { NotFoundError } from "../store/errors";
+import { cache } from "../store/cache";
 
 const app = Router();
 
@@ -229,6 +230,7 @@ export async function getRunningRecording(content: DBStream, req: Request) {
     `);
     return {
       url: null,
+      thumbUrl: null,
       session: null,
       objectStoreId: null,
     };
@@ -246,43 +248,38 @@ export async function buildRecordingUrl(
   recordCatalystObjectStoreId: string,
   secondaryRecordObjectStoreId: string
 ) {
-  const os = await db.objectStore.get(recordCatalystObjectStoreId, {
-    useCache: true,
-  });
-
-  let urlPrefix = pathJoin(os.publicUrl, session.playbackId, session.id);
-  let manifestUrl = pathJoin(urlPrefix, "output.m3u8");
-
-  let params = {
-    method: "HEAD",
-    timeout: 5 * 1000,
-  };
-  let resp = await fetchWithTimeout(manifestUrl, params);
-  if (resp.status == 200) {
-    return {
-      url: manifestUrl,
-      session,
-      objectStoreId: recordCatalystObjectStoreId,
-      thumbUrl: pathJoin(urlPrefix, "source", "latest.jpg"),
-    };
-  }
-
-  const secondaryOs = await db.objectStore.get(secondaryRecordObjectStoreId, {
-    useCache: true,
-  });
-  urlPrefix = pathJoin(secondaryOs.publicUrl, session.playbackId, session.id);
-  manifestUrl = pathJoin(urlPrefix, "output.m3u8");
-
-  const objectStoreId = secondaryRecordObjectStoreId;
-
-  resp = await fetchWithTimeout(manifestUrl, params);
-
-  if (resp.status != 200) {
-    return {
+  return (
+    (await buildSingleRecordingUrl(session, recordCatalystObjectStoreId)) ??
+    (await buildSingleRecordingUrl(session, secondaryRecordObjectStoreId)) ?? {
       url: null,
+      thumbUrl: null,
       session,
-      objectStoreId,
-    };
+      objectStoreId: secondaryRecordObjectStoreId,
+    }
+  );
+}
+
+async function buildSingleRecordingUrl(
+  session: DBSession,
+  objectStoreId: string
+) {
+  const os = await db.objectStore.get(objectStoreId, { useCache: true });
+
+  const urlPrefix = pathJoin(os.publicUrl, session.playbackId, session.id);
+  const manifestUrl = pathJoin(urlPrefix, "output.m3u8");
+
+  const exists = await cache.getOrSet(
+    `manifest-check-${manifestUrl}`,
+    async () => {
+      let resp = await fetchWithTimeout(manifestUrl, {
+        method: "HEAD",
+        timeout: 5 * 1000,
+      });
+      return resp.status === 200;
+    }
+  );
+  if (!exists) {
+    return null;
   }
 
   return {
@@ -292,4 +289,5 @@ export async function buildRecordingUrl(
     thumbUrl: pathJoin(urlPrefix, "source", "latest.jpg"),
   };
 }
+
 export default app;
