@@ -17,6 +17,7 @@ import {
   SigningKey,
   Room,
   Attestation,
+  JwtRefreshToken,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
@@ -66,6 +67,7 @@ export class DB {
   task: TaskTable;
   signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
+  jwtRefreshToken: Table<JwtRefreshToken>;
   user: Table<User>;
   experiment: ExperimentTable;
   attestation: AttestationTable;
@@ -146,6 +148,10 @@ export class DB {
     this.apiToken = makeTable<ApiToken>({
       db: this,
       schema: schemas["api-token"],
+    });
+    this.jwtRefreshToken = makeTable<JwtRefreshToken>({
+      db: this,
+      schema: schemas["jwt-refresh-token"],
     });
     this.asset = new AssetTable({
       db: this,

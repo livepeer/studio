@@ -19,6 +19,7 @@ import {
   User,
   SuspendUserPayload,
   DisableUserPayload,
+  RefreshTokenPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -615,6 +616,12 @@ app.post("/token", validatePost("user"), async (req, res) => {
       algorithm: "HS256",
     }
   );
+  const refreshToken = await db.jwtRefreshToken.create({
+    id: uuid(),
+    userId: user.id,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + req.config.jwtRefreshTokenTtl * 1000,
+  });
 
   let isTest =
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
@@ -636,8 +643,47 @@ app.post("/token", validatePost("user"), async (req, res) => {
     });
   }
   res.status(201);
-  res.json({ id: user.id, email: user.email, token: token });
+  res.json({ id: user.id, email: user.email, token, refreshToken });
 });
+
+app.post(
+  "/token/refresh",
+  validatePost("refresh-token-payload"),
+  async (req, res) => {
+    const { refreshToken } = req.body as RefreshTokenPayload;
+    const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
+    if (
+      !refreshTokenObj ||
+      refreshTokenObj.expiresAt < Date.now() ||
+      refreshTokenObj.revoked
+    ) {
+      console.log(
+        `Refresh attempt with invalid refresh token=${refreshToken} expiresAt=${refreshTokenObj?.expiresAt} revoked=${refreshTokenObj?.revoked}`
+      );
+      return res.status(401).json({ errors: ["invalid refresh token"] });
+    }
+
+    const user = await db.user.get(refreshTokenObj.userId);
+    if (user.suspended) {
+      return res.status(403).json({ errors: ["user is suspended"] });
+    }
+
+    const token = jwt.sign(
+      { sub: user.id, aud: req.config.jwtAudience },
+      req.config.jwtSecret,
+      {
+        algorithm: "HS256",
+      }
+    );
+
+    await db.jwtRefreshToken.update(refreshToken, {
+      lastSeen: Date.now(),
+    });
+
+    res.status(201);
+    res.json({ token });
+  }
+);
 
 app.post("/verify", validatePost("user-verification"), async (req, res) => {
   let user = await findUserByEmail(req.body.email);

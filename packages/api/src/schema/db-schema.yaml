@@ -464,6 +464,45 @@ components:
           description:
             Timestamp (in milliseconds) at which token object was created
           example: 1587667174725
+    jwt-refresh-token:
+      type: object
+      table: jwt_refresh_token
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        userId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        lastSeen:
+          type: number
+          example: 1587667174725
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which token object was created
+          example: 1587667174725
+        expiresAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which token will expire
+          example: 1587667174725
+        revoked:
+          type: boolean
+          description: Whether the refresh token has been revoked
+          default: false
+    refresh-token-payload:
+      type: object
+      additionalProperties: false
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token to be used to generate a new JWT
     transcode-asset-payload:
       additionalProperties: false
       required:
