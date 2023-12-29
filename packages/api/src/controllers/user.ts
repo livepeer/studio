@@ -44,6 +44,8 @@ const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
 const freePlan = "prod_O9XuIjn7EqYRVW";
 
+const REFRESH_TOKEN_REFRESH_THRESHOLD = 0.2;
+
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
     delete obj[f];
@@ -651,17 +653,30 @@ app.post(
   "/token/refresh",
   validatePost("refresh-token-payload"),
   async (req, res) => {
+    const now = Date.now();
     const { refreshToken } = req.body as RefreshTokenPayload;
     const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
     if (
       !refreshTokenObj ||
-      refreshTokenObj.expiresAt < Date.now() ||
+      refreshTokenObj.expiresAt < now ||
       refreshTokenObj.revoked
     ) {
       console.log(
         `Refresh attempt with invalid refresh token=${refreshToken} expiresAt=${refreshTokenObj?.expiresAt} revoked=${refreshTokenObj?.revoked}`
       );
       return res.status(401).json({ errors: ["invalid refresh token"] });
+    }
+
+    if (now - refreshTokenObj.lastSeen < req.config.jwtAccessTokenTtl / 2) {
+      console.log(
+        `Revoking token due to potential malicious use of refreshToken=${refreshToken}`
+      );
+      await db.jwtRefreshToken.update(refreshToken, {
+        revoked: true,
+      });
+      return res
+        .status(401)
+        .json({ errors: ["refresh token has already been used too recently"] });
     }
 
     const user = await db.user.get(refreshTokenObj.userId);
@@ -678,12 +693,32 @@ app.post(
       }
     );
 
-    await db.jwtRefreshToken.update(refreshToken, {
-      lastSeen: Date.now(),
-    });
+    let newRefreshToken: string;
+    const fullTokenTtl = refreshTokenObj.expiresAt - refreshTokenObj.createdAt;
+    if (
+      refreshTokenObj.expiresAt - now <
+      fullTokenTtl * REFRESH_TOKEN_REFRESH_THRESHOLD
+    ) {
+      // issue a new token and revoke the old one if it's close to expiring
+      await db.jwtRefreshToken.update(refreshToken, {
+        lastSeen: now,
+        revoked: true,
+      });
+      ({ id: newRefreshToken } = await db.jwtRefreshToken.create({
+        id: uuid(),
+        userId: user.id,
+        createdAt: now,
+        expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
+      }));
+    } else {
+      // otherwise just update the lastSeen
+      await db.jwtRefreshToken.update(refreshToken, {
+        lastSeen: now,
+      });
+    }
 
     res.status(201);
-    res.json({ token });
+    res.json({ token, refreshToken: newRefreshToken });
   }
 );
 
