@@ -614,6 +614,7 @@ app.post("/token", validatePost("user"), async (req, res) => {
     req.config.jwtSecret,
     {
       algorithm: "HS256",
+      expiresIn: req.config.jwtAccessTokenTtl,
     }
   );
   const refreshToken = await db.jwtRefreshToken.create({
@@ -673,6 +674,7 @@ app.post(
       req.config.jwtSecret,
       {
         algorithm: "HS256",
+        expiresIn: req.config.jwtAccessTokenTtl,
       }
     );
 

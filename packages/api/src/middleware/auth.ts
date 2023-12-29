@@ -2,7 +2,7 @@ import { URL } from "url";
 import basicAuth from "basic-auth";
 import corsLib, { CorsOptions } from "cors";
 import { Request, RequestHandler, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
 
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
 import { ApiToken, User } from "../schema/types";
@@ -100,6 +100,9 @@ function authenticator(): RequestHandler {
         userId = verified.sub;
         tracking.recordUser(userId);
       } catch (err) {
+        if (err instanceof TokenExpiredError) {
+          throw new UnauthorizedError(`access token expired`);
+        }
         throw new UnauthorizedError(err.message);
       }
     } else {
