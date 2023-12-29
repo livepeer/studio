@@ -14,7 +14,7 @@ import {
 } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
-import { storeToken, clearToken } from "../tokenStorage";
+import { storeToken, clearTokens } from "../tokenStorage";
 import { trackPageView } from "../tracking";
 import { products } from "@livepeer.studio/api/src/config";
 
@@ -43,16 +43,46 @@ export const login = async (email, password) => {
   if (res.status !== 201) {
     return body;
   }
-  const { token } = body;
-  storeToken(token);
+  const { token, refreshToken } = body;
+  storeToken(token, refreshToken);
 
   if (process.env.NODE_ENV === "production") {
     const data = jwt.decode(token, { json: true });
     window.analytics.identify(data.sub, { email });
   }
 
-  setState((state) => ({ ...state, token }));
+  setState((state) => ({ ...state, token, refreshToken }));
   return res;
+};
+
+export const refreshAccessToken = async (
+  email: string,
+  refreshToken: string
+) => {
+  const [res, body] = await context.fetch("/user/token/refresh", {
+    method: "POST",
+    body: JSON.stringify({ refreshToken }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+  if (res.status !== 201) {
+    return false;
+  }
+  const { token, refreshToken: newRefreshToken } = body;
+  if (newRefreshToken) {
+    // allow the refresh token itself to be refreshed if the server sends a new one
+    refreshToken = newRefreshToken;
+  }
+  storeToken(token, refreshToken);
+
+  if (process.env.NODE_ENV === "production") {
+    const data = jwt.decode(token, { json: true });
+    window.analytics.identify(data.sub, { email });
+  }
+
+  setState((state) => ({ ...state, token, refreshToken }));
+  return true;
 };
 
 export const register = async ({
@@ -451,6 +481,11 @@ export const updateCustomerPaymentMethod = async ({
 };
 
 export const logout = async () => {
-  setState((state) => ({ ...state, user: null, token: null }));
-  clearToken();
+  setState((state) => ({
+    ...state,
+    user: null,
+    token: null,
+    refreshToken: null,
+  }));
+  clearTokens();
 };

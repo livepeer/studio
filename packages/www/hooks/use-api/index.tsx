@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "@livepeer.studio/api";
 import { isStaging, isDevelopment } from "../../lib/utils";
 import { ApiState } from "./types";
-import { clearToken, getStoredToken } from "./tokenStorage";
+import { clearTokens, getStoredToken } from "./tokenStorage";
 import * as accessControlEndpointsFunctions from "./endpoints/accessControl";
 import * as apiTokenEndpointsFunctions from "./endpoints/apiToken";
 import * as assetEndpointsFunctions from "./endpoints/asset";
@@ -49,7 +49,7 @@ const makeContext = (
     ...state,
     endpoint,
 
-    async fetch(url: string, opts: RequestInit = {}) {
+    async fetch(url: string, opts: RequestInit = {}, isRetry = false) {
       let headers = new Headers(opts.headers || {});
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
@@ -61,12 +61,26 @@ const makeContext = (
       if (res.status === 204) {
         return [res];
       }
+
       // todo: not every endpoint will return JSON
       const body = await res.json();
       // todo: this can go away once we standardize on body.errors
       if (!Array.isArray(body.errors) && typeof body.error === "string") {
         body.errors = [body.error];
       }
+
+      const tokenExpired =
+        res.status === 401 && body.errors?.[0] === "access token expired";
+      if (tokenExpired && state.refreshToken && !isRetry) {
+        const refreshed = await userEndpointsFunctions.refreshAccessToken(
+          state.user?.email,
+          state.refreshToken
+        );
+        if (refreshed) {
+          return context.fetch(url, opts, true);
+        }
+      }
+
       return [res, body];
     },
 
@@ -123,8 +137,8 @@ export const ApiProvider = ({ children }) => {
       const data = jwt.decode(state.token);
       context.getUser(data.sub).then(([res, user]) => {
         if (res.status !== 200) {
-          clearToken();
-          setState((state) => ({ ...state, token: null }));
+          clearTokens();
+          setState((state) => ({ ...state, token: null, refreshToken: null }));
         } else {
           setState((state) => ({ ...state, user: user as User }));
         }
