@@ -57,15 +57,27 @@ export const login = async (email, password) => {
 
 export const refreshAccessToken = async (
   email: string,
-  refreshToken: string
+  refreshToken: string,
+  legacyJwt?: string
 ) => {
-  const res = await fetch("/user/token/refresh", {
-    method: "POST",
-    body: JSON.stringify({ refreshToken }),
-    headers: {
-      "content-type": "application/json",
-    },
-  });
+  let res: Response;
+  if (!refreshToken && legacyJwt) {
+    // TODO: Remove this logic after the never-expiring JWTs cut-off date
+    res = await fetch("/user/token/migrate", {
+      method: "POST",
+      headers: {
+        authorization: `JWT ${legacyJwt}`,
+      },
+    });
+  } else {
+    res = await fetch("/user/token/refresh", {
+      method: "POST",
+      body: JSON.stringify({ refreshToken }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+  }
   if (res.status !== 201) {
     return false;
   }

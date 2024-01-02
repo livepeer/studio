@@ -14,7 +14,19 @@ import tracking from "./tracking";
 
 type AuthScheme = "jwt" | "bearer" | "basic";
 
-export const EMAIL_VERIFICATION_CUTOFF_DATE = 1695765600000;
+/**
+ * EMAIL_VERIFICATION_CUTOFF_DATE is the date when we started requiring email
+ * verification for new users.
+ */
+export const EMAIL_VERIFICATION_CUTOFF_DATE = 1695765600000; // 2023-09-26T22:00:00.000Z
+
+/**
+ * NEVER_EXPIRING_JWT_CUTOFF_DATE is the date when we stop accepting JWTs
+ * without an expiration date (we used to generate them like that). The new JWTs
+ * are set to expire after a short time and the client manages using a refresh
+ * token for keeping the user logged in.
+ */
+export const NEVER_EXPIRING_JWT_CUTOFF_DATE = 1706745600000; // 2024-02-01T00:00:00.000Z
 
 function parseAuthHeader(authHeader: string) {
   const match = authHeader?.match(/^\s*(\w+)\s+(.+)$/);
@@ -98,6 +110,14 @@ function authenticator(): RequestHandler {
           audience: req.config.jwtAudience,
         }) as JwtPayload;
         userId = verified.sub;
+
+        // jwt lib will already validate the exp in case its present, so we just
+        // need to check for the never-expiring JWTs.
+        if (!verified.exp && Date.now() > EMAIL_VERIFICATION_CUTOFF_DATE) {
+          throw new UnauthorizedError(
+            `legacy access token detected. please log in again`
+          );
+        }
         tracking.recordUser(userId);
       } catch (err) {
         if (err instanceof TokenExpiredError) {

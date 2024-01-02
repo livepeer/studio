@@ -37,6 +37,7 @@ import {
 } from "./helpers";
 import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 import sql from "sql-template-strings";
+import { CliArgs } from "../parse-cli";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -178,6 +179,16 @@ async function createSubscription(
       ...payAsYouGoItems,
     ],
     expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+function signUserJwt(
+  userId: string,
+  { jwtAudience, jwtSecret, jwtAccessTokenTtl }: CliArgs
+) {
+  return jwt.sign({ sub: userId, aud: jwtAudience }, jwtSecret, {
+    algorithm: "HS256",
+    expiresIn: jwtAccessTokenTtl,
   });
 }
 
@@ -611,14 +622,7 @@ app.post("/token", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
-  const token = jwt.sign(
-    { sub: user.id, aud: req.config.jwtAudience },
-    req.config.jwtSecret,
-    {
-      algorithm: "HS256",
-      expiresIn: req.config.jwtAccessTokenTtl,
-    }
-  );
+  const token = signUserJwt(user.id, req.config);
   const refreshToken = await db.jwtRefreshToken.create({
     id: uuid(),
     userId: user.id,
@@ -684,14 +688,7 @@ app.post(
       return res.status(403).json({ errors: ["user is suspended"] });
     }
 
-    const token = jwt.sign(
-      { sub: user.id, aud: req.config.jwtAudience },
-      req.config.jwtSecret,
-      {
-        algorithm: "HS256",
-        expiresIn: req.config.jwtAccessTokenTtl,
-      }
-    );
+    const token = signUserJwt(user.id, req.config);
 
     let newRefreshToken: string;
     const fullTokenTtl = refreshTokenObj.expiresAt - refreshTokenObj.createdAt;
@@ -716,6 +713,29 @@ app.post(
         lastSeen: now,
       });
     }
+
+    res.status(201);
+    res.json({ token, refreshToken: newRefreshToken });
+  }
+);
+
+// Utility to migrate from the never-expiring JWTs from the dashboard to
+// separate access and refresh tokens.
+// TODO: Remove this after the cut-off date when these JWTs won't be valid anymore.
+app.post(
+  "/token/migrate",
+  authorizer({ noApiToken: true }),
+  async (req, res) => {
+    // this API is authorized so we don't need to check anything here
+    const token = signUserJwt(req.user.id, req.config);
+
+    const now = Date.now();
+    const { id: newRefreshToken } = await db.jwtRefreshToken.create({
+      id: uuid(),
+      userId: req.user.id,
+      createdAt: now,
+      expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
+    });
 
     res.status(201);
     res.json({ token, refreshToken: newRefreshToken });
