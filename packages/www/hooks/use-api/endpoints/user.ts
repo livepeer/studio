@@ -59,7 +59,7 @@ export const refreshAccessToken = async (
   email: string,
   refreshToken: string
 ) => {
-  const [res, body] = await context.fetch("/user/token/refresh", {
+  const res = await fetch("/user/token/refresh", {
     method: "POST",
     body: JSON.stringify({ refreshToken }),
     headers: {
@@ -69,7 +69,7 @@ export const refreshAccessToken = async (
   if (res.status !== 201) {
     return false;
   }
-  const { token, refreshToken: newRefreshToken } = body;
+  const { token, refreshToken: newRefreshToken } = await res.json();
   if (newRefreshToken) {
     // allow the refresh token itself to be refreshed if the server sends a new one
     refreshToken = newRefreshToken;
