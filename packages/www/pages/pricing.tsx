@@ -7,6 +7,12 @@ import path from "path";
 import { Pricing as Content } from "content";
 import { Callout } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
+import Ripe, { categories, pages } from "lib/ripe";
+
+Ripe.trackPage({
+  category: categories.PRICING,
+  name: pages.PRICING,
+});
 
 const PricingPage = ({ markdownContent }) => {
   return (
