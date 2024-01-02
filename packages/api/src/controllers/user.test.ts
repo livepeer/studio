@@ -1,10 +1,12 @@
 import { v4 as uuid } from "uuid";
+import jwt from "jsonwebtoken";
 
 import { User } from "../schema/types";
 import db from "../store/db";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import sql from "sql-template-strings";
+import { NEVER_EXPIRING_JWT_CUTOFF_DATE } from "../middleware";
 
 let server: TestServer;
 let mockUser: User;
@@ -268,10 +270,9 @@ describe("controllers/user", () => {
       expect(res.status).toBe(201);
 
       // token request missing field, should return error
-      const postMockUserNoPassword = JSON.parse(JSON.stringify(mockUser));
-      postMockUserNoPassword.password = "";
       res = await client.post("/user/token", {
-        ...postMockUserNoPassword,
+        ...mockUser,
+        password: undefined,
       });
       tokenRes = res.json();
       expect(res.status).toBe(422);
@@ -317,6 +318,7 @@ describe("controllers/user", () => {
       expect(tokenRes.id).toBeDefined();
       expect(tokenRes.email).toBe(mockUser.email);
       expect(tokenRes.token).toBeDefined();
+      expect(tokenRes.refreshToken).toBeDefined();
 
       // token should be returned without error with an uppercase email
       res = await client.post("/user/token", {
@@ -328,6 +330,7 @@ describe("controllers/user", () => {
       expect(tokenRes.id).toBeDefined();
       expect(tokenRes.email).toBe(mockUser.email);
       expect(tokenRes.token).toBeDefined();
+      expect(tokenRes.refreshToken).toBeDefined();
     });
 
     it("should reset user password", async () => {
@@ -390,6 +393,222 @@ describe("controllers/user", () => {
 
       resp = await req.json();
       expect(resp.errors[0]).toBe("Password reset token not found");
+    });
+  });
+
+  describe.only("JWT token refresh", () => {
+    let client: TestClient;
+    let ACCESS_TOKEN_TTL: number;
+    let REFRESH_TOKEN_TTL: number;
+
+    let mockUserObj: User;
+
+    beforeEach(async () => {
+      client = new TestClient({ server });
+      ACCESS_TOKEN_TTL = server.jwtAccessTokenTtl * 1000;
+      REFRESH_TOKEN_TTL = server.jwtRefreshTokenTtl * 1000;
+
+      const res = await client.post("/user/", mockUser);
+      expect(res.status).toBe(201);
+      mockUserObj = await res.json();
+    });
+
+    const expectValidAccessToken = async (token: string) => {
+      const oldJwtAuth = client.jwtAuth;
+      try {
+        client.jwtAuth = token;
+        const res = await client.get("/user/me");
+        const user = await res.json();
+        expect(user).toMatchObject({ id: mockUserObj.id });
+        expect(res.status).toBe(200);
+      } finally {
+        client.jwtAuth = oldJwtAuth;
+      }
+    };
+
+    const expectValidRefreshToken = async (refreshTokenId: string) => {
+      const refreshToken = await db.jwtRefreshToken.get(refreshTokenId);
+      expect(refreshToken).toMatchObject({
+        id: refreshTokenId,
+        userId: mockUserObj.id,
+      });
+      expect(refreshToken.lastSeen).toBeUndefined();
+      expect(refreshToken.revoked).toBeFalsy();
+      expect(refreshToken.createdAt).toBeLessThanOrEqual(Date.now());
+      expect(refreshToken.expiresAt).toBeGreaterThan(
+        Date.now() + REFRESH_TOKEN_TTL - 60000
+      );
+    };
+
+    it("should return access and refresh token", async () => {
+      const res = await client.post("/user/token", mockUser);
+      expect(res.status).toBe(201);
+      const tokenRes = await res.json();
+      expect(tokenRes.id).toBeDefined();
+      expect(tokenRes.email).toBe(mockUser.email);
+      expect(tokenRes.token).toBeDefined();
+      expect(tokenRes.refreshToken).toBeDefined();
+
+      await expectValidAccessToken(tokenRes.token);
+      await expectValidRefreshToken(tokenRes.refreshToken);
+    });
+
+    describe("after login", () => {
+      let token: string;
+      let refreshToken: string;
+
+      beforeEach(async () => {
+        const res = await client.post("/user/token", mockUser);
+        expect(res.status).toBe(201);
+        ({ token, refreshToken } = await res.json());
+      });
+
+      const RealDate = Date.now;
+
+      afterEach(() => {
+        Date.now = RealDate;
+      });
+
+      const mockTimeDelay = (fakeDelay: number) => {
+        const newDate = Date.now() + fakeDelay;
+        Date.now = () => newDate;
+      };
+
+      it("should allow using refresh token to get another access token", async () => {
+        const beforeRefresh = Date.now();
+
+        const res = await client.post("/user/token/refresh", { refreshToken });
+        expect(res.status).toBe(201);
+        const body = await res.json();
+        expect(body.token).toBeDefined();
+        expect(body.token).not.toEqual(token);
+        expect(body.refreshToken).toBeUndefined();
+
+        await expectValidAccessToken(body.token);
+
+        const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
+        expect(refreshTokenObj.lastSeen).toBeLessThanOrEqual(Date.now());
+        expect(refreshTokenObj.lastSeen).toBeGreaterThanOrEqual(beforeRefresh);
+      });
+
+      it("should not accept access token after expiration", async () => {
+        mockTimeDelay(ACCESS_TOKEN_TTL + 1000);
+
+        client.jwtAuth = token;
+        const res2 = await client.get("/user/me");
+        expect(res2.status).toBe(401);
+        const { errors } = await res2.json();
+        expect(errors[0]).toBe("access token expired");
+      });
+
+      it("should allow refreshing token after access token expiration", async () => {
+        mockTimeDelay(ACCESS_TOKEN_TTL + 1000);
+
+        const res = await client.post("/user/token/refresh", {
+          refreshToken,
+        });
+        expect(res.status).toBe(201);
+        const body = await res.json();
+        expect(body.refreshToken).toBeUndefined();
+
+        await expectValidAccessToken(body.token);
+      });
+
+      it("should generate a new refresh token when close to expiration", async () => {
+        mockTimeDelay(0.9 * REFRESH_TOKEN_TTL);
+
+        const res = await client.post("/user/token/refresh", {
+          refreshToken,
+        });
+        expect(res.status).toBe(201);
+        const body = await res.json();
+        expect(body.refreshToken).toBeDefined();
+
+        await expectValidAccessToken(body.token);
+        await expectValidRefreshToken(body.refreshToken);
+
+        const oldRefreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
+        expect(oldRefreshTokenObj.revoked).toBe(true);
+      });
+    });
+
+    // This is an evil reminder to delete all the code for migrating from the
+    // never-expiring JWTs. Once this test starts failing, we should delete the
+    // section below from the tests and all the code paths that mention
+    // "never-expiring JWTs".
+    it("should delete JWT migration dead code after it is done", async () => {
+      expect(Date.now()).toBeLessThanOrEqual(NEVER_EXPIRING_JWT_CUTOFF_DATE);
+    });
+
+    describe("never-expiring JWTs migration", () => {
+      let neverExpiringJwt: string;
+
+      const RealDate = Date.now;
+
+      afterEach(() => {
+        Date.now = RealDate;
+      });
+
+      const mockTime = (newTime: number | string | Date) => {
+        const newDate = new Date(newTime).getTime();
+        Date.now = () => newDate;
+      };
+
+      beforeEach(async () => {
+        // the migration API uses regular auth which requires email verification
+        await db.user.update(mockUserObj.id, { emailValid: true });
+
+        // same as user.ts signUserJwt but without expiresAt
+        neverExpiringJwt = jwt.sign(
+          { sub: mockUserObj.id, aud: server.jwtAudience },
+          server.jwtSecret,
+          {
+            algorithm: "HS256",
+            jwtid: uuid(),
+          }
+        );
+
+        mockTime(NEVER_EXPIRING_JWT_CUTOFF_DATE - 24 * 60 * 60 * 1000);
+      });
+
+      it("should still allow accessing API", async () => {
+        await expectValidAccessToken(neverExpiringJwt);
+      });
+
+      it("should NOT allow accessing API after cut-off date", async () => {
+        mockTime(NEVER_EXPIRING_JWT_CUTOFF_DATE + 1);
+
+        client.jwtAuth = neverExpiringJwt;
+        const res = await client.get("/user/me");
+        expect(res.status).toBe(401);
+        const { errors } = await res.json();
+        expect(errors[0]).toBe(
+          "legacy access token detected. please log in again"
+        );
+      });
+
+      it("should allow migrating to a refresh token", async () => {
+        client.jwtAuth = neverExpiringJwt;
+        const res = await client.post("/user/token/migrate");
+        expect(res.status).toBe(201);
+        const body = await res.json();
+        expect(body.token).not.toEqual(neverExpiringJwt);
+
+        await expectValidAccessToken(body.token);
+        await expectValidRefreshToken(body.refreshToken);
+      });
+
+      it("should NOT allow migrating using a new token (with expiration)", async () => {
+        client.jwtAuth = neverExpiringJwt;
+        const res = await client.post("/user/token/migrate");
+        const { token: expiringToken } = await res.json();
+
+        client.jwtAuth = expiringToken;
+        const res2 = await client.post("/user/token/migrate");
+        expect(res2.status).toBe(400);
+        const { errors } = await res2.json();
+        expect(errors[0]).toBe("can only migrate from never-expiring JWTs");
+      });
     });
   });
 

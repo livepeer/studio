@@ -188,6 +188,7 @@ function signUserJwt(
 ) {
   return jwt.sign({ sub: userId, aud: jwtAudience }, jwtSecret, {
     algorithm: "HS256",
+    jwtid: uuid(),
     expiresIn: jwtAccessTokenTtl,
   });
 }
