@@ -623,8 +623,10 @@ app.post("/token", validatePost("user"), async (req, res) => {
   }
 
   const token = signUserJwt(user.id, req.config);
-  const refreshToken = await db.jwtRefreshToken.create({
-    id: uuid(),
+  const refreshToken = uuid();
+
+  await db.jwtRefreshToken.create({
+    id: refreshToken,
     userId: user.id,
     createdAt: Date.now(),
     expiresAt: Date.now() + req.config.jwtRefreshTokenTtl * 1000,
@@ -701,12 +703,14 @@ app.post(
         lastSeen: now,
         revoked: true,
       });
-      ({ id: newRefreshToken } = await db.jwtRefreshToken.create({
-        id: uuid(),
+
+      newRefreshToken = uuid();
+      await db.jwtRefreshToken.create({
+        id: newRefreshToken,
         userId: user.id,
         createdAt: now,
         expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
-      }));
+      });
     } else {
       // otherwise just update the lastSeen
       await db.jwtRefreshToken.update(refreshToken, {
