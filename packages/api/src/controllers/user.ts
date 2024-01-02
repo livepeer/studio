@@ -730,7 +730,12 @@ app.post(
   "/token/migrate",
   authorizer({ noApiToken: true }),
   async (req, res) => {
-    // this API is authorized so we don't need to check anything here
+    if (!req.isNeverExpiringJWT) {
+      return res.status(400).json({
+        errors: ["can only migrate from never-expiring JWTs"],
+      });
+    }
+
     const token = signUserJwt(req.user.id, req.config);
 
     const now = Date.now();

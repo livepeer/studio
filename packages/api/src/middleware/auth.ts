@@ -113,9 +113,13 @@ function authenticator(): RequestHandler {
 
         // jwt lib will already validate the exp in case its present, so we just
         // need to check for the never-expiring JWTs.
-        if (!verified.exp && Date.now() > EMAIL_VERIFICATION_CUTOFF_DATE) {
+        req.isNeverExpiringJWT = !verified.exp;
+        if (
+          req.isNeverExpiringJWT &&
+          Date.now() > NEVER_EXPIRING_JWT_CUTOFF_DATE
+        ) {
           throw new UnauthorizedError(
-            `legacy access token detected. please log in again`
+            "legacy access token detected. please log in again"
           );
         }
         tracking.recordUser(userId);
