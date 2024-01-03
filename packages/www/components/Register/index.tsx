@@ -18,10 +18,7 @@ export const FRONTEND_SALT = "69195A9476F08546";
 
 const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [organization, setOrganization] = useState("");
-  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -46,8 +43,6 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
     // Subscribe user to newsletter in Mailchimp
     subscribe({
       EMAIL: email,
-      FNAME: firstName,
-      LNAME: lastName,
     });
 
     // only handle submission to hubspot on prod
@@ -60,10 +55,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
     return onSubmit({
       email,
       password: hashedPassword,
-      firstName,
-      lastName,
       organization,
-      phone,
     });
   };
 
