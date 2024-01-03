@@ -1,5 +1,5 @@
 import { Box, Flex, Heading, Link, Text } from "@livepeer/design-system";
-import { Stream } from "livepeer";
+import { Stream } from "@livepeer.studio/api";
 import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
 import { isStaging } from "lib/utils";
