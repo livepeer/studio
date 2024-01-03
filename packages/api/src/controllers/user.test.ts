@@ -7,6 +7,10 @@ import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import sql from "sql-template-strings";
 import { NEVER_EXPIRING_JWT_CUTOFF_DATE } from "../middleware";
+import {
+  REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO,
+  REFRESH_TOKEN_REFRESH_THRESHOLD,
+} from "./user";
 
 let server: TestServer;
 let mockUser: User;
@@ -405,6 +409,7 @@ describe("controllers/user", () => {
 
     beforeEach(async () => {
       client = new TestClient({ server });
+      // JWT TTL args are in seconds but we use millis here, so multiply by 1000
       ACCESS_TOKEN_TTL = server.jwtAccessTokenTtl * 1000;
       REFRESH_TOKEN_TTL = server.jwtRefreshTokenTtl * 1000;
 
@@ -489,6 +494,26 @@ describe("controllers/user", () => {
         const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
         expect(refreshTokenObj.lastSeen).toBeLessThanOrEqual(Date.now());
         expect(refreshTokenObj.lastSeen).toBeGreaterThanOrEqual(beforeRefresh);
+        expect(refreshTokenObj.revoked).toBeFalsy();
+      });
+
+      it("should NOT allow using refresh token too often", async () => {
+        let res = await client.post("/user/token/refresh", { refreshToken });
+        expect(res.status).toBe(201);
+
+        mockTimeDelay(
+          ACCESS_TOKEN_TTL * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO - 60 * 1000
+        );
+
+        res = await client.post("/user/token/refresh", { refreshToken });
+        expect(res.status).toBe(401);
+        const { errors } = await res.json();
+        expect(errors[0]).toBe(
+          "refresh token has already been used too recently"
+        );
+
+        const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
+        expect(refreshTokenObj.revoked).toBe(true);
       });
 
       it("should not accept access token after expiration", async () => {
@@ -515,7 +540,9 @@ describe("controllers/user", () => {
       });
 
       it("should generate a new refresh token when close to expiration", async () => {
-        mockTimeDelay(0.9 * REFRESH_TOKEN_TTL);
+        mockTimeDelay(
+          REFRESH_TOKEN_TTL * (1 - REFRESH_TOKEN_REFRESH_THRESHOLD) + 60 * 1000
+        );
 
         const res = await client.post("/user/token/refresh", {
           refreshToken,
@@ -530,14 +557,6 @@ describe("controllers/user", () => {
         const oldRefreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
         expect(oldRefreshTokenObj.revoked).toBe(true);
       });
-    });
-
-    // This is an evil reminder to delete all the code for migrating from the
-    // never-expiring JWTs. Once this test starts failing, we should delete the
-    // section below from the tests and all the code paths that mention
-    // "never-expiring JWTs".
-    it("should delete JWT migration dead code after it is done", async () => {
-      expect(Date.now()).toBeLessThanOrEqual(NEVER_EXPIRING_JWT_CUTOFF_DATE);
     });
 
     describe("never-expiring JWTs migration", () => {

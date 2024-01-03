@@ -45,7 +45,17 @@ const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
 const freePlan = "prod_O9XuIjn7EqYRVW";
 
-const REFRESH_TOKEN_REFRESH_THRESHOLD = 0.2;
+// Ratio of the refresh token lifetime at which point we should issue a new
+// refresh token. This is to avoid having refresh tokens that never expire or
+// creating objects on the DB for every JWT (access token) that we sign.
+export const REFRESH_TOKEN_REFRESH_THRESHOLD = 0.2;
+
+// Ratio of the access token lifetime to require in between consecutive token
+// refreshes using the same refresh token. This means a refresh token can only
+// be used once every 50% of the access tokens lifetime. This is a simple logic
+// to detect malicious usage of a refresh token, e.g. if it leaks from the user
+// browser. We can improve these checks later like enforcing same device/IP/etc.
+export const REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO = 0.5;
 
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
@@ -674,7 +684,10 @@ app.post(
       return res.status(401).json({ errors: ["invalid refresh token"] });
     }
 
-    if (now - refreshTokenObj.lastSeen < req.config.jwtAccessTokenTtl / 2) {
+    const timeSinceLastRefresh = now - refreshTokenObj.lastSeen;
+    const minReuseDelay =
+      req.config.jwtAccessTokenTtl * 1000 * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO;
+    if (timeSinceLastRefresh < minReuseDelay) {
       console.log(
         `Revoking token due to potential malicious use of refreshToken=${refreshToken}`
       );
