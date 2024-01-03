@@ -24,7 +24,6 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isCompanyAffiliated, setIsCompanyAffiliated] = useState(true);
 
   const { handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -96,66 +95,20 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             Create an account
           </Text>
 
-          <Flex
-            css={{ alignItems: "center", justifyContent: "center", mb: "$4" }}>
-            <Checkbox
-              onCheckedChange={(checked) =>
-                setIsCompanyAffiliated(checked === true)
-              }
-              checked={isCompanyAffiliated}
-            />
-            <Box css={{ ml: "$1" }}>I am using Livepeer Studio for work</Box>
-          </Flex>
-
-          {isCompanyAffiliated ? (
-            <>
-              <TextField
-                size="3"
-                id="organization"
-                css={{
-                  width: "100%",
-                  mb: "$2",
-                }}
-                name="organization"
-                type="text"
-                placeholder="Organization name"
-                required
-                value={organization}
-                onChange={(e) => setOrganization(e.target.value)}
-              />
-              <TextField
-                size="3"
-                id="email"
-                css={{
-                  width: "100%",
-                  mb: "$2",
-                }}
-                name="email"
-                type="email"
-                placeholder="you@company.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </>
-          ) : (
-            <>
-              <TextField
-                size="3"
-                id="email"
-                css={{
-                  width: "100%",
-                  mb: "$2",
-                }}
-                name="email"
-                type="email"
-                placeholder="you@gmail.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </>
-          )}
+          <TextField
+            size="3"
+            id="email"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="email"
+            type="email"
+            placeholder="you@company.com"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
           <TextField
             size="3"
@@ -170,6 +123,21 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <TextField
+            size="3"
+            id="organization"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="organization"
+            type="text"
+            placeholder="Company name (if using for work)"
+            required
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
           />
 
           {errors.length > 0 && (
