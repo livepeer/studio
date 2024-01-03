@@ -2,7 +2,7 @@ import { Box, Heading, Flex, Badge } from "@livepeer/design-system";
 import { HealthStatus } from "hooks/use-analyzer";
 import StatusBadge, { Variant } from "../StatusBadge";
 import { PauseIcon } from "@radix-ui/react-icons";
-import { Stream } from "@livepeer.studio/api";
+import { Stream } from "livepeer";
 
 export type StreamHeadingBoxProps = {
   stream: Stream & { suspended?: boolean };

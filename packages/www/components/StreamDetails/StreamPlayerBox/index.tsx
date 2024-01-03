@@ -8,7 +8,7 @@ import {
 } from "@livepeer/design-system";
 import { Broadcast as LivepeerBroadcast } from "@livepeer/react";
 import { Share2Icon } from "@radix-ui/react-icons";
-import { Stream } from "@livepeer.studio/api";
+import { Stream } from "livepeer";
 import AssetSharePopup from "../../AssetDetails/AssetSharePopup";
 
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
