@@ -33,7 +33,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
     const [hashedPassword] = await hash(password, FRONTEND_SALT);
     // hash password, then
-    return onSubmit({
+    onSubmit({
       password: hashedPassword,
     });
   };

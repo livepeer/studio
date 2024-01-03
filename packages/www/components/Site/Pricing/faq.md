@@ -44,8 +44,9 @@ a Hacker account, your account will be disabled until you select a paid plan.
 ### **What currencies does Livepeer Studio accept?**
 
 USD is the only currency accepted right now via the Livepeer Studio dashboard.
-Crypto-native payments are coming soon. If you prefer to pay with cryptocurrency
-now, you may reach out at [help@livepeer.org](mailto:help@livepeer.org)
+Crypto-native payments are coming later this year. If you prefer to pay with
+cryptocurrency now, you may reach out
+at [help@livepeer.org](mailto:help@livepeer.org)
 
 ### **How are transcoding, storage, and delivery minutes derived?**
 

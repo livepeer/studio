@@ -318,9 +318,7 @@ const CompareTable = ({ comparison = "mux" }) => {
             <Th>
               <Text>Video clipping</Text>
             </Th>
-            <Td>
-              <Check />
-            </Td>
+            <Td>ETA Sept. 2023</Td>
             <Td className="mux">
               <Check />
             </Td>
@@ -332,9 +330,7 @@ const CompareTable = ({ comparison = "mux" }) => {
             <Th>
               <Text>Thumbnails</Text>
             </Th>
-            <Td>
-              <Check />
-            </Td>
+            <Td>ETA Sept. 2023</Td>
             <Td className="mux">
               <Check />
             </Td>
@@ -346,7 +342,7 @@ const CompareTable = ({ comparison = "mux" }) => {
             <Th>
               <Text>Captions</Text>
             </Th>
-            <Td>Coming soon!</Td>
+            <Td>ETA Sept. 2023</Td>
             <Td className="mux">
               <Check />
             </Td>
