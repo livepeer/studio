@@ -132,7 +132,15 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
           />
 
           {errors.length > 0 && (
-            <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+            <Box css={{ mt: "$2" }}>
+              {errors
+                .map((e) => {
+                  // Make sure messages are capitalized
+                  return e.charAt(0).toUpperCase() + e.slice(1);
+                })
+                .join(", ")}
+              &nbsp;
+            </Box>
           )}
 
           <Button
