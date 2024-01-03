@@ -396,7 +396,7 @@ describe("controllers/user", () => {
     });
   });
 
-  describe.only("JWT token refresh", () => {
+  describe("JWT token refresh", () => {
     let client: TestClient;
     let ACCESS_TOKEN_TTL: number;
     let REFRESH_TOKEN_TTL: number;
