@@ -135,7 +135,6 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             name="organization"
             type="text"
             placeholder="Company name (if using for work)"
-            required
             value={organization}
             onChange={(e) => setOrganization(e.target.value)}
           />
