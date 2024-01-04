@@ -1371,11 +1371,11 @@ app.post(
     };
 
     await db.stream.update(stream.id, patch);
-
+    const updatedTarget = await db.multistreamTarget.get(newTarget.id);
     await triggerCatalystStreamUpdated(req, stream.playbackId);
 
     res.status(200);
-    res.json(newTarget);
+    res.json(db.multistreamTarget.cleanWriteOnlyResponse(updatedTarget));
   }
 );
 
