@@ -523,7 +523,9 @@ describe("controllers/stream", () => {
           spec: { name: "target-name", url: "rtmp://test/test" },
         }
       );
-      expect(res2.status).toBe(204);
+      expect(res2.status).toBe(200);
+      const body = await res2.json();
+      expect(body.id).toBeDefined();
     });
 
     describe("set active and heartbeat", () => {

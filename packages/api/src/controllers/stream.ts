@@ -115,11 +115,7 @@ async function validateMultistreamTarget(
   return { ...specless, id: created.id };
 }
 
-async function validateMultistreamOpts(
-  userId: string,
-  profiles: Profile[],
-  multistream: MultistreamOptions
-): Promise<MultistreamOptions> {
+function toProfileNames(profiles: Profile[]): Set<string> {
   const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
@@ -132,7 +128,15 @@ async function validateMultistreamOpts(
     profileNames.add(name);
   }
   profileNames.add("source");
+  return profileNames;
+}
 
+async function validateMultistreamOpts(
+  userId: string,
+  profiles: Profile[],
+  multistream: MultistreamOptions
+): Promise<MultistreamOptions> {
+  const profileNames = toProfileNames(profiles);
   if (!multistream?.targets) {
     return { targets: [] };
   }
@@ -1346,8 +1350,14 @@ app.post(
       return res.json({ errors: ["stream not found"] });
     }
 
+    const newTarget = await validateMultistreamTarget(
+      req.user.id,
+      toProfileNames(stream.profiles),
+      payload
+    );
+
     let multistream: DBStream["multistream"] = {
-      targets: [...(stream.multistream?.targets ?? []), payload],
+      targets: [...(stream.multistream?.targets ?? []), newTarget],
     };
 
     multistream = await validateMultistreamOpts(
@@ -1361,11 +1371,11 @@ app.post(
     };
 
     await db.stream.update(stream.id, patch);
-
+    const updatedTarget = await db.multistreamTarget.get(newTarget.id);
     await triggerCatalystStreamUpdated(req, stream.playbackId);
 
-    res.status(204);
-    res.end();
+    res.status(200);
+    res.json(db.multistreamTarget.cleanWriteOnlyResponse(updatedTarget));
   }
 );
 
