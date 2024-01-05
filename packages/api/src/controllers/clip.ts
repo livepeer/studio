@@ -2,7 +2,11 @@ import { validatePost } from "../middleware";
 import { Request, Response, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
-import { ForbiddenError, NotFoundError } from "../store/errors";
+import {
+  ForbiddenError,
+  NotFoundError,
+  UnprocessableEntityError,
+} from "../store/errors";
 import {
   createAsset,
   validateAssetPayload,
@@ -156,6 +160,12 @@ app.post(
 
     if (!session) {
       throw new Error("Recording session not found");
+    }
+
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    if (typeof endTime === "number" && endTime <= startTime) {
+      throw new UnprocessableEntityError("endTime must occur after startTime");
     }
 
     let asset = await validateAssetPayload(
