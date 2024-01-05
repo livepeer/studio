@@ -10,6 +10,7 @@ import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
 import { authorizer, validatePost } from "../middleware";
+import { isFakeEmail } from "fakefilter";
 import {
   CreateCustomer,
   CreateSubscription,
@@ -312,6 +313,12 @@ app.post("/", validatePost("user"), async (req, res) => {
 
   const emailValid = validator.validate(email);
   if (!emailValid) {
+    res.status(422);
+    res.json({ errors: ["invalid email"] });
+    return;
+  }
+
+  if (isFakeEmail(email)) {
     res.status(422);
     res.json({ errors: ["invalid email"] });
     return;
