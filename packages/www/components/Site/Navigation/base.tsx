@@ -344,7 +344,7 @@ const NavigationBase = ({
                                   passHref
                                   legacyBehavior>
                                   <A css={{ ...ChevronLinkStyles }}>
-                                    Livepeer Studio Vs Mux
+                                    Livepeer Studio vs Mux
                                     <FiChevronRight
                                       className="chevronRight"
                                       style={{
@@ -359,7 +359,7 @@ const NavigationBase = ({
                                   passHref
                                   legacyBehavior>
                                   <A css={{ ...ChevronLinkStyles }}>
-                                    Livepeer Studio Vs Cloudflare Stream
+                                    Livepeer Studio vs Cloudflare Stream
                                     <FiChevronRight
                                       className="chevronRight"
                                       style={{

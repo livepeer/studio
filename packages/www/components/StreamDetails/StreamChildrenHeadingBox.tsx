@@ -10,13 +10,12 @@ import {
   Flex,
 } from "@livepeer/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { Stream } from "livepeer";
 import { Dispatch, SetStateAction } from "react";
 import Record from "components/StreamDetails/Record";
 import Terminate from "components/StreamDetails/Terminate";
 import Suspend from "components/StreamDetails/Suspend";
 import Delete from "components/StreamDetails/Delete";
-import { User } from "@livepeer.studio/api";
+import { Stream, User } from "@livepeer.studio/api";
 
 export type StreamChildrenHeadingBoxProps = {
   stream: Stream;

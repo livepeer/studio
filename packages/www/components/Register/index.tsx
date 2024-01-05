@@ -1,4 +1,11 @@
-import { TextField, Button, Box, Text } from "@livepeer/design-system";
+import {
+  TextField,
+  Button,
+  Box,
+  Text,
+  Flex,
+  Checkbox,
+} from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
@@ -9,12 +16,9 @@ import BroadcastingProvider from "../Login/BroadcastingProvider";
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
 
-const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
+const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [organization, setOrganization] = useState("");
-  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -39,8 +43,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
     // Subscribe user to newsletter in Mailchimp
     subscribe({
       EMAIL: email,
-      FNAME: firstName,
-      LNAME: lastName,
     });
 
     // only handle submission to hubspot on prod
@@ -50,13 +52,10 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
 
     const [hashedPassword] = await hash(password, FRONTEND_SALT);
     // hash password, then
-    onSubmit({
+    return onSubmit({
       email,
       password: hashedPassword,
-      firstName,
-      lastName,
       organization,
-      phone,
     });
   };
 
@@ -88,45 +87,6 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             Create an account
           </Text>
 
-          <Text
-            variant="neutral"
-            size={1}
-            css={{
-              fontWeight: 600,
-              mb: "$1",
-              fontSize: "11px",
-              textTransform: "uppercase",
-            }}>
-            Account details
-          </Text>
-          <TextField
-            size="3"
-            id="firstName"
-            css={{
-              width: "100%",
-              mb: "$2",
-            }}
-            name="firstName"
-            type="text"
-            placeholder="First name"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <TextField
-            size="3"
-            id="lastName"
-            css={{
-              width: "100%",
-              mb: "$2",
-            }}
-            name="lastName"
-            type="text"
-            placeholder="Last name"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
           <TextField
             size="3"
             id="email"
@@ -136,7 +96,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             }}
             name="email"
             type="email"
-            placeholder="Email"
+            placeholder="you@company.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -147,7 +107,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             id="password"
             css={{
               width: "100%",
-              mx: 0,
+              mb: "$2",
             }}
             name="password"
             type="password"
@@ -157,8 +117,30 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          <TextField
+            size="3"
+            id="organization"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="organization"
+            type="text"
+            placeholder="Company name (if using for work)"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+          />
+
           {errors.length > 0 && (
-            <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+            <Box css={{ mt: "$2" }}>
+              {errors
+                .map((e) => {
+                  // Make sure messages are capitalized
+                  return e.charAt(0).toUpperCase() + e.slice(1);
+                })
+                .join(", ")}
+              &nbsp;
+            </Box>
           )}
 
           <Button
@@ -178,4 +160,4 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
   );
 };
 
-export default Login;
+export default Register;
