@@ -1,6 +1,5 @@
 import { Webhook } from "@livepeer.studio/api";
-import { Box, Link } from "@livepeer/design-system";
-import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
+import { Box, Button, Link, Tooltip } from "@livepeer/design-system";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import TableEmptyState from "../Table/components/TableEmptyState";
@@ -26,24 +25,24 @@ export const makeColumns = () => [
       stringSort("original.url.value", ...params),
   },
   {
-    Header: "Name",
+    Header: "Listening for",
+    accessor: "events",
+    Cell: TextCell,
+    disableSortBy: true,
+  },
+  {
+    Header: "Last failure",
     accessor: "name",
     Cell: TextCell,
     sortType: (...params: SortTypeArgs) =>
-      stringSort("original.name.children", ...params),
+      stringSort("original.created.date", ...params),
   },
   {
-    Header: "Created at",
+    Header: "Last Trigger",
     accessor: "created",
     Cell: DateCell,
     sortType: (...params: SortTypeArgs) =>
       dateSort("original.created.date", ...params),
-  },
-  {
-    Header: "Status",
-    accessor: "status",
-    Cell: TextCell,
-    disableSortBy: true,
   },
 ];
 
@@ -96,32 +95,15 @@ export const rowsPageFromState = async (
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
-        status: {
+        events: {
           children: (
-            <Box>
-              {!webhook.status ? (
-                <StatusBadge
-                  variant={StatusVariant.Idle}
-                  tooltipText="No triggers yet"
-                />
-              ) : (webhook.status.lastFailure &&
-                  +Date.now() - webhook.status.lastFailure?.timestamp <
-                    WARNING_TIMEFRAME) ||
-                webhook.status.lastFailure?.timestamp >=
-                  webhook.status.lastTriggeredAt ? (
-                <StatusBadge
-                  variant={StatusVariant.Unhealthy}
-                  timestamp={webhook.status.lastFailure.timestamp}
-                  tooltipText="Last failure"
-                />
-              ) : (
-                <StatusBadge
-                  variant={StatusVariant.Healthy}
-                  timestamp={webhook.status.lastTriggeredAt}
-                  tooltipText="Last triggered"
-                />
-              )}
-            </Box>
+            <Tooltip
+              multiline
+              content={webhook.events.map((event) => (
+                <Box key={event}>{event}</Box>
+              ))}>
+              <Button>{webhook.events.length} events</Button>
+            </Tooltip>
           ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},

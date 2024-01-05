@@ -5,6 +5,8 @@ import {
   Heading,
   Button,
   styled,
+  Tooltip,
+  Code,
 } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useState, useCallback } from "react";
@@ -46,11 +48,9 @@ const WebhookDetails = ({ id, data }) => {
       <Box
         css={{
           borderRadius: 6,
-          border: "1px solid $colors$neutral6",
         }}>
         <Flex
           css={{
-            p: "$3",
             width: "100%",
             borderBottom: "1px solid $colors$neutral6",
             gap: "$3",
@@ -58,17 +58,26 @@ const WebhookDetails = ({ id, data }) => {
             ai: "center",
             jc: "space-between",
           }}>
-          <Heading
-            size="2"
-            css={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              width: "100%",
-              ai: "flex-start",
-            }}>
-            {data.name}
-          </Heading>
+          <Box>
+            <Heading
+              size="2"
+              css={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                width: "100%",
+                ai: "flex-start",
+              }}>
+              {data.url}
+            </Heading>
+            <Text
+              css={{
+                my: "$2",
+                color: "$gray11",
+              }}>
+              {data.name}
+            </Text>
+          </Box>
 
           <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>
             <Button
@@ -92,6 +101,65 @@ const WebhookDetails = ({ id, data }) => {
           </Flex>
         </Flex>
 
+        <Box>
+          <Flex
+            css={{
+              pt: "$3",
+              gap: "$3",
+              fd: "row",
+              ai: "center",
+            }}>
+            <Flex
+              css={{
+                borderRight: "1px solid $colors$neutral6",
+                pr: "$5",
+                gap: "$1",
+                fd: "column",
+              }}>
+              <Text>Listening for</Text>
+              <Tooltip
+                multiline
+                content={data.events.map((event) => (
+                  <Box key={event}>{event}</Box>
+                ))}>
+                <Button
+                  css={{
+                    width: "80%",
+                  }}>
+                  {data.events.length} events
+                </Button>
+              </Tooltip>
+            </Flex>
+            <Flex
+              css={{
+                borderRight: "1px solid $colors$neutral6",
+                pr: "$5",
+                pl: "$1",
+                gap: "$1",
+                fd: "column",
+                ai: "flex-start",
+              }}>
+              <Text>Signing secret</Text>
+              <Text
+                css={{
+                  cursor: "pointer",
+                  fontWeight: 500,
+                }}
+                variant={"green"}>
+                Reveal
+              </Text>
+            </Flex>
+            <Flex
+              css={{
+                gap: "$1",
+                pl: "$1",
+                fd: "column",
+              }}>
+              <Text>ID</Text>
+              <Text>{data.id}</Text>
+            </Flex>
+          </Flex>
+        </Box>
         <DetailsBox data={data} />
       </Box>
 

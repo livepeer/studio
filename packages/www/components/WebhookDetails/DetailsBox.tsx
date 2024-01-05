@@ -1,118 +1,150 @@
-import { Text, Box, Badge, styled } from "@livepeer/design-system";
+import { Text, Box, Badge, styled, Flex } from "@livepeer/design-system";
 import { format } from "date-fns";
 import { STATUS_CODES } from "http";
 import ClipButton from "../Clipping/ClipButton";
+import moment from "moment";
+import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { useState } from "react";
 
 const Cell = styled(Text, {
   py: "$2",
   fontSize: "$3",
 });
 
-function base64Decode(input: string) {
-  const base64Pattern =
-    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-  if (base64Pattern.test(input)) {
-    try {
-      if (typeof window !== "undefined" && typeof window.atob === "function") {
-        return window.atob(input);
-      }
-    } catch (e) {
-      console.error("Failed to decode base64 string", e);
-    }
-  }
-  return input; // return the original string if not base64 or if decoding fails
-}
+const demoRecords = [
+  {
+    name: "recording.record",
+    id: "recording.record",
+    timestamp: "2021-09-15T18:00:00.000Z",
+    status: "success",
+    response: 200,
+  },
+];
 
-const DetailsBox = ({ data }) => (
-  <Box
-    css={{
-      display: "grid",
-      gridTemplateColumns: "12em auto",
-      width: "100%",
-      fontSize: "$2",
-      position: "relative",
-      p: "$3",
-      borderBottomLeftRadius: 6,
-      borderBottomRightRadius: 6,
-      backgroundColor: "$panel",
-    }}>
-    <Cell variant="neutral">Webhook ID</Cell>
-    <Cell>
-      <ClipButton text={data.id} value={data.id} />
-    </Cell>
-    <Cell variant="neutral">URL</Cell>
-    <Cell>{data.url}</Cell>
-    <Cell variant="neutral">Name</Cell>
-    <Cell>{data.name}</Cell>
-    <Cell variant="neutral">Secret</Cell>
-    <Cell>{data.sharedSecret}</Cell>
-    <Cell variant="neutral">Created</Cell>
-    <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
-    <Cell variant="neutral">Event types</Cell>
-    <Cell css={{ display: "flex", fw: "wrap" }}>
-      {data.events.map((event, index) => (
-        <Badge
-          key={`badge-event${index}`}
-          variant="neutral"
-          size="2"
-          css={{ mr: "$1", mb: "$1" }}>
-          {event}
-        </Badge>
-      ))}
-    </Cell>
-    <Cell variant="neutral">Last trigger</Cell>
-    <Cell>
-      {data.status
-        ? format(data.status?.lastTriggeredAt, "MMMM dd, yyyy h:mm:ss a")
-        : "Never"}
-    </Cell>
-    <Cell variant="neutral">Last failure</Cell>
-    <Cell>
-      {!data.status
-        ? "Never"
-        : data.status.lastFailure
-        ? format(data.status.lastFailure.timestamp, "MMMM dd, yyyy h:mm:ss a")
-        : "Never"}
-    </Cell>
-    {data.status ? (
-      data.status.lastFailure?.statusCode ? (
-        <>
-          <Cell variant="neutral">Error Status Code</Cell>
-          <Cell>
-            {`${data.status.lastFailure.statusCode}
-            ${STATUS_CODES[data.status.lastFailure.statusCode]}`}
-          </Cell>
-        </>
-      ) : data.status.lastFailure ? (
-        <>
-          <Cell variant="neutral">Error message</Cell>
-          <Cell
-            css={{
-              fontFamily: "monospace",
-            }}>
-            {data.status.lastFailure.error ?? "unknown"}
-          </Cell>
-        </>
-      ) : (
-        ""
-      )
-    ) : (
-      ""
-    )}
-    {data.status?.lastFailure?.response ? (
-      <>
-        <Cell variant="neutral">Error response</Cell>
-        <Cell
+const DetailsBox = ({ data }) => {
+  const [records, setRecords] = useState(demoRecords);
+  const [selected, setSelected] = useState(0);
+  return (
+    <Box
+      css={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        width: "100%",
+        fontSize: "$2",
+        mt: "$7",
+        position: "relative",
+        p: "$3",
+        pb: "$0",
+        borderTop: "1px solid $colors$neutral6",
+      }}>
+      <Box
+        css={{
+          borderRight: "1px solid $colors$neutral6",
+        }}>
+        <Text
           css={{
-            fontFamily: "monospace",
+            fontWeight: 600,
+          }}
+          size={"2"}
+          variant={"gray"}>
+          TODAY:
+        </Text>
+        {demoRecords.map((record, index) => (
+          <Box
+            onClick={() => setSelected(index)}
+            key={record.id}
+            css={{
+              display: "flex",
+              justifyContent: "space-between",
+              py: "$2",
+              borderBottom: "1px solid $colors$neutral6",
+              "&:hover": {
+                background: "$neutral2",
+              },
+            }}>
+            <Cell
+              css={{
+                fontFamily: "$mono",
+              }}>
+              <Badge
+                css={{
+                  mr: "$2",
+                  width: 30,
+                  height: 30,
+                }}
+                variant={record.status === "success" ? "green" : "red"}>
+                {record.status === "success" ? <CheckIcon /> : <Cross1Icon />}
+              </Badge>
+              {record.name}
+            </Cell>
+            <Cell
+              css={{
+                mr: "$3",
+              }}>
+              {moment(record.timestamp).format("h:mm:ss a")}
+            </Cell>
+          </Box>
+        ))}
+      </Box>
+      <Box
+        css={{
+          p: "$6",
+        }}>
+        <Text
+          size="5"
+          css={{
+            fontWeight: 500,
           }}>
-          {base64Decode(data.status.lastFailure.response)}
-        </Cell>
-      </>
-    ) : (
-      ""
-    )}
-  </Box>
-);
+          {demoRecords[selected].name}
+        </Text>
+        <Box>
+          <Text
+            size="4"
+            css={{
+              mt: "$6",
+              fontWeight: 500,
+            }}>
+            Response
+          </Text>
+          <Flex
+            direction={"row"}
+            justify={"between"}
+            css={{
+              width: "40%",
+              mt: "$3",
+              ml: "$3",
+            }}>
+            <Text variant="neutral">HTTP Status Code</Text>
+            <Text variant="neutral">200 OK</Text>
+          </Flex>
+        </Box>
+        <Box
+          css={{
+            borderTop: "1px solid $colors$neutral6",
+            mt: "$4",
+          }}>
+          <Text
+            size="4"
+            css={{
+              mt: "$4",
+              fontWeight: 500,
+            }}>
+            Request
+          </Text>
+          <Flex
+            direction={"row"}
+            justify={"between"}
+            css={{
+              width: "40%",
+              mt: "$3",
+              ml: "$3",
+            }}>
+            <Text variant="neutral">Code here...</Text>
+          </Flex>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
 export default DetailsBox;
