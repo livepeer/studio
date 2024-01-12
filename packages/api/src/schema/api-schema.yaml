@@ -17,10 +17,9 @@ security:
 components:
   securitySchemes:
     apiKey:
-      type: apiKey
-      in: header
-      name: Authorization
-      description: Bearer api-key
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     ffmpeg-profile:
       type: object
