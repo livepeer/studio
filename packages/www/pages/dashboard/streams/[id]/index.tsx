@@ -6,6 +6,12 @@ import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/StreamDetails/StreamOverviewTab";
+import Ripe, { categories, pages } from "lib/ripe";
+
+Ripe.trackPage({
+  category: categories.DASHBOARD,
+  name: pages.STREAM,
+});
 
 const refetchInterval = 5 * 1000;
 

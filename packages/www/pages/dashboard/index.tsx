@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../layouts/dashboard";
 import { Box, Button, useSnackbar } from "@livepeer/design-system";
@@ -10,6 +10,12 @@ import Banner from "components/Banner";
 
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
+import Ripe, { categories, pages } from "lib/ripe";
+
+Ripe.trackPage({
+  category: categories.DASHBOARD,
+  name: pages.DASHBOARD_HOME,
+});
 
 const Dashboard = () => {
   const { user, verifyEmail, getUserProduct } = useApi();
@@ -33,6 +39,14 @@ const Dashboard = () => {
       );
     }
   };
+
+  useEffect(() => {
+    Ripe.identifyUser(user.id, {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    });
+  }, []);
 
   return (
     <Box css={{ p: "$6" }}>
