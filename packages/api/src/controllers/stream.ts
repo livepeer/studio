@@ -341,15 +341,10 @@ function activeCleanup(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
-  ingest: string,
-  filterToActiveOnly = false
+  ingest: string
 ) {
-  let hasStreamsToClean = false;
   for (const stream of streams) {
-    hasStreamsToClean ||= activeCleanupOne(config, stream, queue, ingest);
-  }
-  if (filterToActiveOnly && hasStreamsToClean) {
-    return streams.filter((s) => s.isActive); // activeCleanupOne monkey patches the stream object
+    activeCleanupOne(config, stream, queue, ingest);
   }
   return streams;
 }
@@ -451,7 +446,7 @@ app.get("/", authorizer({}), async (req, res) => {
     fields = fields + ", count(*) OVER() AS count";
   }
   const from = `stream left join users on stream.data->>'userId' = users.id`;
-  const [output, newCursor] = await db.stream.find(query, {
+  let [output, newCursor] = await db.stream.find(query, {
     limit,
     cursor,
     fields,
@@ -473,17 +468,16 @@ app.get("/", authorizer({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(
-    activeCleanup(
-      req.config,
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(output, req.user.admin)
-      ),
-      req.queue,
-      ingest,
-      !!active
-    )
+
+  output = db.stream.addDefaultFieldsMany(
+    db.stream.removePrivateFieldsMany(output, req.user.admin)
   );
+  output = activeCleanup(req.config, output, req.queue, ingest);
+  if (active) {
+    output = output.filter((s) => s.isActive); // activeCleanup monkey patches the stream object
+  }
+
+  res.json(output);
 });
 
 export async function getRecordingPlaybackUrl(
@@ -2130,7 +2124,7 @@ app.post(
     const ingest = await getIngestBase(req);
 
     streams = activeCleanup(req.config, streams, req.queue, ingest);
-    streams = streams.filter((s) => !s.isActive); // activeCleanupOne monkey patches the stream objects
+    streams = streams.filter((s) => !s.isActive); // activeCleanup monkey patches the stream objects
 
     res.status(200);
     res.json({ cleanedUp: streams });
