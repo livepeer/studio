@@ -33,20 +33,43 @@ export const sleep = (duration) => {
 };
 
 export const semaphore = () => {
-  let resolvePromise;
-  const promise = new Promise((resolve) => {
-    resolvePromise = resolve;
-  });
-  return {
-    release: () => {
-      resolvePromise();
-    },
-    wait: (timeoutMs) => {
-      if (!timeoutMs) return promise;
-      return Promise.race([promise, sleep(timeoutMs)]);
-    },
-  };
+  const sem = new Semaphore(1);
+  sem.wait(); // semaphore from this function starts acquired
+  return sem;
 };
+
+export class Semaphore {
+  private current: number = 0;
+  private waitQueue: Function[] = [];
+
+  constructor(private max: number) {}
+
+  wait(timeoutMs?: number) {
+    if (this.current < this.max) {
+      this.current++;
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      if (timeoutMs) {
+        setTimeout(() => {
+          this.waitQueue = this.waitQueue.filter((fn) => fn !== resolve);
+          reject(new Error("timeout"));
+        }, timeoutMs);
+      }
+      this.waitQueue.push(resolve);
+    });
+  }
+
+  release() {
+    if (this.waitQueue.length === 0) {
+      this.current--;
+    } else {
+      const releaseWaiting = this.waitQueue.shift();
+      releaseWaiting();
+    }
+  }
+}
 
 /**
  * Returns the input array, shuffled.
