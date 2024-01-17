@@ -2115,11 +2115,18 @@ app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
+    const limit = parseInt(req.query.limit?.toString()) || 10000;
     const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
-    let [streams] = await db.stream.find([
-      sql`data->>'isActive' = 'true'`,
-      sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
-    ]);
+    let [streams] = await db.stream.find(
+      [
+        sql`data->>'parentId' IS NULL`,
+        sql`data->>'isActive' = 'true'`,
+        sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
+      ],
+      {
+        limit,
+      }
+    );
 
     const ingest = await getIngestBase(req);
 
