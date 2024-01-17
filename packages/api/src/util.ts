@@ -62,6 +62,10 @@ export class Semaphore {
   }
 
   release() {
+    if (this.current <= 0) {
+      throw new Error("releasing semaphore that is not acquired");
+    }
+
     if (this.waitQueue.length === 0) {
       this.current--;
     } else {
