@@ -2115,6 +2115,28 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   return response;
 });
 
+// queries for all the streams with active clean up pending and triggers the
+// clean up logic for them.
+app.post(
+  "/job/active-cleanup",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
+    let [streams] = await db.stream.find([
+      sql`data->>'isActive' = 'true'`,
+      sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
+    ]);
+
+    const ingest = await getIngestBase(req);
+
+    streams = activeCleanup(req.config, streams, req.queue, ingest);
+    streams = streams.filter((s) => !s.isActive); // activeCleanupOne monkey patches the stream objects
+
+    res.status(200);
+    res.json({ cleanedUp: streams });
+  }
+);
+
 // Hooks
 
 app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
