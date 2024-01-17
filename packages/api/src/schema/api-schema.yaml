@@ -219,7 +219,6 @@ components:
       type: object
       required:
         - webhookId
-        - statusCode
       additionalProperties: false
       properties:
         id:
@@ -241,21 +240,12 @@ components:
           example: 1587667174725
         duration:
           type: number
-        statusCode:
-          type: number
-          default: 0
         response:
           type: object
           additionalProperties: false
           properties:
             body:
               type: string
-            headers:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: string
             redirected:
               type: boolean
             status:

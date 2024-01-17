@@ -15,7 +15,11 @@ import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset, primaryStorageExperiment } from "../controllers/asset";
-import { DBStream } from "../store/stream-table";
+import {
+  DBStream,
+  DeprecatedStreamFields,
+  StreamStats,
+} from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import { db } from "../store";
@@ -411,6 +415,7 @@ export default class WebhookCannon {
       let errorMessage: string;
       let responseBody: string;
       let statusCode: number;
+
       try {
         logger.info(`webhook ${webhook.id} firing`);
         resp = await fetchWithTimeout(webhook.url, params);
@@ -440,7 +445,15 @@ export default class WebhookCannon {
         errorMessage = e.message;
         await this.retry(trigger, params, e);
       } finally {
-        await this.storeResponse(webhook, event, resp, startTime, responseBody);
+        await this.storeResponse(
+          webhook,
+          event,
+          resp,
+          startTime,
+          responseBody,
+          stream,
+          params
+        );
         await this.storeTriggerStatus(
           trigger.webhook,
           triggerTime,
@@ -474,26 +487,32 @@ export default class WebhookCannon {
     event: messages.WebhookEvent,
     resp: Response,
     startTime: [number, number],
-    responseBody: string
+    responseBody: string,
+    stream: DBStream,
+    params
   ) {
     try {
       const hrDuration = process.hrtime(startTime);
-      let encodedResponseBody = Buffer.from(responseBody).toString("base64");
+      const encodedResponseBody = Buffer.from(
+        responseBody.substring(0, 1024)
+      ).toString("base64");
 
       await this.db.webhookResponse.create({
         id: uuid(),
         webhookId: webhook.id,
         eventId: event.id,
+        event: event.event,
+        userId: webhook.userId,
         createdAt: Date.now(),
         duration: hrDuration[0] + hrDuration[1] / 1e9,
         statusCode: resp.status,
         response: {
           body: encodedResponseBody,
-          headers: resp.headers.raw(),
           redirected: resp.redirected,
           status: resp.status,
           statusText: resp.statusText,
         },
+        request: params,
       });
     } catch (e) {
       console.log(

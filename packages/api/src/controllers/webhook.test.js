@@ -1,5 +1,6 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
+import { sleep } from "../util";
 
 let server;
 let mockAdminUser;
@@ -306,6 +307,29 @@ describe("controllers/webhook", () => {
       expect(setActiveRes.status).toBe(204);
       // const setActiveResJson = await setActiveRes.json()
       // expect(setActiveResJson).toBeDefined()
+
+      // a log entry for the webhook should appear after a short wait
+      let logsJson;
+      for (let i = 0; i < 5; i++) {
+        await sleep(500);
+        const logsRes = await client.get(
+          `/webhook/${generatedWebhook.id}/logs`
+        );
+        expect(logsRes.status).toBe(200);
+        logsJson = await logsRes.json();
+        if (logsJson.length > 0) {
+          break;
+        }
+      }
+
+      expect(logsJson.length).toBeGreaterThan(0);
+      expect(logsJson[0].webhookId).toBe(generatedWebhook.id);
+      expect(logsJson[0].event).toBe("stream.started");
+      expect(logsJson[0].request).toBeDefined();
+      expect(logsJson[0].request.body).toBeDefined();
+      expect(logsJson[0].request.headers).toBeDefined();
+      expect(logsJson[0].response).toBeDefined();
+      expect(logsJson[0].response.body).toBeDefined();
     }, 20000);
 
     it("trigger webhook with localIP", async () => {
