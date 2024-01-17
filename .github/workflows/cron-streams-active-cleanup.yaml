@@ -12,6 +12,9 @@ jobs:
           - name: "staging"
             hostname: "livepeer.monster"
             api-token-secret: LP_STAGING_API_ADMIN_TOKEN
+          - name: production
+            hostname: "livepeer.studio"
+            api-token-secret: LP_API_ADMIN_TOKEN
     runs-on: ubuntu-latest
     steps:
       - name: Clean-up ${{ matrix.env.name }} active streams
