@@ -51,6 +51,7 @@ import Queue from "../store/queue";
 import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
+import { Semaphore } from "../util";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -205,6 +206,10 @@ export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `webrtc`, stream.playbackId);
 }
 
+// our DB client uses 10 connections by default, use at most half of that for
+// background cleanup logic.
+const cleanupSemaphore = new Semaphore(5);
+
 /**
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
@@ -229,6 +234,7 @@ function activeCleanupOne(
   }
 
   setImmediate(async () => {
+    await cleanupSemaphore.wait();
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.waiting logic to clean-up the isActive field
@@ -246,6 +252,8 @@ function activeCleanupOne(
       }
     } catch (err) {
       logger.error("Error sending /setactive hooks err=", err);
+    } finally {
+      cleanupSemaphore.release();
     }
   });
 
