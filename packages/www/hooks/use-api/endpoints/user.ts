@@ -80,17 +80,19 @@ export const refreshAccessToken = () =>
     } = context;
 
     let res: Response;
-    let baseUrl = `${endpoint}/api`;
+    let baseUrl = `${endpoint}/api/user/token`;
+    // any access token stored without a corresponding refresh token is
+    // considered legacy. i.e. has no expiration and should be migrated.
+    // TODO: Remove this logic after the never-expiring JWTs cut-off date
     if (!refreshToken && legacyJwt) {
-      // TODO: Remove this logic after the never-expiring JWTs cut-off date
-      res = await fetch(`${baseUrl}/user/token/migrate`, {
+      res = await fetch(`${baseUrl}/migrate`, {
         method: "POST",
         headers: {
           authorization: `JWT ${legacyJwt}`,
         },
       });
     } else {
-      res = await fetch(`${baseUrl}/user/token/refresh`, {
+      res = await fetch(`${baseUrl}/refresh`, {
         method: "POST",
         body: JSON.stringify({ refreshToken }),
         headers: {
