@@ -72,11 +72,8 @@ const makeContext = (
 
       const tokenExpired =
         res.status === 401 && body.errors?.[0] === "access token expired";
-      if (tokenExpired && state.refreshToken && !refreshedToken) {
-        const newToken = await userEndpointsFunctions.refreshAccessToken(
-          state.user?.email,
-          state.refreshToken
-        );
+      if (tokenExpired && !refreshedToken) {
+        const newToken = await userEndpointsFunctions.refreshAccessToken();
         if (newToken) {
           return context.fetch(url, opts, newToken);
         }

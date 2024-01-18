@@ -70,14 +70,17 @@ const singleFlight = <T>(key: string, fn: () => Promise<T>) => {
   });
 };
 
-export const refreshAccessToken = (
-  email: string,
-  refreshToken: string,
-  legacyJwt?: string
-) =>
-  singleFlight(`refresh:${email}:${refreshToken}:${legacyJwt}`, async () => {
+export const refreshAccessToken = () =>
+  singleFlight(`refreshAccessToken`, async () => {
+    let {
+      endpoint,
+      token: legacyJwt,
+      refreshToken,
+      user: { email = "" } = {},
+    } = context;
+
     let res: Response;
-    let baseUrl = `${context.endpoint}/api`;
+    let baseUrl = `${endpoint}/api`;
     if (!refreshToken && legacyJwt) {
       // TODO: Remove this logic after the never-expiring JWTs cut-off date
       res = await fetch(`${baseUrl}/user/token/migrate`, {
