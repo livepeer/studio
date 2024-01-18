@@ -133,12 +133,16 @@ export const ApiProvider = ({ children }) => {
   useEffect(() => {
     if (state.token) {
       const data = jwt.decode(state.token);
-      context.getUser(data.sub).then(([res, user]) => {
+      context.getUser(data.sub).then(async ([res, user]) => {
         if (res.status !== 200) {
           clearTokens();
           setState((state) => ({ ...state, token: null, refreshToken: null }));
         } else {
           setState((state) => ({ ...state, user: user as User }));
+          // migrate old JWT to refresh-token scheme if needed
+          if (!state.refreshToken) {
+            await userEndpointsFunctions.refreshAccessToken();
+          }
         }
       });
     }
