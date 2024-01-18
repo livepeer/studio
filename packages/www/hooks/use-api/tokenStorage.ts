@@ -1,5 +1,5 @@
 export const TOKEN_KEY = "PERSISTENT_TOKEN";
-export const REFRESH_TOKEN_KEY = "REFRESH_TOKEN_KEY";
+export const REFRESH_TOKEN_KEY = "REFRESH_TOKEN";
 
 export const storeToken = (token: string, refreshToken: string) => {
   try {
