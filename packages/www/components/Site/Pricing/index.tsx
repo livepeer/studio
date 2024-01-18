@@ -11,8 +11,8 @@ const PricingCardsContainer = () => {
         margin: "0 auto",
         width: "100%",
         pb: "$9",
-        "@bp2": {
-          overflow: "scroll",
+        "@bp4": {
+          overflow: "hidden",
           px: 0,
         },
       }}>
@@ -22,12 +22,15 @@ const PricingCardsContainer = () => {
           gap: "8px",
           grid: "1fr/repeat(1,1fr)",
           "@bp2": {
+            gridTemplateColumns: "repeat(2, 1fr)",
+          },
+          "@bp3": {
             justifyContent: "center",
             position: "relative",
             "-webkit-overflow-scrolling": "touch",
             maxWidth: 1245,
             minWidth: 1245,
-            gridTemplateColumns: "10% 21.5% 21.5% 21.5% 21.5%",
+            gridTemplateColumns: "repeat(5, 1fr)",
           },
         }}>
         <Box
@@ -35,7 +38,7 @@ const PricingCardsContainer = () => {
             flexDirection: "column",
             px: "$2",
             display: "none",
-            "@bp2": {
+            "@bp3": {
               display: "block",
               pt: 110,
             },
