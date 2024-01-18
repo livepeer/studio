@@ -55,47 +55,65 @@ export const login = async (email, password) => {
   return res;
 };
 
-export const refreshAccessToken = async (
+const inFlight: Record<string, Promise<any>> = {};
+
+const singleFlight = <T>(key: string, fn: () => Promise<T>) => {
+  const cached = inFlight[key];
+  if (cached) {
+    return cached as Promise<T>;
+  }
+
+  const promise = fn();
+  inFlight[key] = promise;
+  return promise.finally(() => {
+    delete inFlight[key];
+  });
+};
+
+export const refreshAccessToken = (
   email: string,
   refreshToken: string,
   legacyJwt?: string
-) => {
-  let res: Response;
-  if (!refreshToken && legacyJwt) {
-    // TODO: Remove this logic after the never-expiring JWTs cut-off date
-    res = await fetch("/user/token/migrate", {
-      method: "POST",
-      headers: {
-        authorization: `JWT ${legacyJwt}`,
-      },
-    });
-  } else {
-    res = await fetch("/user/token/refresh", {
-      method: "POST",
-      body: JSON.stringify({ refreshToken }),
-      headers: {
-        "content-type": "application/json",
-      },
-    });
-  }
-  if (res.status !== 201) {
-    return false;
-  }
-  const { token, refreshToken: newRefreshToken } = await res.json();
-  if (newRefreshToken) {
-    // allow the refresh token itself to be refreshed if the server sends a new one
-    refreshToken = newRefreshToken;
-  }
-  storeToken(token, refreshToken);
+) =>
+  singleFlight(`refresh:${email}:${refreshToken}:${legacyJwt}`, async () => {
+    let res: Response;
+    let baseUrl = `${context.endpoint}/api`;
+    if (!refreshToken && legacyJwt) {
+      // TODO: Remove this logic after the never-expiring JWTs cut-off date
+      res = await fetch(`${baseUrl}/user/token/migrate`, {
+        method: "POST",
+        headers: {
+          authorization: `JWT ${legacyJwt}`,
+        },
+      });
+    } else {
+      res = await fetch(`${baseUrl}/user/token/refresh`, {
+        method: "POST",
+        body: JSON.stringify({ refreshToken }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+    }
+    if (res.status !== 201) {
+      return null;
+    }
 
-  if (process.env.NODE_ENV === "production") {
-    const data = jwt.decode(token, { json: true });
-    window.analytics.identify(data.sub, { email });
-  }
+    const { token, refreshToken: newRefreshToken } = await res.json();
+    if (newRefreshToken) {
+      // allow the refresh token itself to be refreshed if the server sends a new one
+      refreshToken = newRefreshToken;
+    }
+    storeToken(token, refreshToken);
 
-  setState((state) => ({ ...state, token, refreshToken }));
-  return true;
-};
+    if (process.env.NODE_ENV === "production") {
+      const data = jwt.decode(token, { json: true });
+      window.analytics.identify(data.sub, { email });
+    }
+
+    setState((state) => ({ ...state, token, refreshToken }));
+    return token as string;
+  });
 
 export const register = async ({
   email,

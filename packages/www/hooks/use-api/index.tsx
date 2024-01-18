@@ -49,10 +49,11 @@ const makeContext = (
     ...state,
     endpoint,
 
-    async fetch(url: string, opts: RequestInit = {}, isRetry = false) {
-      let headers = new Headers(opts.headers || {});
-      if (state.token && !headers.has("authorization")) {
-        headers.set("authorization", `JWT ${state.token}`);
+    async fetch(url: string, opts: RequestInit = {}, refreshedToken = "") {
+      const headers = new Headers(opts.headers || {});
+      const token = refreshedToken || state.token;
+      if (token && !headers.has("authorization")) {
+        headers.set("authorization", `JWT ${token}`);
       }
       const res = await fetch(`${endpoint}/api${url}`, {
         ...opts,
@@ -71,13 +72,13 @@ const makeContext = (
 
       const tokenExpired =
         res.status === 401 && body.errors?.[0] === "access token expired";
-      if (tokenExpired && state.refreshToken && !isRetry) {
-        const refreshed = await userEndpointsFunctions.refreshAccessToken(
+      if (tokenExpired && state.refreshToken && !refreshedToken) {
+        const newToken = await userEndpointsFunctions.refreshAccessToken(
           state.user?.email,
           state.refreshToken
         );
-        if (refreshed) {
-          return context.fetch(url, opts, true);
+        if (newToken) {
+          return context.fetch(url, opts, newToken);
         }
       }
 
