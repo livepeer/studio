@@ -57,17 +57,21 @@ export const login = async (email, password) => {
 
 const inFlight: Record<string, Promise<any>> = {};
 
+// This makes sure a given function is only executed a single time concurrently.
+// It is used to prevent multiple concurrent executions of the
+// refreshAccessToken function. The result of the function gets re-used for
+// every caller, since the same promise is returned.
 const singleFlight = <T>(key: string, fn: () => Promise<T>) => {
   const cached = inFlight[key];
   if (cached) {
     return cached as Promise<T>;
   }
 
-  const promise = fn();
-  inFlight[key] = promise;
-  return promise.finally(() => {
+  const promise = fn().finally(() => {
     delete inFlight[key];
   });
+  inFlight[key] = promise;
+  return promise;
 };
 
 export const refreshAccessToken = () =>
