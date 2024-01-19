@@ -44,7 +44,7 @@ const fieldsMap: FieldsMap = {
   url: `webhook.data->>'url'`,
   blocking: `webhook.data->'blocking'`,
   deleted: `webhook.data->'deleted'`,
-  createdAt: `webhook.data->'createdAt'`,
+  createdAt: { val: `webhook.data->'createdAt'`, type: "int" },
   userId: `webhook.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   sharedSecret: `webhook.data->>'sharedSecret'`,
