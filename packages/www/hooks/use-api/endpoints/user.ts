@@ -14,7 +14,7 @@ import {
 } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
-import { storeToken, clearToken } from "../tokenStorage";
+import { storeToken, clearTokens } from "../tokenStorage";
 import { trackPageView } from "../tracking";
 import { products } from "@livepeer.studio/api/src/config";
 
@@ -43,17 +43,86 @@ export const login = async (email, password) => {
   if (res.status !== 201) {
     return body;
   }
-  const { token } = body;
-  storeToken(token);
+  const { token, refreshToken } = body;
+  storeToken(token, refreshToken);
 
   if (process.env.NODE_ENV === "production") {
     const data = jwt.decode(token, { json: true });
     window.analytics.identify(data.sub, { email });
   }
 
-  setState((state) => ({ ...state, token }));
+  setState((state) => ({ ...state, token, refreshToken }));
   return res;
 };
+
+const inFlight: Record<string, Promise<any>> = {};
+
+// This makes sure a given function is only executed a single time concurrently.
+// It is used to prevent multiple concurrent executions of the
+// refreshAccessToken function. The result of the function gets re-used for
+// every caller, since the same promise is returned.
+const singleFlight = <T>(key: string, fn: () => Promise<T>) => {
+  const cached = inFlight[key];
+  if (cached) {
+    return cached as Promise<T>;
+  }
+
+  const promise = fn().finally(() => {
+    delete inFlight[key];
+  });
+  inFlight[key] = promise;
+  return promise;
+};
+
+export const refreshAccessToken = () =>
+  singleFlight(`refreshAccessToken`, async () => {
+    let {
+      endpoint,
+      token: legacyJwt,
+      refreshToken,
+      user: { email = "" } = {},
+    } = context;
+
+    let res: Response;
+    let baseUrl = `${endpoint}/api/user/token`;
+    // any access token stored without a corresponding refresh token is
+    // considered legacy. i.e. has no expiration and should be migrated.
+    // TODO: Remove this logic after the never-expiring JWTs cut-off date
+    if (!refreshToken && legacyJwt) {
+      res = await fetch(`${baseUrl}/migrate`, {
+        method: "POST",
+        headers: {
+          authorization: `JWT ${legacyJwt}`,
+        },
+      });
+    } else {
+      res = await fetch(`${baseUrl}/refresh`, {
+        method: "POST",
+        body: JSON.stringify({ refreshToken }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+    }
+    if (res.status !== 201) {
+      return null;
+    }
+
+    const { token, refreshToken: newRefreshToken } = await res.json();
+    if (newRefreshToken) {
+      // allow the refresh token itself to be refreshed if the server sends a new one
+      refreshToken = newRefreshToken;
+    }
+    storeToken(token, refreshToken);
+
+    if (process.env.NODE_ENV === "production") {
+      const data = jwt.decode(token, { json: true });
+      window.analytics.identify(data.sub, { email });
+    }
+
+    setState((state) => ({ ...state, token, refreshToken }));
+    return token as string;
+  });
 
 export const register = async ({
   email,
@@ -451,6 +520,11 @@ export const updateCustomerPaymentMethod = async ({
 };
 
 export const logout = async () => {
-  setState((state) => ({ ...state, user: null, token: null }));
-  clearToken();
+  setState((state) => ({
+    ...state,
+    user: null,
+    token: null,
+    refreshToken: null,
+  }));
+  clearTokens();
 };

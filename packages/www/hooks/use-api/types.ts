@@ -15,6 +15,7 @@ export type FileUploadsDictionary = {
 export type ApiState = {
   user?: User;
   token?: string;
+  refreshToken?: string;
   userRefresh?: number;
   noStripe?: boolean;
   currentFileUploads?: FileUploadsDictionary;

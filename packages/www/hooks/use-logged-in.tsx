@@ -22,7 +22,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
         router.replace("/verify");
       }
     }
-    console.log(shouldBeLoggedIn, user);
+    // console.log(shouldBeLoggedIn, user);
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
       if (emailVerificationMode && user.emailValid === false) {

@@ -247,6 +247,16 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: `["https://livepeer.studio"]`,
         coerce: coerceRegexList("cors-jwt-allowlist"),
       },
+      "jwt-access-token-ttl": {
+        describe: "time to live for JWT access tokens, in seconds",
+        type: "number",
+        default: 60 * 60 * 24, // 1 day
+      },
+      "jwt-refresh-token-ttl": {
+        describe: "time to live for refresh tokens, in seconds",
+        type: "number",
+        default: 60 * 60 * 24 * 30, // 30 days
+      },
       broadcasters: {
         describe:
           "hardcoded list of broadcasters to return from /api/broadcaster.",

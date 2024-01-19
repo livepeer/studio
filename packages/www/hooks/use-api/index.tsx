@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "@livepeer.studio/api";
 import { isStaging, isDevelopment } from "../../lib/utils";
 import { ApiState } from "./types";
-import { clearToken, getStoredToken } from "./tokenStorage";
+import { clearTokens, getStoredToken } from "./tokenStorage";
 import * as accessControlEndpointsFunctions from "./endpoints/accessControl";
 import * as apiTokenEndpointsFunctions from "./endpoints/apiToken";
 import * as assetEndpointsFunctions from "./endpoints/asset";
@@ -49,10 +49,11 @@ const makeContext = (
     ...state,
     endpoint,
 
-    async fetch(url: string, opts: RequestInit = {}) {
-      let headers = new Headers(opts.headers || {});
-      if (state.token && !headers.has("authorization")) {
-        headers.set("authorization", `JWT ${state.token}`);
+    async fetch(url: string, opts: RequestInit = {}, refreshedToken = "") {
+      const headers = new Headers(opts.headers || {});
+      const token = refreshedToken || state.token;
+      if (token && !headers.has("authorization")) {
+        headers.set("authorization", `JWT ${token}`);
       }
       const res = await fetch(`${endpoint}/api${url}`, {
         ...opts,
@@ -61,12 +62,23 @@ const makeContext = (
       if (res.status === 204) {
         return [res];
       }
+
       // todo: not every endpoint will return JSON
       const body = await res.json();
       // todo: this can go away once we standardize on body.errors
       if (!Array.isArray(body.errors) && typeof body.error === "string") {
         body.errors = [body.error];
       }
+
+      const tokenExpired =
+        res.status === 401 && body.errors?.[0] === "access token expired";
+      if (tokenExpired && !refreshedToken) {
+        const newToken = await userEndpointsFunctions.refreshAccessToken();
+        if (newToken) {
+          return context.fetch(url, opts, newToken);
+        }
+      }
+
       return [res, body];
     },
 
@@ -121,12 +133,16 @@ export const ApiProvider = ({ children }) => {
   useEffect(() => {
     if (state.token) {
       const data = jwt.decode(state.token);
-      context.getUser(data.sub).then(([res, user]) => {
+      context.getUser(data.sub).then(async ([res, user]) => {
         if (res.status !== 200) {
-          clearToken();
-          setState((state) => ({ ...state, token: null }));
+          clearTokens();
+          setState((state) => ({ ...state, token: null, refreshToken: null }));
         } else {
           setState((state) => ({ ...state, user: user as User }));
+          // migrate old JWT to refresh-token scheme if needed
+          if (!state.refreshToken) {
+            await userEndpointsFunctions.refreshAccessToken();
+          }
         }
       });
     }

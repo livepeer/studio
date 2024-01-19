@@ -19,6 +19,7 @@ import {
   User,
   SuspendUserPayload,
   DisableUserPayload,
+  RefreshTokenPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -36,12 +37,25 @@ import {
 } from "./helpers";
 import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 import sql from "sql-template-strings";
+import { CliArgs } from "../parse-cli";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
 const freePlan = "prod_O9XuIjn7EqYRVW";
+
+// Ratio of the refresh token lifetime at which point we should issue a new
+// refresh token. This is to avoid having refresh tokens that never expire or
+// creating objects on the DB for every JWT (access token) that we sign.
+export const REFRESH_TOKEN_REFRESH_THRESHOLD = 0.2;
+
+// Ratio of the access token lifetime to require in between consecutive token
+// refreshes using the same refresh token. This means a refresh token can only
+// be used once every 50% of the access tokens lifetime. This is a simple logic
+// to detect malicious usage of a refresh token, e.g. if it leaks from the user
+// browser. We can improve these checks later like enforcing same device/IP/etc.
+export const REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO = 0.5;
 
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
@@ -175,6 +189,17 @@ async function createSubscription(
       ...payAsYouGoItems,
     ],
     expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+function signUserJwt(
+  userId: string,
+  { jwtAudience, jwtSecret, jwtAccessTokenTtl }: CliArgs
+) {
+  return jwt.sign({ sub: userId, aud: jwtAudience }, jwtSecret, {
+    algorithm: "HS256",
+    jwtid: uuid(),
+    expiresIn: jwtAccessTokenTtl,
   });
 }
 
@@ -608,13 +633,15 @@ app.post("/token", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
-  const token = jwt.sign(
-    { sub: user.id, aud: req.config.jwtAudience },
-    req.config.jwtSecret,
-    {
-      algorithm: "HS256",
-    }
-  );
+  const token = signUserJwt(user.id, req.config);
+  const refreshToken = uuid();
+
+  await db.jwtRefreshToken.create({
+    id: refreshToken,
+    userId: user.id,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + req.config.jwtRefreshTokenTtl * 1000,
+  });
 
   let isTest =
     process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
@@ -636,8 +663,107 @@ app.post("/token", validatePost("user"), async (req, res) => {
     });
   }
   res.status(201);
-  res.json({ id: user.id, email: user.email, token: token });
+  res.json({ id: user.id, email: user.email, token, refreshToken });
 });
+
+app.post(
+  "/token/refresh",
+  validatePost("refresh-token-payload"),
+  async (req, res) => {
+    const now = Date.now();
+    const { refreshToken } = req.body as RefreshTokenPayload;
+    const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
+    if (
+      !refreshTokenObj ||
+      refreshTokenObj.expiresAt < now ||
+      refreshTokenObj.revoked
+    ) {
+      console.log(
+        `Refresh attempt with invalid refresh token=${refreshToken} expiresAt=${refreshTokenObj?.expiresAt} revoked=${refreshTokenObj?.revoked}`
+      );
+      return res.status(401).json({ errors: ["invalid refresh token"] });
+    }
+
+    const timeSinceLastRefresh = now - refreshTokenObj.lastSeen;
+    const minReuseDelay =
+      req.config.jwtAccessTokenTtl * 1000 * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO;
+    if (timeSinceLastRefresh < minReuseDelay) {
+      console.log(
+        `Revoking token due to potential malicious use of refreshToken=${refreshToken}`
+      );
+      await db.jwtRefreshToken.update(refreshToken, {
+        revoked: true,
+      });
+      return res
+        .status(401)
+        .json({ errors: ["refresh token has already been used too recently"] });
+    }
+
+    const user = await db.user.get(refreshTokenObj.userId);
+    if (user.suspended) {
+      return res.status(403).json({ errors: ["user is suspended"] });
+    }
+
+    const token = signUserJwt(user.id, req.config);
+
+    let newRefreshToken: string;
+    const fullTokenTtl = refreshTokenObj.expiresAt - refreshTokenObj.createdAt;
+    if (
+      refreshTokenObj.expiresAt - now <
+      fullTokenTtl * REFRESH_TOKEN_REFRESH_THRESHOLD
+    ) {
+      // issue a new token and revoke the old one if it's close to expiring
+      await db.jwtRefreshToken.update(refreshToken, {
+        lastSeen: now,
+        revoked: true,
+      });
+
+      newRefreshToken = uuid();
+      await db.jwtRefreshToken.create({
+        id: newRefreshToken,
+        userId: user.id,
+        createdAt: now,
+        expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
+      });
+    } else {
+      // otherwise just update the lastSeen
+      await db.jwtRefreshToken.update(refreshToken, {
+        lastSeen: now,
+      });
+    }
+
+    res.status(201);
+    res.json({ token, refreshToken: newRefreshToken });
+  }
+);
+
+// Utility to migrate from the never-expiring JWTs from the dashboard to
+// separate access and refresh tokens.
+// TODO: Remove this after the cut-off date when these JWTs won't be valid anymore.
+app.post(
+  "/token/migrate",
+  authorizer({ noApiToken: true }),
+  async (req, res) => {
+    if (!req.isNeverExpiringJWT) {
+      return res.status(400).json({
+        errors: ["can only migrate from never-expiring JWTs"],
+      });
+    }
+
+    const token = signUserJwt(req.user.id, req.config);
+
+    const now = Date.now();
+    const { id: newRefreshToken } = await db.jwtRefreshToken.create({
+      id: uuid(),
+      userId: req.user.id,
+      createdAt: now,
+      expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
+    });
+
+    res.status(201);
+    res.json({ token, refreshToken: newRefreshToken });
+  }
+);
 
 app.post("/verify", validatePost("user-verification"), async (req, res) => {
   let user = await findUserByEmail(req.body.email);
