@@ -505,7 +505,6 @@ export default class WebhookCannon {
         userId: webhook.userId,
         createdAt: Date.now(),
         duration: hrDuration[0] + hrDuration[1] / 1e9,
-        statusCode: resp.status,
         response: {
           body: encodedResponseBody,
           redirected: resp.redirected,

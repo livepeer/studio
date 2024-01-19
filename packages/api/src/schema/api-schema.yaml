@@ -240,6 +240,8 @@ components:
           example: 1587667174725
         duration:
           type: number
+        request:
+          type: object
         response:
           type: object
           additionalProperties: false
@@ -604,15 +606,6 @@ components:
           $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
           $ref: "#/components/schemas/webhook/properties/streamId"
-    webhook-status-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        errorMessage:
-          type: string
-          description: Error message if the webhook failed to process the event
-        response:
-          $ref: "#/components/schemas/webhook-response"
     session:
       type: object
       required:
