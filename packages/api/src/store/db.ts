@@ -213,6 +213,7 @@ export class DB {
     return this.runQuery(pool, query, values);
   }
 
+  // Internal query function — use query() or replicaQuery() externally
   async runQuery<T, I extends any[] = any[]>(
     pool: Pool,
     query: string | QueryConfig<I>,
