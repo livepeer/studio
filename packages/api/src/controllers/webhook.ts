@@ -279,7 +279,7 @@ app.delete("/", authorizer({}), async (req, res) => {
   res.end();
 });
 
-const logsFieldsMap: FieldsMap = {
+const requestsFieldsMap: FieldsMap = {
   id: `webhook_response.ID`,
   createdAt: { val: `webhook_response.data->'createdAt'`, type: "int" },
   userId: `webhook_response.data->>'userId'`,
@@ -287,7 +287,7 @@ const logsFieldsMap: FieldsMap = {
   statusCode: `webhook_response.data->'response'->>'status'`,
 };
 
-app.get("/:id/logs", authorizer({}), async (req, res) => {
+app.get("/:id/requests", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     req.query;
   if (isNaN(parseInt(limit))) {
@@ -298,7 +298,7 @@ app.get("/:id/logs", authorizer({}), async (req, res) => {
   }
 
   if (req.user.admin && allUsers && allUsers !== "false") {
-    const query = parseFilters(logsFieldsMap, filters);
+    const query = parseFilters(requestsFieldsMap, filters);
     query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
     if (!all || all === "false") {
       query.push(sql`webhook_response.data->>'deleted' IS NULL`);
@@ -315,7 +315,7 @@ app.get("/:id/logs", authorizer({}), async (req, res) => {
       cursor,
       fields,
       from,
-      order: parseOrder(logsFieldsMap, order),
+      order: parseOrder(requestsFieldsMap, order),
       process: ({ data, usersdata, count: c }) => {
         if (count) {
           res.set("X-Total-Count", c);
@@ -332,7 +332,7 @@ app.get("/:id/logs", authorizer({}), async (req, res) => {
     return res.json(output);
   }
 
-  const query = parseFilters(logsFieldsMap, filters);
+  const query = parseFilters(requestsFieldsMap, filters);
   query.push(sql`webhook_response.data->>'userId' = ${req.user.id}`);
   query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
 
@@ -350,7 +350,7 @@ app.get("/:id/logs", authorizer({}), async (req, res) => {
     cursor,
     fields,
     from,
-    order: parseOrder(logsFieldsMap, order),
+    order: parseOrder(requestsFieldsMap, order),
     process: ({ data, count: c }) => {
       if (count) {
         res.set("X-Total-Count", c);

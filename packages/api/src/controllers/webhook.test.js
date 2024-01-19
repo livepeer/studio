@@ -292,27 +292,27 @@ describe("controllers/webhook", () => {
       // expect(setActiveResJson).toBeDefined()
 
       // a log entry for the webhook should appear after a short wait
-      let logsJson;
+      let requestsJson;
       for (let i = 0; i < 5; i++) {
         await sleep(500);
-        const logsRes = await client.get(
-          `/webhook/${generatedWebhook.id}/logs`
+        const requestsRes = await client.get(
+          `/webhook/${generatedWebhook.id}/requests`
         );
-        expect(logsRes.status).toBe(200);
-        logsJson = await logsRes.json();
-        if (logsJson.length > 0) {
+        expect(requestsRes.status).toBe(200);
+        requestsJson = await requestsRes.json();
+        if (requestsJson.length > 0) {
           break;
         }
       }
 
-      expect(logsJson.length).toBeGreaterThan(0);
-      expect(logsJson[0].webhookId).toBe(generatedWebhook.id);
-      expect(logsJson[0].event).toBe("stream.started");
-      expect(logsJson[0].request).toBeDefined();
-      expect(logsJson[0].request.body).toBeDefined();
-      expect(logsJson[0].request.headers).toBeDefined();
-      expect(logsJson[0].response).toBeDefined();
-      expect(logsJson[0].response.body).toBeDefined();
+      expect(requestsJson.length).toBeGreaterThan(0);
+      expect(requestsJson[0].webhookId).toBe(generatedWebhook.id);
+      expect(requestsJson[0].event).toBe("stream.started");
+      expect(requestsJson[0].request).toBeDefined();
+      expect(requestsJson[0].request.body).toBeDefined();
+      expect(requestsJson[0].request.headers).toBeDefined();
+      expect(requestsJson[0].response).toBeDefined();
+      expect(requestsJson[0].response.body).toBeDefined();
     }, 20000);
 
     it("trigger webhook with localIP", async () => {
