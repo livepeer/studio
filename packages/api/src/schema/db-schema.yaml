@@ -1090,6 +1090,9 @@ components:
         email:
           unique: true
           index: true
+        newEmail:
+          type: string
+          description: temporary field for email change
         kind:
           type: string
           readOnly: true

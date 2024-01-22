@@ -190,6 +190,23 @@ export const verify = async (email, emailValidToken) => {
   }
 };
 
+export const verifyNewEmail = async (email, emailValidToken) => {
+  trackPageView(email);
+  const [res, body] = await context.fetch("/user/verify/new-email", {
+    method: "POST",
+    body: JSON.stringify({ email, emailValidToken }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  setState((state) => ({ ...state, userRefresh: Date.now() }));
+
+  if (res.status !== 201) {
+    throw new Error(body.errors[0]);
+  }
+};
+
 // resend verify email
 export const verifyEmail = async (email) => {
   const [res, body] = await context.fetch("/user/verify-email", {

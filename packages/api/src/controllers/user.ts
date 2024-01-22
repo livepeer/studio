@@ -480,6 +480,118 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
+app.patch("/:id", authorizer({}), async (req, res) => {
+  const { email } = req.body;
+  const userId = req.user.id;
+
+  if (userId !== req.params.id && !req.user.admin) {
+    return res.status(403).json({
+      errors: ["user can only update their own user object"],
+    });
+  }
+
+  const lowerCaseEmail: string = email.toLowerCase();
+
+  // Validate the new email
+  const emailValid = validator.validate(lowerCaseEmail);
+  if (!emailValid) {
+    return res.status(422).json({ errors: ["Invalid email"] });
+  }
+
+  const isEmailRegisteredAlready = await isEmailRegistered(lowerCaseEmail);
+  if (isEmailRegisteredAlready) {
+    return res.status(409).json({
+      errors: ["This email is already registered. Please choose another one."],
+    });
+  }
+
+  const emailValidToken = uuid();
+
+  if (req.user.admin) {
+    if (!req.params.id) {
+      console.log(`
+        Admin user ${req.user.id} attempted to change email without providing userId
+      `);
+      return res
+        .status(400)
+        .json({ errors: ["userId is required for admins"] });
+    }
+
+    const user = await db.user.get(req.params.id);
+
+    if (user.admin) {
+      return res
+        .status(400)
+        .json({ errors: ["Cannot change email of admins"] });
+    }
+
+    if (!user) {
+      return res.status(404).json({ errors: ["User not found"] });
+    }
+
+    await db.user.update(req.params.id, {
+      email: lowerCaseEmail,
+    });
+
+    res.status(200);
+    return res.json({ message: "Email updated successfully." });
+  }
+
+  // Update user with newEmail (temporary field) and emailValidToken in database
+  await db.user.update(userId, {
+    newEmail: lowerCaseEmail,
+    emailValidToken: emailValidToken,
+  });
+
+  try {
+    await sendgridEmail({
+      email: lowerCaseEmail,
+      supportAddr: req.config.supportAddr,
+      sendgridTemplateId: req.config.sendgridTemplateId,
+      sendgridApiKey: req.config.sendgridApiKey,
+      subject: "Verify Your New Email Address for Livepeer Studio",
+      preheader: "Email Verification Needed!",
+      buttonText: "Verify Email",
+      buttonUrl: frontendUrl(
+        req,
+        `/verify-new-email?${qs.stringify({
+          emailValidToken,
+          email: lowerCaseEmail,
+        })}`
+      ),
+      unsubscribe: unsubscribeUrl(req),
+      text: ["Please verify your new email address."].join("\n\n"),
+    });
+
+    res.status(200).json({ message: "Verification email sent." });
+  } catch (err) {
+    res.status(400).json({ errors: [`Error sending email: ${err}`] });
+  }
+});
+
+app.get("/verify/new-email", async (req, res) => {
+  const { emailValidToken } = req.query;
+
+  // Find user with matching emailValidToken
+  const [[user]] = await db.user.find({ emailValidToken });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ errors: ["Invalid or expired verification token."] });
+  }
+
+  // Update user's email field with the newEmail and remove newEmail field and emailValidToken
+  await db.user.update(user.id, {
+    email: user.newEmail,
+    newEmail: null,
+    emailValidToken: null,
+  });
+
+  // Redirect or send a response
+  res.status(200).json({ message: "Email updated successfully." });
+});
+
 const suspensionEmailText = (
   emailTemplate: SuspendUserPayload["emailTemplate"]
 ) => {
@@ -810,7 +922,19 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 // resend verify email
 app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
   const { selectedPlan } = req.query;
-  const user = await findUserByEmail(req.body.email);
+  let user = await findUserByEmail(req.body.email);
+
+  if (!user) {
+    let [newEmailUser] = await db.user.find({ newEmail: req.body.email });
+    if (newEmailUser.length > 0) {
+      user = newEmailUser[0];
+    }
+  }
+
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["user not found"] });
+  }
 
   const emailSent = await sendVerificationEmail(req, user, selectedPlan);
 
