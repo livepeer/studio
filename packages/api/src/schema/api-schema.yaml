@@ -337,6 +337,11 @@ components:
           example: test_stream
         creatorId:
           $ref: "#/components/schemas/creator-id"
+        tags:
+          type: object
+          description: User input tags associated with the stream
+          additionalProperties:
+            type: string
         lastSeen:
           type: number
           example: 1587667174725
@@ -465,6 +470,8 @@ components:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
+        tags:
+          $ref: "#/components/schemas/stream/properties/tags"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -516,6 +523,8 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           $ref: "#/components/schemas/stream/properties/profiles"
+        tags:
+          $ref: "#/components/schemas/stream/properties/tags"
     target-add-payload:
       type: object
       additionalProperties: false
