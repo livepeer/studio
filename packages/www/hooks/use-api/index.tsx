@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "@livepeer.studio/api";
 import { isStaging, isDevelopment } from "../../lib/utils";
 import { ApiState } from "./types";
-import { clearTokens, getStoredToken } from "./tokenStorage";
+import { clearTokens, getRefreshToken, getStoredToken } from "./tokenStorage";
 import * as accessControlEndpointsFunctions from "./endpoints/accessControl";
 import * as apiTokenEndpointsFunctions from "./endpoints/apiToken";
 import * as assetEndpointsFunctions from "./endpoints/asset";
@@ -125,6 +125,7 @@ export const ApiContext = createContext(makeContext({} as ApiState, () => {}));
 export const ApiProvider = ({ children }) => {
   const [state, setState] = useState<ApiState>({
     token: getStoredToken(),
+    refreshToken: getRefreshToken(),
   });
 
   const context = makeContext(state, setState);
