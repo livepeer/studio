@@ -517,7 +517,7 @@ app.patch("/:id", authorizer({}), async (req, res) => {
         .json({ errors: ["userId is required for admins"] });
     }
 
-    const user = await db.user.get(req.body.userId);
+    const user = await db.user.get(req.params.id);
 
     if (user.admin) {
       return res
@@ -529,7 +529,7 @@ app.patch("/:id", authorizer({}), async (req, res) => {
       return res.status(404).json({ errors: ["User not found"] });
     }
 
-    await db.user.update(req.body.userId, {
+    await db.user.update(req.params.id, {
       email: lowerCaseEmail,
     });
 
