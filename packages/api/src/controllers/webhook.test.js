@@ -1,5 +1,6 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
+import { sleep } from "../util";
 
 let server;
 let mockAdminUser;
@@ -190,23 +191,6 @@ describe("controllers/webhook", () => {
       expect(updated.name).toEqual("modified_name");
     });
 
-    it("update the status of a webhook", async () => {
-      const { id } = generatedWebhook;
-      const payload = {
-        response: {
-          webhookId: id,
-          statusCode: 400,
-          response: {
-            body: "",
-            status: 400,
-          },
-        },
-        errorMessage: "Error test",
-      };
-      const res = await client.post(`/webhook/${id}/status`, payload);
-      expect(res.status).toBe(204);
-    });
-
     it("disallows setting webhook for another user", async () => {
       const { id } = generatedWebhook;
       const modifiedHook = { ...generatedWebhook, userId: nonAdminUser.id };
@@ -306,6 +290,29 @@ describe("controllers/webhook", () => {
       expect(setActiveRes.status).toBe(204);
       // const setActiveResJson = await setActiveRes.json()
       // expect(setActiveResJson).toBeDefined()
+
+      // a log entry for the webhook should appear after a short wait
+      let requestsJson;
+      for (let i = 0; i < 5; i++) {
+        await sleep(500);
+        const requestsRes = await client.get(
+          `/webhook/${generatedWebhook.id}/requests`
+        );
+        expect(requestsRes.status).toBe(200);
+        requestsJson = await requestsRes.json();
+        if (requestsJson.length > 0) {
+          break;
+        }
+      }
+
+      expect(requestsJson.length).toBeGreaterThan(0);
+      expect(requestsJson[0].webhookId).toBe(generatedWebhook.id);
+      expect(requestsJson[0].event).toBe("stream.started");
+      expect(requestsJson[0].request).toBeDefined();
+      expect(requestsJson[0].request.body).toBeDefined();
+      expect(requestsJson[0].request.headers).toBeDefined();
+      expect(requestsJson[0].response).toBeDefined();
+      expect(requestsJson[0].response.body).toBeDefined();
     }, 20000);
 
     it("trigger webhook with localIP", async () => {
