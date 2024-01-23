@@ -960,6 +960,7 @@ app.post(
         });
       }
 
+      // TODO: Index must be manually created or remove table blacklist on table.ts
       const [streams] = await db.stream.find(
         [sql`data->'pull'->>'source' = ${payload.pull.source}`],
         { useReplica: false }
@@ -987,6 +988,7 @@ app.post(
 
     const id = uuid();
     const createdAt = Date.now();
+    // TODO: Remove display of stream key in the UI
     const streamKey = payload.pull
       ? undefined // Postgres allows multiple NULLs in a unique index, so this is fine
       : await generateUniqueStreamKey(id);
