@@ -413,7 +413,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     ...stripeFields,
   });
 
-  const user = cleanUserFields(await db.user.get(id));
+  const user = cleanUserFields(await db.user.get(id, { useReplica: false }));
   if (!validUser && user) {
     const {
       supportAddr,
