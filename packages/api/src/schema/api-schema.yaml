@@ -400,6 +400,8 @@ components:
             external source, rather than pushed to Livepeer. If specified, the
             stream will not have a streamKey.
           additionalProperties: false
+          required:
+            - source
           properties:
             source:
               type: string
@@ -495,6 +497,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/stream/properties/name"
+        pull:
+          $ref: "#/components/schemas/stream/properties/pull"
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:

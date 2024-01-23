@@ -270,6 +270,10 @@ function activeCleanup(
   return streams;
 }
 
+async function TODOtriggerPullStart(stream: DBStream) {
+  // TODO: trigger pull start on catalyst
+}
+
 async function getIngestBase(req: Request) {
   const ingests = await req.getIngest();
   if (!ingests.length) {
@@ -946,11 +950,46 @@ app.post(
   authorizer({}),
   validatePost("new-stream-payload"),
   async (req, res) => {
+    const { autoStartPull } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
+
+    if (autoStartPull === "true") {
+      if (!payload.pull) {
+        return res.status(400).json({
+          errors: [`autoStartPull requires pull configuration to be present`],
+        });
+      }
+
+      const [streams] = await db.stream.find(
+        [sql`data->'pull'->>'source' = ${payload.pull.source}`],
+        { useReplica: false }
+      );
+
+      if (streams.length === 1) {
+        const stream = streams[0];
+        await TODOtriggerPullStart(stream);
+
+        return res
+          .status(200)
+          .json(
+            db.stream.addDefaultFields(
+              db.stream.removePrivateFields(stream, req.user.admin)
+            )
+          );
+      } else if (streams.length > 1) {
+        return res.status(400).json({
+          errors: [
+            `autoStartPull requires pull.source to be unique, found ${streams.length} streams with same source`,
+          ],
+        });
+      }
+    }
 
     const id = uuid();
     const createdAt = Date.now();
-    const streamKey = await generateUniqueStreamKey(id);
+    const streamKey = payload.pull
+      ? undefined // Postgres allows multiple NULLs in a unique index, so this is fine
+      : await generateUniqueStreamKey(id);
     let playbackId = await generateUniquePlaybackId(id, [streamKey]);
     if (req.user.isTestUser) {
       playbackId += "-test";
@@ -995,6 +1034,10 @@ app.post(
     );
 
     await db.stream.create(doc);
+
+    if (autoStartPull === "true") {
+      await TODOtriggerPullStart(doc);
+    }
 
     res.status(201);
     res.json(
