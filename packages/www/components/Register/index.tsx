@@ -144,7 +144,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             }}
             name="email"
             type="email"
-            placeholder="Work Email"
+            placeholder="Work email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
