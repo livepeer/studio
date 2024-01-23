@@ -211,7 +211,7 @@ app.get("/", authorizer({}), async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`task.data->>'userId' = ${req.user.id}`);
 
-  if (!all || all === "false") {
+  if (!all || all === "false" || !req.user.admin) {
     query.push(sql`task.data->>'deleted' IS NULL`);
   }
 

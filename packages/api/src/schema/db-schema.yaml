@@ -598,13 +598,12 @@ components:
           type: string
           index: true
         webhookId:
-          type: string
           index: true
         eventId:
           type: string
           index: true
+          writeOnly: true
         event:
-          type: string
           index: true
         createdAt:
           index: true
@@ -612,8 +611,10 @@ components:
           type: object
           properties:
             status:
-              type: number
               index: true
+            redirected:
+              type: boolean
+              writeOnly: true
     detection-webhook-payload:
       type: object
       required:

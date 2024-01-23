@@ -94,7 +94,7 @@ app.get("/", authorizer({}), async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
 
-  if (!all || all === "false") {
+  if (!all || all === "false" || !req.user.admin) {
     query.push(sql`webhook.data->>'deleted' IS NULL`);
   }
 
@@ -336,7 +336,7 @@ app.get("/:id/requests", authorizer({}), async (req, res) => {
   query.push(sql`webhook_response.data->>'userId' = ${req.user.id}`);
   query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
 
-  if (!all || all === "false") {
+  if (!all || all === "false" || !req.user.admin) {
     query.push(sql`webhook_response.data->>'deleted' IS NULL`);
   }
 

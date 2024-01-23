@@ -511,7 +511,11 @@ export default class WebhookCannon {
           status: resp.status,
           statusText: resp.statusText,
         },
-        request: params,
+        request: {
+          body: params.body,
+          method: params.method,
+          headers: params.headers,
+        },
       });
     } catch (e) {
       console.log(

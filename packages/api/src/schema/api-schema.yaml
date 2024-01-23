@@ -228,32 +228,46 @@ components:
         webhookId:
           readOnly: true
           type: string
-        eventId:
+          description: ID of the webhook this request was made for
+        event:
           readOnly: true
           type: string
+          description: The event type that triggered the webhook request
         createdAt:
           readOnly: true
           type: number
           description: |
-            Timestamp (in milliseconds) at which webhook response object was
+            Timestamp (in milliseconds) at which webhook request object was
             created
           example: 1587667174725
         duration:
           type: number
+          description: The time taken to make the webhook request
         request:
           type: object
+          properties:
+            method:
+              type: string
+              description: HTTP method used for the request
+            headers:
+              type: object
+              description: HTTP headers used for the request
+            body:
+              type: string
+              description: body used for the request
         response:
           type: object
           additionalProperties: false
           properties:
             body:
               type: string
-            redirected:
-              type: boolean
+              description: body of the response
             status:
               type: number
+              description: HTTP status code
             statusText:
               type: string
+              description: status text from the response
     clip-payload:
       type: object
       additionalProperties: false
