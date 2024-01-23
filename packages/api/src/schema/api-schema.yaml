@@ -393,6 +393,46 @@ components:
           type: string
           example: hgebdhhigq
           description: Used to form RTMP ingest URL
+        pull:
+          type: object
+          description: |-
+            Configuration for a stream that should be actively pulled from an
+            external source, rather than pushed to Livepeer. If specified, the
+            stream will not have a streamKey.
+          additionalProperties: false
+          properties:
+            source:
+              type: string
+              description: |-
+                URL from which to pull from.
+              example: https://myservice.com/live/stream.flv
+            headers:
+              type: object
+              description: |-
+                Headers to be sent with the request to the pull source.
+              additionalProperties:
+                type: string
+              example:
+                Authorization: "Bearer 123"
+            location:
+              type: object
+              description: |-
+                Approximate location of the pull source. The location is used to
+                determine the closest Livepeer region to pull the stream from.
+              additionalProperties: false
+              properties:
+                lat:
+                  type: number
+                  description: |-
+                    Latitude of the pull source in degrees. North is positive,
+                    south is negative.
+                  example: 39.739
+                lon:
+                  type: number
+                  description: |-
+                    Longitude of the pull source in degrees. East is positive,
+                    west is negative.
+                  example: -104.988
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
@@ -2776,7 +2816,7 @@ paths:
         tusEndpoint field of the response to upload the video file and track the
         progress:
 
-        ``` 
+        ```
         # This assumes there is an `input` element of `type="file"` with id
         `fileInput` in the HTML
 
@@ -3819,7 +3859,7 @@ paths:
       description: >
         `POST /transcode` transcodes a video file and uploads the results to the
 
-        specified storage service. 
+        specified storage service.
 
         \
 
