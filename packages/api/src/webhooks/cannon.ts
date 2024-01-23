@@ -512,6 +512,7 @@ export default class WebhookCannon {
           statusText: resp.statusText,
         },
         request: {
+          url: webhook.url,
           body: params.body,
           method: params.method,
           headers: params.headers,

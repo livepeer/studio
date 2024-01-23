@@ -242,32 +242,35 @@ components:
           example: 1587667174725
         duration:
           type: number
-          description: The time taken to make the webhook request
+          description: The time taken (in seconds) to make the webhook request
         request:
           type: object
           properties:
+            url:
+              type: string
+              description: URL used for the request
             method:
               type: string
-              description: HTTP method used for the request
+              description: HTTP request method
             headers:
               type: object
-              description: HTTP headers used for the request
+              description: HTTP request headers
             body:
               type: string
-              description: body used for the request
+              description: request body
         response:
           type: object
           additionalProperties: false
           properties:
             body:
               type: string
-              description: body of the response
+              description: response body
             status:
               type: number
               description: HTTP status code
             statusText:
               type: string
-              description: status text from the response
+              description: response status text
     clip-payload:
       type: object
       additionalProperties: false
