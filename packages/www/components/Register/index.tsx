@@ -21,9 +21,9 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const router = useRouter();
   const [organization, setOrganization] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isCompanyAffiliated, setIsCompanyAffiliated] = useState(false);
 
   const { handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -58,7 +58,8 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
     return onSubmit({
       email,
       password: hashedPassword,
-      firstName: isCompanyAffiliated ? organization : firstName,
+      firstName,
+      lastName,
       organization,
     });
   };
@@ -93,6 +94,49 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
 
           <TextField
             size="3"
+            id="name"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="name"
+            type="text"
+            placeholder="Name"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <TextField
+            size="3"
+            id="lastName"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="lastName"
+            type="text"
+            placeholder="Last name"
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+
+          <TextField
+            size="3"
+            id="organization"
+            css={{
+              width: "100%",
+              mb: "$2",
+            }}
+            name="organization"
+            type="text"
+            placeholder="Company name (optional)"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+          />
+
+          <TextField
+            size="3"
             id="email"
             css={{
               width: "100%",
@@ -100,7 +144,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             }}
             name="email"
             type="email"
-            placeholder="you@company.com"
+            placeholder="Work Email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -120,57 +164,6 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
-          <Flex
-            css={{
-              alignItems: "center",
-              justifyContent: "left",
-              mb: "$2",
-              mt: "$3",
-            }}>
-            <Checkbox
-              id="isCompany"
-              onCheckedChange={(checked) =>
-                setIsCompanyAffiliated(checked === true)
-              }
-              checked={isCompanyAffiliated}
-            />
-            <Label css={{ ml: "$1" }} htmlFor="isCompany">
-              I am using Livepeer Studio for work
-            </Label>
-          </Flex>
-
-          {isCompanyAffiliated ? (
-            <TextField
-              size="3"
-              id="organization"
-              css={{
-                width: "100%",
-                mb: "$2",
-              }}
-              name="organization"
-              type="text"
-              placeholder="Company name"
-              required
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-            />
-          ) : (
-            <TextField
-              size="3"
-              id="name"
-              css={{
-                width: "100%",
-                mb: "$2",
-              }}
-              name="name"
-              type="text"
-              placeholder="Name"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          )}
 
           {errors.length > 0 && (
             <Box css={{ mt: "$2" }}>
