@@ -287,7 +287,7 @@ const requestsFieldsMap: FieldsMap = {
   statusCode: `webhook_response.data->'response'->>'status'`,
 };
 
-app.get("/:id/requests", authorizer({}), async (req, res) => {
+app.get("/:id/log", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     req.query;
   if (isNaN(parseInt(limit))) {
