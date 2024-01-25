@@ -51,6 +51,7 @@ import Queue from "../store/queue";
 import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
+import { ensureExperimentSubject } from "../store/experiment-table";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -952,6 +953,10 @@ app.post(
   async (req, res) => {
     const { autoStartPull } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
+
+    if (autoStartPull || payload.pull) {
+      await ensureExperimentSubject(req.user.id, "stream-pull-source");
+    }
 
     if (autoStartPull === "true") {
       if (!payload.pull) {
