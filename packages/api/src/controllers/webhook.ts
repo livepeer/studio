@@ -7,7 +7,15 @@ import { v4 as uuid } from "uuid";
 import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { UnprocessableEntityError, NotFoundError } from "../store/errors";
+import {
+  UnprocessableEntityError,
+  NotFoundError,
+  ForbiddenError,
+  BadRequestError,
+} from "../store/errors";
+import { resendWebhook } from "../webhooks/cannon";
+import { DBWebhook } from "../store/webhook-table";
+import { WebhookResponse } from "../schema/types";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
   try {
@@ -287,9 +295,45 @@ const requestsFieldsMap: FieldsMap = {
   statusCode: `webhook_response.data->'response'->>'status'`,
 };
 
+app.put("/:id/log/:requestId/resend", authorizer({}), async (req, res) => {
+  const webhook = await db.webhook.get(req.params.id);
+  const webhookResponse = await db.webhookResponse.get(req.params.requestId);
+  await checkRequest(req, webhook, webhookResponse);
+
+  await resendWebhook(webhook, webhookResponse);
+  res.status(202).end();
+});
+
+app.get("/:id/log/:requestId", authorizer({}), async (req, res) => {
+  const webhook = await db.webhook.get(req.params.id);
+  const webhookResponse = await db.webhookResponse.get(req.params.requestId);
+  await checkRequest(req, webhook, webhookResponse);
+
+  res.status(200);
+  return res.json(webhookResponse);
+});
+
+async function checkRequest(
+  req,
+  webhook: DBWebhook,
+  webhookResponse: WebhookResponse
+) {
+  if (
+    !req.user.admin &&
+    (req.user.id !== webhook.userId || req.user.id !== webhookResponse.userId)
+  ) {
+    throw new ForbiddenError(`invalid user`);
+  }
+  if (!webhook || webhook.deleted) {
+    throw new NotFoundError(`webhook not found`);
+  }
+  if (webhookResponse.webhookId !== webhook.id) {
+    throw new BadRequestError(`mismatch between webhook and webhook log`);
+  }
+}
+
 app.get("/:id/log", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
+  let { limit, cursor, all, allUsers, order, filters, count } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }

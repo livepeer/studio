@@ -15,16 +15,13 @@ import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset, primaryStorageExperiment } from "../controllers/asset";
-import {
-  DBStream,
-  DeprecatedStreamFields,
-  StreamStats,
-} from "../store/stream-table";
+import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import { db } from "../store";
 import { buildRecordingUrl } from "../controllers/session";
 import { isExperimentSubject } from "../store/experiment-table";
+import { WebhookResponse } from "../schema/types";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -447,11 +444,11 @@ export default class WebhookCannon {
       } finally {
         await this.storeResponse(
           webhook,
-          event,
+          event.id,
+          event.event,
           resp,
           startTime,
           responseBody,
-          stream,
           params
         );
         await this.storeTriggerStatus(
@@ -484,11 +481,11 @@ export default class WebhookCannon {
 
   async storeResponse(
     webhook: DBWebhook,
-    event: messages.WebhookEvent,
+    eventId: string,
+    eventName: string,
     resp: Response,
     startTime: [number, number],
     responseBody: string,
-    stream: DBStream,
     params
   ) {
     try {
@@ -497,11 +494,11 @@ export default class WebhookCannon {
         responseBody.substring(0, 1024)
       ).toString("base64");
 
-      await this.db.webhookResponse.create({
+      await db.webhookResponse.create({
         id: uuid(),
         webhookId: webhook.id,
-        eventId: event.id,
-        event: event.event,
+        eventId: eventId,
+        event: eventName,
         userId: webhook.userId,
         createdAt: Date.now(),
         duration: hrDuration[0] + hrDuration[1] / 1e9,
@@ -623,6 +620,48 @@ export default class WebhookCannon {
         throw e;
       }
     }
+  }
+}
+
+export async function resendWebhook(
+  webhook: DBWebhook,
+  webhookResponse: WebhookResponse
+) {
+  const triggerTime = Date.now();
+  const startTime = process.hrtime();
+  let resp: Response;
+  let responseBody: string;
+  let statusCode: number;
+  let errorMessage: string;
+  try {
+    resp = await fetchWithTimeout(webhookResponse.request.url, {
+      method: webhookResponse.request.method,
+      headers: webhookResponse.request.headers,
+      timeout: WEBHOOK_TIMEOUT,
+      body: webhookResponse.request.body,
+    });
+    responseBody = await resp.text();
+    statusCode = resp.status;
+  } catch (e) {
+    console.log("firing error", e);
+    errorMessage = e.message;
+  } finally {
+    await storeResponse(
+      webhook,
+      webhookResponse.eventId,
+      webhookResponse.event,
+      resp,
+      startTime,
+      responseBody,
+      webhookResponse.request
+    );
+    await storeTriggerStatus(
+      webhook,
+      triggerTime,
+      statusCode,
+      errorMessage,
+      responseBody
+    );
   }
 }
 

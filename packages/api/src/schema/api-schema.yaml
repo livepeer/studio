@@ -255,6 +255,8 @@ components:
             headers:
               type: object
               description: HTTP request headers
+              additionalProperties:
+                type: string
             body:
               type: string
               description: request body

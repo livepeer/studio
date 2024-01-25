@@ -290,6 +290,26 @@ describe("controllers/webhook", () => {
       expect(setActiveRes.status).toBe(204);
       // const setActiveResJson = await setActiveRes.json()
       // expect(setActiveResJson).toBeDefined()
+    }, 20000);
+
+    it("records webhook logs", async () => {
+      // create webhook
+      const webhookRes = await client.post("/webhook", { ...mockWebhook });
+      generatedWebhook = await webhookRes.json();
+      expect(webhookRes.status).toBe(201);
+
+      // create a stream object
+      postMockStream.name = "webhook_logs";
+      const res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      expect(stream.id).toBeDefined();
+
+      // trigger
+      const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
+        active: true,
+      });
+      expect(setActiveRes.status).toBe(204);
 
       // a log entry for the webhook should appear after a short wait
       let logJson;
@@ -303,14 +323,31 @@ describe("controllers/webhook", () => {
         }
       }
 
-      expect(logJson.length).toBeGreaterThan(0);
-      expect(logJson[0].webhookId).toBe(generatedWebhook.id);
-      expect(logJson[0].event).toBe("stream.started");
-      expect(logJson[0].request).toBeDefined();
-      expect(logJson[0].request.body).toBeDefined();
-      expect(logJson[0].request.headers).toBeDefined();
-      expect(logJson[0].response).toBeDefined();
-      expect(logJson[0].response.body).toBeDefined();
+      expect(logJson.length).toBe(1);
+      const webhookRequest = logJson[0];
+      expect(webhookRequest.webhookId).toBe(generatedWebhook.id);
+      expect(webhookRequest.event).toBe("stream.started");
+      expect(webhookRequest.request).toBeDefined();
+      expect(webhookRequest.request.body).toBeDefined();
+      expect(webhookRequest.request.headers).toBeDefined();
+      expect(webhookRequest.response).toBeDefined();
+      expect(webhookRequest.response.body).toBeDefined();
+
+      const getRes = await client.get(
+        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}`
+      );
+      expect(getRes.status).toBe(200);
+      const getJson = await getRes.json();
+      expect(getJson).toEqual(webhookRequest);
+
+      const resendRes = await client.put(
+        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`
+      );
+      expect(resendRes.status).toBe(202);
+      const logRes = await client.get(`/webhook/${generatedWebhook.id}/log`);
+      expect(logRes.status).toBe(200);
+      logJson = await logRes.json();
+      expect(logJson.length).toBe(2);
     }, 20000);
 
     it("trigger webhook with localIP", async () => {
