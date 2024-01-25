@@ -54,6 +54,9 @@ async function checkRequest(
   if (!webhook || webhook.deleted) {
     throw new NotFoundError(`webhook not found`);
   }
+  if (!webhookResponse || webhookResponse.deleted) {
+    throw new NotFoundError(`webhook log not found`);
+  }
   if (webhookResponse.webhookId !== webhook.id) {
     throw new BadRequestError(`mismatch between webhook and webhook log`);
   }

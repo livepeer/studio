@@ -615,6 +615,9 @@ components:
             redirected:
               type: boolean
               writeOnly: true
+        deleted:
+          type: boolean
+          default: false
     detection-webhook-payload:
       type: object
       required:

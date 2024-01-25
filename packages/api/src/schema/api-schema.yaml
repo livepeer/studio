@@ -2729,6 +2729,80 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  "/webhook/{id}/log":
+    get:
+      summary: Retrieve webhook logs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/webhook-response"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log/{logId}":
+    get:
+      summary: Retrieve a webhook log
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/webhook-response"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log/{logId}/resend":
+    put:
+      summary: Resend a webhook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /asset:
     get:
       summary: Retrieve assets
