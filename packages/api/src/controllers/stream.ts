@@ -45,6 +45,7 @@ import {
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
   triggerCatalystStreamNuke,
+  TODOtriggerCatalystPullStart,
 } from "./helpers";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
@@ -52,6 +53,7 @@ import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
 import { ensureExperimentSubject } from "../store/experiment-table";
+import { experimentSubjectsOnly } from "./experiment";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -269,10 +271,6 @@ function activeCleanup(
     return streams.filter((s) => s.isActive); // activeCleanupOne monkey patches the stream object
   }
   return streams;
-}
-
-async function TODOtriggerPullStart(stream: DBStream) {
-  // TODO: trigger pull start on catalyst
 }
 
 async function getIngestBase(req: Request) {
@@ -973,7 +971,7 @@ app.post(
 
       if (streams.length === 1) {
         const stream = streams[0];
-        await TODOtriggerPullStart(stream);
+        await TODOtriggerCatalystPullStart(stream);
 
         return res
           .status(200)
@@ -1041,7 +1039,7 @@ app.post(
     await db.stream.create(doc);
 
     if (autoStartPull === "true") {
-      await TODOtriggerPullStart(doc);
+      await TODOtriggerCatalystPullStart(doc);
     }
 
     res.status(201);
@@ -1706,6 +1704,32 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+app.post(
+  "/:id/start-pull",
+  authorizer({}),
+  experimentSubjectsOnly("stream-pull-source"),
+  async (req, res) => {
+    const { id } = req.params;
+    const stream = await db.stream.get(id);
+    if (
+      !stream ||
+      (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+    ) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+
+    if (!stream.pull) {
+      res.status(400);
+      return res.json({ errors: ["stream does not have a pull source"] });
+    }
+
+    await TODOtriggerCatalystPullStart(stream);
+
+    res.status(204).end();
+  }
+);
 
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
