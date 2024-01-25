@@ -993,10 +993,8 @@ app.post(
 
     const id = uuid();
     const createdAt = Date.now();
-    // TODO: Remove display of stream key in the UI
-    const streamKey = payload.pull
-      ? undefined // Postgres allows multiple NULLs in a unique index, so this is fine
-      : await generateUniqueStreamKey(id);
+    // TODO: Don't create a streamKey if there's a pull source (here and on www)
+    const streamKey = await generateUniqueStreamKey(id);
     let playbackId = await generateUniquePlaybackId(id, [streamKey]);
     if (req.user.isTestUser) {
       playbackId += "-test";
