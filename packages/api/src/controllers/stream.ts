@@ -51,6 +51,7 @@ import Queue from "../store/queue";
 import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
+import { Semaphore } from "../util";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -205,6 +206,10 @@ export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `webrtc`, stream.playbackId);
 }
 
+// our DB client uses 10 connections by default, use at most half of that for
+// background cleanup logic.
+const cleanupSemaphore = new Semaphore(5);
+
 /**
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
@@ -229,6 +234,7 @@ function activeCleanupOne(
   }
 
   setImmediate(async () => {
+    await cleanupSemaphore.wait();
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.waiting logic to clean-up the isActive field
@@ -246,6 +252,8 @@ function activeCleanupOne(
       }
     } catch (err) {
       logger.error("Error sending /setactive hooks err=", err);
+    } finally {
+      cleanupSemaphore.release();
     }
   });
 
@@ -257,15 +265,10 @@ function activeCleanup(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
-  ingest: string,
-  filterToActiveOnly = false
+  ingest: string
 ) {
-  let hasStreamsToClean = false;
   for (const stream of streams) {
-    hasStreamsToClean ||= activeCleanupOne(config, stream, queue, ingest);
-  }
-  if (filterToActiveOnly && hasStreamsToClean) {
-    return streams.filter((s) => s.isActive); // activeCleanupOne monkey patches the stream object
+    activeCleanupOne(config, stream, queue, ingest);
   }
   return streams;
 }
@@ -363,7 +366,7 @@ app.get("/", authorizer({}), async (req, res) => {
     fields = fields + ", count(*) OVER() AS count";
   }
   const from = `stream left join users on stream.data->>'userId' = users.id`;
-  const [output, newCursor] = await db.stream.find(query, {
+  let [output, newCursor] = await db.stream.find(query, {
     limit,
     cursor,
     fields,
@@ -385,17 +388,16 @@ app.get("/", authorizer({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(
-    activeCleanup(
-      req.config,
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(output, req.user.admin)
-      ),
-      req.queue,
-      ingest,
-      !!active
-    )
+
+  output = db.stream.addDefaultFieldsMany(
+    db.stream.removePrivateFieldsMany(output, req.user.admin)
   );
+  output = activeCleanup(req.config, output, req.queue, ingest);
+  if (active) {
+    output = output.filter((s) => s.isActive); // activeCleanup monkey patches the stream object
+  }
+
+  res.json(output);
 });
 
 export async function getRecordingPlaybackUrl(
@@ -1689,6 +1691,35 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   let response = await getClips(stream, req, res);
   return response;
 });
+
+// queries for all the streams with active clean up pending and triggers the
+// clean up logic for them.
+app.post(
+  "/job/active-cleanup",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    const limit = parseInt(req.query.limit?.toString()) || 10000;
+    const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
+    let [streams] = await db.stream.find(
+      [
+        sql`data->>'parentId' IS NULL`,
+        sql`data->>'isActive' = 'true'`,
+        sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
+      ],
+      {
+        limit,
+      }
+    );
+
+    const ingest = await getIngestBase(req);
+
+    streams = activeCleanup(req.config, streams, req.queue, ingest);
+    streams = streams.filter((s) => !s.isActive); // activeCleanup monkey patches the stream objects
+
+    res.status(200);
+    res.json({ cleanedUp: streams });
+  }
+);
 
 // Hooks
 

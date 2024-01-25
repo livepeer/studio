@@ -1,0 +1,15 @@
+name: "cron: Active streams cleanup"
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # run every 10 minutes
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean-up active streams
+        run: |
+          curl --request POST \
+          --url 'https://livepeer.studio/api/stream/job/active-cleanup' \
+          --header 'Authorization: Bearer ${{ secrets.LP_API_ADMIN_TOKEN }}'

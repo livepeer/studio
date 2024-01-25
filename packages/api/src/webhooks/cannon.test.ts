@@ -286,7 +286,8 @@ describe("webhook cannon", () => {
       expect(callCount).toBe(1);
       expect(receivedEvent).toBe("stream.started");
 
-      sem = semaphore();
+      // at this point the semaphore is re-acquired cause we just waited (acquired) above
+
       await server.queue.publishWebhook("events.stream.idle", {
         type: "webhook_event",
         id: "webhook_test_42",
@@ -301,7 +302,6 @@ describe("webhook cannon", () => {
       expect(receivedEvent).toBe("stream.idle");
 
       // does not receive some random event
-      sem = semaphore();
       await server.queue.publishWebhook("events.stream.unknown" as any, {
         type: "webhook_event",
         id: "webhook_test_93",
@@ -311,7 +311,8 @@ describe("webhook cannon", () => {
         userId: nonAdminUser.id,
       });
 
-      await sem.wait(1000);
+      const err = await sem.wait(1000).catch((err) => err);
+      expect(err?.message).toBe("timeout");
       expect(callCount).toBe(2);
     });
 
