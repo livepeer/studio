@@ -2571,6 +2571,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  "/stream/{id}/start-pull":
+    parameters:
+      - name: id
+        description: ID of the stream
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Start ingest for a pull stream
+      description: |
+        `POST /stream/{id}/start-pull` can be used to start ingest for a stream
+        configured with a pull source. If the stream has recording configured,
+        it will also start recording.
+        \
+        \
+        A 204 No Content status response indicates the stream was successfully
+        started.
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
