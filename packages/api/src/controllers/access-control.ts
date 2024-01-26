@@ -18,14 +18,12 @@ import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeoutAndRedirects } from "../util";
 import fetch from "node-fetch";
-import { WithID } from "../store/types";
-import { DBStream } from "../store/stream-table";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
 import { cache } from "../store/cache";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
+const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 30;
 const app = Router();
 
 interface HitRecord {
@@ -135,10 +133,13 @@ app.post(
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
-    if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
-      let limitReached = freeTierLimitReached(content, user, req);
-      if (limitReached) {
-        throw new ForbiddenError("Free tier user reached viewership limit");
+    let response = {};
+
+    if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
+      if (isFreeTierUser(user)) {
+        response = {
+          rateLimit: MAX_ALLOWED_VIEWERS_FOR_FREE_TIER,
+        };
       }
     }
 
@@ -154,8 +155,8 @@ app.post(
 
     switch (playbackPolicyType) {
       case "public":
-        res.status(204);
-        return res.end();
+        res.status(200);
+        return res.json(response);
       case "jwt":
         if (!req.body.pub) {
           console.log(`
@@ -213,8 +214,8 @@ app.post(
         }
 
         tracking.recordSigningKeyValidation(signingKey.id);
-        res.status(204);
-        return res.end();
+        res.status(200);
+        return res.json(response);
       case "webhook":
         if (!req.body.accessKey || req.body.type !== "accessKey") {
           throw new ForbiddenError(
@@ -238,8 +239,8 @@ app.post(
           req.body.accessKey
         );
         if (statusCode >= 200 && statusCode < 300) {
-          res.status(204);
-          return res.end();
+          res.status(200);
+          return res.json(response);
         } else if (statusCode === 0) {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} failed, disallowing playback
@@ -292,38 +293,5 @@ app.get("/public-key", async (req, res) => {
       res.status(500).json({ error: "Unable to retrieve public key" });
     });
 });
-
-function freeTierLimitReached(
-  content: DBStream | WithID<Asset>,
-  user: User,
-  req: Request
-): boolean {
-  if (!isFreeTierUser(user)) {
-    return false;
-  }
-
-  // Register a hit for the given playbackId
-  const now = Date.now();
-  const playbackId = content.playbackId;
-
-  if (!playbackHits[playbackId]) {
-    playbackHits[playbackId] = [];
-  }
-
-  // Remove hits that are older than three minutes
-  playbackHits[playbackId] = playbackHits[playbackId].filter(
-    (hit) => now - hit.timestamp < 60 * 3 * 1000
-  );
-
-  // Add a new hit record
-  playbackHits[playbackId].push({ timestamp: now });
-
-  // Check if the number of hits in the last minute exceeds the threshold
-  if (playbackHits[playbackId].length > MAX_ALLOWED_VIEWERS_FOR_FREE_TIER) {
-    return true;
-  } else {
-    return false;
-  }
-}
 
 export default app;
