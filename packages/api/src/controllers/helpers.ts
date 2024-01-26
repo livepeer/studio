@@ -588,10 +588,10 @@ export function pathJoin(...items: string[]) {
 }
 
 export function isFreeTierUser(user: User) {
-  return (
+  const isFreeTier =
     user.stripeProductId === "hacker_1" ||
-    user.stripeProductId === "prod_O9XuIjn7EqYRVW"
-  );
+    user.stripeProductId === "prod_O9XuIjn7EqYRVW";
+  return isFreeTier;
 }
 
 export function trimPathPrefix(prefix: string, path: string) {
