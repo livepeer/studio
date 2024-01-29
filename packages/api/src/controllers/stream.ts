@@ -963,7 +963,6 @@ app.post(
         });
       }
 
-      // TODO: Index must be manually created or remove table blacklist on table.ts
       const [streams] = await db.stream.find(
         [sql`data->'pull'->>'source' = ${payload.pull.source}`],
         { useReplica: false }
