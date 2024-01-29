@@ -180,11 +180,11 @@ async function validateStreamPlaybackPolicy(
   }
 }
 
-async function validateTags(tags: object) {
-  let stringifiedTags = JSON.stringify(tags);
+async function validateTags(userTags: object) {
+  let stringifiedTags = JSON.stringify(userTags);
   if (stringifiedTags.length > 2048) {
     throw new BadRequestError(
-      `tags object is too large. Max size is 2048 characters`
+      `userTags object is too large. Max size is 2048 characters`
     );
   }
 }
@@ -1003,8 +1003,8 @@ app.post(
       doc.multistream
     );
 
-    if (doc.tags) {
-      await validateTags(doc.tags);
+    if (doc.userTags) {
+      await validateTags(doc.userTags);
     }
 
     await db.stream.create(doc);
@@ -1456,7 +1456,7 @@ app.patch(
       suspended,
       multistream,
       playbackPolicy,
-      tags,
+      userTags,
       creatorId,
       profiles,
     } = payload;
@@ -1495,9 +1495,9 @@ app.patch(
       patch = { ...patch, playbackPolicy };
     }
 
-    if (tags) {
-      await validateTags(tags);
-      patch = { ...patch, tags };
+    if (userTags) {
+      await validateTags(userTags);
+      patch = { ...patch, userTags };
     }
 
     // remove undefined fields to check below

@@ -337,7 +337,7 @@ components:
           example: test_stream
         creatorId:
           $ref: "#/components/schemas/creator-id"
-        tags:
+        userTags:
           type: object
           description: User input tags associated with the stream
           additionalProperties:
@@ -470,8 +470,8 @@ components:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
-        tags:
-          $ref: "#/components/schemas/stream/properties/tags"
+        userTags:
+          $ref: "#/components/schemas/stream/properties/userTags"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -523,8 +523,8 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           $ref: "#/components/schemas/stream/properties/profiles"
-        tags:
-          $ref: "#/components/schemas/stream/properties/tags"
+        userTags:
+          $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
       type: object
       additionalProperties: false
