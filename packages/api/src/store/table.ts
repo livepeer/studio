@@ -388,7 +388,10 @@ export default class Table<T extends DBObject> {
     }
 
     if (!prop.index && !prop.unique) {
-      if (prop.properties && this.name === "asset") {
+      // Tasks embed a bunch of `asset` objects in different fields. This would
+      // mean we'd duplicate the asset indexes in the task table. Because of
+      // that, we disable recursive indexes for the `task` table.
+      if (prop.properties && this.name !== "task") {
         const childProps = Object.entries(prop.properties);
         for (const [childName, childProp] of childProps) {
           await this.ensureIndex(childName, childProp, [...parents, propName]);
