@@ -593,10 +593,28 @@ components:
           readOnly: true
           type: string
           example: webhookResponse
+        userId:
+          readOnly: true
+          type: string
+          index: true
         webhookId:
           index: true
         eventId:
+          type: string
           index: true
+          writeOnly: true
+        event:
+          index: true
+        createdAt:
+          index: true
+        response:
+          type: object
+          properties:
+            status:
+              index: true
+            redirected:
+              type: boolean
+              writeOnly: true
     detection-webhook-payload:
       type: object
       required:

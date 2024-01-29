@@ -219,7 +219,6 @@ components:
       type: object
       required:
         - webhookId
-        - statusCode
       additionalProperties: false
       properties:
         id:
@@ -229,39 +228,49 @@ components:
         webhookId:
           readOnly: true
           type: string
-        eventId:
+          description: ID of the webhook this request was made for
+        event:
           readOnly: true
           type: string
+          description: The event type that triggered the webhook request
         createdAt:
           readOnly: true
           type: number
           description: |
-            Timestamp (in milliseconds) at which webhook response object was
+            Timestamp (in milliseconds) at which webhook request object was
             created
           example: 1587667174725
         duration:
           type: number
-        statusCode:
-          type: number
-          default: 0
+          description: The time taken (in seconds) to make the webhook request
+        request:
+          type: object
+          properties:
+            url:
+              type: string
+              description: URL used for the request
+            method:
+              type: string
+              description: HTTP request method
+            headers:
+              type: object
+              description: HTTP request headers
+            body:
+              type: string
+              description: request body
         response:
           type: object
           additionalProperties: false
           properties:
             body:
               type: string
-            headers:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: string
-            redirected:
-              type: boolean
+              description: response body
             status:
               type: number
+              description: HTTP status code
             statusText:
               type: string
+              description: response status text
     clip-payload:
       type: object
       additionalProperties: false
@@ -658,15 +667,6 @@ components:
           $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
           $ref: "#/components/schemas/webhook/properties/streamId"
-    webhook-status-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        errorMessage:
-          type: string
-          description: Error message if the webhook failed to process the event
-        response:
-          $ref: "#/components/schemas/webhook-response"
     session:
       type: object
       required:

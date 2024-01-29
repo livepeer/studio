@@ -8,8 +8,6 @@ import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
-import { WebhookStatusPayload } from "../schema/types";
-import { DBWebhook } from "../store/webhook-table";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
   try {
@@ -46,7 +44,7 @@ const fieldsMap: FieldsMap = {
   url: `webhook.data->>'url'`,
   blocking: `webhook.data->'blocking'`,
   deleted: `webhook.data->'deleted'`,
-  createdAt: `webhook.data->'createdAt'`,
+  createdAt: { val: `webhook.data->'createdAt'`, type: "int" },
   userId: `webhook.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   sharedSecret: `webhook.data->>'sharedSecret'`,
@@ -96,7 +94,7 @@ app.get("/", authorizer({}), async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
 
-  if (!all || all === "false") {
+  if (!all || all === "false" || !req.user.admin) {
     query.push(sql`webhook.data->>'deleted' IS NULL`);
   }
 
@@ -234,70 +232,6 @@ app.patch(
   }
 );
 
-app.post(
-  "/:id/status",
-  authorizer({ anyAdmin: true }),
-  validatePost("webhook-status-payload"),
-  async (req, res) => {
-    const { id } = req.params;
-    const webhook = await db.webhook.get(id);
-    if (!webhook || webhook.deleted) {
-      return res.status(404).json({ errors: ["webhook not found or deleted"] });
-    }
-
-    const { response, errorMessage } = req.body as WebhookStatusPayload;
-
-    if (!response || !response.response) {
-      return res.status(422).json({ errors: ["missing response in payload"] });
-    }
-    if (!response.response.body && response.response.body !== "") {
-      return res
-        .status(400)
-        .json({ errors: ["missing body in payload response"] });
-    }
-
-    try {
-      const triggerTime = response.createdAt ?? Date.now();
-      let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
-
-      if (
-        response.statusCode >= 300 ||
-        !response.statusCode ||
-        response.statusCode === 0
-      ) {
-        status = {
-          ...status,
-          lastFailure: {
-            error: errorMessage,
-            timestamp: triggerTime,
-            statusCode: response.statusCode,
-            response: response.response.body,
-          },
-        };
-      }
-      await db.webhook.updateStatus(webhook.id, status);
-    } catch (e) {
-      console.log(
-        `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
-      );
-    }
-
-    // TODO : Change the response type and save the response making sure it's compatible object
-    /*await db.webhookResponse.create({
-      id: uuid(),
-      webhookId: webhook.id,
-      createdAt: Date.now(),
-      statusCode: response.statusCode,
-      response: {
-        body: response.response.body,
-        status: response.statusCode,
-      },
-    });*/
-
-    res.status(204).end();
-  }
-);
-
 app.delete("/:id", authorizer({}), async (req, res) => {
   // delete a specific webhook
   const webhook = await db.webhook.get(req.params.id);
@@ -343,6 +277,95 @@ app.delete("/", authorizer({}), async (req, res) => {
 
   res.status(204);
   res.end();
+});
+
+const requestsFieldsMap: FieldsMap = {
+  id: `webhook_response.ID`,
+  createdAt: { val: `webhook_response.data->'createdAt'`, type: "int" },
+  userId: `webhook_response.data->>'userId'`,
+  event: `webhook_response.data->>'event'`,
+  statusCode: `webhook_response.data->'response'->>'status'`,
+};
+
+app.get("/:id/log", authorizer({}), async (req, res) => {
+  let { limit, cursor, all, event, allUsers, order, filters, count } =
+    req.query;
+  if (isNaN(parseInt(limit))) {
+    limit = undefined;
+  }
+  if (!order) {
+    order = "createdAt-true";
+  }
+
+  if (req.user.admin && allUsers && allUsers !== "false") {
+    const query = parseFilters(requestsFieldsMap, filters);
+    query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
+    if (!all || all === "false") {
+      query.push(sql`webhook_response.data->>'deleted' IS NULL`);
+    }
+
+    let fields =
+      " webhook_response.id as id, webhook_response.data as data, users.id as usersId, users.data as usersdata";
+    if (count) {
+      fields = fields + ", count(*) OVER() AS count";
+    }
+    const from = `webhook_response left join users on webhook_response.data->>'userId' = users.id`;
+    const [output, newCursor] = await db.webhookResponse.find(query, {
+      limit,
+      cursor,
+      fields,
+      from,
+      order: parseOrder(requestsFieldsMap, order),
+      process: ({ data, usersdata, count: c }) => {
+        if (count) {
+          res.set("X-Total-Count", c);
+        }
+        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+      },
+    });
+
+    res.status(200);
+
+    if (output.length > 0 && newCursor) {
+      res.links({ next: makeNextHREF(req, newCursor) });
+    }
+    return res.json(output);
+  }
+
+  const query = parseFilters(requestsFieldsMap, filters);
+  query.push(sql`webhook_response.data->>'userId' = ${req.user.id}`);
+  query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
+
+  if (!all || all === "false" || !req.user.admin) {
+    query.push(sql`webhook_response.data->>'deleted' IS NULL`);
+  }
+
+  let fields = " webhook_response.id as id, webhook_response.data as data";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
+  const from = `webhook_response`;
+  const [output, newCursor] = await db.webhookResponse.find(query, {
+    limit,
+    cursor,
+    fields,
+    from,
+    order: parseOrder(requestsFieldsMap, order),
+    process: ({ data, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
+      return { ...data };
+    },
+  });
+
+  res.status(200);
+
+  if (output.length > 0) {
+    res.links({ next: makeNextHREF(req, newCursor) });
+  }
+
+  return res.json(output);
 });
 
 export default app;

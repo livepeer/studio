@@ -69,7 +69,7 @@ export default async function makeApp(params: CliArgs) {
   const close = async () => {
     process.off("SIGTERM", sigterm);
     process.off("unhandledRejection", unhandledRejection);
-    listener.close();
+    listener?.close();
     await tracking.flushAll();
     await store.close();
   };

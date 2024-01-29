@@ -1,5 +1,6 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
+import { sleep } from "../util";
 
 let server;
 let mockAdminUser;
@@ -190,23 +191,6 @@ describe("controllers/webhook", () => {
       expect(updated.name).toEqual("modified_name");
     });
 
-    it("update the status of a webhook", async () => {
-      const { id } = generatedWebhook;
-      const payload = {
-        response: {
-          webhookId: id,
-          statusCode: 400,
-          response: {
-            body: "",
-            status: 400,
-          },
-        },
-        errorMessage: "Error test",
-      };
-      const res = await client.post(`/webhook/${id}/status`, payload);
-      expect(res.status).toBe(204);
-    });
-
     it("disallows setting webhook for another user", async () => {
       const { id } = generatedWebhook;
       const modifiedHook = { ...generatedWebhook, userId: nonAdminUser.id };
@@ -306,6 +290,27 @@ describe("controllers/webhook", () => {
       expect(setActiveRes.status).toBe(204);
       // const setActiveResJson = await setActiveRes.json()
       // expect(setActiveResJson).toBeDefined()
+
+      // a log entry for the webhook should appear after a short wait
+      let logJson;
+      for (let i = 0; i < 5; i++) {
+        await sleep(500);
+        const logRes = await client.get(`/webhook/${generatedWebhook.id}/log`);
+        expect(logRes.status).toBe(200);
+        logJson = await logRes.json();
+        if (logJson.length > 0) {
+          break;
+        }
+      }
+
+      expect(logJson.length).toBeGreaterThan(0);
+      expect(logJson[0].webhookId).toBe(generatedWebhook.id);
+      expect(logJson[0].event).toBe("stream.started");
+      expect(logJson[0].request).toBeDefined();
+      expect(logJson[0].request.body).toBeDefined();
+      expect(logJson[0].request.headers).toBeDefined();
+      expect(logJson[0].response).toBeDefined();
+      expect(logJson[0].response.body).toBeDefined();
     }, 20000);
 
     it("trigger webhook with localIP", async () => {
