@@ -180,6 +180,15 @@ async function validateStreamPlaybackPolicy(
   }
 }
 
+async function validateTags(userTags: object) {
+  let stringifiedTags = JSON.stringify(userTags);
+  if (stringifiedTags.length > 2048) {
+    throw new BadRequestError(
+      `userTags object is too large. Max size is 2048 characters`
+    );
+  }
+}
+
 async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   return Promise.all(
     ids.map(async (id) => {
@@ -994,6 +1003,10 @@ app.post(
       doc.multistream
     );
 
+    if (doc.userTags) {
+      await validateTags(doc.userTags);
+    }
+
     await db.stream.create(doc);
 
     res.status(201);
@@ -1443,6 +1456,7 @@ app.patch(
       suspended,
       multistream,
       playbackPolicy,
+      userTags,
       creatorId,
       profiles,
     } = payload;
@@ -1479,6 +1493,11 @@ app.patch(
       await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
 
       patch = { ...patch, playbackPolicy };
+    }
+
+    if (userTags) {
+      await validateTags(userTags);
+      patch = { ...patch, userTags };
     }
 
     // remove undefined fields to check below
