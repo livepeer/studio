@@ -661,6 +661,10 @@ components:
           index: true
         streamKey:
           unique: true
+        pull:
+          properties:
+            source:
+              index: true
         playbackId:
           unique: true
         mistHost:

@@ -407,6 +407,48 @@ components:
           type: string
           example: hgebdhhigq
           description: Used to form RTMP ingest URL
+        pull:
+          type: object
+          description: |-
+            Configuration for a stream that should be actively pulled from an
+            external source, rather than pushed to Livepeer. If specified, the
+            stream will not have a streamKey.
+          additionalProperties: false
+          required:
+            - source
+          properties:
+            source:
+              type: string
+              description: |-
+                URL from which to pull from.
+              example: https://myservice.com/live/stream.flv
+            headers:
+              type: object
+              description: |-
+                Headers to be sent with the request to the pull source.
+              additionalProperties:
+                type: string
+              example:
+                Authorization: "Bearer 123"
+            location:
+              type: object
+              description: |-
+                Approximate location of the pull source. The location is used to
+                determine the closest Livepeer region to pull the stream from.
+              additionalProperties: false
+              properties:
+                lat:
+                  type: number
+                  description: |-
+                    Latitude of the pull source in degrees. North is positive,
+                    south is negative.
+                  example: 39.739
+                lon:
+                  type: number
+                  description: |-
+                    Longitude of the pull source in degrees. East is positive,
+                    west is negative.
+                  example: -104.988
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
@@ -469,6 +511,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/stream/properties/name"
+        pull:
+          $ref: "#/components/schemas/stream/properties/pull"
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
@@ -2536,6 +2580,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  "/stream/{id}/start-pull":
+    parameters:
+      - name: id
+        description: ID of the stream
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Start ingest for a pull stream
+      description: |
+        `POST /stream/{id}/start-pull` can be used to start ingest for a stream
+        configured with a pull source. If the stream has recording configured,
+        it will also start recording.
+        \
+        \
+        A 204 No Content status response indicates the stream was successfully
+        started.
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
@@ -2785,7 +2856,7 @@ paths:
         tusEndpoint field of the response to upload the video file and track the
         progress:
 
-        ``` 
+        ```
         # This assumes there is an `input` element of `type="file"` with id
         `fileInput` in the HTML
 
@@ -3828,7 +3899,7 @@ paths:
       description: >
         `POST /transcode` transcodes a video file and uploads the results to the
 
-        specified storage service. 
+        specified storage service.
 
         \
 
