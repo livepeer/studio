@@ -962,7 +962,7 @@ app.post(
     const payload = req.body as NewStreamPayload;
 
     if (autoStartPull || payload.pull) {
-      await ensureExperimentSubject(req.user.id, "stream-pull-source");
+      await ensureExperimentSubject("stream-pull-source", req.user.id);
     }
 
     if (autoStartPull === "true") {
