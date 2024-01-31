@@ -349,8 +349,7 @@ components:
         userTags:
           type: object
           description: User input tags associated with the stream
-          additionalProperties:
-            type: string
+          additionalProperties: true
         lastSeen:
           type: number
           example: 1587667174725
