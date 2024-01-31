@@ -1009,26 +1009,54 @@ app.post(
   }
 );
 
+const pullStreamKeyAccessors: Record<string, string[]> = {
+  name: ["name"],
+  creatorId: ["creatorId", "value"],
+  "pull.source": ["pull", "source"],
+};
+
 app.put(
   "/pull",
   authorizer({}),
   validatePost("new-stream-payload"),
   experimentSubjectsOnly("stream-pull-source"),
   async (req, res) => {
-    const { waitActive } = toStringValues(req.query);
-    const payload = req.body as NewStreamPayload;
+    const { key = "pull.source", waitActive } = toStringValues(req.query);
+    const rawPayload = req.body as NewStreamPayload;
 
-    if (!payload.pull) {
+    if (!rawPayload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
       });
     }
 
+    // Make the payload compatible with the stream schema to simplify things
+    const payload: Partial<DBStream> = {
+      profiles: req.config.defaultStreamProfiles,
+      ...rawPayload,
+      creatorId: mapInputCreatorId(rawPayload.creatorId),
+    };
+
+    const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
+    if (!keyValue) {
+      return res.status(400).json({
+        errors: [
+          `key must be one of ${Object.keys(
+            pullStreamKeyAccessors
+          )} and must be present in the payload`,
+        ],
+      });
+    }
+    const filtersStr = encodeURIComponent(
+      JSON.stringify([{ id: key, value: keyValue }])
+    );
+    const filters = parseFilters(fieldsMap, filtersStr);
+
     const [streams] = await db.stream.find(
       [
         sql`data->>'userId' = ${req.user.id}`,
         sql`data->>'deleted' IS NULL`,
-        sql`data->'pull'->>'source' = ${payload.pull.source}`,
+        ...filters,
       ],
       { useReplica: false }
     );
