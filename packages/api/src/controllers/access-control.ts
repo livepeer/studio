@@ -26,11 +26,10 @@ const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 30;
 const app = Router();
 
-interface HitRecord {
-  timestamp: number;
-}
-
-const playbackHits: Record<string, HitRecord[]> = {};
+type GateConfig = {
+  refresh_interval: number;
+  rate_limit: number;
+};
 
 async function fireGateWebhook(
   webhook: DBWebhook,
@@ -133,14 +132,16 @@ app.post(
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
-    let response = {};
+    let config: Partial<GateConfig> = {};
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
       if (isFreeTierUser(user)) {
-        response = {
-          rateLimit: MAX_ALLOWED_VIEWERS_FOR_FREE_TIER,
-        };
+        config.rate_limit = MAX_ALLOWED_VIEWERS_FOR_FREE_TIER;
       }
+    }
+
+    if (content.playbackPolicy?.refreshInterval) {
+      config.refresh_interval = content.playbackPolicy.refreshInterval;
     }
 
     if (
@@ -156,7 +157,7 @@ app.post(
     switch (playbackPolicyType) {
       case "public":
         res.status(200);
-        return res.json(response);
+        return res.json(config);
       case "jwt":
         if (!req.body.pub) {
           console.log(`
@@ -215,7 +216,7 @@ app.post(
 
         tracking.recordSigningKeyValidation(signingKey.id);
         res.status(200);
-        return res.json(response);
+        return res.json(config);
       case "webhook":
         if (!req.body.accessKey || req.body.type !== "accessKey") {
           throw new ForbiddenError(
@@ -240,7 +241,7 @@ app.post(
         );
         if (statusCode >= 200 && statusCode < 300) {
           res.status(200);
-          return res.json(response);
+          return res.json(config);
         } else if (statusCode === 0) {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} failed, disallowing playback

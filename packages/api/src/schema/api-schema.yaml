@@ -2027,6 +2027,11 @@ components:
           type: object
           description: User-defined webhook context
           additionalProperties: true
+        refreshInterval:
+          type: number
+          description: |
+            Interval (in seconds) at which the playback policy should be
+            refreshed (default 600 seconds)
     room:
       type: object
       required:
