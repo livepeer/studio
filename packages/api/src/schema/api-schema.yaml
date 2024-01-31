@@ -1806,6 +1806,7 @@ components:
                 - unverified
             value:
               type: string
+              index: true
               description:
                 Developer-managed ID of the user who created the resource.
     export-task-params:

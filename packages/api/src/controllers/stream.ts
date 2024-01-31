@@ -351,6 +351,8 @@ const fieldsMap: FieldsMap = {
   lastSeen: { val: `stream.data->'lastSeen'`, type: "int" },
   createdAt: { val: `stream.data->'createdAt'`, type: "int" },
   userId: `stream.data->>'userId'`,
+  creatorId: `stream.data->'creatorId'->>'value'`,
+  "pull.source": `stream.data->'pull'->>'source'`,
   isActive: { val: `stream.data->'isActive'`, type: "boolean" },
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
