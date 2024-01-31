@@ -1,5 +1,4 @@
 import { Router, Request } from "express";
-import fetch from "node-fetch";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
@@ -953,6 +952,45 @@ app.post(
   }
 );
 
+app.put(
+  "/pull",
+  authorizer({}),
+  validatePost("new-stream-payload"),
+  experimentSubjectsOnly("stream-pull-source"),
+  async (req, res) => {
+    const payload = req.body as NewStreamPayload;
+    if (!payload.pull) {
+      return res.status(400).json({
+        errors: [`stream pull configuration is required`],
+      });
+    }
+
+    const [streams] = await db.stream.find(
+      [sql`data->'pull'->>'source' = ${payload.pull.source}`],
+      { useReplica: false }
+    );
+    if (streams.length > 1) {
+      return res.status(400).json({
+        errors: [
+          `pull.source must be unique, found ${streams.length} streams with same source`,
+        ],
+      });
+    }
+
+    const stream =
+      streams.length === 1 ? streams[0] : await handleCreateStream(req);
+
+    await TODOtriggerCatalystPullStart(stream);
+
+    res.status(201);
+    res.json(
+      db.stream.addDefaultFields(
+        db.stream.removePrivateFields(stream, req.user.admin)
+      )
+    );
+  }
+);
+
 app.post(
   "/",
   authorizer({}),
@@ -961,6 +999,7 @@ app.post(
     const { autoStartPull } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
 
+    // TODO: Remove autoStartPull once experiment subjects migrate to /pull
     if (autoStartPull || payload.pull) {
       await ensureExperimentSubject("stream-pull-source", req.user.id);
     }
@@ -997,71 +1036,77 @@ app.post(
       }
     }
 
-    const id = uuid();
-    const createdAt = Date.now();
-    // TODO: Don't create a streamKey if there's a pull source (here and on www)
-    const streamKey = await generateUniqueStreamKey(id);
-    let playbackId = await generateUniquePlaybackId(id, [streamKey]);
-    if (req.user.isTestUser) {
-      playbackId += "-test";
-    }
-
-    const { objectStoreId } = payload;
-    if (objectStoreId) {
-      const store = await db.objectStore.get(objectStoreId);
-      if (!store || store.deleted || store.disabled) {
-        return res.status(400).json({
-          errors: [`object store ${objectStoreId} not found or disabled`],
-        });
-      }
-    }
-
-    let doc: DBStream = {
-      profiles: req.config.defaultStreamProfiles,
-      ...payload,
-      kind: "stream",
-      userId: req.user.id,
-      creatorId: mapInputCreatorId(payload.creatorId),
-      renditions: {},
-      objectStoreId,
-      id,
-      createdAt,
-      streamKey,
-      playbackId,
-      createdByTokenName: req.token?.name,
-      createdByTokenId: req.token?.id,
-      isActive: false,
-      lastSeen: 0,
-    };
-    doc = wowzaHydrate(doc);
-
-    await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
-
-    doc.profiles = hackMistSettings(req, doc.profiles);
-    doc.multistream = await validateMultistreamOpts(
-      req.user.id,
-      doc.profiles,
-      doc.multistream
-    );
-
-    if (doc.userTags) {
-      await validateTags(doc.userTags);
-    }
-
-    await db.stream.create(doc);
+    const stream = await handleCreateStream(req);
 
     if (autoStartPull === "true") {
-      await TODOtriggerCatalystPullStart(doc);
+      await TODOtriggerCatalystPullStart(stream);
     }
 
     res.status(201);
     res.json(
       db.stream.addDefaultFields(
-        db.stream.removePrivateFields(doc, req.user.admin)
+        db.stream.removePrivateFields(stream, req.user.admin)
       )
     );
   }
 );
+
+async function handleCreateStream(req: Request) {
+  const payload = req.body as NewStreamPayload;
+
+  const id = uuid();
+  const createdAt = Date.now();
+  // TODO: Don't create a streamKey if there's a pull source (here and on www)
+  const streamKey = await generateUniqueStreamKey(id);
+  let playbackId = await generateUniquePlaybackId(id, [streamKey]);
+  if (req.user.isTestUser) {
+    playbackId += "-test";
+  }
+
+  const { objectStoreId } = payload;
+  if (objectStoreId) {
+    const store = await db.objectStore.get(objectStoreId);
+    if (!store || store.deleted || store.disabled) {
+      throw new BadRequestError(
+        `object store ${objectStoreId} not found or disabled`
+      );
+    }
+  }
+
+  let doc: DBStream = {
+    profiles: req.config.defaultStreamProfiles,
+    ...payload,
+    kind: "stream",
+    userId: req.user.id,
+    creatorId: mapInputCreatorId(payload.creatorId),
+    renditions: {},
+    objectStoreId,
+    id,
+    createdAt,
+    streamKey,
+    playbackId,
+    createdByTokenName: req.token?.name,
+    createdByTokenId: req.token?.id,
+    isActive: false,
+    lastSeen: 0,
+  };
+  doc = wowzaHydrate(doc);
+
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+
+  doc.profiles = hackMistSettings(req, doc.profiles);
+  doc.multistream = await validateMultistreamOpts(
+    req.user.id,
+    doc.profiles,
+    doc.multistream
+  );
+
+  if (doc.userTags) {
+    await validateTags(doc.userTags);
+  }
+
+  return await db.stream.create(doc);
+}
 
 // Refreshes the 'lastSeen' field of a stream
 app.post("/:id/heartbeat", authorizer({ anyAdmin: true }), async (req, res) => {
