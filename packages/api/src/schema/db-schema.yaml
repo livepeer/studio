@@ -653,7 +653,6 @@ components:
           index: true
         userTags:
           type: object
-          additionalProperties: true
         isActive:
           index: true
         createdAt:
