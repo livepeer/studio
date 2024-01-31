@@ -62,6 +62,30 @@ export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
 
+// Helper constant to be used in the PUT /pull API to make sure we delete fields
+// from the stream that are not specified in the PUT payload.
+const EMPTY_NEW_STREAM_PAYLOAD: Required<
+  Omit<
+    NewStreamPayload,
+    // omit all the db-schema fields
+    | "wowza"
+    | "presets"
+    | "renditions"
+    | "recordObjectStoreId"
+    | "objectStoreId"
+    | "detection"
+  >
+> = {
+  name: undefined,
+  profiles: undefined,
+  multistream: undefined,
+  pull: undefined,
+  record: undefined,
+  userTags: undefined,
+  creatorId: undefined,
+  playbackPolicy: undefined,
+};
+
 const app = Router();
 const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
   if (
@@ -981,8 +1005,19 @@ app.put(
       });
     }
 
-    const stream =
-      streams.length === 1 ? streams[0] : await handleCreateStream(req);
+    let stream: DBStream;
+    if (!streams.length) {
+      stream = await handleCreateStream(req);
+    } else {
+      stream = {
+        ...streams[0],
+        ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
+        profiles: req.config.defaultStreamProfiles, // fallback to default profiles if not specified in payload
+        ...payload,
+        creatorId: mapInputCreatorId(payload.creatorId),
+      };
+      await db.stream.replace(stream);
+    }
 
     await TODOtriggerCatalystPullStart(stream);
 
