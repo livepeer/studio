@@ -1,24 +1,24 @@
-import { User } from "@livepeer.studio/api";
+import { useState, useContext, createContext, useEffect } from "react";
 import jwt from "jsonwebtoken";
-import { createContext, useContext, useEffect, useState } from "react";
-import { isDevelopment, isStaging } from "../../lib/utils";
+import { User } from "@livepeer.studio/api";
+import { isStaging, isDevelopment } from "../../lib/utils";
+import { ApiState } from "./types";
+import { clearTokens, getRefreshToken, getStoredToken } from "./tokenStorage";
 import * as accessControlEndpointsFunctions from "./endpoints/accessControl";
 import * as apiTokenEndpointsFunctions from "./endpoints/apiToken";
 import * as assetEndpointsFunctions from "./endpoints/asset";
 import * as broadcasterEndpointsFunctions from "./endpoints/broadcaster";
-import * as clipEndpointsFunctions from "./endpoints/clip";
 import * as dataEndpointsFunctions from "./endpoints/data";
 import * as ingestEndpointsFunctions from "./endpoints/ingest";
 import * as multistreamEndpointsFunctions from "./endpoints/multistream";
 import * as objectStoreEndpointsFunctions from "./endpoints/objectStore";
 import * as sessionEndpointsFunctions from "./endpoints/session";
+import * as clipEndpointsFunctions from "./endpoints/clip";
 import * as streamEndpointsFunctions from "./endpoints/stream";
 import * as taskEndpointsFunctions from "./endpoints/task";
 import * as userEndpointsFunctions from "./endpoints/user";
 import * as versionEndpointsFunctions from "./endpoints/version";
 import * as webhookEndpointsFunctions from "./endpoints/webhook";
-import { clearTokens, getRefreshToken, getStoredToken } from "./tokenStorage";
-import { ApiState } from "./types";
 
 // Allow for manual overriding of the API server endopint
 export const getEndpoint = () => {
@@ -36,7 +36,7 @@ export const getEndpoint = () => {
   if (isDevelopment()) {
     return "http://localhost:3004";
   }
-  return "https://livepeer.studio";
+  return "";
 };
 
 const endpoint = getEndpoint();
