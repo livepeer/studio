@@ -53,6 +53,7 @@ import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { experimentSubjectsOnly } from "./experiment";
+import { sleep } from "../util";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -61,6 +62,7 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
+const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
 
 // Helper constant to be used in the PUT /pull API to make sure we delete fields
 // from the stream that are not specified in the PUT payload.
@@ -230,6 +232,35 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
       });
     })
   );
+}
+
+// Waits for the stream to become active. Works by polling the stream object
+// on the DB until it becomes active or the timeout is reached. Will wait for
+// exponentially longer time in between polls to reduce load on the DB.
+async function pollWaitStreamActive(req: Request, id: string) {
+  let clientGone = false;
+  req.on("close", () => {
+    clientGone = true;
+  });
+
+  const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
+  let sleepDelay = 500;
+  while (!clientGone && Date.now() < deadline) {
+    const stream =
+      (await db.stream.get(id)) ||
+      (await db.stream.get(id, { useReplica: false })); // read from primary in case replica is lagging
+    if (!stream) {
+      throw new NotFoundError("stream not found");
+    }
+    if (stream.isActive) {
+      return;
+    }
+
+    await sleep(sleepDelay);
+    sleepDelay = Math.min(sleepDelay * 2, 5000);
+  }
+
+  throw new InternalServerError("stream not active");
 }
 
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
@@ -982,7 +1013,9 @@ app.put(
   validatePost("new-stream-payload"),
   experimentSubjectsOnly("stream-pull-source"),
   async (req, res) => {
+    const { waitActive } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
+
     if (!payload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
@@ -1020,6 +1053,10 @@ app.put(
     }
 
     await TODOtriggerCatalystPullStart(stream);
+
+    if (waitActive === "true") {
+      await pollWaitStreamActive(req, stream.id);
+    }
 
     res.status(201);
     res.json(
