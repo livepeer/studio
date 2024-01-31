@@ -253,7 +253,7 @@ async function pollWaitStreamActive(req: Request, id: string) {
       throw new NotFoundError("stream not found");
     }
     if (stream.isActive) {
-      return;
+      return stream;
     }
 
     await sleep(sleepDelay);
@@ -1086,7 +1086,7 @@ app.put(
     await TODOtriggerCatalystPullStart(stream);
 
     if (waitActive === "true") {
-      await pollWaitStreamActive(req, stream.id);
+      stream = await pollWaitStreamActive(req, stream.id);
     }
 
     res.status(streamExisted ? 200 : 201);
