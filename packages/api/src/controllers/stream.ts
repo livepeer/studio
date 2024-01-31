@@ -966,7 +966,11 @@ app.put(
     }
 
     const [streams] = await db.stream.find(
-      [sql`data->'pull'->>'source' = ${payload.pull.source}`],
+      [
+        sql`data->>'userId' = ${req.user.id}`,
+        sql`data->>'deleted' IS NULL`,
+        sql`data->'pull'->>'source' = ${payload.pull.source}`,
+      ],
       { useReplica: false }
     );
     if (streams.length > 1) {
@@ -1012,7 +1016,11 @@ app.post(
       }
 
       const [streams] = await db.stream.find(
-        [sql`data->'pull'->>'source' = ${payload.pull.source}`],
+        [
+          sql`data->>'userId' = ${req.user.id}`,
+          sql`data->>'deleted' IS NULL`,
+          sql`data->'pull'->>'source' = ${payload.pull.source}`,
+        ],
         { useReplica: false }
       );
 
