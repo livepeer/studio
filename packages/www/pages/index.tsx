@@ -124,9 +124,9 @@ const benefits = [
       provider: "mdi",
       name: "MdBolt",
     },
-    title: "Performant",
+    title: "Performance",
     description:
-      "Deliver outstanding performance by leveraging the Livepeer Network's highly competitive infrastructure providers transmitting high-quality video at astonishing speeds.",
+      "Deliver high-quality video at astonishing speeds by leveraging the Livepeer Network's highly competitive infrastructure providers.",
   },
   {
     icon: {
