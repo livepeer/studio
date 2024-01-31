@@ -618,6 +618,9 @@ components:
         deleted:
           type: boolean
           default: false
+        sharedSecret:
+          type: string
+          writeOnly: true
     detection-webhook-payload:
       type: object
       required:

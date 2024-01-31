@@ -449,6 +449,7 @@ export default class WebhookCannon {
           resp,
           startTime,
           responseBody,
+          webhook.sharedSecret,
           params
         );
         await this.storeTriggerStatus(
@@ -587,15 +588,16 @@ async function storeResponse(
   resp: Response,
   startTime: [number, number],
   responseBody: string,
+  sharedSecret: string,
   params
-) {
+): Promise<WebhookResponse> {
   try {
     const hrDuration = process.hrtime(startTime);
     const encodedResponseBody = Buffer.from(
       responseBody.substring(0, 1024)
     ).toString("base64");
 
-    await db.webhookResponse.create({
+    const webhookResponse = {
       id: uuid(),
       webhookId: webhook.id,
       eventId: eventId,
@@ -615,7 +617,10 @@ async function storeResponse(
         method: params.method,
         headers: params.headers,
       },
-    });
+      sharedSecret: sharedSecret,
+    };
+    await db.webhookResponse.create(webhookResponse);
+    return webhookResponse;
   } catch (e) {
     console.log(
       `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
@@ -626,7 +631,7 @@ async function storeResponse(
 export async function resendWebhook(
   webhook: DBWebhook,
   webhookResponse: WebhookResponse
-) {
+): Promise<WebhookResponse> {
   const triggerTime = Date.now();
   const startTime = process.hrtime();
   let resp: Response;
@@ -634,6 +639,16 @@ export async function resendWebhook(
   let statusCode: number;
   let errorMessage: string;
   try {
+    const sigHeaders = signatureHeaders(
+      webhookResponse.request.body,
+      webhookResponse.sharedSecret,
+      Date.now()
+    );
+    webhookResponse.request.headers = {
+      ...webhookResponse.request.headers,
+      ...sigHeaders,
+    };
+
     resp = await fetchWithTimeout(webhookResponse.request.url, {
       method: webhookResponse.request.method,
       headers: webhookResponse.request.headers,
@@ -646,21 +661,22 @@ export async function resendWebhook(
     console.log("firing error", e);
     errorMessage = e.message;
   } finally {
-    await storeResponse(
-      webhook,
-      webhookResponse.eventId,
-      webhookResponse.event,
-      resp,
-      startTime,
-      responseBody,
-      webhookResponse.request
-    );
     await storeTriggerStatus(
       webhook,
       triggerTime,
       statusCode,
       errorMessage,
       responseBody
+    );
+    return await storeResponse(
+      webhook,
+      webhookResponse.eventId,
+      webhookResponse.event,
+      resp,
+      startTime,
+      responseBody,
+      webhookResponse.sharedSecret,
+      webhookResponse.request
     );
   }
 }

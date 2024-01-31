@@ -330,6 +330,7 @@ describe("controllers/webhook", () => {
       expect(webhookRequest.request).toBeDefined();
       expect(webhookRequest.request.body).toBeDefined();
       expect(webhookRequest.request.headers).toBeDefined();
+      expect(webhookRequest.request.headers["Livepeer-Signature"]).not.toBe("");
       expect(webhookRequest.response).toBeDefined();
       expect(webhookRequest.response.body).toBeDefined();
 
@@ -340,10 +341,15 @@ describe("controllers/webhook", () => {
       const getJson = await getRes.json();
       expect(getJson).toEqual(webhookRequest);
 
-      const resendRes = await client.put(
+      const resendRes = await client.post(
         `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`
       );
-      expect(resendRes.status).toBe(202);
+      expect(resendRes.status).toBe(200);
+      const resent = await resendRes.json();
+      expect(resent.event).toBe(webhookRequest.event);
+      expect(resent.webhookId).toBe(webhookRequest.webhookId);
+      expect(resent.id).not.toBe(webhookRequest.id);
+
       const logRes = await client.get(`/webhook/${generatedWebhook.id}/log`);
       expect(logRes.status).toBe(200);
       logJson = await logRes.json();

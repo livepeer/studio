@@ -1,4 +1,10 @@
-import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import {
+  FieldsMap,
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  toStringValues,
+} from "./helpers";
 import { authorizer } from "../middleware";
 import { db } from "../store";
 import {
@@ -8,9 +14,9 @@ import {
 } from "../store/errors";
 import { resendWebhook } from "../webhooks/cannon";
 import sql from "sql-template-strings";
-import Router from "express/lib/router";
 import { WebhookResponse } from "../schema/types";
 import { DBWebhook } from "../store/webhook-table";
+import { Request, Router } from "express";
 
 const app = Router({ mergeParams: true });
 
@@ -22,13 +28,14 @@ const requestsFieldsMap: FieldsMap = {
   statusCode: `webhook_response.data->'response'->>'status'`,
 };
 
-app.put("/:requestId/resend", authorizer({}), async (req, res) => {
+app.post("/:requestId/resend", authorizer({}), async (req, res) => {
   const webhook = await db.webhook.get(req.params.id);
   const webhookResponse = await db.webhookResponse.get(req.params.requestId);
   await checkRequest(req, webhook, webhookResponse);
 
-  await resendWebhook(webhook, webhookResponse);
-  res.status(202).end();
+  const resent = await resendWebhook(webhook, webhookResponse);
+  res.status(200);
+  return res.json(db.webhookResponse.cleanWriteOnlyResponse(resent));
 });
 
 app.get("/:requestId", authorizer({}), async (req, res) => {
@@ -37,25 +44,25 @@ app.get("/:requestId", authorizer({}), async (req, res) => {
   await checkRequest(req, webhook, webhookResponse);
 
   res.status(200);
-  return res.json(webhookResponse);
+  return res.json(db.webhookResponse.cleanWriteOnlyResponse(webhookResponse));
 });
 
 async function checkRequest(
-  req,
+  req: Request,
   webhook: DBWebhook,
   webhookResponse: WebhookResponse
 ) {
-  if (
-    !req.user.admin &&
-    (req.user.id !== webhook.userId || req.user.id !== webhookResponse.userId)
-  ) {
-    throw new ForbiddenError(`invalid user`);
-  }
   if (!webhook || webhook.deleted) {
     throw new NotFoundError(`webhook not found`);
   }
   if (!webhookResponse || webhookResponse.deleted) {
     throw new NotFoundError(`webhook log not found`);
+  }
+  if (
+    !req.user.admin &&
+    (req.user.id !== webhook.userId || req.user.id !== webhookResponse.userId)
+  ) {
+    throw new ForbiddenError(`invalid user`);
   }
   if (webhookResponse.webhookId !== webhook.id) {
     throw new BadRequestError(`mismatch between webhook and webhook log`);
@@ -63,7 +70,9 @@ async function checkRequest(
 }
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count } = req.query;
+  let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
+    req.query
+  );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -139,7 +148,7 @@ app.get("/", authorizer({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
 
-  return res.json(output);
+  return res.json(db.webhookResponse.cleanWriteOnlyResponses(output));
 });
 
 export default app;
