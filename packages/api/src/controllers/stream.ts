@@ -1037,9 +1037,10 @@ app.put(
         ],
       });
     }
+    const streamExisted = streams.length === 1;
 
     let stream: DBStream;
-    if (!streams.length) {
+    if (!streamExisted) {
       stream = await handleCreateStream(req);
     } else {
       stream = {
@@ -1058,7 +1059,7 @@ app.put(
       await pollWaitStreamActive(req, stream.id);
     }
 
-    res.status(201);
+    res.status(streamExisted ? 200 : 201);
     res.json(
       db.stream.addDefaultFields(
         db.stream.removePrivateFields(stream, req.user.admin)
