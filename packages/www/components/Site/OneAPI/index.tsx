@@ -35,16 +35,6 @@ const workflows = [
         subheading:
           "See performance data to understand audience demographics, engagement and improve your viewers’ experience.",
       },
-      // {
-      //   heading: "Protect your streams with token-based access controls",
-      //   subheading:
-      //     "Control who has access to livestreams and for how long with token and wallet-based access controls.",
-      // },
-      // {
-      //   heading: "Build low-latency livestreaming experiences",
-      //   subheading:
-      //     "Latency as low as two seconds enables natural interactive experiences between audiences and content creators.",
-      // },
       {
         heading: "Build near realtime livestreaming experiences",
         subheading:
