@@ -20,6 +20,7 @@ import {
 } from "../store/errors";
 import { Room } from "../schema/types";
 import { EgressStatus } from "livekit-server-sdk/dist/proto/livekit_egress";
+import { VideoCodec } from "livekit-server-sdk/dist/proto/livekit_models";
 
 const app = Router();
 
@@ -167,6 +168,7 @@ app.post(
       layout: "speaker-dark",
       encodingOptions: {
         keyFrameInterval: 2,
+        videoCodec: VideoCodec.H264_BASELINE,
       },
     });
     console.log(
