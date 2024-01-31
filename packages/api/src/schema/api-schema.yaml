@@ -2782,8 +2782,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
   "/webhook/{id}/log/{logId}/resend":
-    put:
+    post:
       summary: Resend a webhook
+      description: |
+        Use this API to resend the same webhook request. This is useful when
+        developing and debugging, allowing you to easily repeat the same webhook
+        to check or fix the behaviour in your handler.
       parameters:
         - name: id
           in: path
@@ -2796,8 +2800,12 @@ paths:
           schema:
             type: string
       responses:
-        "202":
+        "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/webhook-response"
         default:
           description: Error
           content:
