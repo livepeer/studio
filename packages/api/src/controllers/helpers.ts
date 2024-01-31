@@ -13,6 +13,7 @@ import base64url from "base64url";
 import { CreatorId, InputCreatorId, ObjectStore, User } from "../schema/types";
 import { BadRequestError } from "../store/errors";
 import * as nativeCrypto from "crypto";
+import { DBStream } from "../store/stream-table";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
@@ -635,6 +636,10 @@ export function isValidBase64(str: string) {
     return false;
   }
 }
+
+export const TODOtriggerCatalystPullStart = async (stream: DBStream) => {
+  // TODO: trigger pull start on catalyst
+};
 
 export const triggerCatalystStreamNuke = (req: Request, playback_id: string) =>
   triggerCatalystEvent(req, { resource: "nuke", playback_id });

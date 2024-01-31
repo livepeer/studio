@@ -45,12 +45,15 @@ import {
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
   triggerCatalystStreamNuke,
+  TODOtriggerCatalystPullStart,
 } from "./helpers";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
 import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
+import { ensureExperimentSubject } from "../store/experiment-table";
+import { experimentSubjectsOnly } from "./experiment";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -955,10 +958,48 @@ app.post(
   authorizer({}),
   validatePost("new-stream-payload"),
   async (req, res) => {
+    const { autoStartPull } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
+
+    if (autoStartPull || payload.pull) {
+      await ensureExperimentSubject("stream-pull-source", req.user.id);
+    }
+
+    if (autoStartPull === "true") {
+      if (!payload.pull) {
+        return res.status(400).json({
+          errors: [`autoStartPull requires pull configuration to be present`],
+        });
+      }
+
+      const [streams] = await db.stream.find(
+        [sql`data->'pull'->>'source' = ${payload.pull.source}`],
+        { useReplica: false }
+      );
+
+      if (streams.length === 1) {
+        const stream = streams[0];
+        await TODOtriggerCatalystPullStart(stream);
+
+        return res
+          .status(200)
+          .json(
+            db.stream.addDefaultFields(
+              db.stream.removePrivateFields(stream, req.user.admin)
+            )
+          );
+      } else if (streams.length > 1) {
+        return res.status(400).json({
+          errors: [
+            `autoStartPull requires pull.source to be unique, found ${streams.length} streams with same source`,
+          ],
+        });
+      }
+    }
 
     const id = uuid();
     const createdAt = Date.now();
+    // TODO: Don't create a streamKey if there's a pull source (here and on www)
     const streamKey = await generateUniqueStreamKey(id);
     let playbackId = await generateUniquePlaybackId(id, [streamKey]);
     if (req.user.isTestUser) {
@@ -1008,6 +1049,10 @@ app.post(
     }
 
     await db.stream.create(doc);
+
+    if (autoStartPull === "true") {
+      await TODOtriggerCatalystPullStart(doc);
+    }
 
     res.status(201);
     res.json(
@@ -1677,6 +1722,32 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+app.post(
+  "/:id/start-pull",
+  authorizer({}),
+  experimentSubjectsOnly("stream-pull-source"),
+  async (req, res) => {
+    const { id } = req.params;
+    const stream = await db.stream.get(id);
+    if (
+      !stream ||
+      (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+    ) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+
+    if (!stream.pull) {
+      res.status(400);
+      return res.json({ errors: ["stream does not have a pull source"] });
+    }
+
+    await TODOtriggerCatalystPullStart(stream);
+
+    res.status(204).end();
+  }
+);
 
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
