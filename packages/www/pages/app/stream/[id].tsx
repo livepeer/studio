@@ -940,9 +940,7 @@ const ID = () => {
                         </Box>
                       </Cell>
                       <Cell>JWT for gated stream</Cell>
-                      <Cell>
-                        <Box>{jwt}</Box>
-                      </Cell>
+                      <Cell>{jwt}</Cell>
                       <Cell>Region/Broadcaster</Cell>
                       <Cell>
                         {region}{" "}
