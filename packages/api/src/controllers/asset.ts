@@ -516,12 +516,17 @@ async function genUploadUrl(
   playbackId: string,
   objectStoreId: string,
   jwtSecret: string,
-  aud: string
+  aud: string,
+  contentLength?: number
 ) {
   const uploadedObjectKey = `directUpload/${playbackId}`;
   const os = await getActiveObjectStore(objectStoreId);
 
-  const presignedUrl = await getS3PresignedUrl(os, uploadedObjectKey);
+  const presignedUrl = await getS3PresignedUrl(
+    os,
+    uploadedObjectKey,
+    contentLength
+  );
   const uploadToken = jwt.sign({ playbackId, presignedUrl, aud }, jwtSecret, {
     algorithm: "HS256",
   });
@@ -888,7 +893,8 @@ app.post(
       playbackId,
       vodObjectStoreId,
       jwtSecret,
-      jwtAudience
+      jwtAudience,
+      req.body.contentLength
     );
 
     const ingests = await req.getIngest();
@@ -1061,7 +1067,6 @@ app.put("/upload/direct", async (req, res) => {
     jwtSecret,
     jwtAudience
   );
-
   // ensure upload exists and is pending
   await getPendingAssetAndTask(playbackId);
 
@@ -1076,7 +1081,17 @@ app.put("/upload/direct", async (req, res) => {
       );
     }
   });
-
+  proxy.on("error", function (err, req, proxyRes) {
+    console.error("Proxy error:", err);
+    if (!res.headersSent) {
+      res.status(403);
+      res.end();
+      proxyRes.end();
+    } else {
+      res.end();
+      proxyRes.end();
+    }
+  });
   proxy.web(req, res, {
     target: uploadUrl,
     changeOrigin: true,
