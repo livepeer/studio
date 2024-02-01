@@ -8,6 +8,7 @@ import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
+import webhookLog from "./webhook-log";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
   try {
@@ -37,6 +38,8 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
 }
 
 const app = Router();
+
+app.use("/:id/log", webhookLog);
 
 const fieldsMap: FieldsMap = {
   id: `webhook.ID`,
@@ -277,95 +280,6 @@ app.delete("/", authorizer({}), async (req, res) => {
 
   res.status(204);
   res.end();
-});
-
-const requestsFieldsMap: FieldsMap = {
-  id: `webhook_response.ID`,
-  createdAt: { val: `webhook_response.data->'createdAt'`, type: "int" },
-  userId: `webhook_response.data->>'userId'`,
-  event: `webhook_response.data->>'event'`,
-  statusCode: `webhook_response.data->'response'->>'status'`,
-};
-
-app.get("/:id/log", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
-  if (isNaN(parseInt(limit))) {
-    limit = undefined;
-  }
-  if (!order) {
-    order = "createdAt-true";
-  }
-
-  if (req.user.admin && allUsers && allUsers !== "false") {
-    const query = parseFilters(requestsFieldsMap, filters);
-    query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
-    if (!all || all === "false") {
-      query.push(sql`webhook_response.data->>'deleted' IS NULL`);
-    }
-
-    let fields =
-      " webhook_response.id as id, webhook_response.data as data, users.id as usersId, users.data as usersdata";
-    if (count) {
-      fields = fields + ", count(*) OVER() AS count";
-    }
-    const from = `webhook_response left join users on webhook_response.data->>'userId' = users.id`;
-    const [output, newCursor] = await db.webhookResponse.find(query, {
-      limit,
-      cursor,
-      fields,
-      from,
-      order: parseOrder(requestsFieldsMap, order),
-      process: ({ data, usersdata, count: c }) => {
-        if (count) {
-          res.set("X-Total-Count", c);
-        }
-        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
-      },
-    });
-
-    res.status(200);
-
-    if (output.length > 0 && newCursor) {
-      res.links({ next: makeNextHREF(req, newCursor) });
-    }
-    return res.json(output);
-  }
-
-  const query = parseFilters(requestsFieldsMap, filters);
-  query.push(sql`webhook_response.data->>'userId' = ${req.user.id}`);
-  query.push(sql`webhook_response.data->>'webhookId' = ${req.params.id}`);
-
-  if (!all || all === "false" || !req.user.admin) {
-    query.push(sql`webhook_response.data->>'deleted' IS NULL`);
-  }
-
-  let fields = " webhook_response.id as id, webhook_response.data as data";
-  if (count) {
-    fields = fields + ", count(*) OVER() AS count";
-  }
-  const from = `webhook_response`;
-  const [output, newCursor] = await db.webhookResponse.find(query, {
-    limit,
-    cursor,
-    fields,
-    from,
-    order: parseOrder(requestsFieldsMap, order),
-    process: ({ data, count: c }) => {
-      if (count) {
-        res.set("X-Total-Count", c);
-      }
-      return { ...data };
-    },
-  });
-
-  res.status(200);
-
-  if (output.length > 0) {
-    res.links({ next: makeNextHREF(req, newCursor) });
-  }
-
-  return res.json(output);
 });
 
 export default app;

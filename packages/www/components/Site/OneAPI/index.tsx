@@ -21,29 +21,29 @@ const workflows = [
     title: "🔴 Live",
     description: (
       <Text size={7} css={{ maxWidth: 520, mx: "auto" }}>
-        Build live video experiences with just a few lines of code — affordably,
-        at scale, and with no vendor lock-in.
+        Build live video experiences with just a few lines of code.
       </Text>
     ),
     list: [
       {
         heading: "Go live effortlessly from any source",
         subheading:
-          "Stream seamlessly from mobile apps or broadcast software to any device with an optimized viewing experience.",
+          "Stream seamlessly from mobile apps, open broadcast software, or a web browser, and protect your streams with flexible playback policies.",
       },
       {
-        heading: "Protect your streams with token-based access controls",
+        heading: "Get real-time metrics and analytics  on your viewership",
         subheading:
-          "Control who has access to livestreams and for how long with token and wallet-based access controls.",
+          "See performance data to understand audience demographics, engagement and improve your viewers’ experience.",
       },
       {
-        heading: "Build low-latency livestreaming experiences",
+        heading: "Build near realtime livestreaming experiences",
         subheading:
-          "Latency as low as two seconds enables natural interactive experiences between audiences and content creators.",
+          "Enabling natural interactive experiences between audiences and content creators with sub-second latency.",
       },
       {
-        heading: "Get real-time viewership and performance health",
-        subheading: "Understand engagement and improve the viewer experience.",
+        heading: "Choose near-realtime for improved performance",
+        subheading:
+          "Ultra-low latency live streaming offers near-perfect uptime, as low as half a second, for a world-class viewing experience.",
       },
     ],
   },
