@@ -442,16 +442,22 @@ export default class WebhookCannon {
         errorMessage = e.message;
         await this.retry(trigger, params, e);
       } finally {
-        await storeResponse(
-          webhook,
-          event.id,
-          event.event,
-          resp,
-          startTime,
-          responseBody,
-          webhook.sharedSecret,
-          params
-        );
+        try {
+          await storeResponse(
+            webhook,
+            event.id,
+            event.event,
+            resp,
+            startTime,
+            responseBody,
+            webhook.sharedSecret,
+            params
+          );
+        } catch (e) {
+          console.log(
+            `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
+          );
+        }
         await this.storeTriggerStatus(
           trigger.webhook,
           triggerTime,
@@ -591,41 +597,35 @@ async function storeResponse(
   sharedSecret: string,
   params
 ): Promise<WebhookResponse> {
-  try {
-    const hrDuration = process.hrtime(startTime);
-    const encodedResponseBody = Buffer.from(
-      responseBody.substring(0, 1024)
-    ).toString("base64");
+  const hrDuration = process.hrtime(startTime);
+  const encodedResponseBody = Buffer.from(
+    responseBody.substring(0, 1024)
+  ).toString("base64");
 
-    const webhookResponse = {
-      id: uuid(),
-      webhookId: webhook.id,
-      eventId: eventId,
-      event: eventName,
-      userId: webhook.userId,
-      createdAt: Date.now(),
-      duration: hrDuration[0] + hrDuration[1] / 1e9,
-      response: {
-        body: encodedResponseBody,
-        redirected: resp.redirected,
-        status: resp.status,
-        statusText: resp.statusText,
-      },
-      request: {
-        url: webhook.url,
-        body: params.body,
-        method: params.method,
-        headers: params.headers,
-      },
-      sharedSecret: sharedSecret,
-    };
-    await db.webhookResponse.create(webhookResponse);
-    return webhookResponse;
-  } catch (e) {
-    console.log(
-      `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
-    );
-  }
+  const webhookResponse = {
+    id: uuid(),
+    webhookId: webhook.id,
+    eventId: eventId,
+    event: eventName,
+    userId: webhook.userId,
+    createdAt: Date.now(),
+    duration: hrDuration[0] + hrDuration[1] / 1e9,
+    response: {
+      body: encodedResponseBody,
+      redirected: resp.redirected,
+      status: resp.status,
+      statusText: resp.statusText,
+    },
+    request: {
+      url: webhook.url,
+      body: params.body,
+      method: params.method,
+      headers: params.headers,
+    },
+    sharedSecret: sharedSecret,
+  };
+  await db.webhookResponse.create(webhookResponse);
+  return webhookResponse;
 }
 
 export async function resendWebhook(
@@ -639,10 +639,16 @@ export async function resendWebhook(
   let statusCode: number;
   let errorMessage: string;
   try {
+    const timestamp = Date.now();
+    const requestBody = JSON.parse(webhookResponse.request.body);
+    webhookResponse.request.body = JSON.stringify({
+      ...requestBody,
+      timestamp,
+    });
     const sigHeaders = signatureHeaders(
       webhookResponse.request.body,
       webhookResponse.sharedSecret,
-      Date.now()
+      timestamp
     );
     webhookResponse.request.headers = {
       ...webhookResponse.request.headers,
