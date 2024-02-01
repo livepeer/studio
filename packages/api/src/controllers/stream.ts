@@ -1848,6 +1848,25 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
   res.json(resp);
 });
 
+app.get("/:id/config", authorizer({ anyAdmin: true }), async (req, res) => {
+  let { id } = req.params;
+  let stream = await db.stream.getByPlaybackId(id);
+  if (!stream) {
+    stream = await db.stream.get(id);
+  }
+  if (!stream) {
+    res.status(404);
+    return res.json({
+      errors: ["not found"],
+    });
+  }
+
+  res.status(200);
+  res.json({
+    pull: stream.pull,
+  });
+});
+
 app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   const { id } = req.params;
   if (
