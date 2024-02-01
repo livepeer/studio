@@ -798,6 +798,11 @@ components:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
         detection:
           $ref: "#/components/schemas/stream/properties/detection"
+    creator-id:
+      oneOf:
+        - properties:
+            value:
+              index: true
     playback-policy:
       properties:
         type:

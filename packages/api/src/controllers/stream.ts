@@ -1010,7 +1010,6 @@ app.post(
 );
 
 const pullStreamKeyAccessors: Record<string, string[]> = {
-  name: ["name"],
   creatorId: ["creatorId", "value"],
   "pull.source": ["pull", "source"],
 };
