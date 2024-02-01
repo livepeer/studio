@@ -182,7 +182,7 @@ function parseUrlToDStorageUrl(
 }
 
 export async function validateAssetPayload(
-  req: Pick<Request, "body" | "user" | "config">,
+  req: Pick<Request, "body" | "user" | "token" | "config">,
   id: string,
   playbackId: string,
   createdAt: number,
@@ -226,6 +226,7 @@ export async function validateAssetPayload(
     playbackId,
     userId,
     createdAt,
+    createdByTokenName: req.token?.name,
     status: {
       phase: source.type === "directUpload" ? "uploading" : "waiting",
       updatedAt: createdAt,

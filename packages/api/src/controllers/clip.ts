@@ -175,6 +175,7 @@ app.post(
           name: req.body.name || `clip-${uPlaybackId}`,
         },
         user: owner,
+        token: req.token,
         config: req.config,
       },
       id,
