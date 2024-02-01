@@ -1196,7 +1196,6 @@ async function handleCreateStream(req: Request) {
     streamKey,
     playbackId,
     createdByTokenName: req.token?.name,
-    createdByTokenId: req.token?.id,
     isActive: false,
     lastSeen: 0,
   };

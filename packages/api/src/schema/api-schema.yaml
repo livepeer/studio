@@ -1010,6 +1010,10 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
+        createdByTokenName:
+          type: string
+          readOnly: true
+          description: Name of the token used to create this object
         size:
           readOnly: true
           type: number
