@@ -139,15 +139,33 @@ target.post(
   authorizer({}),
   validatePost("multistream-target"),
   async (req, res) => {
-    const input = req.body as MultistreamTarget;
-    const data = await db.multistreamTarget.fillAndCreate({
-      name: input.name,
-      url: input.url,
-      disabled: input.disabled,
-      userId: req.user.id,
-    });
-    res.status(201);
-    res.json(data);
+    if (Array.isArray(req.body)) {
+      const input = req.body as MultistreamTarget[];
+      let data = [];
+      for (var i = 0; i < input.length; i++) {
+        data.push(
+          await db.multistreamTarget.fillAndCreate({
+            name: input[i].name,
+            url: input[i].url,
+            disabled: input[i].disabled,
+            userId: req.user.id,
+          })
+        );
+      }
+      res.status(201);
+      res.json(data);
+      return;
+    } else {
+      const input = req.body as MultistreamTarget;
+      const data = await db.multistreamTarget.fillAndCreate({
+        name: input.name,
+        url: input.url,
+        disabled: input.disabled,
+        userId: req.user.id,
+      });
+      res.status(201);
+      res.json(data);
+    }
   }
 );
 
