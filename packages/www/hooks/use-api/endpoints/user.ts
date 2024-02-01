@@ -459,6 +459,33 @@ export const updateSubscription = async ({
   return res;
 };
 
+export const applyCoupon = async ({
+  coupon,
+  stripeCustomerId,
+  stripeCustomerSubscriptionId,
+  stripeProductId,
+}): Promise<[Response, User | ApiError]> => {
+  const [res, body] = await context.fetch("/stripe/apply-coupon", {
+    method: "POST",
+    body: JSON.stringify({
+      stripeCustomerId,
+      stripeCustomerSubscriptionId,
+      stripeProductId,
+      coupon,
+    }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+  setState((state) => ({ ...state, userRefresh: Date.now() }));
+
+  if (res.status !== 201) {
+    return body;
+  }
+
+  return res;
+};
+
 export const getSubscription = async (
   stripeCustomerSubscriptionId: string
 ): Promise<[Response, ApiError]> => {

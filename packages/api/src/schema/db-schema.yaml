@@ -280,6 +280,9 @@ components:
             - prod_O9XuWMU1Up6QKf
             - prod_OTTbwpzxNLMNSh
             - prod_OTTwpzjA4U8B2P
+        stripeAppliedCouponId:
+          type: string
+          description: stripe coupon id
     update-customer-payment-method:
       type: object
       required:
@@ -1184,6 +1187,9 @@ components:
         stripeCustomerSubscriptionId:
           type: string
           example: sub_I29pdyfOTPBkjb
+        stripeAppliedCouponId:
+          type: string
+          description: stripe coupon id
         ccLast4:
           type: string
           example: 1234
