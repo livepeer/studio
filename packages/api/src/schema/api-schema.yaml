@@ -218,6 +218,7 @@ components:
     webhook-response:
       type: object
       required:
+        - id
         - webhookId
       additionalProperties: false
       properties:
@@ -255,6 +256,8 @@ components:
             headers:
               type: object
               description: HTTP request headers
+              additionalProperties:
+                type: string
             body:
               type: string
               description: request body
@@ -2808,6 +2811,88 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log":
+    get:
+      summary: Retrieve webhook logs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/webhook-response"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log/{logId}":
+    get:
+      summary: Retrieve a webhook log
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/webhook-response"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log/{logId}/resend":
+    post:
+      summary: Resend a webhook
+      description: |
+        Use this API to resend the same webhook request. This is useful when
+        developing and debugging, allowing you to easily repeat the same webhook
+        to check or fix the behaviour in your handler.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/webhook-response"
         default:
           description: Error
           content:
