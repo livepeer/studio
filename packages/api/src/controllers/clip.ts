@@ -169,15 +169,17 @@ app.post(
     }
 
     let asset = await validateAssetPayload(
+      {
+        // set custom payload and user for the clip
+        body: {
+          name: req.body.name || `clip-${uPlaybackId}`,
+        },
+        user: owner,
+        config: req.config,
+      },
       id,
       uPlaybackId,
-      owner.id,
       Date.now(),
-      await defaultObjectStoreId(req),
-      req.config,
-      {
-        name: req.body.name || `clip-${uPlaybackId}`,
-      },
       {
         type: "clip",
         playbackId,

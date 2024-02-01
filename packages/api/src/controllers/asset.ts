@@ -81,7 +81,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
 export const primaryStorageExperiment = "primary-vod-storage";
 
 export async function defaultObjectStoreId(
-  { config, body, user }: Request,
+  { config, body, user }: Pick<Request, "config" | "body" | "user">,
   isOldPipeline?: boolean
 ): Promise<string> {
   if (isOldPipeline) {
@@ -182,15 +182,15 @@ function parseUrlToDStorageUrl(
 }
 
 export async function validateAssetPayload(
+  req: Pick<Request, "body" | "user" | "config">,
   id: string,
   playbackId: string,
-  userId: string,
   createdAt: number,
-  defaultObjectStoreId: string,
-  config: CliArgs,
-  payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
+  const userId = req.user.id;
+  const payload = req.body as NewAssetPayload;
+
   if (payload.objectStoreId) {
     const os = await getActiveObjectStore(payload.objectStoreId);
     if (os.userId !== userId) {
@@ -210,7 +210,7 @@ export async function validateAssetPayload(
 
   // Transform IPFS and Arweave gateway URLs into native protocol URLs
   if (source.type === "url") {
-    const dStorageUrl = parseUrlToDStorageUrl(source.url, config);
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, req.config);
 
     if (dStorageUrl) {
       source = {
@@ -235,7 +235,7 @@ export async function validateAssetPayload(
     staticMp4: payload.staticMp4,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
-    objectStoreId: payload.objectStoreId || defaultObjectStoreId,
+    objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
     storage: storageInputToState(payload.storage),
   };
 }
@@ -791,16 +791,11 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
-  const newAsset = await validateAssetPayload(
-    id,
-    playbackId,
-    req.user.id,
-    Date.now(),
-    await defaultObjectStoreId(req),
-    req.config,
-    req.body,
-    { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
-  );
+  const newAsset = await validateAssetPayload(req, id, playbackId, Date.now(), {
+    type: "url",
+    url,
+    encryption: assetEncryptionWithoutKey(encryption),
+  });
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });
@@ -871,19 +866,10 @@ app.post(
       }
     }
 
-    let asset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      await defaultObjectStoreId(req),
-      req.config,
-      req.body,
-      {
-        type: "directUpload",
-        encryption: assetEncryptionWithoutKey(encryption),
-      }
-    );
+    let asset = await validateAssetPayload(req, id, playbackId, Date.now(), {
+      type: "directUpload",
+      encryption: assetEncryptionWithoutKey(encryption),
+    });
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
