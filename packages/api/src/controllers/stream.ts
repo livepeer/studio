@@ -1851,10 +1851,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
 app.get("/:id/config", authorizer({ anyAdmin: true }), async (req, res) => {
   let { id } = req.params;
   let stream = await db.stream.getByPlaybackId(id);
-  if (!stream) {
-    stream = await db.stream.get(id);
-  }
-  if (!stream) {
+  if (!stream || stream.deleted || stream.suspended) {
     res.status(404);
     return res.json({
       errors: ["not found"],
@@ -1863,7 +1860,12 @@ app.get("/:id/config", authorizer({ anyAdmin: true }), async (req, res) => {
 
   res.status(200);
   res.json({
-    pull: stream.pull,
+    pull: !stream.pull
+      ? null
+      : {
+          ...stream.pull,
+          location: undefined,
+        },
   });
 });
 
