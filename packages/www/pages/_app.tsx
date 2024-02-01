@@ -1,31 +1,29 @@
-import Head from "next/head";
-import { DefaultSeo } from "next-seo";
-import SEO from "../next-seo.config";
-import { ApiProvider } from "hooks/use-api";
-import { AnalyzerProvider } from "hooks/use-analyzer";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { MetaMaskProvider } from "metamask-react";
-import "../css/recaptcha.css";
-import "../css/markdown.css";
-import React from "react";
 import {
-  globalCss,
-  getThemes,
-  SnackbarProvider,
   DesignSystemProvider,
+  SnackbarProvider,
+  getThemes,
+  globalCss,
 } from "@livepeer/design-system";
-import { ThemeProvider } from "next-themes";
-import { DEFAULT_THEME } from "../lib/theme";
 import {
-  createReactClient,
   LivepeerConfig,
-  studioProvider,
   ThemeConfig,
+  createReactClient,
+  studioProvider,
 } from "@livepeer/react";
-import "../css/hubspot.scss";
-import { isStaging } from "lib/utils";
-import { getEndpoint } from "../hooks/use-api";
+import { AnalyzerProvider } from "hooks/use-analyzer";
+import { ApiProvider } from "hooks/use-api";
+import { isDevelopment, isStaging } from "lib/utils";
+import { MetaMaskProvider } from "metamask-react";
+import { DefaultSeo } from "next-seo";
+import { ThemeProvider } from "next-themes";
+import Head from "next/head";
 import Script from "next/script";
+import { QueryClient, QueryClientProvider } from "react-query";
+import "../css/hubspot.scss";
+import "../css/markdown.css";
+import "../css/recaptcha.css";
+import { DEFAULT_THEME } from "../lib/theme";
+import SEO from "../next-seo.config";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +64,25 @@ const themeMap = {};
 Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
+
+// Allow for manual overriding of the API server endopint
+const getEndpoint = () => {
+  try {
+    const override = localStorage.getItem("LP_API_SERVER_OVERRIDE");
+    if (typeof override === "string") {
+      return override;
+    }
+  } catch (e) {
+    // not found, no problem
+  }
+  if (process.env.NEXT_PUBLIC_USE_STAGING_ENDPOINT === "true" || isStaging()) {
+    return "https://livepeer.monster";
+  }
+  if (isDevelopment()) {
+    return "http://localhost:3004";
+  }
+  return "https://livepeer.studio";
+};
 
 const livepeerClient = createReactClient({
   provider: studioProvider({
