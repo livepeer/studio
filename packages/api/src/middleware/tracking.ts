@@ -53,10 +53,7 @@ class Tracker {
         { lastSeen }
       );
     } catch (err) {
-      console.log(
-        `error saving last seen: table=${table?.name} id=${id} err=`,
-        err
-      );
+      console.log(`error saving last seen: table=${table?.name} id=${id}`);
     }
   }
 
