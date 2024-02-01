@@ -3,8 +3,6 @@ import { Asset, Task, User } from "../schema/types";
 import Table from "./table";
 import { QueryOptions, WithID } from "./types";
 
-const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
-
 export const taskOutputToIpfsStorage = (
   out: Task["output"]["export"]["ipfs"]
 ): Omit<Asset["storage"]["ipfs"], "spec"> =>
@@ -123,14 +121,12 @@ export default class AssetTable extends Table<WithID<Asset>> {
     url: string,
     userId: string
   ): Promise<WithID<Asset>> {
-    const createdAfter = Date.now() - DUPLICATE_ASSETS_THRESHOLD;
     const query = [
       sql`asset.data->>'deleted' IS NULL`,
       sql`asset.data->>'userId' = ${userId}`,
       sql`asset.data->'source'->>'type' = 'url'`,
       sql`asset.data->'source'->>'url' = ${url}`,
-      sql`asset.data->'status'->>'phase' IN ('waiting', 'processing')`,
-      sql`coalesce((asset.data->>'createdAt')::bigint, 0) > ${createdAfter}`,
+      sql`asset.data->'status'->>'phase' IN ('waiting', 'processing', 'ready')`,
     ];
     const [assets] = await this.find(query, { limit: 1 });
     return assets?.length > 0 ? assets[0] : null;
