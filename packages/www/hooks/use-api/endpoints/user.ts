@@ -302,7 +302,8 @@ export const getBillingUsage = async (
   fromTime: number,
   toTime: number,
   creatorId?: number,
-  timeStep?: string
+  timeStep?: string,
+  userId?: string
 ): Promise<[Response, BillingUsageData | ApiError]> => {
   let [res, usage] = await context.fetch(
     `/data/usage/query?${qs.stringify({
@@ -310,6 +311,7 @@ export const getBillingUsage = async (
       to: toTime,
       creatorId,
       timeStep,
+      userId,
     })}`,
     {}
   );
@@ -349,6 +351,26 @@ export const makeUserAdmin = async (
   const [res, body] = await context.fetch("/user/make-admin", {
     method: "POST",
     body: JSON.stringify({ email: email, admin: admin }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  setState((state) => ({ ...state, userRefresh: Date.now() }));
+
+  if (res.status !== 201) {
+    return body;
+  }
+
+  return res;
+};
+
+export const makeUserEnterprise = async (
+  userId
+): Promise<[Response, User | ApiError]> => {
+  const [res, body] = await context.fetch("/stripe/user/subscribe/enterprise", {
+    method: "POST",
+    body: JSON.stringify({ userId: userId, actually_migrate: true }),
     headers: {
       "content-type": "application/json",
     },

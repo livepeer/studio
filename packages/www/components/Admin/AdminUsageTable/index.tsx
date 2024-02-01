@@ -20,7 +20,7 @@ const Index = ({ id }: { id: string }, children) => {
   const [toTime, setToTime] = useState("");
   const [usage, setUsage] = useState(null);
   const [users, setUsers] = useState([]);
-  const { getUsers, getUsage } = useApi();
+  const { getUsers, getUsage, getBillingUsage } = useApi();
   useEffect(() => {
     getUsers(10000)
       .then((result) => {
@@ -49,7 +49,7 @@ const Index = ({ id }: { id: string }, children) => {
       setMessage(`Invalid date ${toTime}`);
       return;
     }
-    const [res, usage] = await getUsage(ftd, ttd, userId);
+    const [res, usage] = await getBillingUsage(ftd, ttd, null, null, userId);
     if (res.status == 200) {
       console.log(`got usage data:`, usage);
       setUsage(usage);
@@ -95,24 +95,43 @@ const Index = ({ id }: { id: string }, children) => {
           Get usage
         </Button>
       </Box>
-      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto" }}>
+      <Table
+        sx={{
+          border: "1px solid #e0e0e0",
+          gridTemplateColumns: "auto auto auto auto auto",
+          gap: "1rem",
+        }}>
         <>
-          <TableRow variant={TableRowVariant.Header} key="usage header">
+          <TableRow
+            variant={TableRowVariant.Header}
+            key="usage header"
+            sx={{ background: "#f7f7f7", fontWeight: "bold" }}>
             <>
-              <Box></Box>
-              <Box>Source seconds</Box>
-              <Box>Transcoded seconds</Box>
-              <Box>Source segments</Box>
-              <Box>Transcoded segments</Box>
+              <Box sx={{ padding: "0.5rem" }}>Category</Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "center" }}>
+                Transcoding
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "center" }}>
+                Delivery
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "center" }}>Storage</Box>
             </>
           </TableRow>
-          <TableRow key="just one row for now" variant={TableRowVariant.Normal}>
+          <TableRow
+            key="just one row for now"
+            variant={TableRowVariant.Normal}
+            sx={{ borderBottom: "1px solid #e0e0e0" }}>
             <>
-              <Box></Box>
-              <Box>{dur2str(usage && usage.sourceSegmentsDuration)}</Box>
-              <Box>{dur2str(usage && usage.transcodedSegmentsDuration)}</Box>
-              <Box>{usage && usage.sourceSegments}</Box>
-              <Box>{usage && usage.transcodedSegments}</Box>
+              <Box sx={{ padding: "0.5rem" }}>Values</Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "right" }}>
+                {usage && usage.TotalUsageMins}
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "right" }}>
+                {usage && usage.DeliveryUsageMins}
+              </Box>
+              <Box sx={{ padding: "0.5rem", textAlign: "right" }}>
+                {usage && usage.StorageUsageMins}
+              </Box>
             </>
           </TableRow>
         </>
