@@ -586,8 +586,8 @@ components:
         deleted:
           type: boolean
           default: false
-    webhook-response:
-      table: webhook_response
+    webhook-log:
+      table: webhook_log
       properties:
         kind:
           readOnly: true

@@ -215,7 +215,7 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
-    webhook-response:
+    webhook-log:
       type: object
       required:
         - id
@@ -2834,7 +2834,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/webhook-response"
+                  $ref: "#/components/schemas/webhook-log"
         default:
           description: Error
           content:
@@ -2861,7 +2861,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/webhook-response"
+                $ref: "#/components/schemas/webhook-log"
         default:
           description: Error
           content:
@@ -2892,7 +2892,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/webhook-response"
+                $ref: "#/components/schemas/webhook-log"
         default:
           description: Error
           content:

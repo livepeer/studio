@@ -21,7 +21,7 @@ import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import { db } from "../store";
 import { buildRecordingUrl } from "../controllers/session";
 import { isExperimentSubject } from "../store/experiment-table";
-import { WebhookResponse } from "../schema/types";
+import { WebhookLog } from "../schema/types";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -596,7 +596,7 @@ async function storeResponse(
   responseBody: string,
   sharedSecret: string,
   params
-): Promise<WebhookResponse> {
+): Promise<WebhookLog> {
   const hrDuration = process.hrtime(startTime);
   const encodedResponseBody = Buffer.from(
     responseBody.substring(0, 1024)
@@ -624,14 +624,14 @@ async function storeResponse(
     },
     sharedSecret: sharedSecret,
   };
-  await db.webhookResponse.create(webhookResponse);
+  await db.webhookLog.create(webhookResponse);
   return webhookResponse;
 }
 
 export async function resendWebhook(
   webhook: DBWebhook,
-  webhookResponse: WebhookResponse
-): Promise<WebhookResponse> {
+  webhookResponse: WebhookLog
+): Promise<WebhookLog> {
   const triggerTime = Date.now();
   const startTime = process.hrtime();
   let resp: Response;

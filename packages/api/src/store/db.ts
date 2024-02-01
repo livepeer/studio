@@ -11,12 +11,12 @@ import {
   PasswordResetToken,
   Usage,
   Region,
-  WebhookResponse,
   Session,
   SigningKey,
   Room,
   Attestation,
   JwtRefreshToken,
+  WebhookLog,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
@@ -60,7 +60,7 @@ export class DB {
   attestation: AttestationTable;
   usage: Table<Usage>;
   webhook: WebhookTable;
-  webhookResponse: Table<WebhookResponse>;
+  webhookLog: Table<WebhookLog>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: SessionTable;
@@ -169,9 +169,9 @@ export class DB {
     });
 
     this.region = makeTable<Region>({ db: this, schema: schemas["region"] });
-    this.webhookResponse = makeTable<WebhookResponse>({
+    this.webhookLog = makeTable<WebhookLog>({
       db: this,
-      schema: schemas["webhook-response"],
+      schema: schemas["webhook-log"],
     });
     this.session = new SessionTable({ db: this, schema: schemas["session"] });
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
