@@ -592,7 +592,7 @@ components:
         kind:
           readOnly: true
           type: string
-          example: webhookResponse
+          example: webhookLog
         userId:
           readOnly: true
           type: string

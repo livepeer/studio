@@ -602,7 +602,7 @@ async function storeResponse(
     responseBody.substring(0, 1024)
   ).toString("base64");
 
-  const webhookResponse = {
+  const webhookLog = {
     id: uuid(),
     webhookId: webhook.id,
     eventId: eventId,
@@ -624,13 +624,13 @@ async function storeResponse(
     },
     sharedSecret: sharedSecret,
   };
-  await db.webhookLog.create(webhookResponse);
-  return webhookResponse;
+  await db.webhookLog.create(webhookLog);
+  return webhookLog;
 }
 
 export async function resendWebhook(
   webhook: DBWebhook,
-  webhookResponse: WebhookLog
+  webhookLog: WebhookLog
 ): Promise<WebhookLog> {
   const triggerTime = Date.now();
   const startTime = process.hrtime();
@@ -640,26 +640,26 @@ export async function resendWebhook(
   let errorMessage: string;
   try {
     const timestamp = Date.now();
-    const requestBody = JSON.parse(webhookResponse.request.body);
-    webhookResponse.request.body = JSON.stringify({
+    const requestBody = JSON.parse(webhookLog.request.body);
+    webhookLog.request.body = JSON.stringify({
       ...requestBody,
       timestamp,
     });
     const sigHeaders = signatureHeaders(
-      webhookResponse.request.body,
-      webhookResponse.sharedSecret,
+      webhookLog.request.body,
+      webhookLog.sharedSecret,
       timestamp
     );
-    webhookResponse.request.headers = {
-      ...webhookResponse.request.headers,
+    webhookLog.request.headers = {
+      ...webhookLog.request.headers,
       ...sigHeaders,
     };
 
-    resp = await fetchWithTimeout(webhookResponse.request.url, {
-      method: webhookResponse.request.method,
-      headers: webhookResponse.request.headers,
+    resp = await fetchWithTimeout(webhookLog.request.url, {
+      method: webhookLog.request.method,
+      headers: webhookLog.request.headers,
       timeout: WEBHOOK_TIMEOUT,
-      body: webhookResponse.request.body,
+      body: webhookLog.request.body,
     });
     responseBody = await resp.text();
     statusCode = resp.status;
@@ -676,13 +676,13 @@ export async function resendWebhook(
     );
     return await storeResponse(
       webhook,
-      webhookResponse.eventId,
-      webhookResponse.event,
+      webhookLog.eventId,
+      webhookLog.event,
       resp,
       startTime,
       responseBody,
-      webhookResponse.sharedSecret,
-      webhookResponse.request
+      webhookLog.sharedSecret,
+      webhookLog.request
     );
   }
 }

@@ -30,41 +30,41 @@ const requestsFieldsMap: FieldsMap = {
 
 app.post("/:requestId/resend", authorizer({}), async (req, res) => {
   const webhook = await db.webhook.get(req.params.id);
-  const webhookResponse = await db.webhookLog.get(req.params.requestId);
-  await checkRequest(req, webhook, webhookResponse);
+  const webhookLog = await db.webhookLog.get(req.params.requestId);
+  await checkRequest(req, webhook, webhookLog);
 
-  const resent = await resendWebhook(webhook, webhookResponse);
+  const resent = await resendWebhook(webhook, webhookLog);
   res.status(200);
   return res.json(db.webhookLog.cleanWriteOnlyResponse(resent));
 });
 
 app.get("/:requestId", authorizer({}), async (req, res) => {
   const webhook = await db.webhook.get(req.params.id);
-  const webhookResponse = await db.webhookLog.get(req.params.requestId);
-  await checkRequest(req, webhook, webhookResponse);
+  const webhookLog = await db.webhookLog.get(req.params.requestId);
+  await checkRequest(req, webhook, webhookLog);
 
   res.status(200);
-  return res.json(db.webhookLog.cleanWriteOnlyResponse(webhookResponse));
+  return res.json(db.webhookLog.cleanWriteOnlyResponse(webhookLog));
 });
 
 async function checkRequest(
   req: Request,
   webhook: DBWebhook,
-  webhookResponse: WebhookLog
+  webhookLog: WebhookLog
 ) {
   if (!webhook || webhook.deleted) {
     throw new NotFoundError(`webhook not found`);
   }
-  if (!webhookResponse || webhookResponse.deleted) {
+  if (!webhookLog || webhookLog.deleted) {
     throw new NotFoundError(`webhook log not found`);
   }
   if (
     !req.user.admin &&
-    (req.user.id !== webhook.userId || req.user.id !== webhookResponse.userId)
+    (req.user.id !== webhook.userId || req.user.id !== webhookLog.userId)
   ) {
     throw new ForbiddenError(`invalid user`);
   }
-  if (webhookResponse.webhookId !== webhook.id) {
+  if (webhookLog.webhookId !== webhook.id) {
     throw new BadRequestError(`mismatch between webhook and webhook log`);
   }
 }
