@@ -68,7 +68,7 @@ const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
 // from the stream that are not specified in the PUT payload.
 const EMPTY_NEW_STREAM_PAYLOAD: Required<
   Omit<
-    NewStreamPayload,
+    NewStreamPayload & { creatorId: undefined },
     // omit all the db-schema fields
     | "wowza"
     | "presets"
@@ -1076,11 +1076,11 @@ app.put(
       stream = {
         ...streams[0],
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
-        profiles: req.config.defaultStreamProfiles, // fallback to default profiles if not specified in payload
         ...payload,
-        creatorId: mapInputCreatorId(payload.creatorId),
       };
       await db.stream.replace(stream);
+      // read from DB again to keep exactly what got saved
+      stream = await db.stream.get(stream.id, { useReplica: false });
     }
 
     await TODOtriggerCatalystPullStart(stream);

@@ -542,9 +542,7 @@ describe("controllers/stream", () => {
         expect(updatedStream.profiles).toEqual([]);
 
         const document = await db.stream.get(stream.id);
-        expect(server.db.stream.addDefaultFields(document)).toEqual(
-          updatedStream
-        );
+        expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
 
       it("should fail to dedup streams by a random key", async () => {
@@ -592,9 +590,7 @@ describe("controllers/stream", () => {
         expect(updatedStream.profiles).toEqual([]);
 
         const document = await db.stream.get(stream.id);
-        expect(server.db.stream.addDefaultFields(document)).toEqual(
-          updatedStream
-        );
+        expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
 
       it("should wait for stream to become active if requested", async () => {
@@ -610,7 +606,7 @@ describe("controllers/stream", () => {
 
         const [streams] = await db.stream.find();
         expect(streams).toHaveLength(1);
-        expect(streams[0].isActive).toBeFalsy();
+        expect(streams[0].isActive).toBe(false);
 
         // stream not active yet
         expect(responded).toBe(false);
