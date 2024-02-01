@@ -1,5 +1,4 @@
 import { Router, Request } from "express";
-import fetch from "node-fetch";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
@@ -54,6 +53,7 @@ import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
 import { ensureExperimentSubject } from "../store/experiment-table";
 import { experimentSubjectsOnly } from "./experiment";
+import { sleep } from "../util";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -62,6 +62,31 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
+const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
+
+// Helper constant to be used in the PUT /pull API to make sure we delete fields
+// from the stream that are not specified in the PUT payload.
+const EMPTY_NEW_STREAM_PAYLOAD: Required<
+  Omit<
+    NewStreamPayload & { creatorId: undefined },
+    // omit all the db-schema fields
+    | "wowza"
+    | "presets"
+    | "renditions"
+    | "recordObjectStoreId"
+    | "objectStoreId"
+    | "detection"
+  >
+> = {
+  name: undefined,
+  profiles: undefined,
+  multistream: undefined,
+  pull: undefined,
+  record: undefined,
+  userTags: undefined,
+  creatorId: undefined,
+  playbackPolicy: undefined,
+};
 
 const app = Router();
 const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
@@ -209,6 +234,35 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+// Waits for the stream to become active. Works by polling the stream object
+// on the DB until it becomes active or the timeout is reached. Will wait for
+// exponentially longer time in between polls to reduce load on the DB.
+async function pollWaitStreamActive(req: Request, id: string) {
+  let clientGone = false;
+  req.on("close", () => {
+    clientGone = true;
+  });
+
+  const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
+  let sleepDelay = 500;
+  while (!clientGone && Date.now() < deadline) {
+    const stream =
+      (await db.stream.get(id)) ||
+      (await db.stream.get(id, { useReplica: false })); // read from primary in case replica is lagging
+    if (!stream) {
+      throw new NotFoundError("stream not found");
+    }
+    if (stream.isActive) {
+      return stream;
+    }
+
+    await sleep(sleepDelay);
+    sleepDelay = Math.min(sleepDelay * 2, 5000);
+  }
+
+  throw new InternalServerError("stream not active");
+}
+
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
 }
@@ -297,6 +351,8 @@ const fieldsMap: FieldsMap = {
   lastSeen: { val: `stream.data->'lastSeen'`, type: "int" },
   createdAt: { val: `stream.data->'createdAt'`, type: "int" },
   userId: `stream.data->>'userId'`,
+  creatorId: `stream.data->'creatorId'->>'value'`,
+  "pull.source": `stream.data->'pull'->>'source'`,
   isActive: { val: `stream.data->'isActive'`, type: "boolean" },
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
@@ -953,6 +1009,94 @@ app.post(
   }
 );
 
+const pullStreamKeyAccessors: Record<string, string[]> = {
+  creatorId: ["creatorId", "value"],
+  "pull.source": ["pull", "source"],
+};
+
+app.put(
+  "/pull",
+  authorizer({}),
+  validatePost("new-stream-payload"),
+  experimentSubjectsOnly("stream-pull-source"),
+  async (req, res) => {
+    const { key = "pull.source", waitActive } = toStringValues(req.query);
+    const rawPayload = req.body as NewStreamPayload;
+
+    if (!rawPayload.pull) {
+      return res.status(400).json({
+        errors: [`stream pull configuration is required`],
+      });
+    }
+
+    // Make the payload compatible with the stream schema to simplify things
+    const payload: Partial<DBStream> = {
+      profiles: req.config.defaultStreamProfiles,
+      ...rawPayload,
+      creatorId: mapInputCreatorId(rawPayload.creatorId),
+    };
+
+    const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
+    if (!keyValue) {
+      return res.status(400).json({
+        errors: [
+          `key must be one of ${Object.keys(
+            pullStreamKeyAccessors
+          )} and must be present in the payload`,
+        ],
+      });
+    }
+    const filtersStr = encodeURIComponent(
+      JSON.stringify([{ id: key, value: keyValue }])
+    );
+    const filters = parseFilters(fieldsMap, filtersStr);
+
+    const [streams] = await db.stream.find(
+      [
+        sql`data->>'userId' = ${req.user.id}`,
+        sql`data->>'deleted' IS NULL`,
+        ...filters,
+      ],
+      { useReplica: false }
+    );
+    if (streams.length > 1) {
+      return res.status(400).json({
+        errors: [
+          `pull.source must be unique, found ${streams.length} streams with same source`,
+        ],
+      });
+    }
+    const streamExisted = streams.length === 1;
+
+    let stream: DBStream;
+    if (!streamExisted) {
+      stream = await handleCreateStream(req);
+    } else {
+      stream = {
+        ...streams[0],
+        ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
+        ...payload,
+      };
+      await db.stream.replace(stream);
+      // read from DB again to keep exactly what got saved
+      stream = await db.stream.get(stream.id, { useReplica: false });
+    }
+
+    await TODOtriggerCatalystPullStart(stream);
+
+    if (waitActive === "true") {
+      stream = await pollWaitStreamActive(req, stream.id);
+    }
+
+    res.status(streamExisted ? 200 : 201);
+    res.json(
+      db.stream.addDefaultFields(
+        db.stream.removePrivateFields(stream, req.user.admin)
+      )
+    );
+  }
+);
+
 app.post(
   "/",
   authorizer({}),
@@ -961,6 +1105,7 @@ app.post(
     const { autoStartPull } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
 
+    // TODO: Remove autoStartPull once experiment subjects migrate to /pull
     if (autoStartPull || payload.pull) {
       await ensureExperimentSubject("stream-pull-source", req.user.id);
     }
@@ -973,7 +1118,11 @@ app.post(
       }
 
       const [streams] = await db.stream.find(
-        [sql`data->'pull'->>'source' = ${payload.pull.source}`],
+        [
+          sql`data->>'userId' = ${req.user.id}`,
+          sql`data->>'deleted' IS NULL`,
+          sql`data->'pull'->>'source' = ${payload.pull.source}`,
+        ],
         { useReplica: false }
       );
 
@@ -997,71 +1146,77 @@ app.post(
       }
     }
 
-    const id = uuid();
-    const createdAt = Date.now();
-    // TODO: Don't create a streamKey if there's a pull source (here and on www)
-    const streamKey = await generateUniqueStreamKey(id);
-    let playbackId = await generateUniquePlaybackId(id, [streamKey]);
-    if (req.user.isTestUser) {
-      playbackId += "-test";
-    }
-
-    const { objectStoreId } = payload;
-    if (objectStoreId) {
-      const store = await db.objectStore.get(objectStoreId);
-      if (!store || store.deleted || store.disabled) {
-        return res.status(400).json({
-          errors: [`object store ${objectStoreId} not found or disabled`],
-        });
-      }
-    }
-
-    let doc: DBStream = {
-      profiles: req.config.defaultStreamProfiles,
-      ...payload,
-      kind: "stream",
-      userId: req.user.id,
-      creatorId: mapInputCreatorId(payload.creatorId),
-      renditions: {},
-      objectStoreId,
-      id,
-      createdAt,
-      streamKey,
-      playbackId,
-      createdByTokenName: req.token?.name,
-      createdByTokenId: req.token?.id,
-      isActive: false,
-      lastSeen: 0,
-    };
-    doc = wowzaHydrate(doc);
-
-    await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
-
-    doc.profiles = hackMistSettings(req, doc.profiles);
-    doc.multistream = await validateMultistreamOpts(
-      req.user.id,
-      doc.profiles,
-      doc.multistream
-    );
-
-    if (doc.userTags) {
-      await validateTags(doc.userTags);
-    }
-
-    await db.stream.create(doc);
+    const stream = await handleCreateStream(req);
 
     if (autoStartPull === "true") {
-      await TODOtriggerCatalystPullStart(doc);
+      await TODOtriggerCatalystPullStart(stream);
     }
 
     res.status(201);
     res.json(
       db.stream.addDefaultFields(
-        db.stream.removePrivateFields(doc, req.user.admin)
+        db.stream.removePrivateFields(stream, req.user.admin)
       )
     );
   }
 );
+
+async function handleCreateStream(req: Request) {
+  const payload = req.body as NewStreamPayload;
+
+  const id = uuid();
+  const createdAt = Date.now();
+  // TODO: Don't create a streamKey if there's a pull source (here and on www)
+  const streamKey = await generateUniqueStreamKey(id);
+  let playbackId = await generateUniquePlaybackId(id, [streamKey]);
+  if (req.user.isTestUser) {
+    playbackId += "-test";
+  }
+
+  const { objectStoreId } = payload;
+  if (objectStoreId) {
+    const store = await db.objectStore.get(objectStoreId);
+    if (!store || store.deleted || store.disabled) {
+      throw new BadRequestError(
+        `object store ${objectStoreId} not found or disabled`
+      );
+    }
+  }
+
+  let doc: DBStream = {
+    profiles: req.config.defaultStreamProfiles,
+    ...payload,
+    kind: "stream",
+    userId: req.user.id,
+    creatorId: mapInputCreatorId(payload.creatorId),
+    renditions: {},
+    objectStoreId,
+    id,
+    createdAt,
+    streamKey,
+    playbackId,
+    createdByTokenName: req.token?.name,
+    createdByTokenId: req.token?.id,
+    isActive: false,
+    lastSeen: 0,
+  };
+  doc = wowzaHydrate(doc);
+
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+
+  doc.profiles = hackMistSettings(req, doc.profiles);
+  doc.multistream = await validateMultistreamOpts(
+    req.user.id,
+    doc.profiles,
+    doc.multistream
+  );
+
+  if (doc.userTags) {
+    await validateTags(doc.userTags);
+  }
+
+  return await db.stream.create(doc);
+}
 
 // Refreshes the 'lastSeen' field of a stream
 app.post("/:id/heartbeat", authorizer({ anyAdmin: true }), async (req, res) => {
