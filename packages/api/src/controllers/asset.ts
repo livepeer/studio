@@ -1104,10 +1104,14 @@ app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
     throw new NotFoundError(`user not found`);
   }
 
-  const [assets] = await db.asset.find([
-    sql`data->>'userId' = ${userId}`,
-    sql`data->>'deleted' IS NULL`,
-  ]);
+  const limit = parseInt(req.query.limit?.toString() || "100");
+
+  const [assets] = await db.asset.find(
+    [sql`data->>'userId' = ${userId}`, sql`data->>'deleted' IS NULL`],
+    {
+      limit,
+    }
+  );
 
   let deletedCount = 0;
   for (const asset of assets) {
