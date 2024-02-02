@@ -644,7 +644,7 @@ export const triggerCatalystPullStart = async (
   stream: DBStream,
   playbackUrl: string
 ) => {
-  // TODO: use stream.location field to call catalyst on the closest region.
+  // TODO: use pull.location field to call catalyst on the closest region.
   // Ideally by calling catalyst-api/catabalancer and letting it figure it out.
 
   // Instead of the above, for now just access the stream playbackUrl to trigger
