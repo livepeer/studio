@@ -656,7 +656,9 @@ export const triggerCatalystPullStart =
             timeout: PULL_START_TIMEOUT,
             maxRedirects: 10,
           });
-          if (res.ok) {
+          const body = await res.text();
+          const isHlsErr = body.includes("#EXT-X-ERROR: Stream open failed");
+          if (res.ok && !isHlsErr) {
             return;
           }
 
@@ -665,7 +667,7 @@ export const triggerCatalystPullStart =
               stream.id
             } playbackUrl=${playbackUrl} status=${
               res.status
-            } error=${JSON.stringify(await res.text())}`
+            } error=${JSON.stringify(body)}`
           );
           await sleep(1000);
         }
