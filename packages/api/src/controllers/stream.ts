@@ -1849,7 +1849,9 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
 
 app.get("/:id/config", authorizer({ anyAdmin: true }), async (req, res) => {
   let { id } = req.params;
-  let stream = await db.stream.getByPlaybackId(id);
+  let stream = await db.stream.getByPlaybackId(id, {
+    useReplica: false,
+  });
   if (!stream || stream.deleted || stream.suspended) {
     res.status(404);
     return res.json({
