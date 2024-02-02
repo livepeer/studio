@@ -14,7 +14,7 @@ import { CreatorId, InputCreatorId, ObjectStore, User } from "../schema/types";
 import { BadRequestError } from "../store/errors";
 import * as nativeCrypto from "crypto";
 import { DBStream } from "../store/stream-table";
-import { fetchWithTimeoutAndRedirects } from "../util";
+import { fetchWithTimeoutAndRedirects, sleep } from "../util";
 import logger from "../logger";
 
 const ITERATIONS = 10000;
@@ -667,6 +667,7 @@ export const triggerCatalystPullStart = async (
         await res.text()
       )}`
     );
+    await sleep(1000);
   }
 
   throw new Error(`failed to trigger catalyst pull`);
