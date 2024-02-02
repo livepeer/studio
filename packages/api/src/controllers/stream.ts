@@ -44,7 +44,7 @@ import {
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
   triggerCatalystStreamNuke,
-  TODOtriggerCatalystPullStart,
+  triggerCatalystPullStart,
 } from "./helpers";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
@@ -1082,7 +1082,8 @@ app.put(
       stream = await db.stream.get(stream.id, { useReplica: false });
     }
 
-    await TODOtriggerCatalystPullStart(stream);
+    const ingest = await getIngestBase(req);
+    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
 
     if (waitActive === "true") {
       stream = await pollWaitStreamActive(req, stream.id);
@@ -1128,7 +1129,11 @@ app.post(
 
       if (streams.length === 1) {
         const stream = streams[0];
-        await TODOtriggerCatalystPullStart(stream);
+        const ingest = await getIngestBase(req);
+        await triggerCatalystPullStart(
+          stream,
+          getHLSPlaybackUrl(ingest, stream)
+        );
 
         return res
           .status(200)
@@ -1149,7 +1154,8 @@ app.post(
     const stream = await handleCreateStream(req);
 
     if (autoStartPull === "true") {
-      await TODOtriggerCatalystPullStart(stream);
+      const ingest = await getIngestBase(req);
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
     res.status(201);
@@ -1920,7 +1926,8 @@ app.post(
       return res.json({ errors: ["stream does not have a pull source"] });
     }
 
-    await TODOtriggerCatalystPullStart(stream);
+    const ingest = await getIngestBase(req);
+    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
 
     res.status(204).end();
   }
