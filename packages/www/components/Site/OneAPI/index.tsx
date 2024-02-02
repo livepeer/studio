@@ -26,6 +26,11 @@ const workflows = [
     ),
     list: [
       {
+        heading: "10x viewer engagement through realtime live streaming",
+        subheading:
+          "Build rich interactive live streaming experiences, enabled by sub 1-second latency and near-perfect uptime.",
+      },
+      {
         heading: "Go live effortlessly from any source",
         subheading:
           "Stream seamlessly from mobile apps, open broadcast software, or a web browser, and protect your streams with flexible playback policies.",
@@ -36,14 +41,9 @@ const workflows = [
           "See performance data to understand audience demographics, engagement and improve your viewers’ experience.",
       },
       {
-        heading: "Build near realtime livestreaming experiences",
+        heading: "Reach a global audience through auto scaling",
         subheading:
-          "Enabling natural interactive experiences between audiences and content creators with sub-second latency.",
-      },
-      {
-        heading: "Choose near-realtime for improved performance",
-        subheading:
-          "Ultra-low latency live streaming offers near-perfect uptime, as low as half a second, for a world-class viewing experience.",
+          "Enable high performance geographic coverage at a global scale, without managing any infrastructure.",
       },
     ],
   },
