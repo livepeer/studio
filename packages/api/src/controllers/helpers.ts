@@ -654,6 +654,7 @@ export const triggerCatalystPullStart = async (
     const res = await fetchWithTimeoutAndRedirects(playbackUrl, {
       method: "GET",
       timeout: PULL_START_TIMEOUT,
+      maxRedirects: 10,
     });
     if (res.ok) {
       return;
