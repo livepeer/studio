@@ -14,9 +14,12 @@ import { CreatorId, InputCreatorId, ObjectStore, User } from "../schema/types";
 import { BadRequestError } from "../store/errors";
 import * as nativeCrypto from "crypto";
 import { DBStream } from "../store/stream-table";
+import { fetchWithTimeoutAndRedirects, sleep } from "../util";
+import logger from "../logger";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
+const PULL_START_TIMEOUT = 60 * 1000;
 
 const crypto = new Crypto();
 
@@ -637,9 +640,40 @@ export function isValidBase64(str: string) {
   }
 }
 
-export const TODOtriggerCatalystPullStart = async (stream: DBStream) => {
-  // TODO: trigger pull start on catalyst
-};
+export const triggerCatalystPullStart =
+  process.env.NODE_ENV === "test"
+    ? async () => {} // noop in case of tests
+    : async (stream: DBStream, playbackUrl: string) => {
+        // TODO: use pull.location field to call catalyst on the closest region.
+        // Ideally by calling catalyst-api/catabalancer and letting it figure it out.
+
+        // Instead of the above, for now just access the stream playbackUrl to trigger
+        // the pull to start.
+        const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
+        while (Date.now() < deadline) {
+          const res = await fetchWithTimeoutAndRedirects(playbackUrl, {
+            method: "GET",
+            timeout: PULL_START_TIMEOUT,
+            maxRedirects: 10,
+          });
+          const body = await res.text();
+          const isHlsErr = body.includes("#EXT-X-ERROR: Stream open failed");
+          if (res.ok && !isHlsErr) {
+            return;
+          }
+
+          logger.warn(
+            `failed to trigger catalyst pull for stream=${
+              stream.id
+            } playbackUrl=${playbackUrl} status=${
+              res.status
+            } error=${JSON.stringify(body)}`
+          );
+          await sleep(1000);
+        }
+
+        throw new Error(`failed to trigger catalyst pull`);
+      };
 
 export const triggerCatalystStreamNuke = (req: Request, playback_id: string) =>
   triggerCatalystEvent(req, { resource: "nuke", playback_id });
