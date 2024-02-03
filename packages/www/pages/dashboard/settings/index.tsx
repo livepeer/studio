@@ -69,9 +69,7 @@ const Settings = () => {
               Logo
             </Box>
             <Image
-              src={
-                "https://pbs.twimg.com/profile_images/1712502841494138880/GofqA30R_400x400.jpg"
-              }
+              src={workspaces[0].projects[0].logo}
               alt="Project logo"
               style={{
                 borderRadius: "12px",
@@ -101,7 +99,7 @@ const Settings = () => {
               required
               size="2"
               type="text"
-              value={"Paramount Plus"}
+              defaultValue={workspaces[0].projects[0].name}
               id="projectName"
               css={{
                 width: "20%",
@@ -160,5 +158,29 @@ const Settings = () => {
     </Layout>
   );
 };
+
+// Placeholder constants, it will be removed and replaced with real data from the API
+export const workspaces = [
+  {
+    name: "Paramount",
+    logo: "https://pbs.twimg.com/profile_images/1712502841494138880/GofqA30R_400x400.jpg",
+    url: "https://www.paramountplus.com/",
+    projects: [
+      {
+        name: "Paramount Plus",
+        logo: "https://pbs.twimg.com/profile_images/1712502841494138880/GofqA30R_400x400.jpg",
+        activeStreams: 10,
+        inProgressUploads: 5,
+      },
+    ],
+    members: [
+      {
+        name: "John Doe",
+        email: "john@livepeer.org",
+        role: "Admin",
+      },
+    ],
+  },
+];
 
 export default Settings;
