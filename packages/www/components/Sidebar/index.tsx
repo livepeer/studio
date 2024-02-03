@@ -25,6 +25,7 @@ import {
   BillingIcon,
   UsageIcon,
   AssetsIcon,
+  SettingsIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router from "next/router";
@@ -37,8 +38,8 @@ export const NavLink = styled(A, {
   alignItems: "center",
   color: "$primary12",
   px: "$2",
-  py: 6,
-  borderRadius: "$2",
+  py: 8.5,
+  borderRadius: "$1",
   cursor: "default",
   lineHeight: 1.2,
   fontWeight: 500,
@@ -68,7 +69,8 @@ export type SidebarId =
   | "developers/webhooks"
   | "usage"
   | "billing"
-  | "billing/plans";
+  | "billing/plans"
+  | "settings";
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
@@ -258,6 +260,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 </Link>
               </Box>
             )}
+          </Box>
+
+          <Box>
+            <Link href="/dashboard/settings" passHref legacyBehavior>
+              <NavLink active={id === "settings"}>
+                <SettingsIcon active={id === "settings"} />
+                Settings
+              </NavLink>
+            </Link>
           </Box>
         </Grid>
         <Flex direction="column" gap={1}>
