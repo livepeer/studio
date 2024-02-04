@@ -73,7 +73,7 @@ const Header = ({ breadcrumbs = [] }) => {
 
   useEffect(() => {
     setNavBreadcrumbs([
-      { title: workspaces[0].projects[0].name, href: "/settings" },
+      { title: workspaces[0].projects[0].name, href: "/dashboard/settings" },
       ...breadcrumbs,
     ]);
   }, []);
