@@ -30,15 +30,23 @@ import {
   SettingsIcon,
   WorkspaceIcon,
   AccountIcon,
+  TopBottomChevron,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
-import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
+import {
+  RocketIcon,
+  ChatBubbleIcon,
+  LoopIcon,
+  PlusIcon,
+} from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import Image from "next/image";
 import { workspaces } from "pages/dashboard/settings";
 import { User } from "@livepeer.studio/api";
 import { FiChevronLeft } from "react-icons/fi";
+import CreateProjectDialog from "components/Project/CreateProjectDialog";
+import { useState } from "react";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -115,6 +123,8 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 };
 
 const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  const [showCreateProjectDialog, setShowCreateProjectDialog] = useState(false);
+
   return (
     <>
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
@@ -258,6 +268,106 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           }
         />
       </Flex>
+      <DropdownMenu>
+        <Flex
+          align={"center"}
+          as={DropdownMenuTrigger}
+          css={{
+            p: "$2",
+            gap: "$2",
+            mb: "$3",
+            ml: "$3",
+            width: "59%",
+            borderRadius: "$3",
+            border: 0,
+            backgroundColor: "transparent",
+            "&:focus": {
+              outline: "none",
+            },
+            "&:hover": {
+              backgroundColor: "$neutral4",
+              cursor: "pointer",
+            },
+          }}>
+          <Text
+            css={{
+              color: "$neutral11",
+            }}>
+            {workspaces[0].projects[0].name}
+          </Text>
+          <TopBottomChevron />
+        </Flex>
+        <DropdownMenuContent
+          placeholder={workspaces[0].name}
+          css={{
+            border: "1px solid $colors$neutral6",
+            p: "$3",
+            width: "14rem",
+            ml: "$5",
+            mt: "$1",
+          }}>
+          <Text variant={"neutral"} css={{ mb: "$3" }}>
+            Projects
+          </Text>
+          <Box
+            css={{
+              pb: "$3",
+              pl: "$3",
+              borderBottom: "1px solid",
+              borderColor: "$neutral6",
+            }}>
+            {workspaces[0].projects.map((project) => (
+              <Flex
+                direction={"row"}
+                css={{
+                  gap: "$2",
+                  width: "100%",
+                }}>
+                <Image
+                  src={project.logo}
+                  alt="Project logo"
+                  style={{
+                    borderRadius: "6px",
+                  }}
+                  width={22}
+                  height={22}
+                />
+                <Text>{project.name}</Text>
+              </Flex>
+            ))}
+          </Box>
+          <Box
+            css={{
+              py: "$3",
+              pb: 0,
+              fontSize: 14,
+              color: "$primary11",
+              a: {
+                textDecoration: "none",
+                color: "$neutral12",
+              },
+            }}>
+            <Flex
+              direction={"column"}
+              css={{
+                gap: "$3",
+                width: "100%",
+              }}>
+              <Flex
+                onClick={() => setShowCreateProjectDialog(true)}
+                align={"center"}
+                css={{
+                  color: "$neutral12",
+                  gap: "$2",
+                  cursor: "pointer",
+                }}>
+                <PlusIcon />
+                New project
+              </Flex>
+            </Flex>
+          </Box>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Flex
         css={{ px: "$4", height: "calc(100vh - 100px)" }}
         direction="column"
@@ -452,6 +562,14 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           <Contact />
         </Flex>
       </Flex>
+
+      <CreateProjectDialog
+        isOpen={showCreateProjectDialog}
+        onOpenChange={setShowCreateProjectDialog}
+        onCreate={async (projectName: string) => {
+          console.log(projectName);
+        }}
+      />
     </>
   );
 };

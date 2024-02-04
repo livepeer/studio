@@ -162,3 +162,27 @@ export const AccountIcon = ({ active = false }) => (
     />
   </svg>
 );
+
+export const TopBottomChevron = ({ active = false }) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <g opacity="0.4">
+      <path
+        d="M9 4L6 1L3 4"
+        stroke="black"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3 8L6 11L9 8"
+        stroke="black"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </g>
+  </svg>
+);

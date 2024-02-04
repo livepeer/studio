@@ -11,7 +11,7 @@ import {
 } from "@livepeer/design-system";
 import { workspaces } from "../settings";
 import Image from "next/image";
-import ProjectTile from "components/ProjectTile";
+import ProjectTile from "components/Project/ProjectTile";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
