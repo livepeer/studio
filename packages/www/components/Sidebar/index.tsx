@@ -80,8 +80,8 @@ export type SidebarId =
   | "streams/health"
   | "assets"
   | "developers"
-  | "developers/signing-keys"
-  | "developers/webhooks"
+  // | "developers/signing-keys"
+  // | "developers/webhooks"
   | "usage"
   | "billing"
   | "billing/plans"
@@ -400,45 +400,12 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             </NavLink>
           </Link>
           <Box>
-            <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
-              <NavLink>
-                <TerminalIcon active={id?.split("/")[0] === "developers"} />
+            <Link href="/dashboard/developers" passHref legacyBehavior>
+              <NavLink active={id === "developers"}>
+                <TerminalIcon active={id === "developers"} />
                 Developers
               </NavLink>
             </Link>
-
-            {id?.split("/")[0] === "developers" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                    mt: "$1",
-                  },
-                }}>
-                <Link
-                  href="/dashboard/developers/api-keys"
-                  passHref
-                  legacyBehavior>
-                  <NavLink active={id === "developers"}>API Keys</NavLink>
-                </Link>
-                <Link
-                  href="/dashboard/developers/signing-keys"
-                  passHref
-                  legacyBehavior>
-                  <NavLink active={id === "developers/signing-keys"}>
-                    Signing Keys
-                  </NavLink>
-                </Link>
-                <Link
-                  href="/dashboard/developers/webhooks"
-                  passHref
-                  legacyBehavior>
-                  <NavLink active={id === "developers/webhooks"}>
-                    Webhooks
-                  </NavLink>
-                </Link>
-              </Box>
-            )}
           </Box>
 
           <Box>
@@ -484,7 +451,12 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             </Link>
           </Box>
         </Grid>
-        <Flex direction="column" gap={1}>
+        <Flex
+          direction="column"
+          css={{
+            mb: "60px",
+          }}
+          gap={1}>
           <NavLink
             href="https://status.livepeer.studio/"
             target="_blank"
