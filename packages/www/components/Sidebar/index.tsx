@@ -14,8 +14,10 @@ import {
   AlertDialog,
   AlertDialogTrigger,
   AlertDialogContent,
+  Heading,
+  Button,
 } from "@livepeer/design-system";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import {
@@ -26,11 +28,17 @@ import {
   UsageIcon,
   AssetsIcon,
   SettingsIcon,
+  WorkspaceIcon,
+  AccountIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
+import Image from "next/image";
+import { workspaces } from "pages/dashboard/settings";
+import { User } from "@livepeer.studio/api";
+import { FiChevronLeft } from "react-icons/fi";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -60,7 +68,6 @@ export const NavLink = styled(A, {
 export type SidebarId =
   | "home"
   | "streams"
-  | "streams/sessions"
   // /dashboard/stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
@@ -70,10 +77,20 @@ export type SidebarId =
   | "usage"
   | "billing"
   | "billing/plans"
-  | "settings";
+  | "settings"
+  // Workspace settings
+  | "workspace/general"
+  | "workspace/projects"
+  | "workspace/members"
+  | "workspace/plans"
+  | "workspace/billing"
+  | "account/profile"
+  | "account/preferences";
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
+
+  const { pathname } = useRouter();
 
   return (
     <Box
@@ -88,58 +105,158 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         justifyContent: "flex-end",
         bottom: 0,
       }}>
+      {pathname.includes("workspace") ? (
+        <WorkspaceSidebar id={id} user={user} />
+      ) : (
+        <GeneralSidebar id={id} user={user} />
+      )}
+    </Box>
+  );
+};
+
+const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  return (
+    <>
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
         <DropdownMenu>
           <Flex
             as={DropdownMenuTrigger}
-            align="center"
             css={{
+              alignItems: "center",
+              backgroundColor: "transparent",
               border: 0,
-              background: "transparent",
-              p: 0,
+              width: "70%",
+              gap: "$2",
+              cursor: "pointer",
+              color: "$hiContrast",
+              p: 8,
+              ml: "$1",
+              borderRadius: "$2",
+              "&:hover": {
+                background: "$neutral4",
+              },
+              "&:focus": {
+                outline: "none",
+              },
             }}>
-            <Avatar
-              size="3"
-              alt={user?.firstName}
-              fallback={
-                user?.firstName
-                  ? user?.firstName?.charAt(0)
-                  : user?.email.charAt(0)
-              }
+            <Image
+              src={workspaces[0].logo}
+              alt="Project logo"
+              style={{
+                borderRadius: "6px",
+              }}
+              width={27}
+              height={27}
             />
-            <Text
-              size="3"
-              css={{ ml: "$2", fontSize: "$3", mr: "$1" }}
-              title={user?.email}>
-              {user?.firstName}
+            <Text>{workspaces[0].name}</Text>
+          </Flex>
+          <DropdownMenuContent
+            placeholder={workspaces[0].name}
+            css={{
+              border: "1px solid $colors$neutral6",
+              p: "$3",
+              width: "14rem",
+              ml: "$5",
+              mt: "$1",
+            }}>
+            <Text variant={"neutral"} css={{ mb: "$3" }}>
+              {user?.email}
             </Text>
             <Box
-              as={ChevronDownIcon}
-              css={{ width: 20, height: 20, color: "$hiContrast" }}
-            />
-          </Flex>
-          <DropdownMenuContent css={{ border: "1px solid $colors$neutral6" }}>
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/dashboard/billing");
+              css={{
+                pb: "$3",
+                pl: "$3",
+                borderBottom: "1px solid",
+                borderColor: "$neutral6",
+              }}>
+              {workspaces.map((workspace) => (
+                <Flex
+                  direction={"row"}
+                  css={{
+                    gap: "$2",
+                    width: "100%",
+                  }}>
+                  <Image
+                    src={workspace.logo}
+                    alt="Project logo"
+                    style={{
+                      borderRadius: "6px",
+                    }}
+                    width={22}
+                    height={22}
+                  />
+                  <Text>{workspace.name}</Text>
+                </Flex>
+              ))}
+            </Box>
+            <Box
+              css={{
+                py: "$3",
+                borderBottom: "1px solid",
+                borderColor: "$neutral6",
+                fontSize: 14,
+                color: "$primary11",
+                a: {
+                  textDecoration: "none",
+                  color: "$neutral12",
+                },
+              }}>
+              <Flex
+                direction={"column"}
+                css={{
+                  gap: "$3",
+                  width: "100%",
                 }}>
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="logout-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  logout();
+                <Link
+                  href="/dashboard/workspace/general"
+                  passHref
+                  legacyBehavior>
+                  Workspace settings
+                </Link>
+                <Link href="/" passHref legacyBehavior>
+                  Invite & manage members
+                </Link>
+              </Flex>
+            </Box>
+            <Box
+              css={{
+                py: "$3",
+                pb: 0,
+                fontSize: 14,
+                color: "$primary11",
+                a: {
+                  textDecoration: "none",
+                  color: "$neutral12",
+                },
+              }}>
+              <Flex
+                direction={"column"}
+                css={{
+                  gap: "$3",
+                  width: "100%",
                 }}>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+                <Link href="/" passHref legacyBehavior>
+                  Create or join a workspace
+                </Link>
+                <Link href="/" passHref legacyBehavior>
+                  Add an account
+                </Link>
+                <Link href="/" passHref legacyBehavior>
+                  Log out
+                </Link>
+              </Flex>
+            </Box>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ThemeSwitch />
+        <Avatar
+          size="3"
+          alt={user?.firstName}
+          css={{}}
+          placeholder={user?.firstName ? user?.firstName.charAt(0) : "U"}
+          fallback={
+            user?.firstName ? user?.firstName?.charAt(0) : user?.email.charAt(0)
+          }
+        />
       </Flex>
       <Flex
         css={{ px: "$4", height: "calc(100vh - 100px)" }}
@@ -165,20 +282,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 Streams
               </NavLink>
             </Link>
-
-            {id?.split("/")[0] === "streams" && (
-              <Box
-                css={{
-                  a: { pl: 35 },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/dashboard/sessions" passHref legacyBehavior>
-                  <NavLink active={id === "streams/sessions"}>Sessions</NavLink>
-                </Link>
-              </Box>
-            )}
           </Box>
           <Link href="/dashboard/assets" passHref legacyBehavior>
             <NavLink active={id === "assets"}>
@@ -349,7 +452,109 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           <Contact />
         </Flex>
       </Flex>
-    </Box>
+    </>
+  );
+};
+
+const WorkspaceSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  const goBack = () => {
+    Router.push("/dashboard");
+  };
+
+  return (
+    <>
+      <Flex align="center" justify="between" css={{ p: "$3", mb: "$1" }}>
+        <Button
+          onClick={goBack}
+          size={4}
+          css={{
+            ml: "-$2",
+            gap: "$3",
+            backgroundColor: "transparent",
+            color: "$neutral12",
+            fontWeight: 500,
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          }}>
+          <FiChevronLeft size={21} />
+          Settings
+        </Button>
+      </Flex>
+      <Flex
+        css={{ px: "$4", height: "calc(100vh - 100px)" }}
+        direction="column"
+        justify="between">
+        <Grid
+          gap={1}
+          css={{
+            a: {
+              textDecoration: "none",
+            },
+          }}>
+          <Box>
+            <NavLink active={id === "home"}>
+              <WorkspaceIcon active={id === "home"} />
+              Workspace
+            </NavLink>
+            <Box
+              css={{
+                a: {
+                  pl: 35,
+                  mt: "$1",
+                },
+              }}>
+              <Link href="/dashboard/workspace/general" passHref legacyBehavior>
+                <NavLink active={id === "workspace/general"}>General</NavLink>
+              </Link>
+              <Link
+                href="/dashboard/workspace/projects"
+                passHref
+                legacyBehavior>
+                <NavLink active={id === "workspace/projects"}>Projects</NavLink>
+              </Link>
+              <Link href="/dashboard/workspace/members" passHref legacyBehavior>
+                <NavLink active={id === "workspace/members"}>Members</NavLink>
+              </Link>
+              <Link href="/dashboard/workspace/plans" passHref legacyBehavior>
+                <NavLink active={id === "workspace/plans"}>Plans</NavLink>
+              </Link>
+              <Link href="/dashboard/workspace/billing" passHref legacyBehavior>
+                <NavLink active={id === "workspace/billing"}>Billing</NavLink>
+              </Link>
+            </Box>
+          </Box>
+          <Box
+            css={{
+              mt: "$4",
+            }}>
+            <NavLink>
+              <AccountIcon />
+              Account
+            </NavLink>
+            <Box
+              css={{
+                a: {
+                  pl: 35,
+                  mt: "$1",
+                },
+              }}>
+              <Link href="/dashboard/account/profile" passHref legacyBehavior>
+                <NavLink active={id === "account/profile"}>Profile</NavLink>
+              </Link>
+              <Link
+                href="/dashboard/account/preferences"
+                passHref
+                legacyBehavior>
+                <NavLink active={id === "account/preferences"}>
+                  Preferences
+                </NavLink>
+              </Link>
+            </Box>
+          </Box>
+        </Grid>
+      </Flex>
+    </>
   );
 };
 
