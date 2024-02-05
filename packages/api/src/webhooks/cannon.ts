@@ -41,7 +41,6 @@ function isRuntimeError(err: any): boolean {
 }
 
 export default class WebhookCannon {
-  db: DB;
   running: boolean;
   verifyUrls: boolean;
   frontendDomain: string;
@@ -55,7 +54,6 @@ export default class WebhookCannon {
   resolver: any;
   queue: Queue;
   constructor({
-    db,
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
@@ -67,7 +65,6 @@ export default class WebhookCannon {
     verifyUrls,
     queue,
   }) {
-    this.db = db;
     this.running = true;
     this.verifyUrls = verifyUrls;
     this.frontendDomain = frontendDomain;
@@ -139,10 +136,7 @@ export default class WebhookCannon {
       }
     }
 
-    const { data: webhooks } = await this.db.webhook.listSubscribed(
-      userId,
-      event
-    );
+    const { data: webhooks } = await db.webhook.listSubscribed(userId, event);
 
     console.log(
       `fetched webhooks. userId=${userId} event=${event} webhooks=`,
@@ -154,7 +148,7 @@ export default class WebhookCannon {
 
     let stream: DBStream | undefined;
     if (streamId) {
-      stream = await this.db.stream.get(streamId, {
+      stream = await db.stream.get(streamId, {
         useReplica: false,
       });
       if (!stream) {
@@ -164,13 +158,13 @@ export default class WebhookCannon {
         );
       }
       // basic sanitization.
-      stream = this.db.stream.addDefaultFields(
-        this.db.stream.removePrivateFields({ ...stream })
+      stream = db.stream.addDefaultFields(
+        db.stream.removePrivateFields({ ...stream })
       );
       delete stream.streamKey;
     }
 
-    let user = await this.db.user.get(userId);
+    let user = await db.user.get(userId);
     if (!user || user.suspended) {
       // if user isn't found. don't fire the webhook, log an error
       throw new Error(
@@ -490,7 +484,7 @@ export default class WebhookCannon {
     sessionId: string,
     isRetry = false
   ): Promise<string> {
-    const session = await this.db.session.get(sessionId, {
+    const session = await db.session.get(sessionId, {
       useReplica: false,
     });
     if (!session) {
@@ -514,13 +508,13 @@ export default class WebhookCannon {
 
     // if we got to this point, it means we're confident this session is inactive
     // and we can set the child streams isActive=false
-    const [childStreams] = await this.db.stream.find({ sessionId });
+    const [childStreams] = await db.stream.find({ sessionId });
     await Promise.all(
       childStreams.map((child) => {
-        return this.db.stream.update(child.id, { isActive: false });
+        return db.stream.update(child.id, { isActive: false });
       })
     );
-    const res = await this.db.asset.get(sessionId);
+    const res = await db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");
     }
