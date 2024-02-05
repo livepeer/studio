@@ -2,6 +2,7 @@ import { Box, Flex, Text } from "@livepeer/design-system";
 import { GoDotFill } from "react-icons/go";
 import Image from "next/image";
 import React from "react";
+import { sanitizeUrl } from "lib/url-sanitizer";
 
 export default function ProjectTile({
   name,
@@ -46,7 +47,7 @@ export default function ProjectTile({
               mt: "$0.5",
               color: "$neutral10",
             }}>
-            {url}
+            {sanitizeUrl(url)}
           </Text>
         </Flex>
       </Flex>

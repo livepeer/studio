@@ -9,12 +9,22 @@ import {
   Button,
 } from "@livepeer/design-system";
 import { DashboardSettings as Content } from "content";
-import React from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 
 const Settings = () => {
   useLoggedIn();
   const { user } = useApi();
+  const [projectName, setProjectName] = useState<string | null>(null);
+  const [projectLogo, setProjectLogo] = useState<File | null>(null);
+
+  // TODO: Replace with proper media upload once the API is ready
+  const logoRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = () => {
+    console.log("Project Name: ", projectName);
+    console.log("Project Logo: ", projectLogo);
+  };
 
   if (!user) {
     return <Layout />;
@@ -69,13 +79,33 @@ const Settings = () => {
               Logo
             </Box>
             <Image
-              src={workspaces[0].projects[0].logo}
+              onClick={() => logoRef.current?.click()}
+              src={
+                projectLogo
+                  ? URL.createObjectURL(projectLogo)
+                  : workspaces[0].projects[0].logo
+              }
               alt="Project logo"
               style={{
                 borderRadius: "12px",
+                cursor: "pointer",
               }}
               width={90}
               height={90}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              style={{
+                display: "none",
+              }}
+              ref={logoRef}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setProjectLogo(file);
+                }
+              }}
             />
             <Text variant="neutral" size="3" css={{ mt: "$3" }}>
               Pick a logo for your project. Recommended size is 256x256px.
@@ -100,6 +130,8 @@ const Settings = () => {
               size="2"
               type="text"
               defaultValue={workspaces[0].projects[0].name}
+              onChange={(e) => setProjectName(e.target.value)}
+              value={projectName}
               id="projectName"
               css={{
                 width: "20%",
@@ -108,6 +140,7 @@ const Settings = () => {
             />
           </Flex>
           <Button
+            onClick={handleSubmit}
             css={{
               p: "$4",
               fontSize: "$2",

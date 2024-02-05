@@ -11,6 +11,7 @@ import {
 } from "@livepeer/design-system";
 import { workspaces } from "../settings";
 import Image from "next/image";
+import { sanitizeUrl } from "lib/url-sanitizer";
 
 const WorkspaceGeneral = () => {
   useLoggedIn();
@@ -132,7 +133,7 @@ const WorkspaceGeneral = () => {
                 required
                 size="2"
                 type="text"
-                defaultValue={workspaces[0].url}
+                defaultValue={sanitizeUrl(workspaces[0].url)}
                 id="workspaceURL"
                 css={{
                   width: "20%",
