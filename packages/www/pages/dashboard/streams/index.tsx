@@ -18,7 +18,7 @@ import {
 import SessionsTable from "components/StreamDetails/SessionsTable";
 import StreamSessionsTable from "components/StreamSessionsTable";
 import { useState } from "react";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { PlusCircledIcon, PlusIcon } from "@radix-ui/react-icons";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
@@ -78,6 +78,11 @@ const Streams = () => {
                 backgroundColor: "black",
                 color: "white",
               }}>
+              <PlusIcon
+                style={{
+                  marginRight: "7px",
+                }}
+              />
               Create Stream
             </Button>
           </Flex>

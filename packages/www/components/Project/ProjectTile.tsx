@@ -53,7 +53,7 @@ export default function ProjectTile({
       <Flex
         css={{
           gap: "$3",
-          mt: "$5",
+          mt: "$6",
         }}>
         <Flex
           align={"center"}
