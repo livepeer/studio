@@ -76,24 +76,138 @@ export const NavLink = styled(A, {
 export type SidebarId =
   | "home"
   | "streams"
-  // /dashboard/stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
   | "developers"
-  // | "developers/signing-keys"
-  // | "developers/webhooks"
   | "usage"
   | "billing"
   | "billing/plans"
   | "settings"
-  // Workspace settings
   | "workspace/general"
   | "workspace/projects"
   | "workspace/members"
   | "workspace/plans"
   | "workspace/billing"
+  | "workspace/audit-log"
   | "account/profile"
-  | "account/preferences";
+  | "account/preferences"
+  | "account/notifications";
+
+const generalSidebarItems = [
+  {
+    title: "Home",
+    path: "/dashboard",
+    icon: <HomeIcon />,
+    id: "home",
+  },
+  {
+    title: "Streams",
+    path: "/dashboard/streams",
+    icon: <StreamIcon />,
+    id: "streams",
+  },
+  {
+    title: "Assets",
+    path: "/dashboard/assets",
+    icon: <AssetsIcon />,
+    id: "assets",
+  },
+  {
+    title: "Developers",
+    path: "/dashboard/developers",
+    icon: <TerminalIcon />,
+    id: "developers",
+  },
+  {
+    title: "Usage",
+    path: "/dashboard/usage",
+    icon: <UsageIcon />,
+    id: "usage",
+  },
+  {
+    title: "Billing",
+    path: "/dashboard/billing",
+    icon: <BillingIcon />,
+    id: "billing",
+    children: [
+      {
+        title: "Plans",
+        path: "/dashboard/billing/plans",
+        id: "billing/plans",
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    path: "/dashboard/settings",
+    icon: <SettingsIcon />,
+    id: "settings",
+  },
+];
+
+const workspaceSidebarItems = [
+  {
+    title: "Workspace",
+    path: "/dashboard/workspace/general",
+    icon: <WorkspaceIcon />,
+    id: "workspace/general",
+    children: [
+      {
+        title: "General",
+        path: "/dashboard/workspace/general",
+        id: "workspace/general",
+      },
+      {
+        title: "Projects",
+        path: "/dashboard/workspace/projects",
+        id: "workspace/projects",
+      },
+      {
+        title: "Members",
+        path: "/dashboard/workspace/members",
+        id: "workspace/members",
+      },
+      {
+        title: "Plans",
+        path: "/dashboard/workspace/plans",
+        id: "workspace/plans",
+      },
+      {
+        title: "Billing",
+        path: "/dashboard/workspace/billing",
+        id: "workspace/billing",
+      },
+      {
+        title: "Audit Log",
+        path: "/dashboard/workspace/audit-log",
+        id: "workspace/audit-log",
+      },
+    ],
+  },
+  {
+    title: "Account",
+    path: "/dashboard/account/profile",
+    icon: <AccountIcon />,
+    id: "account/profile",
+    children: [
+      {
+        title: "Profile",
+        path: "/dashboard/account/profile",
+        id: "account/profile",
+      },
+      {
+        title: "Preferences",
+        path: "/dashboard/account/preferences",
+        id: "account/preferences",
+      },
+      {
+        title: "Notifications",
+        path: "/dashboard/account/notifications",
+        id: "account/notifications",
+      },
+    ],
+  },
+];
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
@@ -379,77 +493,31 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
               textDecoration: "none",
             },
           }}>
-          <Link href="/dashboard" passHref legacyBehavior>
-            <NavLink active={id === "home"}>
-              <HomeIcon active={id === "home"} />
-              Home
-            </NavLink>
-          </Link>
-          <Box>
-            <Link href="/dashboard/streams" passHref legacyBehavior>
-              <NavLink active={id === "streams"}>
-                <StreamIcon active={id === "streams"} />
-                Streams
-              </NavLink>
-            </Link>
-          </Box>
-          <Link href="/dashboard/assets" passHref legacyBehavior>
-            <NavLink active={id === "assets"}>
-              <AssetsIcon active={id === "assets"} />
-              Assets
-            </NavLink>
-          </Link>
-          <Box>
-            <Link href="/dashboard/developers" passHref legacyBehavior>
-              <NavLink active={id === "developers"}>
-                <TerminalIcon active={id === "developers"} />
-                Developers
-              </NavLink>
-            </Link>
-          </Box>
-
-          <Box>
-            <Link href="/dashboard/usage" passHref legacyBehavior>
-              <NavLink active={id === "usage"}>
-                <UsageIcon active={id === "usage"} />
-                Usage
-              </NavLink>
-            </Link>
-          </Box>
-
-          <Box>
-            <Link href="/dashboard/billing" passHref legacyBehavior>
-              <NavLink active={id === "billing"}>
-                <BillingIcon active={id === "billing"} />
-                Billing
-              </NavLink>
-            </Link>
-
-            {id?.split("/")[0] === "billing" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                  },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/dashboard/billing/plans" passHref legacyBehavior>
-                  <NavLink active={id === "billing/plans"}>Plans</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
-
-          <Box>
-            <Link href="/dashboard/settings" passHref legacyBehavior>
-              <NavLink active={id === "settings"}>
-                <SettingsIcon active={id === "settings"} />
-                Settings
-              </NavLink>
-            </Link>
-          </Box>
+          {generalSidebarItems.map((item) => (
+            <Box>
+              <Link href={item.path} passHref legacyBehavior>
+                <NavLink active={id === item.id}>
+                  {item.icon}
+                  {item.title}
+                </NavLink>
+              </Link>
+              {item.children && id === item.id && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                      mt: "$1",
+                    },
+                  }}>
+                  {item.children.map((child) => (
+                    <Link href={child.path} passHref legacyBehavior>
+                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                    </Link>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          ))}
         </Grid>
         <Flex
           direction="column"
@@ -534,7 +602,6 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           <Contact />
         </Flex>
       </Flex>
-
       <CreateProjectDialog
         isOpen={showCreateProjectDialog}
         onOpenChange={setShowCreateProjectDialog}
@@ -582,66 +649,32 @@ const WorkspaceSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
               textDecoration: "none",
             },
           }}>
-          <Box>
-            <NavLink active={id === "home"}>
-              <WorkspaceIcon active={id === "home"} />
-              Workspace
-            </NavLink>
+          {workspaceSidebarItems.map((item) => (
             <Box
               css={{
-                a: {
-                  pl: 35,
-                  mt: "$1",
-                },
+                mb: "$5",
               }}>
-              <Link href="/dashboard/workspace/general" passHref legacyBehavior>
-                <NavLink active={id === "workspace/general"}>General</NavLink>
-              </Link>
-              <Link
-                href="/dashboard/workspace/projects"
-                passHref
-                legacyBehavior>
-                <NavLink active={id === "workspace/projects"}>Projects</NavLink>
-              </Link>
-              <Link href="/dashboard/workspace/members" passHref legacyBehavior>
-                <NavLink active={id === "workspace/members"}>Members</NavLink>
-              </Link>
-              <Link href="/dashboard/workspace/plans" passHref legacyBehavior>
-                <NavLink active={id === "workspace/plans"}>Plans</NavLink>
-              </Link>
-              <Link href="/dashboard/workspace/billing" passHref legacyBehavior>
-                <NavLink active={id === "workspace/billing"}>Billing</NavLink>
-              </Link>
+              <NavLink>
+                {item.icon}
+                {item.title}
+              </NavLink>
+              {item.children && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                      mt: "$1",
+                    },
+                  }}>
+                  {item.children.map((child) => (
+                    <Link href={child.path} passHref legacyBehavior>
+                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                    </Link>
+                  ))}
+                </Box>
+              )}
             </Box>
-          </Box>
-          <Box
-            css={{
-              mt: "$4",
-            }}>
-            <NavLink>
-              <AccountIcon />
-              Account
-            </NavLink>
-            <Box
-              css={{
-                a: {
-                  pl: 35,
-                  mt: "$1",
-                },
-              }}>
-              <Link href="/dashboard/account/profile" passHref legacyBehavior>
-                <NavLink active={id === "account/profile"}>Profile</NavLink>
-              </Link>
-              <Link
-                href="/dashboard/account/preferences"
-                passHref
-                legacyBehavior>
-                <NavLink active={id === "account/preferences"}>
-                  Preferences
-                </NavLink>
-              </Link>
-            </Box>
-          </Box>
+          ))}
         </Grid>
       </Flex>
     </>
