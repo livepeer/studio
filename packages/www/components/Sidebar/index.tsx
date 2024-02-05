@@ -169,6 +169,11 @@ const workspaceSidebarItems = [
         id: "workspace/plans",
       },
       {
+        title: "Usage",
+        path: "/dashboard/workspace/usage",
+        id: "workspace/usage",
+      },
+      {
         title: "Billing",
         path: "/dashboard/workspace/billing",
         id: "workspace/billing",
