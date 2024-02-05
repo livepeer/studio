@@ -8,13 +8,7 @@ import {
   Grid,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuTrigger,
-  DropdownMenuItem,
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  Heading,
   Button,
 } from "@livepeer/design-system";
 
@@ -39,14 +33,16 @@ import {
   ChatBubbleIcon,
   LoopIcon,
   PlusIcon,
+  CheckIcon,
 } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import Image from "next/image";
 import { workspaces } from "pages/dashboard/settings";
 import { User } from "@livepeer.studio/api";
-import { FiChevronLeft } from "react-icons/fi";
+import { FiCheck, FiChevronLeft } from "react-icons/fi";
 import CreateProjectDialog from "components/Project/CreateProjectDialog";
 import { useState } from "react";
+import { FaCheck } from "react-icons/fa";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -241,7 +237,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
   return (
     <>
-      <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
+      <Flex align="center" justify="between" css={{ p: "$3", mb: "$1" }}>
         <DropdownMenu>
           <Flex
             as={DropdownMenuTrigger}
@@ -389,7 +385,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           css={{
             p: "$2",
             gap: "$2",
-            mb: "$3",
+            mb: "$2",
             ml: "$3",
             width: "59%",
             borderRadius: "$3",
@@ -425,28 +421,35 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           </Text>
           <Box
             css={{
-              pb: "$3",
               pl: "$3",
               borderBottom: "1px solid",
               borderColor: "$neutral6",
             }}>
             {workspaces[0].projects.map((project) => (
               <Flex
-                direction={"row"}
                 css={{
-                  gap: "$2",
-                  width: "100%",
-                }}>
-                <Image
-                  src={project.logo}
-                  alt="Project logo"
-                  style={{
-                    borderRadius: "6px",
-                  }}
-                  width={22}
-                  height={22}
-                />
-                <Text>{project.name}</Text>
+                  mb: "$3",
+                }}
+                align={"center"}
+                justify={"between"}>
+                <Flex
+                  direction={"row"}
+                  css={{
+                    gap: "$2",
+                    width: "100%",
+                  }}>
+                  <Image
+                    src={project.logo}
+                    alt="Project logo"
+                    style={{
+                      borderRadius: "6px",
+                    }}
+                    width={22}
+                    height={22}
+                  />
+                  <Text>{project.name}</Text>
+                </Flex>
+                {project.isDefault && <FiCheck />}
               </Flex>
             ))}
           </Box>

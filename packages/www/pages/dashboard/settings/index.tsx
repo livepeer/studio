@@ -204,7 +204,15 @@ export const workspaces = [
         logo: "https://pbs.twimg.com/profile_images/1712502841494138880/GofqA30R_400x400.jpg",
         url: "https://livepeer.studio/paramount/paramount-plus",
         activeStreams: 10,
+        isDefault: true,
         inProgressUploads: 5,
+      },
+      {
+        name: "Paramount Dev",
+        logo: "https://i.pinimg.com/564x/bf/9a/7a/bf9a7a4ead767c8d66c613b76e2d3596.jpg",
+        url: "https://livepeer.studio/paramount/paramount-dev",
+        activeStreams: 21,
+        inProgressUploads: 48,
       },
     ],
     members: [

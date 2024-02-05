@@ -53,15 +53,17 @@ const WorkspaceProjects = () => {
             </Text>
           </Box>
         </Box>
-        {workspaces[0].projects.map((project) => (
-          <ProjectTile
-            name={project.name}
-            logo={project.logo}
-            url={project.url}
-            activeStreams={project.activeStreams}
-            inProgressUploads={project.inProgressUploads}
-          />
-        ))}
+        <Flex gap={4}>
+          {workspaces[0].projects.map((project) => (
+            <ProjectTile
+              name={project.name}
+              logo={project.logo}
+              url={project.url}
+              activeStreams={project.activeStreams}
+              inProgressUploads={project.inProgressUploads}
+            />
+          ))}
+        </Flex>
       </Box>
     </Layout>
   );
