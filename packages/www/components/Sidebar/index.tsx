@@ -114,25 +114,25 @@ export const generalSidebarItems = [
     icon: <TerminalIcon />,
     id: "developers",
   },
-  {
-    title: "Usage",
-    path: "/dashboard/usage",
-    icon: <UsageIcon />,
-    id: "usage",
-  },
-  {
-    title: "Billing",
-    path: "/dashboard/billing",
-    icon: <BillingIcon />,
-    id: "billing",
-    children: [
-      {
-        title: "Plans",
-        path: "/dashboard/billing/plans",
-        id: "billing/plans",
-      },
-    ],
-  },
+  // {
+  //   title: "Usage",
+  //   path: "/dashboard/usage",
+  //   icon: <UsageIcon />,
+  //   id: "usage",
+  // },
+  // {
+  //   title: "Billing",
+  //   path: "/dashboard/billing",
+  //   icon: <BillingIcon />,
+  //   id: "billing",
+  //   children: [
+  //     {
+  //       title: "Plans",
+  //       path: "/dashboard/billing/plans",
+  //       id: "billing/plans",
+  //     },
+  //   ],
+  // },
   {
     title: "Settings",
     path: "/dashboard/settings",
