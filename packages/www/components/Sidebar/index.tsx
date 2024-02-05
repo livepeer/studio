@@ -89,7 +89,7 @@ export type SidebarId =
   | "account/preferences"
   | "account/notifications";
 
-const generalSidebarItems = [
+export const generalSidebarItems = [
   {
     title: "Home",
     path: "/dashboard",

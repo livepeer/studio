@@ -12,10 +12,23 @@ import {
 import { workspaces } from "../settings";
 import Image from "next/image";
 import { sanitizeUrl } from "lib/url-sanitizer";
+import { useRef, useState } from "react";
 
 const WorkspaceGeneral = () => {
   useLoggedIn();
   const { user } = useApi();
+
+  const [workspaceName, setWorkspaceName] = useState<string | null>(null);
+  const [workspaceURL, setWorkspaceURL] = useState<string | null>(null);
+  const [workspaceLogo, setWorkspaceLogo] = useState<File | null>(null);
+
+  const logoRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = () => {
+    console.log("Workspace Name: ", workspaceName);
+    console.log("Workspace URL: ", workspaceURL);
+    console.log("Workspace Logo: ", workspaceLogo);
+  };
 
   if (!user) {
     return <Layout />;
@@ -74,13 +87,32 @@ const WorkspaceGeneral = () => {
               Logo
             </Box>
             <Image
-              src={workspaces[0].projects[0].logo}
+              onClick={() => logoRef.current?.click()}
+              src={
+                workspaceLogo
+                  ? URL.createObjectURL(workspaceLogo)
+                  : workspaces[0].logo
+              }
               alt="Project logo"
               style={{
                 borderRadius: "12px",
               }}
               width={90}
               height={90}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              style={{
+                display: "none",
+              }}
+              ref={logoRef}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setWorkspaceLogo(file);
+                }
+              }}
             />
             <Text variant="neutral" size="3" css={{ mt: "$3" }}>
               Pick a logo for your workspace. Recommended size is 256x256px.
@@ -113,6 +145,8 @@ const WorkspaceGeneral = () => {
                 size="2"
                 type="text"
                 defaultValue={workspaces[0].name}
+                onChange={(e) => setWorkspaceName(e.target.value)}
+                value={workspaceName}
                 id="workspaceName"
                 css={{
                   width: "20%",
@@ -134,6 +168,8 @@ const WorkspaceGeneral = () => {
                 size="2"
                 type="text"
                 defaultValue={sanitizeUrl(workspaces[0].url)}
+                onChange={(e) => setWorkspaceURL(e.target.value)}
+                value={workspaceURL}
                 id="workspaceURL"
                 css={{
                   width: "20%",
@@ -143,6 +179,7 @@ const WorkspaceGeneral = () => {
             </Box>
           </Flex>
           <Button
+            onClick={handleSubmit}
             css={{
               p: "$4",
               fontSize: "$2",

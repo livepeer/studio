@@ -8,10 +8,14 @@ import {
   Text,
   TextField,
   Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
 } from "@livepeer/design-system";
 import { workspaces } from "../settings";
-import Image from "next/image";
-import ProjectTile from "components/Project/ProjectTile";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 const WorkspaceMembers = () => {
