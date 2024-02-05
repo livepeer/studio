@@ -57,7 +57,7 @@ const Developers = () => {
               Developers
             </Heading>
           </Box>
-          <Tabs className="TabsRoot" defaultValue="tab1">
+          <Tabs className="TabsRoot" defaultValue="api-keys">
             <TabsList
               css={{
                 borderBottom: "1px solid",

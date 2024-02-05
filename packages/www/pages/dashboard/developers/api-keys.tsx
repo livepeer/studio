@@ -26,4 +26,4 @@ const APIKeys = () => {
   );
 };
 
-export default Developers;
+export default APIKeys;

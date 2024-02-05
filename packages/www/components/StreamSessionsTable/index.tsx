@@ -44,7 +44,6 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       fetcher={fetcher}
       initialSortBy={[DefaultSortBy]}
       showOverflow={true}
-      filterItems={filterItems}
       emptyState={makeEmptyState()}
     />
   );

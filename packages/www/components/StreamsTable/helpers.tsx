@@ -1,4 +1,4 @@
-import { Box, Text } from "@livepeer/design-system";
+import { Box, Flex, Text } from "@livepeer/design-system";
 import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import { RenditionDetailsCellProps } from "../Table/cells/streams-table";
@@ -7,6 +7,7 @@ import TableEmptyState from "../Table/components/TableEmptyState";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+import Image from "next/image";
 
 export type StreamsTableData = {
   id: string;
@@ -45,18 +46,20 @@ export const makeColumns = () => [
     sortType: (...params: SortTypeArgs) =>
       dateSort("original.createdAt.date", ...params),
   },
-  {
-    Header: "Last seen",
-    accessor: "lastSeen",
-    Cell: DateCell,
-    sortType: (...params: SortTypeArgs) =>
-      dateSort("original.lastSeen.date", ...params),
-  },
+
   {
     Header: "Status",
     accessor: "status",
     Cell: TextCell,
     disableSortBy: true,
+  },
+  // TODO: Update this to param from the API
+  {
+    Header: "Views",
+    accessor: "lastSeen",
+    Cell: DateCell,
+    sortType: (...params: SortTypeArgs) =>
+      dateSort("original.lastSeen.date", ...params),
   },
 ];
 
@@ -87,7 +90,30 @@ export const rowsPageFromState = async (
     name: {
       id: stream.id,
       value: stream.name,
-      children: <Text size={2}>{stream.name}</Text>,
+      children: (
+        <Flex gap={3} align={"center"}>
+          <Image
+            src="https://htmlcolors.com/color-image/0000.png"
+            // 16:9 aspect ratio
+            alt="Placeholder image"
+            width={128}
+            style={{
+              borderRadius: 8,
+            }}
+            height={72}
+            css={{
+              aspectRatio: "16 / 9",
+            }}
+          />
+          <Text
+            css={{
+              fontWeight: 500,
+            }}
+            size={3}>
+            {stream.name} 1
+          </Text>
+        </Flex>
+      ),
       tooltipChildren: stream.createdByTokenName ? (
         <>
           Created by token <b>{stream.createdByTokenName}</b>
