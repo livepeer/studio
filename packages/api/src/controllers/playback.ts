@@ -275,11 +275,15 @@ async function getPlaybackInfo(
       logger.error("Error while getting recording", e);
     }
 
+    const flvOut = await isExperimentSubject(
+      "stream-pull-source",
+      req.user?.id
+    );
     return newPlaybackInfo(
       "live",
       getHLSPlaybackUrl(ingest, stream),
       getWebRTCPlaybackUrl(ingest, stream),
-      getFLVPlaybackUrl(ingest, stream),
+      flvOut ? getFLVPlaybackUrl(ingest, stream) : null,
       stream.playbackPolicy,
       null,
       undefined,

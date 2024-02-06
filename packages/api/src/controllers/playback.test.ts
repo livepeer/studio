@@ -59,7 +59,9 @@ describe("controllers/playback", () => {
   describe("fetching playback URL of different objects", () => {
     let client: TestClient;
     let client2: TestClient;
+    let noAuthClient: TestClient;
     let nonAdminToken: string;
+    let adminToken: string;
     let otherUserToken: string;
 
     let stream: DBStream;
@@ -74,7 +76,7 @@ describe("controllers/playback", () => {
       const sessionId = "5b12c779-efc3-42ba-83d9-c590955556b0";
       await db.objectStore.create(mockVodStore);
 
-      ({ client, nonAdminToken } = await setupUsers(
+      ({ client, adminToken, nonAdminToken } = await setupUsers(
         server,
         mockAdminUserInput,
         mockNonAdminUserInput
@@ -88,6 +90,8 @@ describe("controllers/playback", () => {
         mockNonAdminUserInput2
       ));
       client2.jwtAuth = otherUserToken;
+
+      noAuthClient = new TestClient({ server });
 
       let res = await client.post("/stream", {
         name: "test-stream",
@@ -143,7 +147,17 @@ describe("controllers/playback", () => {
 
     describe("for streams", () => {
       it("should return playback URLs for streams", async () => {
-        const res = await client.get(`/playback/${stream.playbackId}`);
+        client.jwtAuth = adminToken;
+        let res = await client.post(`/experiment`, {
+          name: "stream-pull-source",
+        });
+        expect(res.status).toBe(201);
+        res = await client.post(`/experiment/stream-pull-source/audience`, {
+          addUsers: [mockAdminUserInput.email],
+        });
+        expect(res.status).toBe(204);
+
+        res = await client.get(`/playback/${stream.playbackId}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
           type: "live",
@@ -164,6 +178,28 @@ describe("controllers/playback", () => {
                 hrn: "FLV (H264)",
                 type: "video/x-flv",
                 url: `${ingest}/flv/${stream.playbackId}`,
+              },
+            ],
+          },
+        });
+
+        // test making a playback info request without any auth token
+        res = await noAuthClient.get(`/playback/${stream.playbackId}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "live",
+          meta: {
+            live: 0,
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/hls/${stream.playbackId}/index.m3u8`,
+              },
+              {
+                hrn: "WebRTC (H264)",
+                type: "html5/video/h264",
+                url: `${ingest}/webrtc/${stream.playbackId}`,
               },
             ],
           },
