@@ -160,6 +160,11 @@ describe("controllers/playback", () => {
                 type: "html5/video/h264",
                 url: `${ingest}/webrtc/${stream.playbackId}`,
               },
+              {
+                hrn: "FLV (H264)",
+                type: "video/x-flv",
+                url: `${ingest}/flv/${stream.playbackId}`,
+              },
             ],
           },
         });

@@ -271,6 +271,10 @@ export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `webrtc`, stream.playbackId);
 }
 
+export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
+  return pathJoin(ingest, `flv`, stream.playbackId);
+}
+
 /**
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
