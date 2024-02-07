@@ -1936,10 +1936,7 @@ app.post(
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
+  if (!stream || stream.deleted || stream.userId !== req.user.id) {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
