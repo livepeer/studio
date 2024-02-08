@@ -281,6 +281,18 @@
   top: 80px;
 }
 
+.cs-switchboard-results-image {
+  background-image: url("../assets/images/cs-switchboard-results.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 40px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  top: 80px;
+}
+
 .cs-transform-info {
   width: 50%;
   padding: 60px;
@@ -381,11 +393,39 @@
   .cs-transform-image {
     height: 800px;
   }
+
+  .cs-switchboard-results .cs-switchboard-results-image {
+    height: 670px;
+  }
+
+  .cs-switchboard-results {
+    height: 700px;
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  .cs-switchboard-results .cs-switchboard-results-image {
+    height: 700px;
+  }
+
+  .cs-switchboard-results {
+    height: 730px;
+  }
 }
 
 @media only screen and (max-width: 504px) {
   .cs-transform-image {
     height: 850px;
+  }
+}
+
+@media only screen and (max-width: 460px) {
+  .cs-switchboard-results .cs-switchboard-results-image {
+    height: 950px;
+  }
+
+  .cs-switchboard-results {
+    height: 880px;
   }
 }
 
@@ -656,6 +696,23 @@
 
 .cs-success-metrics-item-description {
   font-size: 18px;
+  width: 250px;
+  text-align: center;
+}
+
+.cs-switchboard-success-metrics .cs-success-metrics-stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.cs-switchboard-item {
+  display: flex;
+}
+
+@media only screen and (max-width: 1265px) {
+  .cs-switchboard-success-metrics .cs-success-metrics-stats {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 60px;
+  }
 }
 
 @media only screen and (max-width: 1065px) {
@@ -680,5 +737,12 @@
 
   .cs-success-metrics .item3 {
     grid-column: 1/2;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .cs-switchboard-success-metrics .cs-success-metrics-stats {
+    grid-template-columns: repeat(1, 1fr);
+    row-gap: 60px;
   }
 }

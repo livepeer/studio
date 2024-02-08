@@ -14,7 +14,6 @@ const CaseStudyMinds = () => {
         <Container
           size="4"
           css={{
-            maxWidth: "1245px",
             px: "$6",
             py: "$7",
             width: "100%",
