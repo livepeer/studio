@@ -17,7 +17,11 @@ import { DBSession } from "../store/session-table";
 import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "../store/errors";
 import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
@@ -315,6 +319,29 @@ app.get("/:id", async (req, res) => {
 
   const origin = req.headers["origin"] ?? "";
   const isEmbeddablePlayer = embeddablePlayerOrigin.test(origin);
+
+  if (withRecordings) {
+    const { user } = req;
+    if (!user) {
+      throw new UnauthorizedError(
+        `authentication is required to access recordings`
+      );
+    }
+
+    const content =
+      (await db.stream.getByPlaybackId(id)) ||
+      (await db.asset.getByPlaybackId(id));
+
+    if (!content) {
+      throw new NotFoundError("Content not found");
+    }
+
+    if (content.userId !== user.id) {
+      throw new UnauthorizedError(
+        `user does not have access to recordings for this content`
+      );
+    }
+  }
 
   const info = await getPlaybackInfo(
     req,
