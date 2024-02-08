@@ -5,6 +5,7 @@ import {
   getWebRTCPlaybackUrl,
   getRecordingFields,
   getRecordingPlaybackUrl,
+  getFLVPlaybackUrl,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
@@ -38,6 +39,7 @@ function newPlaybackInfo(
   type: PlaybackInfo["type"],
   hlsUrl: string,
   webRtcUrl?: string | null,
+  flvUrl?: string | null,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
   thumbsVTT?: string,
@@ -77,6 +79,13 @@ function newPlaybackInfo(
       hrn: "WebRTC (H264)",
       type: "html5/video/h264",
       url: webRtcUrl,
+    });
+  }
+  if (flvUrl) {
+    playbackInfo.meta.source.push({
+      hrn: "FLV (H264)",
+      type: "video/x-flv",
+      url: flvUrl,
     });
   }
   if (withRecordings) {
@@ -130,6 +139,7 @@ const getAssetPlaybackInfo = async (
   return newPlaybackInfo(
     "vod",
     playbackUrl,
+    null,
     null,
     asset.playbackPolicy || null,
     getStaticPlaybackInfo(asset, os),
@@ -265,10 +275,15 @@ async function getPlaybackInfo(
       logger.error("Error while getting recording", e);
     }
 
+    const flvOut = await isExperimentSubject(
+      "stream-pull-source",
+      req.user?.id
+    );
     return newPlaybackInfo(
       "live",
       getHLSPlaybackUrl(ingest, stream),
       getWebRTCPlaybackUrl(ingest, stream),
+      flvOut ? getFLVPlaybackUrl(ingest, stream) : null,
       stream.playbackPolicy,
       null,
       undefined,
