@@ -1205,6 +1205,10 @@ components:
         c2pa:
           type: boolean
           description: Decides if the output video should include C2PA signature
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/transcode-profile"
     room-user-payload:
       type: object
       required:
@@ -1564,6 +1568,10 @@ components:
                   type: boolean
                   description:
                     Decides if the output video should include C2PA signature
+                profiles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/transcode-profile"
             export:
               $ref: "#/components/schemas/export-task-params"
             exportData:
