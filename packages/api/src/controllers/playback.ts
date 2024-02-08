@@ -328,9 +328,9 @@ app.get("/:id", async (req, res) => {
       );
     }
 
-    const content =
-      (await db.stream.getByPlaybackId(id)) ||
-      (await db.asset.getByPlaybackId(id));
+    let content = await cache.getOrSet(`acl-stream-${id}`, async () => {
+      return await db.stream.getByPlaybackId(id);
+    });
 
     if (!content) {
       throw new NotFoundError("Content not found");
