@@ -2,7 +2,7 @@ import { Router, Request } from "express";
 import { db } from "../store";
 import { products } from "../config";
 import sql from "sql-template-strings";
-import { sendgridEmailPaymentFailed } from "./helpers";
+import { sendgridEmailPaymentFailed, sendgridEmail } from "./helpers";
 import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { authorizer } from "../middleware";
@@ -15,6 +15,7 @@ import {
 import { sleep } from "../util";
 
 const app = Router();
+const HELP_EMAIL = "help@livepeer.org";
 
 export const reportUsage = async (req: Request, adminToken: string) => {
   let payAsYouGoUsers = await getPayAsYouGoUsers(req);
@@ -288,7 +289,7 @@ app.post("/webhook", async (req, res) => {
       }
 
       let emailSent = await sendgridEmailPaymentFailed({
-        email: "help@livepeer.org",
+        email: HELP_EMAIL,
         supportAddr: req.config.supportAddr,
         sendgridApiKey: req.config.sendgridApiKey,
         user,
@@ -303,6 +304,38 @@ app.post("/webhook", async (req, res) => {
             lastEmailAboutPaymentFailure: Date.now(),
           },
         });
+      }
+
+      if (user.stripeProductId) {
+        let allCustomerInvoices = await req.stripe.invoices.list({
+          customer: user.stripeCustomerId,
+          limit: 20,
+        });
+
+        let paidInvoices = allCustomerInvoices.data.filter(
+          (invoice) => invoice.status === "paid"
+        );
+
+        if (paidInvoices.length === 0) {
+          await db.user.update(user.id, {
+            disabled: true,
+          });
+          await sendgridEmail({
+            email: HELP_EMAIL,
+            supportAddr: req.config.supportAddr,
+            sendgridTemplateId: req.config.sendgridTemplateId,
+            sendgridApiKey: req.config.sendgridApiKey,
+            subject: "User disabled for a failed payment",
+            preheader: "User disabled for a failed payment",
+            buttonText: "See on Stripe Dashboard",
+            buttonUrl:
+              "https://dashboard.stripe.com/customers/" + user.stripeCustomerId,
+            unsubscribe: "",
+            text: [
+              `Customer ${user.email} has been disabled due to failed payment.`,
+            ].join("\n\n"),
+          });
+        }
       }
     } catch (e) {
       console.log(`
