@@ -184,7 +184,7 @@ const WebhookDetails = ({ id, data, logs }) => {
                     width: "80%",
                     fontWeight: 500,
                   }}>
-                  1 events
+                  {data.events.length} events
                 </Button>
               </Tooltip>
             </Flex>
