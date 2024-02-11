@@ -5,9 +5,15 @@ import {
   Heading,
   Button,
   styled,
+  Link,
   Tooltip,
   Code,
   ScrollAreaRoot,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuContent,
+  DropdownMenuItem,
 } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useState, useCallback, useEffect } from "react";
@@ -101,18 +107,54 @@ const WebhookDetails = ({ id, data, logs }) => {
           </Box>
 
           <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>
-            <Button
-              onClick={() => {
-                setDeleteDialogOpen(true);
-              }}
-              size={"3"}
-              css={{
-                backgroundColor: "transparent",
-                border: "1px solid",
-                borderColor: "$neutral8",
-              }}>
-              <StyledDots />
-            </Button>
+            <DropdownMenu>
+              <Button
+                as={DropdownMenuTrigger}
+                size={"3"}
+                css={{
+                  backgroundColor: "transparent",
+                  border: "1px solid",
+                  borderColor: "$neutral8",
+                }}>
+                <StyledDots />
+              </Button>
+              <DropdownMenuContent
+                css={{
+                  border: "1px solid $colors$neutral6",
+                  p: "$2",
+                  px: "$0",
+                  width: "12rem",
+                  mr: "$9",
+                  mt: "$1",
+                }}>
+                <DropdownMenuItem
+                  onClick={dialogState.onToggle}
+                  css={{
+                    fontSize: "14px",
+                    borderBottom: "1px solid",
+                    borderColor: "$neutral6",
+                    cursor: "pointer",
+                    pb: "$1",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}>
+                  Edit Webhook
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setDeleteDialogOpen(true)}
+                  css={{
+                    fontSize: "14px",
+                    mt: "$1",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}>
+                  Delete Webhook
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </Flex>
         </Flex>
 
