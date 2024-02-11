@@ -1,4 +1,11 @@
-import { Text, Box, Badge, styled, Flex } from "@livepeer/design-system";
+import {
+  Text,
+  Box,
+  Badge,
+  styled,
+  Flex,
+  Button,
+} from "@livepeer/design-system";
 import moment from "moment";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
@@ -37,9 +44,7 @@ const LogsContainer = ({ data, logs, filter }) => {
         fontSize: "$2",
         mt: "$5",
         position: "relative",
-        p: "$3",
-        pl: "$0",
-        pb: "$0",
+        pt: "$4",
         borderTop: "1px solid $colors$neutral6",
       }}>
       <Flex>
@@ -111,16 +116,31 @@ const LogsContainer = ({ data, logs, filter }) => {
         <Box
           css={{
             p: "$6",
+            pr: "$0",
             width: "50%",
             pt: "$3",
           }}>
-          <Text
-            size="6"
-            css={{
-              fontWeight: 500,
-            }}>
-            {selected?.event}
-          </Text>
+          <Flex align={"center"} justify={"between"}>
+            <Text
+              size="6"
+              css={{
+                fontWeight: 500,
+              }}>
+              {selected?.event}
+            </Text>
+            <Button
+              size={"3"}
+              css={{
+                backgroundColor: "transparent",
+                border: "1px solid",
+                px: "$3",
+                fontWeight: 500,
+                borderColor: "$neutral8",
+                color: "$neutral112",
+              }}>
+              Resend
+            </Button>
+          </Flex>
           <Box>
             <Text
               size="4"
