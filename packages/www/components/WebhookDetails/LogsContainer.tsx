@@ -62,7 +62,6 @@ const LogsContainer = ({ data, logs, filter }) => {
       css={{
         width: "100%",
         fontSize: "$2",
-        mt: "$5",
         position: "relative",
         pt: "$4",
         borderTop: "1px solid $colors$neutral6",
