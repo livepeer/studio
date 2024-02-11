@@ -21,8 +21,7 @@ export const makeColumns = () => [
     Header: "URL",
     accessor: "url",
     Cell: TextCell,
-    sortType: (...params: SortTypeArgs) =>
-      stringSort("original.url.value", ...params),
+    disableSortBy: true,
   },
   {
     Header: "Listening for",
@@ -34,15 +33,13 @@ export const makeColumns = () => [
     Header: "Last failure",
     accessor: "name",
     Cell: TextCell,
-    sortType: (...params: SortTypeArgs) =>
-      stringSort("original.created.date", ...params),
+    disableSortBy: true,
   },
   {
     Header: "Last Trigger",
     accessor: "created",
     Cell: DateCell,
-    sortType: (...params: SortTypeArgs) =>
-      dateSort("original.created.date", ...params),
+    disableSortBy: true,
   },
 ];
 
@@ -82,6 +79,10 @@ export const rowsPageFromState = async (
               css={{
                 overflow: "hidden",
                 "text-overflow": "ellipsis",
+                fontSize: "$3",
+                fontWeight: 500,
+                cursor: "pointer",
+                textDecoration: "none",
               }}>
               {webhook.url}
             </Link>
@@ -102,7 +103,12 @@ export const rowsPageFromState = async (
               content={webhook.events.map((event) => (
                 <Box key={event}>{event}</Box>
               ))}>
-              <Button>{webhook.events.length} events</Button>
+              <Button
+                css={{
+                  fontWeight: 500,
+                }}>
+                {webhook.events.length} events
+              </Button>
             </Tooltip>
           ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,

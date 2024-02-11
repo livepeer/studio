@@ -1,148 +1,178 @@
 import { Text, Box, Badge, styled, Flex } from "@livepeer/design-system";
-import { format } from "date-fns";
-import { STATUS_CODES } from "http";
-import ClipButton from "../Clipping/ClipButton";
 import moment from "moment";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
+import { WebhookLogs } from "hooks/use-api/types";
+import JSONPretty from "react-json-pretty";
 
 const Cell = styled(Text, {
   py: "$2",
   fontSize: "$3",
 });
 
-const demoRecords = [
-  {
-    name: "recording.record",
-    id: "recording.record",
-    timestamp: "2021-09-15T18:00:00.000Z",
-    status: "success",
-    response: 200,
-  },
-];
+const DetailsBox = ({ data, logs, filter }) => {
+  const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
 
-const DetailsBox = ({ data }) => {
-  const [records, setRecords] = useState(demoRecords);
-  const [selected, setSelected] = useState(0);
+  const succeededLogs = logs?.filter((log) => log.response.status === 200);
+  const failedLogs = logs?.filter((log) => log.response.status !== 200);
+
+  const renderedLogs =
+    filter === "all"
+      ? logs
+      : filter === "succeeded"
+      ? succeededLogs
+      : failedLogs;
+
   return (
     <Box
       css={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
         width: "100%",
         fontSize: "$2",
-        mt: "$7",
+        mt: "$5",
         position: "relative",
         p: "$3",
+        pl: "$0",
         pb: "$0",
         borderTop: "1px solid $colors$neutral6",
       }}>
-      <Box
-        css={{
-          borderRight: "1px solid $colors$neutral6",
-        }}>
-        <Text
+      <Flex>
+        <Box
           css={{
-            fontWeight: 600,
-          }}
-          size={"2"}
-          variant={"gray"}>
-          TODAY:
-        </Text>
-        {demoRecords.map((record, index) => (
-          <Box
-            onClick={() => setSelected(index)}
-            key={record.id}
-            css={{
-              display: "flex",
-              justifyContent: "space-between",
-              py: "$2",
-              borderBottom: "1px solid $colors$neutral6",
-              "&:hover": {
-                background: "$neutral2",
-              },
-            }}>
-            <Cell
-              css={{
-                fontFamily: "$mono",
-              }}>
-              <Badge
-                css={{
-                  mr: "$2",
-                  width: 30,
-                  height: 30,
-                }}
-                variant={record.status === "success" ? "green" : "red"}>
-                {record.status === "success" ? <CheckIcon /> : <Cross1Icon />}
-              </Badge>
-              {record.name}
-            </Cell>
-            <Cell
-              css={{
-                mr: "$3",
-              }}>
-              {moment(record.timestamp).format("h:mm:ss a")}
-            </Cell>
-          </Box>
-        ))}
-      </Box>
-      <Box
-        css={{
-          p: "$6",
-        }}>
-        <Text
-          size="5"
-          css={{
-            fontWeight: 500,
+            borderRight: "1px solid $colors$neutral6",
+            width: "50%",
           }}>
-          {demoRecords[selected].name}
-        </Text>
-        <Box>
           <Text
-            size="4"
             css={{
-              mt: "$6",
-              fontWeight: 500,
-            }}>
-            Response
-          </Text>
-          <Flex
-            direction={"row"}
-            justify={"between"}
-            css={{
-              width: "40%",
-              mt: "$3",
+              fontWeight: 600,
               ml: "$3",
+              mb: "$1",
+            }}
+            size={"2"}
+            variant={"gray"}>
+            TODAY:
+          </Text>
+          <Box
+            css={{
+              overflowY: "auto",
+              maxHeight: "calc(100vh - 300px)",
             }}>
-            <Text variant="neutral">HTTP Status Code</Text>
-            <Text variant="neutral">200 OK</Text>
-          </Flex>
+            {renderedLogs.map((log: WebhookLogs, index) => (
+              <Box
+                onClick={() => setSelected(log)}
+                key={log.id}
+                css={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  py: "$1",
+                  pl: "$3",
+                  borderBottom: "1px solid $colors$neutral6",
+                  "&:hover": {
+                    background: "$neutral2",
+                  },
+                }}>
+                <Cell
+                  css={{
+                    fontFamily: "$mono",
+                    color: "$neutral11",
+                  }}>
+                  <Badge
+                    css={{
+                      mr: "$2",
+                      width: 30,
+                      height: 30,
+                    }}
+                    variant={log.response.status === 200 ? "green" : "red"}>
+                    {log.response.status === 200 ? (
+                      <CheckIcon />
+                    ) : (
+                      <Cross1Icon />
+                    )}
+                  </Badge>
+                  {log.event}
+                </Cell>
+                <Cell
+                  css={{
+                    mr: "$3",
+                    color: "$neutral11",
+                  }}>
+                  {moment(log.createdAt).format("h:mm:ss a")}
+                </Cell>
+              </Box>
+            ))}
+          </Box>
         </Box>
         <Box
           css={{
-            borderTop: "1px solid $colors$neutral6",
-            mt: "$4",
+            p: "$6",
+            width: "50%",
+            pt: "$3",
           }}>
           <Text
-            size="4"
+            size="6"
             css={{
-              mt: "$4",
               fontWeight: 500,
             }}>
-            Request
+            {selected.event}
           </Text>
-          <Flex
-            direction={"row"}
-            justify={"between"}
+          <Box>
+            <Text
+              size="4"
+              css={{
+                mt: "$6",
+                fontWeight: 500,
+              }}>
+              Response
+            </Text>
+            <Flex
+              direction={"row"}
+              justify={"between"}
+              css={{
+                width: "40%",
+                mt: "$3",
+                ml: "$3",
+              }}>
+              <Text variant="neutral">HTTP Status Code</Text>
+              <Text variant="neutral">
+                {selected.response.status} {selected.response.statusText}
+              </Text>
+            </Flex>
+          </Box>
+          <Box
             css={{
-              width: "40%",
-              mt: "$3",
-              ml: "$3",
+              borderTop: "1px solid $colors$neutral6",
+              mt: "$4",
             }}>
-            <Text variant="neutral">Code here...</Text>
-          </Flex>
+            <Text
+              size="4"
+              css={{
+                mt: "$4",
+                fontWeight: 500,
+              }}>
+              Request
+            </Text>
+            <Flex
+              direction={"row"}
+              justify={"between"}
+              css={{
+                mt: "$3",
+                overflowY: "auto",
+                maxHeight: "calc(100vh - 45em)",
+                ml: "$3",
+              }}>
+              <JSONPretty
+                id="json-pretty"
+                theme={{
+                  key: "color:#606060;line-height:1.8;font-size:14px;",
+                  string: "color:#DABAAB;font-size:14px",
+                  value: "color:#788570;font-size:14px",
+                  boolean: "color:#788570;font-size:14px",
+                }}
+                data={selected.request.body}
+              />
+            </Flex>
+          </Box>
         </Box>
-      </Box>
+      </Flex>
     </Box>
   );
 };

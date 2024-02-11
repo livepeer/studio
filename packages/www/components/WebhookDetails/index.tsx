@@ -7,13 +7,18 @@ import {
   styled,
   Tooltip,
   Code,
+  ScrollAreaRoot,
 } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQueryClient } from "react-query";
 import { Action } from "../StreamDetails/MultistreamTargetsTable/SaveTargetDialog";
 import CreateEditDialog from "../WebhookDialogs/CreateEditDialog";
-import { Cross1Icon, Pencil1Icon } from "@radix-ui/react-icons";
+import {
+  Cross1Icon,
+  DotsHorizontalIcon,
+  Pencil1Icon,
+} from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import DeleteDialog from "../WebhookDialogs/DeleteDialog";
 import DetailsBox from "./DetailsBox";
@@ -24,18 +29,34 @@ const StyledPencil = styled(Pencil1Icon, {
   height: 12,
 });
 
-const StyledCross = styled(Cross1Icon, {
-  mr: "$1",
-  width: 12,
-  height: 12,
+const StyledDots = styled(DotsHorizontalIcon, {
+  width: 15,
+  height: 15,
 });
 
-const WebhookDetails = ({ id, data }) => {
+type FilterType = "all" | "succeeded" | "failed";
+
+const filters: FilterType[] = ["all", "succeeded", "failed"];
+
+const WebhookDetails = ({ id, data, logs }) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const dialogState = useToggleState();
   const queryClient = useQueryClient();
+  const [activeFilter, setActiveFilter] = useState<FilterType>(filters[0]);
+
+  const totalWebhookLogs = logs?.length;
+  const totalSucceededWebhookLogs = logs?.filter(
+    (log) => log.response.status === 200
+  ).length;
+  const totalFailedWebhookLogs = logs?.filter(
+    (log) => log.response.status !== 200
+  ).length;
+
+  const handleFilterClick = (filter: FilterType) => {
+    setActiveFilter(filter);
+  };
 
   const invalidateQuery = useCallback(() => {
     return queryClient.invalidateQueries(id);
@@ -84,19 +105,13 @@ const WebhookDetails = ({ id, data }) => {
               onClick={() => {
                 setDeleteDialogOpen(true);
               }}
-              size="2"
-              css={{ mr: "$2", display: "flex", ai: "center" }}
-              variant="red">
-              <StyledCross />
-              Delete
-            </Button>
-
-            <Button
-              size="2"
-              css={{ display: "flex", ai: "center" }}
-              onClick={() => dialogState.onToggle()}>
-              <StyledPencil />
-              Update details
+              size={"3"}
+              css={{
+                backgroundColor: "transparent",
+                border: "1px solid",
+                borderColor: "$neutral8",
+              }}>
+              <StyledDots />
             </Button>
           </Flex>
         </Flex>
@@ -125,8 +140,9 @@ const WebhookDetails = ({ id, data }) => {
                 <Button
                   css={{
                     width: "80%",
+                    fontWeight: 500,
                   }}>
-                  {data.events.length} events
+                  1 events
                 </Button>
               </Tooltip>
             </Flex>
@@ -160,7 +176,51 @@ const WebhookDetails = ({ id, data }) => {
             </Flex>
           </Flex>
         </Box>
-        <DetailsBox data={data} />
+
+        <Flex
+          css={{
+            mt: "$4",
+            gap: "$3",
+          }}>
+          {filters.map((filter) => (
+            <Box
+              onClick={() => handleFilterClick(filter)}
+              css={{
+                px: "$3",
+                py: "$2",
+                height: "100%",
+                border: activeFilter === filter ? "2px solid" : "1px solid",
+                borderColor: activeFilter === filter ? "$blue11" : "$neutral8",
+                width: "20%",
+                borderRadius: "$3",
+              }}>
+              <Text
+                css={{
+                  fontSize: "$3",
+                  fontWeight: activeFilter === filter ? 500 : 400,
+                  mb: "$1",
+                  color: activeFilter === filter ? "$blue11" : "$neutral9",
+                  textTransform: "capitalize",
+                }}>
+                {filter}
+              </Text>
+              <Text
+                css={{
+                  fontWeight: 500,
+                  fontSize: "$3",
+                  color: activeFilter === filter && "$blue11",
+                }}>
+                {filter === "all"
+                  ? totalWebhookLogs
+                  : filter === "succeeded"
+                  ? totalSucceededWebhookLogs
+                  : totalFailedWebhookLogs}
+              </Text>
+            </Box>
+          ))}
+        </Flex>
+
+        <DetailsBox data={data} logs={logs} filter={activeFilter} />
       </Box>
 
       <DeleteDialog
