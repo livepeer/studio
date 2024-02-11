@@ -112,3 +112,23 @@ export const getWebhookLogs = async (webhookId): Promise<WebhookLogs[]> => {
   }
   return logs;
 };
+
+export const resendWebhook = async (params: {
+  webhookId: string;
+  logId: string;
+}): Promise<WebhookLogs> => {
+  const [res, webhook] = await context.fetch(
+    `/webhook/${params.webhookId}/log/${params.logId}/resend`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+  );
+
+  if (res.status !== 200) {
+    throw new Error(webhook.errors.join(", "));
+  }
+  return webhook;
+};

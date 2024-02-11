@@ -11,17 +11,25 @@ import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { WebhookLogs } from "hooks/use-api/types";
 import JSONPretty from "react-json-pretty";
+import { useApi } from "hooks";
+import { useRouter } from "next/navigation";
 
 const Cell = styled(Text, {
   py: "$2",
+  fontFamily: "$mono",
   fontSize: "$3",
 });
 
 const LogsContainer = ({ data, logs, filter }) => {
+  const { resendWebhook } = useApi();
+
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
+  const [isResending, setIsResending] = useState(false);
 
   const succeededLogs = logs?.filter((log) => log.response.status === 200);
   const failedLogs = logs?.filter((log) => log.response.status !== 200);
+
+  const router = useRouter();
 
   const renderedLogs =
     filter === "all"
@@ -35,6 +43,18 @@ const LogsContainer = ({ data, logs, filter }) => {
     string: "color:#DABAAB;font-size:14px",
     value: "color:#788570;font-size:14px",
     boolean: "color:#788570;font-size:14px",
+  };
+
+  const onResend = async (log: WebhookLogs) => {
+    setIsResending(true);
+    const res = await resendWebhook({
+      webhookId: data.id,
+      logId: log.id,
+    });
+
+    if (res) {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -78,13 +98,13 @@ const LogsContainer = ({ data, logs, filter }) => {
                   py: "$1",
                   pl: "$3",
                   borderBottom: "1px solid $colors$neutral6",
+                  cursor: "pointer",
                   "&:hover": {
                     background: "$neutral2",
                   },
                 }}>
                 <Cell
                   css={{
-                    fontFamily: "$mono",
                     color: "$neutral11",
                   }}>
                   <Badge
@@ -129,6 +149,8 @@ const LogsContainer = ({ data, logs, filter }) => {
               {selected?.event}
             </Text>
             <Button
+              onClick={() => onResend(selected)}
+              disabled={isResending}
               size={"3"}
               css={{
                 backgroundColor: "transparent",
@@ -138,7 +160,7 @@ const LogsContainer = ({ data, logs, filter }) => {
                 borderColor: "$neutral8",
                 color: "$neutral112",
               }}>
-              Resend
+              {isResending ? "Resending..." : "Resend"}
             </Button>
           </Flex>
           <Box>
