@@ -21,7 +21,7 @@ import {
 } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import DeleteDialog from "../WebhookDialogs/DeleteDialog";
-import DetailsBox from "./DetailsBox";
+import LogsContainer from "./LogsContainer";
 
 const StyledPencil = styled(Pencil1Icon, {
   mr: "$1",
@@ -220,7 +220,9 @@ const WebhookDetails = ({ id, data, logs }) => {
           ))}
         </Flex>
 
-        <DetailsBox data={data} logs={logs} filter={activeFilter} />
+        {logs.length > 0 && (
+          <LogsContainer data={data} logs={logs} filter={activeFilter} />
+        )}
       </Box>
 
       <DeleteDialog

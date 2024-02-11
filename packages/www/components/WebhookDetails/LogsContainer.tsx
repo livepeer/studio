@@ -10,7 +10,7 @@ const Cell = styled(Text, {
   fontSize: "$3",
 });
 
-const DetailsBox = ({ data, logs, filter }) => {
+const LogsContainer = ({ data, logs, filter }) => {
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
 
   const succeededLogs = logs?.filter((log) => log.response.status === 200);
@@ -22,6 +22,13 @@ const DetailsBox = ({ data, logs, filter }) => {
       : filter === "succeeded"
       ? succeededLogs
       : failedLogs;
+
+  const customTheme = {
+    key: "color:#606060;line-height:1.8;font-size:14px;",
+    string: "color:#DABAAB;font-size:14px",
+    value: "color:#788570;font-size:14px",
+    boolean: "color:#788570;font-size:14px",
+  };
 
   return (
     <Box
@@ -112,7 +119,7 @@ const DetailsBox = ({ data, logs, filter }) => {
             css={{
               fontWeight: 500,
             }}>
-            {selected.event}
+            {selected?.event}
           </Text>
           <Box>
             <Text
@@ -133,7 +140,7 @@ const DetailsBox = ({ data, logs, filter }) => {
               }}>
               <Text variant="neutral">HTTP Status Code</Text>
               <Text variant="neutral">
-                {selected.response.status} {selected.response.statusText}
+                {selected?.response?.status} {selected?.response?.statusText}
               </Text>
             </Flex>
           </Box>
@@ -159,16 +166,14 @@ const DetailsBox = ({ data, logs, filter }) => {
                 maxHeight: "calc(100vh - 45em)",
                 ml: "$3",
               }}>
-              <JSONPretty
-                id="json-pretty"
-                theme={{
-                  key: "color:#606060;line-height:1.8;font-size:14px;",
-                  string: "color:#DABAAB;font-size:14px",
-                  value: "color:#788570;font-size:14px",
-                  boolean: "color:#788570;font-size:14px",
-                }}
-                data={selected.request.body}
-              />
+              {selected?.request && (
+                <JSONPretty
+                  theme={customTheme}
+                  data={JSON.stringify(
+                    JSON.parse(selected?.request?.body)?.payload
+                  )}
+                />
+              )}
             </Flex>
           </Box>
         </Box>
@@ -177,4 +182,4 @@ const DetailsBox = ({ data, logs, filter }) => {
   );
 };
 
-export default DetailsBox;
+export default LogsContainer;
