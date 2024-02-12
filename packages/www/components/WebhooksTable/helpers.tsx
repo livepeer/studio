@@ -5,6 +5,7 @@ import TextCell, { TextCellProps } from "../Table/cells/text";
 import TableEmptyState from "../Table/components/TableEmptyState";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+import moment from "moment";
 
 // 1 hour
 const WARNING_TIMEFRAME = 1000 * 60 * 60;
@@ -31,13 +32,13 @@ export const makeColumns = () => [
   },
   {
     Header: "Last failure",
-    accessor: "name",
-    Cell: TextCell,
+    accessor: "lastFailure",
+    Cell: DateCell,
     disableSortBy: true,
   },
   {
-    Header: "Last Trigger",
-    accessor: "created",
+    Header: "Last trigger",
+    accessor: "lastTrigger",
     Cell: DateCell,
     disableSortBy: true,
   },
@@ -90,12 +91,6 @@ export const rowsPageFromState = async (
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
-        created: {
-          date: new Date(webhook.createdAt),
-          fallback: <i>unseen</i>,
-          href: `/dashboard/developers/webhooks/${webhook.id}`,
-          css: {},
-        },
         events: {
           children: (
             <Tooltip
@@ -111,6 +106,18 @@ export const rowsPageFromState = async (
               </Button>
             </Tooltip>
           ),
+          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          css: {},
+        },
+        lastFailure: {
+          date: new Date(webhook.status.lastFailure.timestamp),
+          fallback: <p>-</p>,
+          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          css: {},
+        },
+        lastTrigger: {
+          date: new Date(webhook.status.lastTriggeredAt),
+          fallback: <p>-</p>,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
