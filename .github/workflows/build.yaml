@@ -178,6 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+      - macos
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
