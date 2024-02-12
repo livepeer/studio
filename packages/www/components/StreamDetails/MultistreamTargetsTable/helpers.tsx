@@ -81,6 +81,7 @@ export const makeTableData = (
               <TargetStatusBadge
                 stream={stream}
                 target={target}
+                metrics={streamHealth?.metrics}
                 status={status}
                 streamActiveSince={streamActiveSince}
               />

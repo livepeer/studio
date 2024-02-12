@@ -33,7 +33,94 @@ export interface HealthStatus {
   id: string;
   healthy: Condition;
   conditions: Condition[];
+  metrics?: Metrics;
   multistream?: MultistreamStatus[];
+}
+
+export interface Metrics {
+  MediaTimeMillis: MediaTimeMilli[];
+  MultistreamActiveSec: MultistreamActiveSec[];
+  MultistreamBitrateSec: MultistreamBitrateSec[];
+  MultistreamBytes: MultistreamByte[];
+  MultistreamMediaTimeMillis: MultistreamMediaTimeMilli[];
+  TranscodeRealtimeRatio: TranscodeRealtimeRatio[];
+}
+
+export interface MediaTimeMilli {
+  name: string;
+  dimensions: Dimensions;
+  last: number[];
+}
+
+export interface Dimensions {
+  nodeId: string;
+  region: string;
+}
+
+export interface MultistreamActiveSec {
+  name: string;
+  dimensions: Dimensions2;
+  last: number[];
+}
+
+export interface Dimensions2 {
+  nodeId: string;
+  region: string;
+  targetId: string;
+  targetName: string;
+  targetProfile: string;
+}
+
+export interface MultistreamBitrateSec {
+  name: string;
+  dimensions: Dimensions3;
+  last: number[];
+}
+
+export interface Dimensions3 {
+  nodeId: string;
+  region: string;
+  targetId: string;
+  targetName: string;
+  targetProfile: string;
+}
+
+export interface MultistreamByte {
+  name: string;
+  dimensions: Dimensions4;
+  last: number[];
+}
+
+export interface Dimensions4 {
+  nodeId: string;
+  region: string;
+  targetId: string;
+  targetName: string;
+  targetProfile: string;
+}
+
+export interface MultistreamMediaTimeMilli {
+  name: string;
+  dimensions: Dimensions5;
+  last: number[];
+}
+
+export interface Dimensions5 {
+  nodeId: string;
+  region: string;
+  targetId: string;
+  targetName: string;
+  targetProfile: string;
+}
+
+export interface TranscodeRealtimeRatio {
+  name: string;
+  dimensions: Dimensions6;
+  last: number[];
+}
+
+export interface Dimensions6 {
+  nodeId: string;
 }
 
 export namespace events {
