@@ -5,9 +5,7 @@ import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../../queries/allPosts.gql";
 
-export default Post;
-
-export async function getServerSideProps({ params }) {
+export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
@@ -44,4 +42,6 @@ export async function getServerSideProps({ params }) {
       preview: true,
     },
   };
-}
+};
+
+export default Post;
