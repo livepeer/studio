@@ -1209,6 +1209,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/transcode-profile"
+        targetSegmentSizeSecs:
+          type: number
+          description:
+            How many seconds the duration of each output segment should be
     room-user-payload:
       type: object
       required:
@@ -1572,6 +1576,11 @@ components:
                   type: array
                   items:
                     $ref: "#/components/schemas/transcode-profile"
+                targetSegmentSizeSecs:
+                  type: number
+                  description:
+                    How many seconds the duration of each output segment should
+                    be
             export:
               $ref: "#/components/schemas/export-task-params"
             exportData:
