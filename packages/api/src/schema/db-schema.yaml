@@ -21,6 +21,13 @@ components:
         accessKey:
           type: string
           description: Access key used for access-control verification
+        webhookPayload:
+          type: object
+          description:
+            Payload to be sent in the body of the request to the webhook
+        webhookHeaders:
+          type: object
+          description: Headers to be used in the request to the webhook
     object-store-patch-payload:
       type: object
       additionalProperties: false
