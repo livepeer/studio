@@ -823,7 +823,10 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
         c2pa,
         catalystPipelineStrategy: catalystPipelineStrategy(req),
         encryption,
-        thumbnails: await isExperimentSubject("vod-thumbs", req.user?.id),
+        thumbnails: !(await isExperimentSubject(
+          "vod-thumbs-off",
+          req.user?.id
+        )),
         profiles,
         targetSegmentSizeSecs,
       },
