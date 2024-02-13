@@ -26,19 +26,20 @@ const CaseStudyMinds = () => {
             <div className="cs-hero-info">
               <div className="cs-main-title">Case Study</div>
               <div className="cs-title">
-                Minds finds Livepeer to be the perfect tech partner for live
-                streaming
+                Minds finds Livepeer Studio to be the perfect tech partner for
+                live streaming
               </div>
               <div className="cs-subtitle">
-                The Minds social network uses Livepeer live streaming to empower
-                its social media creators
+                The Minds social network uses Livepeer Studio live streaming to
+                empower its social media creators
               </div>
               <div className="cs-description">
                 Minds is an open source social network dedicated to freedom of
-                speech. In 2023, Minds reached out to Livepeer for help with its
-                live streaming technology to support the company's video sharing
-                capabilities. Livepeer worked with Minds to develop live
-                streaming offerings for the Minds target customer base.
+                speech. In 2023, Minds reached out to Livepeer Studio for help
+                with its live streaming technology to support the company's
+                video sharing capabilities. Livepeer Studio worked with Minds to
+                develop live streaming offerings for the Minds target customer
+                base.
               </div>
             </div>
             <div className="cs-hero-image">
@@ -128,15 +129,15 @@ const CaseStudyMinds = () => {
               </div>
               <div className="cs-title">The Solution</div>
               <div className="cs-description">
-                Minds found that Livepeer was willing to develop the technology
-                to solve its challenges. Livepeer Studio was able to develop and
-                rollout the technology in record time, a testament to Livepeers
-                developer experience. Livepeer Studio has given Minds users the
-                platform to livestream video posts within the Minds social
-                communities. Minds creators can now share real-time video
-                content in an intimate, loosely moderated space that feels safe.
-                Livepeer also enabled access keys, so that users can control who
-                views their videos.
+                Minds found that Livepeer Studio was willing to develop the
+                technology to solve its challenges. Livepeer Studio Studio was
+                able to develop and rollout the technology in record time, a
+                testament to Livepeer Studio's developer experience. Livepeer
+                Studio Studio has given Minds users the platform to livestream
+                video posts within the Minds social communities. Minds creators
+                can now share real-time video content in an intimate, loosely
+                moderated space that feels safe. Livepeer Studio also enabled
+                access keys, so that users can control who views their videos.
               </div>
             </div>
             <div className="cs-why-image cs-image1">
@@ -205,13 +206,13 @@ const CaseStudyMinds = () => {
             </div>
             <div className="cs-title">The Results</div>
             <div className="cs-description">
-              The use of Livepeer's video streaming platform was a next-level
-              enhancement for the Minds social network. By providing world-class
-              live streaming capabilities, Livepeer Studio caters to Minds'
-              target audience of users who expect to see live video in social
-              posts. The upgrade in technology fits right into Minds's open
-              source social media platform and further empowers Minds creators
-              to post content that is authentic and engaging.
+              The use of Livepeer Studio's video streaming platform was a
+              next-level enhancement for the Minds social network. By providing
+              world-class live streaming capabilities, Livepeer Studio caters to
+              Minds' target audience of users who expect to see live video in
+              social posts. The upgrade in technology fits right into Minds's
+              open source social media platform and further empowers Minds
+              creators to post content that is authentic and engaging.
             </div>
           </div>
         </div>

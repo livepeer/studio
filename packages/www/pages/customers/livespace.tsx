@@ -17,7 +17,6 @@ const CaseStudyLivespace = () => {
         <Container
           size="4"
           css={{
-            maxWidth: "1245px",
             px: "$6",
             py: "$7",
             width: "100%",
@@ -36,13 +35,13 @@ const CaseStudyLivespace = () => {
               <div className="cs-description">
                 In the dynamic world of live streaming, LiveSpace has carved out
                 a unique niche for itself, thanks in large part to its
-                partnership with Livepeer. This collaboration has been a
+                partnership with Livepeer Studio. This collaboration has been a
                 game-changer for LiveSpace, enabling it to emerge as a serious
                 contender in a domain dominated by giants like Twitch. With a
                 focus on serving a diverse range of content creators, from
                 gamers to musicians and artists, LiveSpace has leveraged
-                Livepeer's advanced, cost-effective streaming solutions to
-                redefine the creator experience.
+                Livepeer Studio's advanced, cost-effective streaming solutions
+                to redefine the creator experience.
               </div>
             </div>
             <div className="cs-hero-image">
@@ -122,13 +121,13 @@ const CaseStudyLivespace = () => {
               <div className="cs-description">
                 In the dynamic world of live streaming, LiveSpace has carved out
                 a unique niche for itself, thanks in large part to its
-                partnership with Livepeer. This collaboration has been a
+                partnership with Livepeer Studio. This collaboration has been a
                 game-changer for LiveSpace, enabling it to emerge as a serious
                 contender in a domain dominated by giants like Twitch. With a
                 focus on serving a diverse range of content creators, from
                 gamers to musicians and artists, LiveSpace has leveraged
-                Livepeer's advanced, cost-effective streaming solutions to
-                redefine the creator experience.
+                Livepeer Studio's advanced, cost-effective streaming solutions
+                to redefine the creator experience.
               </div>
             </div>
             <div className="cs-why-image cs-image1">
@@ -171,9 +170,9 @@ const CaseStudyLivespace = () => {
               <div className="cs-title">Collaborative Growth & Innovation</div>
               <div className="cs-description">
                 What set this partnership apart was the collaborative spirit
-                between LiveSpace and Livepeer. This synergy enabled the
+                between LiveSpace and Livepeer Studio. This synergy enabled the
                 development of features tailored to the unique needs of
-                LiveSpace’s creators. Livepeer's comprehensive streaming
+                LiveSpace’s creators. Livepeer Studio's comprehensive streaming
                 solution significantly reduced the need for LiveSpace to invest
                 heavily in its own engineering resources, allowing them to focus
                 more on content and community building.
@@ -201,14 +200,14 @@ const CaseStudyLivespace = () => {
             </div>
             <div className="cs-title">Transforming Streaming Experiences</div>
             <div className="cs-description">
-              The switch to Livepeer brought about a significant transformation
-              in LiveSpace's performance and cost structure. Notably, the
-              platform achieved substantial cost savings, a crucial factor for
-              its growth as a startup. Furthermore, features like immediate
-              transcoding provided LiveSpace with a competitive edge in user
-              experience. Feedback from creators highlighted the improved
-              streaming quality and innovative features, enhancing overall user
-              satisfaction and engagement.
+              The switch to Livepeer Studio brought about a significant
+              transformation in LiveSpace's performance and cost structure.
+              Notably, the platform achieved substantial cost savings, a crucial
+              factor for its growth as a startup. Furthermore, features like
+              immediate transcoding provided LiveSpace with a competitive edge
+              in user experience. Feedback from creators highlighted the
+              improved streaming quality and innovative features, enhancing
+              overall user satisfaction and engagement.
             </div>
           </div>
         </div>
@@ -231,7 +230,7 @@ const CaseStudyLivespace = () => {
             <div className="cs-title">Continuous Innovation</div>
             <div className="cs-description">
               The future looks bright for LiveSpace with ongoing projects and
-              enhancements in the pipeline. The partnership with Livepeer
+              enhancements in the pipeline. The partnership with Livepeer Studio
               continues to be a cornerstone of their strategy, with both parties
               committed to bringing new advancements in streaming technology and
               improving user experiences. Features like clipping and enhanced

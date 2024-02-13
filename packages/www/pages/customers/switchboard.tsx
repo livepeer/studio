@@ -27,11 +27,11 @@ const CaseStudySwitchboard = () => {
             <div className="cs-hero-info">
               <div className="cs-main-title">Case Study</div>
               <div className="cs-title">
-                Out with old technology, in with Livepeer live streaming
+                Out with old technology, in with Livepeer Studio live streaming
               </div>
               <div className="cs-subtitle">
                 Switchboard expands its ability to support video streaming with
-                Livepeer infrastructure
+                Livepeer Studio infrastructure
               </div>
               <div className="cs-description">
                 Switchboard is a growing B2B company that offers a live stream
@@ -128,12 +128,12 @@ const CaseStudySwitchboard = () => {
               </div>
               <div className="cs-title">The Solution</div>
               <div className="cs-description">
-                With the help of Livepeer network, Switchboard expanded the
-                potential of its live stream management platform. Livepeer's API
-                was set up to ingest video for Switchboard's clients and then
-                route the video content to the correct destination. Switchboard
-                also uses Livepeer features such as on-demand video asset
-                creation and publication tools.
+                With the help of Livepeer Studio network, Switchboard expanded
+                the potential of its live stream management platform. Livepeer
+                Studio's API was set up to ingest video for Switchboard's
+                clients and then route the video content to the correct
+                destination. Switchboard also uses Livepeer Studio features such
+                as on-demand video asset creation and publication tools.
               </div>
             </div>
             <div className="cs-why-image cs-image1">
@@ -221,17 +221,17 @@ const CaseStudySwitchboard = () => {
             </div>
             <div className="cs-title">The Results</div>
             <div className="cs-description">
-              Livepeer technology has given Switchboard the edge in streamlining
-              its services and meeting increased customer demand. The use of
-              Livepeer technology has allowed for more reliability and
-              scalability, and ultimately supports Switchboard's growing
-              business. Furthermore,  Livepeer's engagement analytics API was
-              especially important for Switchboard to enable accurate tracking
-              and reporting for their customers, who care about reporting on
-              business KPIs. Another advantage: by utilizing the Livepeer
-              platform live streaming and video development, Switchboard is able
-              to make better use of company resources and focus on business
-              priorities.
+              Livepeer Studio technology has given Switchboard the edge in
+              streamlining its services and meeting increased customer demand.
+              The use of Livepeer Studio technology has allowed for more
+              reliability and scalability, and ultimately supports Switchboard's
+              growing business. Furthermore,  Livepeer Studio's engagement
+              analytics API was especially important for Switchboard to enable
+              accurate tracking and reporting for their customers, who care
+              about reporting on business KPIs. Another advantage: by utilizing
+              the Livepeer Studio platform live streaming and video development,
+              Switchboard is able to make better use of company resources and
+              focus on business priorities.
             </div>
           </div>
         </div>
