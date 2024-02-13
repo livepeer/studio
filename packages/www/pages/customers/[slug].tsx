@@ -13,14 +13,20 @@ import React from "react";
 import { urlFor } from "lib/sanity";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
+import BlockContent from "@sanity/block-content-to-react";
+import Image from "next/image";
 
 const Customer = ({
   title,
   noindex = false,
   preview,
   body,
+  headline,
+  excerpt,
   endorserName,
   endorserRole,
+  companyLogo,
+  content,
   metaTitle,
   metaDescription,
   metaUrl,
@@ -34,7 +40,8 @@ const Customer = ({
       </Layout>
     );
   }
-  console.log(body);
+  console.log(headline);
+
   return (
     <Layout
       title={metaTitle}
@@ -60,11 +67,8 @@ const Customer = ({
           }}>
           <Flex
             css={{
-              gap: 200,
+              gap: 40,
               flexDirection: "column",
-              "@bp2": {
-                flexDirection: "row",
-              },
             }}>
             <Box css={{ display: "none", "@bp2": { display: "block" } }}>
               <Link href="/customers" passHref legacyBehavior>
@@ -74,66 +78,124 @@ const Customer = ({
             <Box>
               <Box
                 css={{
-                  maxWidth: 600,
-                  mx: "auto",
-                  borderBottom: "1px solid $neutral4",
                   pb: "$6",
-                  mb: "$6",
-                  textAlign: "center",
-                  "@bp2": {
-                    textAlign: "left",
-                  },
                 }}>
                 <Text size="3" variant="neutral" css={{ mb: "$2" }}>
                   Customer Story
                 </Text>
+
                 <Heading
-                  as="h1"
-                  size="3"
+                  as="h2"
+                  size="4"
                   css={{
+                    mb: 0,
                     fontWeight: 500,
                   }}>
-                  {title}
+                  {headline ? headline : title}
                 </Heading>
               </Box>
-              <Flex
+
+              <Box
+                as={A}
                 css={{
-                  maxWidth: 600,
-                  mx: "auto",
-                  mb: 250,
-                  gap: 16,
+                  transform: "scale(1)",
+                  transition: ".1s",
+                  bc: "$neutral12",
+                  py: 20,
+                  minHeight: 300,
+                  px: "$6",
+                  color: "white",
+                  width: "100%",
+                  borderRadius: 20,
+                  border: "1px solid $neutral4",
+                  textAlign: "center",
+                  textDecoration: "none",
+                  display: "flex",
+                  ai: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  fontWeight: 600,
+                  fontSize: "$7",
+                  mb: "$4",
+                  "@bp1": {
+                    pl: "$3",
+                    "&:nth-child(odd)": {
+                      pl: "$6",
+                    },
+                  },
+                  "@bp3": {
+                    "&:nth-child(odd)": {
+                      pl: "$3",
+                    },
+                  },
                 }}>
-                <Box
-                  css={{
-                    fontSize: 80,
-                    fontFamily: "Helvetica",
-                    mt: "-12px",
-                    color: "$neutral8",
-                  }}>
-                  “
-                </Box>
-                <Box
-                  className="markdown-body"
-                  css={{
-                    fontSize: "20px !important",
-                    display: "flex",
-                  }}>
-                  <Box>
-                    <ReactMarkdown children={body} />
-                    <Flex
-                      css={{
-                        mt: "$7",
-                        ai: "center",
-                        gap: "$1",
-                      }}>
-                      <Text css={{ fontWeight: 500 }} size="3">
-                        {endorserName},
-                      </Text>
-                      <Text size="3">{endorserRole}</Text>
-                    </Flex>
+                {companyLogo ? (
+                  <img
+                    width={250}
+                    height={250}
+                    style={{
+                      objectFit: "contain",
+                      filter: "invert(1)",
+                    }}
+                    src={companyLogo.asset.url}
+                    alt={title}
+                  />
+                ) : (
+                  title
+                )}
+              </Box>
+              <Box className="markdown-body" css={{ img: { borderRadius: 8 } }}>
+                <BlockContent blocks={content} {...client.config()} />
+              </Box>
+              {body && (
+                <Box css={{ mt: "$5" }}>
+                  <Box className="markdown-body">
+                    <Heading as="h2">Testimonial</Heading>
                   </Box>
+                  <Flex
+                    css={{
+                      mx: "auto",
+
+                      gap: 16,
+                      mt: "$4",
+                    }}>
+                    <Box
+                      css={{
+                        fontSize: 80,
+                        fontFamily: "Helvetica",
+                        mt: "-12px",
+                        color: "$neutral8",
+                      }}>
+                      “
+                    </Box>
+                    <Box
+                      className="markdown-body"
+                      css={{
+                        fontSize: "20px !important",
+                        display: "flex",
+                      }}>
+                      <Box>
+                        <ReactMarkdown children={body} />
+                        <Flex
+                          css={{
+                            mt: "$7",
+                            ai: "center",
+                            gap: "$1",
+                          }}>
+                          {endorserName && endorserRole && (
+                            <>
+                              <Text css={{ fontWeight: 500 }} size="3">
+                                {endorserName},
+                              </Text>
+                              <Text size="3">{endorserRole}</Text>
+                            </>
+                          )}
+                        </Flex>
+                      </Box>
+                    </Box>
+                  </Flex>
                 </Box>
-              </Flex>
+              )}
             </Box>
           </Flex>
         </Container>
@@ -164,7 +226,12 @@ export async function getStaticProps({ params }) {
   };
 
   const query = `*[_type=="customer"  && slug.current == $slug][0]{
-        ...
+        ...,
+        headline->{...},
+        excerpt->{...},
+        companyLogo{
+          asset->{...}
+        }
       }`;
   const pageData = (await client.fetch(query, queryParams)) ?? {};
 

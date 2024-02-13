@@ -118,8 +118,18 @@
   font-size: 1em;
 }
 
+
+.markdown-body ul::marker {
+  content: none;
+}
+
+.markdown-body ul {
+  margin-left: 0 !important;
+  padding-left: 20px;
+}
+
 .markdown-body figure {
-  margin: 1em 40px;
+  margin: 1em 0;
 }
 
 .markdown-body hr {
