@@ -12,7 +12,7 @@ const DateCell = <D extends TableData>({
 }: CellComponentProps<D, DateCellProps>) => {
   const { date, fallback } = cell.value;
   try {
-    return format(date, "MMMM dd, yyyy h:mm a");
+    return format(date, "MMM do, h:mm a");
   } catch (error) {
     return fallback;
   }

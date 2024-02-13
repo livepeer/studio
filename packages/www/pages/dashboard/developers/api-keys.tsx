@@ -5,12 +5,7 @@ import ApiKeysTable from "components/ApiKeys";
 import { DashboardAPIKeys as Content } from "content";
 import Ripe, { categories, pages } from "lib/ripe";
 
-Ripe.trackPage({
-  category: categories.DASHBOARD,
-  name: pages.API_KEY,
-});
-
-const ApiKeys = () => {
+const APIKeys = () => {
   useLoggedIn();
   const { user } = useApi();
 
@@ -20,10 +15,7 @@ const ApiKeys = () => {
   return (
     <Layout
       id="developers"
-      breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/api-keys" },
-        { title: "API Keys" },
-      ]}
+      breadcrumbs={[{ title: "Developers" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
@@ -34,4 +26,4 @@ const ApiKeys = () => {
   );
 };
 
-export default ApiKeys;
+export default APIKeys;

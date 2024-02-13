@@ -20,6 +20,8 @@ import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../public/img/icons/checked.svg";
 import { useEffect, useState, useRef } from "react";
 import { useApi, useHubspotForm } from "hooks";
+import { Breadcrumb } from "layouts/dashboard";
+import { workspaces } from "pages/dashboard/settings";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -47,6 +49,8 @@ const Header = ({ breadcrumbs = [] }) => {
     reaction: "",
     feedback: "",
   });
+  const [navBreadcrumbs, setNavBreadcrumbs] =
+    useState<Breadcrumb[]>(breadcrumbs);
   const [formSent, setFormSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { data, handleSubmit } = useHubspotForm({
@@ -67,6 +71,13 @@ const Header = ({ breadcrumbs = [] }) => {
     }
   }, [user]);
 
+  useEffect(() => {
+    setNavBreadcrumbs([
+      { title: workspaces[0].projects[0].name, href: "/dashboard/settings" },
+      ...breadcrumbs,
+    ]);
+  }, []);
+
   return (
     <Box
       id="test123"
@@ -79,14 +90,13 @@ const Header = ({ breadcrumbs = [] }) => {
         align="center"
         justify="between"
         css={{
-          px: "$6",
           height: 60,
           width: "100%",
           margin: "0 auto",
           maxWidth: "1520px",
         }}>
         <Breadcrumbs aria-label="breadcrumb">
-          {breadcrumbs.map((breadcrumb, i) => {
+          {navBreadcrumbs.map((breadcrumb, i) => {
             if (breadcrumb?.href) {
               return (
                 <Link key={i} href={breadcrumb.href} passHref legacyBehavior>
