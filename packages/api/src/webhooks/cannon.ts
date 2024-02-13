@@ -564,6 +564,10 @@ export default class WebhookCannon {
         {
           upload: {
             url: url,
+            thumbnails: !(await isExperimentSubject(
+              "vod-thumbs-off",
+              session.userId
+            )),
           },
         },
         undefined,
