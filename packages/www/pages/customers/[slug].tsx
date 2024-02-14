@@ -205,18 +205,18 @@ export const Customer = ({
 Customer.theme = "light-theme-green";
 export default Customer;
 
-// export async function getStaticPaths() {
-//   const query = `*[_type=="customer"  && defined(slug.current)][].slug.current`;
-//   const data = await client.fetch(query);
-//   const paths = data.map((path: string) => ({ params: { slug: path } }));
+export async function getStaticPaths() {
+  const query = `*[_type=="customer"  && defined(slug.current)][].slug.current`;
+  const data = await client.fetch(query);
+  const paths = data.map((path: string) => ({ params: { slug: path } }));
 
-//   return {
-//     fallback: true,
-//     paths,
-//   };
-// }
+  return {
+    fallback: true,
+    paths,
+  };
+}
 
-export async function getServerSideProps({ params }) {
+export async function getStaticProps({ params }) {
   const { slug } = params;
 
   const queryParams = {
@@ -237,5 +237,6 @@ export async function getServerSideProps({ params }) {
     props: {
       ...pageData,
     },
+    revalidate: 300,
   };
 }
