@@ -286,7 +286,7 @@ Customer.theme = "light-theme-green";
 export default Customer;
 
 export async function getStaticPaths() {
-  const query = `*[_type == "customer" && slug.current == $slug && _id in path("drafts.**")][].slug.current`;
+  const query = `*[_type=="customer" && defined(slug.current) && _id in path("drafts.**")][].slug.current`;
   const data = await client.fetch(query);
   const paths = data.map((path: string) => ({ params: { slug: path } }));
 
