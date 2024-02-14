@@ -277,18 +277,18 @@ export const Post = ({
 Post.theme = "light-theme-green";
 export default Post;
 
-export async function getStaticPaths() {
-  const query = `*[_type=="post"  && defined(slug.current)][].slug.current`;
-  const data = await client.fetch(query);
-  const paths = data.map((path: string) => ({ params: { slug: path } }));
+// export async function getStaticPaths() {
+//   const query = `*[_type=="post"  && defined(slug.current)][].slug.current`;
+//   const data = await client.fetch(query);
+//   const paths = data.map((path: string) => ({ params: { slug: path } }));
 
-  return {
-    fallback: true,
-    paths,
-  };
-}
+//   return {
+//     fallback: true,
+//     paths,
+//   };
+// }
 
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const { slug } = params;
 
   const queryParams = {
@@ -319,6 +319,5 @@ export async function getStaticProps({ params }) {
       ...pageData,
       furtherReads,
     },
-    revalidate: 300,
   };
 }
