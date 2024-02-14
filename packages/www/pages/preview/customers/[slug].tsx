@@ -1,7 +1,7 @@
 import { client } from "lib/client";
-import { Customer } from "../../customers/[slug]";
+import Customer from "../../customers/[slug]";
 
-export const getServerSideProps = async ({ params }) => {
+export const getInitialProps = async ({ params }) => {
   const { slug } = params;
 
   const queryParams = {
@@ -25,10 +25,6 @@ export const getServerSideProps = async ({ params }) => {
     },
   };
 };
-
-function withStaticProps(Component, staticProps) {
-  return Object.assign(Component, staticProps);
-}
 
 Customer.theme = "light-theme-green";
 export default Customer;

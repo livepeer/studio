@@ -3,9 +3,9 @@ import { jsx } from "theme-ui";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../../queries/allPosts.gql";
-import { Post } from "../../blog/[slug]";
+import Post from "../../blog/[slug]";
 
-export const getServerSideProps = async ({ params }) => {
+export const getInitialProps = async ({ params }) => {
   const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
@@ -43,10 +43,6 @@ export const getServerSideProps = async ({ params }) => {
     },
   };
 };
-
-function withStaticProps(Component, staticProps) {
-  return Object.assign(Component, staticProps);
-}
 
 Post.theme = "light-theme-green";
 export default Post;
