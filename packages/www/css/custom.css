@@ -1,0 +1,748 @@
+/* Case Studies - Hero */
+.cs-hero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  column-gap: 60px;
+  height: auto;
+  color: #111c18;
+  padding: 50px 0 100px 0;
+  margin: 40px 0 100px 0;
+}
+
+.cs-hero .cs-main-title {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 28px;
+  margin-bottom: 40px;
+}
+
+.cs-hero .cs-title {
+  font-size: 50px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.cs-hero .cs-subtitle {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.cs-hero .cs-description {
+  font-size: 18px;
+  color: #5e6663;
+  line-height: 28px;
+}
+
+@media only screen and (max-width: 992px) {
+  .cs-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 60px;
+    height: auto;
+  }
+
+  .cs-hero-image div img {
+    position: relative !important;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .cs-hero .cs-title {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 40px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .cs-hero {
+    padding: 0px 0px;
+  }
+
+  .cs-hero .cs-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 40px;
+  }
+
+  .cs-hero .cs-description {
+    font-size: 18px;
+    color: #5e6663;
+    line-height: 22px;
+  }
+
+  .cs-hero-image {
+    grid-row: 1/2;
+  }
+}
+
+/* Case Studies - Evolution */
+.cs-evolution {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  column-gap: 60px;
+  height: auto;
+  color: #111c18;
+  background: var(--colors-neutral2);
+  margin-bottom: 100px;
+  padding: 0 var(--space-4);
+}
+
+.cs-minds-challenge .cs-icon {
+  margin-top: 40px;
+}
+
+.cs-evolution-image {
+  width: 100%;
+  height: 500px;
+  position: absolute;
+  top: -70px;
+}
+
+.cs-minds-challenge .cs-evolution-image {
+  height: 550px;
+  top: -100px;
+}
+
+.cs-evolution-info .cs-title {
+  font-size: 40px;
+  font-weight: bold;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.cs-evolution-info .cs-description {
+  font-size: 18px;
+  color: #5e6663;
+  line-height: 28px;
+  margin-bottom: 40px;
+}
+
+@media only screen and (max-width: 992px) {
+  .cs-evolution {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0px;
+    height: auto;
+    color: #111c18;
+    padding: 0 35px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background: var(--colors-neutral2);
+    margin-bottom: 0px;
+    text-align: center;
+  }
+
+  .cs-evolution-image {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    top: -40px;
+  }
+
+  .cs-minds-challenge .cs-evolution-info {
+    margin-top: -100px;
+  }
+
+  .cs-minds-challenge .cs-why-info {
+    display: flex;
+    justify-content: center;
+    height: 44px;
+    padding-bottom: 40px;
+  }
+
+  .cs-evolution-info .cs-title {
+    font-size: 32px;
+  }
+
+  .cs-evolution-info .cs-description {
+    font-size: 18px;
+  }
+}
+
+/* Case studies - Why */
+.cs-why {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 60px;
+  height: auto;
+  color: #111c18;
+  padding: 100px 80px;
+}
+
+.cs-why-image.cs-image1 {
+  text-align: right;
+}
+
+.cs-why-info .cs-icon {
+  margin-bottom: 40px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 1000px;
+  display: flex;
+  align-items: center;
+  color: var(--colors-hiContrast);
+  justify-content: center;
+  background: linear-gradient(
+    90deg,
+    var(--colors-green4) 0%,
+    var(--colors-green5) 100%
+  );
+}
+
+.cs-why-info .cs-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.cs-why-info .cs-description {
+  font-size: 18px;
+  color: #5e6663;
+  line-height: 28px;
+}
+
+.cs-why-image-wrapper {
+  width: 100%;
+  height: 400px;
+  position: relative;
+}
+
+@media only screen and (max-width: 992px) {
+  .cs-why {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0px;
+    height: auto;
+    color: #111c18;
+    padding: 35px 0px;
+  }
+
+  .cs-why-info .cs-description {
+    margin-bottom: 60px;
+  }
+
+  .cs-why-image.cs-image2 {
+    grid-row: 2/3;
+  }
+}
+
+@media only screen and (max-width: 692px) {
+  .cs-why-info .cs-description {
+    margin-bottom: 20px;
+  }
+
+  .cs-why-image-wrapper {
+    width: 100%;
+    height: 250px;
+    position: relative;
+  }
+}
+
+/* Case studies - transforming experiences */
+.cs-transform {
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  background: #27ac71;
+  position: relative;
+  margin-bottom: 400px;
+  padding: 0 var(--space-8);
+}
+
+.cs-transform-image {
+  background-image: url("../assets/images/cs-streaming.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 40px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  top: 80px;
+}
+
+.cs-minds-results {
+  margin-bottom: 100px;
+}
+
+.cs-minds-results-image {
+  background-image: url("../assets/images/cs-minds-results.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 40px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  top: 80px;
+}
+
+.cs-switchboard-results-image {
+  background-image: url("../assets/images/cs-switchboard-results.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 40px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  top: 80px;
+}
+
+.cs-transform-info {
+  width: 50%;
+  padding: 60px;
+}
+
+.cs-transform-info .cs-icon {
+  margin-bottom: var(--space-3);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 1000px;
+  display: flex;
+  align-items: center;
+  color: var(--colors-hiContrast);
+  justify-content: center;
+  background: linear-gradient(
+    90deg,
+    var(--colors-green4) 0%,
+    var(--colors-green5) 100%
+  );
+  margin-bottom: 40px;
+}
+
+.cs-transform-info .cs-title {
+  font-size: 40px;
+  font-weight: semi-bold;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.cs-transform-info .cs-description {
+  font-size: 18px;
+  line-height: 28px;
+  color: white;
+}
+
+@media only screen and (max-width: 1100px) {
+  .cs-transform-info .cs-title {
+    font-size: 32px;
+  }
+
+  .cs-transform-info {
+    width: 70%;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .cs-transform-info .cs-title {
+    font-size: 32px;
+  }
+
+  .cs-transform-info {
+    width: 80%;
+  }
+
+  .cs-transform-image {
+    height: auto;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .cs-transform-image {
+    height: auto;
+    width: 560px;
+  }
+
+  .cs-transform-info {
+    width: 50%;
+    padding: 30px;
+  }
+
+  .cs-transform-info {
+    width: 85%;
+  }
+}
+
+@media only screen and (max-width: 628px) {
+  .cs-transform {
+    padding: 0 35px;
+  }
+
+  .cs-transform-image {
+    height: 650px;
+  }
+
+  .cs-transform-info {
+    width: 50%;
+    padding: 30px;
+  }
+
+  .cs-transform-info {
+    width: 85%;
+  }
+}
+
+@media only screen and (max-width: 612px) {
+  .cs-transform-image {
+    height: 800px;
+  }
+
+  .cs-switchboard-results .cs-switchboard-results-image {
+    height: 670px;
+  }
+
+  .cs-switchboard-results {
+    height: 700px;
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  .cs-switchboard-results .cs-switchboard-results-image {
+    height: 700px;
+  }
+
+  .cs-switchboard-results {
+    height: 730px;
+  }
+}
+
+@media only screen and (max-width: 504px) {
+  .cs-transform-image {
+    height: 850px;
+  }
+}
+
+@media only screen and (max-width: 460px) {
+  .cs-switchboard-results .cs-switchboard-results-image {
+    height: 950px;
+  }
+
+  .cs-switchboard-results {
+    height: 880px;
+  }
+}
+
+@media only screen and (max-width: 430px) {
+  .cs-minds-results .cs-minds-results-image {
+    height: 650px;
+  }
+}
+
+@media only screen and (max-width: 387px) {
+  .cs-minds-results .cs-minds-results-image {
+    height: 750px;
+  }
+
+  .cs-minds-results {
+    margin-bottom: 250px;
+  }
+}
+
+/* Case study - innovation */
+.cs-innovation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  color: #111c18;
+  padding-top: 150px;
+  padding-bottom: 40px;
+  background: var(--colors-neutral2);
+  margin-bottom: 100px;
+  margin-top: 200px;
+}
+
+.cs-innovation-info {
+  width: 50%;
+  text-align: center;
+}
+
+.cs-innovation-info .cs-main-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 40px;
+}
+
+.cs-innovation-info .cs-title {
+  font-size: 40px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.cs-innovation-info .cs-description {
+  font-size: 18px;
+  color: #5e6663;
+  line-height: 28px;
+  margin-bottom: 40px;
+}
+
+.cs-innovation-image-wrapper {
+  width: 50%;
+  position: relative;
+}
+
+.cs-innovation-image {
+  width: 100%;
+  height: 500px;
+  position: absolute;
+  top: -500px;
+}
+
+@media only screen and (max-width: 1600px) {
+  .cs-innovation {
+    margin-top: 150px;
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  .cs-innovation {
+    margin-top: 100px;
+  }
+
+  .cs-innovation-image-wrapper {
+    width: 70%;
+  }
+
+  .cs-innovation-image {
+    width: 100%;
+    height: 600px;
+    position: absolute;
+    top: -550px;
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  .cs-innovation {
+    margin-top: 50px;
+  }
+}
+
+@media only screen and (max-width: 1100px) {
+  .cs-innovation-image {
+    width: 100%;
+    height: 600px;
+    position: absolute;
+    top: -500px;
+  }
+
+  .cs-innovation-info {
+    width: 70%;
+    text-align: center;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .cs-innovation {
+    margin-top: 20px;
+  }
+}
+
+@media only screen and (max-width: 856px) {
+  .cs-innovation-image-wrapper {
+    width: 80%;
+  }
+}
+
+@media only screen and (max-width: 630px) {
+  .cs-innovation-image-wrapper {
+    width: 100%;
+  }
+
+  .cs-innovation {
+    margin-top: 100px;
+    padding: 0 20px;
+    padding-top: 40px;
+  }
+
+  .cs-innovation-info {
+    width: 100%;
+    text-align: center;
+    padding-top: 60px;
+  }
+
+  .cs-innovation-info .cs-main-title {
+    font-size: 20px;
+  }
+
+  .cs-innovation-info .cs-title {
+    font-size: 32px;
+  }
+
+  .cs-innovation-image {
+    width: 100%;
+    height: 500px;
+    position: absolute;
+    top: -300px;
+  }
+}
+
+/* Footer */
+.cs-footer {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  column-gap: 60px;
+  height: auto;
+  color: #111c18;
+  margin-bottom: 40px;
+  padding: 0 var(--space-8);
+}
+
+.cs-footer .cs-image {
+  transform: rotate(180deg);
+  margin-bottom: 40px;
+}
+
+.cs-footer .cs-footer-title {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.cs-footer .cs-footer-description {
+  font-size: 18px;
+  color: #5e6663;
+  line-height: 28px;
+  padding-top: 90px;
+}
+
+@media only screen and (max-width: 740px) {
+  .cs-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0px;
+    height: auto;
+    text-align: center;
+  }
+}
+
+@media only screen and (max-width: 740px) {
+  .cs-footer .cs-footer-title {
+    font-size: 32px;
+    font-weight: bold;
+  }
+
+  .cs-footer .cs-footer-description {
+    padding-top: 60px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .cs-footer {
+    padding: 0 20px;
+  }
+}
+
+/* Success Metrics */
+.cs-success-metrics {
+  background-image: url("../assets/images/cs-minds-background-gray.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: auto;
+  padding: 100px 0;
+}
+
+.cs-success-metrics-title {
+  font-size: 40px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.cs-success-metrics-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  padding: 0 var(--space-8);
+}
+
+.cs-success-metrics-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.cs-success-metrics-item-count {
+  border-radius: 50%;
+  background-color: #111c18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  width: 200px;
+}
+
+.cs-success-metrics-item .number {
+  color: #8bdd23;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.cs-success-metrics-item .description {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.cs-success-metrics-item-description {
+  font-size: 18px;
+  width: 250px;
+  text-align: center;
+}
+
+.cs-switchboard-success-metrics .cs-success-metrics-stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.cs-switchboard-item {
+  display: flex;
+}
+
+@media only screen and (max-width: 1265px) {
+  .cs-switchboard-success-metrics .cs-success-metrics-stats {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 60px;
+  }
+}
+
+@media only screen and (max-width: 1065px) {
+  .cs-success-metrics-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 60px;
+  }
+
+  .cs-success-metrics .item3 {
+    grid-column: span 2;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .cs-success-metrics-stats {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    justify-items: center;
+    padding: 0;
+  }
+
+  .cs-success-metrics .item3 {
+    grid-column: 1/2;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .cs-switchboard-success-metrics .cs-success-metrics-stats {
+    grid-template-columns: repeat(1, 1fr);
+    row-gap: 60px;
+  }
+}
