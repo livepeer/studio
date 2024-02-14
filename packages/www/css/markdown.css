@@ -118,7 +118,6 @@
   font-size: 1em;
 }
 
-
 .markdown-body ul::marker {
   content: none;
 }
