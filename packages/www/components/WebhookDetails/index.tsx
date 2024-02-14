@@ -49,9 +49,14 @@ const WebhookDetails = ({ id, data, logs }) => {
   const dialogState = useToggleState();
   const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>(filters[0]);
+  const [revealSecret, setRevealSecret] = useState(false);
 
   const handleFilterClick = (filter: FilterType) => {
     setActiveFilter(filter);
+  };
+
+  const revealSecretHandler = () => {
+    setRevealSecret(true);
   };
 
   const invalidateQuery = useCallback(() => {
@@ -187,11 +192,13 @@ const WebhookDetails = ({ id, data, logs }) => {
             <Text>Signing secret</Text>
             <Text
               css={{
-                cursor: "pointer",
                 fontWeight: 500,
+                opacity: data.sharedSecret ? 1 : 0.5,
+                cursor: data.sharedSecret ? "pointer" : "not-allowed",
               }}
+              onClick={revealSecretHandler}
               variant={"green"}>
-              Reveal
+              {revealSecret ? data.sharedSecret : "Reveal"}
             </Text>
           </Flex>
           <Flex
