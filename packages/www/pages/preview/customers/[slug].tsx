@@ -8,7 +8,7 @@ export const getServerSideProps = async ({ params }) => {
     slug,
   };
 
-  const query = `*[_type=="customer"  && slug.current == $slug][0]{
+  const query = `*[_type=="customer" && slug.current == $slug][0]{
         ...,
         companyLogo{
           asset->{...}

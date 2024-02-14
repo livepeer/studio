@@ -58,6 +58,8 @@ const Customer = ({
             px: "$3",
             py: "$7",
             width: "100%",
+            maxWidth: 960,
+            mx: "0 auto",
             "@bp3": {
               py: "$8",
               px: "$3",
@@ -94,11 +96,6 @@ const Customer = ({
                   }}>
                   {headline ? headline : title}
                 </Heading>
-                {excerpt && (
-                  <Text size={4} variant="neutral" css={{ mt: "$4" }}>
-                    {excerpt}
-                  </Text>
-                )}
               </Box>
 
               <Box
@@ -108,7 +105,7 @@ const Customer = ({
                   transition: ".1s",
                   bc: "$neutral12",
                   py: 20,
-                  minHeight: 300,
+                  minHeight: 250,
                   px: "$6",
                   color: "white",
                   width: "100%",
@@ -122,7 +119,7 @@ const Customer = ({
                   position: "relative",
                   fontWeight: 600,
                   fontSize: "$7",
-                  mb: "$4",
+                  mb: "$5",
                   "@bp1": {
                     pl: "$3",
                     "&:nth-child(odd)": {
@@ -150,18 +147,32 @@ const Customer = ({
                   title
                 )}
               </Box>
-              <Box className="markdown-body" css={{ img: { borderRadius: 8 } }}>
-                <BlockContent blocks={content} {...client.config()} />
+              {excerpt && (
+                <Text size={4} variant="neutral" css={{ mt: "$4" }}>
+                  {excerpt}
+                </Text>
+              )}
+              <Box
+                css={{
+                  ".markdown-body img": {
+                    borderRadius: 8,
+                    maxWidth: 500,
+                    width: "100%",
+                    mb: "$4",
+                  },
+                }}>
+                <Box className="markdown-body">
+                  <BlockContent blocks={content} {...client.config()} />
+                </Box>
               </Box>
               {body && (
                 <Box css={{ mt: "$5" }}>
                   <Box className="markdown-body">
-                    <Heading as="h2">Testimonial</Heading>
+                    <Heading as="h3">Testimonial</Heading>
                   </Box>
                   <Flex
                     css={{
                       mx: "auto",
-
                       gap: 16,
                       mt: "$4",
                     }}>
