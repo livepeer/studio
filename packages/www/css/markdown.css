@@ -296,7 +296,7 @@
 
 .markdown-body p {
   margin-top: 0;
-  margin-bottom: 36px;
+  margin-bottom: 48px;
 }
 
 .markdown-body blockquote {
@@ -552,7 +552,7 @@
 .markdown-body pre,
 .markdown-body details {
   margin-top: 0;
-  margin-bottom: 36px;
+  margin-bottom: 48px;
 }
 
 .markdown-body blockquote > :first-child {

@@ -14,6 +14,60 @@ import { urlFor } from "lib/sanity";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
+import SplitImage from "components/Site/SplitImage";
+
+const serializers = {
+  types: {
+    metricsSection: ({ node: { metrics } }) => {
+      return (
+        <Box
+          css={{
+            mb: "$8",
+            display: "grid",
+            gridTemplateColumns: "repeat(1, auto)",
+            gap: 40,
+            "@bp1": {
+              gridTemplateColumns: "repeat(2, auto)",
+            },
+            "@bp2": {
+              gridTemplateColumns: "repeat(4, auto)",
+            },
+          }}>
+          {metrics.map((metric, i) => (
+            <Box
+              css={{
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex",
+                flexDirection: "column",
+                bc: `$green${3 + i}`,
+                height: 200,
+                width: 200,
+                p: 20,
+                borderRadius: 1000,
+                textAlign: "center",
+              }}>
+              <Box css={{ fontWeight: 700, fontSize: 40 }}>{metric.title}</Box>
+              <Text size={3} css={{ minHeight: 50 }}>
+                {metric.description}
+              </Text>
+            </Box>
+          ))}
+        </Box>
+      );
+    },
+    splitImage: ({ node: { defaultImage, portableText, inverted, title } }) => {
+      return (
+        <SplitImage
+          title={title ? title : ""}
+          defaultImage={defaultImage}
+          inverted={inverted}
+          portableText={portableText}
+        />
+      );
+    },
+  },
+};
 
 const Customer = ({
   title,
@@ -119,7 +173,7 @@ const Customer = ({
                   position: "relative",
                   fontWeight: 600,
                   fontSize: "$7",
-                  mb: "$5",
+                  mb: "$3",
                   "@bp1": {
                     pl: "$3",
                     "&:nth-child(odd)": {
@@ -148,7 +202,10 @@ const Customer = ({
                 )}
               </Box>
               {excerpt && (
-                <Text size={4} variant="neutral" css={{ mt: "$4" }}>
+                <Text
+                  size={2}
+                  variant="neutral"
+                  css={{ mb: "$4", lineHeight: 1.8 }}>
                   {excerpt}
                 </Text>
               )}
@@ -162,7 +219,11 @@ const Customer = ({
                   },
                 }}>
                 <Box className="markdown-body">
-                  <BlockContent blocks={content} {...client.config()} />
+                  <BlockContent
+                    blocks={content}
+                    serializers={serializers}
+                    {...client.config()}
+                  />
                 </Box>
               </Box>
               {body && (
