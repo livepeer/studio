@@ -38,7 +38,7 @@ export const makeColumns = () => [
   },
   {
     Header: "Last trigger",
-    accessor: "lastTrigger",
+    accessor: "lastTriggeredAt",
     Cell: DateCell,
     disableSortBy: true,
   },
@@ -62,6 +62,7 @@ export const rowsPageFromState = async (
     nextCursor,
     count,
     rows: webhooks.map((webhook: Webhook) => {
+      console.log(webhook);
       return {
         id: webhook.id,
         name: {
@@ -109,14 +110,15 @@ export const rowsPageFromState = async (
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
+
         lastFailure: {
-          date: new Date(webhook.status.lastFailure.timestamp),
+          date: new Date(webhook?.status?.lastFailure?.timestamp),
           fallback: <p>-</p>,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
-        lastTrigger: {
-          date: new Date(webhook.status.lastTriggeredAt),
+        lastTriggeredAt: {
+          date: new Date(webhook?.status?.lastTriggeredAt),
           fallback: <p>-</p>,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
