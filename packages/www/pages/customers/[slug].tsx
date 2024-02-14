@@ -14,7 +14,6 @@ import { urlFor } from "lib/sanity";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
-import Image from "next/image";
 
 const Customer = ({
   title,
@@ -40,7 +39,6 @@ const Customer = ({
       </Layout>
     );
   }
-  console.log(headline);
 
   return (
     <Layout

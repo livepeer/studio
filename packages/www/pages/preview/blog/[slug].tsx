@@ -1,11 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
-import Post from "../../blog/[slug]";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../../queries/allPosts.gql";
-
-const PreviewPost = Post;
+import dynamic from "next/dynamic";
 
 export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
@@ -46,4 +44,13 @@ export const getServerSideProps = async ({ params }) => {
   };
 };
 
-export default PreviewPost;
+function withStaticProps(Component, staticProps) {
+  return Object.assign(Component, staticProps);
+}
+
+const DynamicComponentWithTheme = withStaticProps(
+  dynamic(() => import("../../blog/[slug]")),
+  { theme: "light-theme-green" }
+);
+
+export default DynamicComponentWithTheme;

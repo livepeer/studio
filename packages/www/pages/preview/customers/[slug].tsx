@@ -1,7 +1,5 @@
-import Customer from "../../customers/[slug]";
 import { client } from "lib/client";
-
-const PreviewCustomer = Customer;
+import dynamic from "next/dynamic";
 
 export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
@@ -28,4 +26,14 @@ export const getServerSideProps = async ({ params }) => {
   };
 };
 
-export default PreviewCustomer;
+function withStaticProps(Component, staticProps) {
+  return Object.assign(Component, staticProps);
+}
+
+// force light theme
+const DynamicComponentWithTheme = withStaticProps(
+  dynamic(() => import("../../customers/[slug]")),
+  { theme: "light-theme-green" }
+);
+
+export default DynamicComponentWithTheme;
