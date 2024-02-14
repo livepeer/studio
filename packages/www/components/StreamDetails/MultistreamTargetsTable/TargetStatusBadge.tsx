@@ -21,9 +21,9 @@ const computeStatus = (
 
   const currentTimestamp = moment().unix() * 1000;
 
-  const lastActive = metrics.MultistreamActiveSec.find(
-    (m) => m.dimensions.targetId === target.id
-  ).last[0];
+  const lastActive = metrics?.MultistreamActiveSec?.find(
+    (m) => m?.dimensions?.targetId === target?.id
+  )?.last[0];
 
   const difference = (currentTimestamp - lastActive) / 1000;
 
