@@ -15,7 +15,7 @@ import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
 
-const Customer = ({
+export const Customer = ({
   title,
   noindex = false,
   preview,

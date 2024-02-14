@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../../queries/allPosts.gql";
-import dynamic from "next/dynamic";
+import { Post } from "../../blog/[slug]";
 
 export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
@@ -48,9 +48,5 @@ function withStaticProps(Component, staticProps) {
   return Object.assign(Component, staticProps);
 }
 
-const DynamicComponentWithTheme = withStaticProps(
-  dynamic(() => import("../../blog/[slug]")),
-  { theme: "light-theme-green" }
-);
-
-export default DynamicComponentWithTheme;
+Post.theme = "light-theme-green";
+export default Post;
