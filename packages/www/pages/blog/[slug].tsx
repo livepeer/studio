@@ -65,7 +65,7 @@ const serializers = {
   },
 };
 
-export const Post = ({
+const Post = ({
   title,
   mainImage,
   author,
