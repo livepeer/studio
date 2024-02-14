@@ -5,7 +5,7 @@ import { print } from "graphql/language/printer";
 import allPosts from "../../../queries/allPosts.gql";
 import Post from "../../blog/[slug]";
 
-export const getInitialProps = async ({ params }) => {
+export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",

@@ -1,7 +1,7 @@
 import { client } from "lib/client";
 import Customer from "../../customers/[slug]";
 
-export const getInitialProps = async ({ params }) => {
+export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
 
   const queryParams = {
