@@ -31,9 +31,6 @@ const computeStatus = (
 
   const isConnected = difference < TIME_THRESHOLD;
 
-  console.log(isConnected);
-  console.log(difference);
-
   if (
     !stream?.isActive ||
     target?.createdAt > streamActiveSince ||
