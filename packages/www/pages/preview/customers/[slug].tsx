@@ -1,5 +1,5 @@
-import { client } from "lib/client";
 import Customer from "../../customers/[slug]";
+import { client } from "lib/client";
 
 export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
@@ -26,5 +26,4 @@ export const getServerSideProps = async ({ params }) => {
   };
 };
 
-Customer.theme = "light-theme-green";
 export default Customer;
