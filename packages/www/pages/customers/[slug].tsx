@@ -88,9 +88,17 @@ const Customer = ({
                   css={{
                     mb: 0,
                     fontWeight: 500,
+                    "@bp2": {
+                      letterSpacing: "-3px",
+                    },
                   }}>
                   {headline ? headline : title}
                 </Heading>
+                {excerpt && (
+                  <Text size={4} variant="neutral" css={{ mt: "$4" }}>
+                    {excerpt}
+                  </Text>
+                )}
               </Box>
 
               <Box
