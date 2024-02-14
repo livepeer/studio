@@ -5,6 +5,8 @@ import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../../queries/allPosts.gql";
 
+const PreviewPost = Post;
+
 export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
   const graphQLClient = new GraphQLClient(
@@ -44,4 +46,4 @@ export const getServerSideProps = async ({ params }) => {
   };
 };
 
-export default Post;
+export default PreviewPost;

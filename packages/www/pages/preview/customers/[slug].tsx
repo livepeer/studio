@@ -1,6 +1,8 @@
 import Customer from "../../customers/[slug]";
 import { client } from "lib/client";
 
+const PreviewCustomer = Customer;
+
 export const getServerSideProps = async ({ params }) => {
   const { slug } = params;
 
@@ -15,7 +17,6 @@ export const getServerSideProps = async ({ params }) => {
         }
       }`;
 
-  console.log(query);
   const pageData = (await client.fetch(query, queryParams)) ?? {};
 
   return {
@@ -27,4 +28,4 @@ export const getServerSideProps = async ({ params }) => {
   };
 };
 
-export default Customer;
+export default PreviewCustomer;
