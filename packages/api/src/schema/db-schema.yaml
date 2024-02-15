@@ -1073,10 +1073,13 @@ components:
                   properties:
                     startTime:
                       type: number
-                      description: Start time of the clip in milliseconds
+                      description:
+                        Start time of the clip in UNIX timestamp (in
+                        milliseconds)
                     endTime:
                       type: number
-                      description: End time of the clip in milliseconds
+                      description:
+                        End time of the clip in UNIX timestamp (in milliseconds)
                     playbackId:
                       type: string
                       description: Playback ID of the stream or asset to clip
