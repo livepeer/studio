@@ -387,6 +387,7 @@ app.get("/", authorizer({}), async (req, res) => {
     filters,
     userId,
     count,
+    projectId,
   } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -395,6 +396,8 @@ app.get("/", authorizer({}), async (req, res) => {
   if (!req.user.admin) {
     userId = req.user.id;
   }
+
+  console.log(`DEBUG: req.query: ${JSON.stringify(req.query)}`);
 
   const query = parseFilters(fieldsMap, filters);
   if (!all || all === "false" || !req.user.admin) {
@@ -415,6 +418,11 @@ app.get("/", authorizer({}), async (req, res) => {
   }
   if (userId) {
     query.push(sql`stream.data->>'userId' = ${userId}`);
+  }
+  if (projectId) {
+    query.push(sql`stream.data->>'projectId' = ${projectId}`);
+  } else {
+    query.push(sql`stream.data->>'projectId' IS NULL`);
   }
 
   if (!order) {
@@ -1940,6 +1948,12 @@ app.post(
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
+  if (!stream) {
+    return res.json({ errors: ["stream not found"] });
+  } else {
+    console.log(`XXX: ${JSON.stringify(req.body)}`);
+  }
+
   if (
     !stream ||
     (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
