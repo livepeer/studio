@@ -273,6 +273,7 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
       css={{
         my: "$5",
         gap: "$3",
+        cursor: "default",
       }}>
       {filters.map((filter) => (
         <Box
