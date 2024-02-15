@@ -10,16 +10,19 @@ const WebhookDetail = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  const { getWebhook } = useApi();
+  const { getWebhook, getWebhookLogs } = useApi();
   const router = useRouter();
   const { id } = router.query;
 
   const fetcher = useCallback(async () => {
     if (!id) return null;
-    return await getWebhook(id);
+    return await Promise.all([getWebhook(id), getWebhookLogs(id)]);
   }, [id]);
 
-  const { data } = useQuery([id], () => fetcher());
+  const { data: response } = useQuery([id], () => fetcher());
+
+  const data = response?.[0];
+  const logs = response?.[1];
 
   if (!user) {
     return <Layout />;
@@ -34,7 +37,7 @@ const WebhookDetail = () => {
         { title: data?.name },
       ]}
       {...Content.metaData}>
-      <WebhookDetails id={id} data={data} />
+      <WebhookDetails id={id} data={data} logs={logs} />
     </Layout>
   );
 };

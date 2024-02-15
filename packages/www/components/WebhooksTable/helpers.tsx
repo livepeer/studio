@@ -1,11 +1,11 @@
 import { Webhook } from "@livepeer.studio/api";
-import { Box, Link } from "@livepeer/design-system";
-import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
+import { Box, Button, Link, Tooltip } from "@livepeer/design-system";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import TableEmptyState from "../Table/components/TableEmptyState";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+import moment from "moment";
 
 // 1 hour
 const WARNING_TIMEFRAME = 1000 * 60 * 60;
@@ -22,27 +22,24 @@ export const makeColumns = () => [
     Header: "URL",
     accessor: "url",
     Cell: TextCell,
-    sortType: (...params: SortTypeArgs) =>
-      stringSort("original.url.value", ...params),
+    disableSortBy: true,
   },
   {
-    Header: "Name",
-    accessor: "name",
+    Header: "Listening for",
+    accessor: "events",
     Cell: TextCell,
-    sortType: (...params: SortTypeArgs) =>
-      stringSort("original.name.children", ...params),
+    disableSortBy: true,
   },
   {
-    Header: "Created at",
-    accessor: "created",
+    Header: "Last failure",
+    accessor: "lastFailure",
     Cell: DateCell,
-    sortType: (...params: SortTypeArgs) =>
-      dateSort("original.created.date", ...params),
+    disableSortBy: true,
   },
   {
-    Header: "Status",
-    accessor: "status",
-    Cell: TextCell,
+    Header: "Last trigger",
+    accessor: "lastTriggeredAt",
+    Cell: DateCell,
     disableSortBy: true,
   },
 ];
@@ -65,6 +62,7 @@ export const rowsPageFromState = async (
     nextCursor,
     count,
     rows: webhooks.map((webhook: Webhook) => {
+      console.log(webhook);
       return {
         id: webhook.id,
         name: {
@@ -83,6 +81,10 @@ export const rowsPageFromState = async (
               css={{
                 overflow: "hidden",
                 "text-overflow": "ellipsis",
+                fontSize: "$3",
+                fontWeight: 500,
+                cursor: "pointer",
+                textDecoration: "none",
               }}>
               {webhook.url}
             </Link>
@@ -90,39 +92,34 @@ export const rowsPageFromState = async (
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
-        created: {
-          date: new Date(webhook.createdAt),
-          fallback: <i>unseen</i>,
+        events: {
+          children: (
+            <Tooltip
+              multiline
+              content={webhook.events.map((event) => (
+                <Box key={event}>{event}</Box>
+              ))}>
+              <Button
+                css={{
+                  fontWeight: 500,
+                }}>
+                {webhook.events.length} events
+              </Button>
+            </Tooltip>
+          ),
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },
-        status: {
-          children: (
-            <Box>
-              {!webhook.status ? (
-                <StatusBadge
-                  variant={StatusVariant.Idle}
-                  tooltipText="No triggers yet"
-                />
-              ) : (webhook.status.lastFailure &&
-                  +Date.now() - webhook.status.lastFailure?.timestamp <
-                    WARNING_TIMEFRAME) ||
-                webhook.status.lastFailure?.timestamp >=
-                  webhook.status.lastTriggeredAt ? (
-                <StatusBadge
-                  variant={StatusVariant.Unhealthy}
-                  timestamp={webhook.status.lastFailure.timestamp}
-                  tooltipText="Last failure"
-                />
-              ) : (
-                <StatusBadge
-                  variant={StatusVariant.Healthy}
-                  timestamp={webhook.status.lastTriggeredAt}
-                  tooltipText="Last triggered"
-                />
-              )}
-            </Box>
-          ),
+
+        lastFailure: {
+          date: new Date(webhook?.status?.lastFailure?.timestamp),
+          fallback: <p>-</p>,
+          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          css: {},
+        },
+        lastTriggeredAt: {
+          date: new Date(webhook?.status?.lastTriggeredAt),
+          fallback: <p>-</p>,
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {},
         },

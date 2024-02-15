@@ -263,3 +263,32 @@ export interface StatusTransitions {
   paid_at: any;
   voided_at: any;
 }
+
+export interface WebhookLogs {
+  id: string;
+  event: string;
+  userId: string;
+  request: Request;
+  duration: number;
+  response: Response;
+  createdAt: number;
+  webhookId: string;
+}
+
+export interface Request {
+  url: string;
+  body: string;
+  method: string;
+  headers: Headers;
+}
+
+export interface Headers {
+  "user-agent": string;
+  "content-type": string;
+}
+
+export interface Response {
+  body: string;
+  status: number;
+  statusText: string;
+}

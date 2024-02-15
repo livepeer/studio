@@ -21,7 +21,7 @@ import {
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
-const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
+const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
   const router = useRouter();
   const { user, getWebhooks, createWebhook, deleteWebhook, deleteWebhooks } =
     useApi();
