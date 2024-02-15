@@ -28,7 +28,7 @@ import { isFreeTierUser } from "./helpers";
 import { cache } from "../store/cache";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 30;
+const MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE = 5;
 const app = Router();
 
 type GateConfig = {
@@ -156,7 +156,7 @@ app.post(
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
       if (isFreeTierUser(user)) {
-        config.rateLimit = MAX_ALLOWED_VIEWERS_FOR_FREE_TIER;
+        config.rateLimit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
       }
     }
 
