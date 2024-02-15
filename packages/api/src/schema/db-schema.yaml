@@ -644,6 +644,17 @@ components:
                 type: string
               probability:
                 type: number
+    project:
+      table: project
+      properties:
+        kind:
+          type: string
+          example: project
+          readOnly: true
+        userId:
+          index: true
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
     stream:
       table: stream
       properties:
