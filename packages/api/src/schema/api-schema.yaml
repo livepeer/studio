@@ -469,6 +469,12 @@ components:
           description: Used to form playback URL
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        isTrovoAuth:
+          type: boolean
+          readOnly: true
+          description: >-
+            Wether the stream is authenticated by Trovo. If true, any webhook
+            policy will include the Trovo Auth header
         profiles:
           type: array
           default:
@@ -864,6 +870,12 @@ components:
           description: URL to manually download the asset if desired
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        isTrovoAuth:
+          type: boolean
+          readOnly: true
+          description: >-
+            Wether the stream is authenticated by Trovo. If true, any webhook
+            policy will include the Trovo Auth header
         source:
           oneOf:
             - additionalProperties: false

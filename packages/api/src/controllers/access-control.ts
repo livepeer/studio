@@ -13,7 +13,12 @@ import {
 } from "../store/errors";
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
-import { Asset, PlaybackPolicy, User } from "../schema/types";
+import {
+  AccessControlGatePayload,
+  Asset,
+  PlaybackPolicy,
+  User,
+} from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeoutAndRedirects } from "../util";
@@ -34,9 +39,20 @@ type GateConfig = {
 async function fireGateWebhook(
   webhook: DBWebhook,
   plabackPolicy: PlaybackPolicy,
-  accessKey: string
+  payload: AccessControlGatePayload,
+  isTrovoAuth: boolean
 ) {
   let timestamp = Date.now();
+  let jsonPayload = {
+    context: plabackPolicy.webhookContext,
+    accessKey: payload.accessKey,
+    timestamp: timestamp,
+  };
+
+  if (payload.webhookPayload) {
+    jsonPayload = { ...jsonPayload, ...payload.webhookPayload };
+  }
+
   let params = {
     method: "POST",
     headers: {
@@ -44,12 +60,16 @@ async function fireGateWebhook(
       "user-agent": "livepeer.studio",
     },
     timeout: WEBHOOK_TIMEOUT,
-    body: JSON.stringify({
-      context: plabackPolicy.webhookContext,
-      accessKey: accessKey,
-      timestamp: timestamp,
-    }),
+    body: JSON.stringify(jsonPayload),
   };
+
+  if (payload.webhookHeaders) {
+    params.headers = { ...params.headers, ...payload.webhookHeaders };
+  }
+
+  if (isTrovoAuth) {
+    params.headers["Trovo-Auth-Version"] = "1.1";
+  }
 
   const sigHeaders = signatureHeaders(
     params.body,
@@ -234,11 +254,16 @@ app.post(
             "Content is gated and corresponding webhook not found"
           );
         }
+
+        const gatePayload: AccessControlGatePayload = req.body;
+
         const statusCode = await fireGateWebhook(
           webhook,
           content.playbackPolicy,
-          req.body.accessKey
+          gatePayload,
+          content.isTrovoAuth
         );
+
         if (statusCode >= 200 && statusCode < 300) {
           res.status(200);
           return res.json(config);
