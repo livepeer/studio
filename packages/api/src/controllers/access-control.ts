@@ -23,7 +23,7 @@ import { isFreeTierUser } from "./helpers";
 import { cache } from "../store/cache";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 30;
+const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
 const app = Router();
 
 type GateConfig = {
