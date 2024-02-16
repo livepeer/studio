@@ -413,7 +413,7 @@ export default class WebhookCannon {
         responseBody = await resp.text();
         statusCode = resp.status;
 
-        if (resp.status >= 200 && resp.status < 300) {
+        if (isSuccess(resp)) {
           // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
           return true;
@@ -449,7 +449,7 @@ export default class WebhookCannon {
           );
         } catch (e) {
           console.log(
-            `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
+            `Unable to store response of webhook ${webhook.id} url: ${webhook.url} error: ${e}`
           );
         }
         await this.storeTriggerStatus(
@@ -585,6 +585,10 @@ export default class WebhookCannon {
   }
 }
 
+function isSuccess(resp: Response) {
+  return resp?.status >= 200 && resp?.status < 300;
+}
+
 async function storeResponse(
   webhook: DBWebhook,
   eventId: string,
@@ -596,9 +600,12 @@ async function storeResponse(
   params
 ): Promise<WebhookLog> {
   const hrDuration = process.hrtime(startTime);
-  const encodedResponseBody = Buffer.from(
-    responseBody.substring(0, 1024)
-  ).toString("base64");
+  let encodedResponseBody = "";
+  if (responseBody) {
+    encodedResponseBody = Buffer.from(responseBody.substring(0, 1024)).toString(
+      "base64"
+    );
+  }
 
   const webhookLog = {
     id: uuid(),
@@ -608,11 +615,12 @@ async function storeResponse(
     userId: webhook.userId,
     createdAt: Date.now(),
     duration: hrDuration[0] + hrDuration[1] / 1e9,
+    success: isSuccess(resp),
     response: {
       body: encodedResponseBody,
-      redirected: resp.redirected,
-      status: resp.status,
-      statusText: resp.statusText,
+      redirected: resp?.redirected,
+      status: resp?.status,
+      statusText: resp?.statusText,
     },
     request: {
       url: webhook.url,
@@ -694,7 +702,9 @@ export async function storeTriggerStatus(
 ): Promise<void> {
   try {
     let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
-    let encodedResponseBody = Buffer.from(responseBody).toString("base64");
+    let encodedResponseBody = responseBody
+      ? Buffer.from(responseBody).toString("base64")
+      : "";
     if (statusCode >= 300 || !statusCode) {
       status = {
         ...status,
