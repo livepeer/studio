@@ -25,6 +25,7 @@ import playback from "./playback";
 import did from "./did";
 import room from "./room";
 import project from "./project";
+import workspace from "./workspace";
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -55,4 +56,5 @@ export default {
   room,
   clip,
   project,
+  workspace,
 };

@@ -18,6 +18,7 @@ import {
   JwtRefreshToken,
   WebhookLog,
   Project,
+  Workspace,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
@@ -67,6 +68,7 @@ export class DB {
   session: SessionTable;
   room: Table<Room>;
   project: Table<Project>;
+  workspace: Table<Workspace>;
 
   postgresUrl: string;
   replicaUrl: string;
@@ -178,6 +180,10 @@ export class DB {
     this.session = new SessionTable({ db: this, schema: schemas["session"] });
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
     this.project = makeTable<Project>({ db: this, schema: schemas["project"] });
+    this.workspace = makeTable<Workspace>({
+      db: this,
+      schema: schemas["workspace"],
+    });
 
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => "table" in schema && schema.table

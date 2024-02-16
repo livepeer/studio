@@ -388,6 +388,7 @@ app.get("/", authorizer({}), async (req, res) => {
     userId,
     count,
     projectId,
+    workspaceId,
   } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -424,6 +425,8 @@ app.get("/", authorizer({}), async (req, res) => {
   } else {
     query.push(sql`stream.data->>'projectId' IS NULL`);
   }
+  // workspaceId will initially be all NULL (which is default)
+  query.push(sql`stream.data->>'workspaceId' IS NULL`);
 
   if (!order) {
     order = "lastSeen-true,createdAt-true";
@@ -1948,11 +1951,6 @@ app.post(
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (!stream) {
-    return res.json({ errors: ["stream not found"] });
-  } else {
-    console.log(`XXX: ${JSON.stringify(req.body)}`);
-  }
 
   if (
     !stream ||

@@ -353,6 +353,25 @@ components:
           description:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
+    workspace:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        name:
+          type: string
+          example: test_workspace
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
     stream:
       type: object
       required:
