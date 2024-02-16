@@ -26,6 +26,7 @@ const requestsFieldsMap: FieldsMap = {
   userId: `webhook_log.data->>'userId'`,
   event: `webhook_log.data->>'event'`,
   statusCode: `webhook_log.data->'response'->>'status'`,
+  success: `webhook_log.data->>'success'`,
   resourceId: {
     val: `webhook_log.data->'request'->>'body'`,
     type: "full-text",

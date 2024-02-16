@@ -614,6 +614,8 @@ components:
           index: true
         createdAt:
           index: true
+        success:
+          index: true
         response:
           type: object
           properties:

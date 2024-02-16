@@ -244,6 +244,9 @@ components:
         duration:
           type: number
           description: The time taken (in seconds) to make the webhook request
+        success:
+          type: boolean
+          description: Whether the webhook request was successful
         request:
           type: object
           properties:
