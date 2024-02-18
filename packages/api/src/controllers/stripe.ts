@@ -11,6 +11,7 @@ import {
   notifyUser,
   getUsageNotifications,
   notifyMissingPaymentMethod,
+  HACKER_DISABLE_CUTOFF_DATE,
 } from "./utils/notification";
 import { sleep } from "../util";
 
@@ -306,14 +307,19 @@ app.post("/webhook", async (req, res) => {
         });
       }
 
-      if (user.stripeProductId) {
+      if (
+        user.stripeProductId &&
+        (user.stripeProductId == "prod_O9XtHhI6rbTT1B" ||
+          user.stripeProductId == "prod_O9XtcfOSMjSD5L") &&
+        user.createdAt > HACKER_DISABLE_CUTOFF_DATE
+      ) {
         let allCustomerInvoices = await req.stripe.invoices.list({
           customer: user.stripeCustomerId,
           limit: 20,
         });
 
         let paidInvoices = allCustomerInvoices.data.filter(
-          (invoice) => invoice.status === "paid"
+          (invoice) => invoice.status === "paid" && invoice.amount_due > 0
         );
 
         if (paidInvoices.length === 0) {
