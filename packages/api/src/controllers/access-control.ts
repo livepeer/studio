@@ -33,7 +33,7 @@ const app = Router();
 
 type GateConfig = {
   refresh_interval: number;
-  rateLimit: number;
+  rate_limit: number;
 };
 
 async function fireGateWebhook(
@@ -152,7 +152,7 @@ app.post(
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
       if (isFreeTierUser(user)) {
-        config.rateLimit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
+        config.rate_limit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
       }
     }
 
