@@ -33,14 +33,14 @@ const app = Router();
 
 type GateConfig = {
   refresh_interval: number;
-  rateLimit: number;
+  rate_limit: number;
 };
 
 async function fireGateWebhook(
   webhook: DBWebhook,
   plabackPolicy: PlaybackPolicy,
   payload: AccessControlGatePayload,
-  isTrovoAuth: boolean
+  isPullStream: boolean
 ) {
   let timestamp = Date.now();
   let jsonPayload = {
@@ -63,7 +63,7 @@ async function fireGateWebhook(
     body: JSON.stringify(jsonPayload),
   };
 
-  if (isTrovoAuth) {
+  if (isPullStream) {
     params.headers["Trovo-Auth-Version"] = "1.1";
   }
 
@@ -152,7 +152,7 @@ app.post(
 
     if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
       if (isFreeTierUser(user)) {
-        config.rateLimit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
+        config.rate_limit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
       }
     }
 
@@ -257,7 +257,7 @@ app.post(
           webhook,
           content.playbackPolicy,
           gatePayload,
-          content.isTrovoAuth
+          content.isPullStream
         );
 
         if (statusCode >= 200 && statusCode < 300) {
