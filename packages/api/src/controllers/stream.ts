@@ -1038,7 +1038,7 @@ app.put(
       profiles: req.config.defaultStreamProfiles,
       ...rawPayload,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
-      isTrovoAuth: true,
+      isPullStream: true,
     };
 
     const keyValue = _.get(payload, pullStreamKeyAccessors[key]);

@@ -40,7 +40,7 @@ async function fireGateWebhook(
   webhook: DBWebhook,
   plabackPolicy: PlaybackPolicy,
   payload: AccessControlGatePayload,
-  isTrovoAuth: boolean
+  isPullStream: boolean
 ) {
   let timestamp = Date.now();
   let jsonPayload = {
@@ -63,7 +63,7 @@ async function fireGateWebhook(
     body: JSON.stringify(jsonPayload),
   };
 
-  if (isTrovoAuth) {
+  if (isPullStream) {
     params.headers["Trovo-Auth-Version"] = "1.1";
   }
 
@@ -257,7 +257,7 @@ app.post(
           webhook,
           content.playbackPolicy,
           gatePayload,
-          content.isTrovoAuth
+          content.isPullStream
         );
 
         if (statusCode >= 200 && statusCode < 300) {
