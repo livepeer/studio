@@ -26,8 +26,13 @@ const LogsContainer = ({ data, logs, filter }) => {
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
   const [isResending, setIsResending] = useState(false);
 
-  const succeededLogs = logs?.filter((log) => log.response.status === 200);
-  const failedLogs = logs?.filter((log) => log.response.status !== 200);
+  const succeededLogs = logs?.filter(
+    (log) => log.response.status >= 200 && log.response.status < 400
+  );
+
+  const failedLogs = logs?.filter(
+    (log) => log.response.status < 200 || log.response.status >= 400
+  );
 
   const router = useRouter();
 

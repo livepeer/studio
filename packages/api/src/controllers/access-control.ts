@@ -63,10 +63,6 @@ async function fireGateWebhook(
     body: JSON.stringify(jsonPayload),
   };
 
-  if (payload.webhookHeaders) {
-    params.headers = { ...params.headers, ...payload.webhookHeaders };
-  }
-
   if (isTrovoAuth) {
     params.headers["Trovo-Auth-Version"] = "1.1";
   }

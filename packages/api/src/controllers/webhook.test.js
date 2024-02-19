@@ -350,7 +350,15 @@ describe("controllers/webhook", () => {
       expect(resent.webhookId).toBe(webhookRequest.webhookId);
       expect(resent.id).not.toBe(webhookRequest.id);
 
-      const logRes = await client.get(`/webhook/${generatedWebhook.id}/log`);
+      let logRes = await client.get(`/webhook/${generatedWebhook.id}/log`);
+      expect(logRes.status).toBe(200);
+      logJson = await logRes.json();
+      expect(logJson.length).toBe(2);
+
+      // try query filters
+      logRes = await client.get(
+        `/webhook/${generatedWebhook.id}/log?filters=[{"id":"success","value":"false"}]`
+      );
       expect(logRes.status).toBe(200);
       logJson = await logRes.json();
       expect(logJson.length).toBe(2);
