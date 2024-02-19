@@ -138,10 +138,14 @@ app.post(
 
     let user = await db.user.get(content.userId, { useCache: true });
 
-    if (user.suspended || ("suspended" in content && content.suspended)) {
+    if (
+      user.suspended ||
+      ("suspended" in content && content.suspended) ||
+      user.disabled
+    ) {
       const contentLog = JSON.stringify(JSON.stringify(content));
       console.log(`
-        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user=${user.id} is suspended, content=${contentLog}
+        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user=${user.id} is suspended or disabled, content=${contentLog}
       `);
       throw new NotFoundError("Content not found");
     }

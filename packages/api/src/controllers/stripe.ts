@@ -325,6 +325,7 @@ app.post("/webhook", async (req, res) => {
         if (paidInvoices.length === 0) {
           await db.user.update(user.id, {
             disabled: true,
+            suspended: true,
           });
           await sendgridEmail({
             email: HELP_EMAIL,
