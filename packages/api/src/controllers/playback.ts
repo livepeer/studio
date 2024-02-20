@@ -18,7 +18,11 @@ import { DBSession } from "../store/session-table";
 import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "../store/errors";
 import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
@@ -267,6 +271,21 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
+    if (withRecordings) {
+      const { user } = req;
+      if (!user) {
+        throw new UnauthorizedError(
+          `authentication is required to access recordings`
+        );
+      }
+
+      if (stream.userId !== user.id) {
+        throw new UnauthorizedError(
+          `user does not have access to recordings for this content`
+        );
+      }
+    }
+
     let url: string;
     let thumbUrl: string;
     try {
