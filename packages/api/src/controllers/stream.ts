@@ -372,6 +372,7 @@ const fieldsMap: FieldsMap = {
     val: `stream.data->'transcodedSegmentsDuration'`,
     type: "real",
   },
+  isHealthy: { val: `stream.data->'isHealthy'`, type: "boolean" },
 };
 
 app.get("/", authorizer({}), async (req, res) => {
