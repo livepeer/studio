@@ -1080,6 +1080,7 @@ app.put(
       stream = {
         ...streams[0],
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
+        suspended: false,
         ...payload,
       };
       await db.stream.replace(stream);
