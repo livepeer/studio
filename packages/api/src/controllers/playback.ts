@@ -261,6 +261,21 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
+    if (withRecordings) {
+      const { user } = req;
+      if (!user) {
+        throw new UnauthorizedError(
+          `authentication is required to access recordings`
+        );
+      }
+
+      if (stream.userId !== user.id) {
+        throw new UnauthorizedError(
+          `user does not have access to recordings for this content`
+        );
+      }
+    }
+
     let url: string;
     let thumbUrl: string;
     try {
@@ -319,29 +334,6 @@ app.get("/:id", async (req, res) => {
 
   const origin = req.headers["origin"] ?? "";
   const isEmbeddablePlayer = embeddablePlayerOrigin.test(origin);
-
-  if (withRecordings) {
-    const { user } = req;
-    if (!user) {
-      throw new UnauthorizedError(
-        `authentication is required to access recordings`
-      );
-    }
-
-    let content = await cache.getOrSet(`acl-stream-${id}`, async () => {
-      return await db.stream.getByPlaybackId(id);
-    });
-
-    if (!content) {
-      throw new NotFoundError("Content not found");
-    }
-
-    if (content.userId !== user.id) {
-      throw new UnauthorizedError(
-        `user does not have access to recordings for this content`
-      );
-    }
-  }
 
   const info = await getPlaybackInfo(
     req,
