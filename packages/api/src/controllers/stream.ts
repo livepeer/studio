@@ -1082,6 +1082,7 @@ app.put(
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         ...payload,
       };
+      stream.suspended = false;
       await db.stream.replace(stream);
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
