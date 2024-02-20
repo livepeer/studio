@@ -40,7 +40,8 @@ async function fireGateWebhook(
   webhook: DBWebhook,
   plabackPolicy: PlaybackPolicy,
   payload: AccessControlGatePayload,
-  isPullStream: boolean
+  isPullStream: boolean,
+  contentName: string
 ) {
   let timestamp = Date.now();
   let jsonPayload = {
@@ -50,6 +51,9 @@ async function fireGateWebhook(
   };
 
   if (payload.webhookPayload) {
+    if (payload.webhookPayload.headers) {
+      payload.webhookPayload.headers["Tx-Stream-Id"] = contentName;
+    }
     jsonPayload = { ...jsonPayload, ...payload.webhookPayload };
   }
 
@@ -105,6 +109,11 @@ async function fireGateWebhook(
       await resp.text();
     }
   }
+  console.log(
+    `access-control: gate: webhook=${
+      webhook.id
+    } statusCode=${statusCode} duration=${process.hrtime(startTime)[1] / 1e6}ms`
+  );
   return statusCode;
 }
 
@@ -261,7 +270,8 @@ app.post(
           webhook,
           content.playbackPolicy,
           gatePayload,
-          content.isPullStream
+          content.isPullStream,
+          content.name
         );
 
         if (statusCode >= 200 && statusCode < 300) {
