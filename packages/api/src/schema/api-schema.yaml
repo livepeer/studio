@@ -2117,13 +2117,13 @@ components:
           description: The creator ID associated with the metric
         DeliveryUsageMins:
           type: number
-          description: The number of minutes of delivery usage
+          description: Total minutes of delivery usage.
         TotalUsageMins:
           type: number
-          description: The number of minutes of total usage
+          description: Total transcoded minutes.
         StorageUsageMins:
           type: number
-          description: The number of minutes of storage usage
+          description: Total minutes of storage usage.
     viewership-metric:
       type: object
       description: |
