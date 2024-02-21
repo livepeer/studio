@@ -44,6 +44,7 @@ import {
   NewAssetPayload,
   ObjectStore,
   PlaybackPolicy,
+  Project,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -57,6 +58,7 @@ import {
 import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
 import { getClips } from "./clip";
+import { getProject } from "./project";
 
 const app = Router();
 
@@ -200,6 +202,13 @@ export async function validateAssetPayload(
     }
   }
 
+  if (payload.projectId) {
+    const project = await getProject(req);
+    if (project.userId != userId) {
+      throw new ForbiddenError(`the provided projectId is not owned by user`);
+    }
+  }
+
   // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
   const playbackPolicy = await validateAssetPlaybackPolicy(
     payload,
@@ -234,6 +243,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
+    projectId: payload.projectId,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
@@ -774,7 +784,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
+  let { url, encryption, c2pa, profiles, targetSegmentSizeSecs, projectId } =
     req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
@@ -798,7 +808,11 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     url,
     encryption: assetEncryptionWithoutKey(encryption),
   });
-  const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
+  const dupAsset = await db.asset.findDuplicateUrlUpload(
+    url,
+    req.user.id,
+    projectId
+  );
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });
     if (!task.length) {

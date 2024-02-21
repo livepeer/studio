@@ -27,9 +27,11 @@ import {
 
 const app = Router();
 
-async function getProject(req) {
-  const project = await db.project.get(req.params.projectId);
+export async function getProject(req) {
+  const projectId = req.params.projectId || req.body.projectId;
+  console.log("XXX: getting project:", projectId);
 
+  const project = await db.project.get(projectId);
   if (!project || project.deleted) {
     throw new NotFoundError(`project not found`);
   }
@@ -96,7 +98,7 @@ app.get("/", authorizer({}), async (req, res) => {
     if (count) {
       fields = fields + ", count(*) OVER() AS count";
     }
-    [output, newCursor] = await db.asset.find(query, {
+    [output, newCursor] = await db.project.find(query, {
       limit,
       cursor,
       fields,
