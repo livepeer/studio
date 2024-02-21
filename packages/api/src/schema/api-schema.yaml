@@ -70,10 +70,10 @@ components:
         encoder:
           type: string
           enum:
-            - h264
-            - hevc
-            - vp8
-            - vp9
+            - H.264
+            - HEVC
+            - VP8
+            - VP9
     transcode-profile:
       type: object
       description: Transcode API profile
@@ -119,10 +119,10 @@ components:
         encoder:
           type: string
           enum:
-            - h264
-            - hevc
-            - vp8
-            - vp9
+            - H.264
+            - HEVC
+            - VP8
+            - VP9
     webhook:
       type: object
       required:
