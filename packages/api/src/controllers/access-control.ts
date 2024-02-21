@@ -26,6 +26,8 @@ import fetch from "node-fetch";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
 import { cache } from "../store/cache";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE = 5;
@@ -38,21 +40,19 @@ type GateConfig = {
 
 async function fireGateWebhook(
   webhook: DBWebhook,
-  plabackPolicy: PlaybackPolicy,
-  payload: AccessControlGatePayload,
-  isPullStream: boolean,
-  contentName: string
+  content: DBStream | WithID<Asset>,
+  payload: AccessControlGatePayload
 ) {
   let timestamp = Date.now();
   let jsonPayload = {
-    context: plabackPolicy.webhookContext,
+    context: content.playbackPolicy.webhookContext,
     accessKey: payload.accessKey,
     timestamp: timestamp,
   };
 
   if (payload.webhookPayload) {
     if (payload.webhookPayload.headers) {
-      payload.webhookPayload.headers["Tx-Stream-Id"] = contentName;
+      payload.webhookPayload.headers["Tx-Stream-Id"] = content.name;
     }
     jsonPayload = { ...jsonPayload, ...payload.webhookPayload };
   }
@@ -67,7 +67,7 @@ async function fireGateWebhook(
     body: JSON.stringify(jsonPayload),
   };
 
-  if (isPullStream) {
+  if ("pull" in content && content.pull) {
     params.headers["Trovo-Auth-Version"] = "1.1";
   }
 
@@ -266,13 +266,7 @@ app.post(
 
         const gatePayload: AccessControlGatePayload = req.body;
 
-        const statusCode = await fireGateWebhook(
-          webhook,
-          content.playbackPolicy,
-          gatePayload,
-          content.isPullStream,
-          content.name
-        );
+        const statusCode = await fireGateWebhook(webhook, content, gatePayload);
 
         if (statusCode >= 200 && statusCode < 300) {
           res.status(200);
