@@ -644,11 +644,16 @@ export const triggerCatalystPullStart =
   process.env.NODE_ENV === "test"
     ? async () => {} // noop in case of tests
     : async (stream: DBStream, playbackUrl: string) => {
-        // TODO: use pull.location field to call catalyst on the closest region.
-        // Ideally by calling catalyst-api/catabalancer and letting it figure it out.
+        const { lat, lon } = stream.pull?.location ?? {};
+        if (lat && lon) {
+          // Set the lat/lon qs to override the observed "client location" and
+          // trigger the pull on the server closest to the requested location.
+          const url = new URL(playbackUrl);
+          url.searchParams.set("lat", lat.toString());
+          url.searchParams.set("lon", lon.toString());
+          playbackUrl = url.toString();
+        }
 
-        // Instead of the above, for now just access the stream playbackUrl to trigger
-        // the pull to start.
         const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
         while (Date.now() < deadline) {
           const res = await fetchWithTimeoutAndRedirects(playbackUrl, {
