@@ -1077,8 +1077,9 @@ app.put(
     if (!streamExisted) {
       stream = await handleCreateStream(req);
     } else {
+      const oldStream = streams[0];
       stream = {
-        ...streams[0],
+        ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
         ...payload,
@@ -1086,6 +1087,10 @@ app.put(
       await db.stream.replace(stream);
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
+
+      if (oldStream.pull?.source != stream.pull?.source) {
+        await triggerCatalystStreamNuke(req, stream.playbackId);
+      }
     }
 
     const ingest = await getIngestBase(req);
