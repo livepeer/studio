@@ -890,9 +890,10 @@ app.post(
       useParentProfiles ? stream.profiles : childStream.profiles
     );
 
-    if (await db.session.get(sessionId)) {
+    const existingSession = await db.session.get(sessionId);
+    if (existingSession) {
       logger.info(
-        `user session re-used for session.id=${sessionId} stream.id=${stream.id} stream.name='${stream.name}' playbackid=${stream.playbackId}`
+        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId}`
       );
     } else {
       const session: DBSession = {
