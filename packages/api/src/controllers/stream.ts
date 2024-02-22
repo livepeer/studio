@@ -1025,7 +1025,7 @@ app.put(
   validatePost("new-stream-payload"),
   experimentSubjectsOnly("stream-pull-source"),
   async (req, res) => {
-    const { key = "creatorId", waitActive } = toStringValues(req.query);
+    const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
     if (!rawPayload.pull) {
