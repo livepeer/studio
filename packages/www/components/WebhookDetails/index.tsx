@@ -258,13 +258,9 @@ const WebhookDetails = ({ id, data, logs }) => {
 const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
   const totalWebhookLogs = logs?.length;
 
-  const totalSucceededWebhookLogs = logs?.filter(
-    (log) => log.response.status >= 200 && log.response.status < 400
-  ).length;
+  const totalSucceededWebhookLogs = logs?.filter((log) => log.success).length;
 
-  const totalFailedWebhookLogs = logs?.filter(
-    (log) => log.response.status < 200 || log.response.status >= 400
-  ).length;
+  const totalFailedWebhookLogs = logs?.filter((log) => !log.success).length;
 
   return (
     <Flex

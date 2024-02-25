@@ -26,13 +26,9 @@ const LogsContainer = ({ data, logs, filter }) => {
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
   const [isResending, setIsResending] = useState(false);
 
-  const succeededLogs = logs?.filter(
-    (log) => log.response.status >= 200 && log.response.status < 400
-  );
+  const succeededLogs = logs?.filter((log) => log.success);
 
-  const failedLogs = logs?.filter(
-    (log) => log.response.status < 200 || log.response.status >= 400
-  );
+  const failedLogs = logs?.filter((log) => !log.success);
 
   const router = useRouter();
 
@@ -117,12 +113,8 @@ const LogsContainer = ({ data, logs, filter }) => {
                       width: 30,
                       height: 30,
                     }}
-                    variant={log.response.status === 200 ? "green" : "red"}>
-                    {log.response.status === 200 ? (
-                      <CheckIcon />
-                    ) : (
-                      <Cross1Icon />
-                    )}
+                    variant={log.success ? "green" : "red"}>
+                    {log.success ? <CheckIcon /> : <Cross1Icon />}
                   </Badge>
                   {log.event}
                 </Cell>
