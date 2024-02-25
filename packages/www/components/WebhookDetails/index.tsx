@@ -55,6 +55,7 @@ const eventOptions: Webhook["events"] = [
 const DateInput = styled("input", {
   WebkitAppearance: "none",
   border: "1px solid",
+  backgroundColor: "transparent",
   borderColor: "$neutral7",
   color: "$neutral9",
   outline: "none",
@@ -412,7 +413,8 @@ const Search = ({ handleSearchFilters }) => {
   return (
     <Flex
       css={{
-        mb: "$5",
+        mb: "$4",
+        mt: "-$1",
         gap: "$3",
       }}
       direction={"row"}>
