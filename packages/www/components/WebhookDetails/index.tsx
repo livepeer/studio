@@ -221,8 +221,6 @@ const WebhookDetails = ({ id, data, logs }) => {
         logs={logs}
       />
 
-      {/* <Search /> */}
-
       {logs.length > 0 && (
         <LogsContainer data={data} logs={logs} filter={activeFilter} />
       )}

@@ -74,7 +74,6 @@ const LogsContainer = ({ data, logs, filter }) => {
       <Flex>
         <Box
           css={{
-            borderRight: "1px solid $colors$neutral6",
             width: "50%",
           }}>
           <Text
@@ -85,7 +84,7 @@ const LogsContainer = ({ data, logs, filter }) => {
             }}
             size={"2"}
             variant={"gray"}>
-            TODAY:
+            LOGS:
           </Text>
           <Box
             css={{
@@ -106,6 +105,7 @@ const LogsContainer = ({ data, logs, filter }) => {
                   "&:hover": {
                     background: "$neutral2",
                   },
+                  borderRight: "1px solid $colors$neutral6",
                 }}>
                 <Cell
                   css={{
@@ -178,14 +178,15 @@ const LogsContainer = ({ data, logs, filter }) => {
             </Text>
             <Flex
               direction={"row"}
-              justify={"between"}
               css={{
-                width: "40%",
                 mt: "$3",
-                ml: "$3",
               }}>
               <Text variant="neutral">HTTP Status Code</Text>
-              <Text variant="neutral">
+              <Text
+                css={{
+                  ml: "$4",
+                }}
+                variant="neutral">
                 {selected?.response?.status} {selected?.response?.statusText}
               </Text>
             </Flex>
@@ -209,8 +210,8 @@ const LogsContainer = ({ data, logs, filter }) => {
               css={{
                 mt: "$3",
                 overflowY: "auto",
-                maxHeight: "calc(100vh - 45em)",
-                ml: "$3",
+                maxHeight: "calc(100vh - 510px)",
+                // ml: "$3",
               }}>
               {selected?.request && (
                 <JSONPretty
