@@ -260,8 +260,24 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters }) => {
 
       <Search handleSearchFilters={handleLogFilters} />
 
-      {logs.length > 0 && (
+      {logs.length > 0 ? (
         <LogsContainer data={data} logs={logs} filter={activeFilter} />
+      ) : (
+        <Flex
+          align={"center"}
+          justify={"center"}
+          css={{
+            height: "50vh",
+            width: "100%",
+          }}>
+          <Text
+            css={{
+              fontSize: "$4",
+              color: "$neutral9",
+            }}>
+            Waiting for logs...
+          </Text>
+        </Flex>
       )}
 
       <DeleteDialog
