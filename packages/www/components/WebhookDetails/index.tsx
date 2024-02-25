@@ -57,7 +57,7 @@ const WebhookDetails = ({ id, data, logs }) => {
 
   const revealSecretHandler = () => {
     if (!data.sharedSecret) return;
-    setRevealSecret(true);
+    setRevealSecret(!revealSecret);
   };
 
   const invalidateQuery = useCallback(() => {
