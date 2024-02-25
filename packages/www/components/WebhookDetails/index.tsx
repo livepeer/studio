@@ -78,7 +78,7 @@ type SearchFilters = {
 
 const filters: FilterType[] = ["all", "succeeded", "failed"];
 
-const WebhookDetails = ({ id, data, logs }) => {
+const WebhookDetails = ({ id, data, logs, handleLogFilters }) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -257,7 +257,7 @@ const WebhookDetails = ({ id, data, logs }) => {
         logs={logs}
       />
 
-      <Search handleSearchFilters={handleSearchFilters} />
+      <Search handleSearchFilters={handleLogFilters} />
 
       {logs.length > 0 && (
         <LogsContainer data={data} logs={logs} filter={activeFilter} />
