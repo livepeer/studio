@@ -85,7 +85,8 @@ const LogsContainer = ({ data, logs, filter }) => {
           <Box
             css={{
               overflowY: "auto",
-              maxHeight: "calc(100vh - 300px)",
+              borderRight: "1px solid $colors$neutral6",
+              height: "calc(100vh - 450px)",
             }}>
             {renderedLogs.map((log: WebhookLogs, index) => (
               <Box
@@ -101,7 +102,6 @@ const LogsContainer = ({ data, logs, filter }) => {
                   "&:hover": {
                     background: "$neutral2",
                   },
-                  borderRight: "1px solid $colors$neutral6",
                 }}>
                 <Cell
                   css={{
@@ -202,7 +202,7 @@ const LogsContainer = ({ data, logs, filter }) => {
               css={{
                 mt: "$3",
                 overflowY: "auto",
-                maxHeight: "calc(100vh - 510px)",
+                height: "calc(100vh - 650px)",
                 // ml: "$3",
               }}>
               {selected?.request && (

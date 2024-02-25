@@ -10,7 +10,6 @@ const WebhookDetail = () => {
   useLoggedIn();
   const { user } = useApi();
   const [logFilters, setLogFilters] = useState();
-  const queryClient = useQueryClient();
 
   const { getWebhook, getWebhookLogs } = useApi();
   const router = useRouter();
