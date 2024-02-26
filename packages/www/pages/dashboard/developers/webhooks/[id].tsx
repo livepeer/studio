@@ -55,6 +55,7 @@ const WebhookDetail = () => {
         id={id}
         data={webhookData}
         logs={logs}
+        refetchLogs={refetchLogs}
       />
     </Layout>
   );

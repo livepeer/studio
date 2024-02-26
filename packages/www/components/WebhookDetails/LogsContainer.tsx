@@ -13,6 +13,8 @@ import { WebhookLogs } from "hooks/use-api/types";
 import JSONPretty from "react-json-pretty";
 import { useApi } from "hooks";
 import { useRouter } from "next/navigation";
+import { Webhook } from "@livepeer.studio/api";
+import { FilterType } from "./index";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -20,7 +22,17 @@ const Cell = styled(Text, {
   fontSize: "$3",
 });
 
-const LogsContainer = ({ data, logs, filter }) => {
+const LogsContainer = ({
+  data,
+  logs,
+  filter,
+  refetchLogs,
+}: {
+  data: Webhook;
+  logs: WebhookLogs[];
+  filter: FilterType;
+  refetchLogs(): Promise<void>;
+}) => {
   const { resendWebhook } = useApi();
 
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
@@ -54,6 +66,7 @@ const LogsContainer = ({ data, logs, filter }) => {
     });
 
     if (res) {
+      await refetchLogs();
       setIsResending(false);
     }
   };

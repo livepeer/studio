@@ -69,7 +69,7 @@ const StyledDots = styled(DotsHorizontalIcon, {
   height: 15,
 });
 
-type FilterType = "all" | "succeeded" | "failed";
+export type FilterType = "all" | "succeeded" | "failed";
 
 type SearchFilters = {
   resourceId: string;
@@ -79,7 +79,7 @@ type SearchFilters = {
 
 const filters: FilterType[] = ["all", "succeeded", "failed"];
 
-const WebhookDetails = ({ id, data, logs, handleLogFilters }) => {
+const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -261,7 +261,12 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters }) => {
       <Search handleSearchFilters={handleLogFilters} />
 
       {logs.length > 0 ? (
-        <LogsContainer data={data} logs={logs} filter={activeFilter} />
+        <LogsContainer
+          data={data}
+          logs={logs}
+          filter={activeFilter}
+          refetchLogs={refetchLogs}
+        />
       ) : (
         <Flex
           align={"center"}
