@@ -366,9 +366,9 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
 
 const Search = ({ handleSearchFilters }) => {
   const [filters, setFilters] = useState<SearchFilters>({
-    resourceId: "",
-    event: "",
-    createdAt: "",
+    resourceId: null,
+    event: null,
+    createdAt: null,
   });
 
   const handleChange = (name: keyof typeof filters, value: string) => {
@@ -487,6 +487,15 @@ const Search = ({ handleSearchFilters }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       ))}
+      {filters.resourceId || filters.event || filters.createdAt ? (
+        <Button
+          onClick={() => handleSearchFilters([])}
+          css={{
+            backgroundColor: "transparent",
+          }}>
+          Clear filters
+        </Button>
+      ) : null}
     </Flex>
   );
 };
