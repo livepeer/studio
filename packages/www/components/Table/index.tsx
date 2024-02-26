@@ -37,6 +37,7 @@ import Link from "next/link";
 import Spinner from "components/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import TableHeader from "./components/TableHeader";
+import StreamFilter from "components/StreamsTable/StreamFilter";
 
 type Sort<T extends Record<string, unknown>> = {
   id: keyof T;
@@ -299,7 +300,12 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           pb: border ? "$2" : 0,
         }}>
         {/* Header title */}
-        <Box>{headerComponent}</Box>
+        <Box>
+          {headerComponent}
+          {!viewAll && filterItems && (
+            <StreamFilter items={filterItems} onDone={(e) => onSetFilters(e)} />
+          )}
+        </Box>
 
         {/* Header actions */}
         <Flex css={{ alignItems: "center" }}>
@@ -335,12 +341,6 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             </Flex>
           ) : (
             <>
-              {!viewAll && filterItems && (
-                <TableFilter
-                  items={filterItems}
-                  onDone={(e) => onSetFilters(e)}
-                />
-              )}
               {createAction && (
                 <Button
                   variant="neutral"
