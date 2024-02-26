@@ -674,7 +674,7 @@ export const triggerCatalystPullStart =
               res.status
             } error=${JSON.stringify(body)}`
           );
-          await sleep(1000);
+          await sleep(250);
         }
 
         throw new Error(`failed to trigger catalyst pull`);
