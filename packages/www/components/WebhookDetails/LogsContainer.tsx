@@ -136,7 +136,7 @@ const LogsContainer = ({
                     mr: "$3",
                     color: "$neutral11",
                   }}>
-                  {moment(log.createdAt).format("h:mm:ss a")}
+                  {moment(log.createdAt).format("MMM D, h:mm:ss a")}
                 </Cell>
               </Box>
             ))}

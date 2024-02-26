@@ -377,23 +377,26 @@ const Search = ({ handleSearchFilters }) => {
   });
 
   const handleChange = (name: keyof typeof filters, value: string) => {
-    if (name === "createdAt") {
-      const date = new Date(value);
-      const timestamp = date.getTime();
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        [name]: timestamp.toString(),
-      }));
-    } else {
-      setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
-    }
+    setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
   };
 
   const handleSearch = () => {
     const filterArray = Object.entries(filters).reduce((acc, [key, value]) => {
-      if (value) {
+      if (!value) return acc;
+
+      if (key === "createdAt") {
+        const date = new Date(value);
+        const startOfDay = new Date(date.setHours(0, 0, 0, 0)).getTime();
+        const endOfDay = new Date(date.setHours(23, 59, 59, 999)).getTime();
+
+        acc.push({
+          id: key,
+          value: { gt: startOfDay, lt: endOfDay },
+        });
+      } else {
         acc.push({ id: key, value });
       }
+
       return acc;
     }, []);
 
