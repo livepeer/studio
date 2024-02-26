@@ -497,7 +497,10 @@ const Search = ({ handleSearchFilters }) => {
       ))}
       {filters.resourceId || filters.event || filters.createdAt ? (
         <Button
-          onClick={() => handleSearchFilters([])}
+          onClick={() => {
+            handleSearchFilters([]);
+            setFilters({ resourceId: null, event: null, createdAt: null });
+          }}
           css={{
             backgroundColor: "transparent",
           }}>
