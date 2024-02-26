@@ -41,15 +41,11 @@ const StreamFilter = ({ items, onDone }) => {
 
   const handleChange = (name: keyof typeof filters, value: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
-    console.log("123", filters);
   };
 
   const handleSearch = () => {
     const outputFilters = searchFilters.reduce((acc, filter) => {
       const filterValue = filters[filter.id];
-
-      console.log("filterId", filter.id);
-      console.log("filterValue", filterValue);
 
       if (filterValue === "" || filterValue === undefined) return acc;
 
