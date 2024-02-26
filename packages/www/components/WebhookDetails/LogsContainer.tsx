@@ -203,7 +203,6 @@ const LogsContainer = ({ data, logs, filter }) => {
                 mt: "$3",
                 overflowY: "auto",
                 height: "calc(100vh - 650px)",
-                // ml: "$3",
               }}>
               {selected?.request && (
                 <JSONPretty
