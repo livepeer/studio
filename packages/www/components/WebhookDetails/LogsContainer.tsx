@@ -209,7 +209,10 @@ const LogsContainer = ({ data, logs, filter }) => {
                 <JSONPretty
                   theme={customTheme}
                   data={JSON.stringify(
-                    JSON.parse(selected?.request?.body)?.payload
+                    JSON.parse(selected?.request?.body)?.payload ||
+                      JSON.parse(selected?.request?.body)?.stream ||
+                      JSON.parse(selected?.request?.body)?.asset ||
+                      JSON.parse(selected?.request?.body)?.task
                   )}
                 />
               )}
