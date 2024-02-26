@@ -372,7 +372,16 @@ const Search = ({ handleSearchFilters }) => {
   });
 
   const handleChange = (name: keyof typeof filters, value: string) => {
-    setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+    if (name === "createdAt") {
+      const date = new Date(value);
+      const timestamp = date.getTime();
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [name]: timestamp.toString(),
+      }));
+    } else {
+      setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+    }
   };
 
   const handleSearch = () => {
@@ -419,7 +428,6 @@ const Search = ({ handleSearchFilters }) => {
       component: (
         <DateInput
           type="date"
-          value={filters.createdAt}
           onChange={(e) => handleChange("createdAt", e.target.value)}
         />
       ),
