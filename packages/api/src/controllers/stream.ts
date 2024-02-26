@@ -244,7 +244,7 @@ async function pollWaitStreamActive(req: Request, id: string) {
   });
 
   const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
-  let sleepDelay = 500;
+  let sleepDelay = 150;
   while (!clientGone && Date.now() < deadline) {
     const stream =
       (await db.stream.get(id)) ||
