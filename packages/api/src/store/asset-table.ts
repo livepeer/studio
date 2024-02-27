@@ -137,7 +137,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
       query.push(sql`asset.data->>'projectId' = ${projectId}`);
     } else {
       query.push(
-        sql`(asset.data->>'projectId' IS NULL OR NOT asset.data ? 'projectId')`
+        sql`(asset.data->>'projectId' IS NULL OR  asset.data->>'projectId' = '')`
       );
     }
     console.log("XXX: HERE");

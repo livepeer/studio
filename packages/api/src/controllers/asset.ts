@@ -635,8 +635,18 @@ const fieldsMap = {
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
-    toStringValues(req.query);
+  let {
+    limit,
+    cursor,
+    all,
+    allUsers,
+    order,
+    filters,
+    count,
+    cid,
+    projectId,
+    ...otherQs
+  } = toStringValues(req.query);
   const fieldFilters = _(otherQs)
     .pick("playbackId", "sourceUrl", "phase")
     .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
@@ -662,6 +672,14 @@ app.get("/", authorizer({}), async (req, res) => {
 
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
+  }
+
+  if (projectId) {
+    query.push(sql`asset.data->>'projectId' = ${projectId}`);
+  } else {
+    query.push(
+      sql`(asset.data->>'projectId' IS NULL OR asset.data->>'projectId' = '')`
+    );
   }
 
   let output: WithID<Asset>[];

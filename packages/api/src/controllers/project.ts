@@ -141,7 +141,7 @@ app.post("/", authorizer({}), async (req, res) => {
   const id = uuid();
   await db.project.create({
     id: id,
-    name: "foo",
+    name: name,
     userId: req.user.id,
     createdAt: Date.now(),
   });
