@@ -114,10 +114,11 @@ export const getWebhookLogs = async (
     ...additionalFilters,
   ];
 
-  const fetchLogs = async (additionalFilters = [], limit = 20) => {
+  const fetchLogs = async (fromStatus, additionalFilters = [], limit = 20) => {
+    console.log("fromStatus", additionalFilters);
     const query = qs.stringify({
       limit,
-      cursor,
+      cursor: fromStatus ? null : cursor,
       count,
       filters: JSON.stringify(
         additionalFilters.length > 0 ? buildFilters(additionalFilters) : filters
@@ -139,9 +140,9 @@ export const getWebhookLogs = async (
   };
 
   const [allLogs, failedLogs, successLogs] = await Promise.all([
-    fetchLogs([]),
-    fetchLogs([{ id: "success", value: "false" }], 1),
-    fetchLogs([{ id: "success", value: "true" }], 1),
+    fetchLogs(false, []),
+    fetchLogs(true, [{ id: "success", value: "false" }], 1),
+    fetchLogs(true, [{ id: "success", value: "true" }], 1),
   ]);
 
   return {

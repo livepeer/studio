@@ -79,7 +79,15 @@ type SearchFilters = {
 
 const filters: FilterType[] = ["all", "succeeded", "failed"];
 
-const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
+const WebhookDetails = ({
+  id,
+  data,
+  logs,
+  handleLogFilters,
+  refetchLogs,
+  loadMore,
+  isLogsLoading,
+}) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -268,7 +276,13 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
       <Search handleSearchFilters={handleLogFilters} />
 
       {logs?.data?.length > 0 ? (
-        <LogsContainer data={data} logs={logs.data} refetchLogs={refetchLogs} />
+        <LogsContainer
+          data={data}
+          logs={logs.data}
+          refetchLogs={refetchLogs}
+          loadMore={loadMore}
+          isLogsLoading={isLogsLoading}
+        />
       ) : (
         <Flex
           align={"center"}

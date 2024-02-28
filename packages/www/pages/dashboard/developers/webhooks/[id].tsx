@@ -10,7 +10,14 @@ const WebhookDetail = () => {
   useLoggedIn();
   const { user } = useApi();
   const [logFilters, setLogFilters] = useState([]);
-  const [logs, setLogs] = useState<any>();
+  const [logs, setLogs] = useState<any>({
+    data: [],
+    cursor: null,
+    totalCount: 0,
+    failedCount: 0,
+    successCount: 0,
+  });
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const { getWebhook, getWebhookLogs } = useApi();
   const router = useRouter();
@@ -24,25 +31,32 @@ const WebhookDetail = () => {
     }
   );
 
-  const { data, refetch: refetchLogs } = useQuery(
+  const { refetch: refetchLogs, isLoading: isLogsLoading } = useQuery(
     ["webhookLogs", id, logFilters],
-    () => getWebhookLogs(id, logFilters, null, true),
+    () => getWebhookLogs(id, logFilters, logs ? logs.cursor : null, true),
     {
       enabled: !!id,
       onSuccess: (data) => {
         const containsSuccessFilter = logFilters.some(
           (filter) => filter.id === "success"
         );
+
         if (containsSuccessFilter) {
           setLogs({
             ...data,
+            data: loadingMore ? [...logs.data, ...data.data] : data.data,
             totalCount: logs.totalCount,
             failedCount: logs.failedCount,
             successCount: logs.successCount,
           });
         } else {
-          setLogs(data);
+          setLogs({
+            ...data,
+            data: loadingMore ? [...logs.data, ...data.data] : data.data,
+          });
         }
+
+        setLoadingMore(false);
       },
     }
   );
@@ -67,6 +81,13 @@ const WebhookDetail = () => {
     return <Layout />;
   }
 
+  const loadMore = () => {
+    if (logs.cursor) {
+      setLoadingMore(true);
+      refetchLogs();
+    }
+  };
+
   return (
     <Layout
       id="developers/webhooks"
@@ -82,6 +103,8 @@ const WebhookDetail = () => {
         data={webhookData}
         logs={logs}
         refetchLogs={refetchLogs}
+        loadMore={loadMore}
+        isLogsLoading={isLogsLoading}
       />
     </Layout>
   );
