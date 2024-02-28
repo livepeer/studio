@@ -11,6 +11,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  Select,
+  DropdownMenuGroup,
+  DropdownMenuCheckboxItem,
 } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useState, useCallback, useEffect } from "react";
@@ -26,11 +29,39 @@ import {
 import { useApi } from "hooks";
 import DeleteDialog from "../WebhookDialogs/DeleteDialog";
 import LogsContainer from "./LogsContainer";
+import { Webhook } from "@livepeer.studio/api";
 
-const StyledPencil = styled(Pencil1Icon, {
-  mr: "$1",
-  width: 12,
-  height: 12,
+const eventOptions: Webhook["events"] = [
+  "playback.accessControl",
+  "stream.started",
+  "stream.idle",
+  "recording.ready",
+  "recording.started",
+  "recording.waiting",
+  "multistream.connected",
+  "multistream.error",
+  "multistream.disconnected",
+  "asset.created",
+  "asset.updated",
+  "asset.ready",
+  "asset.failed",
+  "asset.deleted",
+  "task.spawned",
+  "task.updated",
+  "task.completed",
+  "task.failed",
+];
+
+const DateInput = styled("input", {
+  WebkitAppearance: "none",
+  border: "1px solid",
+  backgroundColor: "transparent",
+  borderColor: "$neutral7",
+  color: "$neutral9",
+  outline: "none",
+  width: "94%",
+  borderRadius: "$1",
+  p: "4px",
 });
 
 const StyledDots = styled(DotsHorizontalIcon, {
@@ -38,11 +69,17 @@ const StyledDots = styled(DotsHorizontalIcon, {
   height: 15,
 });
 
-type FilterType = "all" | "succeeded" | "failed";
+export type FilterType = "all" | "succeeded" | "failed";
+
+type SearchFilters = {
+  resourceId: string;
+  createdAt: string;
+  event: string;
+};
 
 const filters: FilterType[] = ["all", "succeeded", "failed"];
 
-const WebhookDetails = ({ id, data, logs }) => {
+const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -57,7 +94,7 @@ const WebhookDetails = ({ id, data, logs }) => {
 
   const revealSecretHandler = () => {
     if (!data.sharedSecret) return;
-    setRevealSecret(true);
+    setRevealSecret(!revealSecret);
   };
 
   const invalidateQuery = useCallback(() => {
@@ -221,10 +258,31 @@ const WebhookDetails = ({ id, data, logs }) => {
         logs={logs}
       />
 
-      {/* <Search /> */}
+      <Search handleSearchFilters={handleLogFilters} />
 
-      {logs.length > 0 && (
-        <LogsContainer data={data} logs={logs} filter={activeFilter} />
+      {logs.length > 0 ? (
+        <LogsContainer
+          data={data}
+          logs={logs}
+          filter={activeFilter}
+          refetchLogs={refetchLogs}
+        />
+      ) : (
+        <Flex
+          align={"center"}
+          justify={"center"}
+          css={{
+            height: "50vh",
+            width: "100%",
+          }}>
+          <Text
+            css={{
+              fontSize: "$4",
+              color: "$neutral9",
+            }}>
+            Waiting for logs...
+          </Text>
+        </Flex>
       )}
 
       <DeleteDialog
@@ -260,13 +318,9 @@ const WebhookDetails = ({ id, data, logs }) => {
 const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
   const totalWebhookLogs = logs?.length;
 
-  const totalSucceededWebhookLogs = logs?.filter(
-    (log) => log.response.status >= 200 && log.response.status < 400
-  ).length;
+  const totalSucceededWebhookLogs = logs?.filter((log) => log.success).length;
 
-  const totalFailedWebhookLogs = logs?.filter(
-    (log) => log.response.status < 200 || log.response.status >= 400
-  ).length;
+  const totalFailedWebhookLogs = logs?.filter((log) => !log.success).length;
 
   return (
     <Flex
@@ -315,63 +369,144 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
   );
 };
 
-const Search = () => {
+const Search = ({ handleSearchFilters }) => {
+  const [filters, setFilters] = useState<SearchFilters>({
+    resourceId: null,
+    event: null,
+    createdAt: null,
+  });
+
+  const handleChange = (name: keyof typeof filters, value: string) => {
+    setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+  };
+
+  const handleSearch = () => {
+    const filterArray = Object.entries(filters).reduce((acc, [key, value]) => {
+      if (!value) return acc;
+
+      if (key === "createdAt") {
+        const date = new Date(value);
+        const startOfDay = new Date(date.setHours(0, 0, 0, 0)).getTime();
+        const endOfDay = new Date(date.setHours(23, 59, 59, 999)).getTime();
+
+        acc.push({
+          id: key,
+          value: { gt: startOfDay, lt: endOfDay },
+        });
+      } else {
+        acc.push({ id: key, value });
+      }
+
+      return acc;
+    }, []);
+
+    handleSearchFilters(filterArray);
+  };
+
+  const searchFilters = [
+    {
+      name: "Resource ID",
+      component: (
+        <TextField
+          value={filters.resourceId}
+          onChange={(e) => handleChange("resourceId", e.target.value)}
+          placeholder="Resource ID"
+        />
+      ),
+    },
+    {
+      name: "Events",
+      component: (
+        <Select
+          value={filters.event}
+          onChange={(e) => handleChange("event", e.target.value)}>
+          <option value="" disabled selected>
+            Select an event
+          </option>
+          {eventOptions.map((event, index) => (
+            <option key={index} value={event}>
+              {event}
+            </option>
+          ))}
+        </Select>
+      ),
+    },
+    {
+      name: "Date",
+      component: (
+        <DateInput
+          type="date"
+          onChange={(e) => handleChange("createdAt", e.target.value)}
+        />
+      ),
+    },
+  ];
+
   return (
     <Flex
       css={{
-        mb: "$5",
+        mb: "$4",
+        mt: "-$1",
         gap: "$3",
       }}
       direction={"row"}>
-      <DropdownMenu>
-        <Flex
-          as={DropdownMenuTrigger}
-          align={"center"}
-          gap={2}
-          css={{
-            p: "$1",
-            px: "$3",
-            border: "1px dashed",
-            fontSize: "$2",
-            borderRadius: "20px",
-            backgroundColor: "transparent",
-            borderColor: "$neutral8",
-            color: "$neutral9",
-          }}>
-          <PlusCircledIcon />
-          Resource ID
-        </Flex>
-        <DropdownMenuContent
-          placeholder={"more options"}
-          css={{
-            border: "1px solid $colors$neutral6",
-            p: "$2",
-            backgroundColor: "white",
-            ml: "$10",
-            width: "15rem",
-            mt: "$2",
-          }}>
-          <TextField
-            css={{
-              p: "$3",
-              pl: "$2",
-            }}
-            placeholder="Resource ID"
-          />
+      {searchFilters.map((filter, index) => (
+        <DropdownMenu key={index}>
           <Flex
+            as={DropdownMenuTrigger}
+            align={"center"}
+            gap={1}
             css={{
-              jc: "flex-end",
+              p: "$1",
+              px: "$2",
+              border: "1px dashed",
+              fontSize: "$2",
+              borderRadius: "20px",
+              backgroundColor: "transparent",
+              borderColor: "$neutral9",
+              color: "$neutral10",
+            }}>
+            <PlusCircledIcon />
+            {filter.name}
+          </Flex>
+          <DropdownMenuContent
+            placeholder={"more options"}
+            css={{
+              border: "1px solid $colors$neutral6",
+              p: "$2",
+              ml: "7rem",
+              width: "15rem",
               mt: "$2",
             }}>
-            <Button
+            {filter.component}
+            <Flex
               css={{
-                fontWeight: 500,
+                jc: "flex-end",
+                mt: "$2",
               }}>
-              Search
-            </Button>
-          </Flex>
-        </DropdownMenuContent>
-      </DropdownMenu>
+              <Button
+                onClick={handleSearch}
+                css={{
+                  fontWeight: 500,
+                }}>
+                Search
+              </Button>
+            </Flex>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ))}
+      {filters.resourceId || filters.event || filters.createdAt ? (
+        <Button
+          onClick={() => {
+            handleSearchFilters([]);
+            setFilters({ resourceId: null, event: null, createdAt: null });
+          }}
+          css={{
+            backgroundColor: "transparent",
+          }}>
+          Clear filters
+        </Button>
+      ) : null}
     </Flex>
   );
 };

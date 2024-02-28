@@ -62,7 +62,6 @@ export const rowsPageFromState = async (
     nextCursor,
     count,
     rows: webhooks.map((webhook: Webhook) => {
-      console.log(webhook);
       return {
         id: webhook.id,
         name: {
