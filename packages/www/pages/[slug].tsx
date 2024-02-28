@@ -18,7 +18,6 @@ const Page = ({
 }) => {
   const router = useRouter();
   const builder = imageUrlBuilder(client as any);
-  console.log(title, content);
   if (router.isFallback) {
     return (
       <Layout>

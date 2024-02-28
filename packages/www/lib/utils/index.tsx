@@ -82,7 +82,7 @@ export function getMaxLines(element: HTMLElement, height: number) {
 export function blocksToText(blocks, opts = {}) {
   const options = Object.assign({}, { nonTextBehavior: "remove" }, opts);
   return blocks
-    .map((block) => {
+    ?.map((block) => {
       if (block._type !== "block" || !block.children) {
         return options.nonTextBehavior === "remove"
           ? ""
