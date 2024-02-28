@@ -25,10 +25,9 @@ const WebhookDetail = () => {
 
   const { data: logs, refetch: refetchLogs } = useQuery(
     ["webhookLogs", id, logFilters],
-    () => getWebhookLogs(id, logFilters),
+    () => getWebhookLogs(id, logFilters, null, true),
     {
       enabled: !!id,
-      initialData: [],
     }
   );
 

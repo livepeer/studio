@@ -105,19 +105,52 @@ export const deleteWebhooks = async (ids: Array<string>): Promise<void> => {
 
 export const getWebhookLogs = async (
   webhookId,
-  filters = null
-): Promise<WebhookLogs[]> => {
-  const f = filters ? JSON.stringify(filters) : undefined;
+  filters = [],
+  cursor,
+  count
+) => {
+  const buildFilters = (additionalFilters) => [
+    ...filters,
+    ...additionalFilters,
+  ];
 
-  const [res, logs] = await context.fetch(
-    `/webhook/${webhookId}/log?${qs.stringify({ filters: f })}`
-  );
-  if (res.status !== 200) {
-    throw logs && typeof logs === "object"
-      ? { ...logs, status: res.status }
-      : new Error(logs);
-  }
-  return logs;
+  const fetchLogs = async (additionalFilters = [], limit = 10) => {
+    const query = qs.stringify({
+      limit,
+      cursor,
+      count,
+      filters: JSON.stringify(
+        additionalFilters.length > 0 ? buildFilters(additionalFilters) : filters
+      ),
+    });
+    const [res, data] = await context.fetch(
+      `/webhook/${webhookId}/log?${query}`
+    );
+    if (res.status !== 200) {
+      throw data && typeof data === "object"
+        ? { ...data, status: res.status }
+        : new Error(data);
+    }
+    return {
+      data,
+      count: res.headers.get("X-Total-Count"),
+      cursor: getCursor(res.headers.get("link")),
+    };
+  };
+
+  const [allLogs, failedLogs, successLogs] = await Promise.all([
+    fetchLogs([]),
+    fetchLogs([{ id: "success", value: "false" }], 1),
+    fetchLogs([{ id: "success", value: "true" }], 1),
+  ]);
+
+  return {
+    data: allLogs.data,
+    curoser: allLogs.cursor,
+    totalCount: allLogs.count,
+    failedCount: failedLogs.count,
+    successCount: successLogs.count,
+  };
 };
 
 export const resendWebhook = async (params: {

@@ -260,13 +260,8 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
 
       <Search handleSearchFilters={handleLogFilters} />
 
-      {logs.length > 0 ? (
-        <LogsContainer
-          data={data}
-          logs={logs}
-          filter={activeFilter}
-          refetchLogs={refetchLogs}
-        />
+      {logs?.data?.length > 0 ? (
+        <LogsContainer data={data} logs={logs.data} refetchLogs={refetchLogs} />
       ) : (
         <Flex
           align={"center"}
@@ -316,12 +311,6 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
 };
 
 const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
-  const totalWebhookLogs = logs?.length;
-
-  const totalSucceededWebhookLogs = logs?.filter((log) => log.success).length;
-
-  const totalFailedWebhookLogs = logs?.filter((log) => !log.success).length;
-
   return (
     <Flex
       css={{
@@ -358,10 +347,10 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
               color: activeFilter === filter && "$blue11",
             }}>
             {filter === "all"
-              ? totalWebhookLogs
+              ? logs?.totalCount
               : filter === "succeeded"
-              ? totalSucceededWebhookLogs
-              : totalFailedWebhookLogs}
+              ? logs?.successCount
+              : logs?.failedCount}
           </Text>
         </Box>
       ))}
