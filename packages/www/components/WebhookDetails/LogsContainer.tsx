@@ -40,6 +40,7 @@ const LogsContainer = ({
   logs: WebhookLogs[];
   refetchLogs(): Promise<void>;
   loadMore(): void;
+  isLogsLoading: boolean;
 }) => {
   const { resendWebhook } = useApi();
 
