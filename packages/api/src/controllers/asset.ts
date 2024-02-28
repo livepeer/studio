@@ -610,7 +610,7 @@ const fieldsMap = {
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
-  creatorId: `stream.data->'creatorId'->>'value'`,
+  creatorId: `asset.data->'creatorId'->>'value'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   phase: `asset.data->'status'->>'phase'`,
