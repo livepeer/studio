@@ -114,7 +114,7 @@ export const getWebhookLogs = async (
     ...additionalFilters,
   ];
 
-  const fetchLogs = async (additionalFilters = [], limit = 10) => {
+  const fetchLogs = async (additionalFilters = [], limit = 20) => {
     const query = qs.stringify({
       limit,
       cursor,
@@ -146,10 +146,10 @@ export const getWebhookLogs = async (
 
   return {
     data: allLogs.data,
-    curoser: allLogs.cursor,
-    totalCount: allLogs.count,
-    failedCount: failedLogs.count,
-    successCount: successLogs.count,
+    cursor: allLogs.cursor,
+    totalCount: allLogs.count || 0,
+    failedCount: failedLogs.count || 0,
+    successCount: successLogs.count || 0,
   };
 };
 

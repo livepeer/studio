@@ -90,6 +90,13 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
 
   const handleFilterClick = (filter: FilterType) => {
     setActiveFilter(filter);
+    handleLogFilters(
+      filter === "all"
+        ? []
+        : filter === "succeeded"
+        ? [{ id: "success", value: "true" }]
+        : [{ id: "success", value: "false" }]
+    );
   };
 
   const revealSecretHandler = () => {

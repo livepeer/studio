@@ -9,7 +9,8 @@ import { DashboardWebhooks as Content } from "content";
 const WebhookDetail = () => {
   useLoggedIn();
   const { user } = useApi();
-  const [logFilters, setLogFilters] = useState();
+  const [logFilters, setLogFilters] = useState([]);
+  const [logs, setLogs] = useState<any>();
 
   const { getWebhook, getWebhookLogs } = useApi();
   const router = useRouter();
@@ -23,16 +24,42 @@ const WebhookDetail = () => {
     }
   );
 
-  const { data: logs, refetch: refetchLogs } = useQuery(
+  const { data, refetch: refetchLogs } = useQuery(
     ["webhookLogs", id, logFilters],
     () => getWebhookLogs(id, logFilters, null, true),
     {
       enabled: !!id,
+      onSuccess: (data) => {
+        const containsSuccessFilter = logFilters.some(
+          (filter) => filter.id === "success"
+        );
+        if (containsSuccessFilter) {
+          setLogs({
+            ...data,
+            totalCount: logs.totalCount,
+            failedCount: logs.failedCount,
+            successCount: logs.successCount,
+          });
+        } else {
+          setLogs(data);
+        }
+      },
     }
   );
 
   const handleLogFilters = async (filters) => {
-    setLogFilters(filters);
+    if (filters.length === 0) {
+      setLogFilters([]);
+      refetchLogs();
+      return;
+    }
+
+    const newFilters = logFilters.filter(
+      (existingFilter) =>
+        !filters.some((newFilter) => newFilter.id === existingFilter.id)
+    );
+
+    setLogFilters([...newFilters, ...filters]);
     refetchLogs();
   };
 

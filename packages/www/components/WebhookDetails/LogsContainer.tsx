@@ -25,31 +25,16 @@ const Cell = styled(Text, {
 const LogsContainer = ({
   data,
   logs,
-  filter,
   refetchLogs,
 }: {
   data: Webhook;
   logs: WebhookLogs[];
-  filter: FilterType;
   refetchLogs(): Promise<void>;
 }) => {
   const { resendWebhook } = useApi();
 
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
   const [isResending, setIsResending] = useState(false);
-
-  const succeededLogs = logs?.filter((log) => log.success);
-
-  const failedLogs = logs?.filter((log) => !log.success);
-
-  const router = useRouter();
-
-  const renderedLogs =
-    filter === "all"
-      ? logs
-      : filter === "succeeded"
-      ? succeededLogs
-      : failedLogs;
 
   const customTheme = {
     key: "color:#606060;line-height:1.8;font-size:14px;",
@@ -101,7 +86,7 @@ const LogsContainer = ({
               borderRight: "1px solid $colors$neutral6",
               height: "calc(100vh - 450px)",
             }}>
-            {renderedLogs.map((log: WebhookLogs, index) => (
+            {logs.map((log: WebhookLogs, index) => (
               <Box
                 onClick={() => setSelected(log)}
                 key={log.id}
