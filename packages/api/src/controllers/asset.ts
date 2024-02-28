@@ -184,7 +184,7 @@ function parseUrlToDStorageUrl(
 }
 
 export async function validateAssetPayload(
-  req: Pick<Request, "body" | "user" | "token" | "config">,
+  req: Pick<Request, "body" | "user" | "token" | "config" | "project">,
   id: string,
   playbackId: string,
   createdAt: number,
@@ -199,13 +199,6 @@ export async function validateAssetPayload(
       throw new ForbiddenError(
         `the provided object store is not owned by user`
       );
-    }
-  }
-
-  if (payload.projectId) {
-    const project = await getProject(req);
-    if (project.userId != userId) {
-      throw new ForbiddenError(`the provided projectId is not owned by user`);
     }
   }
 
@@ -243,7 +236,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    projectId: payload.projectId,
+    projectId: req.project.id,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),

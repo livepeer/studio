@@ -5,12 +5,13 @@ import { Request, RequestHandler, Response } from "express";
 import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
 
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
-import { ApiToken, User } from "../schema/types";
+import { ApiToken, User, Project } from "../schema/types";
 import { db } from "../store";
 import { ForbiddenError, UnauthorizedError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
+import { getProject } from "../controllers/project";
 
 type AuthScheme = "jwt" | "bearer" | "basic";
 
@@ -84,8 +85,10 @@ function authenticator(): RequestHandler {
       parseAuthHeader(authHeader);
     const basicUser = basicAuth.parse(authHeader);
     let user: User;
+    let project: Project;
     let tokenObject: WithID<ApiToken>;
     let userId: string;
+    let projectId: string;
 
     if (!authScheme) {
       return next();
@@ -102,9 +105,11 @@ function authenticator(): RequestHandler {
       }
 
       userId = tokenObject.userId;
+      projectId = tokenObject.projectId;
       // track last seen
       tracking.recordToken(tokenObject);
     } else if (authScheme === "jwt") {
+      // TODO parse projectID for jwt auth
       try {
         const verified = jwt.verify(authToken, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
@@ -148,6 +153,9 @@ function authenticator(): RequestHandler {
 
     req.token = tokenObject;
     req.user = user;
+
+    project = await getProject(req, projectId);
+    req.project = project;
 
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
