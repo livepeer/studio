@@ -155,6 +155,7 @@ app.post("/", validatePost("api-token"), async (req, res) => {
   await req.store.create({
     id: id,
     userId: userId,
+    projectId: req.project?.id,
     kind: "api-token",
     name: req.body.name,
     access: req.body.access,
