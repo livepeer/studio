@@ -114,13 +114,19 @@ async function fireGateWebhook(
     console.log(
       `access-control: gate: webhook=${
         webhook.id
-      } statusCode=${statusCode} respSpanId=${resp.headers.get("X-Tlive-Spanid")} respBody=${Buffer.from(respBody).toString("base64")} duration=${process.hrtime(startTime)[1] / 1e6}ms`
+      } statusCode=${statusCode} respSpanId=${resp?.headers.get(
+        "X-Tlive-Spanid"
+      )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
+        process.hrtime(startTime)[1] / 1e6
+      }ms`
     );
   } else {
     console.log(
       `access-control: gate: webhook=${
         webhook.id
-      } statusCode=${statusCode} duration=${process.hrtime(startTime)[1] / 1e6}ms`
+      } statusCode=${statusCode} duration=${
+        process.hrtime(startTime)[1] / 1e6
+      }ms`
     );
   }
   return statusCode;
