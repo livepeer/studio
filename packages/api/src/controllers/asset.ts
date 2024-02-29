@@ -616,6 +616,7 @@ const fieldsMap = {
   creatorId: `stream.data->'creatorId'->>'value'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
+  projectId: `asset.data->>'projectId'`,
   phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
@@ -628,18 +629,8 @@ const fieldsMap = {
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let {
-    limit,
-    cursor,
-    all,
-    allUsers,
-    order,
-    filters,
-    count,
-    cid,
-    projectId,
-    ...otherQs
-  } = toStringValues(req.query);
+  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
+    toStringValues(req.query);
   const fieldFilters = _(otherQs)
     .pick("playbackId", "sourceUrl", "phase")
     .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
@@ -667,8 +658,8 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  if (projectId) {
-    query.push(sql`asset.data->>'projectId' = ${projectId}`);
+  if (req.project.id) {
+    query.push(sql`asset.data->>'projectId' = ${req.project.id}`);
   } else {
     query.push(
       sql`(asset.data->>'projectId' IS NULL OR asset.data->>'projectId' = '')`
@@ -795,7 +786,7 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, encryption, c2pa, profiles, targetSegmentSizeSecs, projectId } =
+  let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
     req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
@@ -822,7 +813,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const dupAsset = await db.asset.findDuplicateUrlUpload(
     url,
     req.user.id,
-    projectId
+    req.project.id
   );
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });

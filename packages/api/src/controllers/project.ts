@@ -29,9 +29,16 @@ const app = Router();
 
 export async function getProject(req, projectId) {
   console.log("XXX: getting project:", projectId);
-  const project = await db.project.get(projectId);
-  if (!project || project.deleted) {
-    throw new NotFoundError(`project not found`);
+  let project;
+
+  if (projectId) {
+    project = await db.project.get(projectId);
+    if (!project || project.deleted) {
+      return {};
+      //throw new NotFoundError(`project not found`);
+    }
+  } else {
+    return {};
   }
 
   if (!req.user.admin && req.user.id !== project.userId) {
@@ -119,7 +126,7 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:projectId", authorizer({}), async (req, res) => {
-  const project = await getProject(req, req.params.projectId);
+  const project = await req.project;
 
   if (!project) {
     res.status(403);
