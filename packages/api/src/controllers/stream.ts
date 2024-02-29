@@ -1095,8 +1095,16 @@ app.put(
 
     if (!stream.isActive) {
       const ingest = await getIngestBase(req);
-      // TODO run in background
-      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+      setImmediate(async () => {
+        try {
+          await triggerCatalystPullStart(
+            stream,
+            getHLSPlaybackUrl(ingest, stream)
+          );
+        } catch (err) {
+          logger.error("Error triggering catalyst pull start err=", err);
+        }
+      });
 
       if (waitActive === "true") {
         stream = await pollWaitStreamActive(req, stream.id);
