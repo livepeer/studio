@@ -80,6 +80,7 @@ async function fireGateWebhook(
 
   const startTime = process.hrtime();
   let resp: Response;
+  let respBody: string;
   let errorMessage: string;
   let statusCode: number;
 
@@ -106,14 +107,22 @@ async function fireGateWebhook(
     );
     if (resp) {
       // Dispose of the response body
-      await resp.text();
+      respBody = await resp.text();
     }
   }
-  console.log(
-    `access-control: gate: webhook=${
-      webhook.id
-    } statusCode=${statusCode} duration=${process.hrtime(startTime)[1] / 1e6}ms`
-  );
+  if ("pull" in content && content.pull) {
+    console.log(
+      `access-control: gate: webhook=${
+        webhook.id
+      } statusCode=${statusCode} respSpanId=${resp.headers.get("X-Tlive-Spanid")} respBody=${Buffer.from(respBody).toString("base64")} duration=${process.hrtime(startTime)[1] / 1e6}ms`
+    );
+  } else {
+    console.log(
+      `access-control: gate: webhook=${
+        webhook.id
+      } statusCode=${statusCode} duration=${process.hrtime(startTime)[1] / 1e6}ms`
+    );
+  }
   return statusCode;
 }
 
