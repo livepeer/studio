@@ -1072,6 +1072,7 @@ app.put(
       });
     }
     const streamExisted = streams.length === 1;
+    let streamNuked = false;
 
     let stream: DBStream;
     if (!streamExisted) {
@@ -1090,10 +1091,11 @@ app.put(
 
       if (oldStream.pull?.source != stream.pull?.source) {
         await triggerCatalystStreamNuke(req, stream.playbackId);
+        streamNuked = true;
       }
     }
 
-    if (!stream.isActive) {
+    if (!stream.isActive || streamNuked) {
       const ingest = await getIngestBase(req);
       setImmediate(async () => {
         try {
