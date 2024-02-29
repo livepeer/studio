@@ -1093,11 +1093,14 @@ app.put(
       }
     }
 
-    const ingest = await getIngestBase(req);
-    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+    if (!stream.isActive) {
+      const ingest = await getIngestBase(req);
+      // TODO run in background
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
 
-    if (waitActive === "true") {
-      stream = await pollWaitStreamActive(req, stream.id);
+      if (waitActive === "true") {
+        stream = await pollWaitStreamActive(req, stream.id);
+      }
     }
 
     res.status(streamExisted ? 200 : 201);
