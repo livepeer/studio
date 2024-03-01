@@ -592,35 +592,6 @@ describe("controllers/stream", () => {
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
-
-      it("should wait for stream to become active if requested", async () => {
-        let responded = false;
-        const resProm = client.put(
-          "/stream/pull?waitActive=true",
-          postMockPullStream
-        );
-        resProm.then(() => (responded = true));
-
-        // give some time for API to create object in DB
-        await sleep(100);
-
-        const [streams] = await db.stream.find();
-        expect(streams).toHaveLength(1);
-        expect(streams[0].isActive).toBe(false);
-
-        // stream not active yet
-        expect(responded).toBe(false);
-
-        // set stream active
-        await db.stream.update(streams[0].id, { isActive: true });
-
-        const res = await resProm;
-        expect(responded).toBe(true); // make sure this works
-        expect(res.status).toBe(201);
-        const stream = await res.json();
-        expect(stream.id).toBe(streams[0].id);
-        expect(stream.isActive).toBe(true);
-      });
     });
 
     it("should create a stream, delete it, and error when attempting additional delete or replace", async () => {

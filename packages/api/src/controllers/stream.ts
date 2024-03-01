@@ -234,35 +234,6 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-// Waits for the stream to become active. Works by polling the stream object
-// on the DB until it becomes active or the timeout is reached. Will wait for
-// exponentially longer time in between polls to reduce load on the DB.
-async function pollWaitStreamActive(req: Request, id: string) {
-  let clientGone = false;
-  req.on("close", () => {
-    clientGone = true;
-  });
-
-  const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
-  let sleepDelay = 150;
-  while (!clientGone && Date.now() < deadline) {
-    const stream =
-      (await db.stream.get(id)) ||
-      (await db.stream.get(id, { useReplica: false })); // read from primary in case replica is lagging
-    if (!stream) {
-      throw new NotFoundError("stream not found");
-    }
-    if (stream.isActive) {
-      return stream;
-    }
-
-    await sleep(sleepDelay);
-    sleepDelay = Math.min(sleepDelay * 2, 5000);
-  }
-
-  throw new InternalServerError("stream not active");
-}
-
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
 }
@@ -1097,20 +1068,7 @@ app.put(
 
     if (!stream.isActive || streamNuked) {
       const ingest = await getIngestBase(req);
-      setImmediate(async () => {
-        try {
-          await triggerCatalystPullStart(
-            stream,
-            getHLSPlaybackUrl(ingest, stream)
-          );
-        } catch (err) {
-          logger.error("Error triggering catalyst pull start err=", err);
-        }
-      });
-
-      if (waitActive === "true") {
-        stream = await pollWaitStreamActive(req, stream.id);
-      }
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
     res.status(streamExisted ? 200 : 201);

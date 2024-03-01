@@ -661,12 +661,16 @@ export const triggerCatalystPullStart =
             timeout: PULL_START_TIMEOUT,
             maxRedirects: 10,
           });
-          const body = await res.text();
-          const isHlsErr = body.includes("#EXT-X-ERROR: Stream open failed");
+          const errHeader = res.headers.get("error");
+          const isHlsErr =
+            errHeader &&
+            errHeader != "" &&
+            !errHeader.includes("not allowed to view this stream");
           if (res.ok && !isHlsErr) {
             return;
           }
 
+          const body = await res.text();
           logger.warn(
             `failed to trigger catalyst pull for stream=${
               stream.id
