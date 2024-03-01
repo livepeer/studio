@@ -28,8 +28,11 @@ import {
 const app = Router();
 
 export async function getProject(req, projectId) {
-  console.log("XXX: getting project:", projectId);
   let project;
+
+  if (!req.user.admin && req.user.id !== project.userId) {
+    throw new ForbiddenError(`invalid user`);
+  }
 
   if (projectId) {
     project = await db.project.get(projectId);
@@ -40,10 +43,7 @@ export async function getProject(req, projectId) {
   } else {
     return {};
   }
-
-  if (!req.user.admin && req.user.id !== project.userId) {
-    throw new ForbiddenError(`invalid user`);
-  }
+  console.log("XXX: got project:", projectId, project);
 
   return project;
 }
