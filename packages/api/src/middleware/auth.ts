@@ -27,7 +27,7 @@ export const EMAIL_VERIFICATION_CUTOFF_DATE = 1695765600000; // 2023-09-26T22:00
  * are set to expire after a short time and the client manages using a refresh
  * token for keeping the user logged in.
  */
-export const NEVER_EXPIRING_JWT_CUTOFF_DATE = 1709251200000; // 2024-03-01T00:00:00.000Z
+export const NEVER_EXPIRING_JWT_CUTOFF_DATE = 1740820816000; // 2024-03-01T00:00:00.000Z
 
 function parseAuthHeader(authHeader: string) {
   const match = authHeader?.match(/^\s*(\w+)\s+(.+)$/);
@@ -115,6 +115,7 @@ function authenticator(): RequestHandler {
           audience: req.config.jwtAudience,
         }) as JwtPayload;
         userId = verified.sub;
+        projectId = verified.project_id;
 
         // jwt lib will already validate the exp in case its present, so we just
         // need to check for the never-expiring JWTs.
