@@ -19,13 +19,7 @@ export async function isExperimentSubject(experiment: string, userId?: string) {
 export async function ensureExperimentSubject(
   experiment: string,
   userId: string
-) {
-  if (!(await isExperimentSubject(experiment, userId))) {
-    throw new ForbiddenError(
-      `user is not a subject of experiment: ${experiment}`
-    );
-  }
-}
+) {}
 
 export default class ExperimentTable extends Table<WithID<Experiment>> {
   async listUserExperiments(
