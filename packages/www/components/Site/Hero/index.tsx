@@ -23,7 +23,6 @@ const Hero = ({
   ctas = [],
   backgroundColor = "inherit",
 }) => {
-  console.log(ctas);
   return (
     <Box css={{ position: "relative", bc: backgroundColor }}>
       <Guides backgroundColor={backgroundColor} />

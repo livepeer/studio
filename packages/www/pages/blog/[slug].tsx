@@ -74,7 +74,7 @@ const Post = ({
   excerpt,
   noindex = false,
   preview,
-  content,
+  contentRaw,
   furtherReading,
   metaTitle,
   metaDescription,
@@ -89,8 +89,8 @@ const Post = ({
       </Layout>
     );
   }
-  const text = blocksToText(content);
-  const stats = readingTime(text);
+  // const text = blocksToText(contentRaw);
+  // const stats = readingTime(text);
 
   return (
     <Layout
@@ -207,14 +207,14 @@ const Post = ({
               <Box
                 css={{ mx: "$2", width: "1px", height: 16, bc: "$neutral2" }}
               />
-              <Box
+              {/* <Box
                 css={{
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
                 }}>
                 {stats.text}
-              </Box>
+              </Box> */}
             </Flex>
             <Box
               css={{
@@ -262,7 +262,7 @@ const Post = ({
                 },
               }}>
               <BlockContent
-                blocks={content}
+                blocks={contentRaw}
                 serializers={serializers}
                 {...client.config()}
               />

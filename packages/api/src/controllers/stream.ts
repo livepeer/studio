@@ -1072,6 +1072,7 @@ app.put(
       });
     }
     const streamExisted = streams.length === 1;
+    let streamNuked = false;
 
     let stream: DBStream;
     if (!streamExisted) {
@@ -1090,14 +1091,26 @@ app.put(
 
       if (oldStream.pull?.source != stream.pull?.source) {
         await triggerCatalystStreamNuke(req, stream.playbackId);
+        streamNuked = true;
       }
     }
 
-    const ingest = await getIngestBase(req);
-    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+    if (!stream.isActive || streamNuked) {
+      const ingest = await getIngestBase(req);
+      setImmediate(async () => {
+        try {
+          await triggerCatalystPullStart(
+            stream,
+            getHLSPlaybackUrl(ingest, stream)
+          );
+        } catch (err) {
+          logger.error("Error triggering catalyst pull start err=", err);
+        }
+      });
 
-    if (waitActive === "true") {
-      stream = await pollWaitStreamActive(req, stream.id);
+      if (waitActive === "true") {
+        stream = await pollWaitStreamActive(req, stream.id);
+      }
     }
 
     res.status(streamExisted ? 200 : 201);
