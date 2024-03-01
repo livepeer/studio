@@ -236,7 +236,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    projectId: req.project.id,
+    projectId: req.project?.id,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
@@ -658,13 +658,11 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  if (req.project.id) {
-    query.push(sql`asset.data->>'projectId' = ${req.project.id}`);
-  } else {
-    query.push(
-      sql`(asset.data->>'projectId' IS NULL OR asset.data->>'projectId' = '')`
-    );
-  }
+  query.push(
+    req.project?.id
+      ? sql`asset.data->>'projectId' = ${req.project.id}`
+      : sql`asset.data->>'projectId' IS NULL OR asset.data->>'projectId' = ''`
+  );
 
   let output: WithID<Asset>[];
   let newCursor: string;
