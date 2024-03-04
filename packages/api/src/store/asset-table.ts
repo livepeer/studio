@@ -128,6 +128,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
     const query = [
       sql`asset.data->>'deleted' IS NULL`,
       sql`asset.data->>'userId' = ${userId}`,
+      sql`asset.data->>'projectId' = ${userId}`,
       sql`asset.data->'source'->>'type' = 'url'`,
       sql`asset.data->'source'->>'url' = ${url}`,
       sql`asset.data->'status'->>'phase' IN ('waiting', 'processing')`,

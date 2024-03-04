@@ -27,24 +27,15 @@ import {
 
 const app = Router();
 
-export async function getProject(req, projectId) {
-  let project;
-
+export async function getProject(req: Request, projectId: string) {
+  const project = projectId
+    ? await db.project.get(projectId)
+    : { name: "default", userId: req.user.id };
   if (!req.user.admin && req.user.id !== project.userId) {
     throw new ForbiddenError(`invalid user`);
   }
 
-  if (projectId) {
-    project = await db.project.get(projectId);
-    if (!project || project.deleted) {
-      return {};
-      //throw new NotFoundError(`project not found`);
-    }
-  } else {
-    return {};
-  }
   console.log("XXX: got project:", projectId, project);
-
   return project;
 }
 
@@ -147,7 +138,6 @@ app.post("/", authorizer({}), async (req, res) => {
     userId: req.user.id,
     createdAt: Date.now(),
   });
-  res.status(201);
 
   const project = await db.project.get(id, { useReplica: false });
 

@@ -109,7 +109,6 @@ function authenticator(): RequestHandler {
       // track last seen
       tracking.recordToken(tokenObject);
     } else if (authScheme === "jwt") {
-      // TODO parse projectID for jwt auth
       try {
         const verified = jwt.verify(authToken, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
