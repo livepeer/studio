@@ -115,7 +115,6 @@ export const getWebhookLogs = async (
   ];
 
   const fetchLogs = async (fromStatus, additionalFilters = [], limit = 20) => {
-    console.log("fromStatus", additionalFilters);
     const query = qs.stringify({
       limit,
       cursor: fromStatus ? null : cursor,

@@ -18,7 +18,6 @@ const WebhookDetail = () => {
     successCount: 0,
   });
   const [loadingMore, setLoadingMore] = useState(false);
-
   const { getWebhook, getWebhookLogs } = useApi();
   const router = useRouter();
   const { id } = router.query;
@@ -31,17 +30,25 @@ const WebhookDetail = () => {
     }
   );
 
+  const containsSuccessFilter = (logFilters) => {
+    return logFilters.some((filter) => filter.id === "success");
+  };
+
   const { refetch: refetchLogs, isLoading: isLogsLoading } = useQuery(
     ["webhookLogs", id, logFilters],
-    () => getWebhookLogs(id, logFilters, logs ? logs.cursor : null, true),
+    () =>
+      getWebhookLogs(
+        id,
+        logFilters,
+        logFilters.length > 0 ? null : logs.cursor,
+        true
+      ),
     {
       enabled: !!id,
       onSuccess: (data) => {
-        const containsSuccessFilter = logFilters.some(
-          (filter) => filter.id === "success"
-        );
+        const isSuccess = containsSuccessFilter(logFilters);
 
-        if (containsSuccessFilter) {
+        if (isSuccess) {
           setLogs({
             ...data,
             data: loadingMore ? [...logs.data, ...data.data] : data.data,
@@ -64,6 +71,10 @@ const WebhookDetail = () => {
   const handleLogFilters = async (filters) => {
     if (filters.length === 0) {
       setLogFilters([]);
+      setLogs({
+        ...logs,
+        cursor: null,
+      });
       refetchLogs();
       return;
     }
