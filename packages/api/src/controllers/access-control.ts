@@ -88,11 +88,21 @@ async function fireGateWebhook(
     resp = await fetchWithTimeoutAndRedirects(webhook.url, params);
     statusCode = resp.status;
 
-    if (resp.status < 200 || resp.status >= 300) {
+    // Dispose of the response body
+    respBody = await resp.text();
+    if (resp.status >= 200 && resp.status < 300) {
+      // try parsing response body to check for access denied with a 200
+      const respCode = checkRespBody(respBody);
+      if (respCode) {
+        statusCode = respCode;
+      }
+    }
+
+    if (statusCode < 200 || statusCode >= 300) {
       console.error(
-        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
+        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${statusCode}`
       );
-      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`;
+      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${statusCode}`;
     }
   } catch (e) {
     errorMessage = e.message;
@@ -105,10 +115,6 @@ async function fireGateWebhook(
       errorMessage,
       undefined
     );
-    if (resp) {
-      // Dispose of the response body
-      respBody = await resp.text();
-    }
   }
   if ("pull" in content && content.pull) {
     console.log(
@@ -130,6 +136,20 @@ async function fireGateWebhook(
     );
   }
   return statusCode;
+}
+
+function checkRespBody(resp: string): number | null {
+  if (!resp || resp == "") {
+    return;
+  }
+  try {
+    const body = JSON.parse(resp);
+    return body.ret;
+  } catch (e) {
+    console.log(
+      `access-control: error checking response body for status code: ${e}`
+    );
+  }
 }
 
 app.use("/signing-key", signingKeyApp);
