@@ -292,21 +292,17 @@ components:
         startTime:
           type: number
           description: >-
-            The start timestamp of the clip in Unix milliseconds. This is the
-            **server time** - not relative time to the start of the stream. _See
-            the ClipTrigger in the UI Kit for an example of how this is
-            calculated (for HLS, it uses `Program Date-Time` tags, and for
-            WebRTC, it uses the latency from server to client at stream
-            startup)._
+            The start timestamp of the clip in Unix milliseconds. _See the
+            ClipTrigger in the UI Kit for an example of how this is calculated
+            (for HLS, it uses `Program Date-Time` tags, and for WebRTC, it uses
+            the latency from server to client at stream startup)._
         endTime:
           type: number
           description: >-
-            The end timestamp of the clip in Unix milliseconds. This is the
-            **server time** - not relative time to the start of the stream. _See
-            the ClipTrigger in the UI Kit for an example of how this is
-            calculated (for HLS, it uses `Program Date-Time` tags, and for
-            WebRTC, it uses the latency from server to client at stream
-            startup)._
+            The end timestamp of the clip in Unix milliseconds. _See the
+            ClipTrigger in the UI Kit for an example of how this is calculated
+            (for HLS, it uses `Program Date-Time` tags, and for WebRTC, it uses
+            the latency from server to client at stream startup)._
         name:
           type: string
           description: >-
@@ -1741,26 +1737,11 @@ components:
                   additionalProperties: false
                   properties:
                     startTime:
-                      type: number
-                      description: >-
-                        The start timestamp of the clip in Unix milliseconds.
-                        _See the ClipTrigger in the UI Kit for an example of how
-                        this is calculated (for HLS, it uses `Program Date-Time`
-                        tags, and for WebRTC, it uses the latency from server to
-                        client at stream startup)._
+                      $ref: "#/components/schemas/clip-payload/properties/startTime"
                     endTime:
-                      type: number
-                      description: >-
-                        The end timestamp of the clip in Unix milliseconds. _See
-                        the ClipTrigger in the UI Kit for an example of how this
-                        is calculated (for HLS, it uses `Program Date-Time`
-                        tags, and for WebRTC, it uses the latency from server to
-                        client at stream startup)._
+                      $ref: "#/components/schemas/clip-payload/properties/endTime"
                     playbackId:
-                      type: string
-                      description: >-
-                        The playback ID of the stream or stream recording to
-                        clip. Asset playback IDs are not supported yet.
+                      $ref: "#/components/schemas/clip-payload/properties/playbackId"
                 catalystPipelineStrategy:
                   type: string
                   description: >-
