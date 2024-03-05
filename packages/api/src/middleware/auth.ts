@@ -11,7 +11,6 @@ import { ForbiddenError, UnauthorizedError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
-import { getProject } from "../controllers/project";
 
 type AuthScheme = "jwt" | "bearer" | "basic";
 
@@ -55,6 +54,18 @@ function isAuthorized(
     console.error(`error authorizing ${method} ${path}: ${err}`);
     return false;
   }
+}
+
+export async function getProject(req: Request, projectId: string) {
+  const project = projectId
+    ? await db.project.get(projectId)
+    : { name: "default", userId: req.user.id };
+  if (!req.user.admin && req.user.id !== project.userId) {
+    throw new ForbiddenError(`invalid user`);
+  }
+
+  console.log("XXX: got project:", projectId, project);
+  return project;
 }
 
 /**

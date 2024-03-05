@@ -9,23 +9,10 @@ import {
   toStringValues,
 } from "./helpers";
 import sql from "sql-template-strings";
-import { ForbiddenError } from "../store/errors";
 import { WithID } from "../store/types";
 import { Project } from "../schema/types";
 
 const app = Router();
-
-export async function getProject(req: Request, projectId: string) {
-  const project = projectId
-    ? await db.project.get(projectId)
-    : { name: "default", userId: req.user.id };
-  if (!req.user.admin && req.user.id !== project.userId) {
-    throw new ForbiddenError(`invalid user`);
-  }
-
-  console.log("XXX: got project:", projectId, project);
-  return project;
-}
 
 const fieldsMap = {
   id: `project.ID`,

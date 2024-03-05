@@ -58,7 +58,6 @@ import {
 import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
 import { getClips } from "./clip";
-import { getProject } from "./project";
 
 const app = Router();
 
