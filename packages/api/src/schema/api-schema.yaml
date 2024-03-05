@@ -1024,6 +1024,10 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         createdAt:
           readOnly: true
           type: number
@@ -1173,9 +1177,7 @@ components:
             custom name or title
           example: filename.mp4
         projectId:
-          type: string
-          description: The ID of the project
-          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
+          $ref: "#/components/schemas/asset"
         staticMp4:
           type: boolean
           description: Whether to generate MP4s for the asset.
