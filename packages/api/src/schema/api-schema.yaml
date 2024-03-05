@@ -315,7 +315,8 @@ components:
           type: string
           description: >-
             The optional session ID of the stream to clip. This can be used to
-            clip past sessions.
+            clip _recordings_ - if it is not specified, it will clip the ongoing
+            livestream.
     target:
       type: object
       required:
@@ -886,7 +887,8 @@ components:
           description: >-
             URL for HLS playback. **It is recommended to not use this URL**, and
             instead use playback IDs with the Playback Info endpoint to retrieve
-            the playback URLs - this URL format is subject to change.
+            the playback URLs - this URL format is subject to change (e.g.
+            https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8).
         downloadUrl:
           readOnly: true
           type: string
@@ -1245,38 +1247,15 @@ components:
         - url
       properties:
         name:
-          type: string
-          description: |
-            The name of the asset. This is not necessarily the filename - it can be a
-            custom name or title.
-          example: filename.mp4
+          $ref: "#/components/schemas/new-asset-payload/properties/name"
         staticMp4:
-          type: boolean
-          description: Whether to generate MP4s for the asset.
-          example: true
+          $ref: "#/components/schemas/new-asset-payload/properties/staticMp4"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         storage:
-          additionalProperties: false
-          properties:
-            ipfs:
-              description: |
-                Set to true to make default export to IPFS. To customize the
-                pinned files, specify an object with a spec field. False or null
-                means to unpin from IPFS, but it's unsupported right now.
-              oneOf:
-                - type: object
-                  additionalProperties: false
-                  properties:
-                    spec:
-                      oneOf:
-                        - type: "null"
-                        - $ref: >-
-                            #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
-                - type: boolean
-                - type: "null"
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
         url:
           type: string
           format: uri
@@ -1287,28 +1266,13 @@ components:
             source: `ar://{CID}`.
           example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
-          type: object
-          additionalProperties: false
-          required:
-            - encryptedKey
-          properties:
-            encryptedKey:
-              type: string
-              writeOnly: true
-              description: >-
-                Encryption key used to encrypt the asset. Only writable in the
-                upload asset endpoints and cannot be retrieved back.
+          $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         c2pa:
-          type: boolean
-          description: Decides if the output video should include C2PA signature
+          $ref: "#/components/schemas/new-asset-payload/properties/c2pa"
         profiles:
-          type: array
-          items:
-            $ref: "#/components/schemas/transcode-profile"
+          $ref: "#/components/schemas/new-asset-payload/properties/profiles"
         targetSegmentSizeSecs:
-          type: number
-          description:
-            How many seconds the duration of each output segment should be
+          $ref: "#/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs"
     room-user-payload:
       type: object
       required:
@@ -1780,20 +1744,18 @@ components:
                       type: number
                       description: >-
                         The start timestamp of the clip in Unix milliseconds.
-                        This is the **server time** - not relative time to the
-                        start of the stream. _See the ClipTrigger in the UI Kit
-                        for an example of how this is calculated (for HLS, it
-                        uses `Program Date-Time` tags, and for WebRTC, it uses
-                        the latency from server to client at stream startup)._
+                        _See the ClipTrigger in the UI Kit for an example of how
+                        this is calculated (for HLS, it uses `Program Date-Time`
+                        tags, and for WebRTC, it uses the latency from server to
+                        client at stream startup)._
                     endTime:
                       type: number
                       description: >-
-                        The end timestamp of the clip in Unix milliseconds. This
-                        is the **server time** - not relative time to the start
-                        of the stream. _See the ClipTrigger in the UI Kit for an
-                        example of how this is calculated (for HLS, it uses
-                        `Program Date-Time` tags, and for WebRTC, it uses the
-                        latency from server to client at stream startup)._
+                        The end timestamp of the clip in Unix milliseconds. _See
+                        the ClipTrigger in the UI Kit for an example of how this
+                        is calculated (for HLS, it uses `Program Date-Time`
+                        tags, and for WebRTC, it uses the latency from server to
+                        client at stream startup)._
                     playbackId:
                       type: string
                       description: >-
