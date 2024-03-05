@@ -83,6 +83,7 @@ async function fireGateWebhook(
   let respBody: string;
   let errorMessage: string;
   let statusCode: number;
+  let bodyStatusCode: number;
 
   try {
     resp = await fetchWithTimeoutAndRedirects(webhook.url, params);
@@ -92,17 +93,15 @@ async function fireGateWebhook(
     respBody = await resp.text();
     if (resp.status >= 200 && resp.status < 300) {
       // try parsing response body to check for access denied with a 200
-      const respCode = checkRespBody(respBody);
-      if (respCode) {
-        statusCode = respCode;
+      bodyStatusCode = checkRespBody(respBody);
+      if (bodyStatusCode) {
+        statusCode = bodyStatusCode;
       }
     }
 
     if (statusCode < 200 || statusCode >= 300) {
-      console.error(
-        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${statusCode}`
-      );
-      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${statusCode}`;
+      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status} bodyStatusCode=${bodyStatusCode}`;
+      console.error(`access-control: gate: ${errorMessage}`);
     }
   } catch (e) {
     errorMessage = e.message;
