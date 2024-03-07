@@ -980,7 +980,7 @@ const ID = () => {
                     frameBorder="0"
                     allowFullScreen
                     allow="autoplay; encrypted-media; picture-in-picture"
-                    sandbox="allow-scripts"></iframe>
+                    sandbox="allow-same-origin; allow-scripts"></iframe>
                 </Box>
               </Flex>
               <TimedAlert
