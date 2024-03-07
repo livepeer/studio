@@ -402,6 +402,10 @@ components:
           type: string
           index: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        projectId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         name:
           type: string
           example: Example Token
@@ -653,6 +657,20 @@ components:
                 type: string
               probability:
                 type: number
+    project:
+      table: project
+      properties:
+        kind:
+          type: string
+          example: project
+          readOnly: true
+        userId:
+          index: true
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        deleted:
+          type: boolean
+          description: Set to true when the project is deleted
     stream:
       table: stream
       properties:
