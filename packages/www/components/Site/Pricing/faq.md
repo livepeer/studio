@@ -10,8 +10,8 @@ compares to other video infrastructure providers.
 
 In the hundreds of hackathon projects that were built using Livepeer Studio,
 none have ever exceeded the alloted free minutes provided in the Hacker plan. If
-this is a concern, email Livepeer Inc at
-[help@livepeer.org](mailto:help@livepeer.org) or reach out
+this is a concern, email Livepeer Studio at
+[help@livepeer.studio](mailto:help@livepeer.studio) or reach out
 on [Discord](https://discord.gg/livepeer).
 
 ### **Do I need to provide a credit card number to create an account?**
@@ -45,7 +45,7 @@ a Hacker account, your account will be disabled until you select a paid plan.
 
 USD is the only currency accepted right now via the Livepeer Studio dashboard.
 Crypto-native payments are coming soon. If you prefer to pay with cryptocurrency
-now, you may reach out at [help@livepeer.org](mailto:help@livepeer.org)
+now, you may reach out at [help@livepeer.studio](mailto:help@livepeer.studio)
 
 ### **How are transcoding, storage, and delivery minutes derived?**
 
@@ -55,4 +55,4 @@ bitrate and the total amount of data used.
 
 If you have further questions about these calculations or feel that they do not
 accurately reflect the characteristics of your project's usage, you may reach
-out at [help@livepeer.org](mailto:help@livepeer.org)
+out at [help@livepeer.studio](mailto:help@livepeer.studio)
