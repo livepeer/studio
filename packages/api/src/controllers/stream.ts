@@ -1059,7 +1059,7 @@ app.put(
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
 
-      await triggerCatalystStreamNuke(req, stream.playbackId);
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
     if (!stream.isActive || streamExisted) {
