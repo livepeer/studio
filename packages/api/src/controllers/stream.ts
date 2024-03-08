@@ -1043,7 +1043,6 @@ app.put(
       });
     }
     const streamExisted = streams.length === 1;
-    let streamNuked = false;
 
     let stream: DBStream;
     if (!streamExisted) {
@@ -1060,13 +1059,10 @@ app.put(
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
 
-      if (oldStream.pull?.source != stream.pull?.source) {
-        await triggerCatalystStreamNuke(req, stream.playbackId);
-        streamNuked = true;
-      }
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
-    if (!stream.isActive || streamNuked) {
+    if (!stream.isActive || streamExisted) {
       const ingest = await getIngestBase(req);
       await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
