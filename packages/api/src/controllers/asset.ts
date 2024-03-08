@@ -60,6 +60,9 @@ import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
 import { getClips } from "./clip";
 
+// 7 Days
+const DELETE_ASSET_DELAY = 7 * 24 * 60 * 60 * 1000;
+
 const app = Router();
 
 export function catalystPipelineStrategy(req: Request) {
@@ -629,8 +632,18 @@ const fieldsMap = {
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
-    toStringValues(req.query);
+  let {
+    limit,
+    cursor,
+    all,
+    allUsers,
+    order,
+    filters,
+    count,
+    cid,
+    deleting,
+    ...otherQs
+  } = toStringValues(req.query);
   const fieldFilters = _(otherQs)
     .pick("playbackId", "sourceUrl", "phase")
     .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
@@ -711,6 +724,14 @@ app.get("/", authorizer({}), async (req, res) => {
   res.status(200);
   if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
+  }
+
+  if (req.user.admin && deleting) {
+    output = output.filter((asset) => asset.status.phase == "deleting");
+    output = output.filter(
+      (asset) =>
+        asset.deletedAt && Date.now() > asset.deletedAt + DELETE_ASSET_DELAY
+    );
   }
 
   return res.json(output);
@@ -1100,7 +1121,37 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
+
+  if (asset.status.phase === "deleting" || asset.deleted) {
+    throw new BadRequestError(`Asset is already deleted`);
+  }
+
   await req.taskScheduler.deleteAsset(asset);
+  res.status(204);
+  res.end();
+});
+
+app.put("/:id/restore", authorizer({}), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
+  }
+
+  if (!req.user.admin && req.user.id !== asset.userId) {
+    throw new ForbiddenError(`users may only restore their own assets`);
+  }
+
+  if (!asset.deleted) {
+    throw new BadRequestError(`Asset is not deleted`);
+  }
+
+  if (asset.status?.phase !== "deleting") {
+    throw new BadRequestError(`Asset is not in a restorable state`);
+  }
+
+  await req.taskScheduler.restoreAsset(asset);
   res.status(204);
   res.end();
 });

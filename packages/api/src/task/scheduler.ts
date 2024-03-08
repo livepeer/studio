@@ -539,10 +539,44 @@ export class TaskScheduler {
       if (typeof asset === "string") {
         asset = await db.asset.get(asset);
       }
+
+      let phase = asset.status?.phase;
+      // Prevent bump of updatedAt if phase isn't getting updated
+      let updatedAt = asset.status?.updatedAt;
+
+      if (phase == "ready") {
+        // If the asset is ready, we need to schedule deletion
+        phase = "deleting";
+        updatedAt = Date.now();
+      }
+
       await this.updateAsset(asset, {
         deleted: true,
         deletedAt: Date.now(),
-        status: asset.status, // prevent updatedAt from being bumped
+        status: {
+          phase: phase,
+          updatedAt: updatedAt,
+        },
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async restoreAsset(asset: string | Asset) {
+    try {
+      if (typeof asset === "string") {
+        asset = await db.asset.get(asset);
+      }
+
+      await this.updateAsset(asset, {
+        deleted: false,
+        deletedAt: null,
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
       });
       return true;
     } catch (e) {
