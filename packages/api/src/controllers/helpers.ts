@@ -687,6 +687,11 @@ export const triggerCatalystPullStart =
 export const triggerCatalystStreamNuke = (req: Request, playback_id: string) =>
   triggerCatalystEvent(req, { resource: "nuke", playback_id });
 
+export const triggerCatalystStreamStopSessions = (
+  req: Request,
+  playback_id: string
+) => triggerCatalystEvent(req, { resource: "stopSessions", playback_id });
+
 export const triggerCatalystStreamUpdated = (
   req: Request,
   playback_id: string
@@ -694,7 +699,7 @@ export const triggerCatalystStreamUpdated = (
 
 async function triggerCatalystEvent(
   req: Request,
-  payload: { resource: "stream" | "nuke"; playback_id: string }
+  payload: { resource: "stream" | "nuke" | "stopSessions"; playback_id: string }
 ) {
   const { catalystBaseUrl } = req.config;
 
