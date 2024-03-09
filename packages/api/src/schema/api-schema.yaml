@@ -2545,7 +2545,7 @@ paths:
               type: object
               $ref: "#/components/schemas/new-stream-payload"
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
