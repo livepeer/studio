@@ -1156,6 +1156,29 @@ app.put("/:id/restore", authorizer({}), async (req, res) => {
   res.end();
 });
 
+app.patch("/:id/deleted", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
+  }
+
+  if (!(asset.status.phase === "deleting")) {
+    throw new BadRequestError(`Asset is not in a deleting phase`);
+  }
+
+  await db.asset.update(asset.id, {
+    status: {
+      phase: "deleted",
+      updatedAt: Date.now(),
+    },
+  });
+
+  res.status(204);
+  res.end();
+});
+
 app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
   if (req.query.userId && req.query.userId !== req.user.id && !req.user.admin) {
     throw new ForbiddenError(`users may only delete their own assets`);
