@@ -48,7 +48,6 @@ const fieldsMap = {
   name: { val: `api_token.data->>'name'`, type: "full-text" },
   lastSeen: `api_token.data->'lastSeen'`,
   userId: `api_token.data->>'userId'`,
-  projectId: `api_token.data->>'projectId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
 };
 
@@ -67,9 +66,6 @@ app.get("/", async (req, res) => {
 
   if (!userId) {
     const query = parseFilters(fieldsMap, filters);
-    query.push(
-      sql`coalesce(api_token.data->>'projectId', '') = ${req.project?.id || ""}`
-    );
 
     let fields =
       " api_token.id as id, api_token.data as data, users.id as usersId, users.data as usersdata";
@@ -106,13 +102,9 @@ app.get("/", async (req, res) => {
       errors: ["user can only request information on their own tokens"],
     });
   }
+
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`api_token.data->>'userId' = ${userId}`);
-  query.push(
-    req.project?.id
-      ? sql`api_token.data->>'projectId' = ${req.project.id}`
-      : sql`api_token.data->>'projectId' IS NULL OR api_token.data->>'projectId' = ''`
-  );
 
   let fields = " api_token.id as id, api_token.data as data";
   if (count) {
@@ -163,7 +155,6 @@ app.post("/", validatePost("api-token"), async (req, res) => {
   await req.store.create({
     id: id,
     userId: userId,
-    projectId: req.query.projectId?.toString(),
     kind: "api-token",
     name: req.body.name,
     access: req.body.access,
