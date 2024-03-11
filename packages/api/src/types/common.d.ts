@@ -1,5 +1,5 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
-import { Stream, User, ApiToken, Project } from "../schema/types";
+import { Stream, User, ApiToken } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
 import { TaskScheduler } from "../task/scheduler";
@@ -42,7 +42,6 @@ declare global {
       frontendDomain: string;
       catalystBaseUrl: string;
       user?: User;
-      project?: Project;
       isUIAdmin?: boolean;
       isNeverExpiringJWT?: boolean;
       token?: WithID<ApiToken>;

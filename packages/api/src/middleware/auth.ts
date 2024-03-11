@@ -3,14 +3,11 @@ import basicAuth from "basic-auth";
 import corsLib, { CorsOptions } from "cors";
 import { Request, RequestHandler, Response } from "express";
 import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
+
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
-import { ApiToken, User, Project } from "../schema/types";
+import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
-import {
-  ForbiddenError,
-  BadRequestError,
-  UnauthorizedError,
-} from "../store/errors";
+import { ForbiddenError, UnauthorizedError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
@@ -59,17 +56,6 @@ function isAuthorized(
   }
 }
 
-export async function getProject(req: Request, projectId: string) {
-  const project = projectId
-    ? await db.project.get(projectId)
-    : { id: "", name: "default", userId: req.user.id };
-  if (!req.user.admin && req.user.id !== project.userId) {
-    throw new ForbiddenError(`invalid user`);
-  }
-
-  return project;
-}
-
 /**
  * Creates a middleware that parses and verifies the authentication method from
  * the request and populates the `express.Request` object.
@@ -98,10 +84,8 @@ function authenticator(): RequestHandler {
       parseAuthHeader(authHeader);
     const basicUser = basicAuth.parse(authHeader);
     let user: User;
-    let project: Project;
     let tokenObject: WithID<ApiToken>;
     let userId: string;
-    let projectId: string;
 
     if (!authScheme) {
       return next();
@@ -117,12 +101,7 @@ function authenticator(): RequestHandler {
         throw new UnauthorizedError(`no token ${tokenId} found`);
       }
 
-      if (req.query.projectId) {
-        throw new BadRequestError(`projectId as query param not supported`);
-      }
-
       userId = tokenObject.userId;
-      projectId = tokenObject.projectId;
       // track last seen
       tracking.recordToken(tokenObject);
     } else if (authScheme === "jwt") {
@@ -131,7 +110,6 @@ function authenticator(): RequestHandler {
           audience: req.config.jwtAudience,
         }) as JwtPayload;
         userId = verified.sub;
-        projectId = req.query.projectId?.toString();
 
         // jwt lib will already validate the exp in case its present, so we just
         // need to check for the never-expiring JWTs.
@@ -170,11 +148,6 @@ function authenticator(): RequestHandler {
 
     req.token = tokenObject;
     req.user = user;
-
-    if (projectId) {
-      project = await getProject(req, projectId);
-      req.project = project;
-    }
 
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
