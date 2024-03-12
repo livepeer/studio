@@ -21,28 +21,25 @@ components:
         accessKey:
           type: string
           description: Access key used for access-control verification
-    clip-payload:
+        webhookPayload:
+          type: object
+          description:
+            Payload to be sent in the body of the request to the webhook
+        webhookHeaders:
+          type: object
+          description: Headers to be used in the request to the webhook
+    object-store-patch-payload:
       type: object
       additionalProperties: false
-      required:
-        - playbackId
-        - startTime
       properties:
-        playbackId:
-          type: string
-          description: Playback ID of the stream or asset to clip
-        startTime:
-          type: number
-          description: Start time of the clip in milliseconds
-        endTime:
-          type: number
-          description: End time of the clip in milliseconds
         name:
-          type: string
-          description: Name of the clip
-        sessionId:
-          type: string
-          description: Session ID of the stream to clip
+          $ref: "#/components/schemas/object-store/properties/name"
+        disabled:
+          $ref: "#/components/schemas/object-store/properties/disabled"
+        url:
+          $ref: "#/components/schemas/object-store/properties/url"
+        publicUrl:
+          $ref: "#/components/schemas/object-store/properties/publicUrl"
     experiment-audience-payload:
       type: object
       additionalProperties: false
@@ -477,6 +474,45 @@ components:
           description:
             Timestamp (in milliseconds) at which token object was created
           example: 1587667174725
+    jwt-refresh-token:
+      type: object
+      table: jwt_refresh_token
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        userId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        lastSeen:
+          type: number
+          example: 1587667174725
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which token object was created
+          example: 1587667174725
+        expiresAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which token will expire
+          example: 1587667174725
+        revoked:
+          type: boolean
+          description: Whether the refresh token has been revoked
+          default: false
+    refresh-token-payload:
+      type: object
+      additionalProperties: false
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token to be used to generate a new JWT
     transcode-asset-payload:
       additionalProperties: false
       required:
@@ -560,17 +596,43 @@ components:
         deleted:
           type: boolean
           default: false
-    webhook-response:
-      table: webhook_response
+    webhook-log:
+      table: webhook_log
       properties:
         kind:
           readOnly: true
           type: string
-          example: webhookResponse
+          example: webhookLog
+        userId:
+          readOnly: true
+          type: string
+          index: true
         webhookId:
           index: true
         eventId:
+          type: string
           index: true
+          writeOnly: true
+        event:
+          index: true
+        createdAt:
+          index: true
+        success:
+          index: true
+        response:
+          type: object
+          properties:
+            status:
+              index: true
+            redirected:
+              type: boolean
+              writeOnly: true
+        deleted:
+          type: boolean
+          default: false
+        sharedSecret:
+          type: string
+          writeOnly: true
     detection-webhook-payload:
       type: object
       required:
@@ -607,6 +669,8 @@ components:
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         lastSeen:
           index: true
+        userTags:
+          type: object
         isActive:
           index: true
         createdAt:
@@ -615,6 +679,10 @@ components:
           index: true
         streamKey:
           unique: true
+        pull:
+          properties:
+            source:
+              index: true
         playbackId:
           unique: true
         mistHost:
@@ -742,6 +810,11 @@ components:
           $ref: "#/components/schemas/stream/properties/objectStoreId"
         detection:
           $ref: "#/components/schemas/stream/properties/detection"
+    creator-id:
+      oneOf:
+        - properties:
+            value:
+              index: true
     playback-policy:
       properties:
         type:
@@ -1012,10 +1085,13 @@ components:
                   properties:
                     startTime:
                       type: number
-                      description: Start time of the clip in milliseconds
+                      description:
+                        Start time of the clip in UNIX timestamp (in
+                        milliseconds)
                     endTime:
                       type: number
-                      description: End time of the clip in milliseconds
+                      description:
+                        End time of the clip in UNIX timestamp (in milliseconds)
                     playbackId:
                       type: string
                       description: Playback ID of the stream or asset to clip
@@ -1064,6 +1140,9 @@ components:
         email:
           unique: true
           index: true
+        newEmail:
+          type: string
+          description: temporary field for email change
         kind:
           type: string
           readOnly: true

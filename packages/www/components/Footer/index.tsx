@@ -49,6 +49,11 @@ const Footer = () => {
             Apply for stream credits
           </A>
         </Link>
+        <Link href="https://status.livepeer.studio/" passHref legacyBehavior>
+          <A target="_blank" css={{ fontSize: 10 }} variant="subtle">
+            Status
+          </A>
+        </Link>
       </Flex>
       {/* <Flex align="center" justify="center" gap={5}>
         <Link

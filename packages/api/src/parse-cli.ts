@@ -142,6 +142,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "url of a postgres read replica database",
         type: "string",
       },
+      "default-cache-ttl": {
+        describe: "default TTL for entries cached in memory, in seconds",
+        type: "number",
+        default: 120,
+      },
       "amqp-url": {
         describe: "the RabbitMQ Url",
         type: "string",
@@ -241,6 +246,16 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: `["https://livepeer.studio"]`,
         coerce: coerceRegexList("cors-jwt-allowlist"),
+      },
+      "jwt-access-token-ttl": {
+        describe: "time to live for JWT access tokens, in seconds",
+        type: "number",
+        default: 60 * 60 * 24, // 1 day
+      },
+      "jwt-refresh-token-ttl": {
+        describe: "time to live for refresh tokens, in seconds",
+        type: "number",
+        default: 60 * 60 * 24 * 30, // 30 days
       },
       broadcasters: {
         describe:
@@ -411,6 +426,14 @@ export default function parseCli(argv?: string | readonly string[]) {
       },
       "stripe-webhook-secret": {
         describe: "Stripe webhook secret",
+        type: "string",
+      },
+      "access-control-admin-pubkey": {
+        describe: "Access Control Admin signing public key",
+        type: "string",
+      },
+      "access-control-admin-privkey": {
+        describe: "Access Control Admin signing private key",
         type: "string",
       },
       "verification-frequency": {

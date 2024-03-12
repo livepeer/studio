@@ -21,6 +21,7 @@ import { BadRequestError, UnprocessableEntityError } from "../store/errors";
 import { db } from "../store";
 import { buildRecordingUrl } from "../controllers/session";
 import { isExperimentSubject } from "../store/experiment-table";
+import { WebhookLog } from "../schema/types";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -40,7 +41,6 @@ function isRuntimeError(err: any): boolean {
 }
 
 export default class WebhookCannon {
-  db: DB;
   running: boolean;
   verifyUrls: boolean;
   frontendDomain: string;
@@ -54,7 +54,6 @@ export default class WebhookCannon {
   resolver: any;
   queue: Queue;
   constructor({
-    db,
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
@@ -66,7 +65,6 @@ export default class WebhookCannon {
     verifyUrls,
     queue,
   }) {
-    this.db = db;
     this.running = true;
     this.verifyUrls = verifyUrls;
     this.frontendDomain = frontendDomain;
@@ -138,10 +136,7 @@ export default class WebhookCannon {
       }
     }
 
-    const { data: webhooks } = await this.db.webhook.listSubscribed(
-      userId,
-      event
-    );
+    const { data: webhooks } = await db.webhook.listSubscribed(userId, event);
 
     console.log(
       `fetched webhooks. userId=${userId} event=${event} webhooks=`,
@@ -153,7 +148,7 @@ export default class WebhookCannon {
 
     let stream: DBStream | undefined;
     if (streamId) {
-      stream = await this.db.stream.get(streamId, {
+      stream = await db.stream.get(streamId, {
         useReplica: false,
       });
       if (!stream) {
@@ -163,13 +158,13 @@ export default class WebhookCannon {
         );
       }
       // basic sanitization.
-      stream = this.db.stream.addDefaultFields(
-        this.db.stream.removePrivateFields({ ...stream })
+      stream = db.stream.addDefaultFields(
+        db.stream.removePrivateFields({ ...stream })
       );
       delete stream.streamKey;
     }
 
-    let user = await this.db.user.get(userId);
+    let user = await db.user.get(userId);
     if (!user || user.suspended) {
       // if user isn't found. don't fire the webhook, log an error
       throw new Error(
@@ -411,13 +406,14 @@ export default class WebhookCannon {
       let errorMessage: string;
       let responseBody: string;
       let statusCode: number;
+
       try {
         logger.info(`webhook ${webhook.id} firing`);
         resp = await fetchWithTimeout(webhook.url, params);
         responseBody = await resp.text();
         statusCode = resp.status;
 
-        if (resp.status >= 200 && resp.status < 300) {
+        if (isSuccess(resp)) {
           // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
           return true;
@@ -440,7 +436,22 @@ export default class WebhookCannon {
         errorMessage = e.message;
         await this.retry(trigger, params, e);
       } finally {
-        await this.storeResponse(webhook, event, resp, startTime, responseBody);
+        try {
+          await storeResponse(
+            webhook,
+            event.id,
+            event.event,
+            resp,
+            startTime,
+            responseBody,
+            webhook.sharedSecret,
+            params
+          );
+        } catch (e) {
+          console.log(
+            `Unable to store response of webhook ${webhook.id} url: ${webhook.url} error: ${e}`
+          );
+        }
         await this.storeTriggerStatus(
           trigger.webhook,
           triggerTime,
@@ -469,44 +480,11 @@ export default class WebhookCannon {
     );
   }
 
-  async storeResponse(
-    webhook: DBWebhook,
-    event: messages.WebhookEvent,
-    resp: Response,
-    startTime: [number, number],
-    responseBody: string
-  ) {
-    try {
-      const hrDuration = process.hrtime(startTime);
-      let encodedResponseBody = Buffer.from(responseBody).toString("base64");
-
-      await this.db.webhookResponse.create({
-        id: uuid(),
-        webhookId: webhook.id,
-        eventId: event.id,
-        createdAt: Date.now(),
-        duration: hrDuration[0] + hrDuration[1] / 1e9,
-        statusCode: resp.status,
-        response: {
-          body: encodedResponseBody,
-          headers: resp.headers.raw(),
-          redirected: resp.redirected,
-          status: resp.status,
-          statusText: resp.statusText,
-        },
-      });
-    } catch (e) {
-      console.log(
-        `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
-      );
-    }
-  }
-
   async handleRecordingWaitingChecks(
     sessionId: string,
     isRetry = false
   ): Promise<string> {
-    const session = await this.db.session.get(sessionId, {
+    const session = await db.session.get(sessionId, {
       useReplica: false,
     });
     if (!session) {
@@ -530,13 +508,13 @@ export default class WebhookCannon {
 
     // if we got to this point, it means we're confident this session is inactive
     // and we can set the child streams isActive=false
-    const [childStreams] = await this.db.stream.find({ sessionId });
+    const [childStreams] = await db.stream.find({ sessionId });
     await Promise.all(
       childStreams.map((child) => {
-        return this.db.stream.update(child.id, { isActive: false });
+        return db.stream.update(child.id, { isActive: false });
       })
     );
-    const res = await this.db.asset.get(sessionId);
+    const res = await db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");
     }
@@ -586,6 +564,10 @@ export default class WebhookCannon {
         {
           upload: {
             url: url,
+            thumbnails: !(await isExperimentSubject(
+              "vod-thumbs-off",
+              session.userId
+            )),
           },
         },
         undefined,
@@ -603,6 +585,114 @@ export default class WebhookCannon {
   }
 }
 
+function isSuccess(resp: Response) {
+  return resp?.status >= 200 && resp?.status < 300;
+}
+
+async function storeResponse(
+  webhook: DBWebhook,
+  eventId: string,
+  eventName: string,
+  resp: Response,
+  startTime: [number, number],
+  responseBody: string,
+  sharedSecret: string,
+  params
+): Promise<WebhookLog> {
+  const hrDuration = process.hrtime(startTime);
+  let encodedResponseBody = "";
+  if (responseBody) {
+    encodedResponseBody = Buffer.from(responseBody.substring(0, 1024)).toString(
+      "base64"
+    );
+  }
+
+  const webhookLog = {
+    id: uuid(),
+    webhookId: webhook.id,
+    eventId: eventId,
+    event: eventName,
+    userId: webhook.userId,
+    createdAt: Date.now(),
+    duration: hrDuration[0] + hrDuration[1] / 1e9,
+    success: isSuccess(resp),
+    response: {
+      body: encodedResponseBody,
+      redirected: resp?.redirected,
+      status: resp?.status,
+      statusText: resp?.statusText,
+    },
+    request: {
+      url: webhook.url,
+      body: params.body,
+      method: params.method,
+      headers: params.headers,
+    },
+    sharedSecret: sharedSecret,
+  };
+  await db.webhookLog.create(webhookLog);
+  return webhookLog;
+}
+
+export async function resendWebhook(
+  webhook: DBWebhook,
+  webhookLog: WebhookLog
+): Promise<WebhookLog> {
+  const triggerTime = Date.now();
+  const startTime = process.hrtime();
+  let resp: Response;
+  let responseBody: string;
+  let statusCode: number;
+  let errorMessage: string;
+  try {
+    const timestamp = Date.now();
+    const requestBody = JSON.parse(webhookLog.request.body);
+    webhookLog.request.body = JSON.stringify({
+      ...requestBody,
+      timestamp,
+    });
+    const sigHeaders = signatureHeaders(
+      webhookLog.request.body,
+      webhookLog.sharedSecret,
+      timestamp
+    );
+    webhookLog.request.headers = {
+      ...webhookLog.request.headers,
+      ...sigHeaders,
+    };
+
+    resp = await fetchWithTimeout(webhookLog.request.url, {
+      method: webhookLog.request.method,
+      headers: webhookLog.request.headers,
+      timeout: WEBHOOK_TIMEOUT,
+      body: webhookLog.request.body,
+    });
+    responseBody = await resp.text();
+    statusCode = resp.status;
+  } catch (e) {
+    console.log("firing error", e);
+    errorMessage = e.message;
+  } finally {
+    await storeTriggerStatus(
+      webhook,
+      triggerTime,
+      statusCode,
+      errorMessage,
+      responseBody
+    );
+    return await storeResponse(
+      webhook,
+      webhookLog.eventId,
+      webhookLog.event,
+      resp,
+      startTime,
+      responseBody,
+      webhookLog.sharedSecret,
+      webhookLog.request
+    );
+  }
+}
+
 export async function storeTriggerStatus(
   webhook: DBWebhook,
   triggerTime: number,
@@ -612,7 +702,9 @@ export async function storeTriggerStatus(
 ): Promise<void> {
   try {
     let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
-    let encodedResponseBody = Buffer.from(responseBody).toString("base64");
+    let encodedResponseBody = responseBody
+      ? Buffer.from(responseBody).toString("base64")
+      : "";
     if (statusCode >= 300 || !statusCode) {
       status = {
         ...status,

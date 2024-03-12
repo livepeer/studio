@@ -43,6 +43,7 @@ declare global {
       catalystBaseUrl: string;
       user?: User;
       isUIAdmin?: boolean;
+      isNeverExpiringJWT?: boolean;
       token?: WithID<ApiToken>;
 
       getBroadcasters?: () => Promise<NodeAddress[]>;

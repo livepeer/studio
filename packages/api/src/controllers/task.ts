@@ -211,7 +211,7 @@ app.get("/", authorizer({}), async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`task.data->>'userId' = ${req.user.id}`);
 
-  if (!all || all === "false") {
+  if (!all || all === "false" || !req.user.admin) {
     query.push(sql`task.data->>'deleted' IS NULL`);
   }
 
@@ -278,6 +278,34 @@ app.post(
     res.json(doc);
   }
 );
+
+app.post("/:id/retry", authorizer({}), async (req, res) => {
+  const { id } = req.params;
+  const task = await db.task.get(id, { useReplica: false });
+  if (!task) {
+    return res.status(404).json({ errors: ["task not found"] });
+  } else if (!["failed", "cancelled"].includes(task.status?.phase)) {
+    return res
+      .status(400)
+      .json({ errors: ["task is not in a retryable state"] });
+  }
+
+  const user = await db.user.get(task.userId);
+  if (!user) {
+    return res.status(500).json({ errors: ["user not found"] });
+  }
+
+  if (!req.user.admin && req.user.id !== task.userId) {
+    return res.status(403).json({
+      errors: ["users may only retry their own tasks"],
+    });
+  }
+
+  await req.taskScheduler.retryTask(task, task.status?.errorMessage, true);
+
+  res.status(200);
+  res.json({ id });
+});
 
 app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   // update status of a specific task

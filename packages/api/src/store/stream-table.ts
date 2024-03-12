@@ -113,6 +113,12 @@ export default class StreamTable extends Table<DBStream> {
   }
 
   async usageHistory(fromTime: number, toTime: number, opts?: QueryOptions) {
+    // Note that we filter by timestamp as strings, not numbers, since our
+    // indexes are only created for the string values. This is fine for now
+    // since Unix timestamps have the same number of digits from 2001 til 2286.
+    // TODO: Fix our indexes to use numeric values before the next century.
+    const fromTimeStr = fromTime.toString().padStart(13, "0");
+    const toTimeStr = toTime.toString().padStart(13, "0");
     const q1 = sql`SELECT
       TO_TIMESTAMP((data->>'createdAt')::bigint/1000)::date as day,
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
@@ -123,8 +129,8 @@ export default class StreamTable extends Table<DBStream> {
 
     FROM stream WHERE data->>'sourceSegmentsDuration' IS NOT NULL
       AND data->>'parentId' IS NOT NULL
-      AND (data->>'createdAt')::bigint >= ${fromTime}
-      AND (data->>'createdAt')::bigint < ${toTime}
+      AND data->>'createdAt' >= ${fromTimeStr}
+      AND data->>'createdAt' < ${toTimeStr}
       GROUP BY day
       ORDER BY day
     `;
@@ -162,8 +168,8 @@ export default class StreamTable extends Table<DBStream> {
     FROM stream s WHERE data->>'sourceSegmentsDuration' IS NOT NULL
       AND data->>'parentId' IS NULL
       AND (SELECT COUNT(C.id) FROM stream C WHERE C.data->>'parentId' = S.Id) = 0
-      AND (data->>'createdAt')::bigint >= ${fromTime}
-      AND (data->>'createdAt')::bigint < ${toTime}
+      AND data->>'createdAt' >= ${fromTime}
+      AND data->>'createdAt' < ${toTime}
       GROUP BY day
       ORDER BY day
     `;

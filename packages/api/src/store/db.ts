@@ -1,7 +1,6 @@
 import { Pool, QueryConfig, QueryResult } from "pg";
 import { parse as parseUrl, format as stringifyUrl } from "url";
 import { hostname } from "os";
-import { Histogram } from "prom-client";
 
 import logger from "../logger";
 import schema from "../schema/schema.json";
@@ -12,11 +11,12 @@ import {
   PasswordResetToken,
   Usage,
   Region,
-  WebhookResponse,
   Session,
   SigningKey,
   Room,
   Attestation,
+  JwtRefreshToken,
+  WebhookLog,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
@@ -42,18 +42,6 @@ export interface PostgresParams {
 
 type Table<T> = BaseTable<WithID<T>>;
 
-type QueryHistogramLabels = {
-  query: string;
-  result: string;
-};
-
-const metricHistogram: Histogram<keyof QueryHistogramLabels> = new Histogram({
-  name: "livepeer_api_pgsql_query_duration_seconds",
-  help: "duration histogram of pgsql queries",
-  buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
-  labelNames: ["query", "result"] as const,
-});
-
 const makeTable = <T>(opts: TableOptions) =>
   new BaseTable<WithID<T>>(opts) as Table<T>;
 
@@ -66,12 +54,13 @@ export class DB {
   task: TaskTable;
   signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
+  jwtRefreshToken: Table<JwtRefreshToken>;
   user: Table<User>;
   experiment: ExperimentTable;
   attestation: AttestationTable;
   usage: Table<Usage>;
   webhook: WebhookTable;
-  webhookResponse: Table<WebhookResponse>;
+  webhookLog: Table<WebhookLog>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: SessionTable;
@@ -147,6 +136,10 @@ export class DB {
       db: this,
       schema: schemas["api-token"],
     });
+    this.jwtRefreshToken = makeTable<JwtRefreshToken>({
+      db: this,
+      schema: schemas["jwt-refresh-token"],
+    });
     this.asset = new AssetTable({
       db: this,
       schema: schemas["asset"],
@@ -176,9 +169,9 @@ export class DB {
     });
 
     this.region = makeTable<Region>({ db: this, schema: schemas["region"] });
-    this.webhookResponse = makeTable<WebhookResponse>({
+    this.webhookLog = makeTable<WebhookLog>({
       db: this,
-      schema: schemas["webhook-response"],
+      schema: schemas["webhook-log"],
     });
     this.session = new SessionTable({ db: this, schema: schemas["session"] });
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
@@ -220,7 +213,8 @@ export class DB {
     return this.runQuery(pool, query, values);
   }
 
-  async runQueryNoMetrics<T, I extends any[] = any[]>(
+  // Internal query function — use query() or replicaQuery() externally
+  async runQuery<T, I extends any[] = any[]>(
     pool: Pool,
     query: string | QueryConfig<I>,
     values?: I
@@ -250,27 +244,6 @@ export class DB {
       } query=${queryLog}`
     );
     return result;
-  }
-
-  // Internal logging function — use query() or replicaQuery() externally
-  async runQuery<T, I extends any[] = any[]>(
-    pool: Pool,
-    query: string | QueryConfig<I>,
-    values?: I
-  ): Promise<QueryResult<T>> {
-    let labels: QueryHistogramLabels = {
-      query: typeof query === "string" ? query.trim() : query.text,
-      result: "success",
-    };
-    const queryTimer = metricHistogram.startTimer();
-    try {
-      return await this.runQueryNoMetrics(pool, query, values);
-    } catch (e) {
-      labels.result = "error";
-      throw e;
-    } finally {
-      queryTimer(labels);
-    }
   }
 }
 

@@ -36,7 +36,7 @@ const toUserIds = (emailsOrIds?: string[]) =>
 
 const app = Router();
 
-const experimentSubjectsOnly =
+export const experimentSubjectsOnly =
   (experiment: string) => async (req, res, next) => {
     await ensureExperimentSubject(experiment, req.user?.id);
     return next();

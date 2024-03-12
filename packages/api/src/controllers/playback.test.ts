@@ -5,6 +5,7 @@ import { WithID } from "../store/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBSession } from "../store/session-table";
+import { cache } from "../store/cache";
 
 const EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE = Date.parse(
   "2023-06-06T00:00:00.000Z"
@@ -16,6 +17,12 @@ let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
 let mockAdminUserInput2: User;
 let mockNonAdminUserInput2: User;
+
+const mockVodStore = {
+  id: "mock_vod_store",
+  url: "s3+http://user:password@localhost:8080/us-east-1/vod",
+  publicUrl: "http://localhost/bucket/vod",
+};
 
 // jest.setTimeout(70000)
 
@@ -52,7 +59,9 @@ describe("controllers/playback", () => {
   describe("fetching playback URL of different objects", () => {
     let client: TestClient;
     let client2: TestClient;
+    let noAuthClient: TestClient;
     let nonAdminToken: string;
+    let adminToken: string;
     let otherUserToken: string;
 
     let stream: DBStream;
@@ -65,13 +74,9 @@ describe("controllers/playback", () => {
 
     beforeEach(async () => {
       const sessionId = "5b12c779-efc3-42ba-83d9-c590955556b0";
-      await db.objectStore.create({
-        id: "mock_vod_store",
-        url: "s3+http://user:password@localhost:8080/us-east-1/vod",
-        publicUrl: "http://localhost/bucket/vod",
-      });
+      await db.objectStore.create(mockVodStore);
 
-      ({ client, nonAdminToken } = await setupUsers(
+      ({ client, adminToken, nonAdminToken } = await setupUsers(
         server,
         mockAdminUserInput,
         mockNonAdminUserInput
@@ -85,6 +90,8 @@ describe("controllers/playback", () => {
         mockNonAdminUserInput2
       ));
       client2.jwtAuth = otherUserToken;
+
+      noAuthClient = new TestClient({ server });
 
       let res = await client.post("/stream", {
         name: "test-stream",
@@ -140,7 +147,44 @@ describe("controllers/playback", () => {
 
     describe("for streams", () => {
       it("should return playback URLs for streams", async () => {
-        const res = await client.get(`/playback/${stream.playbackId}`);
+        client.jwtAuth = adminToken;
+        let res = await client.post(`/experiment`, {
+          name: "stream-pull-source",
+        });
+        expect(res.status).toBe(201);
+        res = await client.post(`/experiment/stream-pull-source/audience`, {
+          addUsers: [mockAdminUserInput.email],
+        });
+        expect(res.status).toBe(204);
+
+        res = await client.get(`/playback/${stream.playbackId}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "live",
+          meta: {
+            live: 0,
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/hls/${stream.playbackId}/index.m3u8`,
+              },
+              {
+                hrn: "WebRTC (H264)",
+                type: "html5/video/h264",
+                url: `${ingest}/webrtc/${stream.playbackId}`,
+              },
+              {
+                hrn: "FLV (H264)",
+                type: "video/x-flv",
+                url: `${ingest}/flv/${stream.playbackId}`,
+              },
+            ],
+          },
+        });
+
+        // test making a playback info request without any auth token
+        res = await noAuthClient.get(`/playback/${stream.playbackId}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
           type: "live",
@@ -214,6 +258,37 @@ describe("controllers/playback", () => {
                 hrn: "HLS (TS)",
                 type: "html5/application/vnd.apple.mpegurl",
                 url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
+
+      it("should return VTT thumbnails URL when available", async () => {
+        asset.files = [
+          {
+            type: "thumbnails_vtt",
+            path: "thumbs.vtt",
+          },
+        ];
+        await db.asset.update(asset.id, {
+          files: asset.files,
+        });
+        const res = await client.get(`/playback/${asset.playbackId}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_asset_1/index.m3u8`,
+              },
+              {
+                hrn: "Thumbnails",
+                type: "text/vtt",
+                url: `${mockVodStore.publicUrl}/${asset.playbackId}/thumbs.vtt`,
               },
             ],
           },
@@ -492,6 +567,7 @@ describe("controllers/playback", () => {
         await db.asset.update(asset2.id, {
           createdAt: EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE - 1000,
         });
+        cache.flush();
       });
 
       it("should return playback URL asset of user from CID", async () => {

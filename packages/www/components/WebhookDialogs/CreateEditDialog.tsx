@@ -150,6 +150,7 @@ const CreateEditDialog = ({
               required
               size="2"
               type="url"
+              pattern="^[^ ].+[^ ]$"
               id="url"
               defaultValue={Action.Update ? webhook?.url : ""}
               placeholder="https://"

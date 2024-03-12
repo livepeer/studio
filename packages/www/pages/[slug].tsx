@@ -105,7 +105,7 @@ export async function getStaticProps({ params, locale }) {
     props: {
       ...pageData,
     },
-    revalidate: 86400,
+    revalidate: 5,
   };
 }
 

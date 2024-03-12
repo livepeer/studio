@@ -1,6 +1,6 @@
 import React from "react";
 import Banner from "components/Banner";
-import { Stream } from "livepeer";
+import { Stream } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 
 export type StreamHealthWarningAlertProps = {

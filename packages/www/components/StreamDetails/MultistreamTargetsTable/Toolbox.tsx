@@ -87,13 +87,13 @@ const DisableDialog = ({
 };
 
 const DeleteDialog = ({
-  target,
+  targetId,
   stream,
   invalidateStream,
   open,
   setOpen,
 }: {
-  target?: MultistreamTarget;
+  targetId?: string;
   stream: Stream;
   invalidateStream: (optm: Stream) => Promise<void>;
   open: boolean;
@@ -132,11 +132,10 @@ const DeleteDialog = ({
                 setSaving(true);
                 try {
                   const targets = stream.multistream.targets.filter(
-                    (t) => t.id !== target.id
+                    (t) => t.id !== targetId
                   );
                   const patch = { multistream: { targets } };
                   await patchStream(stream.id, patch);
-                  await deleteMultistreamTarget(target.id);
                   setOpen(false);
                   await invalidateStream({ ...stream, ...patch });
                 } finally {
@@ -166,10 +165,12 @@ const DeleteDialog = ({
 const Toolbox = ({
   target,
   stream,
+  targetId,
   invalidateTargetId,
   invalidateStream,
 }: {
   target?: MultistreamTarget;
+  targetId?: string;
   stream: Stream;
   invalidateTargetId: (id: string) => Promise<void>;
   invalidateStream: (optm?: Stream) => Promise<void>;
@@ -241,7 +242,6 @@ const Toolbox = ({
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={!target}
               onSelect={() => setDeleteDialogOpen(true)}
               color="red">
               Delete
@@ -268,7 +268,7 @@ const Toolbox = ({
         invalidate={invalidateAll}
       />
       <DeleteDialog
-        target={target}
+        targetId={targetId}
         stream={stream}
         invalidateStream={invalidateStream}
         open={deleteDialogOpen}

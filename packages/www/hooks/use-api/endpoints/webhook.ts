@@ -1,5 +1,5 @@
 import qs from "qs";
-import { ApiState } from "../types";
+import { ApiState, WebhookLogs } from "../types";
 import { SetStateAction } from "react";
 import { Webhook } from "@livepeer.studio/api";
 import { getCursor } from "../helpers";
@@ -101,4 +101,34 @@ export const deleteWebhooks = async (ids: Array<string>): Promise<void> => {
   if (res.status !== 204) {
     throw new Error(body);
   }
+};
+
+export const getWebhookLogs = async (webhookId): Promise<WebhookLogs[]> => {
+  const [res, logs] = await context.fetch(`/webhook/${webhookId}/log`);
+  if (res.status !== 200) {
+    throw logs && typeof logs === "object"
+      ? { ...logs, status: res.status }
+      : new Error(logs);
+  }
+  return logs;
+};
+
+export const resendWebhook = async (params: {
+  webhookId: string;
+  logId: string;
+}): Promise<WebhookLogs> => {
+  const [res, webhook] = await context.fetch(
+    `/webhook/${params.webhookId}/log/${params.logId}/resend`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+  );
+
+  if (res.status !== 200) {
+    throw new Error(webhook.errors.join(", "));
+  }
+  return webhook;
 };

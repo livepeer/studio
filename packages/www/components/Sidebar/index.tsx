@@ -28,7 +28,7 @@ import {
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router from "next/router";
-import { RocketIcon, ChatBubbleIcon } from "@radix-ui/react-icons";
+import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 
 export const NavLink = styled(A, {
@@ -262,6 +262,31 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         </Grid>
         <Flex direction="column" gap={1}>
           <NavLink
+            href="https://status.livepeer.studio/"
+            target="_blank"
+            css={{
+              color: "$neutral10",
+              transition: "color .3s",
+              textDecoration: "none",
+              "&:hover": {
+                color: "$neutral11",
+                transition: "color .3s",
+              },
+            }}>
+            <LoopIcon />
+            <Text
+              css={{
+                display: "flex",
+                backgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+                fontSize: "$1",
+              }}>
+              Status
+            </Text>
+          </NavLink>
+
+          <NavLink
             href="https://livepeer.canny.io/changelog?labels=studio"
             target="_blank"
             css={{
@@ -285,6 +310,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               Changelog
             </Text>
           </NavLink>
+
           <NavLink
             href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
             target="_blank"

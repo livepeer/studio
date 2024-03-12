@@ -1,4 +1,5 @@
-openapi: 3.0.1
+openapi: 3.1.0
+
 info:
   title: Livepeer API Reference
   description: |
@@ -6,9 +7,19 @@ info:
     endpoints exposed on the standard Livepeer API, learn how to use them and
     what they return.
   version: 1.0.0
+
 servers:
   - url: "https://livepeer.studio/api"
+
+security:
+  - apiKey: []
+
 components:
+  securitySchemes:
+    apiKey:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     ffmpeg-profile:
       type: object
@@ -41,6 +52,12 @@ components:
         fpsDen:
           type: integer
           minimum: 1
+        quality:
+          type: integer
+          description: |
+            Restricts the size of the output video using the constant quality feature. Increasing this value will result in a lower quality video. Note that this parameter might not work if the transcoder lacks support for it.
+          minimum: 0
+          maximum: 44
         gop:
           type: string
         profile:
@@ -53,10 +70,10 @@ components:
         encoder:
           type: string
           enum:
-            - h264
-            - hevc
-            - vp8
-            - vp9
+            - H.264
+            - HEVC
+            - VP8
+            - VP9
     transcode-profile:
       type: object
       description: Transcode API profile
@@ -78,6 +95,12 @@ components:
         bitrate:
           type: integer
           minimum: 400
+        quality:
+          type: integer
+          description: |
+            Restricts the size of the output video using the constant quality feature. Increasing this value will result in a lower quality video. Note that this parameter might not work if the transcoder lacks support for it.
+          minimum: 0
+          maximum: 44
         fps:
           type: integer
           minimum: 0
@@ -96,10 +119,10 @@ components:
         encoder:
           type: string
           enum:
-            - h264
-            - hevc
-            - vp8
-            - vp9
+            - H.264
+            - HEVC
+            - VP8
+            - VP9
     webhook:
       type: object
       required:
@@ -192,11 +215,11 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
-    webhook-response:
+    webhook-log:
       type: object
       required:
+        - id
         - webhookId
-        - statusCode
       additionalProperties: false
       properties:
         id:
@@ -206,39 +229,115 @@ components:
         webhookId:
           readOnly: true
           type: string
-        eventId:
+          description: ID of the webhook this request was made for
+        event:
           readOnly: true
           type: string
+          description: The event type that triggered the webhook request
         createdAt:
           readOnly: true
           type: number
           description: |
-            Timestamp (in milliseconds) at which webhook response object was
+            Timestamp (in milliseconds) at which webhook request object was
             created
           example: 1587667174725
         duration:
           type: number
-        statusCode:
-          type: number
-          default: 0
+          description: The time taken (in seconds) to make the webhook request
+        success:
+          type: boolean
+          description: Whether the webhook request was successful
+        request:
+          type: object
+          properties:
+            url:
+              type: string
+              description: URL used for the request
+            method:
+              type: string
+              description: HTTP request method
+            headers:
+              type: object
+              description: HTTP request headers
+              additionalProperties:
+                type: string
+            body:
+              type: string
+              description: request body
         response:
           type: object
           additionalProperties: false
           properties:
             body:
               type: string
-            headers:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: string
-            redirected:
-              type: boolean
+              description: response body
             status:
               type: number
+              description: HTTP status code
             statusText:
               type: string
+              description: response status text
+    clip-payload:
+      type: object
+      additionalProperties: false
+      required:
+        - playbackId
+        - startTime
+      properties:
+        playbackId:
+          type: string
+          description: Playback ID of the stream or asset to clip
+        startTime:
+          type: number
+          description:
+            Start time of the clip in UNIX timestamp (in milliseconds)
+        endTime:
+          type: number
+          description: End time of the clip in UNIX timestamp (in milliseconds)
+        name:
+          type: string
+          description: Name of the clip
+        sessionId:
+          type: string
+          description: Session ID of the stream to clip
+    target:
+      type: object
+      required:
+        - profile
+      additionalProperties: false
+      properties:
+        profile:
+          type: string
+          description: |
+            Name of transcoding profile that should be sent. Use
+            "source" for pushing source stream data
+          minLength: 1
+          maxLength: 500
+          example: 720p
+        videoOnly:
+          type: boolean
+          description: |
+            If true, the stream audio will be muted and only silent
+            video will be pushed to the target.
+          default: false
+        id:
+          type: string
+          description: ID of multistream target object where to push this stream
+        spec:
+          type: object
+          writeOnly: true
+          description: |
+            Inline multistream target object. Will automatically
+            create the target resource to be used by the created
+            stream.
+          required:
+            - url
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+            url:
+              $ref: "#/components/schemas/multistream-target/properties/url"
     stream:
       type: object
       required:
@@ -254,6 +353,18 @@ components:
           example: test_stream
         creatorId:
           $ref: "#/components/schemas/creator-id"
+        userTags:
+          type: object
+          description: User input tags associated with the stream
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: number
+              - type: array
+                items:
+                  oneOf:
+                    - type: string
+                    - type: number
         lastSeen:
           type: number
           example: 1587667174725
@@ -310,6 +421,51 @@ components:
           type: string
           example: hgebdhhigq
           description: Used to form RTMP ingest URL
+        pull:
+          type: object
+          description: |-
+            Configuration for a stream that should be actively pulled from an
+            external source, rather than pushed to Livepeer. If specified, the
+            stream will not have a streamKey.
+          additionalProperties: false
+          required:
+            - source
+          properties:
+            source:
+              type: string
+              description: |-
+                URL from which to pull from.
+              example: https://myservice.com/live/stream.flv
+            headers:
+              type: object
+              description: |-
+                Headers to be sent with the request to the pull source.
+              additionalProperties:
+                type: string
+              example:
+                Authorization: "Bearer 123"
+            location:
+              type: object
+              description: |-
+                Approximate location of the pull source. The location is used to
+                determine the closest Livepeer region to pull the stream from.
+              additionalProperties: false
+              required:
+                - lat
+                - lon
+              properties:
+                lat:
+                  type: number
+                  description: |-
+                    Latitude of the pull source in degrees. North is positive,
+                    south is negative.
+                  example: 39.739
+                lon:
+                  type: number
+                  description: |-
+                    Longitude of the pull source in degrees. East is positive,
+                    west is negative.
+                  example: -104.988
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
@@ -360,44 +516,7 @@ components:
                 References to targets where this stream will be simultaneously
                 streamed to
               items:
-                type: object
-                required:
-                  - profile
-                additionalProperties: false
-                properties:
-                  profile:
-                    type: string
-                    description: |
-                      Name of transcoding profile that should be sent. Use
-                      "source" for pushing source stream data
-                    minLength: 1
-                    maxLength: 500
-                    example: 720p
-                  videoOnly:
-                    type: boolean
-                    description: |
-                      If true, the stream audio will be muted and only silent
-                      video will be pushed to the target.
-                    default: false
-                  id:
-                    type: string
-                    description:
-                      ID of multistream target object where to push this stream
-                  spec:
-                    type: object
-                    writeOnly: true
-                    description: |
-                      Inline multistream target object. Will automatically
-                      create the target resource to be used by the created
-                      stream.
-                    required:
-                      - url
-                    additionalProperties: false
-                    properties:
-                      name:
-                        type: string
-                      url:
-                        $ref: "#/components/schemas/multistream-target/properties/url"
+                $ref: "#/components/schemas/target"
         suspended:
           type: boolean
           description: If currently suspended
@@ -409,6 +528,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/stream/properties/name"
+        pull:
+          $ref: "#/components/schemas/stream/properties/pull"
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
@@ -419,6 +540,8 @@ components:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
+        userTags:
+          $ref: "#/components/schemas/stream/properties/userTags"
     deactivate-many-payload:
       type: object
       additionalProperties: false
@@ -436,7 +559,8 @@ components:
         active:
           $ref: "#/components/schemas/stream/properties/isActive"
         hostName:
-          $ref: "#/components/schemas/stream/properties/mistHost"
+          type: string
+          description: Hostname of the Mist server that processes that stream
         startedAt:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
@@ -469,6 +593,12 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           $ref: "#/components/schemas/stream/properties/profiles"
+        userTags:
+          $ref: "#/components/schemas/stream/properties/userTags"
+    target-add-payload:
+      type: object
+      additionalProperties: false
+      $ref: "#/components/schemas/target"
     stream-health-payload:
       type: object
       description: |
@@ -546,18 +676,6 @@ components:
             An object containing any additional fields sent by mist in the
             health (STREAM_BUFFER) payload.
           additionalProperties: true
-    object-store-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: "#/components/schemas/object-store/properties/name"
-        disabled:
-          $ref: "#/components/schemas/object-store/properties/disabled"
-        url:
-          $ref: "#/components/schemas/object-store/properties/url"
-        publicUrl:
-          $ref: "#/components/schemas/object-store/properties/publicUrl"
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
       required: []
@@ -575,15 +693,6 @@ components:
           $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
           $ref: "#/components/schemas/webhook/properties/streamId"
-    webhook-status-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        errorMessage:
-          type: string
-          description: Error message if the webhook failed to process the event
-        response:
-          $ref: "#/components/schemas/webhook-response"
     session:
       type: object
       required:
@@ -905,6 +1014,10 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
+        createdByTokenName:
+          type: string
+          readOnly: true
+          description: Name of the token used to create this object
         size:
           readOnly: true
           type: number
@@ -1077,7 +1190,9 @@ components:
           pattern: "^(https?|ipfs|ar)://"
           description: |
             URL where the asset contents can be retrieved. Only allowed (and
-            also required) in the upload asset via URL endpoint.
+            also required) in the upload asset via URL endpoint. For an IPFS
+            source, this should be similar to: `ipfs://{CID}`. For an Arweave
+            source: `ar://{CID}`.
           example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
           type: object
@@ -1094,6 +1209,14 @@ components:
         c2pa:
           type: boolean
           description: Decides if the output video should include C2PA signature
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/transcode-profile"
+        targetSegmentSizeSecs:
+          type: number
+          description:
+            How many seconds the duration of each output segment should be
     room-user-payload:
       type: object
       required:
@@ -1453,6 +1576,15 @@ components:
                   type: boolean
                   description:
                     Decides if the output video should include C2PA signature
+                profiles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/transcode-profile"
+                targetSegmentSizeSecs:
+                  type: number
+                  description:
+                    How many seconds the duration of each output segment should
+                    be
             export:
               $ref: "#/components/schemas/export-task-params"
             exportData:
@@ -1554,10 +1686,13 @@ components:
                   properties:
                     startTime:
                       type: number
-                      description: Start time of the clip in milliseconds
+                      description:
+                        Start time of the clip in UNIX timestamp (in
+                        milliseconds)
                     endTime:
                       type: number
-                      description: End time of the clip in milliseconds
+                      description:
+                        End time of the clip in UNIX timestamp (in milliseconds)
                     playbackId:
                       type: string
                       description: Playback ID of the stream or asset to clip
@@ -1916,6 +2051,11 @@ components:
           type: object
           description: User-defined webhook context
           additionalProperties: true
+        refreshInterval:
+          type: number
+          description: |
+            Interval (in seconds) at which the playback policy should be
+            refreshed (default 600 seconds)
     room:
       type: object
       required:
@@ -1977,13 +2117,13 @@ components:
           description: The creator ID associated with the metric
         DeliveryUsageMins:
           type: number
-          description: The number of minutes of delivery usage
+          description: Total minutes of delivery usage.
         TotalUsageMins:
           type: number
-          description: The number of minutes of total usage
+          description: Total transcoded minutes.
         StorageUsageMins:
           type: number
-          description: The number of minutes of storage usage
+          description: Total minutes of storage usage.
     viewership-metric:
       type: object
       description: |
@@ -2107,12 +2247,15 @@ components:
                 properties:
                   hrn:
                     type: string
+                    description: Human Readable Name
                     example: MP4
                     enum:
                       - HLS (TS)
                       - MP4
                       - WebRTC (H264)
-                      - Thumbnail
+                      - FLV (H264)
+                      - Thumbnail (JPEG)
+                      - Thumbnails
                   type:
                     type: string
                     example: html5/video/mp4
@@ -2120,7 +2263,9 @@ components:
                       - html5/application/vnd.apple.mpegurl
                       - html5/video/mp4
                       - html5/video/h264
+                      - video/x-flv
                       - image/jpeg
+                      - text/vtt
                   url:
                     type: string
                     example: >-
@@ -2333,16 +2478,6 @@ paths:
     post:
       summary: Create a stream
       description: |
-        POST /stream creates a stream object. The configuration on this stream
-        object is inherited by all live sessions using this stream's streamKey.
-        \
-        \
-        It is important to note, that the stream object is the core building
-        block of the Livepeer Studio platform. In Livepeer Studio, the stream
-        object has unique configuration data and metadata about all livestream
-        sessions that are associated with the stream.
-        \
-        \
         The only parameter you are required to set is the name of your stream,
         but we also highly recommend that you define transcoding profiles
         parameter that suits your specific broadcasting configuration.
@@ -2380,61 +2515,6 @@ paths:
                 $ref: "#/components/schemas/error"
     get:
       summary: Retrieve streams
-      description: >
-        GET `/stream` endpoint is used to retrieve all stream objects with the
-        same userId. The response will include both parent stream objects and
-        the historic stream objects with a parentId, which represent a single
-        live stream session. Please note that the usage of these "child-session"
-        stream objects is deprecated, and it is recommended to use the session
-        endpoints instead.
-
-        \
-
-        \
-
-        To filter the API response and exclude the historic stream objects with
-        a parentId, you can add the `?streamsonly=true` query string.
-
-        \
-
-        \
-
-        **GET `/stream?streamsonly=1`**
-
-        This endpoint retrieves all stream objects with the same userId and
-        excludes the historic stream objects with a parentId, which represent a
-        single live stream session.
-
-
-        ## Quick Filters
-
-        | Filter                                     |
-        Example                                             |
-        Description                                                                                                                                                                                        
-        |
-
-        |--------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
-        | All stream objects with the same userId     |
-        `/api/stream?streamsonly=1`                         | This filter
-        excludes the historic stream objects with a parentId, which represent a
-        single live stream
-        session.                                                                                    
-        |
-
-        | All active stream objects                   |
-        `/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]`
-        | This filter returns active stream objects. Setting the value to
-        `false` returns idle stream objects. The default value for new stream
-        objects is `false`. Note that the example shows a decoded JSON object,
-        but in a URL, it should be URL-encoded. |
-
-        | All stream objects with recording on         |
-        `/api/stream?streamsonly=1&filters=[{"id": "record", "value": true}]`   
-        | This filter returns stream objects with recording turned on. The
-        default value for new stream objects is `false`. Note that the example
-        shows a decoded JSON object, but in a URL, it should be
-        URL-encoded.                                           |
       parameters:
         - name: streamsonly
           in: query
@@ -2465,9 +2545,7 @@ paths:
           type: string
     get:
       summary: Retrieve a stream
-      description: |
-        In order to retrieve a specific stream, you can just pass the stream id
-        to this API
+
       responses:
         "200":
           description: Success
@@ -2483,21 +2561,6 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update a stream
-      description: |
-        PATCH /stream/{id} can be used to modify a stream object. It is a single
-        endpoint that can update any of the mutable properties of a stream.
-        Specifically:
-        - record
-        - suspended
-        - multistream.targets
-        \
-        \
-        All fields in the request payload are optional, and any field that is
-        not included will keep the same value as before in the saved object.
-        \
-        \
-        A 204 No Content status response indicates the stream was successfully
-        updated
       requestBody:
         required: true
         content:
@@ -2516,9 +2579,7 @@ paths:
     delete:
       summary: Delete a stream
       description: |
-        DELETE /stream/{id} deletes an existing stream object.
-        \
-        \
+
         This will also suspend any active stream sessions, so make sure to wait
         until the stream has finished. To explicitly interrupt an active
         session, consider instead updating the suspended field in the stream
@@ -2539,12 +2600,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  "/stream/{id}/terminate":
+    parameters:
+      - name: id
+        description: ID of the stream
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      summary: Terminates a live stream
+      description: |
+        `DELETE /stream/{id}/terminate` can be used to terminate an ongoing
+        session on a live stream. Unlike suspending the stream, it allows the
+        streamer to restart streaming even immediately, but it will force
+        terminate the current session and stop the recording.
+        \
+        \
+        A 204 No Content status response indicates the stream was successfully
+        terminated.
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/stream/{id}/start-pull":
+    parameters:
+      - name: id
+        description: ID of the stream
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Start ingest for a pull stream
+      description: |
+        `POST /stream/{id}/start-pull` can be used to start ingest for a stream
+        configured with a pull source. If the stream has recording configured,
+        it will also start recording.
+        \
+        \
+        A 204 No Content status response indicates the stream was successfully
+        started.
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /multistream/target:
     get:
       summary: Retrieve Multistream Targets
-      description: |
-        Use /multistream/target to a return a list of your existing multistream
-        targets.
+
       responses:
         "200":
           description: Success
@@ -2593,8 +2707,7 @@ paths:
           type: string
     get:
       summary: Retrieve a multistream target
-      description:
-        You can retrieve a multistream target from its ID with this API.
+
       responses:
         "200":
           description: Success
@@ -2610,24 +2723,6 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update Multistream Target
-      description: |
-        PATCH /multistream/target/{id} updates an existing multistream target
-        object. You can change any user-defined field in the current object,
-        specifically name, url and disabled.
-        \
-        \
-        All fields are optional, and if any field is not included in the request
-        payload it will be kept unchanged from the saved object.
-        \
-        \
-        You cannot access the current url field for updating it since we redact
-        it from GET responses. If you want to update the URL you have to build
-        it from scratch. You can also omit it from the PATCH payload to keep it
-        as is.
-        \
-        \
-        A 204 No Content status response indicates the multistream target was
-        successfully updated.
       requestBody:
         required: true
         content:
@@ -2646,8 +2741,7 @@ paths:
     delete:
       summary: Delete a multistream target
       description: |
-        DELETE /multistream/target/{id} deletes an existing multistream target
-        object. Make sure to remove any references to the target on existing
+        Make sure to remove any references to the target on existing
         streams before actually deleting it from the API.
       responses:
         "204":
@@ -2680,101 +2774,9 @@ paths:
       summary: Create a webhook
       description: >
         To create a new webhook, you need to make an API call with the events
-
         you want to listen for and the URL that will be called when those events
-
         occur.
 
-
-
-         ## Types of Events
-        | Name                       |
-        Description                                                                                                                                                          
-        |
-
-        | -------------------------- |
-        ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        |
-
-        | `stream.started`           | The parent stream object's isActive value
-        is marked as true and the .m3u8 HLS URL
-        works                                                                               
-        |
-
-        | `stream.idle`              | The parent stream object's isActive value
-        should be marked as false and the .m3u8 HLS URL no longer
-        works                                                              |
-
-        | `recording.ready`          | This fires when a recording is ready to
-        be
-        downloaded                                                                                                                
-        |
-
-        | `recording.started`        | This fires when recording has started on
-        an active
-        stream                                                                                                             
-        |
-
-        | `recording.waiting`        | This fires after a stream with recording
-        on has concluded and is not yet ready to be downloaded. Typically it
-        takes 5 minutes for recordings to be ready for download |
-
-        | `multistream.connected`    | This fires when we've successfully
-        connected to the multistream
-        target                                                                                               
-        |
-
-        | `multistream.error`        | This fires when we've encountered an
-        error either while attempting to connect to the third-party streaming
-        service or while broadcasting                              |
-
-        | `multistream.disconnected` | This fires when we are no longer sending
-        video to the multistream
-        target                                                                                             
-        |
-
-        | `asset.created`            | This fires when an On Demand asset is
-        created                                                                                                                        
-        |
-
-        | `asset.updated`            | This fires when an On Demand asset is
-        updated                                                                                                                        
-        |
-
-        | `asset.ready`              | This fires when an On Demand asset is
-        ready                                                                                                                          
-        |
-
-        | `asset.failed`             | This fires when an On Demand asset fails
-        during the upload or during
-        processing                                                                                       
-        |
-
-        | `asset.deleted`            | This fires when an On Demand asset is
-        deleted                                                                                                                        
-        |
-
-        | `task.spawned`             | This fires when a task is spawned (e.g.,
-        an On Demand
-        upload)                                                                                                        
-        |
-
-        | `task.updated`             | This fires when a task is
-        updated                                                                                                                                    
-        |
-
-        | `task.completed`           | This fires when a task completes its
-        execution
-        successfully                                                                                                          
-        |
-
-        | `task.failed`              | This fires when a task has
-        failed                                                                                                                                    
-        |
-
-        | `playback.accessControl`   | A specialized webhook for playback access
-        control. Unlike other events, this is only used for assets and streams
-        that reference its ID on their playback policy       |
       responses:
         "200":
           description: Success
@@ -2818,13 +2820,7 @@ paths:
           schema:
             type: string
       summary: Update a webhook
-      description: |
-        You can update a webhook by calling the PATCH webhook endpoint with the
-        webhookId. It is a single endpoint that can update any of the mutable
-        properties of a webhook. Specifically:
-        - name
-        - url
-        - events
+
       responses:
         "200":
           description: Success
@@ -2853,6 +2849,88 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log":
+    get:
+      summary: Retrieve webhook logs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/webhook-log"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log/{logId}":
+    get:
+      summary: Retrieve a webhook log
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/webhook-log"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/webhook/{id}/log/{logId}/resend":
+    post:
+      summary: Resend a webhook
+      description: |
+        Use this API to resend the same webhook request. This is useful when
+        developing and debugging, allowing you to easily repeat the same webhook
+        to check or fix the behaviour in your handler.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/webhook-log"
         default:
           description: Error
           content:
@@ -2908,7 +2986,7 @@ paths:
         tusEndpoint field of the response to upload the video file and track the
         progress:
 
-        ``` 
+        ```
         # This assumes there is an `input` element of `type="file"` with id
         `fileInput` in the HTML
 
@@ -2997,19 +3075,6 @@ paths:
   /asset/upload/url:
     post:
       summary: Upload asset via URL
-      description: |
-        Import a video Asset from an external URL through the POST
-        /api/asset/upload/url API.
-        \
-        \
-        For rapid processing of assets that will also be archived on IPFS or Arweave, 
-        we strongly encourage uploading the raw file to Livepeer via a direct upload rather than passing the IPFS / Arweave gateway URL to this endpoint. 
-        The gateway URL will work, but may incur longer-than-usual processing time.
-        \
-        \
-        For IPFS HTTP gateway URLs, the API currently only supports “path style”
-        URLs and does not support “subdomain style” URLs. The API will support
-        both styles of URLs in a future update.
       requestBody:
         required: true
         content:
@@ -3114,8 +3179,6 @@ paths:
   /clip:
     post:
       summary: Create a clip
-      description: |
-        Create a clip from a livestream
       requestBody:
         required: true
         content:
@@ -3142,12 +3205,12 @@ paths:
                       id:
                         type: string
                         example: 34d7618e-fd42-4798-acf5-19504616a11e
-          default:
-            description: Error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   "/stream/{id}/clips":
     get:
       summary: Retrieve clips of a livestream
@@ -3167,6 +3230,56 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/asset"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/stream/{id}/create-multistream-target":
+    post:
+      summary: Add a multistream target
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: ID of the parent stream
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/target-add-payload"
+      responses:
+        "204":
+          description: Success (No content)
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  "/stream/{id}/multistream/{targetId}":
+    delete:
+      summary: Remove a multistream target
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: ID of the parent stream
+          required: true
+        - in: path
+          name: targetId
+          schema:
+            type: string
+          description: ID of the multistream target
+          required: true
+      responses:
+        "204":
+          description: Success (No content)
         default:
           description: Error
           content:
@@ -3413,8 +3526,7 @@ paths:
     get:
       summary: Query viewership metrics
       description: |
-        Allows querying any metric in its raw form. Requires a private
-        (non-CORS) API key to be used.
+        Requires a private (non-CORS) API key to be used.
       parameters:
         - name: playbackId
           in: query
@@ -3509,11 +3621,7 @@ paths:
     get:
       summary: Query creator viewership metrics
       description: |
-        Allows querying creator-specific metrics. Requires a proof of ownership
-        to be sent in the request, which for now is just the assetId or streamId
-        parameters (1 of those must be in the query-string). Returns only the
-        higher level metrics like viewCount and platimeMins. Can be used from
-        the frontend with a CORS key.
+        Requires a proof of ownership to be sent in the request, which for now is just the assetId or streamId parameters (1 of those must be in the query-string).
       parameters:
         - name: from
           in: query
@@ -3593,7 +3701,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-  "/data/views/query/total/{playbackid}":
+  "/data/views/query/total/{playbackId}":
     get:
       summary: Query public total views metrics
       description: |
@@ -3647,8 +3755,7 @@ paths:
     get:
       summary: Query usage metrics
       description: |
-        Allows querying any metric in its raw form. 
-        This can be called from the frontend with a CORS key.
+
       parameters:
         - name: from
           in: query
@@ -3767,23 +3874,17 @@ paths:
   /access-control/signing-key:
     post:
       summary: Create a signing key
-      description: |
-        A signing key is used to sign JWTs and are necessary to make a stream
-        private.
-        \
-        \
-        When you create a signing key, the request returns a base64 encoded pem
-        keypair, where
+      description: >
 
-        - The publicKey is a representation of the public key, encoded as base
-        64 and is passed as a string,
-        - The privateKey is displayed only on creation. This is the only moment
-        where the client can save the private key, otherwise it will be lost.
-        Remember to decode your string when signing JWTs.
-        \
-        \
+        The publicKey is a representation of the public key, encoded as base 64
+        and is passed as a string, and  the privateKey is displayed only on
+        creation. This is the only moment where the client can save the private
+        key, otherwise it will be lost. Remember to decode your string when
+        signing JWTs.
+
         Up to 10 signing keys can be generated, after that you must delete at
         least one signing key to create a new one.
+
       responses:
         "200":
           description: Success
@@ -3799,9 +3900,6 @@ paths:
                 $ref: "#/components/schemas/error"
     get:
       summary: Retrieves signing keys
-      description: |
-        You can list all the signing keys in your account by making a GET
-        request on /api/access-control/signing-key.
       responses:
         "200":
           description: Success
@@ -3860,16 +3958,6 @@ paths:
                 $ref: "#/components/schemas/error"
     patch:
       summary: Update a signing key
-      description: |
-        PATCH /access-control/signing-key/{KEY_ID} updates an existing signing
-        key. It is a single endpoint that can update any of the mutable
-        properties of a stream. Specifically:
-        - name
-        - disabled
-        \
-        \
-        All fields are optional, and if any field is not included in the request
-        payload it will be kept unchanged from the saved object.
       parameters:
         - in: path
           name: keyId
@@ -3919,10 +4007,6 @@ paths:
   "/task/{taskId}":
     get:
       summary: Retrieve a Task
-      description: |
-        Retrieves the details of a Task, including progress updates and status.
-        Supply the unique Task ID that was returned from your previous request
-        or from an Asset export.
       parameters:
         - in: path
           name: taskId
@@ -3945,7 +4029,7 @@ paths:
       description: >
         `POST /transcode` transcodes a video file and uploads the results to the
 
-        specified storage service. 
+        specified storage service.
 
         \
 
@@ -4050,30 +4134,6 @@ paths:
 
         ```
 
-        | Name                       | Type   |
-        Description                                  |
-
-        | -------------------------- | ------ |
-        -------------------------------------------- |
-
-        | type                       | string | The type of storage service.
-        Supported: "s3". |
-
-        | endpoint                   | string | The S3
-        endpoint.                              |
-
-        | credentials.accessKeyId    | string | The S3 access key
-        ID.                         |
-
-        | credentials.secretAccessKey| string | The S3 access key
-        secret.                     |
-
-        | bucket                     | string | The name of the S3
-        bucket.                    |
-
-        | path                       | string | The path within the S3 bucket of
-        the video file. |
-
 
 
         ## Storage
@@ -4107,29 +4167,6 @@ paths:
         ```
 
 
-        | Name                       | Type   |
-        Description                                      |
-
-        | -------------------------- | ------ |
-        ------------------------------------------------ |
-
-        | type                       | string | The type of storage
-        service.                     |
-
-        | endpoint                   | string | The S3
-        endpoint.                                 |
-
-        | credentials.accessKeyId    | string | The S3 access key
-        ID.                            |
-
-        | credentials.secretAccessKey| string | The S3 access key
-        secret.                        |
-
-        | bucket                     | string | The path within the S3 bucket of
-        the video file. |
-
-
-
         **Web3 Storage**
 
 
@@ -4145,17 +4182,6 @@ paths:
         ```
 
 
-        | Name                   | Type   |
-        Description                               |
-
-        | ---------------------- | ------ |
-        ----------------------------------------- |
-
-        | type                   | string | The type of storage
-        service.              |
-
-        | credentials.proof      | string | Base64-encoded UCAN delegation
-        proof.      |
 
 
         ## Outputs
@@ -4182,16 +4208,6 @@ paths:
 
         ```
 
-        | Name | Type   |
-        Description                                                                                      
-        |
-
-        | ---- | ------ |
-        -------------------------------------------------------------------------------------------------
-        |
-
-        | path | string | The path of the directory that HLS playlists and
-        mpegts segments will be stored in.                |
 
 
         **MP4**
@@ -4207,17 +4223,6 @@ paths:
 
         ```
 
-
-        | Name | Type   |
-        Description                                                                                    
-        |
-
-        | ---- | ------ |
-        -----------------------------------------------------------------------------------------------
-        |
-
-        | path | string | The path of the directory that MP4 output videos will
-        be stored in.                              |
       requestBody:
         required: true
         content:
@@ -4240,10 +4245,6 @@ paths:
   "/playback/{id}":
     get:
       summary: Retrieve Playback Info
-      description: |
-        You can retrieve the playback information about any playback identifier
-        by calling this endpoint. It accepts playbackIds from any resource in
-        the API as well as dStorage IDs for assets.
       parameters:
         - in: path
           name: id

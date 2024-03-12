@@ -14,6 +14,7 @@ import {
   DBLegacyObject,
   FieldSpec,
 } from "./types";
+import { cache } from "./cache";
 
 const DEFAULT_SORT = "id ASC";
 
@@ -44,12 +45,26 @@ export default class Table<T extends DBObject> {
   }
 
   // get a single document by id
-  async get(id: string, opts: GetOptions = { useReplica: true }): Promise<T> {
+  async get(
+    id: string,
+    { useReplica = true, useCache }: GetOptions = {}
+  ): Promise<T> {
     if (!id) {
       throw new Error("missing id");
+    } else if (useCache && !useReplica) {
+      throw new Error("can't cache a non-replica query");
     }
+
+    const cacheKey = this.rowCacheKey(id);
+    if (useCache) {
+      const cached = cache.get<T>(cacheKey);
+      if (cached) {
+        return cached as T;
+      }
+    }
+
     let res: QueryResult<DBLegacyObject>;
-    if (!opts.useReplica) {
+    if (!useReplica) {
       res = await this.db.query(
         sql`SELECT data FROM `
           .append(this.name)
@@ -66,7 +81,12 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       return null;
     }
-    return res.rows[0].data as T;
+
+    const data = res.rows[0].data as T;
+    // always cache on read, even if not returning from cache
+    cache.set(cacheKey, data);
+
+    return data;
   }
 
   async getMany(
@@ -196,6 +216,8 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`);
     }
+
+    cache.set(this.rowCacheKey(doc.id), doc);
   }
 
   async update(
@@ -220,6 +242,10 @@ export default class Table<T extends DBObject> {
     }
 
     const res = await this.db.query(q);
+
+    if (typeof query === "string") {
+      cache.delete(this.rowCacheKey(query));
+    }
 
     if (res.rowCount < 1 && throwIfEmpty) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`);
@@ -362,7 +388,10 @@ export default class Table<T extends DBObject> {
     }
 
     if (!prop.index && !prop.unique) {
-      if (prop.properties && this.name === "asset") {
+      // Tasks embed a bunch of `asset` objects in different fields. This would
+      // mean we'd duplicate the asset indexes in the task table. Because of
+      // that, we disable recursive indexes for the `task` table.
+      if (prop.properties && this.name !== "task") {
         const childProps = Object.entries(prop.properties);
         for (const [childName, childProp] of childProps) {
           await this.ensureIndex(childName, childProp, [...parents, propName]);
@@ -395,5 +424,9 @@ export default class Table<T extends DBObject> {
       return;
     }
     logger.info(`Created ${unique} index ${indexName} on ${this.name}`);
+  }
+
+  private rowCacheKey(id: string) {
+    return `db-get-${this.name}-by-id-${id}`;
   }
 }

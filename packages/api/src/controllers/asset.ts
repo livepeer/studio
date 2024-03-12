@@ -81,7 +81,7 @@ function isPrivatePlaybackPolicy(playbackPolicy: PlaybackPolicy) {
 export const primaryStorageExperiment = "primary-vod-storage";
 
 export async function defaultObjectStoreId(
-  { config, body, user }: Request,
+  { config, body, user }: Pick<Request, "config" | "body" | "user">,
   isOldPipeline?: boolean
 ): Promise<string> {
   if (isOldPipeline) {
@@ -182,15 +182,15 @@ function parseUrlToDStorageUrl(
 }
 
 export async function validateAssetPayload(
+  req: Pick<Request, "body" | "user" | "token" | "config">,
   id: string,
   playbackId: string,
-  userId: string,
   createdAt: number,
-  defaultObjectStoreId: string,
-  config: CliArgs,
-  payload: NewAssetPayload,
   source: Asset["source"]
 ): Promise<WithID<Asset>> {
+  const userId = req.user.id;
+  const payload = req.body as NewAssetPayload;
+
   if (payload.objectStoreId) {
     const os = await getActiveObjectStore(payload.objectStoreId);
     if (os.userId !== userId) {
@@ -210,7 +210,7 @@ export async function validateAssetPayload(
 
   // Transform IPFS and Arweave gateway URLs into native protocol URLs
   if (source.type === "url") {
-    const dStorageUrl = parseUrlToDStorageUrl(source.url, config);
+    const dStorageUrl = parseUrlToDStorageUrl(source.url, req.config);
 
     if (dStorageUrl) {
       source = {
@@ -226,6 +226,7 @@ export async function validateAssetPayload(
     playbackId,
     userId,
     createdAt,
+    createdByTokenName: req.token?.name,
     status: {
       phase: source.type === "directUpload" ? "uploading" : "waiting",
       updatedAt: createdAt,
@@ -235,7 +236,7 @@ export async function validateAssetPayload(
     staticMp4: payload.staticMp4,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
-    objectStoreId: payload.objectStoreId || defaultObjectStoreId,
+    objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
     storage: storageInputToState(payload.storage),
   };
 }
@@ -292,7 +293,7 @@ async function validateAssetPlaybackPolicy(
 }
 
 async function getActiveObjectStore(id: string) {
-  const os = await db.objectStore.get(id);
+  const os = await db.objectStore.get(id, { useCache: true });
   if (!os || os.deleted || os.disabled) {
     throw new Error("Object store not found or disabled");
   }
@@ -341,6 +342,14 @@ export function getPlaybackUrl(
   );
   if (catalystManifest) {
     return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
+  }
+  return undefined;
+}
+
+export function getThumbsVTTUrl(asset: WithID<Asset>, os: ObjectStore): string {
+  const thumb = asset.files?.find((f) => f.type === "thumbnails_vtt");
+  if (thumb) {
+    return pathJoin(os.publicUrl, asset.playbackId, thumb.path);
   }
   return undefined;
 }
@@ -601,6 +610,7 @@ const fieldsMap = {
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
+  creatorId: `stream.data->'creatorId'->>'value'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   phase: `asset.data->'status'->>'phase'`,
@@ -764,7 +774,8 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, encryption, c2pa } = req.body as NewAssetPayload;
+  let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
+    req.body as NewAssetPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -782,16 +793,11 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
-  const newAsset = await validateAssetPayload(
-    id,
-    playbackId,
-    req.user.id,
-    Date.now(),
-    await defaultObjectStoreId(req),
-    req.config,
-    req.body,
-    { type: "url", url, encryption: assetEncryptionWithoutKey(encryption) }
-  );
+  const newAsset = await validateAssetPayload(req, id, playbackId, Date.now(), {
+    type: "url",
+    url,
+    encryption: assetEncryptionWithoutKey(encryption),
+  });
   const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });
@@ -817,7 +823,12 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
         c2pa,
         catalystPipelineStrategy: catalystPipelineStrategy(req),
         encryption,
-        thumbnails: await isExperimentSubject("vod-thumbs", req.user?.id),
+        thumbnails: !(await isExperimentSubject(
+          "vod-thumbs-off",
+          req.user?.id
+        )),
+        profiles,
+        targetSegmentSizeSecs,
       },
     },
     undefined,
@@ -862,19 +873,10 @@ app.post(
       }
     }
 
-    let asset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      await defaultObjectStoreId(req),
-      req.config,
-      req.body,
-      {
-        type: "directUpload",
-        encryption: assetEncryptionWithoutKey(encryption),
-      }
-    );
+    let asset = await validateAssetPayload(req, id, playbackId, Date.now(), {
+      type: "directUpload",
+      encryption: assetEncryptionWithoutKey(encryption),
+    });
 
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
@@ -1108,21 +1110,29 @@ app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
     throw new NotFoundError(`user not found`);
   }
 
-  const [assets] = await db.asset.find([
-    sql`data->>'userId' = ${userId}`,
-    sql`data->>'deleted' IS NULL`,
-  ]);
+  const limit = parseInt(req.query.limit?.toString() || "100");
 
-  if (!assets.length) {
-    throw new NotFoundError(`assets not found for user userId=${userId}`);
+  const [assets] = await db.asset.find(
+    [sql`data->>'userId' = ${userId}`, sql`data->>'deleted' IS NULL`],
+    {
+      limit,
+    }
+  );
+
+  let deletedCount = 0;
+  for (const asset of assets) {
+    let deleted = await req.taskScheduler.deleteAsset(asset);
+
+    if (deleted) {
+      deletedCount++;
+    }
   }
 
-  for (let i = 0; i < assets.length; i++) {
-    await req.taskScheduler.deleteAsset(assets[i]);
-  }
-
-  res.status(204);
-  res.end();
+  res.status(200);
+  res.json({
+    found: assets.length,
+    deleted: deletedCount,
+  });
 });
 
 app.patch(
@@ -1195,6 +1205,44 @@ app.patch(
     res.status(200).json(updated);
   }
 );
+
+app.post("/:id/retry", authorizer({}), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!req.user.admin && asset.userId !== req.user.id) {
+    throw new ForbiddenError(`users may only retry their own assets`);
+  }
+
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
+  }
+  if (asset.status.phase !== "failed") {
+    throw new BadRequestError(`Asset is not failed`);
+  }
+
+  const [tasks] = await db.task.find({ outputAssetId: asset.id });
+  if (!tasks.length) {
+    throw new NotFoundError(`Task not found`);
+  }
+
+  const task = tasks[0];
+
+  if (!task) {
+    return res.status(404).json({ errors: ["task not found"] });
+  } else if (!["failed", "cancelled"].includes(task.status?.phase)) {
+    return res
+      .status(400)
+      .json({ errors: ["task is not in a retryable state"] });
+  }
+
+  await req.taskScheduler.retryTask(task, task.status?.errorMessage, true);
+
+  res.status(204);
+  res.json({
+    task: { id: task.id },
+  });
+});
 
 app.get("/:id/clips", authorizer({}), async (req, res) => {
   const id = req.params.id;

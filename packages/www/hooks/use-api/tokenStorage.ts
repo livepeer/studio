@@ -1,8 +1,10 @@
 export const TOKEN_KEY = "PERSISTENT_TOKEN";
+export const REFRESH_TOKEN_KEY = "REFRESH_TOKEN";
 
-export const storeToken = (token) => {
+export const storeToken = (token: string, refreshToken: string) => {
   try {
     localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
   } catch (err) {
     console.error(`
       Error storing persistent token: ${err.message}. Usually this means that you're in a
@@ -11,21 +13,26 @@ export const storeToken = (token) => {
   }
 };
 
-export const getStoredToken = () => {
+export const getStoredToken = () => getStorageItem(TOKEN_KEY);
+
+export const getRefreshToken = () => getStorageItem(REFRESH_TOKEN_KEY);
+
+const getStorageItem = (key: string) => {
   if (!("browser" in process)) {
     return null;
   }
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(key);
   } catch (err) {
-    console.error(`Error retrieving persistent token: ${err.message}.`);
+    console.error(`Error retrieving ${key} from storage: ${err.message}.`);
     return null;
   }
 };
 
-export const clearToken = () => {
+export const clearTokens = () => {
   try {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
   } catch (err) {
     console.error(`Error clearing persistent token: ${err.message}.`);
   }

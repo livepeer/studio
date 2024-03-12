@@ -33,6 +33,7 @@ let mockUser: User;
 let mockAdminUser: User;
 let mockNonAdminUser: User;
 let postMockStream: Stream;
+let postMockPullStream: Stream;
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
@@ -59,6 +60,12 @@ beforeAll(async () => {
       renditions: ["random_prefix_bbb_160p"],
     },
   ];
+  postMockPullStream = {
+    ...postMockStream,
+    pull: {
+      source: "https://playback.space/video+7bbb3wee.flv",
+    },
+  };
 
   mockUser = {
     email: `mock_user@gmail.com`,
@@ -478,7 +485,145 @@ describe("controllers/stream", () => {
       });
     });
 
-    it("should create a stream, delete it, and error when attempting additional detele or replace", async () => {
+    describe("pull stream idempotent creation", () => {
+      beforeEach(async () => {
+        // TODO: Remove this once experiment is done
+        await client.post("/experiment", {
+          name: "stream-pull-source",
+          audienceUserIds: [adminUser.id],
+        });
+      });
+
+      it("should require a pull configuration", async () => {
+        let res = await client.put("/stream/pull", postMockStream);
+        expect(res.status).toBe(400);
+        const errors = await res.json();
+        expect(errors).toMatchObject({
+          errors: [
+            expect.stringContaining("stream pull configuration is required"),
+          ],
+        });
+
+        res = await client.put("/stream/pull", {
+          ...postMockStream,
+          pull: {}, // an empty object is missing the 'source' field
+        });
+        expect(res.status).toBe(422);
+      });
+
+      it("should create a stream if a pull config is present", async () => {
+        const now = Date.now();
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBeDefined();
+        expect(stream.kind).toBe("stream");
+        expect(stream.name).toBe("test_stream");
+        expect(stream.createdAt).toBeGreaterThanOrEqual(now);
+        const document = await db.stream.get(stream.id);
+        expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+      });
+
+      it("should update a stream if it has the same pull source", async () => {
+        let res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        const now = Date.now();
+        res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          name: "updated_stream",
+          profiles: [],
+        });
+        expect(res.status).toBe(200);
+        const updatedStream = await res.json();
+        expect(updatedStream.id).toBe(stream.id);
+        expect(updatedStream.name).toBe("updated_stream");
+        expect(updatedStream.profiles).toEqual([]);
+
+        const document = await db.stream.get(stream.id);
+        expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
+      });
+
+      it("should fail to dedup streams by a random key", async () => {
+        let res = await client.put(
+          "/stream/pull?key=invalid",
+          postMockPullStream
+        );
+        expect(res.status).toBe(400);
+        const errors = await res.json();
+        expect(errors).toMatchObject({
+          errors: [expect.stringContaining("key must be one of")],
+        });
+      });
+
+      it("should fail to dedup streams by creatorId if not provided", async () => {
+        let res = await client.put(
+          "/stream/pull?key=creatorId",
+          postMockPullStream
+        );
+        expect(res.status).toBe(400);
+        const errors = await res.json();
+        expect(errors).toMatchObject({
+          errors: [expect.stringContaining("must be present in the payload")],
+        });
+      });
+
+      it("should dedup streams by creatorId if requested", async () => {
+        let res = await client.put("/stream/pull?key=creatorId", {
+          ...postMockPullStream,
+          creatorId: "0xjest",
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          creatorId: "0xjest",
+          name: "updated_stream",
+          profiles: [],
+        });
+        expect(res.status).toBe(200);
+        const updatedStream = await res.json();
+        expect(updatedStream.id).toBe(stream.id);
+        expect(updatedStream.name).toBe("updated_stream");
+        expect(updatedStream.profiles).toEqual([]);
+
+        const document = await db.stream.get(stream.id);
+        expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
+      });
+
+      it("should wait for stream to become active if requested", async () => {
+        let responded = false;
+        const resProm = client.put(
+          "/stream/pull?waitActive=true",
+          postMockPullStream
+        );
+        resProm.then(() => (responded = true));
+
+        // give some time for API to create object in DB
+        await sleep(100);
+
+        const [streams] = await db.stream.find();
+        expect(streams).toHaveLength(1);
+        expect(streams[0].isActive).toBe(false);
+
+        // stream not active yet
+        expect(responded).toBe(false);
+
+        // set stream active
+        await db.stream.update(streams[0].id, { isActive: true });
+
+        const res = await resProm;
+        expect(responded).toBe(true); // make sure this works
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBe(streams[0].id);
+        expect(stream.isActive).toBe(true);
+      });
+    });
+
+    it("should create a stream, delete it, and error when attempting additional delete or replace", async () => {
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
@@ -504,6 +649,28 @@ describe("controllers/stream", () => {
       } catch (err) {
         expect(err.status).toBe(404);
       }
+    });
+
+    it("should create a stream and add a multistream target for it", async () => {
+      const res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      expect(stream.id).toBeDefined();
+
+      const document = await server.store.get(`stream/${stream.id}`);
+      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+
+      const res2 = await client.post(
+        `/stream/${stream.id}/create-multistream-target`,
+        {
+          profile: "source",
+          videoOnly: false,
+          spec: { name: "target-name", url: "rtmp://test/test" },
+        }
+      );
+      expect(res2.status).toBe(200);
+      const body = await res2.json();
+      expect(body.id).toBeDefined();
     });
 
     describe("set active and heartbeat", () => {

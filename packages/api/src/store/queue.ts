@@ -109,7 +109,7 @@ export class RabbitQueue implements Queue {
     this.connection = amqp.connect([url]);
     this.channel = this.connection.createChannel({
       json: true,
-      publishTimeout: 10_000, // 10s
+      publishTimeout: 60_000, // 60s
       setup: async (channel: Channel) => {
         await Promise.all([
           channel.assertQueue(this.queues.events, {

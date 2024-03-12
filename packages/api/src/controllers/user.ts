@@ -19,6 +19,7 @@ import {
   User,
   SuspendUserPayload,
   DisableUserPayload,
+  RefreshTokenPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -36,12 +37,25 @@ import {
 } from "./helpers";
 import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 import sql from "sql-template-strings";
+import { CliArgs } from "../parse-cli";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
 const freePlan = "prod_O9XuIjn7EqYRVW";
+
+// Ratio of the refresh token lifetime at which point we should issue a new
+// refresh token. This is to avoid having refresh tokens that never expire or
+// creating objects on the DB for every JWT (access token) that we sign.
+export const REFRESH_TOKEN_REFRESH_THRESHOLD = 0.2;
+
+// Ratio of the access token lifetime to require in between consecutive token
+// refreshes using the same refresh token. This means a refresh token can only
+// be used once every 50% of the access tokens lifetime. This is a simple logic
+// to detect malicious usage of a refresh token, e.g. if it leaks from the user
+// browser. We can improve these checks later like enforcing same device/IP/etc.
+export const REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO = 0.5;
 
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
@@ -175,6 +189,17 @@ async function createSubscription(
       ...payAsYouGoItems,
     ],
     expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+function signUserJwt(
+  userId: string,
+  { jwtAudience, jwtSecret, jwtAccessTokenTtl }: CliArgs
+) {
+  return jwt.sign({ sub: userId, aud: jwtAudience }, jwtSecret, {
+    algorithm: "HS256",
+    jwtid: uuid(),
+    expiresIn: jwtAccessTokenTtl,
   });
 }
 
@@ -388,7 +413,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     ...stripeFields,
   });
 
-  const user = cleanUserFields(await db.user.get(id));
+  const user = cleanUserFields(await db.user.get(id, { useReplica: false }));
   if (!validUser && user) {
     const {
       supportAddr,
@@ -455,6 +480,118 @@ app.post("/", validatePost("user"), async (req, res) => {
 
   res.status(201);
   res.json(user);
+});
+
+app.patch("/:id", authorizer({}), async (req, res) => {
+  const { email } = req.body;
+  const userId = req.user.id;
+
+  if (userId !== req.params.id && !req.user.admin) {
+    return res.status(403).json({
+      errors: ["user can only update their own user object"],
+    });
+  }
+
+  const lowerCaseEmail: string = email.toLowerCase();
+
+  // Validate the new email
+  const emailValid = validator.validate(lowerCaseEmail);
+  if (!emailValid) {
+    return res.status(422).json({ errors: ["Invalid email"] });
+  }
+
+  const isEmailRegisteredAlready = await isEmailRegistered(lowerCaseEmail);
+  if (isEmailRegisteredAlready) {
+    return res.status(409).json({
+      errors: ["This email is already registered. Please choose another one."],
+    });
+  }
+
+  const emailValidToken = uuid();
+
+  if (req.user.admin) {
+    if (!req.params.id) {
+      console.log(`
+        Admin user ${req.user.id} attempted to change email without providing userId
+      `);
+      return res
+        .status(400)
+        .json({ errors: ["userId is required for admins"] });
+    }
+
+    const user = await db.user.get(req.params.id);
+
+    if (user.admin) {
+      return res
+        .status(400)
+        .json({ errors: ["Cannot change email of admins"] });
+    }
+
+    if (!user) {
+      return res.status(404).json({ errors: ["User not found"] });
+    }
+
+    await db.user.update(req.params.id, {
+      email: lowerCaseEmail,
+    });
+
+    res.status(200);
+    return res.json({ message: "Email updated successfully." });
+  }
+
+  // Update user with newEmail (temporary field) and emailValidToken in database
+  await db.user.update(userId, {
+    newEmail: lowerCaseEmail,
+    emailValidToken: emailValidToken,
+  });
+
+  try {
+    await sendgridEmail({
+      email: lowerCaseEmail,
+      supportAddr: req.config.supportAddr,
+      sendgridTemplateId: req.config.sendgridTemplateId,
+      sendgridApiKey: req.config.sendgridApiKey,
+      subject: "Verify Your New Email Address for Livepeer Studio",
+      preheader: "Email Verification Needed!",
+      buttonText: "Verify Email",
+      buttonUrl: frontendUrl(
+        req,
+        `/verify-new-email?${qs.stringify({
+          emailValidToken,
+          email: lowerCaseEmail,
+        })}`
+      ),
+      unsubscribe: unsubscribeUrl(req),
+      text: ["Please verify your new email address."].join("\n\n"),
+    });
+
+    res.status(200).json({ message: "Verification email sent." });
+  } catch (err) {
+    res.status(400).json({ errors: [`Error sending email: ${err}`] });
+  }
+});
+
+app.get("/verify/new-email", async (req, res) => {
+  const { emailValidToken } = req.query;
+
+  // Find user with matching emailValidToken
+  const [[user]] = await db.user.find({ emailValidToken });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ errors: ["Invalid or expired verification token."] });
+  }
+
+  // Update user's email field with the newEmail and remove newEmail field and emailValidToken
+  await db.user.update(user.id, {
+    email: user.newEmail,
+    newEmail: null,
+    emailValidToken: null,
+  });
+
+  // Redirect or send a response
+  res.status(200).json({ message: "Email updated successfully." });
 });
 
 const suspensionEmailText = (
@@ -610,13 +747,15 @@ app.post("/token", validatePost("user"), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
-  const token = jwt.sign(
-    { sub: user.id, aud: req.config.jwtAudience },
-    req.config.jwtSecret,
-    {
-      algorithm: "HS256",
-    }
-  );
+  const token = signUserJwt(user.id, req.config);
+  const refreshToken = uuid();
+
+  await db.jwtRefreshToken.create({
+    id: refreshToken,
+    userId: user.id,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + req.config.jwtRefreshTokenTtl * 1000,
+  });
 
   let isTest =
     process.env.NODE_ENV === "test" ||
@@ -640,8 +779,107 @@ app.post("/token", validatePost("user"), async (req, res) => {
     });
   }
   res.status(201);
-  res.json({ id: user.id, email: user.email, token: token });
+  res.json({ id: user.id, email: user.email, token, refreshToken });
 });
+
+app.post(
+  "/token/refresh",
+  validatePost("refresh-token-payload"),
+  async (req, res) => {
+    const now = Date.now();
+    const { refreshToken } = req.body as RefreshTokenPayload;
+    const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
+    if (
+      !refreshTokenObj ||
+      refreshTokenObj.expiresAt < now ||
+      refreshTokenObj.revoked
+    ) {
+      console.log(
+        `Refresh attempt with invalid refresh token=${refreshToken} expiresAt=${refreshTokenObj?.expiresAt} revoked=${refreshTokenObj?.revoked}`
+      );
+      return res.status(401).json({ errors: ["invalid refresh token"] });
+    }
+
+    const timeSinceLastRefresh = now - refreshTokenObj.lastSeen;
+    const minReuseDelay =
+      req.config.jwtAccessTokenTtl * 1000 * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO;
+    if (timeSinceLastRefresh < minReuseDelay) {
+      console.log(
+        `Revoking token due to potential malicious use of refreshToken=${refreshToken}`
+      );
+      await db.jwtRefreshToken.update(refreshToken, {
+        revoked: true,
+      });
+      return res
+        .status(401)
+        .json({ errors: ["refresh token has already been used too recently"] });
+    }
+
+    const user = await db.user.get(refreshTokenObj.userId);
+    if (user.suspended) {
+      return res.status(403).json({ errors: ["user is suspended"] });
+    }
+
+    const token = signUserJwt(user.id, req.config);
+
+    let newRefreshToken: string;
+    const fullTokenTtl = refreshTokenObj.expiresAt - refreshTokenObj.createdAt;
+    if (
+      refreshTokenObj.expiresAt - now <
+      fullTokenTtl * REFRESH_TOKEN_REFRESH_THRESHOLD
+    ) {
+      // issue a new token and revoke the old one if it's close to expiring
+      await db.jwtRefreshToken.update(refreshToken, {
+        lastSeen: now,
+        revoked: true,
+      });
+
+      newRefreshToken = uuid();
+      await db.jwtRefreshToken.create({
+        id: newRefreshToken,
+        userId: user.id,
+        createdAt: now,
+        expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
+      });
+    } else {
+      // otherwise just update the lastSeen
+      await db.jwtRefreshToken.update(refreshToken, {
+        lastSeen: now,
+      });
+    }
+
+    res.status(201);
+    res.json({ token, refreshToken: newRefreshToken });
+  }
+);
+
+// Utility to migrate from the never-expiring JWTs from the dashboard to
+// separate access and refresh tokens.
+// TODO: Remove this after the cut-off date when these JWTs won't be valid anymore.
+app.post(
+  "/token/migrate",
+  authorizer({ noApiToken: true }),
+  async (req, res) => {
+    if (!req.isNeverExpiringJWT) {
+      return res.status(400).json({
+        errors: ["can only migrate from never-expiring JWTs"],
+      });
+    }
+
+    const token = signUserJwt(req.user.id, req.config);
+
+    const now = Date.now();
+    const { id: newRefreshToken } = await db.jwtRefreshToken.create({
+      id: uuid(),
+      userId: req.user.id,
+      createdAt: now,
+      expiresAt: now + req.config.jwtRefreshTokenTtl * 1000,
+    });
+
+    res.status(201);
+    res.json({ token, refreshToken: newRefreshToken });
+  }
+);
 
 app.post("/verify", validatePost("user-verification"), async (req, res) => {
   let user = await findUserByEmail(req.body.email);
@@ -688,7 +926,19 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 // resend verify email
 app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
   const { selectedPlan } = req.query;
-  const user = await findUserByEmail(req.body.email);
+  let user = await findUserByEmail(req.body.email);
+
+  if (!user) {
+    let [newEmailUser] = await db.user.find({ newEmail: req.body.email });
+    if (newEmailUser.length > 0) {
+      user = newEmailUser[0];
+    }
+  }
+
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["user not found"] });
+  }
 
   const emailSent = await sendVerificationEmail(req, user, selectedPlan);
 

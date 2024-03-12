@@ -406,16 +406,17 @@ export class TaskScheduler {
 
   async scheduleTask(task: WithID<Task>, retries = 0) {
     const timestamp = Date.now();
-    await this.updateTask(task, {
-      // only update scheduledAt on the first schedule (retries == 0)
-      scheduledAt: retries ? undefined : timestamp,
-      status: {
-        phase: "waiting",
-        updatedAt: timestamp,
-        retries,
-      },
-    });
     try {
+      await this.updateTask(task, {
+        // only update scheduledAt on the first schedule (retries == 0)
+        scheduledAt: retries ? undefined : timestamp,
+        status: {
+          phase: "waiting",
+          updatedAt: timestamp,
+          retries,
+        },
+      });
+
       await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
         type: "task_trigger",
         id: uuid(),
@@ -434,8 +435,15 @@ export class TaskScheduler {
     }
   }
 
-  async retryTask(task: WithID<Task>, errorMessage: string) {
+  async retryTask(
+    task: WithID<Task>,
+    errorMessage: string,
+    forceRetry?: boolean
+  ) {
     let retries = (task.status.retries ?? 0) + 1;
+    if (forceRetry) {
+      retries = 0;
+    }
     const status: Task["status"] = {
       phase: "waiting",
       updatedAt: Date.now(),
@@ -444,7 +452,11 @@ export class TaskScheduler {
     };
 
     task = await this.updateTask(task, { status });
-    // increase sleep for final retry
+    if (forceRetry) {
+      await this.scheduleTask(task, retries);
+      return;
+    }
+
     const sleepDur =
       retries == MAX_RETRIES
         ? TASK_FINAL_RETRY_DELAY
@@ -523,14 +535,19 @@ export class TaskScheduler {
   }
 
   async deleteAsset(asset: string | Asset) {
-    if (typeof asset === "string") {
-      asset = await db.asset.get(asset);
+    try {
+      if (typeof asset === "string") {
+        asset = await db.asset.get(asset);
+      }
+      await this.updateAsset(asset, {
+        deleted: true,
+        deletedAt: Date.now(),
+        status: asset.status, // prevent updatedAt from being bumped
+      });
+      return true;
+    } catch (e) {
+      return false;
     }
-    await this.updateAsset(asset, {
-      deleted: true,
-      deletedAt: Date.now(),
-      status: asset.status, // prevent updatedAt from being bumped
-    });
   }
 
   async updateAsset(

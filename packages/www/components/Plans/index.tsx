@@ -206,8 +206,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <Tooltip
                     multiline
-                    content=" Deliver high-quality playback on whatever device or bandwidth the
-                    end viewer is watching.">
+                    content="Deliver high-quality playback with any viewer device and network bandwidth.">
                     <Text
                       size="3"
                       css={{

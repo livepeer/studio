@@ -13,33 +13,50 @@ import {
 } from "../store/errors";
 import tracking from "../middleware/tracking";
 import { DBWebhook } from "../store/webhook-table";
-import { Asset, PlaybackPolicy, User } from "../schema/types";
+import {
+  AccessControlGatePayload,
+  Asset,
+  PlaybackPolicy,
+  User,
+} from "../schema/types";
 import { signatureHeaders, storeTriggerStatus } from "../webhooks/cannon";
 import { Response } from "node-fetch";
 import { fetchWithTimeoutAndRedirects } from "../util";
 import fetch from "node-fetch";
-import { WithID } from "../store/types";
-import { DBStream } from "../store/stream-table";
-import { getViewers } from "./usage";
 import { HACKER_DISABLE_CUTOFF_DATE } from "./utils/notification";
 import { isFreeTierUser } from "./helpers";
+import { cache } from "../store/cache";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-const MAX_ALLOWED_VIEWERS_FOR_FREE_TIER = 5;
+const MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE = 5;
 const app = Router();
 
-interface HitRecord {
-  timestamp: number;
-}
-
-const playbackHits: Record<string, HitRecord[]> = {};
+type GateConfig = {
+  refresh_interval: number;
+  rate_limit: number;
+};
 
 async function fireGateWebhook(
   webhook: DBWebhook,
-  plabackPolicy: PlaybackPolicy,
-  accessKey: string
+  content: DBStream | WithID<Asset>,
+  payload: AccessControlGatePayload
 ) {
   let timestamp = Date.now();
+  let jsonPayload = {
+    context: content.playbackPolicy.webhookContext,
+    accessKey: payload.accessKey,
+    timestamp: timestamp,
+  };
+
+  if (payload.webhookPayload) {
+    if (payload.webhookPayload.headers) {
+      payload.webhookPayload.headers["Tx-Stream-Id"] = content.name;
+    }
+    jsonPayload = { ...jsonPayload, ...payload.webhookPayload };
+  }
+
   let params = {
     method: "POST",
     headers: {
@@ -47,12 +64,12 @@ async function fireGateWebhook(
       "user-agent": "livepeer.studio",
     },
     timeout: WEBHOOK_TIMEOUT,
-    body: JSON.stringify({
-      context: plabackPolicy.webhookContext,
-      accessKey: accessKey,
-      timestamp: timestamp,
-    }),
+    body: JSON.stringify(jsonPayload),
   };
+
+  if ("pull" in content && content.pull) {
+    params.headers["Trovo-Auth-Version"] = "1.1";
+  }
 
   const sigHeaders = signatureHeaders(
     params.body,
@@ -92,6 +109,11 @@ async function fireGateWebhook(
       await resp.text();
     }
   }
+  console.log(
+    `access-control: gate: webhook=${
+      webhook.id
+    } statusCode=${statusCode} duration=${process.hrtime(startTime)[1] / 1e6}ms`
+  );
   return statusCode;
 }
 
@@ -102,9 +124,16 @@ app.post(
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace(/^\w+\+/, "");
-    const content =
-      (await db.stream.getByPlaybackId(playbackId)) ||
-      (await db.asset.getByPlaybackId(playbackId));
+
+    let content = await cache.getOrSet(
+      `acl-content-${playbackId}`,
+      async () => {
+        return (
+          (await db.stream.getByPlaybackId(playbackId)) ||
+          (await db.asset.getByPlaybackId(playbackId))
+        );
+      }
+    );
 
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
@@ -116,29 +145,48 @@ app.post(
       throw new NotFoundError("Content not found");
     }
 
-    const user = await db.user.get(content.userId);
+    let user = await db.user.get(content.userId, { useCache: true });
 
-    if (user.suspended || ("suspended" in content && content.suspended)) {
+    if (
+      user.suspended ||
+      ("suspended" in content && content.suspended) ||
+      user.disabled
+    ) {
       const contentLog = JSON.stringify(JSON.stringify(content));
       console.log(`
-        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user=${user.id} is suspended, content=${contentLog}
+        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user=${user.id} is suspended or disabled, content=${contentLog}
       `);
       throw new NotFoundError("Content not found");
     }
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
-    if (user.createdAt < HACKER_DISABLE_CUTOFF_DATE) {
-      let limitReached = await freeTierLimitReached(content, user, req);
-      if (limitReached) {
-        throw new ForbiddenError("Free tier user reached viewership limit");
+    let config: Partial<GateConfig> = {};
+
+    if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
+      if (isFreeTierUser(user)) {
+        config.rate_limit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
       }
+    }
+
+    if (content.playbackPolicy?.refreshInterval) {
+      config.refresh_interval = content.playbackPolicy.refreshInterval;
+    }
+
+    if (
+      playbackPolicyType !== "public" &&
+      req.body.pub === req.config.accessControlAdminPubkey &&
+      req.body.pub !== "" &&
+      req.body.pub
+    ) {
+      res.status(204);
+      return res.end();
     }
 
     switch (playbackPolicyType) {
       case "public":
-        res.status(204);
-        return res.end();
+        res.status(200);
+        return res.json(config);
       case "jwt":
         if (!req.body.pub) {
           console.log(`
@@ -149,11 +197,15 @@ app.post(
           );
         }
 
-        const query = [];
-        query.push(sql`signing_key.data->>'publicKey' = ${req.body.pub}`);
-        const [signingKeyOutput] = await db.signingKey.find(query, {
-          limit: 2,
-        });
+        const [signingKeyOutput] = await cache.getOrSet(
+          `acl-signing-key-pub-${req.body.pub}`,
+          () => {
+            const query = [
+              sql`signing_key.data->>'publicKey' = ${req.body.pub}`,
+            ];
+            return db.signingKey.find(query, { limit: 2 });
+          }
+        );
 
         if (signingKeyOutput.length == 0) {
           console.log(`
@@ -192,15 +244,17 @@ app.post(
         }
 
         tracking.recordSigningKeyValidation(signingKey.id);
-        res.status(204);
-        return res.end();
+        res.status(200);
+        return res.json(config);
       case "webhook":
         if (!req.body.accessKey || req.body.type !== "accessKey") {
           throw new ForbiddenError(
             "Content is gated and requires an access key"
           );
         }
-        const webhook = await db.webhook.get(content.playbackPolicy.webhookId);
+        const webhook = await db.webhook.get(content.playbackPolicy.webhookId, {
+          useCache: true,
+        });
         if (!webhook) {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but corresponding webhook not found for webhookId=${content.playbackPolicy.webhookId}, disallowing playback
@@ -209,14 +263,14 @@ app.post(
             "Content is gated and corresponding webhook not found"
           );
         }
-        const statusCode = await fireGateWebhook(
-          webhook,
-          content.playbackPolicy,
-          req.body.accessKey
-        );
+
+        const gatePayload: AccessControlGatePayload = req.body;
+
+        const statusCode = await fireGateWebhook(webhook, content, gatePayload);
+
         if (statusCode >= 200 && statusCode < 300) {
-          res.status(204);
-          return res.end();
+          res.status(200);
+          return res.json(config);
         } else if (statusCode === 0) {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} failed, disallowing playback
@@ -269,38 +323,5 @@ app.get("/public-key", async (req, res) => {
       res.status(500).json({ error: "Unable to retrieve public key" });
     });
 });
-
-async function freeTierLimitReached(
-  content: DBStream | WithID<Asset>,
-  user: User,
-  req: Request
-): Promise<boolean> {
-  if (!isFreeTierUser(user)) {
-    return false;
-  }
-
-  // Register a hit for the given playbackId
-  const now = Date.now();
-  const playbackId = content.playbackId;
-
-  if (!playbackHits[playbackId]) {
-    playbackHits[playbackId] = [];
-  }
-
-  // Remove hits that are older than three minutes
-  playbackHits[playbackId] = playbackHits[playbackId].filter(
-    (hit) => now - hit.timestamp < 60 * 3 * 1000
-  );
-
-  // Add a new hit record
-  playbackHits[playbackId].push({ timestamp: now });
-
-  // Check if the number of hits in the last minute exceeds the threshold
-  if (playbackHits[playbackId].length > MAX_ALLOWED_VIEWERS_FOR_FREE_TIER) {
-    return true;
-  } else {
-    return false;
-  }
-}
 
 export default app;

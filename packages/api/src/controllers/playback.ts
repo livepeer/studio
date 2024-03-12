@@ -5,10 +5,12 @@ import {
   getWebRTCPlaybackUrl,
   getRecordingFields,
   getRecordingPlaybackUrl,
+  getFLVPlaybackUrl,
 } from "./stream";
 import {
   getPlaybackUrl as assetPlaybackUrl,
   getStaticPlaybackInfo,
+  getThumbsVTTUrl,
   StaticPlaybackInfo,
 } from "./asset";
 import { CliArgs } from "../parse-cli";
@@ -16,10 +18,15 @@ import { DBSession } from "../store/session-table";
 import { Asset, PlaybackInfo, Stream, User } from "../schema/types";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { NotFoundError, UnprocessableEntityError } from "../store/errors";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "../store/errors";
 import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
+import { cache } from "../store/cache";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -36,8 +43,10 @@ function newPlaybackInfo(
   type: PlaybackInfo["type"],
   hlsUrl: string,
   webRtcUrl?: string | null,
+  flvUrl?: string | null,
   playbackPolicy?: Asset["playbackPolicy"] | Stream["playbackPolicy"],
   staticFilesPlaybackInfo?: StaticPlaybackInfo[],
+  thumbsVTT?: string,
   live?: PlaybackInfo["meta"]["live"],
   recordingUrl?: string,
   withRecordings?: boolean,
@@ -76,6 +85,13 @@ function newPlaybackInfo(
       url: webRtcUrl,
     });
   }
+  if (flvUrl) {
+    playbackInfo.meta.source.push({
+      hrn: "FLV (H264)",
+      type: "video/x-flv",
+      url: flvUrl,
+    });
+  }
   if (withRecordings) {
     playbackInfo.meta.dvrPlayback = [];
     if (recordingUrl) {
@@ -92,9 +108,16 @@ function newPlaybackInfo(
   }
   if (thumbUrl) {
     playbackInfo.meta.source.push({
-      hrn: "Thumbnail",
+      hrn: "Thumbnail (JPEG)",
       type: "image/jpeg",
       url: thumbUrl,
+    });
+  }
+  if (thumbsVTT) {
+    playbackInfo.meta.source.push({
+      hrn: "Thumbnails",
+      type: "text/vtt",
+      url: thumbsVTT,
     });
   }
 
@@ -106,7 +129,7 @@ const getAssetPlaybackInfo = async (
   ingest: string,
   asset: WithID<Asset>
 ) => {
-  const os = await db.objectStore.get(asset.objectStoreId);
+  const os = await db.objectStore.get(asset.objectStoreId, { useCache: true });
   if (!os || os.deleted || os.disabled) {
     return null;
   }
@@ -121,37 +144,24 @@ const getAssetPlaybackInfo = async (
     "vod",
     playbackUrl,
     null,
+    null,
     asset.playbackPolicy || null,
-    getStaticPlaybackInfo(asset, os)
+    getStaticPlaybackInfo(asset, os),
+    getThumbsVTTUrl(asset, os)
   );
+};
+
+type PlaybackResource = {
+  stream?: DBStream;
+  session?: DBSession;
+  asset?: WithID<Asset>;
 };
 
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
-  cutoffDate?: number,
-  origin?: string
-): Promise<{ stream?: DBStream; session?: DBSession; asset?: WithID<Asset> }> {
-  let asset =
-    (await db.asset.getByPlaybackId(id)) ??
-    (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
-    (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
-    (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
-
-  if (asset && !asset.deleted) {
-    if (asset.status.phase !== "ready" && !asset.sourcePlaybackReady) {
-      throw new UnprocessableEntityError("asset is not ready for playback");
-    }
-    if (asset.userId !== user?.id && cutoffDate) {
-      console.log(
-        `Returning cross-user asset for playback. ` +
-          `userId=${user?.id} userEmail=${user?.email} origin=${origin} ` +
-          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
-      );
-    }
-    return { asset };
-  }
-
+  cutoffDate?: number
+): Promise<PlaybackResource> {
   let stream = await db.stream.getByPlaybackId(id);
   if (!stream) {
     const streamById = await db.stream.get(id);
@@ -164,6 +174,16 @@ export async function getResourceByPlaybackId(
     return { stream };
   }
 
+  const asset =
+    (await db.asset.getByPlaybackId(id)) ??
+    (await db.asset.getByIpfsCid(id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id, user, cutoffDate)) ??
+    (await db.asset.getBySourceURL("ar://" + id, user, cutoffDate));
+
+  if (asset && !asset.deleted) {
+    return { asset };
+  }
+
   const session = await db.session.get(id);
   if (session && !session.deleted) {
     return { session };
@@ -171,6 +191,7 @@ export async function getResourceByPlaybackId(
 
   return {};
 }
+
 async function getAttestationPlaybackInfo(
   config: CliArgs,
   ingest: string,
@@ -214,14 +235,30 @@ async function getPlaybackInfo(
   withRecordings?: boolean
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
-  let { stream, asset, session } = await getResourceByPlaybackId(
-    id,
-    req.user,
-    cutoffDate,
-    origin
-  );
+  const cacheKey = `playbackInfo-${id}-user-${req.user?.id}-cutoff-${cutoffDate}`;
+  let resource = cache.get<PlaybackResource>(cacheKey);
+  if (!resource) {
+    resource = await getResourceByPlaybackId(id, req.user, cutoffDate);
+
+    const ttl =
+      resource.asset && resource.asset.status.phase !== "ready" ? 5 : 120;
+    cache.set(cacheKey, resource, ttl);
+  }
+
+  let { stream, asset, session } = resource;
 
   if (asset) {
+    if (asset.status.phase !== "ready" && !asset.sourcePlaybackReady) {
+      throw new UnprocessableEntityError("asset is not ready for playback");
+    }
+    if (asset.userId !== req.user?.id && cutoffDate) {
+      console.log(
+        `Returning cross-user asset for playback. ` +
+          `userId=${req.user?.id} userEmail=${req.user?.email} origin=${origin} ` +
+          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
+      );
+    }
+
     return await getAssetPlaybackInfo(req.config, ingest, asset);
   }
 
@@ -234,26 +271,45 @@ async function getPlaybackInfo(
   }
 
   if (stream) {
-    const thumbsEnabled = await isExperimentSubject(
-      "live-thumbs",
-      req?.user?.id
-    );
-    let url: string;
-    let thumbUrl: string;
-    if (withRecordings || thumbsEnabled) {
-      ({ url, thumbUrl } = await getRunningRecording(stream, req));
+    if (withRecordings) {
+      const { user } = req;
+      if (!user) {
+        throw new UnauthorizedError(
+          `authentication is required to access recordings`
+        );
+      }
+
+      if (stream.userId !== user.id) {
+        throw new UnauthorizedError(
+          `user does not have access to recordings for this content`
+        );
+      }
     }
 
+    let url: string;
+    let thumbUrl: string;
+    try {
+      ({ url, thumbUrl } = await getRunningRecording(stream, req));
+    } catch (e) {
+      logger.error("Error while getting recording", e);
+    }
+
+    const flvOut = await isExperimentSubject(
+      "stream-pull-source",
+      req.user?.id
+    );
     return newPlaybackInfo(
       "live",
       getHLSPlaybackUrl(ingest, stream),
       getWebRTCPlaybackUrl(ingest, stream),
+      flvOut ? getFLVPlaybackUrl(ingest, stream) : null,
       stream.playbackPolicy,
       null,
+      undefined,
       stream.isActive ? 1 : 0,
       url,
       withRecordings,
-      thumbsEnabled && thumbUrl
+      thumbUrl
     );
   }
 

@@ -1,5 +1,4 @@
 import { Router, Request } from "express";
-import fetch from "node-fetch";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
@@ -45,12 +44,16 @@ import {
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
   triggerCatalystStreamNuke,
+  triggerCatalystPullStart,
 } from "./helpers";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
 import { toExternalSession } from "./session";
 import { withPlaybackUrls } from "./asset";
 import { getClips } from "./clip";
+import { ensureExperimentSubject } from "../store/experiment-table";
+import { experimentSubjectsOnly } from "./experiment";
+import { sleep } from "../util";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -59,6 +62,31 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
+const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
+
+// Helper constant to be used in the PUT /pull API to make sure we delete fields
+// from the stream that are not specified in the PUT payload.
+const EMPTY_NEW_STREAM_PAYLOAD: Required<
+  Omit<
+    NewStreamPayload & { creatorId: undefined },
+    // omit all the db-schema fields
+    | "wowza"
+    | "presets"
+    | "renditions"
+    | "recordObjectStoreId"
+    | "objectStoreId"
+    | "detection"
+  >
+> = {
+  name: undefined,
+  profiles: undefined,
+  multistream: undefined,
+  pull: undefined,
+  record: undefined,
+  userTags: undefined,
+  creatorId: undefined,
+  playbackPolicy: undefined,
+};
 
 const app = Router();
 const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
@@ -115,11 +143,7 @@ async function validateMultistreamTarget(
   return { ...specless, id: created.id };
 }
 
-async function validateMultistreamOpts(
-  userId: string,
-  profiles: Profile[],
-  multistream: MultistreamOptions
-): Promise<MultistreamOptions> {
+function toProfileNames(profiles: Profile[]): Set<string> {
   const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
@@ -132,7 +156,15 @@ async function validateMultistreamOpts(
     profileNames.add(name);
   }
   profileNames.add("source");
+  return profileNames;
+}
 
+async function validateMultistreamOpts(
+  userId: string,
+  profiles: Profile[],
+  multistream: MultistreamOptions
+): Promise<MultistreamOptions> {
+  const profileNames = toProfileNames(profiles);
   if (!multistream?.targets) {
     return { targets: [] };
   }
@@ -176,6 +208,15 @@ async function validateStreamPlaybackPolicy(
   }
 }
 
+async function validateTags(userTags: object) {
+  let stringifiedTags = JSON.stringify(userTags);
+  if (stringifiedTags.length > 2048) {
+    throw new BadRequestError(
+      `userTags object is too large. Max size is 2048 characters`
+    );
+  }
+}
+
 async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   return Promise.all(
     ids.map(async (id) => {
@@ -193,12 +234,45 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+// Waits for the stream to become active. Works by polling the stream object
+// on the DB until it becomes active or the timeout is reached. Will wait for
+// exponentially longer time in between polls to reduce load on the DB.
+async function pollWaitStreamActive(req: Request, id: string) {
+  let clientGone = false;
+  req.on("close", () => {
+    clientGone = true;
+  });
+
+  const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
+  let sleepDelay = 500;
+  while (!clientGone && Date.now() < deadline) {
+    const stream =
+      (await db.stream.get(id)) ||
+      (await db.stream.get(id, { useReplica: false })); // read from primary in case replica is lagging
+    if (!stream) {
+      throw new NotFoundError("stream not found");
+    }
+    if (stream.isActive) {
+      return stream;
+    }
+
+    await sleep(sleepDelay);
+    sleepDelay = Math.min(sleepDelay * 2, 5000);
+  }
+
+  throw new InternalServerError("stream not active");
+}
+
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
 }
 
 export function getWebRTCPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `webrtc`, stream.playbackId);
+}
+
+export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
+  return pathJoin(ingest, `flv`, stream.playbackId);
 }
 
 /**
@@ -281,9 +355,12 @@ const fieldsMap: FieldsMap = {
   lastSeen: { val: `stream.data->'lastSeen'`, type: "int" },
   createdAt: { val: `stream.data->'createdAt'`, type: "int" },
   userId: `stream.data->>'userId'`,
+  creatorId: `stream.data->'creatorId'->>'value'`,
+  "pull.source": `stream.data->'pull'->>'source'`,
   isActive: { val: `stream.data->'isActive'`, type: "boolean" },
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
+  playbackId: `stream.data->>'playbackId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
   suspended: { val: `stream.data->'suspended'`, type: "boolean" },
   sourceSegmentsDuration: {
@@ -295,6 +372,7 @@ const fieldsMap: FieldsMap = {
     val: `stream.data->'transcodedSegmentsDuration'`,
     type: "real",
   },
+  isHealthy: { val: `stream.data->'isHealthy'`, type: "boolean" },
 };
 
 app.get("/", authorizer({}), async (req, res) => {
@@ -406,7 +484,7 @@ export async function getRecordingPlaybackUrl(
       return null;
     }
 
-    const os = await db.objectStore.get(objectStoreId);
+    const os = await db.objectStore.get(objectStoreId, { useCache: true });
     url = pathJoin(os.publicUrl, session.playbackId, session.id, "output.m3u8");
   } catch (e) {
     console.log(`
@@ -905,7 +983,6 @@ app.post(
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
 
-    // Since we might need to delete some fields, use replace instead of update
     await db.stream.update(stream.id, patch);
 
     if (payload.session_id) {
@@ -937,69 +1014,225 @@ app.post(
   }
 );
 
+const pullStreamKeyAccessors: Record<string, string[]> = {
+  creatorId: ["creatorId", "value"],
+  "pull.source": ["pull", "source"],
+};
+
+app.put(
+  "/pull",
+  authorizer({}),
+  validatePost("new-stream-payload"),
+  experimentSubjectsOnly("stream-pull-source"),
+  async (req, res) => {
+    const { key = "pull.source", waitActive } = toStringValues(req.query);
+    const rawPayload = req.body as NewStreamPayload;
+
+    if (!rawPayload.pull) {
+      return res.status(400).json({
+        errors: [`stream pull configuration is required`],
+      });
+    }
+
+    // Make the payload compatible with the stream schema to simplify things
+    const payload: Partial<DBStream> = {
+      profiles: req.config.defaultStreamProfiles,
+      ...rawPayload,
+      creatorId: mapInputCreatorId(rawPayload.creatorId),
+    };
+
+    const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
+    if (!keyValue) {
+      return res.status(400).json({
+        errors: [
+          `key must be one of ${Object.keys(
+            pullStreamKeyAccessors
+          )} and must be present in the payload`,
+        ],
+      });
+    }
+    const filtersStr = encodeURIComponent(
+      JSON.stringify([{ id: key, value: keyValue }])
+    );
+    const filters = parseFilters(fieldsMap, filtersStr);
+
+    const [streams] = await db.stream.find(
+      [
+        sql`data->>'userId' = ${req.user.id}`,
+        sql`data->>'deleted' IS NULL`,
+        ...filters,
+      ],
+      { useReplica: false }
+    );
+    if (streams.length > 1) {
+      return res.status(400).json({
+        errors: [
+          `pull.source must be unique, found ${streams.length} streams with same source`,
+        ],
+      });
+    }
+    const streamExisted = streams.length === 1;
+
+    let stream: DBStream;
+    if (!streamExisted) {
+      stream = await handleCreateStream(req);
+    } else {
+      const oldStream = streams[0];
+      stream = {
+        ...oldStream,
+        ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
+        suspended: false,
+        ...payload,
+      };
+      await db.stream.replace(stream);
+      // read from DB again to keep exactly what got saved
+      stream = await db.stream.get(stream.id, { useReplica: false });
+
+      if (oldStream.pull?.source != stream.pull?.source) {
+        await triggerCatalystStreamNuke(req, stream.playbackId);
+      }
+    }
+
+    const ingest = await getIngestBase(req);
+    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+
+    if (waitActive === "true") {
+      stream = await pollWaitStreamActive(req, stream.id);
+    }
+
+    res.status(streamExisted ? 200 : 201);
+    res.json(
+      db.stream.addDefaultFields(
+        db.stream.removePrivateFields(stream, req.user.admin)
+      )
+    );
+  }
+);
+
 app.post(
   "/",
   authorizer({}),
   validatePost("new-stream-payload"),
   async (req, res) => {
+    const { autoStartPull } = toStringValues(req.query);
     const payload = req.body as NewStreamPayload;
 
-    const id = uuid();
-    const createdAt = Date.now();
-    const streamKey = await generateUniqueStreamKey(id);
-    let playbackId = await generateUniquePlaybackId(id, [streamKey]);
-    if (req.user.isTestUser) {
-      playbackId += "-test";
+    // TODO: Remove autoStartPull once experiment subjects migrate to /pull
+    if (autoStartPull || payload.pull) {
+      await ensureExperimentSubject("stream-pull-source", req.user.id);
     }
 
-    const { objectStoreId } = payload;
-    if (objectStoreId) {
-      const store = await db.objectStore.get(objectStoreId);
-      if (!store || store.deleted || store.disabled) {
+    if (autoStartPull === "true") {
+      if (!payload.pull) {
         return res.status(400).json({
-          errors: [`object store ${objectStoreId} not found or disabled`],
+          errors: [`autoStartPull requires pull configuration to be present`],
+        });
+      }
+
+      const [streams] = await db.stream.find(
+        [
+          sql`data->>'userId' = ${req.user.id}`,
+          sql`data->>'deleted' IS NULL`,
+          sql`data->'pull'->>'source' = ${payload.pull.source}`,
+        ],
+        { useReplica: false }
+      );
+
+      if (streams.length === 1) {
+        const stream = streams[0];
+        const ingest = await getIngestBase(req);
+        await triggerCatalystPullStart(
+          stream,
+          getHLSPlaybackUrl(ingest, stream)
+        );
+
+        return res
+          .status(200)
+          .json(
+            db.stream.addDefaultFields(
+              db.stream.removePrivateFields(stream, req.user.admin)
+            )
+          );
+      } else if (streams.length > 1) {
+        return res.status(400).json({
+          errors: [
+            `autoStartPull requires pull.source to be unique, found ${streams.length} streams with same source`,
+          ],
         });
       }
     }
 
-    let doc: DBStream = {
-      profiles: req.config.defaultStreamProfiles,
-      ...payload,
-      kind: "stream",
-      userId: req.user.id,
-      creatorId: mapInputCreatorId(payload.creatorId),
-      renditions: {},
-      objectStoreId,
-      id,
-      createdAt,
-      streamKey,
-      playbackId,
-      createdByTokenName: req.token?.name,
-      createdByTokenId: req.token?.id,
-      isActive: false,
-      lastSeen: 0,
-    };
-    doc = wowzaHydrate(doc);
+    const stream = await handleCreateStream(req);
 
-    await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
-
-    doc.profiles = hackMistSettings(req, doc.profiles);
-    doc.multistream = await validateMultistreamOpts(
-      req.user.id,
-      doc.profiles,
-      doc.multistream
-    );
-
-    await db.stream.create(doc);
+    if (autoStartPull === "true") {
+      const ingest = await getIngestBase(req);
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+    }
 
     res.status(201);
     res.json(
       db.stream.addDefaultFields(
-        db.stream.removePrivateFields(doc, req.user.admin)
+        db.stream.removePrivateFields(stream, req.user.admin)
       )
     );
   }
 );
+
+async function handleCreateStream(req: Request) {
+  const payload = req.body as NewStreamPayload;
+
+  const id = uuid();
+  const createdAt = Date.now();
+  // TODO: Don't create a streamKey if there's a pull source (here and on www)
+  const streamKey = await generateUniqueStreamKey(id);
+  let playbackId = await generateUniquePlaybackId(id, [streamKey]);
+  if (req.user.isTestUser) {
+    playbackId += "-test";
+  }
+
+  const { objectStoreId } = payload;
+  if (objectStoreId) {
+    const store = await db.objectStore.get(objectStoreId);
+    if (!store || store.deleted || store.disabled) {
+      throw new BadRequestError(
+        `object store ${objectStoreId} not found or disabled`
+      );
+    }
+  }
+
+  let doc: DBStream = {
+    profiles: req.config.defaultStreamProfiles,
+    ...payload,
+    kind: "stream",
+    userId: req.user.id,
+    creatorId: mapInputCreatorId(payload.creatorId),
+    renditions: {},
+    objectStoreId,
+    id,
+    createdAt,
+    streamKey,
+    playbackId,
+    createdByTokenName: req.token?.name,
+    isActive: false,
+    lastSeen: 0,
+  };
+  doc = wowzaHydrate(doc);
+
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+
+  doc.profiles = hackMistSettings(req, doc.profiles);
+  doc.multistream = await validateMultistreamOpts(
+    req.user.id,
+    doc.profiles,
+    doc.multistream
+  );
+
+  if (doc.userTags) {
+    await validateTags(doc.userTags);
+  }
+
+  return await db.stream.create(doc);
+}
 
 // Refreshes the 'lastSeen' field of a stream
 app.post("/:id/heartbeat", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -1327,6 +1560,92 @@ app.patch(
   }
 );
 
+app.post(
+  "/:id/create-multistream-target",
+  authorizer({}),
+  validatePost("target-add-payload"),
+  async (req, res) => {
+    const payload = req.body;
+
+    const stream = await db.stream.get(req.params.id);
+
+    if (!stream || stream.deleted) {
+      res.status(404);
+      return res.json({ errors: ["stream not found"] });
+    }
+
+    if (stream.userId !== req.user.id) {
+      res.status(404);
+      return res.json({ errors: ["stream not found"] });
+    }
+
+    const newTarget = await validateMultistreamTarget(
+      req.user.id,
+      toProfileNames(stream.profiles),
+      payload
+    );
+
+    let multistream: DBStream["multistream"] = {
+      targets: [...(stream.multistream?.targets ?? []), newTarget],
+    };
+
+    multistream = await validateMultistreamOpts(
+      req.user.id,
+      stream.profiles,
+      multistream
+    );
+
+    let patch: StreamPatchPayload & Partial<DBStream> = {
+      multistream,
+    };
+
+    await db.stream.update(stream.id, patch);
+    const updatedTarget = await db.multistreamTarget.get(newTarget.id);
+    await triggerCatalystStreamUpdated(req, stream.playbackId);
+
+    res.status(200);
+    res.json(db.multistreamTarget.cleanWriteOnlyResponse(updatedTarget));
+  }
+);
+
+app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
+  const { id, targetId } = req.params;
+
+  const stream = await db.stream.get(id);
+
+  if (!stream || stream.deleted) {
+    res.status(404);
+    return res.json({ errors: ["stream not found"] });
+  }
+
+  if (stream.userId !== req.user.id) {
+    res.status(404);
+    return res.json({ errors: ["stream not found"] });
+  }
+
+  let multistream: DBStream["multistream"] = stream.multistream ?? {
+    targets: [],
+  };
+
+  multistream.targets = multistream.targets.filter((t) => t.id !== targetId);
+  multistream = await validateMultistreamOpts(
+    req.user.id,
+    stream.profiles,
+    multistream
+  );
+
+  let patch: StreamPatchPayload & Partial<DBStream> = {
+    multistream,
+  };
+
+  await db.stream.update(stream.id, patch);
+
+  await triggerCatalystStreamUpdated(req, stream.playbackId);
+
+  res.status(204);
+  res.end();
+});
+
 app.patch(
   "/:id",
   authorizer({}),
@@ -1353,6 +1672,7 @@ app.patch(
       suspended,
       multistream,
       playbackPolicy,
+      userTags,
       creatorId,
       profiles,
     } = payload;
@@ -1389,6 +1709,11 @@ app.patch(
       await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
 
       patch = { ...patch, playbackPolicy };
+    }
+
+    if (userTags) {
+      await validateTags(userTags);
+      patch = { ...patch, userTags };
     }
 
     // remove undefined fields to check below
@@ -1539,6 +1864,29 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
   res.json(resp);
 });
 
+app.get("/:id/config", authorizer({ anyAdmin: true }), async (req, res) => {
+  let { id } = req.params;
+  let stream = await db.stream.getByPlaybackId(id, {
+    useReplica: false,
+  });
+  if (!stream || stream.deleted || stream.suspended) {
+    res.status(404);
+    return res.json({
+      errors: ["not found"],
+    });
+  }
+
+  res.status(200);
+  res.json({
+    pull: !stream.pull
+      ? null
+      : {
+          ...stream.pull,
+          location: undefined,
+        },
+  });
+});
+
 app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   const { id } = req.params;
   if (
@@ -1568,6 +1916,33 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+app.post(
+  "/:id/start-pull",
+  authorizer({}),
+  experimentSubjectsOnly("stream-pull-source"),
+  async (req, res) => {
+    const { id } = req.params;
+    const stream = await db.stream.get(id);
+    if (
+      !stream ||
+      (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+    ) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+
+    if (!stream.pull) {
+      res.status(400);
+      return res.json({ errors: ["stream does not have a pull source"] });
+    }
+
+    const ingest = await getIngestBase(req);
+    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+
+    res.status(204).end();
+  }
+);
 
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;

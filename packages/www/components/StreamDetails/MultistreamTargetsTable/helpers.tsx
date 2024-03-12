@@ -81,6 +81,7 @@ export const makeTableData = (
               <TargetStatusBadge
                 stream={stream}
                 target={target}
+                metrics={streamHealth?.metrics}
                 status={status}
                 streamActiveSince={streamActiveSince}
               />
@@ -90,6 +91,7 @@ export const makeTableData = (
             children: (
               <Toolbox
                 target={target}
+                targetId={ref.id}
                 stream={stream}
                 invalidateTargetId={invalidateTargetId}
                 invalidateStream={invalidateStream}

@@ -10,8 +10,9 @@ export type DateCellProps = {
 const DateCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, DateCellProps>) => {
-  const { date, fallback } = cell.value;
+  const { date, fallback } = cell.value || { date: null, fallback: "N/A" };
   try {
+    if (!date) return fallback;
     return format(date, "MMMM dd, yyyy h:mm a");
   } catch (error) {
     return fallback;
