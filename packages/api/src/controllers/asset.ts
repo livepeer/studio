@@ -659,9 +659,7 @@ app.get("/", authorizer({}), async (req, res) => {
   }
 
   query.push(
-    req.project?.id
-      ? sql`asset.data->>'projectId' = ${req.project.id}`
-      : sql`asset.data->>'projectId' IS NULL OR asset.data->>'projectId' = ''`
+    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
   );
 
   let output: WithID<Asset>[];

@@ -133,13 +133,9 @@ export default class AssetTable extends Table<WithID<Asset>> {
       sql`asset.data->'status'->>'phase' IN ('waiting', 'processing')`,
       sql`coalesce((asset.data->>'createdAt')::bigint, 0) > ${createdAfter}`,
     ];
-    if (projectId) {
-      query.push(sql`asset.data->>'projectId' = ${projectId}`);
-    } else {
-      query.push(
-        sql`(asset.data->>'projectId' IS NULL OR asset.data->>'projectId' = '')`
-      );
-    }
+    query.push(
+      sql`coalesce(asset.data->>'projectId', '') = ${projectId || ""}`
+    );
 
     const [assets] = await this.find(query, { limit: 1 });
     return assets?.length > 0 ? assets[0] : null;

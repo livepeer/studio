@@ -102,20 +102,17 @@ app.get("/:id", authorizer({}), async (req, res) => {
   const project = await db.project.get(req.params.id, {
     useReplica: false,
   });
-  console.log("YYY :", project, req.params.id);
 
   if (!project || project.deleted) {
     res.status(403);
     return res.json({ errors: ["project not found"] });
   }
-  console.log("YYY here:", project, req.params.id);
 
   if (req.user.admin !== true && req.user.id !== project.userId) {
     throw new ForbiddenError(
       "user can only request information on their own projects"
     );
   }
-  console.log("YYY here here:", project, req.params.id);
 
   res.json(project);
 });
