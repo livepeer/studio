@@ -1062,6 +1062,8 @@ app.put(
 
       await triggerCatalystStreamUpdated(req, stream.playbackId);
       await triggerCatalystStreamStopSessions(req, stream.playbackId);
+      // wait briefly to give the stream shutdown a chance to propagate before starting up again
+      await sleep(5000);
     }
 
     if (!stream.isActive || streamExisted) {
