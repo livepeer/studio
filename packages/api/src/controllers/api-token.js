@@ -109,9 +109,7 @@ app.get("/", async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`api_token.data->>'userId' = ${userId}`);
   query.push(
-    req.project?.id
-      ? sql`api_token.data->>'projectId' = ${req.project.id}`
-      : sql`api_token.data->>'projectId' IS NULL OR api_token.data->>'projectId' = ''`
+    sql`coalesce(api_token.data->>'projectId', '') = ${req.project?.id || ""}`
   );
 
   let fields = " api_token.id as id, api_token.data as data";
