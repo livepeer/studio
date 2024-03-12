@@ -134,7 +134,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
       sql`coalesce((asset.data->>'createdAt')::bigint, 0) > ${createdAfter}`,
     ];
     query.push(
-      sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
+      sql`coalesce(asset.data->>'projectId', '') = ${projectId || ""}`
     );
 
     const [assets] = await this.find(query, { limit: 1 });
