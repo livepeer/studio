@@ -43,7 +43,6 @@ import {
   toStringValues,
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
-  triggerCatalystStreamNuke,
   triggerCatalystPullStart,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
@@ -1927,8 +1926,8 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   }
 
   // we don't want to update the stream object on the `/terminate` API, so we
-  // just throw a single nuke
-  await triggerCatalystStreamNuke(req, stream.playbackId);
+  // just throw a single stop call
+  await triggerCatalystStreamStopSessions(req, stream.playbackId);
 
   res.status(204).end();
 });
