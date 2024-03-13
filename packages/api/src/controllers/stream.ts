@@ -1060,7 +1060,6 @@ app.put(
       stream = await db.stream.get(stream.id, { useReplica: false });
 
       await triggerCatalystStreamUpdated(req, stream.playbackId);
-      await triggerCatalystStreamStopSessions(req, stream.playbackId);
     }
 
     if (!stream.isActive || streamExisted) {
