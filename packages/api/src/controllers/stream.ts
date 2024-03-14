@@ -1049,14 +1049,16 @@ app.put(
       stream = await handleCreateStream(req);
     } else {
       const oldStream = streams[0];
-      const minTerminateWait = 5000;
-      const sleepFor =
-        minTerminateWait - (Date.now() - oldStream.lastTerminatedAt);
-      if (sleepFor > 0) {
-        console.log(
-          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
-        );
-        await sleep(sleepFor);
+      if (oldStream.lastTerminatedAt) {
+        const minTerminateWait = 5000;
+        const sleepFor =
+          minTerminateWait - (Date.now() - oldStream.lastTerminatedAt);
+        if (sleepFor > 0) {
+          console.log(
+            `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
+          );
+          await sleep(sleepFor);
+        }
       }
 
       stream = {
