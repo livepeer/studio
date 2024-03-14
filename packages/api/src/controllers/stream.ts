@@ -24,6 +24,7 @@ import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
+  TooManyRequestsError,
   UnprocessableEntityError,
 } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
@@ -1049,16 +1050,12 @@ app.put(
       stream = await handleCreateStream(req);
     } else {
       const oldStream = streams[0];
-      if (oldStream.lastTerminatedAt) {
-        const minTerminateWait = 5000;
-        const sleepFor =
-          minTerminateWait - (Date.now() - oldStream.lastTerminatedAt);
-        if (sleepFor > 0) {
-          console.log(
-            `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
-          );
-          await sleep(sleepFor);
-        }
+      const sleepFor = terminateDelay(oldStream);
+      if (sleepFor > 0) {
+        console.log(
+          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
+        );
+        await sleep(sleepFor);
       }
 
       stream = {
@@ -1087,6 +1084,14 @@ app.put(
     );
   }
 );
+
+function terminateDelay(stream: DBStream) {
+  if (!stream.lastTerminatedAt) {
+    return 0;
+  }
+  const minTerminateWait = 5000;
+  return minTerminateWait - (Date.now() - stream.lastTerminatedAt);
+}
 
 app.post(
   "/",
@@ -1932,6 +1937,10 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
+  }
+
+  if (terminateDelay(stream) > 0) {
+    throw new TooManyRequestsError(`too many terminate requests`);
   }
 
   await db.stream.update(stream.id, { lastTerminatedAt: Date.now() });
