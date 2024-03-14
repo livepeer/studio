@@ -672,6 +672,10 @@ components:
           index: true
         createdAt:
           index: true
+        lastTerminatedAt:
+          writeOnly: true
+          type: number
+          description: The time the last terminate call was made
         parentId:
           index: true
         streamKey:
