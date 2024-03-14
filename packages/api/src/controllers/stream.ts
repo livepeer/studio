@@ -1049,6 +1049,16 @@ app.put(
       stream = await handleCreateStream(req);
     } else {
       const oldStream = streams[0];
+      const minTerminateWait = 5000;
+      const sleepFor =
+        minTerminateWait - (Date.now() - oldStream.lastTerminatedAt);
+      if (sleepFor > 0) {
+        console.log(
+          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
+        );
+        await sleep(sleepFor);
+      }
+
       stream = {
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
@@ -1922,6 +1932,7 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
+  await db.stream.update(stream.id, { lastTerminatedAt: Date.now() });
   // we don't want to update the stream object on the `/terminate` API, so we
   // just throw a single stop call
   await triggerCatalystStreamStopSessions(req, stream.playbackId);
