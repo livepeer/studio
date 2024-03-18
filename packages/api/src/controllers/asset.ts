@@ -41,6 +41,7 @@ import {
   AssetPatchPayload,
   ExportTaskParams,
   IpfsFileInfo,
+  NewAssetFromUrlPayload,
   NewAssetPayload,
   ObjectStore,
   PlaybackPolicy,
@@ -610,7 +611,7 @@ const fieldsMap = {
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
-  creatorId: `stream.data->'creatorId'->>'value'`,
+  creatorId: `asset.data->'creatorId'->>'value'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   phase: `asset.data->'status'->>'phase'`,
@@ -775,7 +776,7 @@ app.post(
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
-    req.body as NewAssetPayload;
+    req.body as NewAssetFromUrlPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -842,7 +843,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 app.post(
   "/upload/url",
   authorizer({}),
-  validatePost("new-asset-payload"),
+  validatePost("new-asset-from-url-payload"),
   uploadWithUrlHandler
 );
 // TODO: Remove this at some point. Registered only for backward compatibility.

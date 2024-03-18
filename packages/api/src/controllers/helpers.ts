@@ -644,11 +644,16 @@ export const triggerCatalystPullStart =
   process.env.NODE_ENV === "test"
     ? async () => {} // noop in case of tests
     : async (stream: DBStream, playbackUrl: string) => {
-        // TODO: use pull.location field to call catalyst on the closest region.
-        // Ideally by calling catalyst-api/catabalancer and letting it figure it out.
+        const { lat, lon } = stream.pull?.location ?? {};
+        if (lat && lon) {
+          // Set the lat/lon qs to override the observed "client location" and
+          // trigger the pull on the server closest to the requested location.
+          const url = new URL(playbackUrl);
+          url.searchParams.set("lat", lat.toString());
+          url.searchParams.set("lon", lon.toString());
+          playbackUrl = url.toString();
+        }
 
-        // Instead of the above, for now just access the stream playbackUrl to trigger
-        // the pull to start.
         const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
         while (Date.now() < deadline) {
           const res = await fetchWithTimeoutAndRedirects(playbackUrl, {
@@ -656,12 +661,16 @@ export const triggerCatalystPullStart =
             timeout: PULL_START_TIMEOUT,
             maxRedirects: 10,
           });
-          const body = await res.text();
-          const isHlsErr = body.includes("#EXT-X-ERROR: Stream open failed");
+          const errHeader = res.headers.get("error");
+          const isHlsErr =
+            errHeader &&
+            errHeader != "" &&
+            !errHeader.includes("not allowed to view this stream");
           if (res.ok && !isHlsErr) {
             return;
           }
 
+          const body = await res.text();
           logger.warn(
             `failed to trigger catalyst pull for stream=${
               stream.id
@@ -669,7 +678,7 @@ export const triggerCatalystPullStart =
               res.status
             } error=${JSON.stringify(body)}`
           );
-          await sleep(1000);
+          await sleep(250);
         }
 
         throw new Error(`failed to trigger catalyst pull`);
@@ -678,6 +687,11 @@ export const triggerCatalystPullStart =
 export const triggerCatalystStreamNuke = (req: Request, playback_id: string) =>
   triggerCatalystEvent(req, { resource: "nuke", playback_id });
 
+export const triggerCatalystStreamStopSessions = (
+  req: Request,
+  playback_id: string
+) => triggerCatalystEvent(req, { resource: "stopSessions", playback_id });
+
 export const triggerCatalystStreamUpdated = (
   req: Request,
   playback_id: string
@@ -685,7 +699,7 @@ export const triggerCatalystStreamUpdated = (
 
 async function triggerCatalystEvent(
   req: Request,
-  payload: { resource: "stream" | "nuke"; playback_id: string }
+  payload: { resource: "stream" | "nuke" | "stopSessions"; playback_id: string }
 ) {
   const { catalystBaseUrl } = req.config;
 

@@ -1,28 +1,41 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import WebhookDetails from "components/WebhookDetails";
 import { DashboardWebhooks as Content } from "content";
 
 const WebhookDetail = () => {
   useLoggedIn();
   const { user } = useApi();
+  const [logFilters, setLogFilters] = useState();
 
   const { getWebhook, getWebhookLogs } = useApi();
   const router = useRouter();
   const { id } = router.query;
 
-  const fetcher = useCallback(async () => {
-    if (!id) return null;
-    return await Promise.all([getWebhook(id), getWebhookLogs(id)]);
-  }, [id]);
+  const { data: webhookData } = useQuery(
+    ["webhook", id],
+    () => getWebhook(id),
+    {
+      enabled: !!id,
+    }
+  );
 
-  const { data: response } = useQuery([id], () => fetcher());
+  const { data: logs, refetch: refetchLogs } = useQuery(
+    ["webhookLogs", id, logFilters],
+    () => getWebhookLogs(id, logFilters),
+    {
+      enabled: !!id,
+      initialData: [],
+    }
+  );
 
-  const data = response?.[0];
-  const logs = response?.[1];
+  const handleLogFilters = async (filters) => {
+    setLogFilters(filters);
+    refetchLogs();
+  };
 
   if (!user) {
     return <Layout />;
@@ -34,10 +47,16 @@ const WebhookDetail = () => {
       breadcrumbs={[
         { title: "Developers" },
         { title: "Webhooks", href: "/dashboard/developers/webhooks" },
-        { title: data?.name },
+        { title: webhookData?.name },
       ]}
       {...Content.metaData}>
-      <WebhookDetails id={id} data={data} logs={logs} />
+      <WebhookDetails
+        handleLogFilters={handleLogFilters}
+        id={id}
+        data={webhookData}
+        logs={logs}
+        refetchLogs={refetchLogs}
+      />
     </Layout>
   );
 };

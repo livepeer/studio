@@ -103,8 +103,15 @@ export const deleteWebhooks = async (ids: Array<string>): Promise<void> => {
   }
 };
 
-export const getWebhookLogs = async (webhookId): Promise<WebhookLogs[]> => {
-  const [res, logs] = await context.fetch(`/webhook/${webhookId}/log`);
+export const getWebhookLogs = async (
+  webhookId,
+  filters = null
+): Promise<WebhookLogs[]> => {
+  const f = filters ? JSON.stringify(filters) : undefined;
+
+  const [res, logs] = await context.fetch(
+    `/webhook/${webhookId}/log?${qs.stringify({ filters: f })}`
+  );
   if (res.status !== 200) {
     throw logs && typeof logs === "object"
       ? { ...logs, status: res.status }

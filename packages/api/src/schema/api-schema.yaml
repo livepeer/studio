@@ -286,20 +286,33 @@ components:
       properties:
         playbackId:
           type: string
-          description: Playback ID of the stream or asset to clip
+          description: >-
+            The playback ID of the stream or stream recording to clip. Asset
+            playback IDs are not supported yet.
         startTime:
           type: number
-          description:
-            Start time of the clip in UNIX timestamp (in milliseconds)
+          description: >-
+            The start timestamp of the clip in Unix milliseconds. _See the
+            ClipTrigger in the UI Kit for an example of how this is calculated
+            (for HLS, it uses `Program Date-Time` tags, and for WebRTC, it uses
+            the latency from server to client at stream startup)._
         endTime:
           type: number
-          description: End time of the clip in UNIX timestamp (in milliseconds)
+          description: >-
+            The end timestamp of the clip in Unix milliseconds. _See the
+            ClipTrigger in the UI Kit for an example of how this is calculated
+            (for HLS, it uses `Program Date-Time` tags, and for WebRTC, it uses
+            the latency from server to client at stream startup)._
         name:
           type: string
-          description: Name of the clip
+          description: >-
+            The optional friendly name of the clip to create.
         sessionId:
           type: string
-          description: Session ID of the stream to clip
+          description: >-
+            The optional session ID of the stream to clip. This can be used to
+            clip _recordings_ - if it is not specified, it will clip the ongoing
+            livestream.
     target:
       type: object
       required:
@@ -469,7 +482,9 @@ components:
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
-          description: Used to form playback URL
+          description:
+            The playback ID to use with the Playback Info endpoint to retrieve
+            playback URLs.
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
@@ -754,14 +769,15 @@ components:
           description: Points to parent stream object
         record:
           description: |
-            Should this stream be recorded? Uses default settings. For more
+            Whether the stream should be recorded. Uses default settings. For more
             customization, create and configure an object store.
           type: boolean
           example: false
         recordingStatus:
           readOnly: true
           type: string
-          description: Status of the recording process of this stream session.
+          description:
+            The status of the recording process of this stream session.
           enum:
             - waiting
             - ready
@@ -773,11 +789,14 @@ components:
         mp4Url:
           type: string
           readOnly: true
-          description: URL for the stream session recording packaged in an mp4.
+          description: >-
+            The URL for the stream session recording packaged in an MP4.
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
-          description: Used to form playback URL
+          description: >-
+            The playback ID to use with the Playback Info endpoint to retrieve
+            playback URLs.
         profiles:
           type: array
           items:
@@ -849,7 +868,9 @@ components:
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
-          description: Used to form playback URL and storage folder
+          description:
+            The playback ID to use with the Playback Info endpoint to retrieve
+            playback URLs.
         staticMp4:
           type: boolean
           writeOnly: true
@@ -859,12 +880,19 @@ components:
           type: string
           example: >-
             https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
-          description: URL for HLS playback
+          description: >-
+            URL for HLS playback. **It is recommended to not use this URL**, and
+            instead use playback IDs with the Playback Info endpoint to retrieve
+            the playback URLs - this URL format is subject to change (e.g.
+            https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8).
         downloadUrl:
           readOnly: true
           type: string
           example: "https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video"
-          description: URL to manually download the asset if desired
+          description: >-
+            The URL to directly download the asset, e.g.
+            `https://livepeercdn.com/asset/eawrrk06ts2d0mzb/video`. It is not
+            recommended to use this for playback.
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         source:
@@ -880,7 +908,7 @@ components:
                     - url
                 url:
                   type: string
-                  description: URL from which the asset was uploaded
+                  description: URL from which the asset was uploaded.
                 gatewayUrl:
                   type: string
                   description:
@@ -915,23 +943,24 @@ components:
                 sourceId:
                   type: string
                   description:
-                    ID of the asset or stream from which this asset was created
+                    ID of the asset or stream from which this asset was created.
                 sessionId:
                   type: string
                   description:
-                    ID of the session from which this asset was created
+                    ID of the session from which this asset was created.
                 playbackId:
                   type: string
                   description:
                     Playback ID of the asset or stream from which this asset was
-                    created
+                    created.
                 requesterId:
                   type: string
                   description:
-                    ID of the requester from which this asset was created
+                    ID of the requester from which this asset was created.
                 assetId:
                   type: string
-                  description: ID of the asset from which this asset was created
+                  description:
+                    ID of the asset from which this asset was created.
         creatorId:
           $ref: "#/components/schemas/creator-id"
         storage:
@@ -1006,8 +1035,8 @@ components:
         name:
           type: string
           description: |
-            Name of the asset. This is not necessarily the filename, can be a
-            custom name or title
+            The name of the asset. This is not necessarily the filename - it can be a
+            custom name or title.
           example: filename.mp4
         createdAt:
           readOnly: true
@@ -1154,8 +1183,8 @@ components:
         name:
           type: string
           description: |
-            Name of the asset. This is not necessarily the filename, can be a
-            custom name or title
+            The name of the asset. This is not necessarily the filename - it can be a
+            custom name or title.
           example: filename.mp4
         staticMp4:
           type: boolean
@@ -1184,16 +1213,6 @@ components:
                             #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec
                 - type: boolean
                 - type: "null"
-        url:
-          type: string
-          format: uri
-          pattern: "^(https?|ipfs|ar)://"
-          description: |
-            URL where the asset contents can be retrieved. Only allowed (and
-            also required) in the upload asset via URL endpoint. For an IPFS
-            source, this should be similar to: `ipfs://{CID}`. For an Arweave
-            source: `ar://{CID}`.
-          example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
           type: object
           additionalProperties: false
@@ -1217,6 +1236,39 @@ components:
           type: number
           description:
             How many seconds the duration of each output segment should be
+    new-asset-from-url-payload:
+      additionalProperties: false
+      required:
+        - name
+        - url
+      properties:
+        name:
+          $ref: "#/components/schemas/new-asset-payload/properties/name"
+        staticMp4:
+          $ref: "#/components/schemas/new-asset-payload/properties/staticMp4"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
+        storage:
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
+        url:
+          type: string
+          format: uri
+          pattern: "^(https?|ipfs|ar)://"
+          description: |
+            URL where the asset contents can be retrieved, e.g. `https://s3.amazonaws.com/my-bucket/path/filename.mp4`.
+            For an IPFS source, this should be similar to: `ipfs://{CID}`. For an Arweave
+            source: `ar://{CID}`.
+          example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
+        encryption:
+          $ref: "#/components/schemas/new-asset-payload/properties/encryption"
+        c2pa:
+          $ref: "#/components/schemas/new-asset-payload/properties/c2pa"
+        profiles:
+          $ref: "#/components/schemas/new-asset-payload/properties/profiles"
+        targetSegmentSizeSecs:
+          $ref: "#/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs"
     room-user-payload:
       type: object
       required:
@@ -1685,17 +1737,11 @@ components:
                   additionalProperties: false
                   properties:
                     startTime:
-                      type: number
-                      description:
-                        Start time of the clip in UNIX timestamp (in
-                        milliseconds)
+                      $ref: "#/components/schemas/clip-payload/properties/startTime"
                     endTime:
-                      type: number
-                      description:
-                        End time of the clip in UNIX timestamp (in milliseconds)
+                      $ref: "#/components/schemas/clip-payload/properties/endTime"
                     playbackId:
-                      type: string
-                      description: Playback ID of the stream or asset to clip
+                      $ref: "#/components/schemas/clip-payload/properties/playbackId"
                 catalystPipelineStrategy:
                   type: string
                   description: >-
@@ -2135,13 +2181,13 @@ components:
       properties:
         playbackId:
           type: string
-          description: The playback ID associated with the metric
+          description: The playback ID associated with the metric.
         creatorId:
           type: string
-          description: The ID of the creator associated with the metric
+          description: The ID of the creator associated with the metric.
         viewerId:
           type: string
-          description: The ID of the viewer associated with the metric
+          description: The ID of the viewer associated with the metric.
         dStorageUrl:
           type: string
           description: The URL of the distributed storage used for the asset
@@ -2154,60 +2200,60 @@ components:
             beginning of the time step period.
         device:
           type: string
-          description: The device used by the viewer
+          description: The device used by the viewer.
         deviceType:
           type: string
-          description: The type of the device used by the viewer
+          description: The type of the device used by the viewer.
         cpu:
           type: string
-          description: The CPU used by the viewer's device
+          description: The CPU used by the viewer's device.
         os:
           type: string
-          description: The operating system used by the viewer
+          description: The operating system used by the viewer.
         browser:
           type: string
-          description: The browser used by the viewer
+          description: The browser used by the viewer.
         browserEngine:
           type: string
-          description: The browser engine used by the viewer's browser
+          description: The browser engine used by the viewer's browser.
         continent:
           type: string
-          description: The continent where the viewer is located
+          description: The continent where the viewer is located.
         country:
           type: string
-          description: The country where the viewer is located
+          description: The country where the viewer is located.
         subdivision:
           type: string
           description: |
             The subdivision (e.g., state or province) where the viewer is
-            located
+            located.
         timezone:
           type: string
-          description: The timezone where the viewer is located
+          description: The timezone where the viewer is located.
         geohas:
           type: string
           description:
             Geographic encoding of the viewers location. Accurate to 3 digits.
         viewCount:
           type: integer
-          description: The number of views for the asset
+          description: The number of views for the asset.
         playtimeMins:
           type: number
-          description: The total playtime in minutes for the asset
+          description: The total playtime in minutes for the asset.
         ttffMs:
           type: number
-          description: The time-to-first-frame (TTFF) in milliseconds
+          description: The time-to-first-frame (TTFF) in milliseconds.
         rebufferRatio:
           type: number
-          description: The rebuffering ratio for the asset
+          description: The rebuffering ratio for the asset.
         errorRate:
           type: number
-          description: The error rate for the asset
+          description: The error rate for the asset.
         exitsBeforeStart:
           type: number
           description: |
             The percentage of sessions that existed before the asset started
-            playing
+            playing.
     playback-info:
       type: object
       additionalProperties: false
@@ -2499,14 +2545,12 @@ paths:
               type: object
               $ref: "#/components/schemas/new-stream-payload"
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/stream"
+                $ref: "#/components/schemas/stream"
         default:
           description: Error
           content:
@@ -3052,10 +3096,20 @@ paths:
                 properties:
                   url:
                     type: string
+                    description: >-
+                      The direct upload endpoint for which supports PUT
+                      requests. **It is recommended to use the Tus endpoint for
+                      a better upload experience.**
                     example: >-
                       https://origin.livepeer.com/api/asset/upload/direct?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
                   tusEndpoint:
                     type: string
+                    description: >-
+                      The [Tus-compatible](https://tus.io/) endpoint for
+                      resumable uploads. **This is the recommended way to upload
+                      assets.** See the
+                      [Tus-js](https://github.com/tus/tus-js-client) client for
+                      more information.
                     example: >-
                       https://origin.livepeer.com/api/asset/upload/tus?token=eyJhbGciOiJIUzI1NiJ9.eyJtc2ciOiJoZWxsbyBoYWNrZXIsIHRoZXJlJ3Mgbm90aGluZyBmb3IgeW91IGhlcmUg8J-YhiJ9.1YDjmXsqLcgNyMSzT4kXl_kIni46_EuGX_xfqmC7e0Q
                   asset:
@@ -4251,7 +4305,9 @@ paths:
           required: true
           schema:
             type: string
-          description: The ID of the playback
+          description:
+            The playback ID from the asset or livestream, e.g.
+            `eaw4nk06ts2d0mzb`.
       responses:
         "200":
           description: Successful response

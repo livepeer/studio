@@ -23,7 +23,7 @@ import { buildRecordingUrl } from "../controllers/session";
 import { isExperimentSubject } from "../store/experiment-table";
 import { WebhookLog } from "../schema/types";
 
-const WEBHOOK_TIMEOUT = 5 * 1000;
+const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
 const BACKOFF_COEF = 2;
 const MAX_RETRIES = 33;

@@ -271,6 +271,7 @@ export interface WebhookLogs {
   request: Request;
   duration: number;
   response: Response;
+  success: boolean;
   createdAt: number;
   webhookId: string;
 }

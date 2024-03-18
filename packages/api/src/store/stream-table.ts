@@ -382,6 +382,7 @@ export default class StreamTable extends Table<DBStream> {
       transcodedSegmentsDuration: 0,
       sourceBytes: 0,
       transcodedBytes: 0,
+      lastTerminatedAt: null,
       ...obj,
     };
   }

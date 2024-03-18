@@ -13,6 +13,8 @@ import { WebhookLogs } from "hooks/use-api/types";
 import JSONPretty from "react-json-pretty";
 import { useApi } from "hooks";
 import { useRouter } from "next/navigation";
+import { Webhook } from "@livepeer.studio/api";
+import { FilterType } from "./index";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -20,19 +22,25 @@ const Cell = styled(Text, {
   fontSize: "$3",
 });
 
-const LogsContainer = ({ data, logs, filter }) => {
+const LogsContainer = ({
+  data,
+  logs,
+  filter,
+  refetchLogs,
+}: {
+  data: Webhook;
+  logs: WebhookLogs[];
+  filter: FilterType;
+  refetchLogs(): Promise<void>;
+}) => {
   const { resendWebhook } = useApi();
 
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
   const [isResending, setIsResending] = useState(false);
 
-  const succeededLogs = logs?.filter(
-    (log) => log.response.status >= 200 && log.response.status < 400
-  );
+  const succeededLogs = logs?.filter((log) => log.success);
 
-  const failedLogs = logs?.filter(
-    (log) => log.response.status < 200 || log.response.status >= 400
-  );
+  const failedLogs = logs?.filter((log) => !log.success);
 
   const router = useRouter();
 
@@ -58,6 +66,7 @@ const LogsContainer = ({ data, logs, filter }) => {
     });
 
     if (res) {
+      await refetchLogs();
       setIsResending(false);
     }
   };
@@ -74,7 +83,6 @@ const LogsContainer = ({ data, logs, filter }) => {
       <Flex>
         <Box
           css={{
-            borderRight: "1px solid $colors$neutral6",
             width: "50%",
           }}>
           <Text
@@ -85,12 +93,13 @@ const LogsContainer = ({ data, logs, filter }) => {
             }}
             size={"2"}
             variant={"gray"}>
-            TODAY:
+            LOGS:
           </Text>
           <Box
             css={{
               overflowY: "auto",
-              maxHeight: "calc(100vh - 300px)",
+              borderRight: "1px solid $colors$neutral6",
+              height: "calc(100vh - 450px)",
             }}>
             {renderedLogs.map((log: WebhookLogs, index) => (
               <Box
@@ -117,12 +126,8 @@ const LogsContainer = ({ data, logs, filter }) => {
                       width: 30,
                       height: 30,
                     }}
-                    variant={log.response.status === 200 ? "green" : "red"}>
-                    {log.response.status === 200 ? (
-                      <CheckIcon />
-                    ) : (
-                      <Cross1Icon />
-                    )}
+                    variant={log.success ? "green" : "red"}>
+                    {log.success ? <CheckIcon /> : <Cross1Icon />}
                   </Badge>
                   {log.event}
                 </Cell>
@@ -131,7 +136,7 @@ const LogsContainer = ({ data, logs, filter }) => {
                     mr: "$3",
                     color: "$neutral11",
                   }}>
-                  {moment(log.createdAt).format("h:mm:ss a")}
+                  {moment(log.createdAt).format("MMM D, h:mm:ss a")}
                 </Cell>
               </Box>
             ))}
@@ -178,14 +183,15 @@ const LogsContainer = ({ data, logs, filter }) => {
             </Text>
             <Flex
               direction={"row"}
-              justify={"between"}
               css={{
-                width: "40%",
                 mt: "$3",
-                ml: "$3",
               }}>
               <Text variant="neutral">HTTP Status Code</Text>
-              <Text variant="neutral">
+              <Text
+                css={{
+                  ml: "$4",
+                }}
+                variant="neutral">
                 {selected?.response?.status} {selected?.response?.statusText}
               </Text>
             </Flex>
@@ -209,14 +215,16 @@ const LogsContainer = ({ data, logs, filter }) => {
               css={{
                 mt: "$3",
                 overflowY: "auto",
-                maxHeight: "calc(100vh - 45em)",
-                ml: "$3",
+                height: "calc(100vh - 650px)",
               }}>
               {selected?.request && (
                 <JSONPretty
                   theme={customTheme}
                   data={JSON.stringify(
-                    JSON.parse(selected?.request?.body)?.payload
+                    JSON.parse(selected?.request?.body)?.payload ||
+                      JSON.parse(selected?.request?.body)?.stream ||
+                      JSON.parse(selected?.request?.body)?.asset ||
+                      JSON.parse(selected?.request?.body)?.task
                   )}
                 />
               )}

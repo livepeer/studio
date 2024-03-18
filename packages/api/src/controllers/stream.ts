@@ -24,6 +24,7 @@ import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
+  TooManyRequestsError,
   UnprocessableEntityError,
 } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
@@ -43,8 +44,8 @@ import {
   toStringValues,
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
-  triggerCatalystStreamNuke,
   triggerCatalystPullStart,
+  triggerCatalystStreamStopSessions,
 } from "./helpers";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
@@ -232,35 +233,6 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
       });
     })
   );
-}
-
-// Waits for the stream to become active. Works by polling the stream object
-// on the DB until it becomes active or the timeout is reached. Will wait for
-// exponentially longer time in between polls to reduce load on the DB.
-async function pollWaitStreamActive(req: Request, id: string) {
-  let clientGone = false;
-  req.on("close", () => {
-    clientGone = true;
-  });
-
-  const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
-  let sleepDelay = 500;
-  while (!clientGone && Date.now() < deadline) {
-    const stream =
-      (await db.stream.get(id)) ||
-      (await db.stream.get(id, { useReplica: false })); // read from primary in case replica is lagging
-    if (!stream) {
-      throw new NotFoundError("stream not found");
-    }
-    if (stream.isActive) {
-      return stream;
-    }
-
-    await sleep(sleepDelay);
-    sleepDelay = Math.min(sleepDelay * 2, 5000);
-  }
-
-  throw new InternalServerError("stream not active");
 }
 
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
@@ -1079,6 +1051,14 @@ app.put(
       stream = await handleCreateStream(req);
     } else {
       const oldStream = streams[0];
+      const sleepFor = terminateDelay(oldStream);
+      if (sleepFor > 0) {
+        console.log(
+          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
+        );
+        await sleep(sleepFor);
+      }
+
       stream = {
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
@@ -1089,16 +1069,12 @@ app.put(
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
 
-      if (oldStream.pull?.source != stream.pull?.source) {
-        await triggerCatalystStreamNuke(req, stream.playbackId);
-      }
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
-    const ingest = await getIngestBase(req);
-    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
-
-    if (waitActive === "true") {
-      stream = await pollWaitStreamActive(req, stream.id);
+    if (!stream.isActive || streamExisted) {
+      const ingest = await getIngestBase(req);
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
     res.status(streamExisted ? 200 : 201);
@@ -1109,6 +1085,14 @@ app.put(
     );
   }
 );
+
+function terminateDelay(stream: DBStream) {
+  if (!stream.lastTerminatedAt) {
+    return 0;
+  }
+  const minTerminateWait = 5000;
+  return minTerminateWait - (Date.now() - stream.lastTerminatedAt);
+}
 
 app.post(
   "/",
@@ -1956,9 +1940,14 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
+  if (terminateDelay(stream) > 0) {
+    throw new TooManyRequestsError(`too many terminate requests`);
+  }
+
+  await db.stream.update(stream.id, { lastTerminatedAt: Date.now() });
   // we don't want to update the stream object on the `/terminate` API, so we
-  // just throw a single nuke
-  await triggerCatalystStreamNuke(req, stream.playbackId);
+  // just throw a single stop call
+  await triggerCatalystStreamStopSessions(req, stream.playbackId);
 
   res.status(204).end();
 });
