@@ -17,6 +17,7 @@ import {
   StreamPatchPayload,
   StreamSetActivePayload,
   User,
+  Project,
 } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
@@ -333,6 +334,7 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
   playbackId: `stream.data->>'playbackId'`,
+  projectId: `stream.data->>'projectId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
   suspended: { val: `stream.data->'suspended'`, type: "boolean" },
   sourceSegmentsDuration: {
@@ -365,11 +367,14 @@ app.get("/", authorizer({}), async (req, res) => {
     limit = undefined;
   }
 
+  const query = parseFilters(fieldsMap, filters);
+
   if (!req.user.admin) {
     userId = req.user.id;
+    query.push(
+      sql`coalesce(stream.data->>'projectId', '') = ${req.project?.id || ""}`
+    );
   }
-
-  const query = parseFilters(fieldsMap, filters);
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`stream.data->>'deleted' IS NULL`);
   }
@@ -543,7 +548,8 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   if (
     !stream ||
     (stream.deleted && !req.isUIAdmin) ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
+    (stream.userId !== req.user.id && !req.isUIAdmin) ||
+    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.isUIAdmin)
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -555,6 +561,11 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   query.push(sql`(data->'lastSeen')::bigint > 0`);
   query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
   query.push(sql`data->>'partialSession' IS NULL`);
+  if (!req.isUIAdmin) {
+    query.push(
+      sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`
+    );
+  }
   if (record) {
     if (record === "true" || record === "1") {
       query.push(sql`data->>'record' = 'true'`);
@@ -627,7 +638,8 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   if (
     !stream ||
     stream.deleted ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
+    (stream.userId !== req.user.id && !req.isUIAdmin) ||
+    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.isUIAdmin)
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -660,7 +672,6 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
       errors: ["user can only request information on their own streams"],
     });
   }
-
   const query = [
     sql`data->>'deleted' IS NULL`,
     sql`data->>'userId' = ${userId}`,
@@ -701,7 +712,10 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let stream = await db.stream.get(req.params.id);
   if (
     !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
+    ((stream.userId !== req.user.id ||
+      (stream.projectId ?? "") !== (req.project?.id ?? "") ||
+      stream.deleted) &&
+      !req.user.admin)
   ) {
     // do not reveal that stream exists
     res.status(404);
@@ -744,7 +758,10 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
   });
   if (
     !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
+    ((stream.userId !== req.user.id ||
+      (stream.projectId ?? "") !== (req.project?.id ?? "") ||
+      stream.deleted) &&
+      !req.user.admin)
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -766,7 +783,10 @@ app.get("/key/:streamKey", authorizer({}), async (req, res) => {
   );
   if (
     !docs.length ||
-    ((docs[0].userId !== req.user.id || docs[0].deleted) && !req.user.admin)
+    ((docs[0].userId !== req.user.id ||
+      (docs[0].projectId ?? "" !== req.project?.id ?? "") ||
+      docs[0].deleted) &&
+      !req.user.admin)
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -822,7 +842,9 @@ app.post(
 
     if (
       !stream ||
-      ((stream.userId !== req.user.id || stream.deleted) &&
+      ((stream.userId !== req.user.id ||
+        (stream.projectId ?? "") !== (req.project?.id ?? "") ||
+        stream.deleted) &&
         !(req.user.admin && !stream.deleted))
     ) {
       // do not reveal that stream exists
@@ -845,6 +867,7 @@ app.post(
       ...req.body,
       kind: "stream",
       userId: stream.userId,
+      projectId: stream.projectId,
       renditions: {},
       objectStoreId: stream.objectStoreId,
       record,
@@ -865,7 +888,7 @@ app.post(
     const existingSession = await db.session.get(sessionId);
     if (existingSession) {
       logger.info(
-        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId}`
+        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId} stream.projectId=${stream.projectId}`
       );
     } else {
       const session: DBSession = {
@@ -873,6 +896,7 @@ app.post(
         parentId: stream.id,
         playbackId: stream.playbackId,
         userId: stream.userId,
+        projectId: stream.projectId,
         kind: "session",
         version: "v2",
         name: req.body.name,
@@ -913,9 +937,9 @@ app.post(
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
-      }' playbackid=${stream.playbackId} session_id=${id} elapsed=${
-        Date.now() - start
-      }ms`
+      }' playbackid=${stream.playbackId} session_id=${id} projectid=${
+        stream.projectId
+      } elapsed=${Date.now() - start}ms`
     );
   }
 );
@@ -1033,6 +1057,7 @@ app.put(
       [
         sql`data->>'userId' = ${req.user.id}`,
         sql`data->>'deleted' IS NULL`,
+        sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
         ...filters,
       ],
       { useReplica: false }
@@ -1154,6 +1179,7 @@ app.post(
           sql`data->>'userId' = ${req.user.id}`,
           sql`data->>'deleted' IS NULL`,
           sql`data->'pull'->>'source' = ${payload.pull.source}`,
+          sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
         ],
         { useReplica: false }
       );
@@ -1229,6 +1255,7 @@ async function handleCreateStream(req: Request) {
     renditions: {},
     objectStoreId,
     id,
+    projectId: req.project?.id ?? "",
     createdAt,
     streamKey,
     playbackId,
@@ -1594,7 +1621,10 @@ app.post(
       return res.json({ errors: ["stream not found"] });
     }
 
-    if (stream.userId !== req.user.id) {
+    if (
+      stream.userId !== req.user.id ||
+      (stream.projectId ?? "") !== (req.project?.id ?? "")
+    ) {
       res.status(404);
       return res.json({ errors: ["stream not found"] });
     }
@@ -1638,7 +1668,10 @@ app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
     return res.json({ errors: ["stream not found"] });
   }
 
-  if (stream.userId !== req.user.id) {
+  if (
+    stream.userId !== req.user.id ||
+    (stream.projectId ?? "") !== (req.project?.id ?? "")
+  ) {
     res.status(404);
     return res.json({ errors: ["stream not found"] });
   }
@@ -1677,7 +1710,10 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess = stream?.userId === req.user.id || req.isUIAdmin;
+    const hasAccess =
+      stream?.userId === req.user.id ||
+      (stream?.projectId ?? "" !== req.project?.id ?? "") ||
+      req.isUIAdmin;
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1757,7 +1793,11 @@ app.patch(
 app.patch("/:id/record", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (!stream || stream.deleted) {
+  if (
+    !stream ||
+    stream.deleted ||
+    (stream.projectId ?? "") !== (req.project?.id ?? "")
+  ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
@@ -1790,7 +1830,8 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (
     !stream ||
     stream.deleted ||
-    (stream.userId !== req.user.id && !req.user.admin)
+    (stream.userId !== req.user.id && !req.user.admin) ||
+    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.user.admin)
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -1820,7 +1861,8 @@ app.delete("/", authorizer({}), async (req, res) => {
     const streams = await db.stream.getMany(ids);
     if (
       streams.length !== ids.length ||
-      streams.some((s) => s.userId !== req.user.id)
+      streams.some((s) => s.userId !== req.user.id) ||
+      streams.some((s) => s.projectId !== req.project.id)
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1853,7 +1895,10 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
   }
   if (
     !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+    (!req.user.admin &&
+      (stream.deleted ||
+        stream.userId !== req.user.id ||
+        (stream.projectId ?? "") !== (req.project?.id ?? "")))
   ) {
     res.status(404);
     return res.json({
@@ -1923,7 +1968,10 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   const stream = await db.stream.get(id);
   if (
     !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+    (!req.user.admin &&
+      (stream.deleted ||
+        stream.userId !== req.user.id ||
+        (stream.projectId ?? "") !== (req.project?.id ?? "")))
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -1946,7 +1994,10 @@ app.post(
     const stream = await db.stream.get(id);
     if (
       !stream ||
-      (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+      (!req.user.admin &&
+        (stream.deleted ||
+          stream.userId !== req.user.id ||
+          (stream.projectId ?? "") !== (req.project?.id ?? "")))
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1969,7 +2020,10 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const stream = await db.stream.get(id);
   if (
     !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+    (!req.user.admin &&
+      (stream.deleted ||
+        stream.userId !== req.user.id ||
+        (stream.projectId ?? "") !== (req.project?.id ?? "")))
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
