@@ -585,6 +585,10 @@ components:
           readOnly: true
           type: string
           index: true
+        projectId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         events:
           index: true
           indexType: gin

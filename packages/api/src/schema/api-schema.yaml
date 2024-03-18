@@ -136,6 +136,10 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         name:
           type: string
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         createdAt:
           type: number
           readOnly: true
