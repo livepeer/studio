@@ -1,4 +1,4 @@
-import { Stripe, loadStripe } from "@stripe/stripe-js";
+import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
@@ -98,11 +98,15 @@ export function blocksToText(blocks, opts = {}) {
  * This is a singleton to ensure we only instantiate Stripe once.
  */
 let stripePromise: Promise<Stripe | null>;
-export const getStripe = () => {
+export const getStripe = async () => {
+  if (isExport()) {
+    return Promise.resolve(null);
+  }
   const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
   if (!key) {
     return Promise.resolve(null);
   }
+  const { loadStripe } = await import("@stripe/stripe-js");
   if (!stripePromise) {
     stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   }
@@ -113,6 +117,9 @@ export const getStripe = () => {
  * should stripe be enabled in this context?
  */
 export const shouldStripe = () => {
+  if (isExport()) {
+    return false;
+  }
   if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
     return false;
   }
@@ -235,6 +242,10 @@ export const CARD_OPTIONS = {
   },
 };
 
+export function isExport(): boolean {
+  return process.env.NEXT_PUBLIC_EXPORT === "true";
+}
+
 export function isStaging(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -242,6 +253,13 @@ export function isStaging(): boolean {
       window.location.hostname.includes("livepeer.vercel.app") ||
       window.location.hostname.includes("livepeerorg.vercel.app") ||
       window.location.hostname.includes("livepeerorg.now.sh"))
+  );
+}
+
+export function isProduction(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.location.hostname.includes("livepeer.studio")
   );
 }
 
