@@ -11,6 +11,7 @@ import Banner from "components/Banner";
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
 import Ripe, { categories, pages } from "lib/ripe";
+import { isExport } from "lib/utils";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
@@ -98,9 +99,11 @@ const Dashboard = () => {
       <Box css={{ mb: "$9" }}>
         <GettingStarted firstName={user?.firstName} />
       </Box>
-      <Box css={{ mb: "100px" }}>
-        <UsageSummary />
-      </Box>
+      {!isExport() && (
+        <Box css={{ mb: "100px" }}>
+          <UsageSummary />
+        </Box>
+      )}
       <Box css={{ mb: "$8" }}>
         <StreamsTable
           title="Streams"

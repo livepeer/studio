@@ -30,6 +30,7 @@ import { useApi } from "../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
+import { isExport } from "lib/utils";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -226,39 +227,43 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             )}
           </Box>
 
-          <Box>
-            <Link href="/dashboard/usage" passHref legacyBehavior>
-              <NavLink active={id === "usage"}>
-                <UsageIcon active={id === "usage"} />
-                Usage
-              </NavLink>
-            </Link>
-          </Box>
+          {!isExport() && (
+            <Box>
+              <Link href="/dashboard/usage" passHref legacyBehavior>
+                <NavLink active={id === "usage"}>
+                  <UsageIcon active={id === "usage"} />
+                  Usage
+                </NavLink>
+              </Link>
+            </Box>
+          )}
 
-          <Box>
-            <Link href="/dashboard/billing" passHref legacyBehavior>
-              <NavLink active={id === "billing"}>
-                <BillingIcon active={id === "billing"} />
-                Billing
-              </NavLink>
-            </Link>
+          {!isExport() && (
+            <Box>
+              <Link href="/dashboard/billing" passHref legacyBehavior>
+                <NavLink active={id === "billing"}>
+                  <BillingIcon active={id === "billing"} />
+                  Billing
+                </NavLink>
+              </Link>
 
-            {id?.split("/")[0] === "billing" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                  },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/dashboard/billing/plans" passHref legacyBehavior>
-                  <NavLink active={id === "billing/plans"}>Plans</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
+              {id?.split("/")[0] === "billing" && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                    },
+                    "> :first-child": {
+                      mt: "$1",
+                    },
+                  }}>
+                  <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+                    <NavLink active={id === "billing/plans"}>Plans</NavLink>
+                  </Link>
+                </Box>
+              )}
+            </Box>
+          )}
         </Grid>
         <Flex direction="column" gap={1}>
           <NavLink
