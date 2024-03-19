@@ -276,83 +276,85 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             </Box>
           )}
         </Grid>
-        <Flex direction="column" gap={1}>
-          <NavLink
-            href="https://status.livepeer.studio/"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <LoopIcon />
-            <Text
+        {!isExport() && (
+          <Flex direction="column" gap={1}>
+            <NavLink
+              href="https://status.livepeer.studio/"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Status
-            </Text>
-          </NavLink>
+              <LoopIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Status
+              </Text>
+            </NavLink>
 
-          <NavLink
-            href="https://livepeer.canny.io/changelog?labels=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <RocketIcon />
-            <Text
+            <NavLink
+              href="https://livepeer.canny.io/changelog?labels=studio"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Changelog
-            </Text>
-          </NavLink>
+              <RocketIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Changelog
+              </Text>
+            </NavLink>
 
-          <NavLink
-            href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <ChatBubbleIcon />
-            <Text
+            <NavLink
+              href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Feature Requests
-            </Text>
-          </NavLink>
-          <Contact />
-        </Flex>
+              <ChatBubbleIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Feature Requests
+              </Text>
+            </NavLink>
+            <Contact />
+          </Flex>
+        )}
       </Flex>
     </Box>
   );
