@@ -19,6 +19,10 @@ const resolveFile = (inputPath: string): string | null => {
   if (frontend[slugPath]) {
     return slugPath;
   }
+  // / --> /index.html
+  if (inputPath === "") {
+    return "index.html";
+  }
   return null;
 };
 
