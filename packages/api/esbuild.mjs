@@ -7,13 +7,13 @@ import { resolve, relative } from "path";
 
 async function getFiles(dir) {
   const dirents = await readdir(dir, { withFileTypes: true });
-  const files = await Promise.all(
+  let files = await Promise.all(
     dirents.map((dirent) => {
       const res = resolve(dir, dirent.name);
       return dirent.isDirectory() ? getFiles(res) : res;
     })
   );
-  return Array.prototype.concat(...files);
+  return Array.prototype.concat(...files).filter((f) => !f.includes("cache"));
 }
 
 const generateFrontendManifest = async (rootPath) => {

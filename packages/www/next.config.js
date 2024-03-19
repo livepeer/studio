@@ -35,8 +35,8 @@ let config = {
 if (isStaticBuild) {
   config = {
     ...config,
-    output: "export",
-    distDir: "static-build",
+    output: "standalone",
+    distDir: "static-build-app",
   };
 } else {
   config = {
