@@ -1,32 +1,10 @@
 import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
-import { pascalCase } from "pascal-case";
-import { Element } from "react-scroll";
 import getConfig from "next/config";
 
 export const { publicRuntimeConfig } = getConfig();
 
 export const { basePath } = publicRuntimeConfig;
-
-export const getComponent = (component) => {
-  const componentName = pascalCase(component._type);
-
-  try {
-    const Component = require(`components/Site/${componentName}`).default;
-
-    return (
-      <Element
-        offset={-20}
-        key={component._type}
-        id={component._type}
-        name={component._type}>
-        <Component {...component} />
-      </Element>
-    );
-  } catch (e) {
-    return <></>;
-  }
-};
 
 export function pathJoin2(p1: string, p2: string): string {
   if (!p1) {
