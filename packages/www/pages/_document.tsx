@@ -1,6 +1,7 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import { min as snippetMin } from "@segment/snippet";
 import { getCssText } from "@livepeer/design-system";
+import { isExport } from "lib/utils";
 
 const MyDocument = () => {
   const renderSnippet = () => {
@@ -200,7 +201,7 @@ const MyDocument = () => {
       <body>
         <Main />
         <NextScript />
-        {
+        {!isExport() && (
           <script
             type="text/javascript"
             id="hs-script-loader"
@@ -208,7 +209,7 @@ const MyDocument = () => {
             defer
             src="//js.hs-scripts.com/6160488.js"
           />
-        }
+        )}
       </body>
     </Html>
   );

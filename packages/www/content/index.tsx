@@ -4,7 +4,9 @@
  * @TODO: We will manage these contents from within the CMS in the future
  */
 
-const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
+import { getBrandName } from "lib/utils";
+
+const makeCompleteTitle = (title) => `${title} - ${getBrandName()}`;
 const defaultDescription =
   "Livepeer Studio is a high-performance video streaming platform that enables developers to build unique live and on-demand video experiences with up to 90% cost savings.";
 const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
@@ -13,7 +15,7 @@ const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
 
 export const Home = {
   metaData: {
-    title: "Livepeer Studio",
+    title: getBrandName(),
     description: defaultDescription,
     url: makeCompleteUrl(),
   },
