@@ -33,7 +33,7 @@ import {
   sendgridValidateEmail,
   toStringValues,
   FieldsMap,
-  triggerCatalystStreamNuke,
+  triggerCatalystStreamStopSessions,
 } from "./helpers";
 import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
 import sql from "sql-template-strings";
@@ -131,8 +131,8 @@ export async function terminateUserStreams(
   ]);
   for (const stream of streams) {
     try {
-      // we don't want to update all user stream objects, so trigger a manual nuke
-      await triggerCatalystStreamNuke(req, stream.playbackId);
+      // we don't want to update all user stream objects, so trigger a manual stop sessions
+      await triggerCatalystStreamStopSessions(req, stream.playbackId);
     } catch (err) {
       logger.error(
         `error suspending stream id=${stream.id} userId=${userId} err=${err}`
