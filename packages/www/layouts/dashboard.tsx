@@ -100,7 +100,7 @@ function DashboardLayout({
           <Head>
             <meta name="viewport" content="width=1023" />
           </Head>
-          <NextSeo {...seo} />
+          {!isExport() && <NextSeo {...seo} />}
           <Sidebar id={id} />
           <Box css={{ pl: 270, width: "100%" }}>
             <Header breadcrumbs={breadcrumbs} />
