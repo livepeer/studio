@@ -11,7 +11,7 @@ import {
   studioProvider,
 } from "@livepeer/react";
 import { AnalyzerProvider } from "hooks/use-analyzer";
-import { ApiProvider } from "hooks/use-api";
+import { ApiProvider, getEndpoint } from "hooks/use-api";
 import { getBrandName, isDevelopment, isExport, isStaging } from "lib/utils";
 import { MetaMaskProvider } from "metamask-react";
 import { DefaultSeo } from "next-seo";
@@ -64,25 +64,6 @@ const themeMap = {};
 Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
-
-// Allow for manual overriding of the API server endopint
-const getEndpoint = () => {
-  try {
-    const override = localStorage.getItem("LP_API_SERVER_OVERRIDE");
-    if (typeof override === "string") {
-      return override;
-    }
-  } catch (e) {
-    // not found, no problem
-  }
-  if (process.env.NEXT_PUBLIC_USE_STAGING_ENDPOINT === "true" || isStaging()) {
-    return "https://livepeer.monster";
-  }
-  if (isDevelopment()) {
-    return "http://localhost:3004";
-  }
-  return "https://livepeer.studio";
-};
 
 const livepeerClient = createReactClient({
   provider: studioProvider({
