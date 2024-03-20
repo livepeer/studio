@@ -684,9 +684,6 @@ export const triggerCatalystPullStart =
         throw new Error(`failed to trigger catalyst pull`);
       };
 
-export const triggerCatalystStreamNuke = (req: Request, playback_id: string) =>
-  triggerCatalystEvent(req, { resource: "nuke", playback_id });
-
 export const triggerCatalystStreamStopSessions = (
   req: Request,
   playback_id: string
