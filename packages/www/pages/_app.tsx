@@ -12,7 +12,7 @@ import {
 } from "@livepeer/react";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { ApiProvider } from "hooks/use-api";
-import { getBrandName, isDevelopment, isStaging } from "lib/utils";
+import { getBrandName, isDevelopment, isExport, isStaging } from "lib/utils";
 import { MetaMaskProvider } from "metamask-react";
 import { DefaultSeo } from "next-seo";
 import { ThemeProvider } from "next-themes";
