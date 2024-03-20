@@ -92,6 +92,7 @@
     "livekit-server-sdk": "^1.2.5",
     "lodash": "^4.17.21",
     "m3u8-parser": "^4.4.0",
+    "mime": "^4.0.0",
     "minio": "^7.0.12",
     "morgan": "^1.9.1",
     "mqtt": "^4.2.6",

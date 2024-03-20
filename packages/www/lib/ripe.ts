@@ -1,3 +1,5 @@
+import { isExport } from "./utils";
+
 export const categories = {
   AUTH: "Authentication",
   HOME: "Home",
@@ -50,9 +52,21 @@ declare global {
   }
 }
 
+const shouldRipe = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  if (isExport()) {
+    return false;
+  }
+  return true;
+};
+
 const Ripe = {
   identifyUser: (userId?: string, traits?: UserTraits): void => {
-    if (typeof window === "undefined") return;
+    if (!shouldRipe()) {
+      return;
+    }
 
     if (window.Ripe) {
       window.Ripe.identify({
@@ -65,7 +79,9 @@ const Ripe = {
   },
 
   trackPage: (pageObject: PageObject): void => {
-    if (typeof window === "undefined") return;
+    if (!shouldRipe()) {
+      return;
+    }
 
     if (window.Ripe) {
       window.Ripe.page(pageObject);
@@ -75,7 +91,9 @@ const Ripe = {
   },
 
   track: (eventObject: EventObject): void => {
-    if (typeof window === "undefined") return;
+    if (!shouldRipe()) {
+      return;
+    }
 
     if (window.Ripe) {
       window.Ripe.track(eventObject);
