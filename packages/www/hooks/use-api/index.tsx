@@ -36,7 +36,7 @@ export const getEndpoint = () => {
   if (isDevelopment()) {
     return "http://localhost:3004";
   }
-  return "";
+  return `${document.location.protocol}//${document.location.host}`;
 };
 
 const endpoint = getEndpoint();
