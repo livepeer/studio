@@ -194,7 +194,7 @@ const MyDocument = () => {
           }}
         />
         {/* Inject the Segment snippet into the <head> of the document  */}
-        {process.env.NODE_ENV === "production" && (
+        {process.env.NODE_ENV === "production" && !isExport() && (
           <script dangerouslySetInnerHTML={{ __html: renderSnippet() }} />
         )}
       </Head>
