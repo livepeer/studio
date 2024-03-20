@@ -11,6 +11,7 @@ import Router from "next/router";
 import { Reset, ThemeProvider } from "../lib/theme";
 import Head from "next/head";
 import { hotjar } from "react-hotjar";
+import { isExport } from "lib/utils";
 
 interface Props {
   title?: string;
@@ -93,7 +94,7 @@ const Layout = ({
         <Reset />
         <Box sx={{ minHeight: "100vh" }}>
           <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
-            <NextSeo {...seo} />
+            {!isExport() && <NextSeo {...seo} />}
             <Flex
               sx={{
                 flexGrow: 1,

@@ -12,12 +12,14 @@ import {
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
+import { getBrandName } from "lib/utils";
 
 const GettingStarted = ({ firstName = "" }) => {
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
-        Welcome to Livepeer Studio{firstName && `, ${firstName}`}
+        Welcome to {getBrandName()}
+        {firstName && `, ${firstName}`}
       </Heading>
       <Box css={{ bc: "$panel" }}>
         <Accordion

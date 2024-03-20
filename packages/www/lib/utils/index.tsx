@@ -253,3 +253,13 @@ export function isDevelopment(): boolean {
 export function truncate(str, n) {
   return str.length > n ? str.substr(0, n - 1) + "…" : str;
 }
+
+export function getBrandName(): string {
+  if (process.env.NEXT_PUBLIC_BRAND_NAME) {
+    return process.env.NEXT_PUBLIC_BRAND_NAME;
+  }
+  if (isExport()) {
+    return "Livepeer Catalyst";
+  }
+  return "Livepeer Studio";
+}

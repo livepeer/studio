@@ -12,7 +12,7 @@ import {
 } from "@livepeer/react";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { ApiProvider } from "hooks/use-api";
-import { isDevelopment, isStaging } from "lib/utils";
+import { getBrandName, isDevelopment, isStaging } from "lib/utils";
 import { MetaMaskProvider } from "metamask-react";
 import { DefaultSeo } from "next-seo";
 import { ThemeProvider } from "next-themes";
@@ -118,7 +118,7 @@ const App = ({ Component, pageProps }) => {
   globalStyles();
   return (
     <>
-      <title>Livepeer Studio</title>
+      <title>{getBrandName()}</title>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
