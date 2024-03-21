@@ -2498,6 +2498,7 @@ components:
 paths:
   /stream:
     post:
+      operationId: createStream
       summary: Create a stream
       description: |
         The only parameter you are required to set is the name of your stream,
@@ -2534,6 +2535,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     get:
+      operationId: getStreams
       summary: Retrieve streams
       parameters:
         - name: streamsonly
@@ -2564,6 +2566,7 @@ paths:
         schema:
           type: string
     get:
+      operationId: getStream
       summary: Retrieve a stream
       responses:
         '200':
@@ -2579,6 +2582,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     patch:
+      operationId: updateStream
       summary: Update a stream
       requestBody:
         required: true
@@ -2596,6 +2600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      operationId: deleteStream
       summary: Delete a stream
       description: |
 
@@ -2628,6 +2633,7 @@ paths:
         schema:
           type: string
     delete:
+      operationId: terminateStream
       summary: Terminates a live stream
       description: |
         `DELETE /stream/{id}/terminate` can be used to terminate an ongoing
@@ -2656,6 +2662,7 @@ paths:
         schema:
           type: string
     post:
+      operationId: startPullStream
       summary: Start ingest for a pull stream
       description: |
         `POST /stream/{id}/start-pull` can be used to start ingest for a stream
@@ -2676,6 +2683,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /multistream/target:
     get:
+      operationId: getMultistreamTargets
       summary: Retrieve Multistream Targets
       responses:
         '200':
@@ -2693,6 +2701,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     post:
+      operationId: createMultistreamTarget
       summary: Create a multistream target
       requestBody:
         required: true
@@ -2724,6 +2733,7 @@ paths:
         schema:
           type: string
     get:
+      operationId: getMultistreamTarget
       summary: Retrieve a multistream target
       responses:
         '200':
@@ -2739,6 +2749,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     patch:
+      operationId: updateMultistreamTarget
       summary: Update Multistream Target
       requestBody:
         required: true
@@ -2756,6 +2767,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      operationId: deleteMultistreamTarget
       summary: Delete a multistream target
       description: |
         Make sure to remove any references to the target on existing
@@ -2771,6 +2783,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /webhook:
     get:
+      operationId: getWebhooks
       summary: Retrieve a Webhook
       responses:
         '200':
@@ -2788,6 +2801,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     post:
+      operationId: createWebhook
       summary: Create a webhook
       description: >
         To create a new webhook, you need to make an API call with the events
@@ -2808,6 +2822,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/webhook/{id}':
     get:
+      operationId: getWebhook
       summary: Retrieve a webhook
       parameters:
         - name: id
@@ -2836,6 +2851,7 @@ paths:
           schema:
             type: string
       summary: Update a webhook
+      operationId: updateWebhook
       responses:
         '200':
           description: Success
@@ -2856,6 +2872,7 @@ paths:
           required: true
           schema:
             type: string
+      operationId: deleteWebhook
       summary: Delete a webhook
       responses:
         '200':
@@ -2872,6 +2889,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/webhook/{id}/log':
     get:
+      operationId: getWebhookLogs
       summary: Retrieve webhook logs
       parameters:
         - name: id
@@ -2896,6 +2914,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/webhook/{id}/log/{logId}':
     get:
+      operationId: getWebhookLog
       summary: Retrieve a webhook log
       parameters:
         - name: id
@@ -2923,6 +2942,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/webhook/{id}/log/{logId}/resend':
     post:
+      operationId: resendWebhook
       summary: Resend a webhook
       description: |
         Use this API to resend the same webhook request. This is useful when
@@ -2953,7 +2973,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
   /asset:
-    get:
+    get:  
+      operationId: getAssets
       summary: Retrieve assets
       responses:
         '200':
@@ -2972,6 +2993,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /asset/request-upload:
     post:
+      operationId: requestUpload
       summary: Upload an asset
       description: |
         To upload an asset, your first need to request for a direct upload URL
@@ -3099,6 +3121,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /asset/upload/url:
     post:
+      operationId: uploadAsset
       summary: Upload asset via URL
       requestBody:
         required: true
@@ -3134,6 +3157,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/asset/{assetId}':
     get:
+      operationId: getAsset
       summary: Retrieves an asset
       parameters:
         - in: path
@@ -3156,6 +3180,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     patch:
+      operationId: updateAsset
       summary: Patch an asset
       parameters:
         - in: path
@@ -3184,6 +3209,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      operationId: deleteAsset
       summary: Delete an asset
       parameters:
         - in: path
@@ -3203,6 +3229,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /clip:
     post:
+      operationId: createClip
       summary: Create a clip
       requestBody:
         required: true
@@ -3238,6 +3265,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/stream/{id}/clips':
     get:
+      operationId: getClips
       summary: Retrieve clips of a livestream
       parameters:
         - in: path
@@ -3263,6 +3291,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/stream/{id}/create-multistream-target':
     post:
+      operationId: addMultistreamTarget
       summary: Add a multistream target
       parameters:
         - in: path
@@ -3288,6 +3317,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/stream/{id}/multistream/{targetId}':
     delete:
+      operationId: removeMultistreamTarget
       summary: Remove a multistream target
       parameters:
         - in: path
@@ -3313,6 +3343,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/session/{id}/clips':
     get:
+      operationId: getSessionClips
       summary: Retrieve clips of a session
       parameters:
         - in: path
@@ -3338,6 +3369,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /room:
     post:
+      operationId: createRoom
       summary: Create a room
       description: |
         Create a multiparticipant livestreaming room.
@@ -3356,6 +3388,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}':
     get:
+      operationId: getRoom
       parameters:
         - name: id
           in: path
@@ -3377,6 +3410,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      operationId: deleteRoom
       parameters:
         - name: id
           in: path
@@ -3395,6 +3429,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}/egress':
     post:
+      operationId: startRoomEgress
       requestBody:
         required: true
         content:
@@ -3423,6 +3458,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      operationId: stopRoomEgress
       summary: Stop room RTMP egress
       parameters:
         - name: id
@@ -3441,6 +3477,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}/user':
     post:
+      operationId: createRoomUser
       requestBody:
         required: true
         content:
@@ -3477,6 +3514,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}/user/{userId}':
     get:
+      operationId: getRoomUser
       parameters:
         - name: id
           in: path
@@ -3503,6 +3541,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     put:
+      operationId: updateRoomUser
       requestBody:
         required: true
         content:
@@ -3532,6 +3571,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      operationId: deleteRoomUser
       parameters:
         - name: id
           in: path
@@ -3555,6 +3595,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /data/views/query:
     get:
+      operationId: getViewershipMetrics
       summary: Query viewership metrics
       description: |
         Requires a private (non-CORS) API key to be used.
@@ -3650,6 +3691,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /data/views/query/creator:
     get:
+      operationId: getCreatorViewershipMetrics
       summary: Query creator viewership metrics
       description: >
         Requires a proof of ownership to be sent in the request, which for now
@@ -3736,6 +3778,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/data/views/query/total/{playbackId}':
     get:
+      operationId: getPublicViewershipMetrics
       summary: Query public total views metrics
       description: |
         Allows querying for the public metrics for viewership about a video.
@@ -3785,6 +3828,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /data/usage/query:
     get:
+      operationId: getUsageMetrics
       summary: Query usage metrics
       description: ''
       parameters:
@@ -3830,6 +3874,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /session:
     get:
+      operationId: getSessions
       summary: Retrieve sessions
       responses:
         '200':
@@ -3848,6 +3893,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/session/{id}':
     get:
+      operationId: getSession
       summary: Retrieve a session
       parameters:
         - in: path
@@ -3871,6 +3917,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/stream/{parentId}/sessions':
     get:
+      operationId: getRecordedSessions
       summary: Retrieve Recorded Sessions
       parameters:
         - in: path
@@ -3904,6 +3951,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /access-control/signing-key:
     post:
+      operationId: createSigningKey
       summary: Create a signing key
       description: >
 
@@ -3929,6 +3977,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     get:
+      operationId: getSigningKeys
       summary: Retrieves signing keys
       responses:
         '200':
@@ -3947,6 +3996,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/access-control/signing-key/{keyId}':
     delete:
+      operationId: deleteSigningKey
       summary: Delete Signing Key
       parameters:
         - in: path
@@ -3965,6 +4015,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     get:
+      operationId: getSigningKey
       summary: Retrieves a signing key
       parameters:
         - in: path
@@ -3987,6 +4038,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     patch:
+      operationId: updateSigningKey
       summary: Update a signing key
       parameters:
         - in: path
@@ -4018,6 +4070,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /task:
     get:
+      operationId: getTasks
       summary: Retrieve Tasks
       responses:
         '200':
@@ -4036,6 +4089,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/task/{taskId}':
     get:
+      operationId: getTask
       summary: Retrieve a Task
       parameters:
         - in: path
@@ -4055,6 +4109,7 @@ paths:
           description: Error
   /transcode:
     post:
+      operationId: transcodeVideo
       summary: Transcode a video
       description: |
         `POST /transcode` transcodes a video file and uploads the results to the
@@ -4199,6 +4254,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/playback/{id}':
     get:
+      operationId: getPlaybackInfo
       summary: Retrieve Playback Info
       parameters:
         - in: path
