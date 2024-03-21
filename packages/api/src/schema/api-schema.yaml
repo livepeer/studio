@@ -3369,6 +3369,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /room:
     post:
+      deprecated: true
       operationId: createRoom
       summary: Create a room
       description: |
@@ -3388,6 +3389,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}':
     get:
+      deprecated: true
       operationId: getRoom
       parameters:
         - name: id
@@ -3410,6 +3412,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      deprecated: true
       operationId: deleteRoom
       parameters:
         - name: id
@@ -3429,6 +3432,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}/egress':
     post:
+      deprecated: true
       operationId: startRoomEgress
       requestBody:
         required: true
@@ -3458,6 +3462,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
+      deprecated: true
       operationId: stopRoomEgress
       summary: Stop room RTMP egress
       parameters:
@@ -3477,6 +3482,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/room/{id}/user':
     post:
+      deprecated: true
       operationId: createRoomUser
       requestBody:
         required: true
@@ -3515,6 +3521,7 @@ paths:
   '/room/{id}/user/{userId}':
     get:
       operationId: getRoomUser
+      deprecated: true
       parameters:
         - name: id
           in: path
@@ -3541,6 +3548,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     put:
+      deprecated: true
       operationId: updateRoomUser
       requestBody:
         required: true
@@ -3572,6 +3580,7 @@ paths:
                 $ref: '#/components/schemas/error'
     delete:
       operationId: deleteRoomUser
+      deprecated: true
       parameters:
         - name: id
           in: path
