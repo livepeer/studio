@@ -581,29 +581,6 @@ components:
           $ref: '#/components/schemas/stream/properties/multistream'
         userTags:
           $ref: '#/components/schemas/stream/properties/userTags'
-    deactivate-many-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        ids:
-          type: array
-          minItems: 1
-          items:
-            type: string
-    stream-set-active-payload:
-      type: object
-      required:
-        - active
-      properties:
-        active:
-          $ref: '#/components/schemas/stream/properties/isActive'
-        hostName:
-          type: string
-          description: Hostname of the Mist server that processes that stream
-        startedAt:
-          type: number
-          description: Timestamp (in milliseconds) at which the stream started.
-          example: 1587667174725
     asset-patch-payload:
       type: object
       additionalProperties: false
@@ -717,20 +694,7 @@ components:
     multistream-target-patch-payload:
       $ref: '#/components/schemas/multistream-target'
       required: []
-    webhook-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: '#/components/schemas/webhook/properties/name'
-        url:
-          $ref: '#/components/schemas/webhook/properties/url'
-        events:
-          $ref: '#/components/schemas/webhook/properties/events'
-        sharedSecret:
-          $ref: '#/components/schemas/webhook/properties/sharedSecret'
-        streamId:
-          $ref: '#/components/schemas/webhook/properties/streamId'
+    
     session:
       type: object
       required:
@@ -1185,12 +1149,7 @@ components:
           readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
-    new-signing-key-payload:
-      additionalProperties: false
-      properties:
-        name:
-          type: string
-          description: Name of the signing key
+    
     new-asset-payload:
       additionalProperties: false
       required:
@@ -1253,44 +1212,6 @@ components:
         targetSegmentSizeSecs:
           type: number
           description: How many seconds the duration of each output segment should be
-    new-asset-from-url-payload:
-      additionalProperties: false
-      required:
-        - name
-        - url
-      properties:
-        name:
-          $ref: '#/components/schemas/new-asset-payload/properties/name'
-        staticMp4:
-          $ref: '#/components/schemas/new-asset-payload/properties/staticMp4'
-        playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
-        creatorId:
-          $ref: '#/components/schemas/input-creator-id'
-        storage:
-          $ref: '#/components/schemas/new-asset-payload/properties/storage'
-        url:
-          type: string
-          format: uri
-          pattern: '^(https?|ipfs|ar)://'
-          description: >
-            URL where the asset contents can be retrieved, e.g.
-            `https://s3.amazonaws.com/my-bucket/path/filename.mp4`.
-
-            For an IPFS source, this should be similar to: `ipfs://{CID}`. For
-            an Arweave
-
-            source: `ar://{CID}`.
-          example: 'https://s3.amazonaws.com/my-bucket/path/filename.mp4'
-        encryption:
-          $ref: '#/components/schemas/new-asset-payload/properties/encryption'
-        c2pa:
-          $ref: '#/components/schemas/new-asset-payload/properties/c2pa'
-        profiles:
-          $ref: '#/components/schemas/new-asset-payload/properties/profiles'
-        targetSegmentSizeSecs:
-          $ref: >-
-            #/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs
     room-user-payload:
       type: object
       required:
@@ -1971,15 +1892,7 @@ components:
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
-    signing-key-response-payload:
-      type: object
-      required:
-        - publicKey
-        - privateKey
-      properties:
-        $ref: '#/components/schemas/signing-key/properties'
-        privateKey:
-          type: string
+    
     user:
       type: object
       required:
