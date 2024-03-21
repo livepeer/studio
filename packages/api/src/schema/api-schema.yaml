@@ -479,6 +479,9 @@ components:
                     Longitude of the pull source in degrees. East is positive,
                     west is negative.
                   example: -104.988
+            lockedAt:
+              type: number
+              example: 1587667174725
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
