@@ -10,9 +10,7 @@ servers:
   - url: 'https://livepeer.studio/api'
 security:
   - apiKey: []
-
-
-tags: 
+tags:
   - name: stream
     description: Operations related to livestream api
   - name: asset
@@ -23,9 +21,9 @@ tags:
     description: Operations related to multistream api
   - name: session
     description: Operations related to session api
-  - name: room 
+  - name: room
     description: Operations related to rooms api
-  - name: transcode 
+  - name: transcode
     description: Operations related to transcode api
   - name: metrics
     description: Operations related to metrics api
@@ -35,16 +33,12 @@ tags:
     description: Operations related to access contorl/signing keys api
   - name: task
     description: Operations related to tasks api
-
-  
-
 components:
   securitySchemes:
     apiKey:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
   schemas:
     ffmpeg-profile:
       type: object
@@ -228,11 +222,11 @@ components:
           type: string
           writeOnly: true
           description: shared secret used to sign the webhook payload
-          example: 'my-secret'
+          example: my-secret
         streamId:
           type: string
           description: streamId of the stream on which the webhook is applied
-          example: 'de7818e7-610a-4057-8f6f-b785dc1e6f88'
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         status:
           type: object
           readOnly: true
@@ -269,7 +263,7 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
-          example: 
+          example:
             lastFailure:
               timestamp: 1587667174725
               error: Error message
@@ -379,7 +373,7 @@ components:
         name:
           type: string
           description: The optional friendly name of the clip to create.
-          example: 'My Clip'
+          example: My Clip
         sessionId:
           type: string
           description: >-
@@ -611,7 +605,6 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
-    
     new-stream-payload:
       type: object
       required:
@@ -1263,7 +1256,6 @@ components:
         targetSegmentSizeSecs:
           type: number
           description: How many seconds the duration of each output segment should be
-    
     room-user-payload:
       type: object
       required:
@@ -1364,7 +1356,7 @@ components:
           default: true
         metadata:
           type: string
-          description: User defined payload to store for the participant 
+          description: User defined payload to store for the participant
     room:
       type: object
       required:
@@ -1407,8 +1399,6 @@ components:
               leftAt:
                 type: integer
                 description: the time the participant left
-    
-
     transcode-payload:
       additionalProperties: false
       required:
@@ -1603,7 +1593,6 @@ components:
         c2pa:
           type: boolean
           description: Decides if the output video should include C2PA signature
-    
     task:
       type: object
       additionalProperties: false
@@ -1689,7 +1678,8 @@ components:
                 content:
                   type: object
                   description: File content to store into IPFS
-                  example: { "data": "Hello, World!" }
+                  example:
+                    data: 'Hello, World!'
                 ipfs:
                   $ref: '#/components/schemas/ipfs-export-params'
                 type:
@@ -1771,7 +1761,8 @@ components:
                 url:
                   type: string
                   description: URL of the asset to "clip"
-                  example: https://asset-cdn.lp-playback.monster/hls/1bde4o2i6xycudoy/static360p0.mp4
+                  example: >-
+                    https://asset-cdn.lp-playback.monster/hls/1bde4o2i6xycudoy/static360p0.mp4
                 clipStrategy:
                   type: object
                   description: >-
@@ -1841,7 +1832,7 @@ components:
             errorMessage:
               type: string
               description: Error message if the task failed
-              example: 'Failed to upload file'
+              example: Failed to upload file
             retries:
               type: number
               description: Number of retries done on the task
@@ -1850,7 +1841,7 @@ components:
               type: string
               writeOnly: true
               description: Step of the task processing
-              example: 'upload'
+              example: upload
         output:
           type: object
           additionalProperties: false
@@ -1864,11 +1855,11 @@ components:
                 videoFilePath:
                   type: string
                   writeOnly: true
-                  example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+                  example: 'https://s3.amazonaws.com/my-bucket/path/filename.mp4'
                 metadataFilePath:
                   type: string
                   writeOnly: true
-                  example: https://s3.amazonaws.com/my-bucket/path/filename.json
+                  example: 'https://s3.amazonaws.com/my-bucket/path/filename.json'
                 assetSpec:
                   $ref: '#/components/schemas/asset'
             export:
@@ -1890,12 +1881,12 @@ components:
                       type: string
                       readOnly: true
                       description: URL for the file with the IPFS protocol
-                      example: ipfs://Qmabc123xyz341
+                      example: 'ipfs://Qmabc123xyz341'
                     videoFileGatewayUrl:
                       readOnly: true
                       type: string
                       description: URL to access file via HTTP through an IPFS gateway
-                      example: https://gateway.ipfs.io/ipfs/Qmabc123xyz341
+                      example: 'https://gateway.ipfs.io/ipfs/Qmabc123xyz341'
                     nftMetadataCid:
                       type: string
                       description: IPFS CID of the default metadata exported for the video
@@ -1904,14 +1895,14 @@ components:
                       readOnly: true
                       type: string
                       description: URL for the metadata file with the IPFS protocol
-                      example: ipfs://Qmabc123xyz341
+                      example: 'ipfs://Qmabc123xyz341'
                     nftMetadataGatewayUrl:
                       readOnly: true
                       type: string
                       description: |
                         URL to access metadata file via HTTP through an IPFS
                         gateway
-                      example: https://gateway.ipfs.io/ipfs/Qmabc123xyz341
+                      example: 'https://gateway.ipfs.io/ipfs/Qmabc123xyz341'
             exportData:
               type: object
               additionalProperties: false
@@ -2017,8 +2008,7 @@ components:
           example: 1587667174725
         publicKey:
           type: string
-          example: >-
-            -----BEGIN PUBLIC KEY
+          example: '-----BEGIN PUBLIC KEY'
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
@@ -2125,7 +2115,7 @@ components:
           example: 200000
         streamCount:
           type: number
-          example: 200000  
+          example: 200000
     playback-policy:
       type: object
       description: Whether the playback policy for a asset or stream is public or signed
@@ -2210,7 +2200,7 @@ components:
         dStorageUrl:
           type: string
           description: The URL of the distributed storage used for the asset
-          example: ipfs://QmZ4
+          example: 'ipfs://QmZ4'
         timestamp:
           type: number
           example: 1587667174725
@@ -2255,7 +2245,7 @@ components:
           description: |
             The subdivision (e.g., state or province) where the viewer is
             located.
-          example : California
+          example: California
         timezone:
           type: string
           description: The timezone where the viewer is located.
@@ -2453,17 +2443,17 @@ components:
                     example: creator
                   address:
                     type: string
-                    example: 0x1234567890abcdef
+                    example: 1311768467294899700
             signer:
               type: string
-              example: 0x1234567890abcdef
+              example: 1311768467294899700
             timestamp:
               type: number
               example: 1587667174725
         signature:
           type: string
           description: Video Metadata EIP-712 message signature
-          example: 0x1234567890abcdef
+          example: 1311768467294899700
         createdAt:
           type: number
           readOnly: true
@@ -2514,7 +2504,8 @@ components:
                   description: |
                     Will be added to the Authorization header as a
                     Bearer token.
-                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+                  example: >-
+                    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
             - type: object
               additionalProperties: false
               required:
@@ -2529,7 +2520,7 @@ components:
                   type: string
                   writeOnly: true
                   description: Will be added to the pinata_secret_api_key header.
-                  example: '1234567890abcdef'
+                  example: 1234567890abcdef
     storage-status:
       readOnly: true
       additionalProperties: false
@@ -2554,7 +2545,7 @@ components:
         errorMessage:
           type: string
           description: Error message if the last storage changed failed.
-          example: 'Failed to update storage'
+          example: Failed to update storage
         tasks:
           type: object
           additionalProperties: false
@@ -2575,7 +2566,6 @@ components:
               type: string
               description: ID of the last task to fail execution.
               example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-
 paths:
   /stream:
     post:
@@ -2620,7 +2610,7 @@ paths:
     get:
       operationId: getStreams
       summary: Retrieve streams
-      tags: 
+      tags:
         - stream
       parameters:
         - name: streamsonly
@@ -2636,6 +2626,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/stream'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2652,7 +2643,7 @@ paths:
           type: string
     get:
       operationId: getStream
-      tags: 
+      tags:
         - stream
       summary: Retrieve a stream
       responses:
@@ -2662,6 +2653,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/stream'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2671,7 +2663,7 @@ paths:
     patch:
       operationId: updateStream
       summary: Update a stream
-      tags: 
+      tags:
         - stream
       requestBody:
         required: true
@@ -2691,10 +2683,9 @@ paths:
     delete:
       operationId: deleteStream
       summary: Delete a stream
-      tags: 
+      tags:
         - stream
       description: |
-
         This will also suspend any active stream sessions, so make sure to wait
         until the stream has finished. To explicitly interrupt an active
         session, consider instead updating the suspended field in the stream
@@ -2725,7 +2716,7 @@ paths:
           type: string
     delete:
       operationId: terminateStream
-      tags: 
+      tags:
         - stream
       summary: Terminates a live stream
       description: |
@@ -2757,7 +2748,7 @@ paths:
     post:
       operationId: startPullStream
       summary: Start ingest for a pull stream
-      tags: 
+      tags:
         - stream
       description: |
         `POST /stream/{id}/start-pull` can be used to start ingest for a stream
@@ -2780,7 +2771,7 @@ paths:
     get:
       operationId: getMultistreamTargets
       summary: Retrieve Multistream Targets
-      tags: 
+      tags:
         - multistream
       responses:
         '200':
@@ -2791,6 +2782,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/multistream-target'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2800,7 +2792,7 @@ paths:
     post:
       operationId: createMultistreamTarget
       summary: Create a multistream target
-      tags: 
+      tags:
         - multistream
       requestBody:
         required: true
@@ -2834,7 +2826,7 @@ paths:
     get:
       operationId: getMultistreamTarget
       summary: Retrieve a multistream target
-      tags: 
+      tags:
         - multistream
       responses:
         '200':
@@ -2843,6 +2835,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/multistream-target'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2852,7 +2845,7 @@ paths:
     patch:
       operationId: updateMultistreamTarget
       summary: Update Multistream Target
-      tags: 
+      tags:
         - multistream
       requestBody:
         required: true
@@ -2872,7 +2865,7 @@ paths:
     delete:
       operationId: deleteMultistreamTarget
       summary: Delete a multistream target
-      tags: 
+      tags:
         - multistream
       description: |
         Make sure to remove any references to the target on existing
@@ -2890,7 +2883,7 @@ paths:
     get:
       operationId: getWebhooks
       summary: Retrieve a Webhook
-      tags: 
+      tags:
         - webhook
       responses:
         '200':
@@ -2901,6 +2894,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/webhook'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2910,7 +2904,7 @@ paths:
     post:
       operationId: createWebhook
       summary: Create a webhook
-      tags: 
+      tags:
         - webhook
       description: >
         To create a new webhook, you need to make an API call with the events
@@ -2923,6 +2917,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/webhook'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2933,7 +2928,7 @@ paths:
     get:
       operationId: getWebhook
       summary: Retrieve a webhook
-      tags: 
+      tags:
         - webhook
       parameters:
         - name: id
@@ -2948,6 +2943,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/webhook'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2963,7 +2959,7 @@ paths:
             type: string
       summary: Update a webhook
       operationId: updateWebhook
-      tags: 
+      tags:
         - webhook
       responses:
         '200':
@@ -2972,6 +2968,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/webhook'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -2979,7 +2976,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
     delete:
-      tags: 
+      tags:
         - webhook
       parameters:
         - name: id
@@ -2996,6 +2993,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/webhook'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3005,7 +3003,7 @@ paths:
   '/webhook/{id}/log':
     get:
       operationId: getWebhookLogs
-      tags: 
+      tags:
         - webhook
       summary: Retrieve webhook logs
       parameters:
@@ -3023,6 +3021,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/webhook-log'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3031,7 +3030,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/webhook/{id}/log/{logId}':
     get:
-      tags: 
+      tags:
         - webhook
       operationId: getWebhookLog
       summary: Retrieve a webhook log
@@ -3053,6 +3052,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/webhook-log'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3061,7 +3061,7 @@ paths:
                 $ref: '#/components/schemas/error'
   '/webhook/{id}/log/{logId}/resend':
     post:
-      tags: 
+      tags:
         - webhook
       operationId: resendWebhook
       summary: Resend a webhook
@@ -3087,6 +3087,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/webhook-log'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3094,9 +3095,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
   /asset:
-    get:  
+    get:
       operationId: getAssets
-      tags: 
+      tags:
         - asset
       summary: Retrieve assets
       responses:
@@ -3108,6 +3109,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/asset'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3117,7 +3119,7 @@ paths:
   /asset/request-upload:
     post:
       operationId: requestUpload
-      tags: 
+      tags:
         - asset
       summary: Upload an asset
       description: |
@@ -3238,6 +3240,7 @@ paths:
                       id:
                         type: string
                         example: 34d7618e-fd42-4798-acf5-19504616a11e
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3248,7 +3251,7 @@ paths:
     post:
       operationId: uploadAsset
       summary: Upload asset via URL
-      tags: 
+      tags:
         - asset
       requestBody:
         required: true
@@ -3276,6 +3279,7 @@ paths:
                       id:
                         type: string
                         example: 34d7618e-fd42-4798-acf5-19504616a11e
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3285,7 +3289,7 @@ paths:
   '/asset/{assetId}':
     get:
       operationId: getAsset
-      tags: 
+      tags:
         - asset
       summary: Retrieves an asset
       parameters:
@@ -3302,6 +3306,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/asset'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3311,7 +3316,7 @@ paths:
     patch:
       operationId: updateAsset
       summary: Patch an asset
-      tags: 
+      tags:
         - asset
       parameters:
         - in: path
@@ -3333,6 +3338,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/asset'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3342,7 +3348,7 @@ paths:
     delete:
       operationId: deleteAsset
       summary: Delete an asset
-      tags: 
+      tags:
         - asset
       parameters:
         - in: path
@@ -3364,7 +3370,7 @@ paths:
     post:
       operationId: createClip
       summary: Create a clip
-      tags: 
+      tags:
         - stream
       requestBody:
         required: true
@@ -3392,6 +3398,7 @@ paths:
                       id:
                         type: string
                         example: 34d7618e-fd42-4798-acf5-19504616a11e
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3401,7 +3408,7 @@ paths:
   '/stream/{id}/clips':
     get:
       operationId: getClips
-      tags: 
+      tags:
         - stream
       summary: Retrieve clips of a livestream
       parameters:
@@ -3420,6 +3427,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/asset'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3430,7 +3438,7 @@ paths:
     post:
       operationId: addMultistreamTarget
       summary: Add a multistream target
-      tags: 
+      tags:
         - stream
       parameters:
         - in: path
@@ -3458,7 +3466,7 @@ paths:
     delete:
       operationId: removeMultistreamTarget
       summary: Remove a multistream target
-      tags: 
+      tags:
         - stream
       parameters:
         - in: path
@@ -3486,7 +3494,7 @@ paths:
     get:
       operationId: getSessionClips
       summary: Retrieve clips of a session
-      tags: 
+      tags:
         - session
       parameters:
         - in: path
@@ -3504,6 +3512,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/asset'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3515,7 +3524,7 @@ paths:
       deprecated: true
       operationId: createRoom
       summary: Create a room
-      tags: 
+      tags:
         - room
       description: |
         Create a multiparticipant livestreaming room.
@@ -3526,6 +3535,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/create-room-response'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3536,7 +3546,7 @@ paths:
     get:
       deprecated: true
       operationId: getRoom
-      tags: 
+      tags:
         - room
       parameters:
         - name: id
@@ -3552,6 +3562,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/room'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3561,7 +3572,7 @@ paths:
     delete:
       deprecated: true
       operationId: deleteRoom
-      tags: 
+      tags:
         - room
       parameters:
         - name: id
@@ -3583,7 +3594,7 @@ paths:
     post:
       deprecated: true
       operationId: startRoomEgress
-      tags: 
+      tags:
         - room
       requestBody:
         required: true
@@ -3616,7 +3627,7 @@ paths:
       deprecated: true
       operationId: stopRoomEgress
       summary: Stop room RTMP egress
-      tags: 
+      tags:
         - room
       parameters:
         - name: id
@@ -3637,7 +3648,7 @@ paths:
     post:
       deprecated: true
       operationId: createRoomUser
-      tags: 
+      tags:
         - room
       requestBody:
         required: true
@@ -3676,7 +3687,7 @@ paths:
   '/room/{id}/user/{userId}':
     get:
       operationId: getRoomUser
-      tags: 
+      tags:
         - room
       deprecated: true
       parameters:
@@ -3698,6 +3709,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/get-room-user-response'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3707,7 +3719,7 @@ paths:
     put:
       deprecated: true
       operationId: updateRoomUser
-      tags: 
+      tags:
         - room
       requestBody:
         required: true
@@ -3739,7 +3751,7 @@ paths:
                 $ref: '#/components/schemas/error'
     delete:
       operationId: deleteRoomUser
-      tags: 
+      tags:
         - room
       deprecated: true
       parameters:
@@ -3767,7 +3779,7 @@ paths:
     get:
       operationId: getViewershipMetrics
       summary: Query viewership metrics
-      tags: 
+      tags:
         - metrics
       description: |
         Requires a private (non-CORS) API key to be used.
@@ -3855,6 +3867,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/viewership-metric'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3865,7 +3878,7 @@ paths:
     get:
       operationId: getCreatorViewershipMetrics
       summary: Query creator viewership metrics
-      tags: 
+      tags:
         - metrics
       description: >
         Requires a proof of ownership to be sent in the request, which for now
@@ -3944,6 +3957,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/viewership-metric'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -3954,7 +3968,7 @@ paths:
     get:
       operationId: getPublicViewershipMetrics
       summary: Query public total views metrics
-      tags: 
+      tags:
         - metrics
       description: |
         Allows querying for the public metrics for viewership about a video.
@@ -3996,6 +4010,7 @@ paths:
                   playtimeMins:
                     $ref: >-
                       #/components/schemas/viewership-metric/properties/playtimeMins
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4005,7 +4020,7 @@ paths:
   /data/usage/query:
     get:
       operationId: getUsageMetrics
-      tags: 
+      tags:
         - metrics
       summary: Query usage metrics
       description: ''
@@ -4044,6 +4059,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/usage-metric'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4054,7 +4070,7 @@ paths:
     get:
       operationId: getSessions
       summary: Retrieve sessions
-      tags: 
+      tags:
         - session
       responses:
         '200':
@@ -4065,6 +4081,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/session'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4075,7 +4092,7 @@ paths:
     get:
       operationId: getSession
       summary: Retrieve a session
-      tags: 
+      tags:
         - session
       parameters:
         - in: path
@@ -4091,6 +4108,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/session'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4101,7 +4119,7 @@ paths:
     get:
       operationId: getRecordedSessions
       summary: Retrieve Recorded Sessions
-      tags: 
+      tags:
         - session
       parameters:
         - in: path
@@ -4127,6 +4145,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/session'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4137,10 +4156,9 @@ paths:
     post:
       operationId: createSigningKey
       summary: Create a signing key
-      tags: 
+      tags:
         - accessControl
       description: >
-
         The publicKey is a representation of the public key, encoded as base 64
         and is passed as a string, and  the privateKey is displayed only on
         creation. This is the only moment where the client can save the private
@@ -4156,6 +4174,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/signing-key'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4165,7 +4184,7 @@ paths:
     get:
       operationId: getSigningKeys
       summary: Retrieves signing keys
-      tags: 
+      tags:
         - accessControl
       responses:
         '200':
@@ -4176,6 +4195,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/signing-key'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4186,7 +4206,7 @@ paths:
     delete:
       operationId: deleteSigningKey
       summary: Delete Signing Key
-      tags: 
+      tags:
         - accessControl
       parameters:
         - in: path
@@ -4207,7 +4227,7 @@ paths:
     get:
       operationId: getSigningKey
       summary: Retrieves a signing key
-      tags: 
+      tags:
         - accessControl
       parameters:
         - in: path
@@ -4223,6 +4243,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/signing-key'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4232,7 +4253,7 @@ paths:
     patch:
       operationId: updateSigningKey
       summary: Update a signing key
-      tags: 
+      tags:
         - accessControl
       parameters:
         - in: path
@@ -4266,7 +4287,7 @@ paths:
     get:
       operationId: getTasks
       summary: Retrieve Tasks
-      tags: 
+      tags:
         - task
       responses:
         '200':
@@ -4277,6 +4298,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/task'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4287,7 +4309,7 @@ paths:
     get:
       operationId: getTask
       summary: Retrieve a Task
-      tags: 
+      tags:
         - task
       parameters:
         - in: path
@@ -4303,13 +4325,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/task'
+                x-speakeasy-name-override: data
         default:
           description: Error
   /transcode:
     post:
       operationId: transcodeVideo
       summary: Transcode a video
-      tags: 
+      tags:
         - transcode
       description: |
         `POST /transcode` transcodes a video file and uploads the results to the
@@ -4446,6 +4469,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/task'
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
@@ -4456,7 +4480,7 @@ paths:
     get:
       operationId: getPlaybackInfo
       summary: Retrieve Playback Info
-      tags: 
+      tags:
         - playback
       parameters:
         - in: path
@@ -4474,6 +4498,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/playback-info'
+                x-speakeasy-name-override: data
         '404':
           description: Playback not found
           content:
