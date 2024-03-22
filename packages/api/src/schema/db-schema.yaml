@@ -1036,7 +1036,7 @@ components:
         - publicKey
         - privateKey
       properties:
-        $ref: '#/components/schemas/signing-key/properties'
+        $ref: "#/components/schemas/signing-key/properties"
         privateKey:
           type: string
     stream-set-active-payload:
@@ -1045,7 +1045,7 @@ components:
         - active
       properties:
         active:
-          $ref: '#/components/schemas/stream/properties/isActive'
+          $ref: "#/components/schemas/stream/properties/isActive"
         hostName:
           type: string
           description: Hostname of the Mist server that processes that stream
@@ -1058,15 +1058,15 @@ components:
       additionalProperties: false
       properties:
         name:
-          $ref: '#/components/schemas/webhook/properties/name'
+          $ref: "#/components/schemas/webhook/properties/name"
         url:
-          $ref: '#/components/schemas/webhook/properties/url'
+          $ref: "#/components/schemas/webhook/properties/url"
         events:
-          $ref: '#/components/schemas/webhook/properties/events'
+          $ref: "#/components/schemas/webhook/properties/events"
         sharedSecret:
-          $ref: '#/components/schemas/webhook/properties/sharedSecret'
+          $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
-          $ref: '#/components/schemas/webhook/properties/streamId'
+          $ref: "#/components/schemas/webhook/properties/streamId"
     new-asset-from-url-payload:
       additionalProperties: false
       required:
@@ -1074,19 +1074,19 @@ components:
         - url
       properties:
         name:
-          $ref: '#/components/schemas/new-asset-payload/properties/name'
+          $ref: "#/components/schemas/new-asset-payload/properties/name"
         staticMp4:
-          $ref: '#/components/schemas/new-asset-payload/properties/staticMp4'
+          $ref: "#/components/schemas/new-asset-payload/properties/staticMp4"
         playbackPolicy:
-          $ref: '#/components/schemas/playback-policy'
+          $ref: "#/components/schemas/playback-policy"
         creatorId:
-          $ref: '#/components/schemas/input-creator-id'
+          $ref: "#/components/schemas/input-creator-id"
         storage:
-          $ref: '#/components/schemas/new-asset-payload/properties/storage'
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
         url:
           type: string
           format: uri
-          pattern: '^(https?|ipfs|ar)://'
+          pattern: "^(https?|ipfs|ar)://"
           description: >
             URL where the asset contents can be retrieved, e.g.
             `https://s3.amazonaws.com/my-bucket/path/filename.mp4`.
@@ -1095,13 +1095,13 @@ components:
             an Arweave
 
             source: `ar://{CID}`.
-          example: 'https://s3.amazonaws.com/my-bucket/path/filename.mp4'
+          example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
         encryption:
-          $ref: '#/components/schemas/new-asset-payload/properties/encryption'
+          $ref: "#/components/schemas/new-asset-payload/properties/encryption"
         c2pa:
-          $ref: '#/components/schemas/new-asset-payload/properties/c2pa'
+          $ref: "#/components/schemas/new-asset-payload/properties/c2pa"
         profiles:
-          $ref: '#/components/schemas/new-asset-payload/properties/profiles'
+          $ref: "#/components/schemas/new-asset-payload/properties/profiles"
         targetSegmentSizeSecs:
           $ref: >-
             #/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs
@@ -1402,5 +1402,3 @@ components:
                       type: string
                     timestamp:
                       type: integer
-    
-    
