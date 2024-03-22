@@ -2570,6 +2570,7 @@ paths:
   /stream:
     post:
       operationId: createStream
+      x-speakeasy-name-override: create
       tags:
         - stream
       summary: Create a stream
@@ -2609,6 +2610,7 @@ paths:
                 $ref: '#/components/schemas/error'
     get:
       operationId: getStreams
+      x-speakeasy-name-override: getAll
       summary: Retrieve streams
       tags:
         - stream
@@ -2643,6 +2645,7 @@ paths:
           type: string
     get:
       operationId: getStream
+      x-speakeasy-name-override: get
       tags:
         - stream
       summary: Retrieve a stream
@@ -2662,6 +2665,7 @@ paths:
                 $ref: '#/components/schemas/error'
     patch:
       operationId: updateStream
+      x-speakeasy-name-override: update
       summary: Update a stream
       tags:
         - stream
@@ -2682,6 +2686,7 @@ paths:
                 $ref: '#/components/schemas/error'
     delete:
       operationId: deleteStream
+      x-speakeasy-name-override: delete
       summary: Delete a stream
       tags:
         - stream
@@ -2716,6 +2721,7 @@ paths:
           type: string
     delete:
       operationId: terminateStream
+      x-speakeasy-name-override: terminate
       tags:
         - stream
       summary: Terminates a live stream
@@ -2747,6 +2753,7 @@ paths:
           type: string
     post:
       operationId: startPullStream
+      x-speakeasy-name-override: startPull
       summary: Start ingest for a pull stream
       tags:
         - stream
@@ -2770,6 +2777,7 @@ paths:
   /multistream/target:
     get:
       operationId: getMultistreamTargets
+      x-speakeasy-name-override: getAll
       summary: Retrieve Multistream Targets
       tags:
         - multistream
@@ -2791,6 +2799,7 @@ paths:
                 $ref: '#/components/schemas/error'
     post:
       operationId: createMultistreamTarget
+      x-speakeasy-name-override: create
       summary: Create a multistream target
       tags:
         - multistream
@@ -2825,6 +2834,7 @@ paths:
           type: string
     get:
       operationId: getMultistreamTarget
+      x-speakeasy-name-override: get
       summary: Retrieve a multistream target
       tags:
         - multistream
@@ -2844,6 +2854,7 @@ paths:
                 $ref: '#/components/schemas/error'
     patch:
       operationId: updateMultistreamTarget
+      x-speakeasy-name-override: update
       summary: Update Multistream Target
       tags:
         - multistream
@@ -2864,6 +2875,7 @@ paths:
                 $ref: '#/components/schemas/error'
     delete:
       operationId: deleteMultistreamTarget
+      x-speakeasy-name-override: delete
       summary: Delete a multistream target
       tags:
         - multistream
@@ -2881,6 +2893,7 @@ paths:
                 $ref: '#/components/schemas/error'
   /webhook:
     get:
+      x-speakeasy-name-override: getAll
       operationId: getWebhooks
       summary: Retrieve a Webhook
       tags:
@@ -2903,6 +2916,7 @@ paths:
                 $ref: '#/components/schemas/error'
     post:
       operationId: createWebhook
+      x-speakeasy-name-override: create
       summary: Create a webhook
       tags:
         - webhook
@@ -2927,6 +2941,7 @@ paths:
   '/webhook/{id}':
     get:
       operationId: getWebhook
+      x-speakeasy-name-override: get
       summary: Retrieve a webhook
       tags:
         - webhook
@@ -2958,6 +2973,7 @@ paths:
           schema:
             type: string
       summary: Update a webhook
+      x-speakeasy-name-override: update
       operationId: updateWebhook
       tags:
         - webhook
@@ -2985,6 +3001,7 @@ paths:
           schema:
             type: string
       operationId: deleteWebhook
+      x-speakeasy-name-override: delete
       summary: Delete a webhook
       responses:
         '200':
@@ -3003,6 +3020,7 @@ paths:
   '/webhook/{id}/log':
     get:
       operationId: getWebhookLogs
+      x-speakeasy-name-override: getLogs
       tags:
         - webhook
       summary: Retrieve webhook logs
@@ -3033,6 +3051,7 @@ paths:
       tags:
         - webhook
       operationId: getWebhookLog
+      x-speakeasy-name-override: getLog
       summary: Retrieve a webhook log
       parameters:
         - name: id
@@ -3064,6 +3083,7 @@ paths:
       tags:
         - webhook
       operationId: resendWebhook
+      x-speakeasy-name-override: resendLog
       summary: Resend a webhook
       description: |
         Use this API to resend the same webhook request. This is useful when
@@ -3097,6 +3117,7 @@ paths:
   /asset:
     get:
       operationId: getAssets
+      x-speakeasy-name-override: getAll
       tags:
         - asset
       summary: Retrieve assets
@@ -3119,6 +3140,7 @@ paths:
   /asset/request-upload:
     post:
       operationId: requestUpload
+      x-speakeasy-name-override: create
       tags:
         - asset
       summary: Upload an asset
@@ -3250,6 +3272,7 @@ paths:
   /asset/upload/url:
     post:
       operationId: uploadAsset
+      x-speakeasy-name-override: createViaUrl
       summary: Upload asset via URL
       tags:
         - asset
@@ -3289,6 +3312,7 @@ paths:
   '/asset/{assetId}':
     get:
       operationId: getAsset
+      x-speakeasy-name-override: get
       tags:
         - asset
       summary: Retrieves an asset
@@ -3315,6 +3339,7 @@ paths:
                 $ref: '#/components/schemas/error'
     patch:
       operationId: updateAsset
+      x-speakeasy-name-override: update
       summary: Patch an asset
       tags:
         - asset
@@ -3347,6 +3372,7 @@ paths:
                 $ref: '#/components/schemas/error'
     delete:
       operationId: deleteAsset
+      x-speakeasy-name-override: delete
       summary: Delete an asset
       tags:
         - asset
@@ -3369,6 +3395,7 @@ paths:
   /clip:
     post:
       operationId: createClip
+      x-speakeasy-name-override: createClip
       summary: Create a clip
       tags:
         - stream
@@ -3408,6 +3435,7 @@ paths:
   '/stream/{id}/clips':
     get:
       operationId: getClips
+      x-speakeasy-name-override: getClips
       tags:
         - stream
       summary: Retrieve clips of a livestream
@@ -3437,6 +3465,7 @@ paths:
   '/stream/{id}/create-multistream-target':
     post:
       operationId: addMultistreamTarget
+      x-speakeasy-name-override: addMultistreamTarget
       summary: Add a multistream target
       tags:
         - stream
@@ -3465,6 +3494,7 @@ paths:
   '/stream/{id}/multistream/{targetId}':
     delete:
       operationId: removeMultistreamTarget
+      x-speakeasy-name-override: removeMultistreamTarget
       summary: Remove a multistream target
       tags:
         - stream
@@ -3493,6 +3523,7 @@ paths:
   '/session/{id}/clips':
     get:
       operationId: getSessionClips
+      x-speakeasy-name-override: getClips
       summary: Retrieve clips of a session
       tags:
         - session
@@ -3523,6 +3554,7 @@ paths:
     post:
       deprecated: true
       operationId: createRoom
+      x-speakeasy-name-override: create
       summary: Create a room
       tags:
         - room
@@ -3546,6 +3578,7 @@ paths:
     get:
       deprecated: true
       operationId: getRoom
+      x-speakeasy-name-override: get
       tags:
         - room
       parameters:
@@ -3572,6 +3605,7 @@ paths:
     delete:
       deprecated: true
       operationId: deleteRoom
+      x-speakeasy-name-override: delete
       tags:
         - room
       parameters:
@@ -3594,6 +3628,7 @@ paths:
     post:
       deprecated: true
       operationId: startRoomEgress
+      x-speakeasy-name-override: startEgress
       tags:
         - room
       requestBody:
@@ -3626,6 +3661,7 @@ paths:
     delete:
       deprecated: true
       operationId: stopRoomEgress
+      x-speakeasy-name-override: stopEgress
       summary: Stop room RTMP egress
       tags:
         - room
@@ -3648,6 +3684,7 @@ paths:
     post:
       deprecated: true
       operationId: createRoomUser
+      x-speakeasy-name-override: createUser
       tags:
         - room
       requestBody:
@@ -3687,6 +3724,7 @@ paths:
   '/room/{id}/user/{userId}':
     get:
       operationId: getRoomUser
+      x-speakeasy-name-override: getUser
       tags:
         - room
       deprecated: true
@@ -3719,6 +3757,7 @@ paths:
     put:
       deprecated: true
       operationId: updateRoomUser
+      x-speakeasy-name-override: updateUser
       tags:
         - room
       requestBody:
@@ -3751,6 +3790,7 @@ paths:
                 $ref: '#/components/schemas/error'
     delete:
       operationId: deleteRoomUser
+      x-speakeasy-name-override: deleteUser
       tags:
         - room
       deprecated: true
@@ -3778,6 +3818,7 @@ paths:
   /data/views/query:
     get:
       operationId: getViewershipMetrics
+      x-speakeasy-name-override: getViewership
       summary: Query viewership metrics
       tags:
         - metrics
@@ -3877,6 +3918,7 @@ paths:
   /data/views/query/creator:
     get:
       operationId: getCreatorViewershipMetrics
+      x-speakeasy-name-override: getCreatorViewership
       summary: Query creator viewership metrics
       tags:
         - metrics
@@ -3967,6 +4009,7 @@ paths:
   '/data/views/query/total/{playbackId}':
     get:
       operationId: getPublicViewershipMetrics
+      x-speakeasy-name-override: getPublicViewership
       summary: Query public total views metrics
       tags:
         - metrics
@@ -4020,6 +4063,7 @@ paths:
   /data/usage/query:
     get:
       operationId: getUsageMetrics
+      x-speakeasy-name-override: getUsage
       tags:
         - metrics
       summary: Query usage metrics
@@ -4069,6 +4113,7 @@ paths:
   /session:
     get:
       operationId: getSessions
+      x-speakeasy-name-override: getAll
       summary: Retrieve sessions
       tags:
         - session
@@ -4091,6 +4136,7 @@ paths:
   '/session/{id}':
     get:
       operationId: getSession
+      x-speakeasy-name-override: get
       summary: Retrieve a session
       tags:
         - session
@@ -4118,6 +4164,7 @@ paths:
   '/stream/{parentId}/sessions':
     get:
       operationId: getRecordedSessions
+      x-speakeasy-name-override: getRecorded
       summary: Retrieve Recorded Sessions
       tags:
         - session
@@ -4155,6 +4202,7 @@ paths:
   /access-control/signing-key:
     post:
       operationId: createSigningKey
+      x-speakeasy-name-override: create
       summary: Create a signing key
       tags:
         - accessControl
@@ -4183,6 +4231,7 @@ paths:
                 $ref: '#/components/schemas/error'
     get:
       operationId: getSigningKeys
+      x-speakeasy-name-override: getAll
       summary: Retrieves signing keys
       tags:
         - accessControl
@@ -4205,6 +4254,7 @@ paths:
   '/access-control/signing-key/{keyId}':
     delete:
       operationId: deleteSigningKey
+      x-speakeasy-name-override: delete
       summary: Delete Signing Key
       tags:
         - accessControl
@@ -4226,6 +4276,7 @@ paths:
                 $ref: '#/components/schemas/error'
     get:
       operationId: getSigningKey
+      x-speakeasy-name-override: get
       summary: Retrieves a signing key
       tags:
         - accessControl
@@ -4252,6 +4303,7 @@ paths:
                 $ref: '#/components/schemas/error'
     patch:
       operationId: updateSigningKey
+      x-speakeasy-name-override: update
       summary: Update a signing key
       tags:
         - accessControl
@@ -4286,6 +4338,7 @@ paths:
   /task:
     get:
       operationId: getTasks
+      x-speakeasy-name-override: getAll
       summary: Retrieve Tasks
       tags:
         - task
@@ -4308,6 +4361,7 @@ paths:
   '/task/{taskId}':
     get:
       operationId: getTask
+      x-speakeasy-name-override: get
       summary: Retrieve a Task
       tags:
         - task
@@ -4331,6 +4385,7 @@ paths:
   /transcode:
     post:
       operationId: transcodeVideo
+      x-speakeasy-name-override: create
       summary: Transcode a video
       tags:
         - transcode
@@ -4480,6 +4535,7 @@ paths:
     get:
       operationId: getPlaybackInfo
       summary: Retrieve Playback Info
+      x-speakeasy-name-override: get
       tags:
         - playback
       parameters:
