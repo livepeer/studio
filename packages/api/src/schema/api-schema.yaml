@@ -44,6 +44,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
   schemas:
     ffmpeg-profile:
       type: object
@@ -59,6 +60,7 @@ components:
         width:
           type: integer
           minimum: 128
+          example: 1280
         name:
           type: string
           minLength: 1
@@ -67,15 +69,19 @@ components:
         height:
           type: integer
           minimum: 128
+          expample: 720
         bitrate:
           type: integer
           minimum: 400
+          example: 3000000
         fps:
           type: integer
           minimum: 0
+          example: 30
         fpsDen:
           type: integer
           minimum: 1
+          example: 1
         quality:
           type: integer
           description: >
@@ -85,8 +91,10 @@ components:
             support for it.
           minimum: 0
           maximum: 44
+          example: 23
         gop:
           type: string
+          example: 2
         profile:
           type: string
           enum:
@@ -94,6 +102,7 @@ components:
             - H264Main
             - H264High
             - H264ConstrainedHigh
+          example: H264Baseline
         encoder:
           type: string
           enum:
@@ -101,6 +110,7 @@ components:
             - HEVC
             - VP8
             - VP9
+          example: H.264
     transcode-profile:
       type: object
       description: Transcode API profile
@@ -111,6 +121,7 @@ components:
         width:
           type: integer
           minimum: 128
+          example: 1280
         name:
           type: string
           minLength: 1
@@ -119,9 +130,11 @@ components:
         height:
           type: integer
           minimum: 128
+          expample: 720
         bitrate:
           type: integer
           minimum: 400
+          example: 3000000
         quality:
           type: integer
           description: >
@@ -131,14 +144,18 @@ components:
             support for it.
           minimum: 0
           maximum: 44
+          example: 23
         fps:
           type: integer
           minimum: 0
+          example: 30
         fpsDen:
           type: integer
           minimum: 1
+          example: 1
         gop:
           type: string
+          example: 2
         profile:
           type: string
           enum:
@@ -146,6 +163,7 @@ components:
             - H264Main
             - H264High
             - H264ConstrainedHigh
+          example: H264Baseline
         encoder:
           type: string
           enum:
@@ -153,6 +171,7 @@ components:
             - HEVC
             - VP8
             - VP9
+          example: H.264
     webhook:
       type: object
       required:
@@ -166,6 +185,7 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         name:
           type: string
+          example: test_webhook
         createdAt:
           type: number
           readOnly: true
@@ -196,17 +216,23 @@ components:
               - task.updated
               - task.completed
               - task.failed
+          example:
+            - stream.started
+            - stream.detection
         url:
           type: string
           format: uri
           pattern: '^http(s)?://'
+          example: 'https://my-service.com/webhook'
         sharedSecret:
           type: string
           writeOnly: true
           description: shared secret used to sign the webhook payload
+          example: 'my-secret'
         streamId:
           type: string
           description: streamId of the stream on which the webhook is applied
+          example: 'de7818e7-610a-4057-8f6f-b785dc1e6f88'
         status:
           type: object
           readOnly: true
@@ -243,6 +269,13 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
+          example: 
+            lastFailure:
+              timestamp: 1587667174725
+              error: Error message
+              response: Response body
+              statusCode: 500
+            lastTriggeredAt: 1587667174725
     webhook-log:
       type: object
       required:
@@ -258,10 +291,12 @@ components:
           readOnly: true
           type: string
           description: ID of the webhook this request was made for
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
         event:
           readOnly: true
           type: string
           description: The event type that triggered the webhook request
+          example: stream.started
         createdAt:
           readOnly: true
           type: number
@@ -272,26 +307,33 @@ components:
         duration:
           type: number
           description: The time taken (in seconds) to make the webhook request
+          example: 0.5
         success:
           type: boolean
           description: Whether the webhook request was successful
+          example: true
         request:
           type: object
           properties:
             url:
               type: string
               description: URL used for the request
+              example: 'https://my-service.com/webhook'
             method:
               type: string
               description: HTTP request method
+              example: POST
             headers:
               type: object
               description: HTTP request headers
               additionalProperties:
                 type: string
+              example:
+                Authorization: Bearer 123
             body:
               type: string
               description: request body
+              example: '{"event": "stream.started"}'
         response:
           type: object
           additionalProperties: false
@@ -317,6 +359,7 @@ components:
           description: >-
             The playback ID of the stream or stream recording to clip. Asset
             playback IDs are not supported yet.
+          example: eaw4nk06ts2d0mzb
         startTime:
           type: number
           description: >-
@@ -324,6 +367,7 @@ components:
             ClipTrigger in the UI Kit for an example of how this is calculated
             (for HLS, it uses `Program Date-Time` tags, and for WebRTC, it uses
             the latency from server to client at stream startup)._
+          example: 1587667174725
         endTime:
           type: number
           description: >-
@@ -331,15 +375,18 @@ components:
             ClipTrigger in the UI Kit for an example of how this is calculated
             (for HLS, it uses `Program Date-Time` tags, and for WebRTC, it uses
             the latency from server to client at stream startup)._
+          example: 1587667174725
         name:
           type: string
           description: The optional friendly name of the clip to create.
+          example: 'My Clip'
         sessionId:
           type: string
           description: >-
             The optional session ID of the stream to clip. This can be used to
             clip _recordings_ - if it is not specified, it will clip the ongoing
             livestream.
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
     target:
       type: object
       required:
@@ -360,9 +407,11 @@ components:
             If true, the stream audio will be muted and only silent
             video will be pushed to the target.
           default: false
+          example: false
         id:
           type: string
           description: ID of multistream target object where to push this stream
+          example: PUSH123
         spec:
           type: object
           writeOnly: true
@@ -376,6 +425,7 @@ components:
           properties:
             name:
               type: string
+              example: My target
             url:
               $ref: '#/components/schemas/multistream-target/properties/url'
     stream:
@@ -439,6 +489,7 @@ components:
         isActive:
           type: boolean
           description: If currently active
+          example: true
         isHealthy:
           $ref: '#/components/schemas/stream-health-payload/properties/is_healthy'
         issues:
@@ -447,6 +498,7 @@ components:
           type: string
           readOnly: true
           description: Name of the token used to create this object
+          example: abc-123-xyz-456
         createdAt:
           type: number
           readOnly: true
@@ -559,6 +611,7 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
+    
     new-stream-payload:
       type: object
       required:
@@ -694,7 +747,6 @@ components:
     multistream-target-patch-payload:
       $ref: '#/components/schemas/multistream-target'
       required: []
-    
     session:
       type: object
       required:
@@ -1149,7 +1201,6 @@ components:
           readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
-    
     new-asset-payload:
       additionalProperties: false
       required:
@@ -1212,6 +1263,7 @@ components:
         targetSegmentSizeSecs:
           type: number
           description: How many seconds the duration of each output segment should be
+    
     room-user-payload:
       type: object
       required:
@@ -1312,7 +1364,51 @@ components:
           default: true
         metadata:
           type: string
-          description: User defined payload to store for the participant
+          description: User defined payload to store for the participant 
+    room:
+      type: object
+      required:
+        - id
+        - participants
+        - events
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: room ID
+          example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which the room was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which room was updated
+          example: 1587667174725
+        egressId:
+          type: string
+          description: internal ID for egress output
+        participants:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              identity:
+                type: string
+                description: participant ID
+              name:
+                type: string
+                description: user defined participant name
+              joinedAt:
+                type: integer
+                description: the time the participant joined
+              leftAt:
+                type: integer
+                description: the time the participant left
+    
+
     transcode-payload:
       additionalProperties: false
       required:
@@ -1507,6 +1603,7 @@ components:
         c2pa:
           type: boolean
           description: Decides if the output video should include C2PA signature
+    
     task:
       type: object
       additionalProperties: false
@@ -1525,6 +1622,7 @@ components:
             - export-data
             - transcode-file
             - clip
+          example: upload
         createdAt:
           readOnly: true
           type: number
@@ -1548,6 +1646,7 @@ components:
         requesterId:
           type: string
           description: ID of the requester hash(IP + SALT + PlaybackId)
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
           type: object
           additionalProperties: false
@@ -1567,6 +1666,7 @@ components:
                 c2pa:
                   type: boolean
                   description: Decides if the output video should include C2PA signature
+                  example: true
                 profiles:
                   type: array
                   items:
@@ -1576,6 +1676,7 @@ components:
                   description: >-
                     How many seconds the duration of each output segment should
                     be
+                  example: 6
             export:
               $ref: '#/components/schemas/export-task-params'
             exportData:
@@ -1588,14 +1689,17 @@ components:
                 content:
                   type: object
                   description: File content to store into IPFS
+                  example: { "data": "Hello, World!" }
                 ipfs:
                   $ref: '#/components/schemas/ipfs-export-params'
                 type:
                   type: string
                   description: Optional type of content
+                  example: text/plain
                 id:
                   type: string
                   description: Optional ID of the content
+                  example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
             transcode-file:
               type: object
               additionalProperties: false
@@ -1655,16 +1759,19 @@ components:
                   description: |
                     How many seconds the duration of each output segment should
                     be
+                  example: 10
                 creatorId:
                   $ref: '#/components/schemas/input-creator-id'
                 c2pa:
                   type: boolean
                   description: Decides if the output video should include C2PA signature
+                  example: false
             clip:
               properties:
                 url:
                   type: string
                   description: URL of the asset to "clip"
+                  example: https://asset-cdn.lp-playback.monster/hls/1bde4o2i6xycudoy/static360p0.mp4
                 clipStrategy:
                   type: object
                   description: >-
@@ -1694,12 +1801,15 @@ components:
                     - background_mist
                     - fallback_external
                     - external
+                  example: catalyst_ffmpeg
                 sessionId:
                   type: string
                   description: ID of the session
+                  example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
                 inputId:
                   type: string
                   description: ID of the input asset or stream
+                  example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         status:
           readOnly: true
           type: object
@@ -1719,6 +1829,7 @@ components:
                 - failed
                 - completed
                 - cancelled
+              example: pending
             updatedAt:
               type: number
               description: Timestamp (in milliseconds) at which task was updated
@@ -1726,16 +1837,20 @@ components:
             progress:
               type: number
               description: Current progress of the task in a 0-1 ratio
+              example: 0.5
             errorMessage:
               type: string
               description: Error message if the task failed
+              example: 'Failed to upload file'
             retries:
               type: number
               description: Number of retries done on the task
+              example: 3
             step:
               type: string
               writeOnly: true
               description: Step of the task processing
+              example: 'upload'
         output:
           type: object
           additionalProperties: false
@@ -1749,9 +1864,11 @@ components:
                 videoFilePath:
                   type: string
                   writeOnly: true
+                  example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
                 metadataFilePath:
                   type: string
                   writeOnly: true
+                  example: https://s3.amazonaws.com/my-bucket/path/filename.json
                 assetSpec:
                   $ref: '#/components/schemas/asset'
             export:
@@ -1768,27 +1885,33 @@ components:
                     videoFileCid:
                       type: string
                       description: IPFS CID of the exported video file
+                      example: Qmabc123xyz341
                     videoFileUrl:
                       type: string
                       readOnly: true
                       description: URL for the file with the IPFS protocol
+                      example: ipfs://Qmabc123xyz341
                     videoFileGatewayUrl:
                       readOnly: true
                       type: string
                       description: URL to access file via HTTP through an IPFS gateway
+                      example: https://gateway.ipfs.io/ipfs/Qmabc123xyz341
                     nftMetadataCid:
                       type: string
                       description: IPFS CID of the default metadata exported for the video
+                      example: Qmabc123xyz341
                     nftMetadataUrl:
                       readOnly: true
                       type: string
                       description: URL for the metadata file with the IPFS protocol
+                      example: ipfs://Qmabc123xyz341
                     nftMetadataGatewayUrl:
                       readOnly: true
                       type: string
                       description: |
                         URL to access metadata file via HTTP through an IPFS
                         gateway
+                      example: https://gateway.ipfs.io/ipfs/Qmabc123xyz341
             exportData:
               type: object
               additionalProperties: false
@@ -1803,6 +1926,7 @@ components:
                     cid:
                       type: string
                       description: IPFS CID of the exported data
+                      example: Qmabc123xyz341
     input-creator-id:
       oneOf:
         - $ref: '#/components/schemas/creator-id'
@@ -1823,9 +1947,11 @@ components:
               type: string
               enum:
                 - unverified
+              example: unverified
             value:
               type: string
               description: Developer-managed ID of the user who created the resource.
+              example: 123456
     export-task-params:
       description: Parameters for the export task
       oneOf:
@@ -1852,6 +1978,7 @@ components:
                   type: string
                   description: Method to use on the export request
                   default: PUT
+                  example: POST
                 headers:
                   type: object
                   description: Headers to add to the export request
@@ -1877,6 +2004,7 @@ components:
         name:
           type: string
           description: Name of the signing key
+          example: key1
         createdAt:
           readOnly: true
           type: number
@@ -1889,10 +2017,12 @@ components:
           example: 1587667174725
         publicKey:
           type: string
+          example: >-
+            -----BEGIN PUBLIC KEY
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
-    
+          example: false
     user:
       type: object
       required:
@@ -1995,7 +2125,7 @@ components:
           example: 200000
         streamCount:
           type: number
-          example: 200000
+          example: 200000  
     playback-policy:
       type: object
       description: Whether the playback policy for a asset or stream is public or signed
@@ -2009,60 +2139,22 @@ components:
             - public
             - jwt
             - webhook
+          example: webhook
         webhookId:
           type: string
           description: ID of the webhook to use for playback policy
+          example: 1bde4o2i6xycudoy
         webhookContext:
           type: object
           description: User-defined webhook context
           additionalProperties: true
+          example: {}
         refreshInterval:
           type: number
           description: |
             Interval (in seconds) at which the playback policy should be
-            refreshed (default 600 seconds)
-    room:
-      type: object
-      required:
-        - id
-        - participants
-        - events
-      properties:
-        id:
-          type: string
-          readOnly: true
-          description: room ID
-          example: d32ae9e6-c459-4931-9898-e86e2f5e7e16
-        createdAt:
-          type: number
-          readOnly: true
-          description: Timestamp (in milliseconds) at which the room was created
-          example: 1587667174725
-        updatedAt:
-          type: number
-          readOnly: true
-          description: Timestamp (in milliseconds) at which room was updated
-          example: 1587667174725
-        egressId:
-          type: string
-          description: internal ID for egress output
-        participants:
-          type: object
-          additionalProperties:
-            type: object
-            properties:
-              identity:
-                type: string
-                description: participant ID
-              name:
-                type: string
-                description: user defined participant name
-              joinedAt:
-                type: integer
-                description: the time the participant joined
-              leftAt:
-                type: integer
-                description: the time the participant left
+            refreshed (default 600 seconds) 
+          example: 600
     usage-metric:
       type: object
       description: |
@@ -2077,18 +2169,23 @@ components:
         UserID:
           type: string
           description: The user ID associated with the metric
+          example: 1bde4o2i6xycudoy
         CreatorID:
           type: string
           description: The creator ID associated with the metric
+          example: ucqw1bde4o2i6xycudoy
         DeliveryUsageMins:
           type: number
           description: Total minutes of delivery usage.
+          example: 100
         TotalUsageMins:
           type: number
           description: Total transcoded minutes.
+          example: 100
         StorageUsageMins:
           type: number
           description: Total minutes of storage usage.
+          example: 100
     viewership-metric:
       type: object
       description: |
@@ -2101,15 +2198,19 @@ components:
         playbackId:
           type: string
           description: The playback ID associated with the metric.
+          example: 1bde4o2i6xycudoy
         creatorId:
           type: string
           description: The ID of the creator associated with the metric.
+          example: ucqw1bde4o2i6xycudoy
         viewerId:
           type: string
           description: The ID of the viewer associated with the metric.
+          example: 1bde4o2i6xycudoy
         dStorageUrl:
           type: string
           description: The URL of the distributed storage used for the asset
+          example: ipfs://QmZ4
         timestamp:
           type: number
           example: 1587667174725
@@ -2120,58 +2221,75 @@ components:
         device:
           type: string
           description: The device used by the viewer.
+          example: iPhone
         deviceType:
           type: string
           description: The type of the device used by the viewer.
+          example: mobile
         cpu:
           type: string
           description: The CPU used by the viewer's device.
+          example: ARM
         os:
           type: string
           description: The operating system used by the viewer.
+          example: iOS
         browser:
           type: string
           description: The browser used by the viewer.
+          example: Safari
         browserEngine:
           type: string
           description: The browser engine used by the viewer's browser.
+          example: WebKit
         continent:
           type: string
           description: The continent where the viewer is located.
+          example: North America
         country:
           type: string
           description: The country where the viewer is located.
+          example: United States
         subdivision:
           type: string
           description: |
             The subdivision (e.g., state or province) where the viewer is
             located.
+          example : California
         timezone:
           type: string
           description: The timezone where the viewer is located.
+          example: America/Los_Angeles
         geohas:
           type: string
           description: Geographic encoding of the viewers location. Accurate to 3 digits.
+          example: 123
         viewCount:
           type: integer
           description: The number of views for the asset.
+          example: 100
         playtimeMins:
           type: number
           description: The total playtime in minutes for the asset.
+          example: 10
         ttffMs:
           type: number
           description: The time-to-first-frame (TTFF) in milliseconds.
+          example: 100
         rebufferRatio:
           type: number
           description: The rebuffering ratio for the asset.
+          example: 0.1
         errorRate:
           type: number
           description: The error rate for the asset.
+          example: 0.1
         exitsBeforeStart:
           type: number
           description: |
             The percentage of sessions that existed before the asset started
             playing.
+          example: 0.5
     playback-info:
       type: object
       additionalProperties: false
@@ -2197,6 +2315,7 @@ components:
               enum:
                 - 0
                 - 1
+              example: 0
             playbackPolicy:
               $ref: '#/components/schemas/playback-policy'
             source:
@@ -2288,6 +2407,7 @@ components:
           description: Video Metadata EIP-712 primaryType
           enum:
             - VideoAttestation
+          example: VideoAttestation
         domain:
           type: object
           description: Video Metadata EIP-712 domain
@@ -2300,10 +2420,12 @@ components:
               type: string
               enum:
                 - Verifiable Video
+              example: Verifiable Video
             version:
               type: string
               enum:
                 - '1'
+              example: '1'
         message:
           type: object
           additionalProperties: false
@@ -2316,6 +2438,7 @@ components:
           properties:
             video:
               type: string
+              example: 5b9e63bb-6fd0-4bea-aff2-cc5d4eb9cad0
             attestations:
               type: array
               items:
@@ -2327,24 +2450,31 @@ components:
                 properties:
                   role:
                     type: string
+                    example: creator
                   address:
                     type: string
+                    example: 0x1234567890abcdef
             signer:
               type: string
+              example: 0x1234567890abcdef
             timestamp:
               type: number
+              example: 1587667174725
         signature:
           type: string
           description: Video Metadata EIP-712 message signature
+          example: 0x1234567890abcdef
         createdAt:
           type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which the object was created
+          example: 1587667174725
         signatureType:
           type: string
           enum:
             - eip712
             - flow
+          example: eip712
         storage:
           additionalProperties: false
           properties:
@@ -2384,6 +2514,7 @@ components:
                   description: |
                     Will be added to the Authorization header as a
                     Bearer token.
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
             - type: object
               additionalProperties: false
               required:
@@ -2393,10 +2524,12 @@ components:
                 apiKey:
                   type: string
                   description: Will be added to the pinata_api_key header.
+                  example: '1234567890'
                 apiSecret:
                   type: string
                   writeOnly: true
                   description: Will be added to the pinata_secret_api_key header.
+                  example: '1234567890abcdef'
     storage-status:
       readOnly: true
       additionalProperties: false
@@ -2413,12 +2546,15 @@ components:
             - ready
             - failed
             - reverted
+          example: ready
         progress:
           type: number
           description: Current progress of the task updating the storage.
+          example: 0.5
         errorMessage:
           type: string
           description: Error message if the last storage changed failed.
+          example: 'Failed to update storage'
         tasks:
           type: object
           additionalProperties: false
@@ -2428,14 +2564,18 @@ components:
               description: |
                 ID of any currently running task that is exporting this
                 asset to IPFS.
+              example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
             last:
               type: string
               description: |
                 ID of the last task to run successfully, that created
                 the currently saved data.
+              example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
             failed:
               type: string
               description: ID of the last task to fail execution.
+              example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+
 paths:
   /stream:
     post:
