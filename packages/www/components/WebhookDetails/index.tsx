@@ -79,7 +79,15 @@ type SearchFilters = {
 
 const filters: FilterType[] = ["all", "succeeded", "failed"];
 
-const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
+const WebhookDetails = ({
+  id,
+  data,
+  logs,
+  handleLogFilters,
+  refetchLogs,
+  loadMore,
+  isLogsLoading,
+}) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -90,6 +98,13 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
 
   const handleFilterClick = (filter: FilterType) => {
     setActiveFilter(filter);
+    handleLogFilters(
+      filter === "all"
+        ? []
+        : filter === "succeeded"
+        ? [{ id: "success", value: "true" }]
+        : [{ id: "success", value: "false" }]
+    );
   };
 
   const revealSecretHandler = () => {
@@ -260,12 +275,13 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
 
       <Search handleSearchFilters={handleLogFilters} />
 
-      {logs.length > 0 ? (
+      {logs?.data?.length > 0 ? (
         <LogsContainer
           data={data}
-          logs={logs}
-          filter={activeFilter}
+          logs={logs.data}
           refetchLogs={refetchLogs}
+          loadMore={loadMore}
+          isLogsLoading={isLogsLoading}
         />
       ) : (
         <Flex
@@ -316,12 +332,6 @@ const WebhookDetails = ({ id, data, logs, handleLogFilters, refetchLogs }) => {
 };
 
 const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
-  const totalWebhookLogs = logs?.length;
-
-  const totalSucceededWebhookLogs = logs?.filter((log) => log.success).length;
-
-  const totalFailedWebhookLogs = logs?.filter((log) => !log.success).length;
-
   return (
     <Flex
       css={{
@@ -358,10 +368,10 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
               color: activeFilter === filter && "$blue11",
             }}>
             {filter === "all"
-              ? totalWebhookLogs
+              ? logs?.totalCount
               : filter === "succeeded"
-              ? totalSucceededWebhookLogs
-              : totalFailedWebhookLogs}
+              ? logs?.successCount
+              : logs?.failedCount}
           </Text>
         </Box>
       ))}

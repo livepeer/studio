@@ -6,15 +6,15 @@ import {
   Flex,
   Button,
 } from "@livepeer/design-system";
+import { useEffect, useRef } from "react";
 import moment from "moment";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { WebhookLogs } from "hooks/use-api/types";
 import JSONPretty from "react-json-pretty";
 import { useApi } from "hooks";
-import { useRouter } from "next/navigation";
 import { Webhook } from "@livepeer.studio/api";
-import { FilterType } from "./index";
+import Spinner from "components/Spinner";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -22,41 +22,32 @@ const Cell = styled(Text, {
   fontSize: "$3",
 });
 
+const customTheme = {
+  key: "color:#606060;line-height:1.8;font-size:14px;",
+  string: "color:#DABAAB;font-size:14px",
+  value: "color:#788570;font-size:14px",
+  boolean: "color:#788570;font-size:14px",
+};
+
 const LogsContainer = ({
   data,
   logs,
-  filter,
   refetchLogs,
+  loadMore,
+  isLogsLoading,
 }: {
   data: Webhook;
   logs: WebhookLogs[];
-  filter: FilterType;
   refetchLogs(): Promise<void>;
+  loadMore(): void;
+  isLogsLoading: boolean;
 }) => {
   const { resendWebhook } = useApi();
 
   const [selected, setSelected] = useState<WebhookLogs>(logs[0]);
   const [isResending, setIsResending] = useState(false);
 
-  const succeededLogs = logs?.filter((log) => log.success);
-
-  const failedLogs = logs?.filter((log) => !log.success);
-
-  const router = useRouter();
-
-  const renderedLogs =
-    filter === "all"
-      ? logs
-      : filter === "succeeded"
-      ? succeededLogs
-      : failedLogs;
-
-  const customTheme = {
-    key: "color:#606060;line-height:1.8;font-size:14px;",
-    string: "color:#DABAAB;font-size:14px",
-    value: "color:#788570;font-size:14px",
-    boolean: "color:#788570;font-size:14px",
-  };
+  const logsContainerRef = useRef(null);
 
   const onResend = async (log: WebhookLogs) => {
     setIsResending(true);
@@ -70,6 +61,26 @@ const LogsContainer = ({
       setIsResending(false);
     }
   };
+
+  const handleScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = logsContainerRef.current;
+    if (scrollTop + clientHeight >= scrollHeight) {
+      loadMore();
+    }
+  };
+
+  useEffect(() => {
+    const scrollContainer = logsContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [loadMore]);
 
   return (
     <Box
@@ -96,12 +107,13 @@ const LogsContainer = ({
             LOGS:
           </Text>
           <Box
+            ref={logsContainerRef}
             css={{
               overflowY: "auto",
               borderRight: "1px solid $colors$neutral6",
               height: "calc(100vh - 450px)",
             }}>
-            {renderedLogs.map((log: WebhookLogs, index) => (
+            {logs.map((log: WebhookLogs, index) => (
               <Box
                 onClick={() => setSelected(log)}
                 key={log.id}
@@ -140,6 +152,17 @@ const LogsContainer = ({
                 </Cell>
               </Box>
             ))}
+            {isLogsLoading && (
+              <Box
+                css={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 50,
+                }}>
+                <Spinner />
+              </Box>
+            )}
           </Box>
         </Box>
         <Box
