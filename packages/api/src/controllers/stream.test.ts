@@ -535,11 +535,11 @@ describe("controllers/stream", () => {
         const resLockPull = await client.post(`/stream/${stream.id}/lockPull`);
         expect(resLockPull.status).toBe(204);
 
-        // Check that the lockedAt is marked with the correct date
+        // Check that the pullLockedAt is marked with the correct date
         const res2 = await client.get(`/stream/${stream.id}`);
         expect(res2.status).toBe(200);
         const stream2 = await res2.json();
-        expect(stream2.pull.lockedAt).toBeGreaterThan(now);
+        expect(stream2.pullLockedAt).toBeGreaterThan(now);
       });
 
       it("should not lock pull for an active stream", async () => {

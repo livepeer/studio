@@ -684,6 +684,9 @@ components:
           properties:
             source:
               index: true
+        pullLockedAt:
+          type: number
+          example: 1587667174725
         playbackId:
           unique: true
         mistHost:
