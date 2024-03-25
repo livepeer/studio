@@ -562,13 +562,14 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(201);
         const stream = await res.json();
 
-        // Request pull lock
-        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`);
-        expect(resLockPull.status).toBe(204);
-
-        // Requesting pull lock should fail, because pull has already locked b y another node (so it should be replicated instead of being pulled)
-        const resLockPull2 = await client.post(`/stream/${stream.id}/lockPull`);
-        expect(resLockPull2.status).toBe(423);
+        // Request pull lock by many processes at the same time, only one should acquire a lock
+        const promises = [];
+        for (let i = 0; i < 10; i++) {
+          promises.push(client.post(`/stream/${stream.id}/lockPull`));
+        }
+        const resPulls = await Promise.all(promises);
+        expect(resPulls.filter((r) => r.status === 204).length).toBe(1);
+        expect(resPulls.filter((r) => r.status === 423).length).toBe(9);
       });
 
       it("should lock pull for already locked pull if lease has expired", async () => {
