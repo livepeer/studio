@@ -19,6 +19,7 @@ import * as taskEndpointsFunctions from "./endpoints/task";
 import * as userEndpointsFunctions from "./endpoints/user";
 import * as versionEndpointsFunctions from "./endpoints/version";
 import * as webhookEndpointsFunctions from "./endpoints/webhook";
+import * as projectEndpointsFunctions from "./endpoints/project";
 
 // Allow for manual overriding of the API server endopint
 export const getEndpoint = () => {
@@ -97,6 +98,7 @@ const makeContext = (
     ...userEndpointsFunctions,
     ...versionEndpointsFunctions,
     ...webhookEndpointsFunctions,
+    ...projectEndpointsFunctions,
   };
 
   accessControlEndpointsFunctions.setSharedScope(context, setState);
@@ -114,6 +116,7 @@ const makeContext = (
   userEndpointsFunctions.setSharedScope(context, setState);
   versionEndpointsFunctions.setSharedScope(context, setState);
   webhookEndpointsFunctions.setSharedScope(context, setState);
+  projectEndpointsFunctions.setSharedScope(context, setState);
 
   delete context.setSharedScope;
 

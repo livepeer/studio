@@ -30,6 +30,7 @@ import { useApi } from "../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
+import CreateProjectDialog from "components/Project/createProjectDialog";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -71,7 +72,15 @@ export type SidebarId =
   | "billing/plans";
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
-  const { user, logout } = useApi();
+  const { user, logout, createProject } = useApi();
+
+  const onCreateClick = async (projectName: string) => {
+    const project = await createProject({
+      name: projectName,
+    });
+
+    console.log(project);
+  };
 
   return (
     <Box
@@ -86,6 +95,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         justifyContent: "flex-end",
         bottom: 0,
       }}>
+      <CreateProjectDialog onCreate={onCreateClick} />
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
         <DropdownMenu>
           <Flex
