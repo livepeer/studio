@@ -104,6 +104,8 @@ const StreamsTable = ({
           },
         },
       ];
+
+      //@ts-ignore
       stateSetter.setFilters(currentFilters.concat(filter));
     }
   };
