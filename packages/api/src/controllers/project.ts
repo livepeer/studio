@@ -136,7 +136,7 @@ app.post("/", authorizer({}), async (req, res) => {
   }
 
   res.status(201);
-  res.json(id);
+  res.json(project);
 });
 
 export default app;
