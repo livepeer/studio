@@ -60,6 +60,9 @@ import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
 import { getClips } from "./clip";
 
+// 7 Days
+const DELETE_ASSET_DELAY = 7 * 24 * 60 * 60 * 1000;
+
 const app = Router();
 
 export function catalystPipelineStrategy(req: Request) {
@@ -629,8 +632,18 @@ const fieldsMap = {
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
-    toStringValues(req.query);
+  let {
+    limit,
+    cursor,
+    all,
+    allUsers,
+    order,
+    filters,
+    count,
+    cid,
+    deleting,
+    ...otherQs
+  } = toStringValues(req.query);
   const fieldFilters = _(otherQs)
     .pick("playbackId", "sourceUrl", "phase")
     .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
@@ -661,6 +674,16 @@ app.get("/", authorizer({}), async (req, res) => {
   query.push(
     sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
   );
+  if (req.user.admin && deleting) {
+    const deletionThreshold = new Date(
+      Date.now() - DELETE_ASSET_DELAY
+    ).toISOString();
+
+    query.push(sql`asset.data->'status'->>'phase' = 'deleting'`);
+    query.push(
+      sql`asset.data->>'deletedAt' IS NOT NULL AND asset.data->>'deletedAt' < ${deletionThreshold}`
+    );
+  }
 
   let output: WithID<Asset>[];
   let newCursor: string;
@@ -1100,7 +1123,60 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
+
+  if (asset.status.phase === "deleting" || asset.deleted) {
+    throw new BadRequestError(`asset is already deleted`);
+  }
+
   await req.taskScheduler.deleteAsset(asset);
+  res.status(204);
+  res.end();
+});
+
+app.post("/:id/restore", authorizer({}), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  }
+
+  if (!req.user.admin && req.user.id !== asset.userId) {
+    throw new ForbiddenError(`users may only restore their own assets`);
+  }
+
+  if (!asset.deleted) {
+    throw new BadRequestError(`asset is not deleted`);
+  }
+
+  if (asset.status?.phase !== "deleting") {
+    throw new BadRequestError(`asset is not in a restorable state`);
+  }
+
+  await req.taskScheduler.restoreAsset(asset);
+  res.status(204);
+  res.end();
+});
+
+app.patch("/:id/deleted", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  }
+
+  if (!(asset.status.phase === "deleting")) {
+    throw new BadRequestError(`asset is not in a deleting phase`);
+  }
+
+  await db.asset.update(asset.id, {
+    status: {
+      phase: "deleted",
+      updatedAt: Date.now(),
+    },
+  });
+
   res.status(204);
   res.end();
 });
