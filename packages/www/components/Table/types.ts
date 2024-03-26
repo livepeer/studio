@@ -25,4 +25,9 @@ export type RowsPageFromStateResult<RowType> = {
   rows: RowType[];
   nextCursor: any;
   count: any;
+
+  // Only used in the StreamsTable component
+  allStreamCount?: any;
+  activeStreamCount?: any;
+  unHealtyStreamCount?: any;
 };
