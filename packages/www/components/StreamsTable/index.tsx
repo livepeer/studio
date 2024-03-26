@@ -95,15 +95,15 @@ const StreamsTable = ({
         {
           id: type === "Active" ? "isActive" : "isHealthy",
           isOpen: true,
-          labelOn: type === "Active" ? "Active" : "Unhealthy",
-          labelOff: type === "Active" ? "Idle" : "Healthy",
+          label: type === "Active" ? "Active" : "Unhealthy",
           condition: {
             type: "boolean",
             value: type === "Active" ? true : false,
+            labelOn: type === "Active" ? "Active" : "Unhealthy",
+            labelOff: type === "Active" ? "Idle" : "Healthy",
           },
         },
       ];
-
       stateSetter.setFilters(currentFilters.concat(filter));
     }
   };
