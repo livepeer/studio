@@ -8,7 +8,7 @@ import {
   TextField,
   Select,
 } from "@livepeer/design-system";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 
@@ -31,13 +31,15 @@ const DateInput = styled("input", {
   p: "4px",
 });
 
-const StreamFilter = ({ items, onDone }) => {
+const StreamFilter = ({ onDone }) => {
   const [filters, setFilters] = useState<SearchFilters>({
     name: "",
     createdAt: "",
     lastSeen: "",
     isActive: "",
   });
+
+  const [outputFilters, setOutputFilters] = useState([]);
 
   const handleChange = (name: keyof typeof filters, value: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
@@ -69,8 +71,7 @@ const StreamFilter = ({ items, onDone }) => {
           condition = { type: "boolean", value: filterValue === "true" };
           baseStructure = {
             ...baseStructure,
-            labelOn: "Active",
-            labelOff: "Idle",
+            label: "Active",
           };
           break;
         default:
@@ -84,6 +85,7 @@ const StreamFilter = ({ items, onDone }) => {
       return acc;
     }, []);
 
+    setOutputFilters(outputFilters);
     onDone(outputFilters);
   };
 
@@ -142,58 +144,81 @@ const StreamFilter = ({ items, onDone }) => {
     },
   ];
 
+  const clearFilter = () => {
+    setOutputFilters([]);
+    onDone([]);
+  };
+
   return (
-    <Flex
-      css={{
-        my: "$4",
-      }}
-      gap={3}
-      direction={"row"}>
-      {searchFilters.map((filter, index) => (
-        <DropdownMenu key={index}>
-          <Flex
-            as={DropdownMenuTrigger}
-            align={"center"}
-            gap={1}
-            css={{
-              p: "$1",
-              px: "$2",
-              border: "1px dashed",
-              fontSize: "$2",
-              borderRadius: "20px",
-              backgroundColor: "transparent",
-              borderColor: "$neutral9",
-              color: "$neutral10",
-            }}>
-            <PlusCircledIcon />
-            {filter.name}
-          </Flex>
-          <DropdownMenuContent
-            placeholder={"more options"}
-            css={{
-              border: "1px solid $colors$neutral6",
-              p: "$2",
-              ml: "7rem",
-              width: "15rem",
-              mt: "$2",
-            }}>
-            {filter.component}
+    <Flex gap={3} direction={"row"}>
+      {searchFilters.map((filter, index) => {
+        const isActive = outputFilters?.find((f) => f.id === filter.id);
+        const value = isActive?.condition?.value;
+        return (
+          <DropdownMenu key={index}>
             <Flex
+              as={DropdownMenuTrigger}
+              align={"center"}
+              gap={1}
               css={{
-                jc: "flex-end",
+                p: "$1",
+                px: "$2",
+                border: "1px dashed",
+                fontSize: "$2",
+                borderRadius: "20px",
+                backgroundColor: "transparent",
+                borderColor: isActive ? "$primary8" : "$neutral9",
+                color: isActive ? "$primary9" : "$neutral9",
+              }}>
+              <PlusCircledIcon />
+              {filter.name} {isActive && " | " + value}
+            </Flex>
+            <DropdownMenuContent
+              placeholder={"more options"}
+              css={{
+                border: "1px solid $colors$neutral6",
+                p: "$2",
+                ml: "7rem",
+                width: "15rem",
                 mt: "$2",
               }}>
-              <Button
-                onClick={handleSearch}
+              {filter.component}
+              <Flex
                 css={{
-                  fontWeight: 500,
+                  jc: "flex-end",
+                  mt: "$2",
                 }}>
-                Search
-              </Button>
-            </Flex>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ))}
+                <Button
+                  onClick={handleSearch}
+                  css={{
+                    fontWeight: 500,
+                  }}>
+                  Search
+                </Button>
+              </Flex>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      })}
+
+      {outputFilters.length > 0 && (
+        <Button
+          onClick={clearFilter}
+          css={{
+            backgroundColor: "transparent",
+            fontWeight: 600,
+            color: "$neutral10",
+            p: "$3",
+            pl: "0",
+            borderRadius: "$1",
+            "&:hover": {
+              backgroundColor: "transparent",
+              color: "$neutral11",
+            },
+          }}>
+          Clear filters
+        </Button>
+      )}
     </Flex>
   );
 };

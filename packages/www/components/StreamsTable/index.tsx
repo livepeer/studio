@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useApi } from "hooks";
 import Table, {
   useTableState,
@@ -21,6 +21,11 @@ import {
 import { makeSelectAction, makeCreateAction } from "../Table/helpers";
 import TableHeader from "../Table/components/TableHeader";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import StreamFilter from "./StreamFilter";
+import { Flex } from "@livepeer/design-system";
+import TypeFilterCard from "components/TypeFilterCard";
+
+const filterCategory = ["All", "Active", "Unhealthy"];
 
 const StreamsTable = ({
   title = "Streams",
@@ -39,6 +44,7 @@ const StreamsTable = ({
   const { getStreams, createStream, deleteStream, deleteStreams } = useApi();
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
+  const [filter, setFilter] = useState("all");
   const { state, stateSetter } = useTableState<StreamsTableData>({
     pageSize,
     tableId,
@@ -66,6 +72,42 @@ const StreamsTable = ({
     [createStream, state.invalidate]
   );
 
+  const onSetFilters = (e) => {
+    stateSetter.setCursor("");
+    stateSetter.setPrevCursors([]);
+    stateSetter.setFilters(e);
+  };
+
+  const handleFilterType = (type: string) => {
+    stateSetter.setCursor("");
+    stateSetter.setPrevCursors([]);
+    const currentFilters = state.filters;
+
+    setFilter(type);
+    if (type === "All") {
+      const newFilters = currentFilters.filter(
+        (filter) => filter.id !== "isActive" && filter.id !== "isHealthy"
+      );
+
+      stateSetter.setFilters(newFilters);
+    } else {
+      const filter = [
+        {
+          id: type === "Active" ? "isActive" : "isHealthy",
+          isOpen: true,
+          labelOn: type === "Active" ? "Active" : "Unhealthy",
+          labelOff: type === "Active" ? "Idle" : "Healthy",
+          condition: {
+            type: "boolean",
+            value: type === "Active" ? true : false,
+          },
+        },
+      ];
+
+      stateSetter.setFilters(currentFilters.concat(filter));
+    }
+  };
+
   return (
     <>
       <Table
@@ -84,9 +126,30 @@ const StreamsTable = ({
           createDialogState.onOn
         )}
         header={
-          <TableHeader title={title}>
-            <ActiveStreamsBadge />
-          </TableHeader>
+          <>
+            <TableHeader title={title}>
+              <ActiveStreamsBadge />
+            </TableHeader>
+            <>
+              <Flex
+                gap={4}
+                css={{
+                  my: "$4",
+                }}>
+                {filterCategory.map((category, index) => (
+                  <TypeFilterCard
+                    name={category}
+                    value={state?.dataCount[index] || "0"}
+                    isActive={filter === category}
+                    handleClick={() => handleFilterType(category)}
+                  />
+                ))}
+              </Flex>
+              {!viewAll && filterItems && (
+                <StreamFilter onDone={(e) => onSetFilters(e)} />
+              )}
+            </>
+          </>
         }
       />
 
