@@ -674,6 +674,16 @@ app.get("/", authorizer({}), async (req, res) => {
   query.push(
     sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
   );
+  if (req.user.admin && deleting) {
+    const deletionThreshold = new Date(
+      Date.now() - DELETE_ASSET_DELAY
+    ).toISOString();
+
+    query.push(sql`asset.data->'status'->>'phase' = 'deleting'`);
+    query.push(
+      sql`asset.data->>'deletedAt' IS NOT NULL AND asset.data->>'deletedAt' < ${deletionThreshold}`
+    );
+  }
 
   let output: WithID<Asset>[];
   let newCursor: string;
@@ -724,14 +734,6 @@ app.get("/", authorizer({}), async (req, res) => {
   res.status(200);
   if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
-  }
-
-  if (req.user.admin && deleting) {
-    output = output.filter((asset) => asset.status.phase == "deleting");
-    output = output.filter(
-      (asset) =>
-        asset.deletedAt && Date.now() > asset.deletedAt + DELETE_ASSET_DELAY
-    );
   }
 
   return res.json(output);
@@ -1123,7 +1125,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   }
 
   if (asset.status.phase === "deleting" || asset.deleted) {
-    throw new BadRequestError(`Asset is already deleted`);
+    throw new BadRequestError(`asset is already deleted`);
   }
 
   await req.taskScheduler.deleteAsset(asset);
@@ -1131,12 +1133,12 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.end();
 });
 
-app.put("/:id/restore", authorizer({}), async (req, res) => {
+app.post("/:id/restore", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const asset = await db.asset.get(id);
 
   if (!asset) {
-    throw new NotFoundError(`Asset not found`);
+    throw new NotFoundError(`asset not found`);
   }
 
   if (!req.user.admin && req.user.id !== asset.userId) {
@@ -1144,11 +1146,11 @@ app.put("/:id/restore", authorizer({}), async (req, res) => {
   }
 
   if (!asset.deleted) {
-    throw new BadRequestError(`Asset is not deleted`);
+    throw new BadRequestError(`asset is not deleted`);
   }
 
   if (asset.status?.phase !== "deleting") {
-    throw new BadRequestError(`Asset is not in a restorable state`);
+    throw new BadRequestError(`asset is not in a restorable state`);
   }
 
   await req.taskScheduler.restoreAsset(asset);
@@ -1161,11 +1163,11 @@ app.patch("/:id/deleted", authorizer({ anyAdmin: true }), async (req, res) => {
   const asset = await db.asset.get(id);
 
   if (!asset) {
-    throw new NotFoundError(`Asset not found`);
+    throw new NotFoundError(`asset not found`);
   }
 
   if (!(asset.status.phase === "deleting")) {
-    throw new BadRequestError(`Asset is not in a deleting phase`);
+    throw new BadRequestError(`asset is not in a deleting phase`);
   }
 
   await db.asset.update(asset.id, {

@@ -544,7 +544,7 @@ export class TaskScheduler {
       // Prevent bump of updatedAt if phase isn't getting updated
       let updatedAt = asset.status?.updatedAt;
 
-      if (phase == "ready") {
+      if (phase === "ready") {
         // If the asset is ready, we need to schedule deletion
         phase = "deleting";
         updatedAt = Date.now();
