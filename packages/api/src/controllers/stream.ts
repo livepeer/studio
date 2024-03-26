@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 import _ from "lodash";
 
 import logger from "../logger";
-import { authorizer } from "../middleware";
+import { authorizer, hasAccessToResource } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
 import { CliArgs } from "../parse-cli";
@@ -545,15 +545,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    (stream.deleted && !req.isUIAdmin) ||
-    (stream.userId !== req.user.id && !req.isUIAdmin) ||
-    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   let filterOut;
   const query = [];
@@ -710,17 +702,8 @@ app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
   const { forceUrl } = req.query;
   let stream = await db.stream.get(req.params.id);
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id ||
-      (stream.projectId ?? "") !== (req.project?.id ?? "") ||
-      stream.deleted) &&
-      !req.user.admin)
-  ) {
-    // do not reveal that stream exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
+
   activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
@@ -1710,10 +1693,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess =
-      stream?.userId === req.user.id ||
-      (stream?.projectId ?? "" !== req.project?.id ?? "") ||
-      req.isUIAdmin;
+    const hasAccess = hasAccessToResource(req, stream, true);
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
