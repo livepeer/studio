@@ -1086,41 +1086,6 @@ app.put(
   }
 );
 
-app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
-  const { id } = req.params;
-  let { leaseTimeout } = req.body;
-  if (!leaseTimeout) {
-    // Sets the default lock lease to 60s
-    leaseTimeout = 60 * 1000;
-  }
-  logger.info(`got /lockPull for stream=${id}`);
-
-  const stream = await db.stream.get(id, { useReplica: false });
-  if (!stream || (stream.deleted && !req.user.admin)) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-  if (stream.isActive) {
-    return res.status(423).end();
-  }
-
-  const updateRes = await db.stream.update(
-    [
-      sql`id = ${stream.id}`,
-      sql`COALESCE((data->>'pullLockedAt')::bigint,0) < ${
-        Date.now() - leaseTimeout
-      }`,
-    ],
-    { pullLockedAt: Date.now() },
-    { throwIfEmpty: false }
-  );
-
-  if (updateRes.rowCount > 0) {
-    res.status(204).end();
-  }
-  res.status(423).end();
-});
-
 function terminateDelay(stream: DBStream) {
   if (!stream.lastTerminatedAt) {
     return 0;
