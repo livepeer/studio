@@ -338,12 +338,13 @@ export default class WebhookCannon {
     }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
 
+    let ips: string[];
     let isLocal = false;
     // These conditions are mainly useful for local testing
     if (!user.admin && verifyUrl) {
       try {
         const urlObj = parseUrl(webhook.url);
-        const ips = await this.resolver.resolve4(urlObj.hostname);
+        ips = await this.resolver.resolve4(urlObj.hostname);
         isLocal = ips?.length && ips.every(isLocalIP);
       } catch (e) {
         console.error("error checking if is local IP: ", e);
