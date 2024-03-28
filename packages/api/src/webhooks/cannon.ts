@@ -208,8 +208,7 @@ export default class WebhookCannon {
       return;
     }
     try {
-      // TODO Activate URL Verification
-      await this._fireHook(trigger, false);
+      await this._fireHook(trigger);
     } catch (err) {
       console.log("_fireHook error", err);
       await this.retry(trigger, null, err);
