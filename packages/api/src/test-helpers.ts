@@ -199,6 +199,32 @@ export class TestClient {
   }
 }
 
+export async function createProject(client: TestClient) {
+  let res = await client.post(`/project`);
+  const project = await res.json();
+  return project;
+}
+
+export async function createApiToken({
+  client,
+  projectId,
+  tokenName = "test",
+  jwtAuthToken,
+}: {
+  client: TestClient;
+  projectId: string;
+  tokenName?: string;
+  jwtAuthToken: string;
+}): Promise<string> {
+  client.jwtAuth = jwtAuthToken;
+  let res = await client.post(`/api-token/?projectId=${projectId}`, {
+    name: tokenName,
+  });
+  client.jwtAuth = null;
+  const apiKeyObj = await res.json();
+  return apiKeyObj;
+}
+
 export async function createUser(
   server: TestServer,
   client: TestClient,
