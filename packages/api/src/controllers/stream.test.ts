@@ -565,7 +565,11 @@ describe("controllers/stream", () => {
         // Request pull lock by many processes at the same time, only one should acquire a lock
         const promises = [];
         for (let i = 0; i < 10; i++) {
-          promises.push(client.post(`/stream/${stream.id}/lockPull`));
+          promises.push(
+            client.post(`/stream/${stream.id}/lockPull`, {
+              host: `host-${i}`,
+            })
+          );
         }
         const resPulls = await Promise.all(promises);
         expect(resPulls.filter((r) => r.status === 204).length).toBe(1);
@@ -591,6 +595,28 @@ describe("controllers/stream", () => {
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
           { leaseTimeout: 1 }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
+      it("should lock pull for already locked pull if host is the same", async () => {
+        const host = "some-host";
+
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          host,
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { host }
         );
         expect(resLockPull2.status).toBe(204);
       });

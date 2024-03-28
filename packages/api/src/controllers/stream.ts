@@ -1088,10 +1088,13 @@ app.put(
 
 app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
-  let { leaseTimeout } = req.body;
+  let { leaseTimeout, host } = req.body;
   if (!leaseTimeout) {
     // Sets the default lock lease to 60s
     leaseTimeout = 60 * 1000;
+  }
+  if (!host) {
+    host = "unknown";
   }
   logger.info(`got /lockPull for stream=${id}`);
 
@@ -1107,11 +1110,11 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const updateRes = await db.stream.update(
     [
       sql`id = ${stream.id}`,
-      sql`COALESCE((data->>'pullLockedAt')::bigint,0) < ${
+      sql`data->>'pullLockedBy' = ${host} OR COALESCE((data->>'pullLockedAt')::bigint,0) < ${
         Date.now() - leaseTimeout
       }`,
     ],
-    { pullLockedAt: Date.now() },
+    { pullLockedAt: Date.now(), pullLockedBy: host },
     { throwIfEmpty: false }
   );
 

@@ -705,6 +705,8 @@ components:
         pullLockedAt:
           type: number
           example: 1587667174725
+        pullLockedBy:
+          type: string
         playbackId:
           unique: true
         mistHost:
