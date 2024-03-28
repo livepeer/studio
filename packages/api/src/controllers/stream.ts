@@ -1103,16 +1103,13 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  if (stream.isActive) {
-    return res.status(423).end();
-  }
 
   const updateRes = await db.stream.update(
     [
       sql`id = ${stream.id}`,
-      sql`data->>'pullLockedBy' = ${host} OR COALESCE((data->>'pullLockedAt')::bigint,0) < ${
+      sql`data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${
         Date.now() - leaseTimeout
-      }`,
+      } AND data->>'isActive::bool' = FALSE)`,
     ],
     { pullLockedAt: Date.now(), pullLockedBy: host },
     { throwIfEmpty: false }
