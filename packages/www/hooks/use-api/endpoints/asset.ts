@@ -5,6 +5,7 @@ import { HttpError } from "../../../lib/utils";
 import { Upload } from "tus-js-client";
 import qs from "qs";
 import { getCursor } from "../helpers";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -41,13 +42,16 @@ export const uploadAssets = async (
   const requestAssetUpload = async (
     params
   ): Promise<{ tusEndpoint: string }> => {
-    const [res, assetUpload] = await context.fetch(`/asset/request-upload`, {
-      method: "POST",
-      body: JSON.stringify(params),
-      headers: {
-        "content-type": "application/json",
-      },
-    });
+    const [res, assetUpload] = await context.fetch(
+      `/asset/request-upload?projectId=${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    );
 
     if (!res.ok) {
       throw new Error(assetUpload.errors.join(", "));
@@ -157,6 +161,7 @@ export const getAssets = async (
       cursor: opts?.cursor,
       count: opts?.count,
       details: 1,
+      projectId: projectId,
     })}`
   );
   if (res.status !== 200) {
