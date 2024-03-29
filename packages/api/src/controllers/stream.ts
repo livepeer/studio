@@ -1107,9 +1107,9 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const updateRes = await db.stream.update(
     [
       sql`id = ${stream.id}`,
-      sql`data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${
+      sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${
         Date.now() - leaseTimeout
-      } AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE)`,
+      } AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
     ],
     { pullLockedAt: Date.now(), pullLockedBy: host },
     { throwIfEmpty: false }
