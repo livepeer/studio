@@ -1,5 +1,8 @@
 import { styled, Box } from "@livepeer/design-system";
+import { useApi } from "hooks";
+import useProject from "hooks/use-project";
 import { Children, isValidElement } from "react";
+import { useQuery } from "react-query";
 
 const BreadcrumbsOl = styled("ol", {
   display: "flex",
@@ -38,6 +41,10 @@ function insertSeparators(items) {
 }
 
 const Breadcrumbs = ({ children }) => {
+  const { currentProject } = useProject();
+  const { getProjects } = useApi();
+  const { data } = useQuery("projects", getProjects);
+
   const allItems = Children.toArray(children)
     .filter((child) => {
       return isValidElement(child);
@@ -54,6 +61,22 @@ const Breadcrumbs = ({ children }) => {
         <Box css={{ display: "inline-flex" }}>{child}</Box>
       </Box>
     ));
+
+  if (currentProject) {
+    const project = data?.find((project) => project.id === currentProject);
+    allItems.unshift(
+      <Box
+        as="li"
+        css={{
+          m: 0,
+          fontSize: "$3",
+          lineHeight: 1.5,
+        }}
+        key="project">
+        <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
+      </Box>
+    );
+  }
   return (
     <Box>
       <BreadcrumbsOl>{insertSeparators(allItems)}</BreadcrumbsOl>
