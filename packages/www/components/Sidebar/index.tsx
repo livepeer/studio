@@ -187,7 +187,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             css={{
               color: "$neutral11",
             }}>
-            {activeProject?.name}
+            {activeProject?.name || "Untitled"}
           </Text>
           <TopBottomChevron />
         </Flex>
