@@ -23,7 +23,7 @@ components:
   schemas:
     ffmpeg-profile:
       type: object
-      description: LMPS ffmpeg profile
+      description: Transcode profile
       additionalProperties: false
       required:
         - width
@@ -71,9 +71,6 @@ components:
           type: string
           enum:
             - H.264
-            - HEVC
-            - VP8
-            - VP9
     transcode-profile:
       type: object
       description: Transcode API profile
