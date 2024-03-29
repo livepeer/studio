@@ -621,6 +621,29 @@ describe("controllers/stream", () => {
         expect(resLockPull2.status).toBe(204);
       });
 
+      it("should release lock when stream is terminated", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          host: "host-1",
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Terminate stream
+        await client.delete(`/stream/${stream.id}/terminate`);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { host: "host-2" }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
       it("should update a stream if it has the same pull source", async () => {
         let res = await client.put("/stream/pull", postMockPullStream);
         expect(res.status).toBe(201);
