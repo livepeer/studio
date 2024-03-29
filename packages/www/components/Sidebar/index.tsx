@@ -11,11 +11,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
   DropdownMenuItem,
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
 } from "@livepeer/design-system";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, PlusIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import {
@@ -25,12 +22,17 @@ import {
   BillingIcon,
   UsageIcon,
   AssetsIcon,
+  TopBottomChevron,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import CreateProjectDialog from "components/Project/createProjectDialog";
+import { useQueries, useQuery } from "react-query";
+import { useState } from "react";
+import { FiCheck } from "react-icons/fi";
+import useProject from "hooks/use-project";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -72,7 +74,9 @@ export type SidebarId =
   | "billing/plans";
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
-  const { user, logout, createProject } = useApi();
+  const { user, logout, createProject, getProjects } = useApi();
+  const { setCurrentProject, currentProject } = useProject();
+  const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
 
   const onCreateClick = async (projectName: string) => {
     const project = await createProject({
@@ -81,6 +85,10 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
     console.log(project);
   };
+
+  const { data } = useQuery("projects", getProjects);
+
+  const activeProject = data?.find((project) => project.id === currentProject);
 
   return (
     <Box
@@ -95,7 +103,12 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         justifyContent: "flex-end",
         bottom: 0,
       }}>
-      <CreateProjectDialog onCreate={onCreateClick} />
+      <CreateProjectDialog
+        onCreate={onCreateClick}
+        onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
+        isOpen={showCreateProjectAlert}
+      />
+
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
         <DropdownMenu>
           <Flex
@@ -149,6 +162,103 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         </DropdownMenu>
         <ThemeSwitch />
       </Flex>
+
+      <DropdownMenu>
+        <Flex
+          align={"center"}
+          as={DropdownMenuTrigger}
+          css={{
+            p: "$2",
+            gap: "$3",
+            mb: "$2",
+            ml: "$3",
+            border: 0,
+            backgroundColor: "transparent",
+            "&:focus": {
+              outline: "none",
+            },
+            "&:hover": {
+              backgroundColor: "$neutral4",
+              borderRadius: "$3",
+              cursor: "pointer",
+            },
+          }}>
+          <Text
+            css={{
+              color: "$neutral11",
+            }}>
+            {activeProject?.name}
+          </Text>
+          <TopBottomChevron />
+        </Flex>
+        <DropdownMenuContent
+          placeholder={"test"}
+          css={{
+            border: "1px solid $colors$neutral6",
+            p: "$3",
+            width: "14rem",
+            ml: "$5",
+            mt: "$1",
+          }}>
+          <Text variant={"neutral"} css={{ mb: "$3" }}>
+            Projects
+          </Text>
+          <Box
+            css={{
+              borderBottom: "1px solid",
+              borderColor: "$neutral6",
+            }}>
+            {data?.map((project) => (
+              <Flex
+                onClick={() => setCurrentProject(project)}
+                key={project.id}
+                css={{
+                  p: "$2",
+                  "&:hover": {
+                    backgroundColor: "$neutral4",
+                    borderRadius: "$3",
+                  },
+                }}
+                align={"center"}
+                justify={"between"}>
+                <Text>{project.name || "Untitled"}</Text>
+                {currentProject === project.id && <FiCheck />}
+              </Flex>
+            ))}
+          </Box>
+          <Box
+            css={{
+              py: "$3",
+              pb: 0,
+              fontSize: 14,
+              color: "$primary11",
+              a: {
+                textDecoration: "none",
+                color: "$neutral12",
+              },
+            }}>
+            <Flex
+              direction={"column"}
+              css={{
+                gap: "$3",
+                width: "100%",
+              }}>
+              <Flex
+                onClick={() => setShowCreateProjectAlert(true)}
+                align={"center"}
+                css={{
+                  color: "$neutral12",
+                  gap: "$2",
+                  cursor: "pointer",
+                }}>
+                <PlusIcon />
+                New project
+              </Flex>
+            </Flex>
+          </Box>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <Flex
         css={{ px: "$4", height: "calc(100vh - 100px)" }}
         direction="column"

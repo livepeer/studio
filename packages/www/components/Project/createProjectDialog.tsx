@@ -27,7 +27,7 @@ const CreateProjectDialog = ({
   const [projectName, setProjectName] = useState("");
 
   return (
-    <AlertDialog open={true} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Create Project</Heading>
