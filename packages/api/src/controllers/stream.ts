@@ -1979,7 +1979,11 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     throw new TooManyRequestsError(`too many terminate requests`);
   }
 
-  await db.stream.update(stream.id, { lastTerminatedAt: Date.now() });
+  await db.stream.update(stream.id, {
+    lastTerminatedAt: Date.now(),
+    pullLockedAt: 0,
+    pullLockedBy: "",
+  });
   // we don't want to update the stream object on the `/terminate` API, so we
   // just throw a single stop call
   await triggerCatalystStreamStopSessions(req, stream.playbackId);
