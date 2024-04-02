@@ -340,7 +340,10 @@ export default class WebhookCannon {
     if (!user.admin && !this.skipUrlVerification) {
       try {
         const urlObj = parseUrl(webhook.url);
-        ips = await this.resolver.resolve4(urlObj.hostname);
+        ips = await Promise.all([
+          this.resolver.resolve4(urlObj.hostname),
+          this.resolver.resolve6(urlObj.hostname),
+        ]).then((ipsArrs) => ipsArrs.flat());
         isLocal = ips?.length && ips.every(isLocalIP);
       } catch (e) {
         console.error("error checking if is local IP: ", e);
