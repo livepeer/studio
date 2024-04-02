@@ -344,7 +344,7 @@ export default class WebhookCannon {
           this.resolver.resolve4(urlObj.hostname),
           this.resolver.resolve6(urlObj.hostname),
         ]).then((ipsArrs) => ipsArrs.flat());
-        isLocal = ips?.length && ips.every(isLocalIP);
+        isLocal = ips.some(isLocalIP);
       } catch (e) {
         console.error("error checking if is local IP: ", e);
         throw e;
