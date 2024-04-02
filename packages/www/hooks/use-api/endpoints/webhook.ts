@@ -3,6 +3,7 @@ import { ApiState, WebhookLogs } from "../types";
 import { SetStateAction } from "react";
 import { Webhook } from "@livepeer.studio/api";
 import { getCursor } from "../helpers";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -34,6 +35,7 @@ export const getWebhooks = async (
       cursor,
       filters: f,
       count,
+      projectId,
     })}`
   );
   const nextCursor = getCursor(res.headers.get("link"));
@@ -52,13 +54,16 @@ export const getWebhook = async (webhookId): Promise<Webhook> => {
 };
 
 export const createWebhook = async (params): Promise<Webhook> => {
-  const [res, webhook] = await context.fetch(`/webhook`, {
-    method: "POST",
-    body: JSON.stringify(params),
-    headers: {
-      "content-type": "application/json",
-    },
-  });
+  const [res, webhook] = await context.fetch(
+    `/webhook?projectId=${projectId}`,
+    {
+      method: "POST",
+      body: JSON.stringify(params),
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+  );
 
   if (res.status !== 201) {
     throw new Error(webhook.errors.join(", "));

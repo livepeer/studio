@@ -161,7 +161,7 @@ export const getAssets = async (
       cursor: opts?.cursor,
       count: opts?.count,
       details: 1,
-      projectId: projectId,
+      projectId,
     })}`
   );
   if (res.status !== 200) {

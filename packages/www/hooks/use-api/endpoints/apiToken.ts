@@ -36,7 +36,7 @@ export const getApiTokens = async (
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
-      projectId: projectId,
+      projectId,
     })}`
   );
   const nextCursor = getCursor(res.headers.get("link"));

@@ -8,6 +8,7 @@ import { HttpError } from "../../../lib/utils";
 import { ApiState, StreamInfo } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -59,6 +60,7 @@ export const getStreams = async (
       cursor: opts?.cursor,
       count: opts?.count,
       streamsonly: 1,
+      projectId,
     })}`
   );
   if (res.status !== 200) {
@@ -123,7 +125,7 @@ export const generateJwt = async (playbackId: string): Promise<string> => {
 };
 
 export const createStream = async (params): Promise<Stream> => {
-  const [res, stream] = await context.fetch(`/stream`, {
+  const [res, stream] = await context.fetch(`/stream?projectId=${projectId}`, {
     method: "POST",
     body: JSON.stringify(params),
     headers: {
