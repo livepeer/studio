@@ -163,10 +163,16 @@ export class RabbitQueue implements Queue {
         console.log("AMQP Connected!");
         resolveOnce();
       });
+      this.connection.on("connectFailed", (err: Error) => {
+        console.log("AMQP Connect Failed.", err);
+        resolveOnce(
+          new Error(`Error connecting to RabbitMQ. ${err.name}: ${err.message}`)
+        );
+      });
       this.connection.on("disconnect", ({ err }: { err: Error }) => {
         console.log("AMQP Disconnected.", err);
         resolveOnce(
-          new Error(`Error connecting to RabbitMQ. ${err.name}: ${err.message}`)
+          new Error(`RabbitMQ disconnected. ${err.name}: ${err.message}`)
         );
       });
     });
