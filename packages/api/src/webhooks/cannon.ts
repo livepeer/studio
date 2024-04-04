@@ -338,7 +338,7 @@ export default class WebhookCannon {
       user.admin
     ).catch((e) => {
       console.error("error checking if is local IP: ", e);
-      throw e;
+      return { ips: [], isLocal: false };
     });
 
     if (isLocal) {
