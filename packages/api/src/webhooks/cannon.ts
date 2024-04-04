@@ -42,7 +42,7 @@ function isRuntimeError(err: any): boolean {
 
 export default class WebhookCannon {
   running: boolean;
-  verifyUrls: boolean;
+  skipUrlVerification: boolean;
   frontendDomain: string;
   sendgridTemplateId: string;
   sendgridApiKey: string;
@@ -51,7 +51,7 @@ export default class WebhookCannon {
   secondaryVodObjectStoreId: string;
   recordCatalystObjectStoreId: string;
   secondaryRecordObjectStoreId: string;
-  resolver: any;
+  resolver: dns.Resolver;
   queue: Queue;
   constructor({
     frontendDomain,
@@ -62,11 +62,11 @@ export default class WebhookCannon {
     secondaryVodObjectStoreId,
     recordCatalystObjectStoreId,
     secondaryRecordObjectStoreId,
-    verifyUrls,
+    skipUrlVerification,
     queue,
   }) {
     this.running = true;
-    this.verifyUrls = verifyUrls;
+    this.skipUrlVerification = skipUrlVerification;
     this.frontendDomain = frontendDomain;
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
@@ -208,8 +208,7 @@ export default class WebhookCannon {
       return;
     }
     try {
-      // TODO Activate URL Verification
-      await this._fireHook(trigger, false);
+      await this._fireHook(trigger);
     } catch (err) {
       console.log("_fireHook error", err);
       await this.retry(trigger, null, err);
@@ -221,10 +220,6 @@ export default class WebhookCannon {
   stop() {
     // this.db.queue.unsetMsgHandler();
     this.running = false;
-  }
-
-  disableUrlVerify() {
-    this.verifyUrls = false;
   }
 
   public calcBackoff = (lastInterval?: number): number => {
@@ -328,7 +323,7 @@ export default class WebhookCannon {
     );
   }
 
-  async _fireHook(trigger: messages.WebhookTrigger, verifyUrl = true) {
+  async _fireHook(trigger: messages.WebhookTrigger) {
     const { event, webhook, stream, user } = trigger;
     if (!event || !webhook || !user) {
       console.error(
@@ -338,34 +333,24 @@ export default class WebhookCannon {
       return;
     }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
-    let ips, urlObj, isLocal;
-    if (verifyUrl) {
+
+    let ips: string[];
+    let isLocal = false;
+    // These conditions are mainly useful for local testing
+    if (!user.admin && !this.skipUrlVerification) {
       try {
-        urlObj = parseUrl(webhook.url);
-        if (urlObj.host) {
-          ips = await this.resolver.resolve4(urlObj.hostname);
-        }
+        const urlObj = parseUrl(webhook.url);
+        ips = await Promise.all([
+          this.resolver.resolve4(urlObj.hostname),
+          this.resolver.resolve6(urlObj.hostname),
+        ]).then((ipsArrs) => ipsArrs.flat());
+        isLocal = ips.some(isLocalIP);
       } catch (e) {
-        console.error("error: ", e);
+        console.error("error checking if is local IP: ", e);
         throw e;
       }
     }
 
-    // This is mainly useful for local testing
-    if (user.admin || verifyUrl === false) {
-      isLocal = false;
-    } else {
-      try {
-        if (ips && ips.length) {
-          isLocal = isLocalIP(ips[0]);
-        } else {
-          isLocal = true;
-        }
-      } catch (e) {
-        console.error("isLocal Error", isLocal, e);
-        throw e;
-      }
-    }
     if (isLocal) {
       // don't fire this webhook.
       console.log(
