@@ -3,6 +3,7 @@ import { Stream } from "@livepeer.studio/api";
 import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
 import { isStaging } from "lib/utils";
+import June, { events } from "lib/June";
 
 export type StreamSetupBoxProps = {
   activeTab: "Browser" | "Streaming Software";
@@ -78,7 +79,10 @@ const StreamSetupBox = ({
               ? "Stream key"
               : "Embeddable broadcast"}
           </Box>
-          <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
+          <Text
+            variant="neutral"
+            css={{ fontSize: "$2", mt: "$2" }}
+            onClick={() => June.track(events.stream.keyCopy)}>
             <ClipButton
               value={
                 activeTab === "Streaming Software"

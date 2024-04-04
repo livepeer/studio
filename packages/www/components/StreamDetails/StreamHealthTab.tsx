@@ -6,6 +6,7 @@ import Logger from "components/Logger";
 import Chart from "components/Chart";
 import HealthChecksTable from "components/StreamDetails/HealthChecksTable";
 import { Text, Box, Heading } from "@livepeer/design-system";
+import June, { events } from "lib/June";
 
 const ingestInterval = 10 * 1000;
 const maxItems = 6;
@@ -18,6 +19,8 @@ interface ChartType {
 interface MultistreamChartType {
   [kbps: string]: number;
 }
+
+June.track(events.stream.health);
 
 const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
   const router = useRouter();

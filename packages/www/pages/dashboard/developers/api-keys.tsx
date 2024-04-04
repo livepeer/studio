@@ -3,12 +3,6 @@ import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import ApiKeysTable from "components/ApiKeys";
 import { DashboardAPIKeys as Content } from "content";
-import Ripe, { categories, pages } from "lib/ripe";
-
-Ripe.trackPage({
-  category: categories.DASHBOARD,
-  name: pages.API_KEY,
-});
 
 const ApiKeys = () => {
   useLoggedIn();

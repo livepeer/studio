@@ -11,6 +11,8 @@ import {
 import { CodeIcon, Link1Icon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { isStaging } from "lib/utils";
+import { events } from "lib/June";
+import June from "lib/June";
 
 const buttonLinkCss = {
   display: "flex",

@@ -1,6 +1,7 @@
 import useApi from "./use-api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import June from "lib/June";
 
 /**
  * Verifies that the user is logged in. Redirects to / if not. Pass
@@ -29,6 +30,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
         router.replace("/verify");
       } else {
         router.replace(next ? next.toString() : "/dashboard");
+        June.identifyUser(user.email);
       }
     }
   }, [user, token, next]);

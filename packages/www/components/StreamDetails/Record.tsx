@@ -7,6 +7,7 @@ import {
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "../../hooks";
 import ErrorDialog from "../ErrorDialog";
+import June, { events } from "lib/June";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
   const { patchStream } = useApi();
@@ -14,6 +15,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
   const errorRecordDialogState = useToggleState();
 
   const onCheckedChange = async () => {
+    June.track(events.stream.recordingToggle);
     if (stream.isActive) {
       errorRecordDialogState.onOn();
     } else if (!stream.record) {

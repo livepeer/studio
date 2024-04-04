@@ -19,6 +19,7 @@ import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
+import June, { events } from "lib/June";
 
 export interface OverUsageBill {
   transcodingBill: OverUsageItem;
@@ -348,7 +349,11 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Link href="/dashboard/usage" passHref legacyBehavior>
+          <Link
+            href="/dashboard/usage"
+            passHref
+            legacyBehavior
+            onClick={() => June.track(events.billing.usageDetails)}>
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}>

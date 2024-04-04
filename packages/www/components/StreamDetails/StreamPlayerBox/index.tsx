@@ -16,6 +16,7 @@ import { FaKey, FaVideo } from "react-icons/fa";
 import { FiVideo } from "react-icons/fi";
 import StreamSetupBox from "../StreamSetupBox";
 import ActiveStream from "./ActiveStream";
+import June, { events } from "lib/June";
 
 export type StreamPlayerBoxProps = {
   stream: Stream;
@@ -122,7 +123,10 @@ const StreamPlayerBox = ({
                 Share
               </Button>
             }
-            onEmbedVideoClick={onEmbedVideoClick}
+            onEmbedVideoClick={() => {
+              June.track(events.stream.embed);
+              return onEmbedVideoClick;
+            }}
           />
           <Tooltip
             content={
@@ -136,7 +140,12 @@ const StreamPlayerBox = ({
                 flex: 2,
               }}
               disabled={isStreamActiveFromExternal}
-              onClick={() => setIsBroadcastLive((prev) => !prev)}>
+              onClick={() =>
+                setIsBroadcastLive((prev) => {
+                  prev && June.track(events.stream.goLive);
+                  return !prev;
+                })
+              }>
               <Box
                 as={FiVideo}
                 css={{

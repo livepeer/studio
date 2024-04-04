@@ -20,6 +20,7 @@ import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../public/img/icons/checked.svg";
 import { useEffect, useState, useRef } from "react";
 import { useApi, useHubspotForm } from "hooks";
+import June, { events } from "lib/June";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -105,7 +106,11 @@ const Header = ({ breadcrumbs = [] }) => {
               appearance: "none",
               border: "none",
             }}>
-            <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
+            <Link
+              href="https://docs.livepeer.studio"
+              passHref
+              legacyBehavior
+              onClick={() => June.track(events.all.documentation)}>
               <Button
                 ghost
                 as={A}
@@ -131,6 +136,7 @@ const Header = ({ breadcrumbs = [] }) => {
             <Button
               ghost
               as={DropdownMenuTrigger}
+              onClick={() => June.track(events.all.documentation)}
               size={2}
               css={{
                 mr: "$2",

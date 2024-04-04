@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
+import June, { events } from "lib/June";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
@@ -296,7 +297,11 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/dashboard/billing" passHref legacyBehavior>
+        <Link
+          href="/dashboard/billing"
+          passHref
+          legacyBehavior
+          onClick={() => June.track(events.landing.billingCta)}>
           <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>

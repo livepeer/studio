@@ -16,6 +16,7 @@ import {
 } from "./helpers";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import June, { events } from "lib/June";
 
 const ApiKeysTable = ({
   title = "API Keys",
@@ -50,10 +51,10 @@ const ApiKeysTable = ({
         initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
-        createAction={makeCreateAction(
-          "Create API Key",
-          createDialogState.onOn
-        )}
+        createAction={makeCreateAction("Create API Key", () => {
+          June.track(events.developer.apiKeyCreate);
+          return createDialogState.onOn;
+        })}
       />
 
       <TableStateDeleteDialog
