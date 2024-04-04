@@ -1,17 +1,16 @@
 import { ConsumeMessage } from "amqplib";
-import { promises as dns } from "dns";
+import dns from "dns";
 import isLocalIP from "is-local-ip";
 import { Response } from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { parse as parseUrl } from "url";
-import { DB } from "../store/db";
 import { DBSession } from "../store/session-table";
 import messages from "../store/messages";
 import Queue from "../store/queue";
 import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout, sleep } from "../util";
 import logger from "../logger";
-import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
+import { sign, sendgridEmail } from "../controllers/helpers";
 import { taskScheduler } from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset, primaryStorageExperiment } from "../controllers/asset";
@@ -51,7 +50,7 @@ export default class WebhookCannon {
   secondaryVodObjectStoreId: string;
   recordCatalystObjectStoreId: string;
   secondaryRecordObjectStoreId: string;
-  resolver: dns.Resolver;
+  resolver: dns.promises.Resolver;
   queue: Queue;
   constructor({
     frontendDomain,
@@ -75,7 +74,7 @@ export default class WebhookCannon {
     this.secondaryVodObjectStoreId = secondaryVodObjectStoreId;
     this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
     this.secondaryRecordObjectStoreId = secondaryRecordObjectStoreId;
-    this.resolver = new dns.Resolver();
+    this.resolver = new dns.promises.Resolver();
     this.queue = queue;
     // this.start();
   }
@@ -334,22 +333,13 @@ export default class WebhookCannon {
     }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
 
-    let ips: string[];
-    let isLocal = false;
-    // These conditions are mainly useful for local testing
-    if (!user.admin && !this.skipUrlVerification) {
-      try {
-        const urlObj = parseUrl(webhook.url);
-        ips = await Promise.all([
-          this.resolver.resolve4(urlObj.hostname),
-          this.resolver.resolve6(urlObj.hostname),
-        ]).then((ipsArrs) => ipsArrs.flat());
-        isLocal = ips.some(isLocalIP);
-      } catch (e) {
-        console.error("error checking if is local IP: ", e);
-        throw e;
-      }
-    }
+    const { ips, isLocal } = await this.checkIsLocalIp(
+      webhook.url,
+      user.admin
+    ).catch((e) => {
+      console.error("error checking if is local IP: ", e);
+      throw e;
+    });
 
     if (isLocal) {
       // don't fire this webhook.
@@ -447,6 +437,29 @@ export default class WebhookCannon {
         return;
       }
     }
+  }
+
+  private async checkIsLocalIp(url: string, isAdmin: boolean) {
+    if (isAdmin || this.skipUrlVerification) {
+      // this is mainly useful for local testing
+      return { ips: [], isLocal: false };
+    }
+
+    const emptyIfNotFound = (err) => {
+      if ([dns.NODATA, dns.NOTFOUND, dns.BADFAMILY].includes(err.code)) {
+        return [] as string[];
+      }
+      throw err;
+    };
+
+    const urlObj = parseUrl(url);
+    const ips = await Promise.all([
+      this.resolver.resolve4(urlObj.hostname).catch(emptyIfNotFound),
+      this.resolver.resolve6(urlObj.hostname).catch(emptyIfNotFound),
+    ]).then((ipsArrs) => ipsArrs.flat());
+
+    const isLocal = ips.some(isLocalIP);
+    return { ips, isLocal };
   }
 
   async storeTriggerStatus(
