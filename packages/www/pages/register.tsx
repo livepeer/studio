@@ -16,6 +16,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
 import Link from "next/link";
 import { useApi, useLoggedIn } from "../hooks";
+import June, { events } from "lib/June";
 
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
@@ -85,6 +86,9 @@ const RegisterPage = () => {
       ...(phone && { phone }),
       recaptchaToken,
     });
+
+    June.track(events.onboarding.register);
+
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
       setErrors(res.errors);

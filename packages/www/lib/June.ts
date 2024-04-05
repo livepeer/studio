@@ -3,6 +3,9 @@ export const events: EventObject = {
     documentation: "documentation",
     feedback: "feedback",
   },
+  onboarding: {
+    register: "register",
+  },
   stream: {
     preview: "stream preview",
     embed: "stream embed",
