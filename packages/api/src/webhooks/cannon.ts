@@ -1,4 +1,5 @@
 import { ConsumeMessage } from "amqplib";
+import { isIP } from "net";
 import dns from "dns";
 import isLocalIP from "is-local-ip";
 import { Response } from "node-fetch";
@@ -452,11 +453,13 @@ export default class WebhookCannon {
       throw err;
     };
 
-    const urlObj = parseUrl(url);
-    const ips = await Promise.all([
-      this.resolver.resolve4(urlObj.hostname).catch(emptyIfNotFound),
-      this.resolver.resolve6(urlObj.hostname).catch(emptyIfNotFound),
-    ]).then((ipsArrs) => ipsArrs.flat());
+    const { hostname } = parseUrl(url);
+    const ips = isIP(hostname)
+      ? [hostname]
+      : await Promise.all([
+          this.resolver.resolve4(hostname).catch(emptyIfNotFound),
+          this.resolver.resolve6(hostname).catch(emptyIfNotFound),
+        ]).then((ipsArrs) => ipsArrs.flat());
 
     const isLocal = ips.some(isLocalIP);
     return { ips, isLocal };
