@@ -125,7 +125,7 @@ const StreamPlayerBox = ({
             }
             onEmbedVideoClick={() => {
               June.track(events.stream.embed);
-              return onEmbedVideoClick;
+              return onEmbedVideoClick();
             }}
           />
           <Tooltip
