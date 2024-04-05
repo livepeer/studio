@@ -32,8 +32,6 @@ import LogsContainer from "./LogsContainer";
 import { Webhook } from "@livepeer.studio/api";
 import June, { events } from "lib/June";
 
-June.track(events.developer.webhookDetail);
-
 const eventOptions: Webhook["events"] = [
   "playback.accessControl",
   "stream.started",

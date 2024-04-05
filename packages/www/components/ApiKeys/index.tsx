@@ -53,7 +53,7 @@ const ApiKeysTable = ({
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction("Create API Key", () => {
           June.track(events.developer.apiKeyCreate);
-          return createDialogState.onOn;
+          return createDialogState.onOn();
         })}
       />
 
