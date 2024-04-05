@@ -30,7 +30,6 @@ import { useApi } from "hooks";
 import DeleteDialog from "../WebhookDialogs/DeleteDialog";
 import LogsContainer from "./LogsContainer";
 import { Webhook } from "@livepeer.studio/api";
-import June, { events } from "lib/June";
 
 const eventOptions: Webhook["events"] = [
   "playback.accessControl",
