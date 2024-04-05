@@ -11,6 +11,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
   DropdownMenuItem,
+  Button,
 } from "@livepeer/design-system";
 import { ChevronDownIcon, PlusIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
@@ -23,15 +24,16 @@ import {
   UsageIcon,
   AssetsIcon,
   TopBottomChevron,
+  SettingsIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { useQueries, useQuery } from "react-query";
 import { useState } from "react";
-import { FiCheck } from "react-icons/fi";
+import { FiCheck, FiChevronLeft } from "react-icons/fi";
 import useProject from "hooks/use-project";
 
 export const NavLink = styled(A, {
@@ -63,32 +65,114 @@ export type SidebarId =
   | "home"
   | "streams"
   | "streams/sessions"
-  // /dashboard/stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
-  | "usage"
-  | "billing"
-  | "billing/plans";
+  | "settings/general"
+  | "settings/projects"
+  | "settings/usage"
+  | "settings/billing"
+  | "settings/billing/plans";
+
+export const generalSidebarItems = [
+  {
+    title: "Home",
+    path: "/dashboard",
+    icon: <HomeIcon />,
+    id: "home",
+  },
+  {
+    title: "Streams",
+    path: "/dashboard/streams",
+    icon: <StreamIcon />,
+    id: "streams",
+    children: [
+      {
+        title: "Sessions",
+        path: "/dashboard/sessions",
+        id: "streams/sessions",
+      },
+    ],
+  },
+  {
+    title: "Assets",
+    path: "/dashboard/assets",
+    icon: <AssetsIcon />,
+    id: "assets",
+  },
+  {
+    title: "Developers",
+    path: "/dashboard/developers/api-keys",
+    icon: <TerminalIcon />,
+    id: "developers",
+    children: [
+      {
+        title: "API Keys",
+        path: "/dashboard/developers/api-keys",
+        id: "developers",
+      },
+      {
+        title: "Signing Keys",
+        path: "/dashboard/developers/signing-keys",
+        id: "developers/signing-keys",
+      },
+      {
+        title: "Webhooks",
+        path: "/dashboard/developers/webhooks",
+        id: "developers/webhooks",
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    path: "/dashboard/settings/general",
+    icon: <SettingsIcon />,
+    id: "settings",
+  },
+];
+
+const settingsSidebarItems = [
+  {
+    title: "Settings",
+    path: "/dashboard/workspace/general",
+    icon: <SettingsIcon />,
+    id: "settings/general",
+    children: [
+      {
+        title: "General",
+        path: "/dashboard/settings/general",
+        id: "settings/general",
+      },
+      {
+        title: "Projects",
+        path: "/dashboard/settings/projects",
+        id: "settings/projects",
+      },
+      {
+        title: "Usage",
+        path: "/dashboard/settings/usage",
+        id: "settings/usage",
+      },
+      {
+        title: "Billing",
+        path: "/dashboard/settings/billing",
+        id: "settings/billing",
+      },
+      {
+        title: "Plans",
+        path: "/dashboard/settings/billing/plans",
+        id: "settings/billing/plans",
+      },
+    ],
+  },
+];
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
-  const { user, logout, createProject, getProjects } = useApi();
-  const { setCurrentProject, currentProject } = useProject();
-  const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
+  const { user, logout } = useApi();
 
-  const onCreateClick = async (projectName: string) => {
-    const project = await createProject({
-      name: projectName,
-    });
-
-    console.log(project);
-  };
-
-  const { data } = useQuery("projects", getProjects);
-
-  const activeProject = data?.find((project) => project.id === currentProject);
+  const { pathname } = useRouter();
 
   return (
     <Box
@@ -103,6 +187,37 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         justifyContent: "flex-end",
         bottom: 0,
       }}>
+      {pathname.includes("settings") ? (
+        <SettingsSidebar id={id} user={user} />
+      ) : (
+        <GeneralSidebar id={id} user={user} />
+      )}
+    </Box>
+  );
+};
+
+const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  const { createProject, getProjects } = useApi();
+
+  const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
+  const { setCurrentProject, currentProject } = useProject();
+
+  const goBack = () => {
+    Router.push("/dashboard");
+  };
+
+  const onCreateClick = async (projectName: string) => {
+    const project = await createProject({
+      name: projectName,
+    });
+  };
+
+  const { data } = useQuery("projects", getProjects);
+
+  const activeProject = data?.find((project) => project.id === currentProject);
+
+  return (
+    <>
       <CreateProjectDialog
         onCreate={onCreateClick}
         onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
@@ -270,115 +385,31 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               textDecoration: "none",
             },
           }}>
-          <Link href="/dashboard" passHref legacyBehavior>
-            <NavLink active={id === "home"}>
-              <HomeIcon active={id === "home"} />
-              Home
-            </NavLink>
-          </Link>
-          <Box>
-            <Link href="/dashboard/streams" passHref legacyBehavior>
-              <NavLink active={id === "streams"}>
-                <StreamIcon active={id === "streams"} />
-                Streams
-              </NavLink>
-            </Link>
-
-            {id?.split("/")[0] === "streams" && (
-              <Box
-                css={{
-                  a: { pl: 35 },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/dashboard/sessions" passHref legacyBehavior>
-                  <NavLink active={id === "streams/sessions"}>Sessions</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
-          <Link href="/dashboard/assets" passHref legacyBehavior>
-            <NavLink active={id === "assets"}>
-              <AssetsIcon active={id === "assets"} />
-              Assets
-            </NavLink>
-          </Link>
-          <Box>
-            <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
-              <NavLink>
-                <TerminalIcon active={id?.split("/")[0] === "developers"} />
-                Developers
-              </NavLink>
-            </Link>
-
-            {id?.split("/")[0] === "developers" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                    mt: "$1",
-                  },
-                }}>
-                <Link
-                  href="/dashboard/developers/api-keys"
-                  passHref
-                  legacyBehavior>
-                  <NavLink active={id === "developers"}>API Keys</NavLink>
-                </Link>
-                <Link
-                  href="/dashboard/developers/signing-keys"
-                  passHref
-                  legacyBehavior>
-                  <NavLink active={id === "developers/signing-keys"}>
-                    Signing Keys
-                  </NavLink>
-                </Link>
-                <Link
-                  href="/dashboard/developers/webhooks"
-                  passHref
-                  legacyBehavior>
-                  <NavLink active={id === "developers/webhooks"}>
-                    Webhooks
-                  </NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
-
-          <Box>
-            <Link href="/dashboard/usage" passHref legacyBehavior>
-              <NavLink active={id === "usage"}>
-                <UsageIcon active={id === "usage"} />
-                Usage
-              </NavLink>
-            </Link>
-          </Box>
-
-          <Box>
-            <Link href="/dashboard/billing" passHref legacyBehavior>
-              <NavLink active={id === "billing"}>
-                <BillingIcon active={id === "billing"} />
-                Billing
-              </NavLink>
-            </Link>
-
-            {id?.split("/")[0] === "billing" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                  },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/dashboard/billing/plans" passHref legacyBehavior>
-                  <NavLink active={id === "billing/plans"}>Plans</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
+          {generalSidebarItems.map((item) => (
+            <Box>
+              <Link href={item.path} passHref legacyBehavior>
+                <NavLink active={id === item.id}>
+                  {item.icon}
+                  {item.title}
+                </NavLink>
+              </Link>
+              {item.children && id === item.id && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                      mt: "$1",
+                    },
+                  }}>
+                  {item.children.map((child) => (
+                    <Link href={child.path} passHref legacyBehavior>
+                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                    </Link>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          ))}
         </Grid>
         <Flex direction="column" gap={1}>
           <NavLink
@@ -458,7 +489,75 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           <Contact />
         </Flex>
       </Flex>
-    </Box>
+    </>
+  );
+};
+
+const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  const goBack = () => {
+    Router.push("/dashboard");
+  };
+
+  return (
+    <>
+      <Flex align="center" justify="between" css={{ p: "$3", mb: "$1" }}>
+        <Button
+          onClick={goBack}
+          size={4}
+          css={{
+            ml: "-$2",
+            gap: "$3",
+            backgroundColor: "transparent",
+            color: "$neutral12",
+            fontWeight: 500,
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          }}>
+          <FiChevronLeft size={21} />
+          Settings
+        </Button>
+      </Flex>
+      <Flex
+        css={{ px: "$4", height: "calc(100vh - 100px)" }}
+        direction="column"
+        justify="between">
+        <Grid
+          gap={1}
+          css={{
+            a: {
+              textDecoration: "none",
+            },
+          }}>
+          {settingsSidebarItems.map((item) => (
+            <Box
+              css={{
+                mb: "$5",
+              }}>
+              <NavLink>
+                {item.icon}
+                {item.title}
+              </NavLink>
+              {item.children && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                      mt: "$1",
+                    },
+                  }}>
+                  {item.children.map((child) => (
+                    <Link href={child.path} passHref legacyBehavior>
+                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                    </Link>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          ))}
+        </Grid>
+      </Flex>
+    </>
   );
 };
 
