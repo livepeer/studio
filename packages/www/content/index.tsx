@@ -206,3 +206,12 @@ export const DashboardPlans = {
     url: makeCompleteUrl(),
   },
 };
+
+export const DashboardSettingsGeneral = {
+  metaData: {
+    title: makeCompleteTitle("Settings"),
+    description:
+      "Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.",
+    url: makeCompleteUrl(),
+  },
+};
