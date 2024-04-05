@@ -26,11 +26,12 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
     // console.log(shouldBeLoggedIn, user);
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
+      process.env.NODE_ENV === "production" &&
+        June.identifyUser(user.id, user.email);
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
         router.replace(next ? next.toString() : "/dashboard");
-        June.identifyUser(user.id, user.email);
       }
     }
   }, [user, token, next]);
