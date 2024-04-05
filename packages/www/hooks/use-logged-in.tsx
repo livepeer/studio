@@ -30,7 +30,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
         router.replace("/verify");
       } else {
         router.replace(next ? next.toString() : "/dashboard");
-        June.identifyUser(user.email);
+        June.identifyUser(user.id, user.email);
       }
     }
   }, [user, token, next]);

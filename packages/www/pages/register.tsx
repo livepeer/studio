@@ -16,12 +16,6 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
 import Link from "next/link";
 import { useApi, useLoggedIn } from "../hooks";
-import Ripe, { categories, pages } from "lib/ripe";
-
-Ripe.trackPage({
-  category: categories.AUTH,
-  name: pages.CREATE_ACCOUNT,
-});
 
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";

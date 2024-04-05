@@ -47,11 +47,11 @@ declare global {
 }
 
 const June = {
-  identifyUser: (email: string): void => {
+  identifyUser: (id: string, email: string): void => {
     if (typeof window === "undefined") return;
 
     if (window.analytics) {
-      window.analytics.identify("USER_ID", {
+      window.analytics.identify(id, {
         email,
       });
     } else {

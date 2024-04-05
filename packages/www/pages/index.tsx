@@ -139,11 +139,6 @@ const benefits = [
   },
 ];
 
-Ripe.trackPage({
-  category: categories.HOME,
-  name: pages.LANDING,
-});
-
 const HomePage = () => {
   return (
     <Layout {...Content.metaData}>
