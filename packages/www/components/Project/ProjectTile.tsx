@@ -14,14 +14,22 @@ import { sanitizeUrl } from "lib/url-sanitizer";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { HiDotsHorizontal } from "react-icons/hi";
 import Link from "next/link";
-import { generalSidebarItems } from "components/Sidebar";
+import { NavLink, generalSidebarItems } from "components/Sidebar";
+import useProject from "hooks/use-project";
+import { useRouter } from "next/router";
 
-export default function ProjectTile({
-  name,
-  url,
+export default function ProjectTile({ name, url, id, ...props }) {
+  const { setCurrentProject } = useProject();
 
-  ...props
-}) {
+  const navigate = (id, path) => {
+    setCurrentProject(
+      {
+        id,
+      },
+      false
+    );
+  };
+
   return (
     <Box
       css={{
@@ -54,14 +62,13 @@ export default function ProjectTile({
             <DropdownMenuContent
               css={{
                 border: "1px solid $colors$neutral6",
-                p: "$3",
+                p: "$2",
                 width: "13rem",
-                ml: "-11rem",
                 mt: "$1",
+                ml: "-11rem",
               }}>
               <Box
                 css={{
-                  p: "$1",
                   pb: 0,
                   fontSize: 14,
                   color: "$primary11",
@@ -73,13 +80,17 @@ export default function ProjectTile({
                 <Flex
                   direction={"column"}
                   css={{
-                    gap: "$3",
                     width: "100%",
                   }}>
                   {generalSidebarItems.map((item) => (
-                    <Link href="/" passHref legacyBehavior>
-                      {item.title}
-                    </Link>
+                    <Box
+                      onClick={() => {
+                        navigate(id, item.path);
+                      }}>
+                      <NavLink key={item.title} href={item.path}>
+                        {item.title}
+                      </NavLink>
+                    </Box>
                   ))}
                 </Flex>
               </Box>

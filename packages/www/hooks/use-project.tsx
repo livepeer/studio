@@ -2,9 +2,11 @@ export const projectId =
   typeof window !== "undefined" && localStorage.getItem("currentProject");
 
 export default function useProject() {
-  const setCurrentProject = (project) => {
+  const setCurrentProject = (project, shouldReload = true) => {
     localStorage.setItem("currentProject", project.id);
-    window.location.reload();
+    if (shouldReload) {
+      window.location.reload();
+    }
   };
 
   return {

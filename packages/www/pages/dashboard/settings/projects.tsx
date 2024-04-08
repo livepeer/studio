@@ -53,15 +53,17 @@ const WorkspaceProjects = () => {
               Projects
             </Heading>
             <Text variant="neutral" size="3" css={{ mt: "$2" }}>
-              Manage your workspace projects
+              Manage your projects
             </Text>
           </Box>
         </Box>
         <Flex gap={4} wrap={"wrap"}>
           {data.map((project) => (
             <ProjectTile
+              id={project.id}
               name={project.name}
-              url={"http://localhost:3000/dashboard/settings/projects"}
+              // TODO: use the correct URL
+              url={"https://example.com/projects/" + project.name}
             />
           ))}
         </Flex>
