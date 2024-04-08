@@ -25,13 +25,19 @@ const Settings = () => {
     getProject(projectId)
   );
 
-  const [projectName, setProjectName] = useState<string | null>(data?.name);
+  const [projectName, setProjectName] = useState<string | null>();
 
   const logoRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     console.log("Project Name: ", projectName);
     console.log("Project Logo: ", projectLogo);
+  };
+
+  const deleteProject = () => {
+    if (confirm("Are you sure you want to delete this project?")) {
+      console.log("Project deleted");
+    }
   };
 
   if (!user) {
@@ -191,6 +197,7 @@ const Settings = () => {
               you can do so below.
             </Text>
             <Button
+              onClick={deleteProject}
               css={{
                 p: "$4",
                 fontSize: "$2",

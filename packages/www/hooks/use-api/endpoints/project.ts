@@ -55,3 +55,14 @@ export const getProjects = async (): Promise<Project[]> => {
   }
   return projects;
 };
+
+export const deleteProject = async (projectId) => {
+  const [res, project] = await context.fetch(`/project/${projectId}`, {
+    method: "DELETE",
+  });
+  if (res.status !== 204) {
+    throw project && typeof project === "object"
+      ? { ...project, status: res.status }
+      : new Error(project);
+  }
+};

@@ -35,6 +35,7 @@ import { useQueries, useQuery } from "react-query";
 import { useState } from "react";
 import { FiCheck, FiChevronLeft } from "react-icons/fi";
 import useProject from "hooks/use-project";
+import { User } from "@livepeer.studio/api";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -197,7 +198,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 };
 
 const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
-  const { createProject, getProjects } = useApi();
+  const { createProject, getProjects, logout } = useApi();
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
   const { setCurrentProject, currentProject } = useProject();
