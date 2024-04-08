@@ -28,12 +28,17 @@ const WorkspaceProjects = () => {
   return (
     <Layout
       id="settings/projects"
-      breadcrumbs={[
-        { title: "Workspace", href: "/dashboard/workspace/general" },
-        { title: "Projects" },
-      ]}
+      breadcrumbs={[{ title: "Projects" }]}
       {...Content.metaData}>
-      <Box css={{ p: "$6", pl: 0 }}>
+      <Box
+        css={{
+          pb: "$9",
+          px: "$6",
+          pt: "$6",
+          "@bp4": {
+            p: "$6",
+          },
+        }}>
         <Box css={{ mb: "$7" }}>
           <Box
             css={{

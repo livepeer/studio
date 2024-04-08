@@ -1,6 +1,7 @@
 import { styled, Box } from "@livepeer/design-system";
 import { useApi } from "hooks";
 import useProject from "hooks/use-project";
+import { usePathname } from "next/navigation";
 import { Children, isValidElement } from "react";
 import { useQuery } from "react-query";
 
@@ -44,6 +45,9 @@ const Breadcrumbs = ({ children }) => {
   const { currentProject } = useProject();
   const { getProjects } = useApi();
   const { data } = useQuery("projects", getProjects);
+  const pathname = usePathname();
+
+  const isSettingsPage = pathname.includes("settings");
 
   const allItems = Children.toArray(children)
     .filter((child) => {
@@ -62,8 +66,7 @@ const Breadcrumbs = ({ children }) => {
       </Box>
     ));
 
-  if (currentProject) {
-    const project = data?.find((project) => project.id === currentProject);
+  if (isSettingsPage) {
     allItems.unshift(
       <Box
         as="li"
@@ -73,10 +76,27 @@ const Breadcrumbs = ({ children }) => {
           lineHeight: 1.5,
         }}
         key="project">
-        <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
+        <Box css={{ display: "inline-flex" }}>Settings</Box>
       </Box>
     );
+  } else {
+    if (currentProject) {
+      const project = data?.find((project) => project.id === currentProject);
+      allItems.unshift(
+        <Box
+          as="li"
+          css={{
+            m: 0,
+            fontSize: "$3",
+            lineHeight: 1.5,
+          }}
+          key="project">
+          <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
+        </Box>
+      );
+    }
   }
+
   return (
     <Box>
       <BreadcrumbsOl>{insertSeparators(allItems)}</BreadcrumbsOl>

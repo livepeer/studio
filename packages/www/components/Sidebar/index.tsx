@@ -136,37 +136,29 @@ export const generalSidebarItems = [
 
 const settingsSidebarItems = [
   {
-    title: "Settings",
-    path: "/dashboard/workspace/general",
-    icon: <SettingsIcon />,
+    title: "General",
+    path: "/dashboard/settings/general",
     id: "settings/general",
-    children: [
-      {
-        title: "General",
-        path: "/dashboard/settings/general",
-        id: "settings/general",
-      },
-      {
-        title: "Projects",
-        path: "/dashboard/settings/projects",
-        id: "settings/projects",
-      },
-      {
-        title: "Usage",
-        path: "/dashboard/settings/usage",
-        id: "settings/usage",
-      },
-      {
-        title: "Billing",
-        path: "/dashboard/settings/billing",
-        id: "settings/billing",
-      },
-      {
-        title: "Plans",
-        path: "/dashboard/settings/billing/plans",
-        id: "settings/plans",
-      },
-    ],
+  },
+  {
+    title: "Projects",
+    path: "/dashboard/settings/projects",
+    id: "settings/projects",
+  },
+  {
+    title: "Usage",
+    path: "/dashboard/settings/usage",
+    id: "settings/usage",
+  },
+  {
+    title: "Billing",
+    path: "/dashboard/settings/billing",
+    id: "settings/billing",
+  },
+  {
+    title: "Plans",
+    path: "/dashboard/settings/billing/plans",
+    id: "settings/plans",
   },
 ];
 
@@ -296,7 +288,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             "&:hover": {
               backgroundColor: "$neutral4",
               borderRadius: "$3",
-              cursor: "pointer",
+              cursor: "default",
             },
           }}>
           <Text
@@ -365,7 +357,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 css={{
                   color: "$neutral12",
                   gap: "$2",
-                  cursor: "pointer",
+                  cursor: "default",
                 }}>
                 <PlusIcon />
                 New project
@@ -412,7 +404,12 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             </Box>
           ))}
         </Grid>
-        <Flex direction="column" gap={1}>
+        <Flex
+          direction="column"
+          gap={1}
+          css={{
+            mb: "$7",
+          }}>
           <NavLink
             href="https://status.livepeer.studio/"
             target="_blank"
@@ -531,30 +528,9 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             },
           }}>
           {settingsSidebarItems.map((item) => (
-            <Box
-              css={{
-                mb: "$5",
-              }}>
-              <NavLink>
-                {item.icon}
-                {item.title}
-              </NavLink>
-              {item.children && (
-                <Box
-                  css={{
-                    a: {
-                      pl: 35,
-                      mt: "$1",
-                    },
-                  }}>
-                  {item.children.map((child) => (
-                    <Link href={child.path} passHref legacyBehavior>
-                      <NavLink active={id === child.id}>{child.title}</NavLink>
-                    </Link>
-                  ))}
-                </Box>
-              )}
-            </Box>
+            <Link href={item.path} passHref legacyBehavior>
+              <NavLink active={id === item.id}>{item.title}</NavLink>
+            </Link>
           ))}
         </Grid>
       </Flex>

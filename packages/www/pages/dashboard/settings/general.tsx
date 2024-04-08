@@ -110,7 +110,6 @@ const Settings = () => {
               alt="Project logo"
               style={{
                 borderRadius: "12px",
-                cursor: "pointer",
               }}
               width={90}
               height={90}
@@ -138,7 +137,7 @@ const Settings = () => {
             css={{
               mb: "$4",
               mt: "$6",
-              width: "100%",
+              width: "20%",
             }}>
             <Box
               css={{
@@ -155,9 +154,6 @@ const Settings = () => {
               onChange={(e) => setProjectName(e.target.value)}
               value={projectName}
               id="projectName"
-              css={{
-                width: "20%",
-              }}
               placeholder="Project Name"
             />
           </Flex>
@@ -203,7 +199,7 @@ const Settings = () => {
                 fontSize: "$2",
                 color: "white",
                 mt: "$3",
-                width: "10%",
+                width: "10em",
                 backgroundColor: "$red9",
               }}>
               Delete Project
