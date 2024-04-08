@@ -27,7 +27,7 @@ const WorkspaceProjects = () => {
 
   return (
     <Layout
-      id="workspace/projects"
+      id="settings/projects"
       breadcrumbs={[
         { title: "Workspace", href: "/dashboard/workspace/general" },
         { title: "Projects" },

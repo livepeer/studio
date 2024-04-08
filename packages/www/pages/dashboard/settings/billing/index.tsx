@@ -184,7 +184,7 @@ const Billing = () => {
   }
   return (
     <Layout
-      id="billing"
+      id="settings/billing"
       breadcrumbs={[{ title: "Billing" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>

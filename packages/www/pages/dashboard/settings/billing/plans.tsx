@@ -1,4 +1,4 @@
-import Layout from "../../../layouts/dashboard";
+import Layout from "../../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import Plans from "components/Plans";
@@ -13,7 +13,7 @@ const PlansPage = () => {
   }
   return (
     <Layout
-      id="billing/plans"
+      id="settings/plans"
       breadcrumbs={[
         { title: "Billing", href: "/dashboard/billing" },
         { title: "Plans" },

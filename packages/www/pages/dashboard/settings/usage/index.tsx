@@ -160,7 +160,10 @@ const Usage = () => {
     return <Layout />;
   }
   return (
-    <Layout id="usage" breadcrumbs={[{ title: "Usage" }]} {...Content.metaData}>
+    <Layout
+      id="settings/usage"
+      breadcrumbs={[{ title: "Usage" }]}
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
           <Flex

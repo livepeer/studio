@@ -39,7 +39,7 @@ const Settings = () => {
   }
   return (
     <Layout
-      id="settings"
+      id="settings/general"
       breadcrumbs={[{ title: "Settings" }]}
       {...Content.metaData}>
       <Box

@@ -74,7 +74,7 @@ export type SidebarId =
   | "settings/projects"
   | "settings/usage"
   | "settings/billing"
-  | "settings/billing/plans";
+  | "settings/plans";
 
 export const generalSidebarItems = [
   {
@@ -163,7 +163,7 @@ const settingsSidebarItems = [
       {
         title: "Plans",
         path: "/dashboard/settings/billing/plans",
-        id: "settings/billing/plans",
+        id: "settings/plans",
       },
     ],
   },
