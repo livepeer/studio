@@ -78,7 +78,7 @@ const MultistreamTargetsTable = ({
 
   const onCreateClick = () => {
     June.track(events.stream.multistreamTarget);
-    return saveDialogState.onOn;
+    return saveDialogState.onOn();
   };
 
   return (

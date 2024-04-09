@@ -7,7 +7,6 @@ import { Home as Content } from "content";
 import Link from "next/link";
 import { Button, Box, Link as A } from "@livepeer/design-system";
 import { FiArrowUpRight } from "react-icons/fi";
-import Ripe, { categories, pages } from "lib/ripe";
 
 const networkFeatures = [
   {
