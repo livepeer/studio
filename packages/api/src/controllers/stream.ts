@@ -1086,6 +1086,41 @@ app.put(
   }
 );
 
+app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  let { leaseTimeout, host } = req.body;
+  if (!leaseTimeout) {
+    // Sets the default lock lease to 60s
+    leaseTimeout = 60 * 1000;
+  }
+  if (!host) {
+    host = "unknown";
+  }
+  logger.info(`got /lockPull for stream=${id}`);
+
+  const stream = await db.stream.get(id, { useReplica: false });
+  if (!stream || (stream.deleted && !req.user.admin)) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+
+  const updateRes = await db.stream.update(
+    [
+      sql`id = ${stream.id}`,
+      sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${
+        Date.now() - leaseTimeout
+      } AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
+    ],
+    { pullLockedAt: Date.now(), pullLockedBy: host },
+    { throwIfEmpty: false }
+  );
+
+  if (updateRes.rowCount > 0) {
+    res.status(204).end();
+  }
+  res.status(423).end();
+});
+
 function terminateDelay(stream: DBStream) {
   if (!stream.lastTerminatedAt) {
     return 0;
@@ -1944,7 +1979,11 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     throw new TooManyRequestsError(`too many terminate requests`);
   }
 
-  await db.stream.update(stream.id, { lastTerminatedAt: Date.now() });
+  await db.stream.update(stream.id, {
+    lastTerminatedAt: Date.now(),
+    pullLockedAt: 0,
+    pullLockedBy: "",
+  });
   // we don't want to update the stream object on the `/terminate` API, so we
   // just throw a single stop call
   await triggerCatalystStreamStopSessions(req, stream.playbackId);

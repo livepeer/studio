@@ -45,6 +45,7 @@ import {
   NewAssetPayload,
   ObjectStore,
   PlaybackPolicy,
+  Project,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -183,7 +184,7 @@ function parseUrlToDStorageUrl(
 }
 
 export async function validateAssetPayload(
-  req: Pick<Request, "body" | "user" | "token" | "config">,
+  req: Pick<Request, "body" | "user" | "token" | "config" | "project">,
   id: string,
   playbackId: string,
   createdAt: number,
@@ -235,6 +236,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
+    projectId: req.project?.id ?? "",
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
@@ -614,6 +616,7 @@ const fieldsMap = {
   creatorId: `asset.data->'creatorId'->>'value'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
+  projectId: `asset.data->>'projectId'`,
   phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
@@ -654,6 +657,10 @@ app.get("/", authorizer({}), async (req, res) => {
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
+
+  query.push(
+    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
+  );
 
   let output: WithID<Asset>[];
   let newCursor: string;
@@ -799,7 +806,11 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     url,
     encryption: assetEncryptionWithoutKey(encryption),
   });
-  const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
+  const dupAsset = await db.asset.findDuplicateUrlUpload(
+    url,
+    req.user.id,
+    req.project?.id
+  );
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });
     if (!task.length) {

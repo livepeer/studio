@@ -316,7 +316,7 @@ app.post(
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} returned status code ${statusCode}, disallowing playback
           `);
-          throw new BadGatewayError(
+          throw new ForbiddenError(
             "Content is gated and corresponding webhook failed"
           );
         }

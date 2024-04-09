@@ -121,7 +121,8 @@ export default class AssetTable extends Table<WithID<Asset>> {
 
   async findDuplicateUrlUpload(
     url: string,
-    userId: string
+    userId: string,
+    projectId: string
   ): Promise<WithID<Asset>> {
     const createdAfter = Date.now() - DUPLICATE_ASSETS_THRESHOLD;
     const query = [
@@ -132,6 +133,10 @@ export default class AssetTable extends Table<WithID<Asset>> {
       sql`asset.data->'status'->>'phase' IN ('waiting', 'processing')`,
       sql`coalesce((asset.data->>'createdAt')::bigint, 0) > ${createdAfter}`,
     ];
+    query.push(
+      sql`coalesce(asset.data->>'projectId', '') = ${projectId || ""}`
+    );
+
     const [assets] = await this.find(query, { limit: 1 });
     return assets?.length > 0 ? assets[0] : null;
   }
