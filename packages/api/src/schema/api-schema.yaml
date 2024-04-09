@@ -1933,7 +1933,10 @@ components:
     input-creator-id:
       oneOf:
         - $ref: "#/components/schemas/creator-id"
-        - type: string
+        - type: object
+          properties:
+            id:
+              type: string
           description: >-
             Helper syntax to specify an unverified creator ID, fully managed by
             the developer.
