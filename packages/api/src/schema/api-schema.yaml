@@ -265,13 +265,6 @@ components:
                 Timestamp (in milliseconds) at which the webhook last was
                 triggered
               example: 1587667174725
-          example:
-            lastFailure:
-              timestamp: 1587667174725
-              error: Error message
-              response: Response body
-              statusCode: 500
-            lastTriggeredAt: 1587667174725
     webhook-log:
       type: object
       required:
@@ -807,9 +800,7 @@ components:
         record:
           description: >
             Whether the stream should be recorded. Uses default settings. For
-            more
-
-            customization, create and configure an object store.
+            more customization, create and configure an object store.
           type: boolean
           example: false
         recordingStatus:
@@ -1075,9 +1066,7 @@ components:
           type: string
           description: >
             The name of the asset. This is not necessarily the filename - it can
-            be a
-
-            custom name or title.
+            be a custom name or title.
           example: filename.mp4
         createdAt:
           readOnly: true
@@ -2034,7 +2023,6 @@ components:
           example: 1587667174725
         publicKey:
           type: string
-          example: "-----BEGIN PUBLIC KEY"
         disabled:
           type: boolean
           description: Disable the signing key to allow rotation safely
@@ -2194,7 +2182,7 @@ components:
         CreatorID:
           type: string
           description: The creator ID associated with the metric
-          example: ucqw1bde4o2i6xycudoy
+          example: john@doe.com
         DeliveryUsageMins:
           type: number
           description: Total minutes of delivery usage.
@@ -2223,7 +2211,7 @@ components:
         creatorId:
           type: string
           description: The ID of the creator associated with the metric.
-          example: ucqw1bde4o2i6xycudoy
+          example: john@doe.com
         viewerId:
           type: string
           description: The ID of the viewer associated with the metric.
