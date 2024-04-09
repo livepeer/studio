@@ -213,7 +213,7 @@ components:
               - task.failed
           example:
             - stream.started
-            - stream.detection
+            - stream.idle
         url:
           type: string
           format: uri
