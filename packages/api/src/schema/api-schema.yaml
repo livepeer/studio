@@ -1954,10 +1954,7 @@ components:
     input-creator-id:
       oneOf:
         - $ref: "#/components/schemas/creator-id"
-        - type: object
-          properties:
-            id:
-              type: string
+        - type: string
           description: >-
             Helper syntax to specify an unverified creator ID, fully managed by
             the developer.
@@ -1974,12 +1971,10 @@ components:
               type: string
               enum:
                 - unverified
-              example: unverified
             value:
               type: string
               description:
                 Developer-managed ID of the user who created the resource.
-              example: 123456
     export-task-params:
       description: Parameters for the export task
       oneOf:
