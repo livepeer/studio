@@ -325,7 +325,7 @@ components:
               additionalProperties:
                 type: string
               example:
-                Authorization: Bearer 123
+                User-Agent: livepeer.studio
             body:
               type: string
               description: request body
