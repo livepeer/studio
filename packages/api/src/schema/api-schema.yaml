@@ -2612,6 +2612,52 @@ components:
               type: string
               description: ID of the last task to fail execution.
               example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+    new-asset-from-url-payload:
+      additionalProperties: false
+      required:
+        - name
+        - url
+      properties:
+        name:
+          $ref: "#/components/schemas/new-asset-payload/properties/name"
+        staticMp4:
+          $ref: "#/components/schemas/new-asset-payload/properties/staticMp4"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
+        creatorId:
+          $ref: "#/components/schemas/input-creator-id"
+        storage:
+          $ref: "#/components/schemas/new-asset-payload/properties/storage"
+        url:
+          type: string
+          format: uri
+          pattern: "^(https?|ipfs|ar)://"
+          description: >
+            URL where the asset contents can be retrieved, e.g.
+            `https://s3.amazonaws.com/my-bucket/path/filename.mp4`.
+
+            For an IPFS source, this should be similar to: `ipfs://{CID}`. For
+            an Arweave
+
+            source: `ar://{CID}`.
+          example: "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
+        encryption:
+          $ref: "#/components/schemas/new-asset-payload/properties/encryption"
+        c2pa:
+          $ref: "#/components/schemas/new-asset-payload/properties/c2pa"
+        profiles:
+          $ref: "#/components/schemas/new-asset-payload/properties/profiles"
+        targetSegmentSizeSecs:
+          $ref: >-
+            #/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+
 paths:
   /stream:
     post:
@@ -3329,7 +3375,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/new-asset-payload"
+              $ref: "#/components/schemas/new-asset-from-url-payload"
       responses:
         "200":
           description: Success
