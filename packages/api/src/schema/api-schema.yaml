@@ -1219,9 +1219,7 @@ components:
           type: string
           description: >
             The name of the asset. This is not necessarily the filename - it can
-            be a
-
-            custom name or title.
+            be a custom name or title.
           example: filename.mp4
         staticMp4:
           type: boolean
