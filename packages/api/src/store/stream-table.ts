@@ -414,6 +414,7 @@ const adminOnlyFields = [
   "createdByTokenId",
   "pullLockedAt",
   "pullLockedBy",
+  "createdRegion",
 ];
 
 const privateFields = [

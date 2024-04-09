@@ -688,6 +688,8 @@ components:
           type: object
         isActive:
           index: true
+        createdRegion:
+          type: string
         createdAt:
           index: true
         lastTerminatedAt:

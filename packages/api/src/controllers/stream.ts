@@ -1063,6 +1063,7 @@ app.put(
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
+        createdRegion: req.config.ownRegion,
         ...payload,
       };
       await db.stream.replace(stream);
@@ -1203,6 +1204,7 @@ async function handleCreateStream(req: Request) {
 
   const id = uuid();
   const createdAt = Date.now();
+  const createdRegion = req.config.ownRegion;
   // TODO: Don't create a streamKey if there's a pull source (here and on www)
   const streamKey = await generateUniqueStreamKey(id);
   let playbackId = await generateUniquePlaybackId(id, [streamKey]);
@@ -1230,6 +1232,7 @@ async function handleCreateStream(req: Request) {
     objectStoreId,
     id,
     createdAt,
+    createdRegion,
     streamKey,
     playbackId,
     createdByTokenName: req.token?.name,
