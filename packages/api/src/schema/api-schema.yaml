@@ -42,7 +42,7 @@ components:
   schemas:
     ffmpeg-profile:
       type: object
-      description: LMPS ffmpeg profile
+      description: Transcode profile
       additionalProperties: false
       required:
         - width
@@ -101,10 +101,6 @@ components:
           type: string
           enum:
             - H.264
-            - HEVC
-            - VP8
-            - VP9
-          example: H.264
     transcode-profile:
       type: object
       description: Transcode API profile
@@ -417,6 +413,25 @@ components:
               example: My target
             url:
               $ref: "#/components/schemas/multistream-target/properties/url"
+    project:
+      type: object
+      required:
+        - name
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        name:
+          type: string
+          example: test_project
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
     stream:
       type: object
       required:
@@ -1068,6 +1083,10 @@ components:
             The name of the asset. This is not necessarily the filename - it can
             be a custom name or title.
           example: filename.mp4
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         createdAt:
           readOnly: true
           type: number
@@ -1210,6 +1229,8 @@ components:
             The name of the asset. This is not necessarily the filename - it can
             be a custom name or title.
           example: filename.mp4
+        projectId:
+          $ref: "#/components/schemas/asset"
         staticMp4:
           type: boolean
           description: Whether to generate MP4s for the asset.

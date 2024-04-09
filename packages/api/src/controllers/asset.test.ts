@@ -6,7 +6,13 @@ import {
   createMockFile,
 } from "../test-helpers";
 import { v4 as uuid } from "uuid";
-import { Asset, AssetPatchPayload, Task, User } from "../schema/types";
+import {
+  ApiToken,
+  Asset,
+  AssetPatchPayload,
+  Task,
+  User,
+} from "../schema/types";
 import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
@@ -76,6 +82,41 @@ describe("controllers/asset", () => {
   let nonAdminUser: User;
   let nonAdminToken: string;
 
+  const createProject = async () => {
+    let res = await client.post(`/project`);
+    expect(res.status).toBe(201);
+    const projectObj = await res.json();
+    expect(projectObj).toMatchObject({
+      id: expect.any(String),
+    });
+    return projectObj.id;
+  };
+
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://staging.wetube.com",
+    "http://blockflix.io:69",
+  ];
+
+  const createApiToken = async (
+    cors: ApiToken["access"]["cors"],
+    projectId: string
+  ) => {
+    client.jwtAuth = nonAdminToken;
+    let res = await client.post(`/api-token/?projectId=${projectId}`, {
+      name: "test",
+      access: { cors },
+    });
+    client.jwtAuth = null;
+    expect(res.status).toBe(201);
+    const apiKeyObj = await res.json();
+    expect(apiKeyObj).toMatchObject({
+      id: expect.any(String),
+      access: { cors },
+    });
+    return apiKeyObj.id;
+  };
+
   beforeEach(async () => {
     await db.objectStore.create({
       id: "mock_vod_store",
@@ -103,6 +144,7 @@ describe("controllers/asset", () => {
           type: "url",
           url: spec.url,
         },
+        projectId: "", //should be blank when using jwt and projectId not specified as query-param
         status: { phase: "waiting" },
       });
 
@@ -123,6 +165,7 @@ describe("controllers/asset", () => {
 
       client.jwtAuth = null;
       client.apiKey = adminApiKey;
+
       res = await client.post(`/task/${taskId}/status`, {
         status: {
           phase: "running",
@@ -145,6 +188,102 @@ describe("controllers/asset", () => {
         id: asset.id,
         status: { phase: "processing", progress: 0.5 },
       });
+    });
+  });
+
+  it("should import asset (using jwt) for existing project (created with jwt)", async () => {
+    const spec = {
+      name: "test",
+      url: "https://example.com/test.mp4",
+    };
+    const projectId = await createProject();
+
+    let res = await client.post(
+      `/asset/upload/url/?projectId=${projectId}`,
+      spec
+    );
+    expect(res.status).toBe(201);
+    const { asset, task } = await res.json();
+    expect(asset).toMatchObject({
+      id: expect.any(String),
+      name: "test",
+      source: {
+        type: "url",
+        url: spec.url,
+      },
+      projectId: `${projectId}`,
+      status: { phase: "waiting" },
+    });
+
+    client.jwtAuth = null;
+    client.apiKey = adminApiKey;
+
+    res = await client.get(`/project/${projectId}`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toBeDefined(); //api-key be retrieve if adminApiKey is used..
+  });
+
+  it("should import asset (using api-token) for existing project (created with jwt)", async () => {
+    const spec = {
+      name: "test",
+      url: "https://example.com/test.mp4",
+    };
+    const projectId = await createProject();
+
+    client.jwtAuth = null;
+    client.apiKey = await createApiToken({ allowedOrigins }, projectId);
+
+    let res = await client.post(`/asset/upload/url/`, spec);
+    expect(res.status).toBe(201);
+    const { asset, task } = await res.json();
+    expect(asset).toMatchObject({
+      id: expect.any(String),
+      name: "test",
+      source: {
+        type: "url",
+        url: spec.url,
+      },
+      projectId: `${projectId}`,
+      status: { phase: "waiting" },
+    });
+
+    client.apiKey = adminApiKey;
+    res = await client.get(`/project/${projectId}`);
+    const project = await res.json();
+    expect(res.status).toBe(200);
+    expect(project.id).toBeDefined();
+  });
+
+  it("should NOT import asset (using api-key) when projectId passed as ouery-param", async () => {
+    const spec = {
+      name: "test",
+      url: "https://example.com/test.mp4",
+    };
+
+    client.jwtAuth = null;
+    client.apiKey = adminApiKey;
+
+    const projectId = await createProject();
+
+    // BadRequest is expected if projectId is passed in as query-param
+    let res = await client.post(
+      `/asset/upload/url/?projectId=${projectId}`,
+      spec
+    );
+    expect(res.status).toBe(400);
+
+    // Let's try again without query-param
+    res = await client.post(`/asset/upload/url/`, spec);
+    const { asset, task } = await res.json();
+    expect(asset).toMatchObject({
+      id: expect.any(String),
+      name: "test",
+      source: {
+        type: "url",
+        url: spec.url,
+      },
+      projectId: "", //should be blank when using an existing api-key and new project was created
+      status: { phase: "waiting" },
     });
   });
 

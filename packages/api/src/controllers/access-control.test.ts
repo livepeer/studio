@@ -122,7 +122,7 @@ describe("controllers/access-control", () => {
         type: "accessKey",
         accessKey: "foo",
       });
-      expect(res.status).toBe(502);
+      expect(res.status).toBe(403);
       await hookSem.wait(3000);
     });
 
@@ -135,7 +135,7 @@ describe("controllers/access-control", () => {
         type: "accessKey",
         accessKey: "foo",
       });
-      expect(res.status).toBe(502);
+      expect(res.status).toBe(403);
       await hookSem.wait(3000);
     });
   });
