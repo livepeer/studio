@@ -9,6 +9,7 @@ import logger from "../logger";
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
+import { fetchWithTimeout } from "../util";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -233,6 +234,31 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
       });
     })
   );
+}
+
+async function resolvePullRegion(
+  req: Request,
+  ingest: string
+): Promise<string> {
+  const payload = req.body as NewStreamPayload;
+  const url = new URL(pathJoin(ingest, `hls`, "any-playback", `index.m3u8`));
+  const { lat, lon } = payload.pull?.location ?? {};
+  if (lat && lon) {
+    url.searchParams.set("lat", lat.toString());
+    url.searchParams.set("lon", lon.toString());
+  }
+  const playbackUrl = url.toString();
+  const response = await fetchWithTimeout(playbackUrl, { redirect: "manual" });
+  if (response.status < 300 || response.status >= 400) {
+    return null;
+  }
+  const redirectUrl = response.headers.get("location");
+
+  // TODO: Write better regxp :)
+  const regionRegex = /https:\/\/(\w+)-\w+-(\d+)\./;
+  const match = redirectUrl.match(regionRegex);
+  const region = match ? match[2] : null;
+  return region;
 }
 
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
@@ -1001,6 +1027,8 @@ app.put(
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
+    const ingest = await getIngestBase(req);
+
     if (!rawPayload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
@@ -1046,9 +1074,13 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
+    const pullRegion = await resolvePullRegion(req, ingest);
+
     let stream: DBStream;
     if (!streamExisted) {
       stream = await handleCreateStream(req);
+      stream.createdRegion = pullRegion;
+      await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
       const sleepFor = terminateDelay(oldStream);
@@ -1063,7 +1095,7 @@ app.put(
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
-        createdRegion: req.config.ownRegion,
+        createdRegion: pullRegion,
         ...payload,
       };
       await db.stream.replace(stream);
@@ -1074,7 +1106,6 @@ app.put(
     }
 
     if (!stream.isActive || streamExisted) {
-      const ingest = await getIngestBase(req);
       await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
@@ -1204,7 +1235,6 @@ async function handleCreateStream(req: Request) {
 
   const id = uuid();
   const createdAt = Date.now();
-  const createdRegion = req.config.ownRegion;
   // TODO: Don't create a streamKey if there's a pull source (here and on www)
   const streamKey = await generateUniqueStreamKey(id);
   let playbackId = await generateUniquePlaybackId(id, [streamKey]);
@@ -1232,7 +1262,6 @@ async function handleCreateStream(req: Request) {
     objectStoreId,
     id,
     createdAt,
-    createdRegion,
     streamKey,
     playbackId,
     createdByTokenName: req.token?.name,
