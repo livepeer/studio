@@ -297,12 +297,11 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link
-          href="/dashboard/billing"
-          passHref
-          legacyBehavior
-          onClick={() => June.track(events.landing.billingCta)}>
-          <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
+        <Link href="/dashboard/billing" passHref legacyBehavior>
+          <A
+            variant="primary"
+            css={{ display: "flex", alignItems: "center" }}
+            onClick={() => June.track(events.landing.billingCta)}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

@@ -349,14 +349,11 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Link
-            href="/dashboard/usage"
-            passHref
-            legacyBehavior
-            onClick={() => June.track(events.billing.usageDetails)}>
+          <Link href="/dashboard/usage" passHref legacyBehavior>
             <A
               variant="primary"
-              css={{ display: "flex", alignItems: "center" }}>
+              css={{ display: "flex", alignItems: "center" }}
+              onClick={() => June.track(events.billing.usageDetails)}>
               View Usage Details <ArrowRightIcon />
             </A>
           </Link>

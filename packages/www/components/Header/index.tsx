@@ -106,16 +106,13 @@ const Header = ({ breadcrumbs = [] }) => {
               appearance: "none",
               border: "none",
             }}>
-            <Link
-              href="https://docs.livepeer.studio"
-              passHref
-              legacyBehavior
-              onClick={() => June.track(events.all.documentation)}>
+            <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
               <Button
                 ghost
                 as={A}
                 target="_blank"
                 size={2}
+                onClick={() => June.track(events.all.documentation)}
                 css={{
                   cursor: "default",
                   color: "$hiContrast",
@@ -136,7 +133,7 @@ const Header = ({ breadcrumbs = [] }) => {
             <Button
               ghost
               as={DropdownMenuTrigger}
-              onClick={() => June.track(events.all.documentation)}
+              onClick={() => June.track(events.all.feedback)}
               size={2}
               css={{
                 mr: "$2",
