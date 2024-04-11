@@ -237,12 +237,16 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
 }
 
 async function resolvePullRegion(
-  req: Request,
+  stream: NewStreamPayload,
   ingest: string
 ): Promise<string> {
-  const payload = req.body as NewStreamPayload;
-  const url = new URL(pathJoin(ingest, `hls`, "any-playback", `index.m3u8`));
-  const { lat, lon } = payload.pull?.location ?? {};
+  if (process.env.NODE_ENV === "test") {
+    return null;
+  }
+  const url = new URL(
+    pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
+  );
+  const { lat, lon } = stream.pull?.location ?? {};
   if (lat && lon) {
     url.searchParams.set("lat", lat.toString());
     url.searchParams.set("lon", lon.toString());
@@ -250,15 +254,19 @@ async function resolvePullRegion(
   const playbackUrl = url.toString();
   const response = await fetchWithTimeout(playbackUrl, { redirect: "manual" });
   if (response.status < 300 || response.status >= 400) {
+    // not a redirect response, so we can't determine the region
     return null;
   }
   const redirectUrl = response.headers.get("location");
+  return extractRegionFrom(redirectUrl);
+}
 
-  // TODO: Write better regxp :)
-  const regionRegex = /https:\/\/(\w+)-\w+-(\d+)\./;
-  const match = redirectUrl.match(regionRegex);
-  const region = match ? match[2] : null;
-  return region;
+// Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
+export function extractRegionFrom(playbackUrl: string): string {
+  const regionRegex =
+    /https?:\/\/(\w+)-.+-catalyst.+not-used-playback\/index.m3u8/;
+  const matches = playbackUrl.match(regionRegex);
+  return matches ? matches[1] : null;
 }
 
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
@@ -1074,7 +1082,7 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
-    const pullRegion = await resolvePullRegion(req, ingest);
+    const pullRegion = await resolvePullRegion(rawPayload, ingest);
 
     let stream: DBStream;
     if (!streamExisted) {
