@@ -1079,7 +1079,7 @@ app.put(
     let stream: DBStream;
     if (!streamExisted) {
       stream = await handleCreateStream(req);
-      stream.createdRegion = pullRegion;
+      stream.pullRegion = pullRegion;
       await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
@@ -1095,7 +1095,7 @@ app.put(
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
-        createdRegion: pullRegion,
+        pullRegion,
         ...payload,
       };
       await db.stream.replace(stream);

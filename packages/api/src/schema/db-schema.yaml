@@ -688,8 +688,6 @@ components:
           type: object
         isActive:
           index: true
-        createdRegion:
-          type: string
         createdAt:
           index: true
         lastTerminatedAt:
@@ -708,6 +706,8 @@ components:
           type: number
           example: 1587667174725
         pullLockedBy:
+          type: string
+        pullRegion:
           type: string
         playbackId:
           unique: true
