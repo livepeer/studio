@@ -1952,12 +1952,18 @@ components:
                       description: IPFS CID of the exported data
                       example: Qmabc123xyz341
     input-creator-id:
-      oneOf:
-        - $ref: "#/components/schemas/creator-id"
-        - type: string
+      type: object
+      additionalProperties: true
+      required:
+        - type
+        - value
+      properties:
+        type:
+          type: string
+        value:
+          type: string
           description: >-
-            Helper syntax to specify an unverified creator ID, fully managed by
-            the developer.
+            Developer-managed ID of the user who created the resource.
     creator-id:
       type: object
       oneOf:
@@ -1969,8 +1975,6 @@ components:
           properties:
             type:
               type: string
-              enum:
-                - unverified
             value:
               type: string
               description:
