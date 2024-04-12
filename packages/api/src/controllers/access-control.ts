@@ -123,7 +123,11 @@ async function fireGateWebhook(
         "X-Tlive-Spanid"
       )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
         process.hrtime(startTime)[1] / 1e6
-      }ms`
+      }ms accessKey=${payload.accessKey} playbackId=${
+        content.playbackId
+      } webhook=${webhook.id} referer=${params.headers["Referer"]} origin=${
+        params.headers["Origin"]
+      }`
     );
   } else {
     console.log(
