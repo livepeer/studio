@@ -1951,19 +1951,28 @@ components:
                       type: string
                       description: IPFS CID of the exported data
                       example: Qmabc123xyz341
+
     input-creator-id:
-      type: object
-      additionalProperties: true
-      required:
-        - type
-        - value
-      properties:
-        type:
-          type: string
-        value:
-          type: string
+      oneOf:
+        - type: object
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+                - type
+                - value
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - unverified
+                value:
+                  type: string
+
+        - type: string
           description: >-
-            Developer-managed ID of the user who created the resource.
+            Helper syntax to specify an unverified creator ID, fully managed by
+            the developer.
     creator-id:
       type: object
       oneOf:
@@ -1975,10 +1984,13 @@ components:
           properties:
             type:
               type: string
+              enum:
+                - unverified
             value:
               type: string
               description:
                 Developer-managed ID of the user who created the resource.
+
     export-task-params:
       description: Parameters for the export task
       oneOf:
