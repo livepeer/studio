@@ -69,6 +69,9 @@ async function fireGateWebhook(
 
   if ("pull" in content && content.pull) {
     params.headers["Trovo-Auth-Version"] = "1.1";
+    console.log(`
+      access-control: gate: accessKey=${payload.accessKey} playbackId=${content.playbackId} webhook=${webhook.id} referer=${params.headers["Referer"]} origin=${params.headers["Origin"]}
+    `);
   }
 
   const sigHeaders = signatureHeaders(
