@@ -69,9 +69,6 @@ async function fireGateWebhook(
 
   if ("pull" in content && content.pull) {
     params.headers["Trovo-Auth-Version"] = "1.1";
-    console.log(`
-      access-control: gate: accessKey=${payload.accessKey} playbackId=${content.playbackId} webhook=${webhook.id} referer=${params.headers["Referer"]} origin=${params.headers["Origin"]}
-    `);
   }
 
   const sigHeaders = signatureHeaders(
@@ -126,7 +123,11 @@ async function fireGateWebhook(
         "X-Tlive-Spanid"
       )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
         process.hrtime(startTime)[1] / 1e6
-      }ms`
+      }ms accessKey=${payload.accessKey} playbackId=${
+        content.playbackId
+      } webhook=${webhook.id} referer=${params.headers["Referer"]} origin=${
+        params.headers["Origin"]
+      }`
     );
   } else {
     console.log(
