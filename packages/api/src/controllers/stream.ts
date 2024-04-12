@@ -252,6 +252,7 @@ async function resolvePullRegion(
     url.searchParams.set("lon", lon.toString());
   }
   const playbackUrl = url.toString();
+  // Send any playback request to catalyst-api, which effectively resolves the region using MistUtilLoad
   const response = await fetchWithTimeout(playbackUrl, { redirect: "manual" });
   if (response.status < 300 || response.status >= 400) {
     // not a redirect response, so we can't determine the region
