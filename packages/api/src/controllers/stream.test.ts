@@ -728,7 +728,7 @@ describe("controllers/stream", () => {
           extractRegionFrom(
             "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
           )
-        ).toBe("fra");
+        ).toBe("fra-staging");
         expect(
           extractRegionFrom(
             "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
