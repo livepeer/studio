@@ -116,6 +116,11 @@ async function fireGateWebhook(
     );
   }
   if ("pull" in content && content.pull) {
+    let referer: string, origin: string;
+    if (payload?.webhookPayload?.headers) {
+      referer = payload?.webhookPayload?.headers["Referer"];
+      origin = payload?.webhookPayload?.headers["Origin"];
+    }
     console.log(
       `access-control: gate: webhook=${
         webhook.id
@@ -125,9 +130,7 @@ async function fireGateWebhook(
         process.hrtime(startTime)[1] / 1e6
       }ms accessKey=${payload.accessKey} playbackId=${
         content.playbackId
-      } webhook=${webhook.id} referer=${
-        payload.webhookPayload.headers["Referer"]
-      } origin=${payload.webhookPayload.headers["Origin"]}`
+      } webhook=${webhook.id} referer=${referer} origin=${origin}`
     );
   } else {
     console.log(
