@@ -125,9 +125,9 @@ async function fireGateWebhook(
         process.hrtime(startTime)[1] / 1e6
       }ms accessKey=${payload.accessKey} playbackId=${
         content.playbackId
-      } webhook=${webhook.id} referer=${params.headers["Referer"]} origin=${
-        params.headers["Origin"]
-      }`
+      } webhook=${webhook.id} referer=${
+        payload.webhookPayload.headers["Referer"]
+      } origin=${payload.webhookPayload.headers["Origin"]}`
     );
   } else {
     console.log(
