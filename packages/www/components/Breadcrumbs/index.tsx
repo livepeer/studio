@@ -47,7 +47,7 @@ const Breadcrumbs = ({ children }) => {
   const { data } = useQuery("projects", getProjects);
   const pathname = usePathname();
 
-  const isSettingsPage = pathname.includes("settings");
+  const isSettingsPage = pathname.includes("account");
 
   const allItems = Children.toArray(children)
     .filter((child) => {
@@ -91,7 +91,9 @@ const Breadcrumbs = ({ children }) => {
             lineHeight: 1.5,
           }}
           key="project">
-          <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
+          <Box css={{ display: "inline-flex" }}>
+            {project?.name || "Untitled Project"}
+          </Box>
         </Box>
       );
     }

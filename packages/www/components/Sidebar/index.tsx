@@ -13,7 +13,6 @@ import {
   DropdownMenuItem,
   Button,
 } from "@livepeer/design-system";
-import { ChevronDownIcon, PlusIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import {
@@ -31,7 +30,7 @@ import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import CreateProjectDialog from "components/Project/createProjectDialog";
-import { useQueries, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { useState } from "react";
 import { FiCheck, FiChevronLeft } from "react-icons/fi";
 import useProject from "hooks/use-project";
@@ -43,7 +42,7 @@ export const NavLink = styled(A, {
   alignItems: "center",
   color: "$primary12",
   px: "$2",
-  py: 6,
+  py: 7,
   borderRadius: "$2",
   cursor: "default",
   lineHeight: 1.2,
@@ -128,7 +127,7 @@ export const generalSidebarItems = [
   },
   {
     title: "Settings",
-    path: "/dashboard/settings/general",
+    path: "/dashboard/settings",
     icon: <SettingsIcon />,
     id: "settings",
   },
@@ -160,6 +159,12 @@ const settingsSidebarItems = [
     path: "/dashboard/settings/billing/plans",
     id: "settings/plans",
   },
+  {
+    title: "Settings",
+    path: "/dashboard/settings/general",
+    icon: <SettingsIcon />,
+    id: "settings",
+  },
 ];
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
@@ -180,7 +185,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         justifyContent: "flex-end",
         bottom: 0,
       }}>
-      {pathname.includes("settings") ? (
+      {pathname.includes("account") ? (
         <SettingsSidebar id={id} user={user} />
       ) : (
         <GeneralSidebar id={id} user={user} />
@@ -225,10 +230,17 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             css={{
               border: 0,
               background: "transparent",
-              p: 0,
+              p: 6,
+              "&:hover": {
+                backgroundColor: "$neutral4",
+                borderRadius: "$3",
+              },
             }}>
             <Avatar
-              size="3"
+              css={{
+                width: 55,
+                height: 55,
+              }}
               alt={user?.firstName}
               fallback={
                 user?.firstName
@@ -238,16 +250,17 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             />
             <Text
               size="3"
-              css={{ ml: "$2", fontSize: "$3", mr: "$1" }}
-              title={user?.email}>
-              {user?.firstName}
+              css={{ ml: "$2", fontSize: "$3", mr: "$1", color: "$neutral11" }}>
+              My Account
             </Text>
-            <Box
-              as={ChevronDownIcon}
-              css={{ width: 20, height: 20, color: "$hiContrast" }}
-            />
           </Flex>
-          <DropdownMenuContent css={{ border: "1px solid $colors$neutral6" }}>
+          <DropdownMenuContent
+            css={{
+              border: "1px solid $colors$neutral6",
+              width: "12rem",
+              ml: "$4",
+              mt: "$1",
+            }}>
             <DropdownMenuGroup>
               <DropdownMenuItem
                 key="billing-dropdown-item"
@@ -255,7 +268,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                   e.preventDefault();
                   Router.push("/dashboard/billing");
                 }}>
-                Billing
+                Account setting
               </DropdownMenuItem>
               <DropdownMenuItem
                 key="logout-dropdown-item"
@@ -279,7 +292,8 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             p: "$2",
             gap: "$3",
             mb: "$2",
-            ml: "$3",
+            mt: "-$1",
+            ml: "$4",
             border: 0,
             backgroundColor: "transparent",
             "&:focus": {
@@ -288,14 +302,13 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             "&:hover": {
               backgroundColor: "$neutral4",
               borderRadius: "$3",
-              cursor: "default",
             },
           }}>
           <Text
             css={{
               color: "$neutral11",
             }}>
-            {activeProject?.name || "Untitled"}
+            {activeProject?.name || "Untitled project"}
           </Text>
           <TopBottomChevron />
         </Flex>
@@ -306,11 +319,8 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             p: "$3",
             width: "14rem",
             ml: "$5",
-            mt: "$1",
           }}>
-          <Text variant={"neutral"} css={{ mb: "$3" }}>
-            Projects
-          </Text>
+          <Text variant={"neutral"}>Projects</Text>
           <Box
             css={{
               borderBottom: "1px solid",
@@ -322,6 +332,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 key={project.id}
                 css={{
                   p: "$2",
+                  ml: "-$2",
                   "&:hover": {
                     backgroundColor: "$neutral4",
                     borderRadius: "$3",
@@ -329,7 +340,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 }}
                 align={"center"}
                 justify={"between"}>
-                <Text>{project.name || "Untitled"}</Text>
+                <Text>{project.name || "Untitled project"}</Text>
                 {currentProject === project.id && <FiCheck />}
               </Flex>
             ))}
@@ -356,11 +367,18 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 align={"center"}
                 css={{
                   color: "$neutral12",
-                  gap: "$2",
                   cursor: "default",
                 }}>
-                <PlusIcon />
-                New project
+                Create new project
+              </Flex>
+              <Flex
+                onClick={() => setShowCreateProjectAlert(true)}
+                align={"center"}
+                css={{
+                  color: "$neutral12",
+                  cursor: "default",
+                }}>
+                View all project
               </Flex>
             </Flex>
           </Box>
