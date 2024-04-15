@@ -20,8 +20,14 @@ export default function TypeFilterCard({
         py: "$2",
         width: "20em",
         border: isActive ? "2px solid" : "1px solid",
-        borderColor: isActive ? "$black" : "$neutral8",
+        borderColor: isActive ? "$primary8" : "$neutral8",
         borderRadius: "$3",
+        cursor: "default",
+        "&:hover": {
+          border: "2px solid",
+          borderColor: "$primary8",
+          transition: "0.3s",
+        },
       }}>
       <Text
         css={{
@@ -37,7 +43,7 @@ export default function TypeFilterCard({
         css={{
           fontWeight: 500,
           fontSize: "$3",
-          color: isActive && "$black",
+          color: isActive && "$primary8",
         }}>
         {value}
       </Text>

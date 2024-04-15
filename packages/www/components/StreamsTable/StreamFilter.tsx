@@ -169,6 +169,10 @@ const StreamFilter = ({ onDone }) => {
                 backgroundColor: "transparent",
                 borderColor: isActive ? "$primary8" : "$neutral9",
                 color: isActive ? "$primary9" : "$neutral9",
+                "&:hover": {
+                  borderColor: "$primary8",
+                  color: "$primary9",
+                },
               }}>
               <PlusCircledIcon />
               {filter.name} {isActive && " | " + value}
@@ -192,8 +196,9 @@ const StreamFilter = ({ onDone }) => {
                   onClick={handleSearch}
                   css={{
                     fontWeight: 500,
+                    cursor: "default",
                   }}>
-                  Search
+                  Apply
                 </Button>
               </Flex>
             </DropdownMenuContent>
