@@ -94,8 +94,6 @@ const livepeerClient = createReactClient({
   }),
 });
 
-const RIPE_API_KEY = process.env.NEXT_PUBLIC_RIPE_API_KEY;
-
 const livepeerTheme: ThemeConfig = {
   colors: {
     accent: "$colors$green10",
