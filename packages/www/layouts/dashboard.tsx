@@ -23,7 +23,7 @@ if (!isExport()) {
 // Track client-side page views with Segment & HubSpot
 if (!isExport() && process.env.NODE_ENV === "production") {
   Router.events.on("routeChangeComplete", (url) => {
-    window.analytics.page();
+    window.analytics && window.analytics.page();
     var _hsq = (window["hsq"] = window["hsq"] || []);
     _hsq.push(["setPath", url]);
     _hsq.push(["trackPageView"]);
