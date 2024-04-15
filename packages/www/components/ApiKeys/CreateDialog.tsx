@@ -164,6 +164,7 @@ const CreateDialog = ({
 
                 <Box css={{ display: "flex", mt: "$2", alignItems: "center" }}>
                   <Checkbox
+                    placeholder="allowCors"
                     id="allowCors"
                     checked={allowCors}
                     disabled={isAdmin}
@@ -286,6 +287,7 @@ const CreateDialog = ({
 
                     <Box css={{ display: "flex", mt: "$2" }}>
                       <Checkbox
+                        placeholder="corsFullAccess"
                         id="corsFullAccess"
                         checked={cors.fullAccess ?? false}
                         onCheckedChange={(checked: boolean) =>

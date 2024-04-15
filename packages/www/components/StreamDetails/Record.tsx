@@ -33,6 +33,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
     <Box>
       {isSwitch ? (
         <Switch
+          placeholder="Record mode"
           checked={!!stream.record}
           name="record-mode"
           value={`${!!stream.record}`}

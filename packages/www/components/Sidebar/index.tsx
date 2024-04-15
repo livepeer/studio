@@ -100,6 +100,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               p: 0,
             }}>
             <Avatar
+              placeholder="user"
               size="3"
               alt={user?.firstName}
               fallback={
@@ -119,7 +120,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               css={{ width: 20, height: 20, color: "$hiContrast" }}
             />
           </Flex>
-          <DropdownMenuContent css={{ border: "1px solid $colors$neutral6" }}>
+          <DropdownMenuContent
+            placeholder="dropdown-menu-content"
+            css={{ border: "1px solid $colors$neutral6" }}>
             <DropdownMenuGroup>
               <DropdownMenuItem
                 key="billing-dropdown-item"

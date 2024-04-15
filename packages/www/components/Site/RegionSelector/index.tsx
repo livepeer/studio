@@ -12,6 +12,7 @@ import { useState } from "react";
 
 const Item = ({ active = false, language, locale, flag, ...props }) => (
   <DropdownMenuCheckboxItem
+    placeholder="Language"
     css={{
       borderRadius: 3,
       display: "flex",
@@ -97,6 +98,7 @@ const LanguageDropdown = ({ navBackgroundColor }) => {
         </Box>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        placeholder="dropdown-menu-content"
         css={{
           minWidth: 300,
           backgroundColor: "#ffffff",

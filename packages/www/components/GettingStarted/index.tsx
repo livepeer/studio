@@ -20,7 +20,10 @@ const GettingStarted = ({ firstName = "" }) => {
         Welcome to Livepeer Studio{firstName && `, ${firstName}`}
       </Heading>
       <Box css={{ bc: "$panel" }}>
-        <Accordion type="single" defaultValue="accordion-one">
+        <Accordion
+          placeholder="Getting Started"
+          type="single"
+          defaultValue="accordion-one">
           <AccordionItem value="accordion-one">
             <AccordionTrigger css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
@@ -71,7 +74,9 @@ const GettingStarted = ({ firstName = "" }) => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="accordion-two">
-            <AccordionTrigger css={{ color: "$primary12" }}>
+            <AccordionTrigger
+              placeholder="Create your first livestream"
+              css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
                 Create your first livestream
               </Text>
@@ -120,8 +125,10 @@ const GettingStarted = ({ firstName = "" }) => {
               </Flex>
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="accordion-three">
-            <AccordionTrigger css={{ color: "$primary12" }}>
+          <AccordionItem placeholder="accordion-three" value="accordion-three">
+            <AccordionTrigger
+              placeholder="Integrate with your app"
+              css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
                 Integrate with your app
               </Text>

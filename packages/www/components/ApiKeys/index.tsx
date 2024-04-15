@@ -16,7 +16,7 @@ import {
 } from "./helpers";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
-import June, { events } from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 const ApiKeysTable = ({
   title = "API Keys",
@@ -33,6 +33,7 @@ const ApiKeysTable = ({
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const columns = useMemo(makeColumns, []);
+  const June = useJune();
 
   const fetcher: Fetcher<ApiKeysTableData> = useCallback(
     async () => rowsPageFromState(userId, getApiTokens),

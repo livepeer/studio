@@ -150,6 +150,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Box>Feedback</Box>
             </Button>
             <DropdownMenuContent
+              placeholder="Feedback"
               css={{
                 padding: "18px 0 12px",
                 position: "relative",

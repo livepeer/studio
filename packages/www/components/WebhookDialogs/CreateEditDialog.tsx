@@ -178,7 +178,9 @@ const CreateEditDialog = ({
                   </Select>
                 </Box>
               </DropdownMenuTrigger>
-              <DropdownMenuContent css={{ mt: "$1" }}>
+              <DropdownMenuContent
+                placeholder="dropdown-menu-content"
+                css={{ mt: "$1" }}>
                 <Box
                   css={{
                     position: "relative",

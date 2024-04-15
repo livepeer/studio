@@ -228,6 +228,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                 <StyledItem value={filter.label} key={i}>
                   <StyledHeader onClick={onToggleOpen}>
                     <Checkbox
+                      placeholder="isOpen"
                       checked={filter.isOpen}
                       onCheckedChange={onToggleOpen}
                       onClick={onToggleOpen}
