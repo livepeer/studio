@@ -27,7 +27,7 @@ const WorkspaceProjects = () => {
 
   return (
     <Layout
-      id="settings/projects"
+      id="account/projects"
       breadcrumbs={[{ title: "Projects" }]}
       {...Content.metaData}>
       <Box

@@ -19,11 +19,10 @@ import {
   HomeIcon,
   StreamIcon,
   TerminalIcon,
-  BillingIcon,
-  UsageIcon,
   AssetsIcon,
   TopBottomChevron,
   SettingsIcon,
+  WorkspaceIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
@@ -70,11 +69,11 @@ export type SidebarId =
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
-  | "settings/general"
-  | "settings/projects"
-  | "settings/usage"
-  | "settings/billing"
-  | "settings/plans";
+  | "account/general"
+  | "account/projects"
+  | "account/usage"
+  | "account/billing"
+  | "account/plans";
 
 export const generalSidebarItems = [
   {
@@ -135,35 +134,32 @@ export const generalSidebarItems = [
 
 const settingsSidebarItems = [
   {
-    title: "General",
-    path: "/dashboard/settings/general",
-    id: "settings/general",
-  },
-  {
-    title: "Projects",
-    path: "/dashboard/settings/projects",
-    id: "settings/projects",
-  },
-  {
-    title: "Usage",
-    path: "/dashboard/settings/usage",
-    id: "settings/usage",
-  },
-  {
-    title: "Billing",
-    path: "/dashboard/settings/billing",
-    id: "settings/billing",
-  },
-  {
-    title: "Plans",
-    path: "/dashboard/settings/billing/plans",
-    id: "settings/plans",
-  },
-  {
-    title: "Settings",
-    path: "/dashboard/settings/general",
-    icon: <SettingsIcon />,
-    id: "settings",
+    title: "Workspace",
+    path: "#",
+    icon: <WorkspaceIcon />,
+    id: "account/workspace",
+    children: [
+      {
+        title: "Projects",
+        path: "/dashboard/account/projects",
+        id: "account/projects",
+      },
+      {
+        title: "Plans",
+        path: "/dashboard/account/billing/plans",
+        id: "account/plans",
+      },
+      {
+        title: "Usage",
+        path: "/dashboard/account/usage",
+        id: "account/usage",
+      },
+      {
+        title: "Billing",
+        path: "/dashboard/account/billing",
+        id: "account/billing",
+      },
+    ],
   },
 ];
 
@@ -266,7 +262,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 key="billing-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
-                  Router.push("/dashboard/billing");
+                  Router.push("/dashboard/account/projects");
                 }}>
                 Account setting
               </DropdownMenuItem>
@@ -546,9 +542,30 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             },
           }}>
           {settingsSidebarItems.map((item) => (
-            <Link href={item.path} passHref legacyBehavior>
-              <NavLink active={id === item.id}>{item.title}</NavLink>
-            </Link>
+            <Box>
+              <Link href={item.path} passHref legacyBehavior>
+                <NavLink active={id === item.id}>
+                  {item.icon}
+                  {item.title}
+                </NavLink>
+              </Link>
+
+              {item.children && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                      mt: "$1",
+                    },
+                  }}>
+                  {item.children.map((child) => (
+                    <Link href={child.path} passHref legacyBehavior>
+                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                    </Link>
+                  ))}
+                </Box>
+              )}
+            </Box>
           ))}
         </Grid>
       </Flex>

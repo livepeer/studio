@@ -13,7 +13,7 @@ const PlansPage = () => {
   }
   return (
     <Layout
-      id="settings/plans"
+      id="account/plans"
       breadcrumbs={[{ title: "Plans" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>

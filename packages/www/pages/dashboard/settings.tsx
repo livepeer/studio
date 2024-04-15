@@ -16,18 +16,12 @@ import { projectId } from "hooks/use-project";
 
 const Settings = () => {
   useLoggedIn();
-  const { user } = useApi();
+  const { user, getProject } = useApi();
   const [projectLogo, setProjectLogo] = useState<File | null>(null);
-
-  const { getProject } = useApi();
-
-  const { data } = useQuery(["project", projectId], () =>
-    getProject(projectId)
-  );
-
   const [projectName, setProjectName] = useState<string | null>();
-
   const logoRef = useRef<HTMLInputElement>(null);
+
+  const { data } = useQuery(["project", projectId], getProject);
 
   const handleSubmit = () => {
     console.log("Project Name: ", projectName);
@@ -45,7 +39,7 @@ const Settings = () => {
   }
   return (
     <Layout
-      id="settings/general"
+      id="dashboard/general"
       breadcrumbs={[{ title: "Settings" }]}
       {...Content.metaData}>
       <Box
@@ -137,7 +131,6 @@ const Settings = () => {
             css={{
               mb: "$4",
               mt: "$6",
-              width: "20%",
             }}>
             <Box
               css={{
@@ -154,6 +147,9 @@ const Settings = () => {
               onChange={(e) => setProjectName(e.target.value)}
               value={projectName}
               id="projectName"
+              css={{
+                width: "15rem",
+              }}
               placeholder="Project Name"
             />
           </Flex>
@@ -187,7 +183,7 @@ const Settings = () => {
             <Text
               variant="neutral"
               size="3"
-              css={{ mb: "$3", width: "40%", lineHeight: 1.7 }}>
+              css={{ mb: "$3", width: "30rem", lineHeight: 1.7 }}>
               If you want to permanently delete this project and all of its
               data, including but not limited to streams, sessions, and assets,
               you can do so below.

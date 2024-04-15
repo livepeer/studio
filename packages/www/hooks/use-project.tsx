@@ -1,3 +1,6 @@
+import { useQuery } from "react-query";
+import { getProject } from "./use-api/endpoints/project";
+
 export const projectId =
   typeof window !== "undefined" && localStorage.getItem("currentProject");
 
