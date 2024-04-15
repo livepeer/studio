@@ -114,7 +114,7 @@ export default function ProjectTile({ name, url, id, ...props }) {
       </Flex>
       <Button
         onClick={() => {
-          navigate(id);
+          navigate(id, "/");
         }}
         css={{
           padding: "18px",
