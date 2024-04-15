@@ -7,12 +7,13 @@ import {
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "../../hooks";
 import ErrorDialog from "../ErrorDialog";
-import June, { events } from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
   const { patchStream } = useApi();
   const [openSnackbar] = useSnackbar();
   const errorRecordDialogState = useToggleState();
+  const June = useJune();
 
   const onCheckedChange = async () => {
     June.track(events.stream.recordingToggle);

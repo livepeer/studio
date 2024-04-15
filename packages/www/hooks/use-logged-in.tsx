@@ -1,7 +1,7 @@
 import useApi from "./use-api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import June from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 /**
  * Verifies that the user is logged in. Redirects to / if not. Pass
@@ -11,6 +11,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   const { user, token } = useApi();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const June = useJune();
   const { next } = router.query;
   const emailVerificationMode =
     process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";

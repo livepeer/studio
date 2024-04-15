@@ -19,7 +19,7 @@ import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
-import June, { events } from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 export interface OverUsageBill {
   transcodingBill: OverUsageItem;
@@ -51,6 +51,7 @@ const Billing = () => {
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
     null
   );
+  const June = useJune();
 
   const standardProducts = ["Hacker", "Growth", "Scale"];
 

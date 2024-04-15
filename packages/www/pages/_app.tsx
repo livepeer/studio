@@ -24,7 +24,6 @@ import "../css/markdown.css";
 import "../css/recaptcha.css";
 import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
-import June from "components/June";
 
 const queryClient = new QueryClient();
 
@@ -146,7 +145,6 @@ const App = ({ Component, pageProps }) => {
                       client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
-                      <June />
                     </LivepeerConfig>
                   </AnalyzerProvider>
                 </ApiProvider>

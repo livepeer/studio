@@ -30,7 +30,7 @@ import { useApi } from "../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
-import June from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -73,8 +73,9 @@ export type SidebarId =
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
+  const June = useJune();
 
-  June.track(`sidebar ${id}`);
+  June?.track(`sidebar ${id}`);
 
   return (
     <Box

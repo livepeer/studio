@@ -20,7 +20,7 @@ import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../public/img/icons/checked.svg";
 import { useEffect, useState, useRef } from "react";
 import { useApi, useHubspotForm } from "hooks";
-import June, { events } from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -54,6 +54,7 @@ const Header = ({ breadcrumbs = [] }) => {
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
   });
+  const June = useJune();
 
   useEffect(() => {
     if (data) {

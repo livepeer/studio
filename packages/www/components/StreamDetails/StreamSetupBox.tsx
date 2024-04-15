@@ -3,7 +3,7 @@ import { Stream } from "@livepeer.studio/api";
 import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
 import { isStaging } from "lib/utils";
-import June, { events } from "lib/June";
+import { useJune, events } from "hooks/use-june";
 
 export type StreamSetupBoxProps = {
   activeTab: "Browser" | "Streaming Software";
@@ -24,6 +24,8 @@ const StreamSetupBox = ({
   const broadcastIframeUrl = isStaging()
     ? `https://monster.lvpr.tv/broadcast/${stream.streamKey}`
     : `https://lvpr.tv/broadcast/${stream.streamKey}`;
+
+  const June = useJune();
 
   return (
     <>

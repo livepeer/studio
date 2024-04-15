@@ -200,6 +200,7 @@ const CreateEditDialog = ({
                   <DropdownMenuGroup>
                     {eventOptions.map((event, i) => (
                       <DropdownMenuCheckboxItem
+                        placeholder="dropdown-menu-checkbox-item"
                         key={i}
                         checked={events.includes(event)}
                         onSelect={(e) => {

@@ -213,7 +213,6 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               return (
                 <Checkbox
                   placeholder="Select row"
-                  placeholder="Select row"
                   css={{ display: "flex" }}
                   // @ts-ignore
                   value={row.isSelected}

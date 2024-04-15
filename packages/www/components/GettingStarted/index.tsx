@@ -25,7 +25,9 @@ const GettingStarted = ({ firstName = "" }) => {
           type="single"
           defaultValue="accordion-one">
           <AccordionItem value="accordion-one">
-            <AccordionTrigger css={{ color: "$primary12" }}>
+            <AccordionTrigger
+              placeholder="upload video accordion"
+              css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
                 Upload your first video
               </Text>
@@ -125,7 +127,7 @@ const GettingStarted = ({ firstName = "" }) => {
               </Flex>
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem placeholder="accordion-three" value="accordion-three">
+          <AccordionItem value="accordion-three">
             <AccordionTrigger
               placeholder="Integrate with your app"
               css={{ color: "$primary12" }}>
