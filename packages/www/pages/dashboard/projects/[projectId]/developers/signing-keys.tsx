@@ -1,4 +1,4 @@
-import Layout from "../../../layouts/dashboard";
+import Layout from "../../../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardSigningKeys as Content } from "content";

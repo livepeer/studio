@@ -1,17 +1,7 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardStreams as Content } from "content";
-import {
-  Box,
-  Heading,
-  Flex,
-  Text,
-  TextField,
-  Button,
-  Grid,
-} from "@livepeer/design-system";
-import { workspaces } from "./general";
-import Image from "next/image";
+import { Box, Heading, Text, Grid } from "@livepeer/design-system";
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery } from "react-query";
 

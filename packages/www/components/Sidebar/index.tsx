@@ -78,55 +78,55 @@ export type SidebarId =
 export const generalSidebarItems = [
   {
     title: "Home",
-    path: "/dashboard",
+    path: "/",
     icon: <HomeIcon />,
     id: "home",
   },
   {
     title: "Streams",
-    path: "/dashboard/streams",
+    path: "/streams",
     icon: <StreamIcon />,
     id: "streams",
     children: [
       {
         title: "Sessions",
-        path: "/dashboard/sessions",
+        path: "/sessions",
         id: "streams/sessions",
       },
     ],
   },
   {
     title: "Assets",
-    path: "/dashboard/assets",
+    path: "/assets",
     icon: <AssetsIcon />,
     id: "assets",
   },
   {
     title: "Developers",
-    path: "/dashboard/developers/api-keys",
+    path: "/developers/api-keys",
     icon: <TerminalIcon />,
     id: "developers",
     children: [
       {
         title: "API Keys",
-        path: "/dashboard/developers/api-keys",
+        path: "/developers/api-keys",
         id: "developers",
       },
       {
         title: "Signing Keys",
-        path: "/dashboard/developers/signing-keys",
+        path: "/developers/signing-keys",
         id: "developers/signing-keys",
       },
       {
         title: "Webhooks",
-        path: "/dashboard/developers/webhooks",
+        path: "/developers/webhooks",
         id: "developers/webhooks",
       },
     ],
   },
   {
     title: "Settings",
-    path: "/dashboard/settings",
+    path: "/settings",
     icon: <SettingsIcon />,
     id: "settings",
   },
@@ -141,22 +141,22 @@ const settingsSidebarItems = [
     children: [
       {
         title: "Projects",
-        path: "/dashboard/account/projects",
+        path: "/account/projects",
         id: "account/projects",
       },
       {
         title: "Plans",
-        path: "/dashboard/account/billing/plans",
+        path: "/account/billing/plans",
         id: "account/plans",
       },
       {
         title: "Usage",
-        path: "/dashboard/account/usage",
+        path: "/account/usage",
         id: "account/usage",
       },
       {
         title: "Billing",
-        path: "/dashboard/account/billing",
+        path: "/account/billing",
         id: "account/billing",
       },
     ],
@@ -194,10 +194,10 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const { createProject, getProjects, logout } = useApi();
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
-  const { setCurrentProject, currentProject } = useProject();
+  const { setCurrentProject, activeProjectId, appendProjectId } = useProject();
 
   const goBack = () => {
-    Router.push("/dashboard");
+    Router.push("");
   };
 
   const onCreateClick = async (projectName: string) => {
@@ -208,7 +208,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
   const { data } = useQuery("projects", getProjects);
 
-  const activeProject = data?.find((project) => project.id === currentProject);
+  const activeProject = data?.find((project) => project.id === activeProjectId);
 
   return (
     <>
@@ -337,7 +337,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 align={"center"}
                 justify={"between"}>
                 <Text>{project.name || "Untitled project"}</Text>
-                {currentProject === project.id && <FiCheck />}
+                {activeProjectId === project.id && <FiCheck />}
               </Flex>
             ))}
           </Box>
@@ -394,7 +394,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           }}>
           {generalSidebarItems.map((item) => (
             <Box>
-              <Link href={item.path} passHref legacyBehavior>
+              <Link href={appendProjectId(item.path)} passHref legacyBehavior>
                 <NavLink active={id === item.id}>
                   {item.icon}
                   {item.title}
@@ -409,7 +409,10 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                     },
                   }}>
                   {item.children.map((child) => (
-                    <Link href={child.path} passHref legacyBehavior>
+                    <Link
+                      href={appendProjectId(child.path)}
+                      passHref
+                      legacyBehavior>
                       <NavLink active={id === child.id}>{child.title}</NavLink>
                     </Link>
                   ))}
@@ -507,7 +510,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
 const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const goBack = () => {
-    Router.push("/dashboard");
+    Router.push("");
   };
 
   return (

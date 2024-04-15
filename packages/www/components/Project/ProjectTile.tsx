@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   Button,
+  Badge,
 } from "@livepeer/design-system";
 import { GoDotFill } from "react-icons/go";
 import Image from "next/image";
@@ -16,17 +17,16 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import Link from "next/link";
 import { NavLink, generalSidebarItems } from "components/Sidebar";
 import useProject from "hooks/use-project";
-import { useRouter } from "next/router";
 
 export default function ProjectTile({ name, url, id, ...props }) {
-  const { setCurrentProject } = useProject();
+  const { setCurrentProject, activeProjectId } = useProject();
 
   const navigate = (id, path) => {
     setCurrentProject(
       {
         id,
       },
-      false
+      path
     );
   };
 
@@ -46,6 +46,15 @@ export default function ProjectTile({ name, url, id, ...props }) {
               fontWeight: 500,
             }}>
             {name || "Untitled project"}
+            {activeProjectId === id && (
+              <Badge
+                variant={"green"}
+                css={{
+                  ml: "$2",
+                }}>
+                Active
+              </Badge>
+            )}
           </Text>
           <DropdownMenu>
             <Box
@@ -87,9 +96,7 @@ export default function ProjectTile({ name, url, id, ...props }) {
                       onClick={() => {
                         navigate(id, item.path);
                       }}>
-                      <NavLink key={item.title} href={item.path}>
-                        {item.title}
-                      </NavLink>
+                      <NavLink key={item.title}>{item.title}</NavLink>
                     </Box>
                   ))}
                 </Flex>
@@ -99,13 +106,16 @@ export default function ProjectTile({ name, url, id, ...props }) {
         </Flex>
         <Text
           css={{
-            mt: "$0.5",
+            mt: "$1",
             color: "$neutral10",
           }}>
           {sanitizeUrl(url)}
         </Text>
       </Flex>
       <Button
+        onClick={() => {
+          navigate(id);
+        }}
         css={{
           padding: "18px",
           fontSize: "13px",

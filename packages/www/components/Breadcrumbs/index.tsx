@@ -47,7 +47,7 @@ const Breadcrumbs = ({ children }) => {
   const { data } = useQuery("projects", getProjects);
   const pathname = usePathname();
 
-  const isSettingsPage = pathname.includes("account");
+  const isSettingsPage = false;
 
   const allItems = Children.toArray(children)
     .filter((child) => {

@@ -1,16 +1,16 @@
-import Layout from "../../../layouts/dashboard";
+import Layout from "../../../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import ApiKeysTable from "components/ApiKeys";
-import { DashboardAPIKeys as Content } from "content";
+import AssetsTable from "components/AssetsTable";
+import { DashboardAssets as Content } from "content";
 import Ripe, { categories, pages } from "lib/ripe";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
-  name: pages.API_KEY,
+  name: pages.ASSETS,
 });
 
-const ApiKeys = () => {
+const Assets = () => {
   useLoggedIn();
   const { user } = useApi();
 
@@ -19,19 +19,16 @@ const ApiKeys = () => {
   }
   return (
     <Layout
-      id="developers"
-      breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/api-keys" },
-        { title: "API Keys" },
-      ]}
+      id="assets"
+      breadcrumbs={[{ title: "Assets" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
-          <ApiKeysTable userId={user.id} />
+          <AssetsTable userId={user.id} tableId="dashboardAssetsTable" />
         </Box>
       </Box>
     </Layout>
   );
 };
 
-export default ApiKeys;
+export default Assets;
