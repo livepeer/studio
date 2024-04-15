@@ -36,8 +36,8 @@ export default function ProjectTile({ name, url, id, ...props }) {
         border: "1px solid",
         borderColor: "$neutral6",
         p: "$4",
+        width: "100%",
         borderRadius: "11px",
-        width: "30%",
       }}>
       <Flex direction={"column"}>
         <Flex align={"center"} justify={"between"}>

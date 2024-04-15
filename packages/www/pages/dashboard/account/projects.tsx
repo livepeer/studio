@@ -8,6 +8,7 @@ import {
   Text,
   TextField,
   Button,
+  Grid,
 } from "@livepeer/design-system";
 import { workspaces } from "./general";
 import Image from "next/image";
@@ -62,8 +63,12 @@ const WorkspaceProjects = () => {
             </Text>
           </Box>
         </Box>
-        <Flex gap={4} wrap={"wrap"}>
-          {data.map((project) => (
+        <Grid
+          css={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+            gap: "$5",
+          }}>
+          {data?.map((project) => (
             <ProjectTile
               id={project.id}
               name={project.name}
@@ -71,7 +76,7 @@ const WorkspaceProjects = () => {
               url={"https://example.com/projects/" + project.name}
             />
           ))}
-        </Flex>
+        </Grid>
       </Box>
     </Layout>
   );
