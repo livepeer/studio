@@ -652,6 +652,9 @@ export const triggerCatalystPullStart =
           url.searchParams.set("lat", lat.toString());
           url.searchParams.set("lon", lon.toString());
           playbackUrl = url.toString();
+          console.log(
+            `triggering catalyst pull start for streamId=${stream.id} playbackId=${stream.playbackId} lat=${lat} lon=${lon} pullRegion=${stream.pullRegion}`
+          );
         }
 
         const deadline = Date.now() + 2 * PULL_START_TIMEOUT;

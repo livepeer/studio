@@ -9,6 +9,7 @@ import logger from "../logger";
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
+import { fetchWithTimeout } from "../util";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -233,6 +234,40 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
       });
     })
   );
+}
+
+async function resolvePullRegion(
+  stream: NewStreamPayload,
+  ingest: string
+): Promise<string> {
+  if (process.env.NODE_ENV === "test") {
+    return null;
+  }
+  const url = new URL(
+    pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
+  );
+  const { lat, lon } = stream.pull?.location ?? {};
+  if (lat && lon) {
+    url.searchParams.set("lat", lat.toString());
+    url.searchParams.set("lon", lon.toString());
+  }
+  const playbackUrl = url.toString();
+  // Send any playback request to catalyst-api, which effectively resolves the region using MistUtilLoad
+  const response = await fetchWithTimeout(playbackUrl, { redirect: "manual" });
+  if (response.status < 300 || response.status >= 400) {
+    // not a redirect response, so we can't determine the region
+    return null;
+  }
+  const redirectUrl = response.headers.get("location");
+  return extractRegionFrom(redirectUrl);
+}
+
+// Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
+export function extractRegionFrom(playbackUrl: string): string {
+  const regionRegex =
+    /https?:\/\/(.+)-\w+-catalyst.+not-used-playback\/index.m3u8/;
+  const matches = playbackUrl.match(regionRegex);
+  return matches ? matches[1] : null;
 }
 
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
@@ -1001,6 +1036,8 @@ app.put(
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
+    const ingest = await getIngestBase(req);
+
     if (!rawPayload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
@@ -1046,9 +1083,13 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
+    const pullRegion = await resolvePullRegion(rawPayload, ingest);
+
     let stream: DBStream;
     if (!streamExisted) {
       stream = await handleCreateStream(req);
+      stream.pullRegion = pullRegion;
+      await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
       const sleepFor = terminateDelay(oldStream);
@@ -1063,6 +1104,7 @@ app.put(
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
+        pullRegion,
         ...payload,
       };
       await db.stream.replace(stream);
@@ -1073,7 +1115,6 @@ app.put(
     }
 
     if (!stream.isActive || streamExisted) {
-      const ingest = await getIngestBase(req);
       await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
