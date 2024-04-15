@@ -43,7 +43,7 @@ const RegisterPage = () => {
     if (email && emailValidToken) {
       verify(email, emailValidToken).then(() => {
         if (selectedPlan === "1") {
-          router.replace("/dashboard/billing/plans?promptUpgrade=true");
+          router.replace("/dashboard/account/billing/plans?promptUpgrade=true");
         } else {
           router.replace("/dashboard");
         }

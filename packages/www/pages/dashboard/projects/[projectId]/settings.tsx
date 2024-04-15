@@ -21,22 +21,26 @@ import { FiImage } from "react-icons/fi";
 const Settings = () => {
   useLoggedIn();
   const { user, getProject } = useApi();
+  const { activeProjectId } = useProject();
+
+  const { data } = useQuery(
+    ["project", activeProjectId],
+    () => getProject(activeProjectId),
+    {
+      onSuccess(data) {
+        setProjectName(data.name);
+      },
+    }
+  );
+
   const [projectLogo, setProjectLogo] = useState<File | null>(null);
   const [projectName, setProjectName] = useState<string | null>();
   const logoRef = useRef<HTMLInputElement>(null);
-
-  const { activeProjectId } = useProject();
-
-  const { data } = useQuery(["project", activeProjectId], () =>
-    getProject(activeProjectId)
-  );
 
   const handleSubmit = () => {
     console.log("Project Name: ", projectName);
     console.log("Project Logo: ", projectLogo);
   };
-
-  console.log(data);
 
   const deleteProject = () => {
     if (confirm("Are you sure you want to delete this project?")) {
@@ -163,7 +167,6 @@ const Settings = () => {
               required
               size="2"
               type="text"
-              defaultValue={data?.name}
               onChange={(e) => setProjectName(e.target.value)}
               value={projectName}
               id="projectName"

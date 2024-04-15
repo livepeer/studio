@@ -14,6 +14,7 @@ import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { State } from "../Table";
 import TableEmptyState from "../Table/components/TableEmptyState";
 import { useApi } from "hooks";
+import useProject from "hooks/use-project";
 
 type ApiClient = ReturnType<typeof useApi>;
 
@@ -100,7 +101,8 @@ export const rowsPageFromState = async (
   userId: string,
   getAssets: ApiClient["getAssets"],
   getTasks: ApiClient["getTasks"],
-  onDeleteAsset: Function
+  onDeleteAsset: Function,
+  appendProjectId: Function
 ): Promise<RowsPageFromStateResult<AssetsTableData>> => {
   const assetsPromise = getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
@@ -137,7 +139,7 @@ export const rowsPageFromState = async (
         id: asset.id,
         name: {
           id: asset.id,
-          href: `/dashboard/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
           name: asset.name,
           isStatusFailed,
           errorMessage,
@@ -149,18 +151,18 @@ export const rowsPageFromState = async (
             </Box>
           ),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
         },
         sessionId: {
           children: <Box>{sessionId}</Box>,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/sessions?sessionId=${sessionId}`,
+          href: appendProjectId(`/sessions?sessionId=${sessionId}`),
         },
         createdAt: {
           id: asset.id,
           date: new Date(asset.createdAt),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
           asset: asset as Asset, // CreatedAt cell expect SDK asset instead of API
         },
         updatedAt: {
@@ -169,7 +171,7 @@ export const rowsPageFromState = async (
               ? new Date(asset.status.updatedAt)
               : null,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
         },
         action: {
           id: asset.id,

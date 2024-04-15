@@ -7,6 +7,7 @@ import TableEmptyState from "../Table/components/TableEmptyState";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+import useProject from "hooks/use-project";
 
 export type StreamsTableData = {
   id: string;
@@ -63,7 +64,8 @@ export const makeColumns = () => [
 export const rowsPageFromState = async (
   state: State<StreamsTableData>,
   userId: string,
-  getStreams: Function
+  getStreams: Function,
+  appendProjectId: Function
 ): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
   const filteredFilters = state.filters.filter((f) => {
@@ -93,22 +95,22 @@ export const rowsPageFromState = async (
           Created by token <b>{stream.createdByTokenName}</b>
         </>
       ) : null,
-      href: `/dashboard/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
     details: { stream },
     createdAt: {
       date: new Date(stream.createdAt),
       fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
-      href: `/dashboard/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
     lastSeen: {
       date: stream.lastSeen ? new Date(stream.lastSeen) : null,
       fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
-      href: `/dashboard/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
     status: {
       children: stream.isActive ? "Active" : "Idle",
-      href: `/dashboard/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
   }));
   return { rows, nextCursor, count };

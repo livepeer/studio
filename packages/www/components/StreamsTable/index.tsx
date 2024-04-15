@@ -21,6 +21,7 @@ import {
 import { makeSelectAction, makeCreateAction } from "../Table/helpers";
 import TableHeader from "../Table/components/TableHeader";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import useProject from "hooks/use-project";
 
 const StreamsTable = ({
   title = "Streams",
@@ -45,8 +46,11 @@ const StreamsTable = ({
     initialOrder: sortByToString(DefaultSortBy),
   });
   const columns = useMemo(makeColumns, []);
+  const { appendProjectId } = useProject();
+
   const fetcher: Fetcher<StreamsTableData> = useCallback(
-    async (state) => rowsPageFromState(state, userId, getStreams),
+    async (state) =>
+      rowsPageFromState(state, userId, getStreams, appendProjectId),
     [userId]
   );
 
@@ -59,7 +63,7 @@ const StreamsTable = ({
       await state.invalidate();
       const query = router.query.admin === "true" ? { admin: true } : {};
       await router.push({
-        pathname: `/dashboard/streams/${newStream.id}`,
+        pathname: appendProjectId(`/streams/${newStream.id}`),
         query,
       });
     },

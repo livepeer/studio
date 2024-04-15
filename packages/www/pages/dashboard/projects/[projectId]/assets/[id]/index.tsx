@@ -7,6 +7,7 @@ import AssetOverviewTab from "components/AssetDetails/AssetOverviewTab";
 import AssetEventLogTab from "components/AssetDetails/AssetEventLogTab";
 import { Asset } from "@livepeer.studio/api";
 import Ripe, { categories, pages } from "lib/ripe";
+import useProject from "hooks/use-project";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
@@ -23,6 +24,7 @@ const AssetDetails = () => {
   );
   const [editAssetDialogOpen, setEditAssetDialogOpen] = useState(false);
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
+  const { appendProjectId } = useProject();
 
   const { query } = router;
   const id = query.id as string;
@@ -57,7 +59,7 @@ const AssetDetails = () => {
       setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}
       refetchAsset={() => refetchAsset()}
       breadcrumbs={[
-        { title: "Assets", href: "/dashboard/assets" },
+        { title: "Assets", href: appendProjectId("/assets") },
         { title: asset?.name },
       ]}>
       {currentTab === "Overview" ? (

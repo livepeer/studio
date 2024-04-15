@@ -20,6 +20,7 @@ import {
 } from "./helpers";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import useProject from "hooks/use-project";
 
 const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
   const router = useRouter();
@@ -33,9 +34,10 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
   });
 
   const columns = useMemo(makeColumns, []);
+  const { appendProjectId } = useProject();
 
   const fetcher: Fetcher<WebhooksTableData> = useCallback(
-    async (state) => rowsPageFromState(state, getWebhooks),
+    async (state) => rowsPageFromState(state, getWebhooks, appendProjectId),
     [getWebhooks, user.id]
   );
 
@@ -49,7 +51,7 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
     await state.invalidate();
     const query = router.query.admin === "true" ? { admin: true } : {};
     await router.push({
-      pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,
+      pathname: appendProjectId(`/developers/webhooks/${newWebhook.id}`),
       query,
     });
   };

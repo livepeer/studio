@@ -11,6 +11,7 @@ import Banner from "components/Banner";
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
 import Ripe, { categories, pages } from "lib/ripe";
+import useProject from "hooks/use-project";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
@@ -20,6 +21,7 @@ Ripe.trackPage({
 const Dashboard = () => {
   const { user, verifyEmail, getUserProduct } = useApi();
   const { emailValid } = user;
+  const { appendProjectId } = useProject();
 
   const [loading, setLoading] = useState(false);
   const product = getUserProduct(user);
@@ -82,7 +84,10 @@ const Dashboard = () => {
           title="Upgrade"
           description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
           button={
-            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+            <Link
+              href="/dashboard/account/billing/plans"
+              passHref
+              legacyBehavior>
               <Button
                 variant="primary"
                 as="a"
@@ -107,7 +112,7 @@ const Dashboard = () => {
           userId={user.id}
           pageSize={5}
           tableId="dashboardStreamsTable"
-          viewAll="/dashboard/streams"
+          viewAll={appendProjectId("/streams")}
         />
       </Box>
     </Box>

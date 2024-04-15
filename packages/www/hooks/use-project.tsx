@@ -3,6 +3,9 @@ import useApi from "./use-api";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 
+export const projectId =
+  typeof window !== "undefined" && localStorage.getItem("currentProject");
+
 const useProject = () => {
   const {
     query: { projectId },

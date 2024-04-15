@@ -142,22 +142,22 @@ const settingsSidebarItems = [
     children: [
       {
         title: "Projects",
-        path: "/account/projects",
+        path: "/dashboard/account/projects",
         id: "account/projects",
       },
       {
         title: "Plans",
-        path: "/account/billing/plans",
+        path: "/dashboard/account/billing/plans",
         id: "account/plans",
       },
       {
         title: "Usage",
-        path: "/account/usage",
+        path: "/dashboard/account/usage",
         id: "account/usage",
       },
       {
         title: "Billing",
-        path: "/account/billing",
+        path: "/dashboard/account/billing",
         id: "account/billing",
       },
     ],

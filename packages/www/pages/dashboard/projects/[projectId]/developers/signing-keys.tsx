@@ -3,10 +3,12 @@ import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardSigningKeys as Content } from "content";
 import SigningKeysTable from "components/SigningKeysTable";
+import useProject from "hooks/use-project";
 
 const SigningKeys = () => {
   useLoggedIn();
   const { user } = useApi();
+  const { appendProjectId } = useProject();
 
   if (!user) {
     return <Layout />;
@@ -15,7 +17,10 @@ const SigningKeys = () => {
     <Layout
       id="developers/signing-keys"
       breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/signing-keys" },
+        {
+          title: "Developers",
+          href: appendProjectId("/developers/signing-keys"),
+        },
         { title: "Signing Keys" },
       ]}
       {...Content.metaData}>

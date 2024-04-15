@@ -296,7 +296,7 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/dashboard/billing" passHref legacyBehavior>
+        <Link href="/dashboard/account/billing" passHref legacyBehavior>
           <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>

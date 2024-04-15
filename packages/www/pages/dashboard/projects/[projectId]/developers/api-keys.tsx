@@ -4,6 +4,7 @@ import { useApi, useLoggedIn } from "hooks";
 import ApiKeysTable from "components/ApiKeys";
 import { DashboardAPIKeys as Content } from "content";
 import Ripe, { categories, pages } from "lib/ripe";
+import useProject from "hooks/use-project";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
@@ -13,6 +14,7 @@ Ripe.trackPage({
 const ApiKeys = () => {
   useLoggedIn();
   const { user } = useApi();
+  const { appendProjectId } = useProject();
 
   if (!user) {
     return <Layout />;
@@ -21,7 +23,10 @@ const ApiKeys = () => {
     <Layout
       id="developers"
       breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/api-keys" },
+        {
+          title: "Developers",
+          href: appendProjectId("/developers/api-keys"),
+        },
         { title: "API Keys" },
       ]}
       {...Content.metaData}>

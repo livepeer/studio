@@ -7,6 +7,7 @@ import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/StreamDetails/StreamOverviewTab";
 import Ripe, { categories, pages } from "lib/ripe";
+import useProject from "hooks/use-project";
 
 Ripe.trackPage({
   category: categories.DASHBOARD,
@@ -20,6 +21,7 @@ const StreamDetails = () => {
   const queryClient = useQueryClient();
   const { getStream } = useApi();
   const { getHealth } = useAnalyzer();
+  const { appendProjectId } = useProject();
   const [currentTab, setCurrentTab] = useState<"Overview" | "Health">(
     "Overview"
   );
@@ -57,7 +59,7 @@ const StreamDetails = () => {
       invalidateStream={invalidateStream}
       setSwitchTab={setCurrentTab}
       breadcrumbs={[
-        { title: "Streams", href: "/dashboard/streams" },
+        { title: "Streams", href: appendProjectId("/streams") },
         { title: stream?.name },
       ]}
       embedVideoDialogOpen={embedVideoDialogOpen}
