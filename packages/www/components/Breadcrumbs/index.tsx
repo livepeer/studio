@@ -42,12 +42,12 @@ function insertSeparators(items) {
 }
 
 const Breadcrumbs = ({ children }) => {
-  const { currentProject } = useProject();
+  const { activeProjectId } = useProject();
   const { getProjects } = useApi();
   const { data } = useQuery("projects", getProjects);
   const pathname = usePathname();
 
-  const isSettingsPage = false;
+  const isSettingsPage = pathname?.includes("account");
 
   const allItems = Children.toArray(children)
     .filter((child) => {
@@ -80,8 +80,8 @@ const Breadcrumbs = ({ children }) => {
       </Box>
     );
   } else {
-    if (currentProject) {
-      const project = data?.find((project) => project.id === currentProject);
+    if (activeProjectId) {
+      const project = data?.find((project) => project.id === activeProjectId);
       allItems.unshift(
         <Box
           as="li"

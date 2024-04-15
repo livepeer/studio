@@ -12,7 +12,11 @@ import { DashboardSettingsGeneral as Content } from "content";
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { useQuery } from "react-query";
-import { projectId } from "hooks/use-project";
+import useProject from "hooks/use-project";
+import { ImageIcon, RocketIcon } from "@radix-ui/react-icons";
+import { GoRocket } from "react-icons/go";
+import { FaImage, FaImages } from "react-icons/fa";
+import { FiImage } from "react-icons/fi";
 
 const Settings = () => {
   useLoggedIn();
@@ -21,12 +25,18 @@ const Settings = () => {
   const [projectName, setProjectName] = useState<string | null>();
   const logoRef = useRef<HTMLInputElement>(null);
 
-  const { data } = useQuery(["project", projectId], getProject);
+  const { activeProjectId } = useProject();
+
+  const { data } = useQuery(["project", activeProjectId], () =>
+    getProject(activeProjectId)
+  );
 
   const handleSubmit = () => {
     console.log("Project Name: ", projectName);
     console.log("Project Logo: ", projectLogo);
   };
+
+  console.log(data);
 
   const deleteProject = () => {
     if (confirm("Are you sure you want to delete this project?")) {
@@ -39,7 +49,7 @@ const Settings = () => {
   }
   return (
     <Layout
-      id="dashboard/general"
+      id="settings"
       breadcrumbs={[{ title: "Settings" }]}
       {...Content.metaData}>
       <Box
@@ -94,20 +104,30 @@ const Settings = () => {
               }}>
               Logo
             </Box>
-            <Image
-              onClick={() => logoRef.current?.click()}
-              src={
-                projectLogo
-                  ? URL.createObjectURL(projectLogo)
-                  : workspaces[0].projects[0].logo
-              }
-              alt="Project logo"
-              style={{
-                borderRadius: "12px",
-              }}
-              width={90}
-              height={90}
-            />
+            {!projectLogo ? (
+              <Flex
+                onClick={() => logoRef.current?.click()}
+                justify={"center"}
+                align="center"
+                css={{
+                  width: "90px",
+                  height: "90px",
+                  background: "$neutral3",
+                  borderRadius: "$3",
+                }}
+              />
+            ) : (
+              <Image
+                onClick={() => logoRef.current?.click()}
+                src={URL.createObjectURL(projectLogo)}
+                alt="Project logo"
+                style={{
+                  borderRadius: "12px",
+                }}
+                width={90}
+                height={90}
+              />
+            )}
             <input
               type="file"
               accept="image/*"
@@ -159,8 +179,8 @@ const Settings = () => {
               p: "$4",
               fontSize: "$2",
               mt: "$3",
-              backgroundColor: "black",
-              color: "white",
+              backgroundColor: "$hiContrast",
+              color: "$loContrast",
             }}>
             Update
           </Button>
@@ -206,38 +226,5 @@ const Settings = () => {
     </Layout>
   );
 };
-
-// Placeholder constants, it will be removed and replaced with real data from the API
-export const workspaces = [
-  {
-    name: "Paramount",
-    logo: "https://pbs.twimg.com/profile_images/1712502841494138880/GofqA30R_400x400.jpg",
-    url: "https://livepeer.studio/paramount",
-    projects: [
-      {
-        name: "Paramount Plus",
-        logo: "https://pbs.twimg.com/profile_images/1712502841494138880/GofqA30R_400x400.jpg",
-        url: "https://livepeer.studio/paramount/paramount-plus",
-        activeStreams: 10,
-        isDefault: true,
-        inProgressUploads: 5,
-      },
-      {
-        name: "Paramount Dev",
-        logo: "https://i.pinimg.com/564x/bf/9a/7a/bf9a7a4ead767c8d66c613b76e2d3596.jpg",
-        url: "https://livepeer.studio/paramount/paramount-dev",
-        activeStreams: 21,
-        inProgressUploads: 48,
-      },
-    ],
-    members: [
-      {
-        name: "John Doe",
-        email: "john@livepeer.org",
-        role: "Admin",
-      },
-    ],
-  },
-];
 
 export default Settings;

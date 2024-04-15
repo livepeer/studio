@@ -69,6 +69,7 @@ export type SidebarId =
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
+  | "settings"
   | "account/general"
   | "account/projects"
   | "account/usage"
@@ -509,8 +510,9 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 };
 
 const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  const { appendProjectId } = useProject();
   const goBack = () => {
-    Router.push("");
+    Router.push(appendProjectId("/"));
   };
 
   return (
