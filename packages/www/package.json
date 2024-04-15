@@ -20,6 +20,7 @@
     "@emotion/core": "^10.0.17",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^10.0.23",
+    "@june-so/analytics-next": "^2.0.0",
     "@livepeer.studio/api": "^0.16.2",
     "@livepeer/design-system": "^1.1.0",
     "@livepeer/react": "^3.1.9",

@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { AnalyticsBrowser } from "@june-so/analytics-next";
+
 export const events: EventObject = {
   all: {
     documentation: "documentation",
@@ -38,39 +41,19 @@ interface EventDetail {
   [path: string]: string;
 }
 
-type June = {
-  identify: (payload: { email: string }) => void;
-  track: (eventObject: EventObject) => void;
-};
+export function useJune() {
+  const [analytics, setAnalytics] = useState(undefined);
 
-declare global {
-  interface Window {
-    June: June;
-  }
-}
-
-const June = {
-  identifyUser: (id: string, email: string): void => {
-    if (typeof window === "undefined") return;
-
-    if (window.analytics) {
-      window.analytics.identify(id, {
-        email,
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      let response = AnalyticsBrowser.load({
+        writeKey: "3VINzqYVjfOxFyIr",
       });
-    } else {
-      console.error("June is not available on window.");
-    }
-  },
+      console.log("response", response);
+      setAnalytics(response);
+    };
+    loadAnalytics();
+  }, []);
 
-  track: (event: string): void => {
-    if (typeof window === "undefined") return;
-
-    if (window.analytics) {
-      window.analytics.track(event);
-    } else {
-      console.error("June is not available on window.");
-    }
-  },
-};
-
-export default June;
+  return analytics;
+}
