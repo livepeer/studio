@@ -1,6 +1,2 @@
-// Stub thing to call when we don't want the whole frontend there
-export default function () {
-  return (req, res, next) => {
-    next();
-  };
-}
+// Empty frontend for when we don't want it packaged.
+export default {};

@@ -7,7 +7,7 @@
     "dev": "next",
     "dev:staging": "NEXT_PUBLIC_USE_STAGING_ENDPOINT=true yarn dev",
     "build": "next build",
-    "static": "STATIC_BUILD=true next build && STATIC_BUILD=true next export",
+    "static": "STATIC_BUILD=true NEXT_PUBLIC_EXPORT=true next build && STATIC_BUILD=true NEXT_PUBLIC_EXPORT=true next export -o static-build",
     "start": "next start -p 3012",
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
@@ -163,23 +163,5 @@
       "git add"
     ]
   },
-  "bin": "server.js",
-  "pkg": {
-    "assets": [
-      ".next/**/*",
-      "../../node_modules/dom-helpers/**/*",
-      "../../node_modules/react-icons/**/*",
-      "../../node_modules/next-mdx-remote/**/*"
-    ],
-    "scripts": [
-      ".next/dist/**/*.js"
-    ],
-    "targets": [
-      "node18-macos-arm64",
-      "node18-macos-x64",
-      "node18-linux-arm64",
-      "node18-linux-x64",
-      "node18-windows-x64"
-    ]
-  }
+  "bin": "server.js"
 }

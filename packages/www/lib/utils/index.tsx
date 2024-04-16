@@ -1,27 +1,5 @@
-import { Stripe, loadStripe } from "@stripe/stripe-js";
+import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
-import { pascalCase } from "pascal-case";
-import { Element } from "react-scroll";
-
-export const getComponent = (component) => {
-  const componentName = pascalCase(component._type);
-
-  try {
-    const Component = require(`components/Site/${componentName}`).default;
-
-    return (
-      <Element
-        offset={-20}
-        key={component._type}
-        id={component._type}
-        name={component._type}>
-        <Component {...component} />
-      </Element>
-    );
-  } catch (e) {
-    return <></>;
-  }
-};
 
 export function pathJoin2(p1: string, p2: string): string {
   if (!p1) {
@@ -98,11 +76,15 @@ export function blocksToText(blocks, opts = {}) {
  * This is a singleton to ensure we only instantiate Stripe once.
  */
 let stripePromise: Promise<Stripe | null>;
-export const getStripe = () => {
+export const getStripe = async () => {
+  if (isExport()) {
+    return Promise.resolve(null);
+  }
   const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
   if (!key) {
     return Promise.resolve(null);
   }
+  const { loadStripe } = await import("@stripe/stripe-js");
   if (!stripePromise) {
     stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   }
@@ -113,6 +95,9 @@ export const getStripe = () => {
  * should stripe be enabled in this context?
  */
 export const shouldStripe = () => {
+  if (isExport()) {
+    return false;
+  }
   if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
     return false;
   }
@@ -235,6 +220,10 @@ export const CARD_OPTIONS = {
   },
 };
 
+export function isExport(): boolean {
+  return process.env.NEXT_PUBLIC_EXPORT === "true";
+}
+
 export function isStaging(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -245,10 +234,27 @@ export function isStaging(): boolean {
   );
 }
 
+export function isProduction(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.location.hostname.includes("livepeer.studio")
+  );
+}
+
 export function isDevelopment(): boolean {
   return process.env.NODE_ENV === "development";
 }
 
 export function truncate(str, n) {
   return str.length > n ? str.substr(0, n - 1) + "…" : str;
+}
+
+export function getBrandName(): string {
+  if (process.env.NEXT_PUBLIC_BRAND_NAME) {
+    return process.env.NEXT_PUBLIC_BRAND_NAME;
+  }
+  if (isExport()) {
+    return "Livepeer Catalyst";
+  }
+  return "Livepeer Studio";
 }
