@@ -43,7 +43,7 @@ components:
     ffmpeg-profile:
       type: object
       description: Transcode profile
-      additionalProperties: false
+      additionalProperties: true
       required:
         - width
         - name
@@ -104,7 +104,7 @@ components:
     transcode-profile:
       type: object
       description: Transcode API profile
-      additionalProperties: false
+      additionalProperties: true
       required:
         - bitrate
       properties:
@@ -167,7 +167,7 @@ components:
       required:
         - name
         - url
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -266,7 +266,7 @@ components:
       required:
         - id
         - webhookId
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -321,7 +321,7 @@ components:
               example: '{"event": "stream.started"}'
         response:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           properties:
             body:
               type: string
@@ -334,7 +334,7 @@ components:
               description: response status text
     clip-payload:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       required:
         - playbackId
         - startTime
@@ -376,7 +376,7 @@ components:
       type: object
       required:
         - profile
-      additionalProperties: false
+      additionalProperties: true
       properties:
         profile:
           type: string
@@ -385,7 +385,7 @@ components:
             "source" for pushing source stream data
           minLength: 1
           maxLength: 500
-          example: 720p
+          example: 720p0
         videoOnly:
           type: boolean
           description: |
@@ -406,7 +406,7 @@ components:
             stream.
           required:
             - url
-          additionalProperties: false
+          additionalProperties: true
           properties:
             name:
               type: string
@@ -417,7 +417,7 @@ components:
       type: object
       required:
         - name
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -436,7 +436,7 @@ components:
       type: object
       required:
         - name
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -445,6 +445,9 @@ components:
         name:
           type: string
           example: test_stream
+        kind:
+          type: string
+          example: stream
         creatorId:
           $ref: "#/components/schemas/creator-id"
         userTags:
@@ -523,28 +526,29 @@ components:
             Configuration for a stream that should be actively pulled from an
             external source, rather than pushed to Livepeer. If specified, the
             stream will not have a streamKey.
-          additionalProperties: false
+          additionalProperties: true
           required:
             - source
           properties:
             source:
               type: string
-              description: URL from which to pull from.
-              example: "https://myservice.com/live/stream.flv"
+              description: |-
+                URL from which to pull from.
+              example: https://myservice.com/live/stream.flv
             headers:
               type: object
-              description:
+              description: |-
                 Headers to be sent with the request to the pull source.
               additionalProperties:
                 type: string
               example:
-                Authorization: Bearer 123
+                Authorization: "Bearer 123"
             location:
               type: object
               description: |-
                 Approximate location of the pull source. The location is used to
                 determine the closest Livepeer region to pull the stream from.
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - lat
                 - lon
@@ -564,7 +568,7 @@ components:
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
-          description: >-
+          description:
             The playback ID to use with the Playback Info endpoint to retrieve
             playback URLs.
         playbackPolicy:
@@ -602,7 +606,7 @@ components:
           example: false
         multistream:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           properties:
             targets:
               type: array
@@ -617,11 +621,23 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
+        lastTerminatedAt:
+          type:
+            - number
+            - "null"
+          example: 1713281212993
+          description:
+            Timestamp (in milliseconds) when the stream was last terminated
+        userId:
+          type: string
+          example: "we7818e7-610a-4057-8f6f-b785dc1e6f88"
+        renditions:
+          type: object
     new-stream-payload:
       type: object
       required:
         - name
-      additionalProperties: false
+      additionalProperties: true
       properties:
         name:
           $ref: "#/components/schemas/stream/properties/name"
@@ -641,7 +657,7 @@ components:
           $ref: "#/components/schemas/stream/properties/userTags"
     asset-patch-payload:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         name:
           $ref: "#/components/schemas/asset/properties/name"
@@ -653,7 +669,7 @@ components:
           $ref: "#/components/schemas/new-asset-payload/properties/storage"
     stream-patch-payload:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
@@ -671,7 +687,7 @@ components:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       $ref: "#/components/schemas/target"
     stream-health-payload:
       type: object
@@ -758,7 +774,7 @@ components:
       required:
         - name
         - streamId
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -863,7 +879,7 @@ components:
       type: object
       required:
         - url
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -893,7 +909,7 @@ components:
           example: 1587667174725
     asset:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       required:
         - id
         - name
@@ -942,7 +958,7 @@ components:
           $ref: "#/components/schemas/playback-policy"
         source:
           oneOf:
-            - additionalProperties: false
+            - additionalProperties: true
               required:
                 - type
                 - url
@@ -961,7 +977,7 @@ components:
                     upload.
                 encryption:
                   $ref: "#/components/schemas/new-asset-payload/properties/encryption"
-            - additionalProperties: false
+            - additionalProperties: true
               required:
                 - type
                 - sessionId
@@ -974,7 +990,7 @@ components:
                   type: string
                   description:
                     ID of the session from which this asset was created
-            - additionalProperties: false
+            - additionalProperties: true
               required:
                 - type
               properties:
@@ -1009,15 +1025,15 @@ components:
         creatorId:
           $ref: "#/components/schemas/creator-id"
         storage:
-          additionalProperties: false
+          additionalProperties: true
           properties:
             ipfs:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               properties:
                 spec:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   default: {}
                   properties:
                     nftMetadataTemplate:
@@ -1051,7 +1067,7 @@ components:
         status:
           readOnly: true
           type: object
-          additionalProperties: false
+          additionalProperties: true
           required:
             - phase
             - updatedAt
@@ -1106,7 +1122,7 @@ components:
           description: Hash of the asset
           items:
             type: object
-            additionalProperties: false
+            additionalProperties: true
             properties:
               hash:
                 type: string
@@ -1120,7 +1136,7 @@ components:
         videoSpec:
           readOnly: true
           type: object
-          additionalProperties: false
+          additionalProperties: true
           description: Video metadata
           properties:
             format:
@@ -1142,7 +1158,7 @@ components:
                 contemplates them (e.g. mp4)
               items:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 required:
                   - type
                   - codec
@@ -1205,7 +1221,7 @@ components:
       type: object
       required:
         - cid
-      additionalProperties: false
+      additionalProperties: true
       properties:
         cid:
           type: string
@@ -1219,7 +1235,7 @@ components:
           type: string
           description: URL to access file via HTTP through an IPFS gateway
     new-asset-payload:
-      additionalProperties: false
+      additionalProperties: true
       required:
         - name
       properties:
@@ -1240,7 +1256,7 @@ components:
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         storage:
-          additionalProperties: false
+          additionalProperties: true
           properties:
             ipfs:
               description: |
@@ -1249,7 +1265,7 @@ components:
                 means to unpin from IPFS, but it's unsupported right now.
               oneOf:
                 - type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   properties:
                     spec:
                       oneOf:
@@ -1260,7 +1276,7 @@ components:
                 - type: "null"
         encryption:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           required:
             - encryptedKey
           properties:
@@ -1285,7 +1301,7 @@ components:
       type: object
       required:
         - name
-      additionalProperties: false
+      additionalProperties: true
       properties:
         name:
           type: string
@@ -1356,7 +1372,7 @@ components:
       type: object
       required:
         - streamId
-      additionalProperties: false
+      additionalProperties: true
       properties:
         streamId:
           type: string
@@ -1366,7 +1382,7 @@ components:
       type: object
       required:
         - canPublish
-      additionalProperties: false
+      additionalProperties: true
       properties:
         canPublish:
           type: boolean
@@ -1427,7 +1443,7 @@ components:
                 type: integer
                 description: the time the participant left
     transcode-payload:
-      additionalProperties: false
+      additionalProperties: true
       required:
         - input
         - storage
@@ -1436,7 +1452,7 @@ components:
         input:
           oneOf:
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               description: URL input video
               required:
                 - url
@@ -1448,7 +1464,7 @@ components:
                   description: URL of the video to transcode
                   example: "https://s3.amazonaws.com/bucket/file.mp4"
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               description: S3-like storage input video
               required:
                 - type
@@ -1484,7 +1500,7 @@ components:
                   example: /path/file.mp4
                 credentials:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   required:
                     - accessKeyId
                     - secretAccessKey
@@ -1501,7 +1517,7 @@ components:
         storage:
           oneOf:
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - type
                 - endpoint
@@ -1530,7 +1546,7 @@ components:
                   example: outputbucket
                 credentials:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   required:
                     - accessKeyId
                     - secretAccessKey
@@ -1545,7 +1561,7 @@ components:
                       description: Secret Access Key
                       example: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - type
                 - credentials
@@ -1558,7 +1574,7 @@ components:
                   description: Type of service used for output files
                 credentials:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   required:
                     - proof
                   description: |
@@ -1572,12 +1588,12 @@ components:
                         EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn
         outputs:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           description: Output formats
           properties:
             hls:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - path
               description: HLS output format
@@ -1588,7 +1604,7 @@ components:
                   example: /samplevideo/hls
             mp4:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - path
               description: MP4 output format
@@ -1599,7 +1615,7 @@ components:
                   example: /samplevideo/mp4
             fmp4:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - path
               description: FMP4 output format
@@ -1623,7 +1639,7 @@ components:
           description: Decides if the output video should include C2PA signature
     task:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -1666,12 +1682,12 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           description: Parameters of the task
           properties:
             upload:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Parameters for the upload task
               properties:
                 url:
@@ -1699,7 +1715,7 @@ components:
               $ref: "#/components/schemas/export-task-params"
             exportData:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Parameters for the export-data task
               required:
                 - content
@@ -1721,12 +1737,12 @@ components:
                   example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
             transcode-file:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Parameters for the transcode-file task
               properties:
                 input:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   description: Input video file to transcode
                   properties:
                     url:
@@ -1737,7 +1753,7 @@ components:
                       example: "https://cdn.livepeer.com/ABC123/filename.mp4"
                 storage:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   description: Storage for the output files
                   properties:
                     url:
@@ -1748,12 +1764,12 @@ components:
                       example: "s3+https://accessKeyId:secretAccessKey@s3Endpoint/bucket"
                 outputs:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   description: Output formats
                   properties:
                     hls:
                       type: object
-                      additionalProperties: false
+                      additionalProperties: true
                       description: HLS output format
                       properties:
                         path:
@@ -1762,7 +1778,7 @@ components:
                           example: /samplevideo/hls
                     mp4:
                       type: object
-                      additionalProperties: false
+                      additionalProperties: true
                       description: MP4 output format
                       properties:
                         path:
@@ -1800,7 +1816,7 @@ components:
                     the default strategy that Catalyst is configured for will be
                     used. This field only available for admin users, and is only
                     used for E2E testing.
-                  additionalProperties: false
+                  additionalProperties: true
                   properties:
                     startTime:
                       $ref: "#/components/schemas/clip-payload/properties/startTime"
@@ -1834,7 +1850,7 @@ components:
         status:
           readOnly: true
           type: object
-          additionalProperties: false
+          additionalProperties: true
           description: Status of the task
           required:
             - phase
@@ -1874,7 +1890,7 @@ components:
               example: upload
         output:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           description: Output of the task
           properties:
             upload:
@@ -1894,12 +1910,12 @@ components:
                   $ref: "#/components/schemas/asset"
             export:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Output of the export task
               properties:
                 ipfs:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   required:
                     - videoFileCid
                   properties:
@@ -1938,12 +1954,12 @@ components:
                       example: "https://gateway.ipfs.io/ipfs/Qmabc123xyz341"
             exportData:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Output of the export data task
               properties:
                 ipfs:
                   type: object
-                  additionalProperties: false
+                  additionalProperties: true
                   required:
                     - cid
                   properties:
@@ -1957,7 +1973,7 @@ components:
         - type: object
           oneOf:
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - type
                 - value
@@ -1975,34 +1991,34 @@ components:
             the developer.
     creator-id:
       type: object
-      oneOf:
-        - type: object
-          additionalProperties: false
-          required:
-            - type
-            - value
-          properties:
-            type:
-              type: string
-              enum:
-                - unverified
-            value:
-              type: string
-              description:
-                Developer-managed ID of the user who created the resource.
+      additionalProperties: true
+      required:
+        - type
+        - value
+      properties:
+        type:
+          type: string
+          enum:
+            - unverified
+          example: "unverified"
+        value:
+          type: string
+          description:
+            Developer-managed ID of the user who created the resource.
+          example: "user123"
 
     export-task-params:
       description: Parameters for the export task
       oneOf:
         - type: object
-          additionalProperties: false
+          additionalProperties: true
           required:
             - custom
           properties:
             custom:
               type: object
               description: custom URL parameters for the export task
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - url
               properties:
@@ -2024,7 +2040,7 @@ components:
                   additionalProperties:
                     type: string
         - type: object
-          additionalProperties: false
+          additionalProperties: true
           required:
             - ipfs
           properties:
@@ -2032,7 +2048,7 @@ components:
               $ref: "#/components/schemas/ipfs-export-params"
     signing-key:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       required:
         - publicKey
       properties:
@@ -2067,7 +2083,7 @@ components:
       required:
         - email
         - password
-      additionalProperties: false
+      additionalProperties: true
       properties:
         email:
           type: string
@@ -2144,7 +2160,7 @@ components:
           example: 1587667174725
     usage:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -2173,7 +2189,7 @@ components:
       type: object
       description:
         Whether the playback policy for a asset or stream is public or signed
-      additionalProperties: false
+      additionalProperties: true
       required:
         - type
       properties:
@@ -2337,7 +2353,7 @@ components:
           example: 0.5
     playback-info:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       required:
         - type
         - meta
@@ -2351,7 +2367,7 @@ components:
             - recording
         meta:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           required:
             - source
           properties:
@@ -2367,7 +2383,7 @@ components:
               type: array
               items:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 required:
                   - hrn
                   - type
@@ -2414,7 +2430,7 @@ components:
               type: array
               items:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 properties:
                   hrn:
                     type: string
@@ -2436,7 +2452,7 @@ components:
               $ref: "#/components/schemas/attestation"
     attestation:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       required:
         - primaryType
         - domain
@@ -2456,7 +2472,7 @@ components:
         domain:
           type: object
           description: Video Metadata EIP-712 domain
-          additionalProperties: false
+          additionalProperties: true
           required:
             - name
             - version
@@ -2473,7 +2489,7 @@ components:
               example: "1"
         message:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           description: Video Metadata EIP-712 message content
           required:
             - video
@@ -2488,7 +2504,7 @@ components:
               type: array
               items:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 required:
                   - role
                   - address
@@ -2522,11 +2538,11 @@ components:
             - flow
           example: eip712
         storage:
-          additionalProperties: false
+          additionalProperties: true
           properties:
             ipfs:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               properties:
                 $ref: "#/components/schemas/ipfs-file-info/properties"
                 updatedAt:
@@ -2540,7 +2556,7 @@ components:
               $ref: "#/components/schemas/storage-status"
     ipfs-export-params:
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         $ref: >-
           #/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties
@@ -2550,7 +2566,7 @@ components:
             a JWT or an API key and an API secret.
           oneOf:
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - jwt
               properties:
@@ -2563,7 +2579,7 @@ components:
                   example: >-
                     eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
             - type: object
-              additionalProperties: false
+              additionalProperties: true
               required:
                 - apiKey
                 - apiSecret
@@ -2580,7 +2596,7 @@ components:
                   example: 1234567890abcdef
     storage-status:
       readOnly: true
-      additionalProperties: false
+      additionalProperties: true
       required:
         - phase
         - tasks
@@ -2605,7 +2621,7 @@ components:
           example: Failed to update storage
         tasks:
           type: object
-          additionalProperties: false
+          additionalProperties: true
           properties:
             pending:
               type: string
@@ -2624,7 +2640,7 @@ components:
               description: ID of the last task to fail execution.
               example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
     new-asset-from-url-payload:
-      additionalProperties: false
+      additionalProperties: true
       required:
         - name
         - url
@@ -3334,7 +3350,7 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 required:
                   - url
                   - tusEndpoint
@@ -3394,7 +3410,7 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 required:
                   - asset
                   - task
@@ -3517,7 +3533,7 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: false
+                additionalProperties: true
                 required:
                   - asset
                   - task
@@ -4432,7 +4448,7 @@ paths:
                   type: boolean
                 name:
                   type: string
-              additionalProperties: false
+              additionalProperties: true
       responses:
         "204":
           description: Success (No content)
