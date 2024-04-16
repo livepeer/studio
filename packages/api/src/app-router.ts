@@ -25,7 +25,7 @@ import { pathJoin } from "./controllers/helpers";
 import { taskScheduler } from "./task/scheduler";
 import { setupTus, setupTestTus } from "./controllers/asset";
 import * as fcl from "@onflow/fcl";
-import createFrontend from "@livepeer.studio/www";
+import createFrontend from "./frontend";
 import { NotFoundError } from "./store/errors";
 import { cache } from "./store/cache";
 

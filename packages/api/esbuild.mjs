@@ -30,9 +30,9 @@ const generateFrontendManifest = async (rootPath) => {
 let frontendBundlePlugin = {
   name: "frontendBundle",
   setup(build) {
-    build.onResolve({ filter: /.*static\-build$/ }, async (args) => {
+    build.onResolve({ filter: /.*frontend-stub$/ }, async (args) => {
       return {
-        path: resolve(args.resolveDir, args.path),
+        path: resolve(args.resolveDir, "..", "..", "www", "static-build"),
         namespace: "frontendBundle",
       };
     });
@@ -65,11 +65,8 @@ let frontendBundlePlugin = {
     entryPoints: ["./src/cli.ts"],
     bundle: true,
     platform: "node",
-    outfile: "./dist-esbuild/api.js",
+    outfile: "./dist-esbuild/livepeer-api",
     target: "node18",
-    alias: {
-      "@livepeer.studio/www": "./src/frontend-stub.ts",
-    },
     external: ["pg-native"],
     sourcemap: "inline",
     plugins: [frontendBundlePlugin],

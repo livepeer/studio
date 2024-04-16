@@ -16,3 +16,4 @@ packages/api/src/schema/types.d.ts
 packages/api/src/schema/schema.yaml
 packages/www/static-build
 packages/www/static-build-app
+packages/api/dist-esbuild/api.js
