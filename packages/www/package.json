@@ -163,23 +163,5 @@
       "git add"
     ]
   },
-  "bin": "server.js",
-  "pkg": {
-    "assets": [
-      ".next/**/*",
-      "../../node_modules/dom-helpers/**/*",
-      "../../node_modules/react-icons/**/*",
-      "../../node_modules/next-mdx-remote/**/*"
-    ],
-    "scripts": [
-      ".next/dist/**/*.js"
-    ],
-    "targets": [
-      "node18-macos-arm64",
-      "node18-macos-x64",
-      "node18-linux-arm64",
-      "node18-linux-x64",
-      "node18-windows-x64"
-    ]
-  }
+  "bin": "server.js"
 }

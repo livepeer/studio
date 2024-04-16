@@ -4,12 +4,13 @@ WORKDIR /app
 COPY . .
 RUN	yarn install --frozen-lockfile --ignore-scripts
 RUN yarn run prepare:lerna
-RUN cd packages/api && yarn run pkg:local
+RUN cd packages/www && yarn run static
+RUN cd packages/api && yarn run esbuild
 
-FROM ubuntu:22.04
+FROM node:18
 
 WORKDIR app
-COPY --from=builder /app/packages/api/bin/api /usr/local/bin/livepeer-api
+COPY --from=builder /app/packages/api/dist-esbuild/api.js /usr/local/bin/livepeer-api
 ENV NODE_ENV production
 ARG	VERSION
 ENV	VERSION ${VERSION}
