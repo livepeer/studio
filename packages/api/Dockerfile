@@ -10,7 +10,7 @@ RUN cd packages/api && yarn run esbuild
 FROM node:18
 
 WORKDIR app
-COPY --from=builder /app/packages/api/dist-esbuild/api.js /usr/local/bin/livepeer-api
+COPY --from=builder /app/packages/api/dist-esbuild/livepeer-api /usr/local/bin/livepeer-api
 ENV NODE_ENV production
 ARG	VERSION
 ENV	VERSION ${VERSION}
