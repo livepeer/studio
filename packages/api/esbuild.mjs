@@ -70,5 +70,6 @@ let frontendBundlePlugin = {
     external: ["pg-native"],
     sourcemap: "inline",
     plugins: [frontendBundlePlugin],
+    minify: true,
   });
 })();
