@@ -76,7 +76,6 @@ const data = _.merge({}, apiData, dbData);
   | {
       type: "unverified";
       value: string;
-      [k: string]: unknown;
     }
   | string;`;
 
