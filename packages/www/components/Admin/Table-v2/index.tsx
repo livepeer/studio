@@ -199,7 +199,7 @@ const Table = <T extends Record<string, unknown>>({
                 }
                 return (
                   <Box
-                    key={`${f.type}-${f.props.columnId}`}
+                    key={`${f.type}-${String(f.props.columnId)}`}
                     sx={{ ":not(:last-of-type)": { mr: 3 } }}>
                     {filter}
                   </Box>

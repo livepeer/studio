@@ -56,6 +56,7 @@ const ProcessingProgress = ({ progress, playbackUrl }) => (
     {playbackUrl && (
       <Tooltip
         multiline
+        // @ts-ignore
         content={
           <Box>
             Your video can now be played. In the background, it is converted

@@ -16,12 +16,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
 import Link from "next/link";
 import { useApi, useLoggedIn } from "../hooks";
-import Ripe, { categories, pages } from "lib/ripe";
-
-Ripe.trackPage({
-  category: categories.AUTH,
-  name: pages.CREATE_ACCOUNT,
-});
+import { useJune, events } from "hooks/use-june";
 
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
@@ -33,7 +28,7 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
-
+  const June = useJune();
   const router = useRouter();
   const { register, verify, user } = useApi();
 
@@ -91,6 +86,9 @@ const RegisterPage = () => {
       ...(phone && { phone }),
       recaptchaToken,
     });
+
+    June.track(events.onboarding.register);
+
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
       setErrors(res.errors);

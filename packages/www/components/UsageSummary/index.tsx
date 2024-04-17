@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
+import { useJune, events } from "hooks/use-june";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
@@ -206,6 +207,8 @@ const UsageSummary = () => {
     }
   }, [user]);
 
+  const June = useJune();
+
   return (
     <>
       <Flex
@@ -231,6 +234,7 @@ const UsageSummary = () => {
             <Flex align="center" css={{ mr: "$3" }}>
               <Tooltip
                 multiline
+                // @ts-ignore
                 content={
                   <Box>
                     Usage minutes may take up to an hour to be reflected.
@@ -297,7 +301,10 @@ const UsageSummary = () => {
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Link href="/dashboard/billing" passHref legacyBehavior>
-          <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
+          <A
+            variant="primary"
+            css={{ display: "flex", alignItems: "center" }}
+            onClick={() => June.track(events.landing.billingCta)}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

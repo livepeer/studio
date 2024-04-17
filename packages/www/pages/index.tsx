@@ -7,7 +7,6 @@ import { Home as Content } from "content";
 import Link from "next/link";
 import { Button, Box, Link as A } from "@livepeer/design-system";
 import { FiArrowUpRight } from "react-icons/fi";
-import Ripe, { categories, pages } from "lib/ripe";
 
 const networkFeatures = [
   {
@@ -138,11 +137,6 @@ const benefits = [
       "Livepeer Studio runs on open source software. Tap into a worldwide network of Livepeer experts committed to driving value and solutions.",
   },
 ];
-
-Ripe.trackPage({
-  category: categories.HOME,
-  name: pages.LANDING,
-});
 
 const HomePage = () => {
   return (

@@ -33,6 +33,7 @@ const AssetHeadingBox = ({ asset, totalViews }: AssetHeadingBoxProps) => {
         {totalViews != undefined ? (
           <Tooltip
             css={{ bc: "$neutral3", color: "$neutral3" }}
+            // @ts-ignore
             content={
               <Box css={{ color: "$hiContrast" }}>
                 Views are defined as at least 1 second of watch time.

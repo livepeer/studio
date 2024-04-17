@@ -40,6 +40,7 @@ const EmbedVideoDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
+        placeholder="Embed Video"
         css={{
           maxWidth: 450,
           minWidth: 350,

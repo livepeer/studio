@@ -417,6 +417,7 @@ const ConditionValue = ({
             <Box css={{ display: "flex", flexDirection: "column" }}>
               <Box css={{ display: "flex", mb: "$2" }}>
                 <Radio
+                  placeholder="radio"
                   value="on"
                   id={`${filter.label}-on`}
                   checked={condition.value === true}
@@ -430,6 +431,7 @@ const ConditionValue = ({
               </Box>
               <Box css={{ display: "flex" }}>
                 <Radio
+                  placeholder="radio"
                   value="off"
                   id={`${filter.label}-off`}
                   checked={condition.value === false}

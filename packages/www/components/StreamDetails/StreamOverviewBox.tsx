@@ -101,6 +101,7 @@ const StreamOverviewBox = ({
               </Box>
               <Tooltip
                 multiline
+                // @ts-ignore
                 content={
                   <Box>
                     When enabled, transcoded streaming sessions will be recorded

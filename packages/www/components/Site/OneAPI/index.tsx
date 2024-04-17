@@ -157,6 +157,7 @@ export const StartBuilding = ({ backgroundColor = "$loContrast" }) => (
           justifyContent: "center",
         }}>
         <TabsList
+          placeholder="Select a workflow"
           css={{
             alignSelf: "center",
             width: "auto",
