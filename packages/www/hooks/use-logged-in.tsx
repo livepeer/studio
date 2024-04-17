@@ -28,7 +28,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
       process.env.NODE_ENV === "production" &&
-        June.identifyUser(user.id, user.email);
+        June?.identify(user.id, user.email);
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
