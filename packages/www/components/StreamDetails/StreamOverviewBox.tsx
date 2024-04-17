@@ -107,7 +107,7 @@ const StreamOverviewBox = ({
                     When enabled, transcoded streaming sessions will be recorded
                     and stored by Livepeer Studio. Each recorded session will
                     have a recording .m3u8 URL for playback and an MP4 download
-                    link. This feature is currently free.
+                    link.
                   </Box>
                 }>
                 <Help />
