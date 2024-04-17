@@ -1990,22 +1990,23 @@ components:
             Helper syntax to specify an unverified creator ID, fully managed by
             the developer.
     creator-id:
-      type: object
-      additionalProperties: false
-      required:
-        - type
-        - value
-      properties:
-        type:
-          type: string
-          enum:
-            - unverified
-          example: "unverified"
-        value:
-          type: string
-          description:
-            Developer-managed ID of the user who created the resource.
-          example: "user123"
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - value
+          properties:
+            type:
+              type: string
+              enum:
+                - unverified
+              example: "unverified"
+            value:
+              type: string
+              description:
+                Developer-managed ID of the user who created the resource.
+              example: "user123"
 
     export-task-params:
       description: Parameters for the export task
