@@ -212,6 +212,9 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                   color: "$primary9",
                   transition: "0.3s",
                 },
+                "&:focus": {
+                  outline: "none",
+                },
               }}>
               {isActive ? (
                 <CrossCircledIcon
@@ -226,6 +229,12 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                       ...prevFilters,
                       [filter.id]: "",
                     }));
+                    const query = outputFilters.reduce((acc, filter) => {
+                      acc[filter.id] = filter.condition.value;
+                      return acc;
+                    }, {});
+                    delete query[filter.id];
+                    router.push({ query });
                   }}
                   style={{
                     pointerEvents: "auto",
