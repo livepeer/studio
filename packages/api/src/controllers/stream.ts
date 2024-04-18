@@ -241,7 +241,7 @@ async function resolvePullHostAndRegion(
   ingest: string
 ): Promise<{ pullHost: string; pullRegion: string }> {
   if (process.env.NODE_ENV === "test") {
-    return null;
+    return { pullHost: null, pullRegion: null };
   }
   const url = new URL(
     pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
