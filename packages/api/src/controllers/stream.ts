@@ -1036,6 +1036,8 @@ app.put(
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
+    logger.info(`/pull request received for stream name=${rawPayload.name}`);
+
     const ingest = await getIngestBase(req);
 
     if (!rawPayload.pull) {
@@ -1087,11 +1089,17 @@ app.put(
 
     let stream: DBStream;
     if (!streamExisted) {
+      logger.info(
+        `/pull request creating a new stream with name=${rawPayload.name}`
+      );
       stream = await handleCreateStream(req);
       stream.pullRegion = pullRegion;
       await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
+      logger.info(
+        `/pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
+      );
       const sleepFor = terminateDelay(oldStream);
       if (sleepFor > 0) {
         console.log(
@@ -1158,7 +1166,11 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
 
   if (updateRes.rowCount > 0) {
     res.status(204).end();
+    return;
   }
+  logger.info(
+    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`
+  );
   res.status(423).end();
 });
 
