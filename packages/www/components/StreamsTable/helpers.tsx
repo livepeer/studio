@@ -72,10 +72,7 @@ export const rowsPageFromState = async (
       active = f.condition.value as boolean;
       return false;
     }
-    if (f.id === "isHealthy" && f.isOpen) {
-      isHealthy = f.condition.value as boolean;
-      return false;
-    }
+
     return true;
   });
   const [streams, nextCursor, count, allStreamCount, activeStreamCount] =

@@ -89,7 +89,10 @@ const StreamFilter = ({ onDone, activeFilters }) => {
     }, []);
 
     const query = outputFilters.reduce((acc, filter) => {
-      acc[filter.id] = filter.condition.value;
+      acc[filter.id] =
+        filter.condition.type === "dateEqual"
+          ? new Date(filter.condition.value).getTime()
+          : filter.condition.value;
       return acc;
     }, {});
 
@@ -244,7 +247,14 @@ const StreamFilter = ({ onDone, activeFilters }) => {
               ) : (
                 <PlusCircledIcon />
               )}
-              {filter.name} {isActive && " | " + value}
+              {filter.name}{" "}
+              {isActive &&
+                " | " +
+                  (filter.name == "Status"
+                    ? Boolean(value)
+                      ? "Active"
+                      : "Idle"
+                    : value)}
             </Flex>
             <DropdownMenuContent
               placeholder={"more options"}
