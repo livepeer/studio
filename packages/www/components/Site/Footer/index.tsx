@@ -25,6 +25,7 @@ const queryClient = new QueryClient();
 
 function useSiteConfig() {
   return useQuery(["siteConfig"], async () => {
+    // @ts-ignore
     const { SiteConfig } = await request(
       "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
       print(siteConfig)

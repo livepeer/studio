@@ -402,6 +402,10 @@ components:
           type: string
           index: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        projectId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         name:
           type: string
           example: Example Token
@@ -653,6 +657,20 @@ components:
                 type: string
               probability:
                 type: number
+    project:
+      table: project
+      properties:
+        kind:
+          type: string
+          example: project
+          readOnly: true
+        userId:
+          index: true
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        deleted:
+          type: boolean
+          description: Set to true when the project is deleted
     stream:
       table: stream
       properties:
@@ -672,6 +690,10 @@ components:
           index: true
         createdAt:
           index: true
+        lastTerminatedAt:
+          writeOnly: true
+          type: number
+          description: The time the last terminate call was made
         parentId:
           index: true
         streamKey:
@@ -680,6 +702,13 @@ components:
           properties:
             source:
               index: true
+        pullLockedAt:
+          type: number
+          example: 1587667174725
+        pullLockedBy:
+          type: string
+        pullRegion:
+          type: string
         playbackId:
           unique: true
         mistHost:
@@ -1003,6 +1032,15 @@ components:
           index: true
           readOnly: true
     new-asset-payload:
+      properties:
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+    new-asset-from-url-payload:
       properties:
         objectStoreId:
           type: string

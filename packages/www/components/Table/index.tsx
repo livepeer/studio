@@ -207,6 +207,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               const props = getToggleAllRowsSelectedProps();
               return (
                 <Checkbox
+                  placeholder="Select all rows"
                   css={{ display: "flex" }}
                   onClick={props.onChange}
                   value="toggle-all"
@@ -219,6 +220,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             Cell: ({ row }) => {
               return (
                 <Checkbox
+                  placeholder="Select row"
                   css={{ display: "flex" }}
                   // @ts-ignore
                   value={row.isSelected}

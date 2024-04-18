@@ -1,6 +1,5 @@
 import { Box } from "@livepeer/design-system";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
-import Ripe from "lib/ripe";
 
 export const makeSelectAction = (title: string, onClick: () => void) => ({
   onClick,
@@ -14,12 +13,7 @@ export const makeSelectAction = (title: string, onClick: () => void) => ({
 });
 
 export const makeCreateAction = (title: string, onClick: () => void) => ({
-  onClick: () => {
-    Ripe.track({
-      event: `clicked ${title} button`,
-    });
-    onClick();
-  },
+  onClick,
   css: { display: "flex", alignItems: "center", ml: "$2" },
   children: (
     <>

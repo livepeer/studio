@@ -6,12 +6,6 @@ import AssetDetail from "layouts/assetDetail";
 import AssetOverviewTab from "components/AssetDetails/AssetOverviewTab";
 import AssetEventLogTab from "components/AssetDetails/AssetEventLogTab";
 import { Asset } from "@livepeer.studio/api";
-import Ripe, { categories, pages } from "lib/ripe";
-
-Ripe.trackPage({
-  category: categories.DASHBOARD,
-  name: pages.ASSET,
-});
 
 const refetchInterval = 5 * 1000;
 

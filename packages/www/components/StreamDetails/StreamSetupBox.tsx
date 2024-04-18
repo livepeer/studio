@@ -3,6 +3,7 @@ import { Stream } from "@livepeer.studio/api";
 import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
 import { isStaging } from "lib/utils";
+import { useJune, events } from "hooks/use-june";
 
 export type StreamSetupBoxProps = {
   activeTab: "Browser" | "Streaming Software";
@@ -23,6 +24,8 @@ const StreamSetupBox = ({
   const broadcastIframeUrl = isStaging()
     ? `https://monster.lvpr.tv/broadcast/${stream.streamKey}`
     : `https://lvpr.tv/broadcast/${stream.streamKey}`;
+
+  const June = useJune();
 
   return (
     <>
@@ -78,7 +81,10 @@ const StreamSetupBox = ({
               ? "Stream key"
               : "Embeddable broadcast"}
           </Box>
-          <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
+          <Text
+            variant="neutral"
+            css={{ fontSize: "$2", mt: "$2" }}
+            onClick={() => June.track(events.stream.keyCopy)}>
             <ClipButton
               value={
                 activeTab === "Streaming Software"

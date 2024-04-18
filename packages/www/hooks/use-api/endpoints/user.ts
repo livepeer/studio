@@ -48,7 +48,6 @@ export const login = async (email, password) => {
 
   if (process.env.NODE_ENV === "production") {
     const data = jwt.decode(token, { json: true });
-    window.analytics.identify(data.sub, { email });
   }
 
   setState((state) => ({ ...state, token, refreshToken }));

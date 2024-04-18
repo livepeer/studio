@@ -14,6 +14,7 @@ import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 import { makeColumns, makeTableData, TargetsTableData } from "./helpers";
 import { makeCreateAction } from "components/Table/helpers";
 import { getMultistreamTarget } from "hooks/use-api/endpoints/multistream";
+import { useJune, events } from "hooks/use-june";
 
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
@@ -41,6 +42,7 @@ const MultistreamTargetsTable = ({
   const saveDialogState = useToggleState();
 
   const columns = useMemo(makeColumns, []);
+  const June = useJune();
 
   const targetQueryKey = (id: string) => ["multistreamTarget", id];
   const invalidateTargetId = useCallback(
@@ -75,7 +77,10 @@ const MultistreamTargetsTable = ({
     [state.tableId, stream, streamHealth, invalidateTargetId, targetRefs]
   );
 
-  const onCreateClick = saveDialogState.onOn;
+  const onCreateClick = () => {
+    June.track(events.stream.multistreamTarget);
+    return saveDialogState.onOn();
+  };
 
   return (
     <Box {...props}>

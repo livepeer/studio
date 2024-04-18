@@ -9,6 +9,7 @@ import logger from "../logger";
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
+import { fetchWithTimeout } from "../util";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -24,6 +25,7 @@ import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
+  TooManyRequestsError,
   UnprocessableEntityError,
 } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
@@ -43,8 +45,8 @@ import {
   toStringValues,
   mapInputCreatorId,
   triggerCatalystStreamUpdated,
-  triggerCatalystStreamNuke,
   triggerCatalystPullStart,
+  triggerCatalystStreamStopSessions,
 } from "./helpers";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
@@ -234,33 +236,38 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-// Waits for the stream to become active. Works by polling the stream object
-// on the DB until it becomes active or the timeout is reached. Will wait for
-// exponentially longer time in between polls to reduce load on the DB.
-async function pollWaitStreamActive(req: Request, id: string) {
-  let clientGone = false;
-  req.on("close", () => {
-    clientGone = true;
-  });
-
-  const deadline = Date.now() + MAX_WAIT_STREAM_ACTIVE;
-  let sleepDelay = 500;
-  while (!clientGone && Date.now() < deadline) {
-    const stream =
-      (await db.stream.get(id)) ||
-      (await db.stream.get(id, { useReplica: false })); // read from primary in case replica is lagging
-    if (!stream) {
-      throw new NotFoundError("stream not found");
-    }
-    if (stream.isActive) {
-      return stream;
-    }
-
-    await sleep(sleepDelay);
-    sleepDelay = Math.min(sleepDelay * 2, 5000);
+async function resolvePullRegion(
+  stream: NewStreamPayload,
+  ingest: string
+): Promise<string> {
+  if (process.env.NODE_ENV === "test") {
+    return null;
   }
+  const url = new URL(
+    pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
+  );
+  const { lat, lon } = stream.pull?.location ?? {};
+  if (lat && lon) {
+    url.searchParams.set("lat", lat.toString());
+    url.searchParams.set("lon", lon.toString());
+  }
+  const playbackUrl = url.toString();
+  // Send any playback request to catalyst-api, which effectively resolves the region using MistUtilLoad
+  const response = await fetchWithTimeout(playbackUrl, { redirect: "manual" });
+  if (response.status < 300 || response.status >= 400) {
+    // not a redirect response, so we can't determine the region
+    return null;
+  }
+  const redirectUrl = response.headers.get("location");
+  return extractRegionFrom(redirectUrl);
+}
 
-  throw new InternalServerError("stream not active");
+// Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
+export function extractRegionFrom(playbackUrl: string): string {
+  const regionRegex =
+    /https?:\/\/(.+)-\w+-catalyst.+not-used-playback\/index.m3u8/;
+  const matches = playbackUrl.match(regionRegex);
+  return matches ? matches[1] : null;
 }
 
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
@@ -890,9 +897,10 @@ app.post(
       useParentProfiles ? stream.profiles : childStream.profiles
     );
 
-    if (await db.session.get(sessionId)) {
+    const existingSession = await db.session.get(sessionId);
+    if (existingSession) {
       logger.info(
-        `user session re-used for session.id=${sessionId} stream.id=${stream.id} stream.name='${stream.name}' playbackid=${stream.playbackId}`
+        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId}`
       );
     } else {
       const session: DBSession = {
@@ -1028,6 +1036,10 @@ app.put(
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
+    logger.info(`pull request received for stream name=${rawPayload.name}`);
+
+    const ingest = await getIngestBase(req);
+
     if (!rawPayload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
@@ -1073,31 +1085,45 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
+    const pullRegion = await resolvePullRegion(rawPayload, ingest);
+
     let stream: DBStream;
     if (!streamExisted) {
+      logger.info(
+        `pull request creating a new stream with name=${rawPayload.name}`
+      );
       stream = await handleCreateStream(req);
+      stream.pullRegion = pullRegion;
+      await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
+      logger.info(
+        `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
+      );
+      const sleepFor = terminateDelay(oldStream);
+      if (sleepFor > 0) {
+        console.log(
+          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
+        );
+        await sleep(sleepFor);
+      }
+
       stream = {
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
+        pullRegion,
         ...payload,
       };
       await db.stream.replace(stream);
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
 
-      if (oldStream.pull?.source != stream.pull?.source) {
-        await triggerCatalystStreamNuke(req, stream.playbackId);
-      }
+      await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
-    const ingest = await getIngestBase(req);
-    await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
-
-    if (waitActive === "true") {
-      stream = await pollWaitStreamActive(req, stream.id);
+    if (!stream.isActive || streamExisted) {
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
     res.status(streamExisted ? 200 : 201);
@@ -1108,6 +1134,53 @@ app.put(
     );
   }
 );
+
+app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  let { leaseTimeout, host } = req.body;
+  if (!leaseTimeout) {
+    // Sets the default lock lease to 60s
+    leaseTimeout = 60 * 1000;
+  }
+  if (!host) {
+    host = "unknown";
+  }
+  logger.info(`got /lockPull for stream=${id}`);
+
+  const stream = await db.stream.get(id, { useReplica: false });
+  if (!stream || (stream.deleted && !req.user.admin)) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+
+  const updateRes = await db.stream.update(
+    [
+      sql`id = ${stream.id}`,
+      sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${
+        Date.now() - leaseTimeout
+      } AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
+    ],
+    { pullLockedAt: Date.now(), pullLockedBy: host },
+    { throwIfEmpty: false }
+  );
+
+  if (updateRes.rowCount > 0) {
+    res.status(204).end();
+    return;
+  }
+  logger.info(
+    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`
+  );
+  res.status(423).end();
+});
+
+function terminateDelay(stream: DBStream) {
+  if (!stream.lastTerminatedAt) {
+    return 0;
+  }
+  const minTerminateWait = 5000;
+  return minTerminateWait - (Date.now() - stream.lastTerminatedAt);
+}
 
 app.post(
   "/",
@@ -1955,9 +2028,18 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
+  if (terminateDelay(stream) > 0) {
+    throw new TooManyRequestsError(`too many terminate requests`);
+  }
+
+  await db.stream.update(stream.id, {
+    lastTerminatedAt: Date.now(),
+    pullLockedAt: 0,
+    pullLockedBy: "",
+  });
   // we don't want to update the stream object on the `/terminate` API, so we
-  // just throw a single nuke
-  await triggerCatalystStreamNuke(req, stream.playbackId);
+  // just throw a single stop call
+  await triggerCatalystStreamStopSessions(req, stream.playbackId);
 
   res.status(204).end();
 });

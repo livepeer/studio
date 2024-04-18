@@ -94,8 +94,6 @@ const livepeerClient = createReactClient({
   }),
 });
 
-const RIPE_API_KEY = process.env.NEXT_PUBLIC_RIPE_API_KEY;
-
 const livepeerTheme: ThemeConfig = {
   colors: {
     accent: "$colors$green10",
@@ -145,9 +143,6 @@ const App = ({ Component, pageProps }) => {
                       client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
-                      <Script id="ripe-integration">
-                        {`(function(a,b){var c=function(a){return fetch("".concat("https://storage.getripe.com","/sdk%2Fversion.txt?alt=media"),{cache:"no-store"}).then(function(a){return a.text()}).then(function(b){a(b)})};a.Ripe=a.Ripe||[],["init","identify","group","track","page"].forEach(function(b){a.Ripe[b]=function(){for(var c=arguments.length,d=Array(c),e=0;e<c;e++)d[e]=arguments[e];var f=Array.prototype.slice.call(d);return f.unshift(b),a.Ripe.push(f),a.Ripe}}),a.Ripe.load=function(){var a=b.createElement("script"),d=b.getElementsByTagName("script")[0];a.async=!0,c(function(b){var c;a.src="".concat("https://storage.getripe.com","/sdk%2F").concat(b,"%2Fsdk.umd.js?alt=media"),null===d||void 0===d||null===(c=d.parentNode)||void 0===c?void 0:c.insertBefore(a,d)})},a.Ripe.load()})(window,document);Ripe.init('${RIPE_API_KEY}')`}
-                      </Script>
                     </LivepeerConfig>
                   </AnalyzerProvider>
                 </ApiProvider>

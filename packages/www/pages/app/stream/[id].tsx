@@ -733,7 +733,6 @@ const ID = () => {
                         <br /> Each recorded session will have a recording .m3u8
                         URL for playback and an MP4 download link.
                         <br />
-                        This feature is currently free.
                       </p>
                     </ReactTooltip>
                   </Box>
@@ -980,7 +979,7 @@ const ID = () => {
                     frameBorder="0"
                     allowFullScreen
                     allow="autoplay; encrypted-media; picture-in-picture"
-                    sandbox="allow-scripts"></iframe>
+                    sandbox="allow-same-origin; allow-scripts"></iframe>
                 </Box>
               </Flex>
               <TimedAlert

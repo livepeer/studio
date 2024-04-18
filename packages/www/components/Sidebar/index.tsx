@@ -30,6 +30,7 @@ import { useApi } from "../../hooks";
 import Router from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
+import { useJune, events } from "hooks/use-june";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -72,6 +73,9 @@ export type SidebarId =
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
+  const June = useJune();
+
+  June?.track(`sidebar ${id}`);
 
   return (
     <Box
@@ -97,6 +101,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               p: 0,
             }}>
             <Avatar
+              placeholder="user"
               size="3"
               alt={user?.firstName}
               fallback={
@@ -116,7 +121,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               css={{ width: 20, height: 20, color: "$hiContrast" }}
             />
           </Flex>
-          <DropdownMenuContent css={{ border: "1px solid $colors$neutral6" }}>
+          <DropdownMenuContent
+            placeholder="dropdown-menu-content"
+            css={{ border: "1px solid $colors$neutral6" }}>
             <DropdownMenuGroup>
               <DropdownMenuItem
                 key="billing-dropdown-item"

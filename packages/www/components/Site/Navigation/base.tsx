@@ -169,6 +169,7 @@ const NavigationBase = ({
                           </A>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
+                          placeholder="dropdown-menu-content"
                           align="start"
                           css={{
                             p: 0,

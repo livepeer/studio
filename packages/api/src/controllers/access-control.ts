@@ -80,18 +80,28 @@ async function fireGateWebhook(
 
   const startTime = process.hrtime();
   let resp: Response;
+  let respBody: string;
   let errorMessage: string;
   let statusCode: number;
+  let bodyStatusCode: number;
 
   try {
     resp = await fetchWithTimeoutAndRedirects(webhook.url, params);
     statusCode = resp.status;
 
-    if (resp.status < 200 || resp.status >= 300) {
-      console.error(
-        `access-control: gate: webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`
-      );
-      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status}`;
+    // Dispose of the response body
+    respBody = await resp.text();
+    if (resp.status >= 200 && resp.status < 300) {
+      // try parsing response body to check for access denied with a 200
+      bodyStatusCode = checkRespBody(respBody);
+      if (bodyStatusCode) {
+        statusCode = bodyStatusCode;
+      }
+    }
+
+    if (statusCode < 200 || statusCode >= 300) {
+      errorMessage = `webhook=${webhook.id} got response status != 2XX statusCode=${resp.status} bodyStatusCode=${bodyStatusCode}`;
+      console.error(`access-control: gate: ${errorMessage}`);
     }
   } catch (e) {
     errorMessage = e.message;
@@ -104,17 +114,66 @@ async function fireGateWebhook(
       errorMessage,
       undefined
     );
-    if (resp) {
-      // Dispose of the response body
-      await resp.text();
-    }
   }
-  console.log(
-    `access-control: gate: webhook=${
-      webhook.id
-    } statusCode=${statusCode} duration=${process.hrtime(startTime)[1] / 1e6}ms`
-  );
+  if ("pull" in content && content.pull) {
+    try {
+      let referer: string, origin: string;
+      if (payload?.webhookPayload?.headers) {
+        referer = payload?.webhookPayload?.headers["Referer"];
+        origin = payload?.webhookPayload?.headers["Origin"];
+      }
+      let playURL = payload?.webhookPayload?.playURL;
+      let playDomain = payload?.webhookPayload?.playDomain;
+      console.log(
+        `access-control: gate: webhook=${
+          webhook.id
+        } statusCode=${statusCode} respSpanId=${resp?.headers.get(
+          "X-Tlive-Spanid"
+        )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
+          process.hrtime(startTime)[1] / 1e6
+        }ms accessKey=${payload.accessKey} playbackId=${
+          content.playbackId
+        } webhook=${
+          webhook.id
+        } referer=${referer} origin=${origin} playURL=${playURL} playDomain=${playDomain}`
+      );
+    } catch (e) {
+      console.log(
+        `access-control: gate: webhook=${
+          webhook.id
+        } statusCode=${statusCode} respSpanId=${resp?.headers.get(
+          "X-Tlive-Spanid"
+        )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
+          process.hrtime(startTime)[1] / 1e6
+        }ms accessKey=${payload.accessKey} playbackId=${
+          content.playbackId
+        } webhook=${webhook.id}`
+      );
+    }
+  } else {
+    console.log(
+      `access-control: gate: webhook=${
+        webhook.id
+      } statusCode=${statusCode} duration=${
+        process.hrtime(startTime)[1] / 1e6
+      }ms`
+    );
+  }
   return statusCode;
+}
+
+function checkRespBody(resp: string): number | null {
+  if (!resp || resp == "") {
+    return;
+  }
+  try {
+    const body = JSON.parse(resp);
+    return body.ret;
+  } catch (e) {
+    console.log(
+      `access-control: error checking response body for status code: ${e}`
+    );
+  }
 }
 
 app.use("/signing-key", signingKeyApp);
@@ -282,7 +341,7 @@ app.post(
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} returned status code ${statusCode}, disallowing playback
           `);
-          throw new BadGatewayError(
+          throw new ForbiddenError(
             "Content is gated and corresponding webhook failed"
           );
         }

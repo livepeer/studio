@@ -178,7 +178,9 @@ const CreateEditDialog = ({
                   </Select>
                 </Box>
               </DropdownMenuTrigger>
-              <DropdownMenuContent css={{ mt: "$1" }}>
+              <DropdownMenuContent
+                placeholder="dropdown-menu-content"
+                css={{ mt: "$1" }}>
                 <Box
                   css={{
                     position: "relative",
@@ -198,6 +200,7 @@ const CreateEditDialog = ({
                   <DropdownMenuGroup>
                     {eventOptions.map((event, i) => (
                       <DropdownMenuCheckboxItem
+                        placeholder="dropdown-menu-checkbox-item"
                         key={i}
                         checked={events.includes(event)}
                         onSelect={(e) => {

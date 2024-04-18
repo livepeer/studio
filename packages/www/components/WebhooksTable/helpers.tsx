@@ -62,7 +62,6 @@ export const rowsPageFromState = async (
     nextCursor,
     count,
     rows: webhooks.map((webhook: Webhook) => {
-      console.log(webhook);
       return {
         id: webhook.id,
         name: {
@@ -96,6 +95,7 @@ export const rowsPageFromState = async (
           children: (
             <Tooltip
               multiline
+              //@ts-ignore
               content={webhook.events.map((event) => (
                 <Box key={event}>{event}</Box>
               ))}>

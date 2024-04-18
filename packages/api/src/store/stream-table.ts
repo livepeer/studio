@@ -382,6 +382,7 @@ export default class StreamTable extends Table<DBStream> {
       transcodedSegmentsDuration: 0,
       sourceBytes: 0,
       transcodedBytes: 0,
+      lastTerminatedAt: null,
       ...obj,
     };
   }
@@ -407,7 +408,14 @@ export default class StreamTable extends Table<DBStream> {
   }
 }
 
-const adminOnlyFields = ["mistHost", "broadcasterHost", "createdByTokenId"];
+const adminOnlyFields = [
+  "mistHost",
+  "broadcasterHost",
+  "createdByTokenId",
+  "pullLockedAt",
+  "pullLockedBy",
+  "pullRegion",
+];
 
 const privateFields = [
   "recordObjectStoreId",

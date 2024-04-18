@@ -19,6 +19,7 @@ import PastInvoicesTable from "components/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 import React, { PureComponent } from "react";
+import { useJune, events } from "hooks/use-june";
 
 export interface OverUsageBill {
   transcodingBill: OverUsageItem;
@@ -50,6 +51,7 @@ const Billing = () => {
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
     null
   );
+  const June = useJune();
 
   const standardProducts = ["Hacker", "Growth", "Scale"];
 
@@ -351,7 +353,8 @@ const Billing = () => {
           <Link href="/dashboard/usage" passHref legacyBehavior>
             <A
               variant="primary"
-              css={{ display: "flex", alignItems: "center" }}>
+              css={{ display: "flex", alignItems: "center" }}
+              onClick={() => June.track(events.billing.usageDetails)}>
               View Usage Details <ArrowRightIcon />
             </A>
           </Link>

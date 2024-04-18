@@ -10,6 +10,7 @@ const Footer = () => {
         justify="center"
         gap={5}
         css={{
+          py: "$5",
           flexDirection: "column",
           "@bp2": {
             flexDirection: "row",

@@ -230,6 +230,7 @@ const Usage = () => {
                 <Flex align="center">
                   <LPTooltip
                     multiline
+                    //@ts-ignore
                     content={
                       <Box>
                         Usage minutes may take up to an hour to be reflected.

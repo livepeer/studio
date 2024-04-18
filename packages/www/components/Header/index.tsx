@@ -20,6 +20,7 @@ import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../public/img/icons/checked.svg";
 import { useEffect, useState, useRef } from "react";
 import { useApi, useHubspotForm } from "hooks";
+import { useJune, events } from "hooks/use-june";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -53,6 +54,7 @@ const Header = ({ breadcrumbs = [] }) => {
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
   });
+  const June = useJune();
 
   useEffect(() => {
     if (data) {
@@ -111,6 +113,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 as={A}
                 target="_blank"
                 size={2}
+                onClick={() => June.track(events.all.documentation)}
                 css={{
                   cursor: "default",
                   color: "$hiContrast",
@@ -131,6 +134,7 @@ const Header = ({ breadcrumbs = [] }) => {
             <Button
               ghost
               as={DropdownMenuTrigger}
+              onClick={() => June.track(events.all.feedback)}
               size={2}
               css={{
                 mr: "$2",
@@ -147,6 +151,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Box>Feedback</Box>
             </Button>
             <DropdownMenuContent
+              placeholder="Feedback"
               css={{
                 padding: "18px 0 12px",
                 position: "relative",

@@ -23,7 +23,7 @@ import { buildRecordingUrl } from "../controllers/session";
 import { isExperimentSubject } from "../store/experiment-table";
 import { WebhookLog } from "../schema/types";
 
-const WEBHOOK_TIMEOUT = 5 * 1000;
+const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
 const BACKOFF_COEF = 2;
 const MAX_RETRIES = 33;
@@ -482,7 +482,7 @@ export default class WebhookCannon {
 
   async handleRecordingWaitingChecks(
     sessionId: string,
-    isRetry = false
+    attempt = 1
   ): Promise<string> {
     const session = await db.session.get(sessionId, {
       useReplica: false,
@@ -497,13 +497,13 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session is unused");
     }
     if (lastSeen > activeThreshold) {
-      if (isRetry) {
+      if (attempt >= 5) {
         throw new UnprocessableEntityError("Session is still active");
       }
-      // there was an update after the delayed event was sent, so sleep a few
-      // secs (up to USER_SESSION_TIMEOUT) and re-check if it actually stopped.
+      // there was an update after the delayed event was sent, so sleep a few secs
+      // (up to 5s + USER_SESSION_TIMEOUT) and re-check if it actually stopped.
       await sleep(5000 + (lastSeen - activeThreshold));
-      return this.handleRecordingWaitingChecks(sessionId, true);
+      return this.handleRecordingWaitingChecks(sessionId, attempt + 1);
     }
 
     // if we got to this point, it means we're confident this session is inactive

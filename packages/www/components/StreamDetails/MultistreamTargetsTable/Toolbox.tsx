@@ -209,6 +209,7 @@ const Toolbox = ({
   return (
     <Flex align="center" gap="2" justify="end">
       <Switch
+        placeholder="Multistream target toggle"
         name="multistream-target-toggle"
         disabled={!target}
         checked={!target?.disabled}
@@ -234,7 +235,7 @@ const Toolbox = ({
             <Overflow />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent placeholder="dropdown-menu-content" align="end">
           <DropdownMenuGroup>
             <DropdownMenuItem
               disabled={!target}

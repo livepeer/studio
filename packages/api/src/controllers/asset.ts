@@ -41,9 +41,11 @@ import {
   AssetPatchPayload,
   ExportTaskParams,
   IpfsFileInfo,
+  NewAssetFromUrlPayload,
   NewAssetPayload,
   ObjectStore,
   PlaybackPolicy,
+  Project,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -57,6 +59,9 @@ import {
 import { CliArgs } from "../parse-cli";
 import mung from "express-mung";
 import { getClips } from "./clip";
+
+// 7 Days
+const DELETE_ASSET_DELAY = 7 * 24 * 60 * 60 * 1000;
 
 const app = Router();
 
@@ -182,7 +187,7 @@ function parseUrlToDStorageUrl(
 }
 
 export async function validateAssetPayload(
-  req: Pick<Request, "body" | "user" | "token" | "config">,
+  req: Pick<Request, "body" | "user" | "token" | "config" | "project">,
   id: string,
   playbackId: string,
   createdAt: number,
@@ -234,6 +239,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
+    projectId: req.project?.id ?? "",
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
@@ -610,9 +616,10 @@ const fieldsMap = {
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
-  creatorId: `stream.data->'creatorId'->>'value'`,
+  creatorId: `asset.data->'creatorId'->>'value'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
+  projectId: `asset.data->>'projectId'`,
   phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
@@ -625,8 +632,18 @@ const fieldsMap = {
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
-    toStringValues(req.query);
+  let {
+    limit,
+    cursor,
+    all,
+    allUsers,
+    order,
+    filters,
+    count,
+    cid,
+    deleting,
+    ...otherQs
+  } = toStringValues(req.query);
   const fieldFilters = _(otherQs)
     .pick("playbackId", "sourceUrl", "phase")
     .map((v, k) => ({ id: k, value: decodeURIComponent(v) }))
@@ -652,6 +669,20 @@ app.get("/", authorizer({}), async (req, res) => {
 
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
+  }
+
+  query.push(
+    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
+  );
+  if (req.user.admin && deleting) {
+    const deletionThreshold = new Date(
+      Date.now() - DELETE_ASSET_DELAY
+    ).toISOString();
+
+    query.push(sql`asset.data->'status'->>'phase' = 'deleting'`);
+    query.push(
+      sql`asset.data->>'deletedAt' IS NOT NULL AND asset.data->>'deletedAt' < ${deletionThreshold}`
+    );
   }
 
   let output: WithID<Asset>[];
@@ -775,7 +806,7 @@ app.post(
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
-    req.body as NewAssetPayload;
+    req.body as NewAssetFromUrlPayload;
   if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
@@ -798,7 +829,11 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     url,
     encryption: assetEncryptionWithoutKey(encryption),
   });
-  const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
+  const dupAsset = await db.asset.findDuplicateUrlUpload(
+    url,
+    req.user.id,
+    req.project?.id
+  );
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });
     if (!task.length) {
@@ -842,7 +877,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 app.post(
   "/upload/url",
   authorizer({}),
-  validatePost("new-asset-payload"),
+  validatePost("new-asset-from-url-payload"),
   uploadWithUrlHandler
 );
 // TODO: Remove this at some point. Registered only for backward compatibility.
@@ -1088,7 +1123,60 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
+
+  if (asset.status.phase === "deleting" || asset.deleted) {
+    throw new BadRequestError(`asset is already deleted`);
+  }
+
   await req.taskScheduler.deleteAsset(asset);
+  res.status(204);
+  res.end();
+});
+
+app.post("/:id/restore", authorizer({}), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  }
+
+  if (!req.user.admin && req.user.id !== asset.userId) {
+    throw new ForbiddenError(`users may only restore their own assets`);
+  }
+
+  if (!asset.deleted) {
+    throw new BadRequestError(`asset is not deleted`);
+  }
+
+  if (asset.status?.phase !== "deleting") {
+    throw new BadRequestError(`asset is not in a restorable state`);
+  }
+
+  await req.taskScheduler.restoreAsset(asset);
+  res.status(204);
+  res.end();
+});
+
+app.patch("/:id/deleted", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  }
+
+  if (!(asset.status.phase === "deleting")) {
+    throw new BadRequestError(`asset is not in a deleting phase`);
+  }
+
+  await db.asset.update(asset.id, {
+    status: {
+      phase: "deleted",
+      updatedAt: Date.now(),
+    },
+  });
+
   res.status(204);
   res.end();
 });

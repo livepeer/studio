@@ -23,6 +23,7 @@ import {
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
+import { extractRegionFrom } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -524,6 +525,126 @@ describe("controllers/stream", () => {
         expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
       });
 
+      it("should lock pull for a new stream", async () => {
+        // Create stream pull
+        const now = Date.now();
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`);
+        expect(resLockPull.status).toBe(204);
+
+        // Check that the pullLockedAt is marked with the correct date
+        const res2 = await client.get(`/stream/${stream.id}`);
+        expect(res2.status).toBe(200);
+        const stream2 = await res2.json();
+        expect(stream2.pullLockedAt).toBeGreaterThan(now);
+      });
+
+      it("should not lock pull for an active stream", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Mark stream as active
+        await db.stream.update(stream.id, { isActive: true });
+
+        // Requesting pull lock should fail, because the stream is active (so it should be replicated instead of being pulled)
+        const reslockPull = await client.post(`/stream/${stream.id}/lockPull`);
+        expect(reslockPull.status).toBe(423);
+      });
+
+      it("should not lock pull for already locked pull", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock by many processes at the same time, only one should acquire a lock
+        const promises = [];
+        for (let i = 0; i < 10; i++) {
+          promises.push(
+            client.post(`/stream/${stream.id}/lockPull`, {
+              host: `host-${i}`,
+            })
+          );
+        }
+        const resPulls = await Promise.all(promises);
+        expect(resPulls.filter((r) => r.status === 204).length).toBe(1);
+        expect(resPulls.filter((r) => r.status === 423).length).toBe(9);
+      });
+
+      it("should lock pull for already locked pull if lease has expired", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          leaseTimeout: 1,
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Wait until lease has expired
+        await sleep(1);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { leaseTimeout: 1 }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
+      it("should lock pull for already locked pull if host is the same", async () => {
+        const host = "some-host";
+
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          host,
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { host }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
+      it("should release lock when stream is terminated", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          host: "host-1",
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Terminate stream
+        await client.delete(`/stream/${stream.id}/terminate`);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { host: "host-2" }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
       it("should update a stream if it has the same pull source", async () => {
         let res = await client.put("/stream/pull", postMockPullStream);
         expect(res.status).toBe(201);
@@ -592,34 +713,27 @@ describe("controllers/stream", () => {
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
-
-      it("should wait for stream to become active if requested", async () => {
-        let responded = false;
-        const resProm = client.put(
-          "/stream/pull?waitActive=true",
-          postMockPullStream
-        );
-        resProm.then(() => (responded = true));
-
-        // give some time for API to create object in DB
-        await sleep(100);
-
-        const [streams] = await db.stream.find();
-        expect(streams).toHaveLength(1);
-        expect(streams[0].isActive).toBe(false);
-
-        // stream not active yet
-        expect(responded).toBe(false);
-
-        // set stream active
-        await db.stream.update(streams[0].id, { isActive: true });
-
-        const res = await resProm;
-        expect(responded).toBe(true); // make sure this works
-        expect(res.status).toBe(201);
-        const stream = await res.json();
-        expect(stream.id).toBe(streams[0].id);
-        expect(stream.isActive).toBe(true);
+      it("should extract region from redirected playback url", async () => {
+        expect(
+          extractRegionFrom(
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("sto");
+        expect(
+          extractRegionFrom(
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("mos2");
+        expect(
+          extractRegionFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("fra-staging");
+        expect(
+          extractRegionFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+          )
+        ).toBe(null);
       });
     });
 
@@ -778,6 +892,18 @@ describe("controllers/stream", () => {
       });
 
       it("heartbeat should bump the last seen value", async () => {
+        const stream = await createAndActivateStream();
+        const timeBeforeBump = Date.now();
+        expect(stream.lastSeen).toBeLessThan(timeBeforeBump);
+
+        const res = await client.post(`/stream/${stream.id}/heartbeat`);
+
+        expect(res.status).toBe(204);
+        const updatedStream = await server.db.stream.get(stream.id);
+        expect(updatedStream.lastSeen).toBeGreaterThan(timeBeforeBump);
+      });
+
+      it("start pull should update lastPullAt", async () => {
         const stream = await createAndActivateStream();
         const timeBeforeBump = Date.now();
         expect(stream.lastSeen).toBeLessThan(timeBeforeBump);
