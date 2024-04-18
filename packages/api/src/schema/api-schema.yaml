@@ -1037,6 +1037,8 @@ components:
                 - processing
                 - ready
                 - failed
+                - deleting
+                - deleted
             updatedAt:
               type: number
               description:
