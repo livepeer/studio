@@ -1036,7 +1036,7 @@ app.put(
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
-    logger.info(`/pull request received for stream name=${rawPayload.name}`);
+    logger.info(`pull request received for stream name=${rawPayload.name}`);
 
     const ingest = await getIngestBase(req);
 
@@ -1090,7 +1090,7 @@ app.put(
     let stream: DBStream;
     if (!streamExisted) {
       logger.info(
-        `/pull request creating a new stream with name=${rawPayload.name}`
+        `pull request creating a new stream with name=${rawPayload.name}`
       );
       stream = await handleCreateStream(req);
       stream.pullRegion = pullRegion;
@@ -1098,7 +1098,7 @@ app.put(
     } else {
       const oldStream = streams[0];
       logger.info(
-        `/pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
+        `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
       );
       const sleepFor = terminateDelay(oldStream);
       if (sleepFor > 0) {
