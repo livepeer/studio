@@ -75,7 +75,7 @@ const Header = ({ breadcrumbs = [] }) => {
       css={{
         width: "100%",
         borderBottom: "1px solid",
-        borderColor: "$neutral6",
+        borderColor: "$neutral4",
       }}>
       <Flex
         align="center"

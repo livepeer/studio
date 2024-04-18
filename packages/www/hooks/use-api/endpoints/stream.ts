@@ -49,7 +49,7 @@ export const getStreams = async (
   }
 ): Promise<[Stream[], string, number, number, number, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
-  console.log("filters", opts?.filters);
+
   const [res, streams] = await context.fetch(
     `/stream?${qs.stringify({
       userId,

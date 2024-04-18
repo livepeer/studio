@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi } from "hooks";
 import Table, {
   useTableState,
@@ -24,6 +24,10 @@ import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 import StreamFilter from "./StreamFilter";
 import { Flex } from "@livepeer/design-system";
 import TypeFilterCard from "components/TypeFilterCard";
+import {
+  Filter,
+  formatFilterItemFromQueryParam,
+} from "components/Table/filters";
 
 const filterCategory = ["All", "Active", "Unhealthy"];
 
@@ -85,11 +89,11 @@ const StreamsTable = ({
 
     setFilter(type);
     if (type === "All") {
+      console.log("All", currentFilters);
       const newFilters = currentFilters.filter(
         (filter) => filter.id !== "isActive" && filter.id !== "isHealthy"
       );
-
-      stateSetter.setFilters(newFilters);
+      stateSetter.setFilters([]);
     } else {
       const filter = [
         {
@@ -108,7 +112,35 @@ const StreamsTable = ({
       //@ts-ignore
       stateSetter.setFilters(currentFilters.concat(filter));
     }
+
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.delete("isActive");
+    searchParams.delete("isHealthy");
+    if (type !== "All") {
+      searchParams.set(
+        type === "Active" ? "isActive" : "isHealthy",
+        type === "Active" ? "true" : "false"
+      );
+    }
+
+    router.push({
+      query: searchParams.toString(),
+    });
   };
+
+  // Initialize filters from queryParams
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const itemsFromQueryParams: Filter[] = filterItems.map((item) => {
+      const searchParamValue = searchParams.get(item.id);
+      if (searchParamValue === null) return;
+      return formatFilterItemFromQueryParam(item, searchParamValue);
+    });
+
+    const filters = itemsFromQueryParams.filter((item) => item !== undefined);
+    stateSetter.setFilters(filters);
+  }, [stateSetter, router.query]);
 
   return (
     <>
@@ -148,7 +180,10 @@ const StreamsTable = ({
                 ))}
               </Flex>
               {!viewAll && filterItems && (
-                <StreamFilter onDone={(e) => onSetFilters(e)} />
+                <StreamFilter
+                  activeFilters={state.filters}
+                  onDone={(e) => onSetFilters(e)}
+                />
               )}
             </>
           </>

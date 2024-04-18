@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/router";
 
 type SearchFilters = {
   name: string;
@@ -31,7 +32,7 @@ const DateInput = styled("input", {
   p: "4px",
 });
 
-const StreamFilter = ({ onDone }) => {
+const StreamFilter = ({ onDone, activeFilters }) => {
   const [filters, setFilters] = useState<SearchFilters>({
     name: "",
     createdAt: "",
@@ -40,6 +41,7 @@ const StreamFilter = ({ onDone }) => {
   });
 
   const [outputFilters, setOutputFilters] = useState([]);
+  const router = useRouter();
 
   const handleChange = (name: keyof typeof filters, value: string) => {
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
@@ -84,6 +86,13 @@ const StreamFilter = ({ onDone }) => {
 
       return acc;
     }, []);
+
+    const query = outputFilters.reduce((acc, filter) => {
+      acc[filter.id] = filter.condition.value;
+      return acc;
+    }, {});
+
+    router.push({ query });
 
     setOutputFilters(outputFilters);
     onDone(outputFilters);
@@ -147,7 +156,31 @@ const StreamFilter = ({ onDone }) => {
   const clearFilter = () => {
     setOutputFilters([]);
     onDone([]);
+    router.push({ query: {} });
+    setFilters({
+      name: "",
+      createdAt: "",
+      lastSeen: "",
+      isActive: "",
+    });
   };
+
+  useEffect(() => {
+    if (activeFilters.length > 0) {
+      setOutputFilters(activeFilters);
+      const filters = activeFilters.reduce((acc, filter) => {
+        if (filter.condition.type === "dateEqual") {
+          acc[filter.id] = filter.condition.value;
+        } else {
+          acc[filter.id] = String(filter.condition.value);
+        }
+
+        return acc;
+      }, {});
+
+      setFilters((prevFilters) => ({ ...prevFilters, ...filters }));
+    }
+  }, [activeFilters]);
 
   return (
     <Flex gap={3} direction={"row"}>
@@ -172,6 +205,7 @@ const StreamFilter = ({ onDone }) => {
                 "&:hover": {
                   borderColor: "$primary8",
                   color: "$primary9",
+                  transition: "0.3s",
                 },
               }}>
               <PlusCircledIcon />
@@ -186,21 +220,27 @@ const StreamFilter = ({ onDone }) => {
                 width: "15rem",
                 mt: "$2",
               }}>
-              {filter.component}
-              <Flex
-                css={{
-                  jc: "flex-end",
-                  mt: "$2",
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSearch();
                 }}>
-                <Button
-                  onClick={handleSearch}
+                {filter.component}
+                <Flex
                   css={{
-                    fontWeight: 500,
-                    cursor: "default",
+                    jc: "flex-end",
+                    mt: "$2",
                   }}>
-                  Apply
-                </Button>
-              </Flex>
+                  <Button
+                    type="submit"
+                    css={{
+                      fontWeight: 500,
+                      cursor: "default",
+                    }}>
+                    Apply
+                  </Button>
+                </Flex>
+              </form>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -216,6 +256,7 @@ const StreamFilter = ({ onDone }) => {
             p: "$3",
             pl: "0",
             borderRadius: "$1",
+            cursor: "default",
             "&:hover": {
               backgroundColor: "transparent",
               color: "$neutral11",
