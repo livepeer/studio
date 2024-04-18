@@ -10,7 +10,7 @@ import {
 } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { CrossCircledIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
 
 type SearchFilters = {
@@ -190,12 +190,13 @@ const StreamFilter = ({ onDone, activeFilters }) => {
         return (
           <DropdownMenu key={index}>
             <Flex
-              as={DropdownMenuTrigger}
+              as={!isActive && DropdownMenuTrigger}
               align={"center"}
               gap={1}
               css={{
                 p: "$1",
                 px: "$2",
+                cursor: "default",
                 border: "1px dashed",
                 fontSize: "$2",
                 borderRadius: "20px",
@@ -208,7 +209,27 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                   transition: "0.3s",
                 },
               }}>
-              <PlusCircledIcon />
+              {isActive ? (
+                <CrossCircledIcon
+                  onClick={() => {
+                    const newFilters = outputFilters.filter(
+                      (f) => f.id !== filter.id
+                    );
+                    setOutputFilters(newFilters);
+                    onDone(newFilters);
+                    setFilters((prevFilters) => ({
+                      ...prevFilters,
+                      [filter.id]: "",
+                    }));
+                  }}
+                  style={{
+                    pointerEvents: "auto",
+                    overflow: "visible",
+                  }}
+                />
+              ) : (
+                <PlusCircledIcon />
+              )}
               {filter.name} {isActive && " | " + value}
             </Flex>
             <DropdownMenuContent
