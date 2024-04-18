@@ -39,6 +39,7 @@ const StreamFilter = ({ onDone, activeFilters }) => {
     lastSeen: "",
     isActive: "",
   });
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const [outputFilters, setOutputFilters] = useState([]);
   const router = useRouter();
@@ -188,9 +189,12 @@ const StreamFilter = ({ onDone, activeFilters }) => {
         const isActive = outputFilters?.find((f) => f.id === filter.id);
         const value = isActive?.condition?.value;
         return (
-          <DropdownMenu key={index}>
+          <DropdownMenu
+            open={activeDropdown === filter.id}
+            onOpenChange={(open) => setActiveDropdown(open ? filter.id : null)}
+            key={index}>
             <Flex
-              as={!isActive && DropdownMenuTrigger}
+              as={DropdownMenuTrigger}
               align={"center"}
               gap={1}
               css={{
@@ -211,7 +215,8 @@ const StreamFilter = ({ onDone, activeFilters }) => {
               }}>
               {isActive ? (
                 <CrossCircledIcon
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const newFilters = outputFilters.filter(
                       (f) => f.id !== filter.id
                     );
@@ -245,6 +250,7 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSearch();
+                  setActiveDropdown(null);
                 }}>
                 {filter.component}
                 <Flex
