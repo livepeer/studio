@@ -22,10 +22,12 @@ export default function TypeFilterCard({
         border: "1px solid",
         borderColor: isActive ? "$primary8" : "$neutral8",
         borderRadius: "$3",
+        color: isActive ? "$primary8" : "$neutral8",
         cursor: "default",
         "&:hover": {
           border: "1px solid",
           borderColor: "$primary8",
+          color: "$primary8",
           transition: "0.3s",
         },
       }}>
@@ -34,8 +36,7 @@ export default function TypeFilterCard({
           fontSize: "$3",
           fontWeight: isActive ? 500 : 400,
           mb: "$1",
-          color: "$neutral9",
-          textTransform: "capitalize",
+          color: "inherit",
         }}>
         {name}
       </Text>

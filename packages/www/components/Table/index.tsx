@@ -306,7 +306,6 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   return (
     <Box>
       <Flex
-        align="end"
         justify="between"
         css={{
           mb: "$3",
@@ -315,10 +314,21 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           pb: border ? "$2" : 0,
         }}>
         {/* Header title */}
-        <Box>{headerComponent}</Box>
+        <Box
+          css={{
+            width: "100%",
+          }}>
+          {headerComponent}
+        </Box>
 
         {/* Header actions */}
-        <Flex css={{ alignItems: "center" }}>
+        <Flex
+          css={{
+            alignItems: "center",
+
+            position: "absolute",
+            right: 20,
+          }}>
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
               <Flex css={{ ai: "center", mr: "$3" }}>
