@@ -80,9 +80,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
   return (
     <Box
       css={{
-        backgroundColor: "$loContrast",
+        backgroundColor: "$panel",
         borderRight: "1px solid",
-        borderColor: "$neutral4",
+        borderColor: "$neutral6",
         maxWidth: 270,
         width: 270,
         top: 0,
