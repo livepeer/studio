@@ -41,6 +41,8 @@ const StreamFilter = ({ onDone, activeFilters }) => {
   });
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  console.log("activeFilters", activeFilters);
+
   const [outputFilters, setOutputFilters] = useState([]);
   const router = useRouter();
 
@@ -183,6 +185,14 @@ const StreamFilter = ({ onDone, activeFilters }) => {
       }, {});
 
       setFilters((prevFilters) => ({ ...prevFilters, ...filters }));
+    } else {
+      setOutputFilters([]);
+      setFilters({
+        name: "",
+        createdAt: "",
+        lastSeen: "",
+        isActive: "",
+      });
     }
   }, [activeFilters]);
 
