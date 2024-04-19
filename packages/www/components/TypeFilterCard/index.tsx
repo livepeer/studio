@@ -31,7 +31,7 @@ export default function TypeFilterCard({
       transition: "0.3s",
     },
     "& h4": {
-      color: "$primary12",
+      color: isActive ? "$primary8" : "$primary12",
     },
     "&:hover h4": {
       color: "$primary8",
