@@ -1971,19 +1971,17 @@ components:
     input-creator-id:
       oneOf:
         - type: object
-          oneOf:
-            - type: object
-              additionalProperties: false
-              required:
-                - type
-                - value
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - unverified
-                value:
-                  type: string
+          additionalProperties: false
+          required:
+            - type
+            - value
+          properties:
+            type:
+              type: string
+              enum:
+                - unverified
+            value:
+              type: string
 
         - type: string
           description: >-
