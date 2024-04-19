@@ -48,7 +48,9 @@ params.ingest = [
   {
     ingest: "rtmp://test/live",
     playback: "https://test/hls",
+    playbackDirect: "https://test/hls",
     base: "https://test",
+    baseDirect: "https://test",
     origin: "http://test",
   },
 ];
