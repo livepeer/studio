@@ -765,7 +765,7 @@ components:
           description: |
             An object containing any additional fields sent by mist in the
             health (STREAM_BUFFER) payload.
-          additionalProperties: false
+          additionalProperties: true
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
       required: []
@@ -1895,7 +1895,7 @@ components:
           properties:
             upload:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Output of the upload task
               properties:
                 videoFilePath:
@@ -2206,7 +2206,7 @@ components:
         webhookContext:
           type: object
           description: User-defined webhook context
-          additionalProperties: false
+          additionalProperties: true
           example: {}
         refreshInterval:
           type: number
