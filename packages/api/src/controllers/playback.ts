@@ -342,7 +342,11 @@ app.get("/:id", async (req, res) => {
     res.status(501);
     return res.json({ errors: ["Ingest not configured"] });
   }
-  const ingest = ingests[0].base;
+  let ingest = ingests[0].base;
+
+  if (req.user.directPlayback) {
+    ingest = ingests[0].baseDirect;
+  }
 
   let { id } = req.params;
   const withRecordings = req.query.recordings === "true";

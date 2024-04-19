@@ -480,7 +480,7 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
-app.patch("/:id", authorizer({}), async (req, res) => {
+app.patch("/:id/email", authorizer({}), async (req, res) => {
   const { email } = req.body;
   const userId = req.user.id;
 
@@ -730,6 +730,18 @@ app.patch(
     res.end();
   }
 );
+
+app.patch("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
+  const { id } = req.params;
+  const { directPlayback } = req.body;
+
+  if (directPlayback) {
+    await db.user.update(id, { directPlayback });
+  }
+
+  res.status(204);
+  res.end();
+});
 
 app.post("/token", validatePost("user"), async (req, res) => {
   const user = await findUserByEmail(req.body.email);
