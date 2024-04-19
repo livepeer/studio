@@ -132,7 +132,8 @@ const StreamsTable = ({
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
 
-    if (searchParams.size === 0) {
+    // @ts-ignore
+    if (searchParams?.size === 0) {
       setFilter("All");
       stateSetter.setFilters([]);
     }
