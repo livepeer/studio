@@ -344,7 +344,7 @@ app.get("/:id", async (req, res) => {
   }
   let ingest = ingests[0].base;
 
-  if (req.user.directPlayback) {
+  if (req.user.directPlayback && ingests[0].baseDirect) {
     ingest = ingests[0].baseDirect;
   }
 
