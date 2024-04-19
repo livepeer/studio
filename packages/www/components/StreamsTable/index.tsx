@@ -132,6 +132,12 @@ const StreamsTable = ({
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
 
+    // @ts-ignore
+    if (searchParams?.size === 0) {
+      setFilter("All");
+      stateSetter.setFilters([]);
+    }
+
     const itemsFromQueryParams: Filter[] = filterItems.map((item) => {
       const searchParamValue = searchParams.get(item.id);
       if (searchParamValue === null) return;
@@ -139,6 +145,17 @@ const StreamsTable = ({
     });
 
     const filters = itemsFromQueryParams.filter((item) => item !== undefined);
+
+    const isActiveItem = filters.find((item) => item.id === "isActive");
+
+    if (isActiveItem) {
+      if (isActiveItem.isOpen && isActiveItem.condition.value) {
+        setFilter("Active");
+      } else {
+        setFilter("All");
+      }
+    }
+
     stateSetter.setFilters(filters);
   }, [stateSetter, router.query]);
 
