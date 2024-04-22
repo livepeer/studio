@@ -209,6 +209,10 @@ const UsageSummary = () => {
 
   const June = useJune();
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.landing.billingCta);
+  }, [June]);
+
   return (
     <>
       <Flex
@@ -304,7 +308,7 @@ const UsageSummary = () => {
           <A
             variant="primary"
             css={{ display: "flex", alignItems: "center" }}
-            onClick={() => June.track(events.landing.billingCta)}>
+            onClick={() => trackEvent()}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

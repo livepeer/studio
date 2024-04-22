@@ -27,6 +27,10 @@ const StreamSetupBox = ({
 
   const June = useJune();
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.stream.keyCopy);
+  }, [June]);
+
   return (
     <>
       <Flex
@@ -84,7 +88,7 @@ const StreamSetupBox = ({
           <Text
             variant="neutral"
             css={{ fontSize: "$2", mt: "$2" }}
-            onClick={() => June.track(events.stream.keyCopy)}>
+            onClick={() => trackEvent()}>
             <ClipButton
               value={
                 activeTab === "Streaming Software"

@@ -77,8 +77,12 @@ const MultistreamTargetsTable = ({
     [state.tableId, stream, streamHealth, invalidateTargetId, targetRefs]
   );
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.stream.multistreamTarget);
+  }, [June]);
+
   const onCreateClick = () => {
-    June.track(events.stream.multistreamTarget);
+    trackEvent();
     return saveDialogState.onOn();
   };
 

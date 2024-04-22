@@ -10,7 +10,7 @@ import {
   Container,
   Link as A,
 } from "@livepeer/design-system";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
@@ -56,6 +56,10 @@ const RegisterPage = () => {
     }
   }, [user]);
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.onboarding.register);
+  }, [June]);
+
   const onSubmit = async ({
     email,
     password,
@@ -87,7 +91,7 @@ const RegisterPage = () => {
       recaptchaToken,
     });
 
-    June.track(events.onboarding.register);
+    trackEvent();
 
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
