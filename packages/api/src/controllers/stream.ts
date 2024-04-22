@@ -1170,12 +1170,22 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
+  const doingActiveCleanup = activeCleanupOne(
+    req.config,
+    stream,
+    req.queue,
+    await getIngestBase(req)
+  );
+  // the `isActive` field is only cleared later in background, so we ignore it
+  // in the query below in case we triggered an active cleanup logic above.
+
+  const leaseDeadline = Date.now() - leaseTimeout;
   const updateRes = await db.stream.update(
     [
       sql`id = ${stream.id}`,
-      sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${
-        Date.now() - leaseTimeout
-      } AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
+      doingActiveCleanup
+        ? sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${leaseDeadline}))`
+        : sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${leaseDeadline} AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
     ],
     { pullLockedAt: Date.now(), pullLockedBy: host },
     { throwIfEmpty: false }
@@ -1186,7 +1196,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     return;
   }
   logger.info(
-    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`
+    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, lastSeen=${stream.lastSeen}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`
   );
   res.status(423).end();
 });
