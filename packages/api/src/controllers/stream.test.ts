@@ -23,7 +23,7 @@ import {
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
-import { extractRegionFrom } from "./stream";
+import { extractUrlFrom, extractRegionFrom } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -712,6 +712,32 @@ describe("controllers/stream", () => {
 
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
+      });
+      it("should extract host from redirected playback url", async () => {
+        expect(
+          extractUrlFrom(
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+");
+        expect(
+          extractUrlFrom(
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe(
+          "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+"
+        );
+        expect(
+          extractUrlFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe(
+          "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+"
+        );
+        expect(
+          extractUrlFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+          )
+        ).toBe(null);
       });
       it("should extract region from redirected playback url", async () => {
         expect(
