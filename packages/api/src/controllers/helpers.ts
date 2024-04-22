@@ -653,7 +653,7 @@ export const triggerCatalystPullStart =
           url.searchParams.set("lon", lon.toString());
           playbackUrl = url.toString();
           console.log(
-            `triggering catalyst pull start for streamId=${stream.id} playbackId=${stream.playbackId} lat=${lat} lon=${lon} pullRegion=${stream.pullRegion}`
+            `triggering catalyst pull start for streamId=${stream.id} playbackId=${stream.playbackId} lat=${lat} lon=${lon} pullRegion=${stream.pullRegion}, playbackUrl=${playbackUrl}`
           );
         }
 
