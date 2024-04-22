@@ -1178,6 +1178,9 @@ components:
         newEmail:
           type: string
           description: temporary field for email change
+        directPlayback:
+          type: boolean
+          default: false
         kind:
           type: string
           readOnly: true
