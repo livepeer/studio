@@ -66,21 +66,25 @@ export const rowsPageFromState = async (
   getStreams: Function
 ): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
+  let isHealthy: boolean;
   const filteredFilters = state.filters.filter((f) => {
     if (f.id === "isActive" && f.isOpen) {
       active = f.condition.value as boolean;
       return false;
     }
+
     return true;
   });
-  const [streams, nextCursor, count] = await getStreams(userId, {
-    active,
-    filters: formatFiltersForApiRequest(filteredFilters),
-    limit: state.pageSize.toString(),
-    cursor: state.cursor,
-    order: state.order,
-    count: true,
-  });
+  const [streams, nextCursor, count, allStreamCount, activeStreamCount] =
+    await getStreams(userId, {
+      active,
+      isHealthy,
+      filters: formatFiltersForApiRequest(filteredFilters),
+      limit: state.pageSize.toString(),
+      cursor: state.cursor,
+      order: state.order,
+      count: true,
+    });
 
   const rows = streams.map((stream) => ({
     id: stream.id,
@@ -111,7 +115,7 @@ export const rowsPageFromState = async (
       href: `/dashboard/streams/${stream.id}`,
     },
   }));
-  return { rows, nextCursor, count };
+  return { rows, nextCursor, count, allStreamCount, activeStreamCount };
 };
 
 export const defaultCreateProfiles = [
