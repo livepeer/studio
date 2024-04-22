@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../public/img/icons/upcoming.svg";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";

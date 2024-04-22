@@ -4,6 +4,7 @@ import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
 import { isStaging } from "lib/utils";
 import { useJune, events } from "hooks/use-june";
+import { useCallback } from "react";
 
 export type StreamSetupBoxProps = {
   activeTab: "Browser" | "Streaming Software";

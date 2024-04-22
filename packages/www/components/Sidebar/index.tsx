@@ -75,11 +75,11 @@ export type SidebarId =
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
 
-  const june = useJune();
+  const June = useJune();
 
   const trackSidebarEvent = useCallback(() => {
-    if (june) june.track(`sidebar ${id} new`);
-  }, [june]);
+    if (June) June.track(`sidebar ${id}`);
+  }, [June]);
 
   useEffect(() => {
     trackSidebarEvent();
