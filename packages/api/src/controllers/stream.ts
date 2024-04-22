@@ -236,12 +236,12 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-async function resolvePullHostAndRegion(
+async function resolvePullUrlAndRegion(
   stream: NewStreamPayload,
   ingest: string
-): Promise<{ pullHost: string; pullRegion: string }> {
+): Promise<{ pullUrl: string; pullRegion: string }> {
   if (process.env.NODE_ENV === "test") {
-    return { pullHost: null, pullRegion: null };
+    return { pullUrl: null, pullRegion: null };
   }
   const url = new URL(
     pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
@@ -259,15 +259,15 @@ async function resolvePullHostAndRegion(
     return null;
   }
   return {
-    pullHost: extractHostFrom(response.url),
+    pullUrl: extractUrlFrom(response.url),
     pullRegion: extractRegionFrom(response.url),
   };
 }
 
-// Extracts host from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
-export function extractHostFrom(playbackUrl: string): string {
+// Extracts Mist URL from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
+export function extractUrlFrom(playbackUrl: string): string {
   const hostRegex =
-    /(https?:\/\/.+-\w+-catalyst.+)\/hls\/.+not-used-playback\/index.m3u8/;
+    /(https?:\/\/.+-\w+-catalyst.+\/hls\/.+)not-used-playback\/index.m3u8/;
   const matches = playbackUrl.match(hostRegex);
   return matches ? matches[1] : null;
 }
@@ -1095,7 +1095,7 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
-    const { pullHost, pullRegion } = await resolvePullHostAndRegion(
+    const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
       rawPayload,
       ingest
     );
@@ -1136,8 +1136,8 @@ app.put(
     }
 
     // If pullHost was resolved, then stick to that host for triggering Catalyst pull start
-    const playbackUrl = pullHost
-      ? getHLSPlaybackUrl(pullHost, stream)
+    const playbackUrl = pullUrl
+      ? pathJoin(pullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
       await triggerCatalystPullStart(stream, playbackUrl);
