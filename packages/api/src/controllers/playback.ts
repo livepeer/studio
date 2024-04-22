@@ -346,7 +346,7 @@ app.get("/:id", async (req, res) => {
   let { id } = req.params;
 
   if (
-    (id === "1ba7nrr34rbjl4bb" || req.user.directPlayback) &&
+    (id === "1ba7nrr34rbjl4bb" || req.user?.directPlayback) &&
     ingests[0].baseDirect
   ) {
     ingest = ingests[0].baseDirect;
