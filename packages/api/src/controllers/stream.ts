@@ -9,7 +9,7 @@ import logger from "../logger";
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
-import { fetchWithTimeoutAndRedirects } from "../util";
+import { fetchWithTimeout } from "../util";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -236,12 +236,12 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-async function resolvePullHostAndRegion(
+async function resolvePullRegion(
   stream: NewStreamPayload,
   ingest: string
-): Promise<{ pullHost: string; pullRegion: string }> {
+): Promise<string> {
   if (process.env.NODE_ENV === "test") {
-    return { pullHost: null, pullRegion: null };
+    return null;
   }
   const url = new URL(
     pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
@@ -253,23 +253,13 @@ async function resolvePullHostAndRegion(
   }
   const playbackUrl = url.toString();
   // Send any playback request to catalyst-api, which effectively resolves the region using MistUtilLoad
-  const response = await fetchWithTimeoutAndRedirects(playbackUrl, {});
-  if (response.status !== 200) {
-    // not a correct status code, so we can't determine the region/host
+  const response = await fetchWithTimeout(playbackUrl, { redirect: "manual" });
+  if (response.status < 300 || response.status >= 400) {
+    // not a redirect response, so we can't determine the region
     return null;
   }
-  return {
-    pullHost: extractHostFrom(response.url),
-    pullRegion: extractRegionFrom(response.url),
-  };
-}
-
-// Extracts host from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
-export function extractHostFrom(playbackUrl: string): string {
-  const hostRegex =
-    /(https?:\/\/.+-\w+-catalyst.+)\/hls\/.+not-used-playback\/index.m3u8/;
-  const matches = playbackUrl.match(hostRegex);
-  return matches ? matches[1] : null;
+  const redirectUrl = response.headers.get("location");
+  return extractRegionFrom(redirectUrl);
 }
 
 // Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
@@ -1095,10 +1085,7 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
-    const { pullHost, pullRegion } = await resolvePullHostAndRegion(
-      rawPayload,
-      ingest
-    );
+    const pullRegion = await resolvePullRegion(rawPayload, ingest);
 
     let stream: DBStream;
     if (!streamExisted) {
@@ -1135,12 +1122,8 @@ app.put(
       await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
-    // If pullHost was resolved, then stick to that host for triggering Catalyst pull start
-    const playbackUrl = pullHost
-      ? getHLSPlaybackUrl(pullHost, stream)
-      : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      await triggerCatalystPullStart(stream, playbackUrl);
+      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
     }
 
     res.status(streamExisted ? 200 : 201);
