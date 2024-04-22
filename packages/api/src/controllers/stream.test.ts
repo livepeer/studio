@@ -550,11 +550,31 @@ describe("controllers/stream", () => {
         const stream = await res.json();
 
         // Mark stream as active
-        await db.stream.update(stream.id, { isActive: true });
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now(),
+        });
 
         // Requesting pull lock should fail, because the stream is active (so it should be replicated instead of being pulled)
         const reslockPull = await client.post(`/stream/${stream.id}/lockPull`);
         expect(reslockPull.status).toBe(423);
+      });
+
+      it("should still lock pull for an active stream that got lost", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Mark stream as active
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now() - 24 * 60 * 60 * 1000,
+        });
+
+        // Requesting pull lock should work, because the stream is not actually active (outdated lastSeen)
+        const reslockPull = await client.post(`/stream/${stream.id}/lockPull`);
+        expect(reslockPull.status).toBe(204);
       });
 
       it("should not lock pull for already locked pull", async () => {
