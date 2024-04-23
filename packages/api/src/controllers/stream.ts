@@ -1170,15 +1170,17 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
+  // We have an issue that some of the streams/sessions are not marked as inactive when they should be.
+  // This is a workaround to clean up the stream in the background
   const doingActiveCleanup = activeCleanupOne(
     req.config,
     stream,
     req.queue,
     await getIngestBase(req)
   );
+
   // the `isActive` field is only cleared later in background, so we ignore it
   // in the query below in case we triggered an active cleanup logic above.
-
   const leaseDeadline = Date.now() - leaseTimeout;
   const updateRes = await db.stream.update(
     [
