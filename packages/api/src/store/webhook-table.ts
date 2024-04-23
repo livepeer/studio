@@ -50,7 +50,7 @@ export default class WebhookTable extends Table<DBWebhook> {
 
   async updateStatus(id: string, status: DBWebhook["status"]) {
     const res = await this.db.query(
-      `UPDATE ${
+      sql`UPDATE ${
         this.name
       } SET data = jsonb_set(data, '{status}', case when data->'status' is null then '{}' else data->'status' end || '${JSON.stringify(
         status
