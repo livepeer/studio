@@ -2207,7 +2207,7 @@ components:
           type: object
           description: User-defined webhook context
           additionalProperties: true
-          example: {"streamerId":"my-custom-id"}
+          example: { "streamerId": "my-custom-id" }
         refreshInterval:
           type: number
           description: |
