@@ -1387,9 +1387,6 @@ components:
                       type: integer
     new-asset-from-url-payload:
       properties:
-        url:
-          type: string
-          description: URL of the asset to be imported
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
