@@ -54,9 +54,9 @@ export default class WebhookTable extends Table<DBWebhook> {
       sql``
         .append(`UPDATE ${this.name} `) // table name can't be parameterized, append a raw string
         .append(
-          sql`SET data = jsonb_set(data, '{status}', case when data->'status' is null then '{}' else data->'status' end || '${statusStr}') `
+          sql`SET data = jsonb_set(data, '{status}', case when data->'status' is null then '{}' else data->'status' end || ${statusStr}) `
         )
-        .append(sql`WHERE id = '${id}'`)
+        .append(sql`WHERE id = ${id}`)
     );
 
     if (res.rowCount < 1) {
