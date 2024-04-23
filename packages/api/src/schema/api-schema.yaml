@@ -2207,7 +2207,7 @@ components:
           type: object
           description: User-defined webhook context
           additionalProperties: true
-          example: {}
+          example: {"streamerId":"my-custom-id"}
         refreshInterval:
           type: number
           description: |
@@ -2319,7 +2319,7 @@ components:
           type: string
           description: The timezone where the viewer is located.
           example: America/Los_Angeles
-        geohas:
+        geohash:
           type: string
           description:
             Geographic encoding of the viewers location. Accurate to 3 digits.
