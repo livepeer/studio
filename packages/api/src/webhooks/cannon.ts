@@ -441,6 +441,9 @@ export default class WebhookCannon {
   }
 
   private async checkIsLocalIp(url: string, isAdmin: boolean) {
+    console.log(
+      `checkIsLocalIp(${url}): admin ${isAdmin} skip ${this.skipUrlVerification}`
+    );
     if (isAdmin || this.skipUrlVerification) {
       // this is mainly useful for local testing
       return { ips: [], isLocal: false };
@@ -448,6 +451,9 @@ export default class WebhookCannon {
 
     const emptyIfNotFound = (err) => {
       if ([dns.NODATA, dns.NOTFOUND, dns.BADFAMILY].includes(err.code)) {
+        console.log(
+          `checkIsLocalIp(${url}): returning empty array for ${err.code} error`
+        );
         return [] as string[];
       }
       throw err;
@@ -460,8 +466,10 @@ export default class WebhookCannon {
           this.resolver.resolve4(hostname).catch(emptyIfNotFound),
           this.resolver.resolve6(hostname).catch(emptyIfNotFound),
         ]).then((ipsArrs) => ipsArrs.flat());
+    console.log(`checkIsLocalIp(${url}): resolved IPs for ${hostname}: ${ips}`);
 
     const isLocal = ips.some(isLocalIP);
+    console.log(`checkIsLocalIp(${url}): isLocal=${isLocal}`);
     return { ips, isLocal };
   }
 
