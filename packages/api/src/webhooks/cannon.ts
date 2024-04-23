@@ -454,6 +454,11 @@ export default class WebhookCannon {
     };
 
     const { hostname } = parseUrl(url);
+    if (["localhost", "ip6-localhost", "ip6-loopback"].includes(hostname)) {
+      // dns.resolve functions do not take /etc/hosts into account, so we need to handle these separately
+      return { ips: ["127.0.0.1"], isLocal: true };
+    }
+
     const ips = isIP(hostname)
       ? [hostname]
       : await Promise.all([
