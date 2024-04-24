@@ -90,6 +90,7 @@ const Dashboard = () => {
       <Box css={{ mb: "$8" }}>
         <StreamsTable
           title="Streams"
+          hideFilters={true}
           userId={user.id}
           pageSize={5}
           tableId="dashboardStreamsTable"
