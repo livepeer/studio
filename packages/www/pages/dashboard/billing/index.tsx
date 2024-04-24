@@ -181,6 +181,10 @@ const Billing = () => {
     }
   }, [user]);
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.billing.usageDetails);
+  }, [June]);
+
   if (!user) {
     return <Layout />;
   }
@@ -354,7 +358,7 @@ const Billing = () => {
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}
-              onClick={() => June.track(events.billing.usageDetails)}>
+              onClick={() => trackEvent()}>
               View Usage Details <ArrowRightIcon />
             </A>
           </Link>

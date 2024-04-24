@@ -8,6 +8,7 @@ import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "../../hooks";
 import ErrorDialog from "../ErrorDialog";
 import { useJune, events } from "hooks/use-june";
+import { useCallback } from "react";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
   const { patchStream } = useApi();
@@ -15,8 +16,12 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
   const errorRecordDialogState = useToggleState();
   const June = useJune();
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.stream.recordingToggle);
+  }, [June]);
+
   const onCheckedChange = async () => {
-    June.track(events.stream.recordingToggle);
+    trackEvent();
     if (stream.isActive) {
       errorRecordDialogState.onOn();
     } else if (!stream.record) {

@@ -4,6 +4,7 @@ import ClipButton from "../Clipping/ClipButton";
 import ShowURL from "../ShowURL";
 import { isStaging } from "lib/utils";
 import { useJune, events } from "hooks/use-june";
+import { useCallback } from "react";
 
 export type StreamSetupBoxProps = {
   activeTab: "Browser" | "Streaming Software";
@@ -26,6 +27,10 @@ const StreamSetupBox = ({
     : `https://lvpr.tv/broadcast/${stream.streamKey}`;
 
   const June = useJune();
+
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.stream.keyCopy);
+  }, [June]);
 
   return (
     <>
@@ -84,7 +89,7 @@ const StreamSetupBox = ({
           <Text
             variant="neutral"
             css={{ fontSize: "$2", mt: "$2" }}
-            onClick={() => June.track(events.stream.keyCopy)}>
+            onClick={() => trackEvent()}>
             <ClipButton
               value={
                 activeTab === "Streaming Software"

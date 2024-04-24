@@ -40,6 +40,10 @@ const ApiKeysTable = ({
     [userId]
   );
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.developer.apiKeyCreate);
+  }, [June]);
+
   return (
     <>
       <Table
@@ -53,7 +57,7 @@ const ApiKeysTable = ({
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction("Create API Key", () => {
-          June.track(events.developer.apiKeyCreate);
+          trackEvent();
           return createDialogState.onOn();
         })}
       />

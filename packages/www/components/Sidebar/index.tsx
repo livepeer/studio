@@ -27,10 +27,11 @@ import {
   AssetsIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import { useJune, events } from "hooks/use-june";
+import { useCallback, useEffect } from "react";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -73,9 +74,21 @@ export type SidebarId =
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
+  const router = useRouter();
+
   const June = useJune();
 
-  June?.track(`sidebar ${id}`);
+  useEffect(() => {
+    const handleRouteChange = (url, { shallow }) => {
+      if (June) June.page(url);
+    };
+
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [June]);
 
   return (
     <Box
