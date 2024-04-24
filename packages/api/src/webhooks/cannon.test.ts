@@ -219,6 +219,47 @@ describe("webhook cannon", () => {
       expect(called).toBe(true);
     });
 
+    describe("local webhook", () => {
+      beforeAll(() => {
+        server.webhook.skipUrlVerification = false;
+      });
+
+      afterAll(() => {
+        server.webhook.skipUrlVerification = true;
+      });
+
+      it("should not call local webhooks", async () => {
+        // we create the same mock webhook, but given url verification is enabled it should not be called
+        const res = await client.post("/webhook", {
+          ...mockWebhook,
+          name: "test non admin",
+        });
+        const resJson = await res.json();
+        console.log("webhook body: ", resJson);
+        expect(res.status).toBe(201);
+        expect(resJson.name).toBe("test non admin");
+
+        const sem = semaphore();
+        let called = false;
+        webhookCallback = () => {
+          called = true;
+          sem.release();
+        };
+
+        await server.queue.publishWebhook("events.stream.started", {
+          type: "webhook_event",
+          id: "webhook_test_12",
+          timestamp: Date.now(),
+          streamId: "streamid",
+          event: "stream.started",
+          userId: nonAdminUser.id,
+        });
+
+        await sem.wait(3000);
+        expect(called).toBe(false);
+      });
+    });
+
     it("should call multiple webhooks", async () => {
       let res = await client.post("/webhook", {
         ...mockWebhook,
@@ -353,6 +394,127 @@ describe("webhook cannon", () => {
 
       await Promise.all(sems.map((s) => s.wait(3000)));
       expect(calledCounts).toEqual([4, 2]);
+    });
+  });
+
+  describe("local IP check", () => {
+    beforeAll(() => {
+      server.webhook.skipUrlVerification = false;
+    });
+
+    afterAll(() => {
+      server.webhook.skipUrlVerification = true;
+    });
+
+    const expectIsLocal = async (
+      url: string,
+      isLocal: boolean,
+      ips?: string[]
+    ) => {
+      expect(await server.webhook.checkIsLocalIp(url, false)).toMatchObject({
+        isLocal,
+        ips,
+      });
+    };
+
+    it("should flag local IPs", async () => {
+      await expectIsLocal("http://127.0.0.1/test", true, ["127.0.0.1"]);
+      await expectIsLocal("http://[::1]/test", true, ["::1"]);
+    });
+
+    it("should flag private IPs", async () => {
+      await expectIsLocal("http://10.42.0.1/test", true, ["10.42.0.1"]);
+      await expectIsLocal("http://172.16.3.4/test", true, ["172.16.3.4"]);
+      await expectIsLocal("http://[fd12:3456:789a:1::1]/test", true, [
+        "fd12:3456:789a:1::1",
+      ]);
+    });
+
+    it("should flag loopback addresses", async () => {
+      await expectIsLocal("http://localhost:1234/test", true, ["127.0.0.1"]);
+      await expectIsLocal("http://ip6-localhost:1234/test", true, ["::1"]);
+      await expectIsLocal("http://ip6-loopback:1234/test", true, ["::1"]);
+    });
+
+    it("should not flag public IPs", async () => {
+      await expectIsLocal("http://172.67.149.35/test", false, [
+        "172.67.149.35",
+      ]);
+      await expectIsLocal("http://[2606:4700:3037::ac43:9523]/test", false, [
+        "2606:4700:3037::ac43:9523",
+      ]);
+    });
+
+    describe("domain resolution", () => {
+      let prevResolver;
+      let resolverMock: ReturnType<typeof createResolverMock>;
+
+      const createResolverMock = () => ({
+        resolve4: jest.fn<Promise<string[]>, any, any>(),
+        resolve6: jest.fn<Promise<string[]>, any, any>(),
+      });
+
+      beforeEach(() => {
+        prevResolver = server.webhook.resolver;
+        server.webhook.resolver = resolverMock = createResolverMock() as any;
+      });
+
+      afterEach(() => {
+        server.webhook.resolver = prevResolver;
+      });
+
+      it("should not flag domains that resolve to public IPs", async () => {
+        resolverMock.resolve4.mockReturnValueOnce(
+          Promise.resolve(["172.67.149.35"])
+        );
+        resolverMock.resolve6.mockReturnValueOnce(
+          Promise.resolve(["2606:4700:3037::ac43:9523"])
+        );
+
+        await expectIsLocal("http://livepeer.studio/mock", false, [
+          "172.67.149.35",
+          "2606:4700:3037::ac43:9523",
+        ]);
+        expect(resolverMock.resolve4.mock.calls).toHaveLength(1);
+        expect(resolverMock.resolve4.mock.calls[0][0]).toEqual(
+          "livepeer.studio"
+        );
+        expect(resolverMock.resolve6.mock.calls).toHaveLength(1);
+        expect(resolverMock.resolve6.mock.calls[0][0]).toEqual(
+          "livepeer.studio"
+        );
+      });
+
+      const privateTestCases = [
+        { name: "IPv4-only", ipv4: ["10.42.0.10"], ipv6: [] },
+        { name: "IPv6-only", ipv4: [], ipv6: ["::1"] },
+        { name: "IPv4 and IPv6", ipv4: ["172.0.0.1"], ipv6: ["::1"] },
+        {
+          name: "mixed private and public IPs",
+          ipv4: ["172.67.149.35", "172.16.34.123"],
+          ipv6: ["2606:4700:3037::ac43:9523", "fd12:3456:789a:1::1"],
+        },
+      ];
+
+      for (const { name, ipv4, ipv6 } of privateTestCases) {
+        it(`should flag domains that resolve to private IPs (${name})`, async () => {
+          resolverMock.resolve4.mockReturnValueOnce(Promise.resolve(ipv4));
+          resolverMock.resolve6.mockReturnValueOnce(Promise.resolve(ipv6));
+
+          await expectIsLocal("http://local.mydomain.com/test", true, [
+            ...ipv4,
+            ...ipv6,
+          ]);
+          expect(resolverMock.resolve4.mock.calls).toHaveLength(1);
+          expect(resolverMock.resolve4.mock.calls[0][0]).toEqual(
+            "local.mydomain.com"
+          );
+          expect(resolverMock.resolve6.mock.calls).toHaveLength(1);
+          expect(resolverMock.resolve6.mock.calls[0][0]).toEqual(
+            "local.mydomain.com"
+          );
+        });
+      }
     });
   });
 });

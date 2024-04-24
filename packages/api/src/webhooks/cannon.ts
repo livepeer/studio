@@ -440,7 +440,7 @@ export default class WebhookCannon {
     }
   }
 
-  private async checkIsLocalIp(url: string, isAdmin: boolean) {
+  public async checkIsLocalIp(url: string, isAdmin: boolean) {
     if (isAdmin || this.skipUrlVerification) {
       // this is mainly useful for local testing
       return { ips: [], isLocal: false };
@@ -456,7 +456,8 @@ export default class WebhookCannon {
     const { hostname } = parseUrl(url);
     if (["localhost", "ip6-localhost", "ip6-loopback"].includes(hostname)) {
       // dns.resolve functions do not take /etc/hosts into account, so we need to handle these separately
-      return { ips: ["127.0.0.1"], isLocal: true };
+      const ips = hostname === "localhost" ? ["127.0.0.1"] : ["::1"];
+      return { ips, isLocal: true };
     }
 
     const ips = isIP(hostname)
