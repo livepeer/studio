@@ -735,12 +735,11 @@ app.patch("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   const { directPlayback } = req.body;
 
-  if (directPlayback) {
+  if (typeof directPlayback !== "undefined") {
     await db.user.update(id, { directPlayback });
   }
 
-  res.status(204);
-  res.end();
+  res.status(204).end();
 });
 
 app.post("/token", validatePost("user"), async (req, res) => {
