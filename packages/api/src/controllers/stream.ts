@@ -30,7 +30,7 @@ import Queue from "../store/queue";
 import { DBSession } from "../store/session-table";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { Semaphore, fetchWithTimeoutAndRedirects, sleep } from "../util";
+import { fetchWithTimeoutAndRedirects, sleep } from "../util";
 import { withPlaybackUrls } from "./asset";
 import { getBroadcasterHandler } from "./broadcaster";
 import { getClips } from "./clip";
@@ -289,10 +289,6 @@ export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `flv`, stream.playbackId);
 }
 
-// our DB client uses 10 connections by default, use at most half of that for
-// background cleanup logic.
-const cleanupSemaphore = new Semaphore(5);
-
 /**
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
@@ -317,7 +313,6 @@ function activeCleanupOne(
   }
 
   setImmediate(async () => {
-    await cleanupSemaphore.wait();
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.waiting logic to clean-up the isActive field
@@ -335,8 +330,6 @@ function activeCleanupOne(
       }
     } catch (err) {
       logger.error("Error sending /setactive hooks err=", err);
-    } finally {
-      cleanupSemaphore.release();
     }
   });
 
