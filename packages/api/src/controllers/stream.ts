@@ -16,7 +16,8 @@ import {
   StreamSetActivePayload,
   User,
 } from "../schema/types";
-import { db } from "../store";
+import { db, jobsDb } from "../store";
+import { DB } from "../store/db";
 import {
   BadRequestError,
   InternalServerError,
@@ -316,10 +317,18 @@ function activeCleanupOne(
     try {
       if (stream.parentId) {
         // this is a session so trigger the recording.waiting logic to clean-up the isActive field
-        await triggerSessionRecordingHooks(config, stream, queue, ingest, true);
+        await triggerSessionRecordingHooks(
+          jobsDb,
+          config,
+          stream,
+          queue,
+          ingest,
+          true
+        );
       } else {
         const patch = { isActive: false };
         await setStreamActiveWithHooks(
+          jobsDb,
           config,
           stream,
           patch,
@@ -1429,6 +1438,7 @@ app.put(
       region: req.config.ownRegion,
     };
     await setStreamActiveWithHooks(
+      db,
       req.config,
       stream,
       patch,
@@ -1472,6 +1482,7 @@ app.put(
  * events from {@link triggerSessionRecordingHooks}.
  */
 async function setStreamActiveWithHooks(
+  db: DB,
   config: CliArgs,
   stream: DBStream,
   patch: Partial<DBStream> & { isActive: boolean },
@@ -1513,14 +1524,19 @@ async function setStreamActiveWithHooks(
   }
 
   // opportunistically trigger recording.waiting logic for this stream's sessions
-  triggerSessionRecordingHooks(config, stream, queue, ingest, isCleanup).catch(
-    (err) => {
-      logger.error(
-        `Error triggering session recording hooks stream_id=${stream.id} err=`,
-        err
-      );
-    }
-  );
+  triggerSessionRecordingHooks(
+    db,
+    config,
+    stream,
+    queue,
+    ingest,
+    isCleanup
+  ).catch((err) => {
+    logger.error(
+      `Error triggering session recording hooks stream_id=${stream.id} err=`,
+      err
+    );
+  });
 }
 
 /**
@@ -1529,6 +1545,7 @@ async function setStreamActiveWithHooks(
  * the handler will check if the session is actually inactive to fire the hook.
  */
 async function triggerSessionRecordingHooks(
+  db: DB,
   config: CliArgs,
   stream: DBStream,
   queue: Queue,
@@ -2117,7 +2134,7 @@ app.post(
   async (req, res) => {
     const limit = parseInt(req.query.limit?.toString()) || 10000;
     const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
-    let [streams] = await db.stream.find(
+    let [streams] = await jobsDb.stream.find(
       [
         sql`data->>'parentId' IS NULL`,
         sql`data->>'isActive' = 'true'`,

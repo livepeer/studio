@@ -4,7 +4,6 @@ import isLocalIP from "is-local-ip";
 import { Response } from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { parse as parseUrl } from "url";
-import { DB } from "../store/db";
 import { DBSession } from "../store/session-table";
 import messages from "../store/messages";
 import Queue from "../store/queue";
@@ -18,7 +17,7 @@ import { createAsset, primaryStorageExperiment } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
 import { BadRequestError, UnprocessableEntityError } from "../store/errors";
-import { db } from "../store";
+import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
 import { buildRecordingUrl } from "../controllers/session";
 import { isExperimentSubject } from "../store/experiment-table";
 import { WebhookLog } from "../schema/types";

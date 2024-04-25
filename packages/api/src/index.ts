@@ -71,7 +71,8 @@ export default async function makeApp(params: CliArgs) {
     process.off("unhandledRejection", unhandledRejection);
     listener?.close();
     await tracking.flushAll();
-    await store.close();
+    await db.close();
+    await jobsDb.close();
   };
 
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
@@ -94,6 +95,7 @@ export default async function makeApp(params: CliArgs) {
   });
   const {
     db,
+    jobsDb,
     queue,
     router,
     store,
@@ -164,6 +166,7 @@ export default async function makeApp(params: CliArgs) {
     close,
     store,
     db,
+    jobsDb,
     webhook,
     taskScheduler,
     queue,
