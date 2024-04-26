@@ -2135,7 +2135,7 @@ app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    const limit = parseInt(req.query.limit?.toString()) || 10000;
+    const limit = parseInt(req.query.limit?.toString()) || 1000;
     const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
     let [streams] = await jobsDb.stream.find(
       [
