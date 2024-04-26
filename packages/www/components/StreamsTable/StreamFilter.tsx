@@ -41,8 +41,6 @@ const StreamFilter = ({ onDone, activeFilters }) => {
   });
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  console.log("activeFilters", activeFilters);
-
   const [outputFilters, setOutputFilters] = useState([]);
   const router = useRouter();
 
@@ -196,8 +194,28 @@ const StreamFilter = ({ onDone, activeFilters }) => {
     }
   }, [activeFilters]);
 
+  const getDropdownMargin = (filterId) => {
+    switch (filterId) {
+      case "name":
+        return "-2.5rem";
+      case "isActive":
+        return "-2.5rem";
+      case "createdAt":
+        return "-3.5rem";
+      case "lastSeen":
+        return "-3.5rem";
+      default:
+        return "0rem";
+    }
+  };
+
   return (
-    <Flex gap={3} direction={"row"}>
+    <Flex
+      gap={3}
+      direction={"row"}
+      css={{
+        position: "relative",
+      }}>
       {searchFilters.map((filter, index) => {
         const isActive = outputFilters?.find((f) => f.id === filter.id);
         const value = isActive?.condition?.value;
@@ -271,9 +289,10 @@ const StreamFilter = ({ onDone, activeFilters }) => {
               css={{
                 border: "1px solid $colors$neutral6",
                 p: "$2",
-                ml: "7rem",
                 width: "15rem",
                 mt: "$2",
+                ml: getDropdownMargin(filter.id), // Dynamic margin based on filter ID
+                position: "absolute",
               }}>
               <form
                 onSubmit={(e) => {

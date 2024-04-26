@@ -325,9 +325,8 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
         <Flex
           css={{
             alignItems: "center",
-
             position: "absolute",
-            right: 20,
+            right: "4%",
           }}>
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
