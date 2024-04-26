@@ -60,7 +60,7 @@ type MultistreamOptions = DBStream["multistream"];
 type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
-const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
+export const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
 const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
 
