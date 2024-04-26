@@ -307,10 +307,12 @@ function shouldCleanUpIsActive(stream: DBStream | DBSession) {
  * Creates an updated stream object with a fixed `isActive` field in case it is lost and needs clean up.
  */
 function withFixedIsActive(stream: DBStream) {
-  return {
-    ...stream,
-    isActive: stream.isActive && !shouldCleanUpIsActive(stream),
-  };
+  return !shouldCleanUpIsActive(stream)
+    ? stream
+    : {
+        ...stream,
+        isActive: false,
+      };
 }
 
 /**
