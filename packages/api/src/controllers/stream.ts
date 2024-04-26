@@ -294,7 +294,7 @@ export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
  */
-function shouldActiveCleanup(stream: DBStream | DBSession) {
+function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   const isActive = "isActive" in stream ? stream.isActive : true; // sessions don't have `isActive` field so we just assume `true`
   return (
     isActive &&
@@ -303,13 +303,34 @@ function shouldActiveCleanup(stream: DBStream | DBSession) {
   );
 }
 
-function activeCleanupOne(
+/**
+ * Creates an updated stream object with a fixed `isActive` field in case it is lost and needs clean up.
+ */
+function withFixedIsActive(stream: DBStream) {
+  return {
+    ...stream,
+    isActive: stream.isActive && !shouldCleanUpIsActive(stream),
+  };
+}
+
+/**
+ * Calls {@link withFixedIsActive} on multiple streams, optionally filtering to only the really active streams.
+ */
+function withFixedIsActiveMany(streams: DBStream[], filter = false) {
+  streams = streams.map(withFixedIsActive);
+  if (filter) {
+    streams = streams.filter((s) => s.isActive);
+  }
+  return streams;
+}
+
+function triggerCleanUpIsActiveJob(
   config: CliArgs,
   stream: DBStream,
   queue: Queue,
   ingest: string
 ) {
-  if (!shouldActiveCleanup(stream)) {
+  if (!shouldCleanUpIsActive(stream)) {
     return false;
   }
 
@@ -341,21 +362,7 @@ function activeCleanupOne(
       logger.error("Error sending /setactive hooks err=", err);
     }
   });
-
-  stream.isActive = false;
   return true;
-}
-
-function activeCleanup(
-  config: CliArgs,
-  streams: DBStream[],
-  queue: Queue,
-  ingest: string
-) {
-  for (const stream of streams) {
-    activeCleanupOne(config, stream, queue, ingest);
-  }
-  return streams;
 }
 
 async function getIngestBase(req: Request) {
@@ -471,22 +478,19 @@ app.get("/", authorizer({}), async (req, res) => {
     },
   });
 
-  const ingest = await getIngestBase(req);
-  res.status(200);
-
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
 
-  output = db.stream.addDefaultFieldsMany(
-    db.stream.removePrivateFieldsMany(output, req.user.admin)
+  const filter = active && active !== "false";
+  output = withFixedIsActiveMany(
+    db.stream.addDefaultFieldsMany(
+      db.stream.removePrivateFieldsMany(output, req.user.admin)
+    ),
+    filter
   );
-  output = activeCleanup(req.config, output, req.queue, ingest);
-  if (active) {
-    output = output.filter((s) => s.isActive); // activeCleanup monkey patches the stream object
-  }
 
-  res.json(output);
+  res.status(200).json(output);
 });
 
 export async function getRecordingPlaybackUrl(
@@ -730,13 +734,10 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   res.json(
-    activeCleanup(
-      req.config,
+    withFixedIsActiveMany(
       db.stream.addDefaultFieldsMany(
         db.stream.removePrivateFieldsMany(streams, req.user.admin)
-      ),
-      req.queue,
-      ingest
+      )
     )
   );
 });
@@ -753,7 +754,8 @@ app.get("/:id", authorizer({}), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
+  stream = withFixedIsActive(stream);
+
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -1206,7 +1208,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
 
   // We have an issue that some of the streams/sessions are not marked as inactive when they should be.
   // This is a workaround to clean up the stream in the background
-  const doingActiveCleanup = activeCleanupOne(
+  const doingActiveCleanup = triggerCleanUpIsActiveJob(
     req.config,
     stream,
     req.queue,
@@ -1568,8 +1570,8 @@ async function triggerSessionRecordingHooks(
     }
 
     const session = await db.session.get(sessionId);
-    if (isCleanup && !shouldActiveCleanup(session)) {
-      // The {activeCleanupOne} logic only checks the parent stream, so we need
+    if (isCleanup && !shouldCleanUpIsActive(session)) {
+      // The {activeCleanup} logic only checks the parent stream, so we need
       // to recheck the sessions here to avoid spamming active sessions.
       continue;
     }
@@ -1982,7 +1984,8 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
       errors: ["not found"],
     });
   }
-  activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
+  stream = withFixedIsActive(stream);
+
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
@@ -2147,11 +2150,21 @@ app.post(
 
     const ingest = await getIngestBase(req);
 
-    streams = activeCleanup(req.config, streams, req.queue, ingest);
-    streams = streams.filter((s) => !s.isActive); // activeCleanup monkey patches the stream objects
+    const cleanedUp: DBStream[] = [];
+    for (const stream of streams) {
+      const cleaned = triggerCleanUpIsActiveJob(
+        req.config,
+        stream,
+        req.queue,
+        ingest
+      );
+      if (cleaned) {
+        cleanedUp.push(stream);
+      }
+    }
 
     res.status(200);
-    res.json({ cleanedUp: streams });
+    res.json({ cleanedUp });
   }
 );
 
