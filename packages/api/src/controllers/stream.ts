@@ -1059,46 +1059,9 @@ app.put(
       });
     }
 
-    let defaultProfiles = req.config.defaultStreamProfiles;
-
-    // Allow test creatorIds to set custom profiles
-    if (rawPayload.creatorId && typeof rawPayload.creatorId === "string") {
-      if (testCreatorIds.includes(rawPayload.creatorId)) {
-        logger.info(
-          `pull request creatorId=${rawPayload.creatorId} is a test creatorId`
-        );
-        defaultProfiles = [
-          {
-            name: "240p0",
-            fps: 0,
-            bitrate: 250000,
-            width: 426,
-            height: 240,
-            profile: "H264ConstrainedHigh",
-          },
-          {
-            name: "360p0",
-            fps: 0,
-            bitrate: 800000,
-            width: 640,
-            height: 360,
-            profile: "H264ConstrainedHigh",
-          },
-          {
-            name: "480p0",
-            fps: 0,
-            bitrate: 1600000,
-            width: 854,
-            height: 480,
-            profile: "H264ConstrainedHigh",
-          },
-        ];
-      }
-    }
-
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
-      profiles: defaultProfiles,
+      profiles: req.config.defaultStreamProfiles,
       ...rawPayload,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
@@ -1183,6 +1146,9 @@ app.put(
         pullRegion,
         ...payload,
       };
+      if (testCreatorIds.includes(stream.creatorId?.value)) {
+        stream.profiles = oldStream.profiles;
+      }
       await db.stream.replace(stream);
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
