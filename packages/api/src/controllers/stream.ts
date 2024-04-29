@@ -1070,7 +1070,7 @@ app.put(
     };
     logger.info(
       `pull request received userId=${req.user.id} ` +
-        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escaping string for logfmt
+        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escape string for logfmt
     );
 
     const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
