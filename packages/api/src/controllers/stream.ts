@@ -1059,7 +1059,7 @@ app.put(
       });
     }
 
-    let profiles = req.config.defaultStreamProfiles;
+    let defaultProfiles = req.config.defaultStreamProfiles;
 
     // Allow test creatorIds to set custom profiles
     if (rawPayload.creatorId && typeof rawPayload.creatorId === "string") {
@@ -1067,7 +1067,7 @@ app.put(
         logger.info(
           `pull request creatorId=${rawPayload.creatorId} is a test creatorId`
         );
-        profiles = [
+        defaultProfiles = [
           {
             name: "240p0",
             fps: 0,
@@ -1098,7 +1098,7 @@ app.put(
 
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
-      profiles,
+      profiles: defaultProfiles,
       ...rawPayload,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
