@@ -183,6 +183,11 @@ let config = {
           "https://livepeer.notion.site/livepeer/Livepeer-Inc-6898d5451e2b40e79b1225812f4f1705",
         permanent: false,
       },
+      {
+        source: "/changelog",
+        destination: "https://livepeer.canny.io",
+        permanent: false,
+      },
     ];
   },
 };
