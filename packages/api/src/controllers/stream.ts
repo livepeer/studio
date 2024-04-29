@@ -1046,28 +1046,11 @@ app.put(
   async (req, res) => {
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
-
-    const ingest = await getIngestBase(req);
-
     if (!rawPayload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
       });
     }
-
-    const payloadLog = {
-      ...db.stream.cleanWriteOnlyResponse(rawPayload as DBStream),
-      pull: {
-        ...rawPayload.pull,
-        source: "REDACTED",
-        headers: "REDACTED",
-        headersList: Object.keys(rawPayload.pull.headers || {}),
-      },
-    };
-    logger.info(
-      `pull request received userId=${req.user.id} ` +
-        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escaping string for logfmt
-    );
 
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
@@ -1075,6 +1058,20 @@ app.put(
       ...rawPayload,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
+
+    const payloadLog = {
+      ...db.stream.cleanWriteOnlyResponse(payload as DBStream),
+      pull: {
+        ...payload.pull,
+        source: "REDACTED",
+        headers: "REDACTED",
+        headersList: Object.keys(payload.pull.headers || {}),
+      },
+    };
+    logger.info(
+      `pull request received userId=${req.user.id} ` +
+        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escaping string for logfmt
+    );
 
     const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
     if (!keyValue) {
@@ -1108,6 +1105,7 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
+    const ingest = await getIngestBase(req);
     const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
       rawPayload,
       ingest
