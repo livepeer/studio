@@ -1067,7 +1067,7 @@ app.put(
         logger.info(
           `pull request creatorId=${rawPayload.creatorId} is a test creatorId`
         );
-        profiles = rawPayload.profiles;
+        profiles = rawPayload.profiles; // TODO: specify here the hardcoded profiles for testing
       }
     }
 
