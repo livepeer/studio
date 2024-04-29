@@ -1038,6 +1038,13 @@ const pullStreamKeyAccessors: Record<string, string[]> = {
   "pull.source": ["pull", "source"],
 };
 
+const testCreatorIds: string[] = [
+  "73846_104901225_104901225",
+  "73846_116005487_116003843",
+  "73846_116003843_116003843",
+  "73846_115939837_115939837",
+];
+
 app.put(
   "/pull",
   authorizer({}),
@@ -1052,9 +1059,21 @@ app.put(
       });
     }
 
+    let profiles = req.config.defaultStreamProfiles;
+
+    // Allow test creatorIds to set custom profiles
+    if (rawPayload.creatorId && typeof rawPayload.creatorId === "string") {
+      if (testCreatorIds.includes(rawPayload.creatorId)) {
+        logger.info(
+          `pull request creatorId=${rawPayload.creatorId} is a test creatorId`
+        );
+        profiles = rawPayload.profiles;
+      }
+    }
+
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
-      profiles: req.config.defaultStreamProfiles,
+      profiles,
       ...rawPayload,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
