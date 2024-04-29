@@ -1780,7 +1780,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess = stream?.userId === req.user.id || req.isUIAdmin;
+    const hasAccess = stream?.userId === req.user.id || req.user.admin;
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
