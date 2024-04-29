@@ -715,6 +715,7 @@ components:
           description: Indicates whether the stream is currently live or not.
         is_healthy:
           type: boolean
+          nullable: true
           description: Indicates whether the stream is healthy or not.
         issues:
           type: string
