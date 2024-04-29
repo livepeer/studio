@@ -1038,6 +1038,13 @@ const pullStreamKeyAccessors: Record<string, string[]> = {
   "pull.source": ["pull", "source"],
 };
 
+const testCreatorIds: string[] = [
+  "73846_104901225_104901225",
+  "73846_116005487_116003843",
+  "73846_116003843_116003843",
+  "73846_115939837_115939837",
+];
+
 app.put(
   "/pull",
   authorizer({}),
@@ -1139,6 +1146,9 @@ app.put(
         pullRegion,
         ...payload,
       };
+      if (testCreatorIds.includes(stream.creatorId?.value)) {
+        stream.profiles = oldStream.profiles;
+      }
       await db.stream.replace(stream);
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
