@@ -587,12 +587,9 @@ components:
       table: webhook
       properties:
         kind:
-          type: string
-          example: webhook
           readOnly: true
         userId:
           readOnly: true
-          type: string
           index: true
         events:
           index: true
@@ -938,9 +935,6 @@ components:
         userId:
           readOnly: true
           index: true
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          description: owner of the asset
         source:
           oneOf:
             - properties:
@@ -1318,8 +1312,6 @@ components:
         userId:
           readOnly: true
           index: true
-          type: string
-          example: 78df0075-b5f3-4683-a618-1086faca35dc
         deleted:
           type: boolean
           default: false

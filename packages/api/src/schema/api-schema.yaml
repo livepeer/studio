@@ -176,6 +176,11 @@ components:
         name:
           type: string
           example: test_webhook
+        kind:
+          type: string
+          example: webhook
+        userId:
+          type: string
         createdAt:
           type: number
           readOnly: true
@@ -217,7 +222,6 @@ components:
           example: "https://my-service.com/webhook"
         sharedSecret:
           type: string
-          writeOnly: true
           description: shared secret used to sign the webhook payload
           example: my-secret
         streamId:
@@ -933,6 +937,9 @@ components:
           description: >-
             The playback ID to use with the Playback Info endpoint to retrieve
             playback URLs.
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         staticMp4:
           type: boolean
           writeOnly: true
@@ -2062,6 +2069,9 @@ components:
           type: string
           description: Name of the signing key
           example: key1
+        userId:
+          type: string
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
         createdAt:
           readOnly: true
           type: number
