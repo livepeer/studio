@@ -1047,8 +1047,6 @@ app.put(
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
 
-    logger.info(`pull request received for stream name=${rawPayload.name}`);
-
     const ingest = await getIngestBase(req);
 
     if (!rawPayload.pull) {
@@ -1056,6 +1054,20 @@ app.put(
         errors: [`stream pull configuration is required`],
       });
     }
+
+    const payloadLog = {
+      ...db.stream.cleanWriteOnlyResponse(rawPayload as DBStream),
+      pull: {
+        ...rawPayload.pull,
+        source: "REDACTED",
+        headers: "REDACTED",
+        headersList: Object.keys(rawPayload.pull.headers || {}),
+      },
+    };
+    logger.info(
+      `pull request received userId=${req.user.id} ` +
+        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escaping string for logfmt
+    );
 
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
