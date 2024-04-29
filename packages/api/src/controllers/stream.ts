@@ -1067,7 +1067,32 @@ app.put(
         logger.info(
           `pull request creatorId=${rawPayload.creatorId} is a test creatorId`
         );
-        profiles = rawPayload.profiles; // TODO: specify here the hardcoded profiles for testing
+        profiles = [
+          {
+            name: "240p0",
+            fps: 0,
+            bitrate: 250000,
+            width: 426,
+            height: 240,
+            profile: "H264ConstrainedHigh",
+          },
+          {
+            name: "360p0",
+            fps: 0,
+            bitrate: 800000,
+            width: 640,
+            height: 360,
+            profile: "H264ConstrainedHigh",
+          },
+          {
+            name: "480p0",
+            fps: 0,
+            bitrate: 1600000,
+            width: 854,
+            height: 480,
+            profile: "H264ConstrainedHigh",
+          },
+        ];
       }
     }
 
