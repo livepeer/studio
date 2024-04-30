@@ -875,8 +875,6 @@ components:
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
     error:
-      required:
-        - errors
       type: object
       properties:
         errors:
