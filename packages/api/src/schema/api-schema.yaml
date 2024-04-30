@@ -236,6 +236,7 @@ components:
           example: "https://my-service.com/webhook"
         sharedSecret:
           type: string
+          writeOnly: true
           description: shared secret used to sign the webhook payload
           example: my-secret
         streamId:
@@ -2958,9 +2959,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                items:
-                  $ref: "#/components/schemas/multistream-target"
+                $ref: "#/components/schemas/multistream-target"
                 x-speakeasy-name-override: data
         default:
           description: Error
