@@ -259,10 +259,8 @@ const ID = () => {
         throw new Error(info.errors.toString());
       }
 
-      // @ts-ignore
-      setStream(info.stream);
-      // @ts-ignore
-      setStreamOwner(info.user);
+      setStream(info.stream as Stream);
+      setStreamOwner(info.user as User);
     } catch (err) {
       console.error(err); // todo: surface this
     }
