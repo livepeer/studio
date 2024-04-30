@@ -29,7 +29,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   useEffect(() => {
     if (shouldBeLoggedIn === true) {
       if (!token) {
-        router.replace("/login");
+        router.replace("/dashboard/login");
       } else if (emailVerificationMode && user?.emailValid === false) {
         router.replace("/verify");
       }

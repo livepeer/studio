@@ -905,7 +905,7 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
           subject: `User ${user.email} signed up with Livepeer!`,
           preheader: "We have a new verified user",
           buttonText: "Log into livepeer",
-          buttonUrl: frontendUrl(req, "/login"),
+          buttonUrl: frontendUrl(req, "/dashboard/login"),
           unsubscribe: unsubscribeUrl(req),
           text: [
             `User ${user.email} has signed up and verified their email with Livepeer!`,
