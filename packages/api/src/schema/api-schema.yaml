@@ -719,22 +719,24 @@ components:
           description: Indicates whether the stream is currently live or not.
         is_healthy:
           oneOf:
-            - type: 'null'
-            - type: 'boolean'
+            - type: "null"
+            - type: "boolean"
           description: "Indicates whether the stream is healthy or not."
         issues:
           oneOf:
-            - type: 'null'
-            - type: 'string'
+            - type: "null"
+            - type: "string"
           description: |
             "Raw issues affecting the stream as described by Mist, if any. We don't expose those to the end-user, showing only human_issues instead."
         human_issues:
           oneOf:
-            - type: 'null'
-            - type: 'array'
+            - type: "null"
+            - type: "array"
               items:
-                type: 'string'
-          description: "A string array of human-readable errors describing issues affecting the stream, if any."
+                type: "string"
+          description:
+            "A string array of human-readable errors describing issues affecting
+            the stream, if any."
         tracks:
           type: object
           description: |
@@ -2239,12 +2241,6 @@ components:
       type: object
       description: |
         An individual metric about usage of a user.
-      required:
-        - UserID
-        - CreatorID
-        - DeliveryUsageMins
-        - TotalUsageMins
-        - StorageUsageMins
       properties:
         UserID:
           type: string
@@ -4173,9 +4169,6 @@ paths:
                 description: |
                   A simplified metric object about aggregate viewership of an
                   asset. Either playbackId or dStorageUrl will be set.
-                required:
-                  - viewCount
-                  - playtimeMins
                 properties:
                   playbackId:
                     $ref: >-
