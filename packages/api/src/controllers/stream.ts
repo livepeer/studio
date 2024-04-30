@@ -1,15 +1,12 @@
-import { Router, Request } from "express";
+import { Request, Router } from "express";
+import _ from "lodash";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
-import _ from "lodash";
 
 import logger from "../logger";
-import { authorizer } from "../middleware";
-import { validatePost } from "../middleware";
-import { geolocateMiddleware } from "../middleware";
-import { fetchWithTimeoutAndRedirects } from "../util";
+import { authorizer, geolocateMiddleware, validatePost } from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -20,7 +17,6 @@ import {
   User,
 } from "../schema/types";
 import { db } from "../store";
-import { DBSession } from "../store/session-table";
 import {
   BadRequestError,
   InternalServerError,
@@ -28,34 +24,35 @@ import {
   TooManyRequestsError,
   UnprocessableEntityError,
 } from "../store/errors";
+import { ensureExperimentSubject } from "../store/experiment-table";
+import messages from "../store/messages";
+import Queue from "../store/queue";
+import { DBSession } from "../store/session-table";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
-import messages from "../store/messages";
+import { fetchWithTimeoutAndRedirects, sleep } from "../util";
+import { withPlaybackUrls } from "./asset";
 import { getBroadcasterHandler } from "./broadcaster";
+import { getClips } from "./clip";
+import { experimentSubjectsOnly } from "./experiment";
 import {
   generateUniquePlaybackId,
   generateUniqueStreamKey,
 } from "./generate-keys";
 import {
+  FieldsMap,
   makeNextHREF,
+  mapInputCreatorId,
   parseFilters,
   parseOrder,
   pathJoin,
-  FieldsMap,
   toStringValues,
-  mapInputCreatorId,
-  triggerCatalystStreamUpdated,
   triggerCatalystPullStart,
   triggerCatalystStreamStopSessions,
+  triggerCatalystStreamUpdated,
 } from "./helpers";
-import wowzaHydrate from "./wowza-hydrate";
-import Queue from "../store/queue";
 import { toExternalSession } from "./session";
-import { withPlaybackUrls } from "./asset";
-import { getClips } from "./clip";
-import { ensureExperimentSubject } from "../store/experiment-table";
-import { experimentSubjectsOnly } from "./experiment";
-import { sleep } from "../util";
+import wowzaHydrate from "./wowza-hydrate";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
