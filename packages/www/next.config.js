@@ -199,19 +199,56 @@ let config = {
         permanent: false,
       },
       {
-        source: "/reset-password",
-        destination: "/dashboard/reset-password",
-        permanent: false,
-      },
-      {
         source: "/verify",
-        destination: "/dashboard/verify",
+        destination:
+          "/dashboard/verify?email=:email&emailValidToken=:emailValidToken&selectedPlan=:selectedPlan",
         permanent: false,
+        has: [
+          {
+            type: "query",
+            key: "email",
+          },
+          {
+            type: "query",
+            key: "emailValidToken",
+          },
+          {
+            type: "query",
+            key: "selectedPlan",
+          },
+        ],
       },
       {
         source: "/verify-new-email",
-        destination: "/dashboard/verify-new-email",
+        destination:
+          "/dashboard/verify-new-email?email=:email&emailValidToken=:emailValidToken",
         permanent: false,
+        has: [
+          {
+            type: "query",
+            key: "email",
+          },
+          {
+            type: "query",
+            key: "emailValidToken",
+          },
+        ],
+      },
+      {
+        source: "/reset-password",
+        destination:
+          "/dashboard/reset-password?email=:email&resetToken=:resetToken",
+        permanent: false,
+        has: [
+          {
+            type: "query",
+            key: "email",
+          },
+          {
+            type: "query",
+            key: "resetToken",
+          },
+        ],
       },
     ];
   },
