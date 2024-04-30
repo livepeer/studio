@@ -1042,6 +1042,15 @@ const testCreatorIds: string[] = [
   "73846_115939837_115939837",
 ];
 
+// TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API.
+function fixTrovoProfiles(profiles: Profile[], isMobile: boolean) {
+  return profiles?.map((p) => ({
+    ...p,
+    fps: isMobile && p.fps ? 0 : p.fps,
+    height: p.width === 480 && p.height === 853 ? 854 : p.height,
+  }));
+}
+
 app.put(
   "/pull",
   authorizer({}),
@@ -1058,8 +1067,10 @@ app.put(
 
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
-      profiles: req.config.defaultStreamProfiles,
       ...rawPayload,
+      profiles:
+        fixTrovoProfiles(rawPayload.profiles, rawPayload.pull.isMobile) ||
+        req.config.defaultStreamProfiles,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
 
