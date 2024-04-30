@@ -258,7 +258,10 @@ const ID = () => {
       } else if ("errors" in info) {
         throw new Error(info.errors.toString());
       }
+
+      // @ts-ignore
       setStream(info.stream);
+      // @ts-ignore
       setStreamOwner(info.user);
     } catch (err) {
       console.error(err); // todo: surface this
