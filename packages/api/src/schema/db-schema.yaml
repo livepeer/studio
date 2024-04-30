@@ -917,8 +917,6 @@ components:
       table: multistream_target
       properties:
         userId:
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           readOnly: true
           index: true
     asset:
