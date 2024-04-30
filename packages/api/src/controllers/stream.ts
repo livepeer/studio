@@ -1155,6 +1155,8 @@ app.put(
         ...payload,
       };
       if (testCreatorIds.includes(stream.creatorId?.value)) {
+        // Temporarily make this API non-idempotent for a couple creatorIds from Trovo, to facilitate testing profiles.
+        // TODO: Remove this once we define the right set of profiles for Trovo and they start sending them correctly.
         stream.profiles = oldStream.profiles;
       }
       await db.stream.replace(stream);
