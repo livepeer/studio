@@ -554,7 +554,7 @@ app.patch("/:id/email", authorizer({}), async (req, res) => {
       buttonText: "Verify Email",
       buttonUrl: frontendUrl(
         req,
-        `/verify-new-email?${qs.stringify({
+        `/dashboard/verify-new-email?${qs.stringify({
           emailValidToken,
           email: lowerCaseEmail,
         })}`
@@ -979,7 +979,11 @@ async function sendVerificationEmail(req: Request, user: User, selectedPlan) {
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
-          `/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
+          `/dashboard/verify?${qs.stringify({
+            email,
+            emailValidToken,
+            selectedPlan,
+          })}`
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
@@ -1068,7 +1072,7 @@ app.post(
         buttonText: "Reset Password",
         buttonUrl: frontendUrl(
           req,
-          `/reset-password?${qs.stringify({ email, resetToken })}`
+          `/dashboard/reset-password?${qs.stringify({ email, resetToken })}`
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [

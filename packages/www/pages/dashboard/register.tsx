@@ -1,7 +1,7 @@
 import Layout from "layouts/main";
 import { withRecaptcha } from "layouts/withRecaptcha";
-import Login from "../components/Login";
-import Register from "../components/Register";
+import Login from "../../components/Login";
+import Register from "../../components/Register";
 import {
   Flex,
   Box,
@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
 import Link from "next/link";
-import { useApi, useLoggedIn } from "../hooks";
+import { useApi, useLoggedIn } from "../../hooks";
 import { useJune, events } from "hooks/use-june";
 
 const emailVerificationMode =
@@ -49,7 +49,7 @@ const RegisterPage = () => {
   useEffect(() => {
     if (user) {
       if (emailVerificationMode && user.emailValid === false) {
-        router.replace("/verify");
+        router.replace("/dashboard/verify");
       } else {
         router.replace("/dashboard");
       }

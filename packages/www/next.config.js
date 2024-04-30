@@ -188,6 +188,31 @@ let config = {
         destination: "https://livepeer.canny.io",
         permanent: false,
       },
+      {
+        source: "/register",
+        destination: "/dashboard/register",
+        permanent: false,
+      },
+      {
+        source: "/login",
+        destination: "/dashboard/login",
+        permanent: false,
+      },
+      {
+        source: "/reset-password",
+        destination: "/dashboard/reset-password",
+        permanent: false,
+      },
+      {
+        source: "/verify",
+        destination: "/dashboard/verify",
+        permanent: false,
+      },
+      {
+        source: "/verify-new-email",
+        destination: "/dashboard/verify-new-email",
+        permanent: false,
+      },
     ];
   },
 };
