@@ -718,24 +718,23 @@ components:
           type: boolean
           description: Indicates whether the stream is currently live or not.
         is_healthy:
-          type: boolean
-          nullable: true
-          description: Indicates whether the stream is healthy or not.
+          oneOf:
+            - type: 'null'
+            - type: 'boolean'
+          description: "Indicates whether the stream is healthy or not."
         issues:
-          type: string
-          nullable: true
+          oneOf:
+            - type: 'null'
+            - type: 'string'
           description: |
-            Raw issues affecting the stream as described by Mist, if any. We
-            don't expose those to the end-user, showing only human_issues
-            instead.
+            "Raw issues affecting the stream as described by Mist, if any. We don't expose those to the end-user, showing only human_issues instead."
         human_issues:
-          type: array
-          nullable: true
-          description: |
-            A string array of human-readable errors describing issues affecting
-            the stream, if any.
-          items:
-            type: string
+          oneOf:
+            - type: 'null'
+            - type: 'array'
+              items:
+                type: 'string'
+          description: "A string array of human-readable errors describing issues affecting the stream, if any."
         tracks:
           type: object
           description: |
