@@ -197,7 +197,7 @@ app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
 app.patch(
   "/:id",
   authorizer({}),
-  validatePost("webhook-patch-payload"),
+  validatePost("webhook-payload"),
   async (req, res) => {
     const webhook = await db.webhook.get(req.params.id);
 
