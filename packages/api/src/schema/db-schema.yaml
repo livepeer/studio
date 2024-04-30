@@ -887,15 +887,11 @@ components:
       table: session
       properties:
         kind:
-          type: string
-          example: stream
           readOnly: true
         version:
           type: string
           description: Version of the session object
         userId:
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
         lastSeen:
           index: true

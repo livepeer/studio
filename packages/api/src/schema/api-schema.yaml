@@ -786,6 +786,12 @@ components:
           type: string
           readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          example: stream
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         name:
           type: string
           example: test_session
