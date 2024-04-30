@@ -1,4 +1,4 @@
-import Layout from "layouts/main";
+import Layout from "layouts/auth";
 import ForgotPassword from "components/ForgotPassword";
 import {
   Button,
@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
         <Box
           css={{
             position: "relative",
-            height: "100vh",
+            height: "calc(100vh - 70px)",
             display: "flex",
             alignItems: "center",
           }}>
@@ -85,26 +85,19 @@ const ForgotPasswordPage = () => {
                       "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                   }}
                 />
-                <Link href="/" passHref legacyBehavior>
-                  <A
-                    css={{
-                      "&:hover": {
-                        textDecoration: "none",
-                      },
-                    }}>
-                    <Button
-                      size="4"
-                      css={{
-                        width: "100%",
-                        fontSize: "$3",
-                        "&:hover": {
-                          textDecoration: "none",
-                        },
-                      }}>
-                      Nevermind! Take me back to sign in
-                    </Button>
-                  </A>
-                </Link>
+                <Text
+                  variant="neutral"
+                  css={{
+                    display: "flex",
+                    gap: 10,
+                    with: "100%",
+                    justifyContent: "center",
+                  }}>
+                  Nevermind!
+                  <Link href="/dashboard/login" passHref legacyBehavior>
+                    <A>Take me back to sign in</A>
+                  </Link>
+                </Text>
               </Box>
             </Flex>
           </Container>
@@ -114,5 +107,5 @@ const ForgotPasswordPage = () => {
   );
 };
 
-ForgotPasswordPage.theme = "light-theme-green";
+ForgotPasswordPage.theme = "dark-theme-gray";
 export default ForgotPasswordPage;

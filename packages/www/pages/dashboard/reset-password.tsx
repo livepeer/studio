@@ -1,4 +1,4 @@
-import Layout from "layouts/main";
+import Layout from "layouts/auth";
 import ResetPassword from "components/ResetPassword";
 import Link from "next/link";
 import {
@@ -38,7 +38,7 @@ const ResetPasswordPage = () => {
       <Box
         css={{
           position: "relative",
-          height: "100vh",
+          height: "calc(100vh - 70px)",
           display: "flex",
           alignItems: "center",
         }}>
@@ -59,19 +59,6 @@ const ResetPasswordPage = () => {
               flexDirection: "column",
               py: "$5",
             }}>
-            <Text
-              size="8"
-              as="h1"
-              css={{
-                textTransform: "uppercase",
-                mb: "$6",
-                fontWeight: 700,
-                width: 150,
-                lineHeight: "30px",
-                textAlign: "center",
-              }}>
-              Livepeer Studio
-            </Text>
             <ResetPassword
               id="reset-password"
               onSubmit={onSubmit}
@@ -89,26 +76,19 @@ const ResetPasswordPage = () => {
                     "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
-              <Link href="/" passHref legacyBehavior>
-                <A
-                  css={{
-                    "&:hover": {
-                      textDecoration: "none",
-                    },
-                  }}>
-                  <Button
-                    size="4"
-                    css={{
-                      width: "100%",
-                      fontSize: "$3",
-                      "&:hover": {
-                        textDecoration: "none",
-                      },
-                    }}>
-                    Nevermind! Take me back to sign in
-                  </Button>
-                </A>
-              </Link>
+              <Text
+                variant="neutral"
+                css={{
+                  display: "flex",
+                  gap: 10,
+                  with: "100%",
+                  justifyContent: "center",
+                }}>
+                Nevermind!
+                <Link href="/dashboard/login" passHref legacyBehavior>
+                  <A>Take me back to sign in</A>
+                </Link>
+              </Text>
             </Box>
           </Flex>
         </Container>
@@ -117,5 +97,5 @@ const ResetPasswordPage = () => {
   );
 };
 
-ResetPasswordPage.theme = "light-theme-green";
+ResetPasswordPage.theme = "dark-theme-gray";
 export default ResetPasswordPage;

@@ -1,18 +1,9 @@
-import {
-  TextField,
-  Button,
-  Box,
-  Text,
-  Flex,
-  Checkbox,
-  Label,
-} from "@livepeer/design-system";
+import { TextField, Button, Box, Text } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
 import { useMailChimp } from "react-use-mailchimp-signup";
 import { useHubspotForm } from "hooks";
-import BroadcastingProvider from "../Login/BroadcastingProvider";
 
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
@@ -73,9 +64,8 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          ml: "auto",
-          mr: "auto",
           maxWidth: 500,
+          mx: "auto",
         }}>
         <form id={id} onSubmit={submit}>
           <Text
@@ -162,13 +152,25 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
           )}
 
           <Button
-            variant="primary"
+            variant="transparentWhite"
             disabled={loading ? true : false}
             size={4}
             css={{
+              bc: "#F8F8F8",
+              color: "black",
+              borderRadius: 10,
+              fontWeight: 600,
               width: "100%",
+              fontSize: 14,
+              textDecoration: "none",
+              textTransform: "uppercase",
               my: "$3",
-              px: "$3",
+              "&:hover": {
+                bc: "rgba(255, 255, 255, .8)",
+                transition: ".2s",
+                color: "black",
+                textDecoration: "none",
+              },
             }}>
             {loading ? "Loading..." : buttonText}
           </Button>
