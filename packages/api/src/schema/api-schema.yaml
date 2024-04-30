@@ -162,6 +162,20 @@ components:
             - VP8
             - VP9
           example: H.264
+    webhook-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/webhook/properties/name"
+        url:
+          $ref: "#/components/schemas/webhook/properties/url"
+        events:
+          $ref: "#/components/schemas/webhook/properties/events"
+        sharedSecret:
+          $ref: "#/components/schemas/webhook/properties/sharedSecret"
+        streamId:
+          $ref: "#/components/schemas/webhook/properties/streamId"
     webhook:
       type: object
       required:
@@ -3054,6 +3068,12 @@ paths:
         To create a new webhook, you need to make an API call with the events
         you want to listen for and the URL that will be called when those events
         occur.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/webhook-payload"
       responses:
         "200":
           description: Success
@@ -3107,6 +3127,12 @@ paths:
       operationId: updateWebhook
       tags:
         - webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/webhook-payload"
       responses:
         "200":
           description: Success

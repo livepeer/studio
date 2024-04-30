@@ -1066,20 +1066,6 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
-    webhook-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: "#/components/schemas/webhook/properties/name"
-        url:
-          $ref: "#/components/schemas/webhook/properties/url"
-        events:
-          $ref: "#/components/schemas/webhook/properties/events"
-        sharedSecret:
-          $ref: "#/components/schemas/webhook/properties/sharedSecret"
-        streamId:
-          $ref: "#/components/schemas/webhook/properties/streamId"
     ipfs-file-info:
       properties:
         cid:
