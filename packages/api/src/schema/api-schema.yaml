@@ -193,8 +193,12 @@ components:
         kind:
           type: string
           example: webhook
+          readOnly: true
+          deprecated: true
         userId:
           type: string
+          readOnly: true
+          deprecated: true
         createdAt:
           type: number
           readOnly: true
@@ -467,6 +471,7 @@ components:
         kind:
           type: string
           example: stream
+          deprecated: true
         creatorId:
           $ref: "#/components/schemas/creator-id"
         userTags:
@@ -649,7 +654,9 @@ components:
             Timestamp (in milliseconds) when the stream was last terminated
         userId:
           type: string
+          readOnly: true
           example: "we7818e7-610a-4057-8f6f-b785dc1e6f88"
+          deprecated: true
         renditions:
           type: object
     new-stream-payload:
@@ -806,9 +813,12 @@ components:
         kind:
           type: string
           example: stream
+          deprecated: true
         userId:
           type: string
+          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          deprecated: true
         name:
           type: string
           example: test_session
@@ -916,7 +926,9 @@ components:
           type: string
         userId:
           type: string
+          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          deprecated: true
         url:
           type: string
           writeOnly: true
@@ -964,7 +976,9 @@ components:
             playback URLs.
         userId:
           type: string
+          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          deprecated: true
         staticMp4:
           type: boolean
           writeOnly: true
@@ -2096,7 +2110,9 @@ components:
           example: key1
         userId:
           type: string
+          readOnly: true
           example: 78df0075-b5f3-4683-a618-1086faca35dc
+          deprecated: true
         createdAt:
           readOnly: true
           type: number
@@ -2261,6 +2277,7 @@ components:
           type: string
           description: The user ID associated with the metric
           example: 1bde4o2i6xycudoy
+          
         CreatorID:
           type: string
           description: The creator ID associated with the metric

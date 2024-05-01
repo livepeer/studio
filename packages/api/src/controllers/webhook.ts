@@ -143,18 +143,23 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
   return res.json(data);
 });
 
-app.post("/", authorizer({}), validatePost("webhook"), async (req, res) => {
-  const id = uuid();
-  const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
-  try {
-    await req.store.create(doc);
-  } catch (e) {
-    console.error(e);
-    throw e;
+app.post(
+  "/",
+  authorizer({}),
+  validatePost("webhook-payload"),
+  async (req, res) => {
+    const id = uuid();
+    const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
+    try {
+      await req.store.create(doc);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+    res.status(201);
+    res.json(doc);
   }
-  res.status(201);
-  res.json(doc);
-});
+);
 
 app.get("/:id", authorizer({}), async (req, res) => {
   // get a specific webhook
@@ -173,26 +178,34 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(webhook);
 });
 
-app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
-  // modify a specific webhook
-  const webhook = await req.store.get(`webhook/${req.body.id}`);
-  if ((webhook.userId !== req.user.id || webhook.deleted) && !req.user.admin) {
-    // do not reveal that webhooks exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+app.put(
+  "/:id",
+  authorizer({}),
+  validatePost("webhook-payload"),
+  async (req, res) => {
+    // modify a specific webhook
+    const webhook = await req.store.get(`webhook/${req.body.id}`);
+    if (
+      (webhook.userId !== req.user.id || webhook.deleted) &&
+      !req.user.admin
+    ) {
+      // do not reveal that webhooks exists
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
 
-  const { id, userId, createdAt } = webhook;
-  const doc = validateWebhookPayload(id, userId, createdAt, req.body);
-  try {
-    await req.store.replace(doc);
-  } catch (e) {
-    console.error(e);
-    throw e;
+    const { id, userId, createdAt } = webhook;
+    const doc = validateWebhookPayload(id, userId, createdAt, req.body);
+    try {
+      await req.store.replace(doc);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+    res.status(200);
+    res.json({ id: req.body.id });
   }
-  res.status(200);
-  res.json({ id: req.body.id });
-});
+);
 
 app.patch(
   "/:id",

@@ -586,10 +586,7 @@ components:
     webhook:
       table: webhook
       properties:
-        kind:
-          readOnly: true
-        userId:
-          readOnly: true
+        userId: 
           index: true
         events:
           index: true
@@ -917,7 +914,6 @@ components:
       table: multistream_target
       properties:
         userId:
-          readOnly: true
           index: true
     asset:
       table: asset
@@ -927,7 +923,6 @@ components:
         playbackId:
           index: true
         userId:
-          readOnly: true
           index: true
         source:
           oneOf:
@@ -1290,7 +1285,6 @@ components:
         id:
           index: true
         userId:
-          readOnly: true
           index: true
         deleted:
           type: boolean
