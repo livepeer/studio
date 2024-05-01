@@ -12,7 +12,18 @@ const Nav = () => {
         height: 70,
         width: "100%",
         px: "$4",
+        pt: "4px",
         borderBottom: "1px solid rgba(255,255,255,.05)",
+        "&:before": {
+          position: "absolute",
+          content: '""',
+          width: "100%",
+          height: "4px",
+          left: 0,
+          top: 0,
+          background:
+            "linear-gradient(90deg, #DC3D42 0%, #F0C000 45.83%, #299764 70%, #3A5CCC 99.48%), #D9D9D9",
+        },
       }}>
       <A href="/">
         <img src="/logo.svg" />
