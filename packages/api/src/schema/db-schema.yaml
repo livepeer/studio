@@ -1360,3 +1360,18 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+    webhook-patch-payload:
+          type: object
+          additionalProperties: false
+          properties:
+            name:
+              $ref: "#/components/schemas/webhook/properties/name"
+            url:
+              $ref: "#/components/schemas/webhook/properties/url"
+            events:
+              $ref: "#/components/schemas/webhook/properties/events"
+            sharedSecret:
+              $ref: "#/components/schemas/webhook/properties/sharedSecret"
+            streamId:
+              $ref: "#/components/schemas/webhook/properties/streamId"
+        
