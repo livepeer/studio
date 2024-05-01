@@ -8,6 +8,7 @@ import GoogleTagManager from "components/GoogleTagManager";
 import Nav from "components/Nav";
 import Footer from "components/Footer";
 import { TopNotificationProps } from "components/Site/TopNotification";
+import { basePath } from "../lib/utils";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -106,7 +107,7 @@ function Layout({
       <Flex
         className="main"
         css={{
-          backgroundImage: "url(/noise.png)",
+          backgroundImage: `url(${basePath}/noise.png)`,
           backgroundRepeat: "repeat",
           bc: "#1C1C1C",
           flexGrow: 1,

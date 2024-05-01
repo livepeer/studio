@@ -23,6 +23,8 @@ const SentryWebpackPluginOptions = {
 };
 
 let config = {
+  basePath: "/dashboard",
+  publicRuntimeConfig: { basePath: "/dashboard" },
   sentry: {
     hideSourceMaps: true,
   },
@@ -186,73 +188,6 @@ let config = {
       {
         source: "/changelog",
         destination: "https://livepeer.canny.io",
-        permanent: false,
-      },
-      {
-        source: "/register",
-        destination: "/dashboard/register",
-        permanent: false,
-      },
-      {
-        source: "/login",
-        destination: "/dashboard/login",
-        permanent: false,
-      },
-      {
-        source: "/verify",
-        destination:
-          "/dashboard/verify?email=:email&emailValidToken=:emailValidToken&selectedPlan=:selectedPlan",
-        permanent: false,
-        has: [
-          {
-            type: "query",
-            key: "email",
-          },
-          {
-            type: "query",
-            key: "emailValidToken",
-          },
-          {
-            type: "query",
-            key: "selectedPlan",
-          },
-        ],
-      },
-      {
-        source: "/verify-new-email",
-        destination:
-          "/dashboard/verify-new-email?email=:email&emailValidToken=:emailValidToken",
-        permanent: false,
-        has: [
-          {
-            type: "query",
-            key: "email",
-          },
-          {
-            type: "query",
-            key: "emailValidToken",
-          },
-        ],
-      },
-      {
-        source: "/reset-password",
-        destination:
-          "/dashboard/reset-password?email=:email&resetToken=:resetToken",
-        permanent: false,
-        has: [
-          {
-            type: "query",
-            key: "email",
-          },
-          {
-            type: "query",
-            key: "resetToken",
-          },
-        ],
-      },
-      {
-        source: "/forgot-password",
-        destination: "/dashboard/forgot-password",
         permanent: false,
       },
     ];

@@ -2,6 +2,11 @@ import { Stripe, loadStripe } from "@stripe/stripe-js";
 import { theme } from "../theme";
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
+import getConfig from "next/config";
+
+export const { publicRuntimeConfig } = getConfig();
+
+export const { basePath } = publicRuntimeConfig;
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);

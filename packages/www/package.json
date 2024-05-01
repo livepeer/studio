@@ -5,10 +5,10 @@
   "scripts": {
     "prepare": "cd ../api && yarn run prepare",
     "dev": "next",
-    "dev:staging": "NEXT_PUBLIC_USE_STAGING_ENDPOINT=true yarn dev",
+    "dev:staging": "BASE_PATH=/dashboard && NEXT_PUBLIC_USE_STAGING_ENDPOINT=true yarn dev",
     "build": "next build",
     "static": "STATIC_BUILD=true next build && STATIC_BUILD=true next export",
-    "start": "next start -p 3012",
+    "start": "BASE_PATH=/dashboard && next start -p 3012",
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
     "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-master}) -f Dockerfile ../..",
