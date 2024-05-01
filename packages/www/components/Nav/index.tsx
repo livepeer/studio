@@ -25,7 +25,7 @@ const Nav = () => {
             "linear-gradient(90deg, #DC3D42 0%, #F0C000 45.83%, #299764 70%, #3A5CCC 99.48%), #D9D9D9",
         },
       }}>
-      <A href="/">
+      <A href="/" css={{ display: "flex" }}>
         <img src="/logo.svg" />
       </A>
       <Button
