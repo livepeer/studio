@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Layout from "layouts/main";
+import Layout from "layouts/auth";
 import { useApi } from "hooks";
 import {
   Container,
@@ -52,7 +52,7 @@ const VerifyPage = () => {
   );
 };
 
-VerifyPage.theme = "light-theme-green";
+VerifyPage.theme = "dark-theme-gray";
 export default VerifyPage;
 
 const Verify = ({
@@ -87,13 +87,7 @@ const Verify = ({
       <Container
         size="3"
         css={{
-          px: "$6",
-          py: "$8",
           width: "100%",
-          "@bp3": {
-            py: "$9",
-            px: "$4",
-          },
         }}>
         <Flex
           css={{
@@ -107,22 +101,8 @@ const Verify = ({
               justifyContent: "center",
               alignItems: "center",
               textAlign: "center",
-              height: "calc(100vh - 280px)",
-              mb: 65,
+              height: "calc(100vh - 70px)",
             }}>
-            <Text
-              size="8"
-              as="h1"
-              css={{
-                textTransform: "uppercase",
-                mb: "$5",
-                fontWeight: 700,
-                width: 150,
-                lineHeight: "30px",
-                textAlign: "center",
-              }}>
-              Livepeer Studio
-            </Text>
             {email && emailValidToken ? (
               <>
                 {errors ? (
