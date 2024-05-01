@@ -436,7 +436,7 @@ app.post("/", validatePost("user"), async (req, res) => {
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
-          `/verify?${qs.stringify({
+          `/dashboard/verify?${qs.stringify({
             email: lowercaseEmail,
             emailValidToken,
             selectedPlan,
