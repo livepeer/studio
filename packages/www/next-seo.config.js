@@ -1,5 +1,5 @@
 export default {
-  title: "Livepeer Catalyst",
+  title: "Livepeer Studio",
   description:
     "Livepeer Studio is a high-performance video streaming platform that enables developers to build unique live and on-demand video experiences with up to 90% cost savings.",
   openGraph: {
