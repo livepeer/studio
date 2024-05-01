@@ -1,4 +1,4 @@
-import { Flex, Box, Container } from "@livepeer/design-system";
+import { Flex, Box } from "@livepeer/design-system";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -6,8 +6,6 @@ import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
 import GoogleTagManager from "components/GoogleTagManager";
 import Nav from "components/Nav";
-import Footer from "components/Footer";
-import { TopNotificationProps } from "components/Site/TopNotification";
 import { basePath } from "../lib/utils";
 
 if (process.env.NODE_ENV === "production") {
@@ -84,20 +82,6 @@ function Layout({
   if (canonical) {
     seo["canonical"] = canonical;
   }
-
-  const topNotification: TopNotificationProps = {
-    title: (
-      <Box>
-        💰 Switch to Livepeer Studio by October 13th for{" "}
-        <span css={{ fontWeight: "bold" }}>up to six months free</span> 💰
-      </Box>
-    ),
-    link: {
-      label: "Learn more",
-      href: "https://livepeer.typeform.com/to/shoMCvCl#lead_source=xxxxx&contact_owner=xxxxx",
-      isExternal: true,
-    },
-  };
 
   return (
     <>
