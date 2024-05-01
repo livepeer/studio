@@ -564,9 +564,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         size="4"
         disabled={streaming + transcoding === 0}
         onClick={() => {
-          router.push(
-            token ? "/dashboard/billing/plans" : "/dashboard/register"
-          );
+          router.push(token ? "/billing/plans" : "/register");
         }}>
         {totalValue > 3000 ? "Contact us" : "Get Started"}
       </Button>

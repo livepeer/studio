@@ -27,9 +27,9 @@ const VerifyPage = () => {
       verify(email, emailValidToken)
         .then(() => {
           if (selectedPlan === "1") {
-            router.replace("/dashboard/billing/plans?promptUpgrade=true");
+            router.replace("/billing/plans?promptUpgrade=true");
           } else {
-            router.replace("/dashboard");
+            router.replace("/");
           }
         })
         .catch((e) => {
@@ -41,7 +41,7 @@ const VerifyPage = () => {
   // If they've already validated their email, get 'em out of here
   useEffect(() => {
     if (user?.emailValid === true) {
-      router.replace("/dashboard");
+      router.replace("/");
     }
   }, [user]);
 

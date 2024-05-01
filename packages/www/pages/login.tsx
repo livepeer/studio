@@ -86,7 +86,7 @@ const LoginPage = () => {
                   justifyContent: "center",
                 }}>
                 <Box>Don't have an account?</Box>
-                <Link href="/dashboard/register" passHref legacyBehavior>
+                <Link href="/register" passHref legacyBehavior>
                   <A>Sign up now</A>
                 </Link>
               </Text>

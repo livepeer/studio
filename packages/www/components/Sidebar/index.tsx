@@ -62,7 +62,7 @@ export type SidebarId =
   | "home"
   | "streams"
   | "streams/sessions"
-  // /dashboard/stream-health - unhandled in the sidebar
+  // /stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
   | "developers"
@@ -142,7 +142,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 key="billing-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
-                  Router.push("/dashboard/billing");
+                  Router.push("/billing");
                 }}>
                 Billing
               </DropdownMenuItem>
@@ -170,14 +170,14 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               textDecoration: "none",
             },
           }}>
-          <Link href="/dashboard" passHref legacyBehavior>
+          <Link href="/" passHref legacyBehavior>
             <NavLink active={id === "home"}>
               <HomeIcon active={id === "home"} />
               Home
             </NavLink>
           </Link>
           <Box>
-            <Link href="/dashboard/streams" passHref legacyBehavior>
+            <Link href="/streams" passHref legacyBehavior>
               <NavLink active={id === "streams"}>
                 <StreamIcon active={id === "streams"} />
                 Streams
@@ -192,20 +192,20 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     mt: "$1",
                   },
                 }}>
-                <Link href="/dashboard/sessions" passHref legacyBehavior>
+                <Link href="/sessions" passHref legacyBehavior>
                   <NavLink active={id === "streams/sessions"}>Sessions</NavLink>
                 </Link>
               </Box>
             )}
           </Box>
-          <Link href="/dashboard/assets" passHref legacyBehavior>
+          <Link href="/assets" passHref legacyBehavior>
             <NavLink active={id === "assets"}>
               <AssetsIcon active={id === "assets"} />
               Assets
             </NavLink>
           </Link>
           <Box>
-            <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
+            <Link href="/developers/api-keys" passHref legacyBehavior>
               <NavLink>
                 <TerminalIcon active={id?.split("/")[0] === "developers"} />
                 Developers
@@ -220,24 +220,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     mt: "$1",
                   },
                 }}>
-                <Link
-                  href="/dashboard/developers/api-keys"
-                  passHref
-                  legacyBehavior>
+                <Link href="/developers/api-keys" passHref legacyBehavior>
                   <NavLink active={id === "developers"}>API Keys</NavLink>
                 </Link>
-                <Link
-                  href="/dashboard/developers/signing-keys"
-                  passHref
-                  legacyBehavior>
+                <Link href="/developers/signing-keys" passHref legacyBehavior>
                   <NavLink active={id === "developers/signing-keys"}>
                     Signing Keys
                   </NavLink>
                 </Link>
-                <Link
-                  href="/dashboard/developers/webhooks"
-                  passHref
-                  legacyBehavior>
+                <Link href="/developers/webhooks" passHref legacyBehavior>
                   <NavLink active={id === "developers/webhooks"}>
                     Webhooks
                   </NavLink>
@@ -247,7 +238,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           </Box>
 
           <Box>
-            <Link href="/dashboard/usage" passHref legacyBehavior>
+            <Link href="/usage" passHref legacyBehavior>
               <NavLink active={id === "usage"}>
                 <UsageIcon active={id === "usage"} />
                 Usage
@@ -256,7 +247,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           </Box>
 
           <Box>
-            <Link href="/dashboard/billing" passHref legacyBehavior>
+            <Link href="/billing" passHref legacyBehavior>
               <NavLink active={id === "billing"}>
                 <BillingIcon active={id === "billing"} />
                 Billing
@@ -273,7 +264,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     mt: "$1",
                   },
                 }}>
-                <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+                <Link href="/billing/plans" passHref legacyBehavior>
                   <NavLink active={id === "billing/plans"}>Plans</NavLink>
                 </Link>
               </Box>

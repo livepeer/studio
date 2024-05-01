@@ -43,7 +43,7 @@ const CompareHero = ({
               how its features and pricing compare to {comparison}.
             </Text>
             <Flex align="center" gap={1}>
-              <Link href="/dashboard/register" passHref>
+              <Link href="/register" passHref>
                 <Button
                   target="_blank"
                   size={3}

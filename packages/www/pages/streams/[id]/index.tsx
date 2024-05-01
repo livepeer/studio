@@ -51,7 +51,7 @@ const StreamDetails = () => {
       invalidateStream={invalidateStream}
       setSwitchTab={setCurrentTab}
       breadcrumbs={[
-        { title: "Streams", href: "/dashboard/streams" },
+        { title: "Streams", href: "/streams" },
         { title: stream?.name },
       ]}
       embedVideoDialogOpen={embedVideoDialogOpen}

@@ -94,7 +94,7 @@ const ForgotPasswordPage = () => {
                     justifyContent: "center",
                   }}>
                   Nevermind!
-                  <Link href="/dashboard/login" passHref legacyBehavior>
+                  <Link href="/login" passHref legacyBehavior>
                     <A>Take me back to sign in</A>
                   </Link>
                 </Text>

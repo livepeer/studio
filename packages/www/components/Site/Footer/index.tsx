@@ -156,7 +156,7 @@ const Footer = () => {
                             Contact
                           </Button>
                         </Link>
-                        <Link href="/dashboard/login" passHref legacyBehavior>
+                        <Link href="/login" passHref legacyBehavior>
                           <Button
                             as={A}
                             small

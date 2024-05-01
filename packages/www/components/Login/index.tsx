@@ -109,7 +109,7 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
                 transform: "translateY(-50%)",
                 top: "50%",
               }}>
-              <Link href="/dashboard/forgot-password" passHref legacyBehavior>
+              <Link href="/forgot-password" passHref legacyBehavior>
                 <A
                   variant="primary"
                   css={{

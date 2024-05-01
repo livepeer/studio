@@ -46,7 +46,7 @@ const WebhookDetail = () => {
       id="developers/webhooks"
       breadcrumbs={[
         { title: "Developers" },
-        { title: "Webhooks", href: "/dashboard/developers/webhooks" },
+        { title: "Webhooks", href: "/developers/webhooks" },
         { title: webhookData?.name },
       ]}
       {...Content.metaData}>

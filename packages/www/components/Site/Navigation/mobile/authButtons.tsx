@@ -13,7 +13,7 @@ const AuthButtons = ({
 }) => {
   if (!isTokenDefined) {
     return (
-      <Link href="/dashboard/login" passHref legacyBehavior>
+      <Link href="/login" passHref legacyBehavior>
         <Button
           onClick={() => setMobileMenuIsOpen(false)}
           arrow
@@ -26,7 +26,7 @@ const AuthButtons = ({
 
   return (
     <>
-      <Link href="/dashboard" passHref legacyBehavior>
+      <Link href="/" passHref legacyBehavior>
         <Button arrow>Dashboard</Button>
       </Link>
       {isAdminUser && (

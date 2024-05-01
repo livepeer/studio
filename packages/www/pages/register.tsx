@@ -38,9 +38,9 @@ const RegisterPage = () => {
     if (email && emailValidToken) {
       verify(email, emailValidToken).then(() => {
         if (selectedPlan === "1") {
-          router.replace("/dashboard/billing/plans?promptUpgrade=true");
+          router.replace("/billing/plans?promptUpgrade=true");
         } else {
-          router.replace("/dashboard");
+          router.replace("/");
         }
       });
     }
@@ -49,9 +49,9 @@ const RegisterPage = () => {
   useEffect(() => {
     if (user) {
       if (emailVerificationMode && user.emailValid === false) {
-        router.replace("/dashboard/verify");
+        router.replace("/verify");
       } else {
-        router.replace("/dashboard");
+        router.replace("/");
       }
     }
   }, [user]);
@@ -147,7 +147,7 @@ const RegisterPage = () => {
                   justifyContent: "center",
                 }}>
                 Have an account?
-                <Link href="/dashboard/login" passHref legacyBehavior>
+                <Link href="/login" passHref legacyBehavior>
                   <A>Sign in instead</A>
                 </Link>
               </Text>

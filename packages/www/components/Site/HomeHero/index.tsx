@@ -168,7 +168,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               </small>
             </Text>
             <Flex align="center" css={{ justifyContent: "center" }}>
-              <Link href="/dashboard/register" passHref>
+              <Link href="/register" passHref>
                 <Button
                   size={4}
                   variant="green"

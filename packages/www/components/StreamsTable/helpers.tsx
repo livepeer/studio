@@ -97,22 +97,22 @@ export const rowsPageFromState = async (
           Created by token <b>{stream.createdByTokenName}</b>
         </>
       ) : null,
-      href: `/dashboard/streams/${stream.id}`,
+      href: `/streams/${stream.id}`,
     },
     details: { stream },
     createdAt: {
       date: new Date(stream.createdAt),
       fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
-      href: `/dashboard/streams/${stream.id}`,
+      href: `/streams/${stream.id}`,
     },
     lastSeen: {
       date: stream.lastSeen ? new Date(stream.lastSeen) : null,
       fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
-      href: `/dashboard/streams/${stream.id}`,
+      href: `/streams/${stream.id}`,
     },
     status: {
       children: stream.isActive ? "Active" : "Idle",
-      href: `/dashboard/streams/${stream.id}`,
+      href: `/streams/${stream.id}`,
     },
   }));
   return { rows, nextCursor, count, allStreamCount, activeStreamCount };

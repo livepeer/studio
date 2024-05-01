@@ -15,7 +15,7 @@ const Webhooks = () => {
     <Layout
       id="developers/webhooks"
       breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/webhooks" },
+        { title: "Developers", href: "/developers/webhooks" },
         { title: "Webhooks" },
       ]}
       {...Content.metaData}>

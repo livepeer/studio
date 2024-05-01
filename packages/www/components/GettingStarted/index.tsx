@@ -42,7 +42,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 </Text>
               </Box>
               <Flex align="center" gap={2}>
-                <Link href="/dashboard/assets" passHref legacyBehavior>
+                <Link href="/assets" passHref legacyBehavior>
                   <Button
                     variant="primary"
                     css={{
@@ -94,7 +94,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 </Text>
               </Box>
               <Flex align="center" gap={2}>
-                <Link href="/dashboard/streams" passHref legacyBehavior>
+                <Link href="/streams" passHref legacyBehavior>
                   <Button
                     variant="primary"
                     css={{

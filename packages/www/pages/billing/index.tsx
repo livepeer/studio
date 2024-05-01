@@ -280,7 +280,7 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
-            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+            <Link href="/billing/plans" passHref legacyBehavior>
               <A
                 variant="primary"
                 css={{ display: "flex", alignItems: "center" }}>
@@ -354,7 +354,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Link href="/dashboard/usage" passHref legacyBehavior>
+          <Link href="/usage" passHref legacyBehavior>
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}

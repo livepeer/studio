@@ -29,7 +29,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   useEffect(() => {
     if (shouldBeLoggedIn === true) {
       if (!token) {
-        router.replace("/dashboard/login");
+        router.replace("/login");
       } else if (emailVerificationMode && user?.emailValid === false) {
         router.replace("/verify");
       }
@@ -41,7 +41,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
-        router.replace(next ? next.toString() : "/dashboard");
+        router.replace(next ? next.toString() : "/");
       }
     }
   }, [user, token, next]);

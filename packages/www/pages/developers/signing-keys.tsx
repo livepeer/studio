@@ -15,7 +15,7 @@ const SigningKeys = () => {
     <Layout
       id="developers/signing-keys"
       breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/signing-keys" },
+        { title: "Developers", href: "/developers/signing-keys" },
         { title: "Signing Keys" },
       ]}
       {...Content.metaData}>

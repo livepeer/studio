@@ -51,7 +51,7 @@ const AssetDetails = () => {
       setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}
       refetchAsset={() => refetchAsset()}
       breadcrumbs={[
-        { title: "Assets", href: "/dashboard/assets" },
+        { title: "Assets", href: "/assets" },
         { title: asset?.name },
       ]}>
       {currentTab === "Overview" ? (

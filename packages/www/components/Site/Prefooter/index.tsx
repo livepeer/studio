@@ -81,7 +81,7 @@ const Prefooter = ({ backgroundColor = "inherit" }) => (
                 flexDirection: "row",
               },
             }}>
-            <Link href="/dashboard/register">
+            <Link href="/register">
               <Button
                 size={4}
                 as={A}

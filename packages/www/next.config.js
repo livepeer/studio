@@ -51,37 +51,37 @@ let config = {
       },
       {
         source: "/app/user/keys",
-        destination: "/dashboard/developers/api-keys",
+        destination: "/developers/api-keys",
         permanent: false,
       },
       {
         source: "/app/user/billing",
-        destination: "/dashboard/billing",
+        destination: "/billing",
         permanent: false,
       },
       {
         source: "/app/user/plans",
-        destination: "/dashboard/billing/plans",
+        destination: "/billing/plans",
         permanent: false,
       },
       {
         source: "/app/test-player",
-        destination: "/dashboard/stream-health",
+        destination: "/stream-health",
         permanent: false,
       },
       {
-        source: "/dashboard/plans",
-        destination: "/dashboard/billing/plans",
+        source: "/plans",
+        destination: "/billing/plans",
         permanent: false,
       },
       {
         source: "/app/user/usage",
-        destination: "/dashboard/usage",
+        destination: "/usage",
         permanent: false,
       },
       {
-        source: "/dashboard/billing/usage",
-        destination: "/dashboard/usage",
+        source: "/billing/usage",
+        destination: "/usage",
         permanent: false,
       },
       {

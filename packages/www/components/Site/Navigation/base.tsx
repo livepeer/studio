@@ -46,7 +46,7 @@ const NavigationBase = ({
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const { token, user, logout } = useApi();
-  const isDashboard = pathname.includes("/dashboard/");
+  const isDashboard = pathname.includes("/");
 
   const handleScroll = useCallback(() => {
     const { scrollTop } = document.documentElement;
@@ -408,7 +408,7 @@ const NavigationBase = ({
                           display: "block",
                         },
                       }}>
-                      <Link href="/dashboard/login" passHref legacyBehavior>
+                      <Link href="/login" passHref legacyBehavior>
                         <A>
                           <Button variant="neutral" css={{ mr: "$3" }} size={3}>
                             Sign in
@@ -425,7 +425,7 @@ const NavigationBase = ({
                           display: "block",
                         },
                       }}>
-                      <Link href="/dashboard/register" passHref legacyBehavior>
+                      <Link href="/register" passHref legacyBehavior>
                         <A>
                           <Button variant="green" size={3}>
                             Sign Up
@@ -457,7 +457,7 @@ const NavigationBase = ({
                       )}
 
                       {!isDashboard && (
-                        <Link href="/dashboard" passHref legacyBehavior>
+                        <Link href="/" passHref legacyBehavior>
                           <A>
                             <Button variant="green" size={3}>
                               Dashboard

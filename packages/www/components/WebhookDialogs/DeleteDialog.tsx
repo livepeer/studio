@@ -33,7 +33,7 @@ const DeleteDialog = ({
     await invalidateQuery();
     setDeleting(false);
     setDeleteDialogOpen(false);
-    router.push("/dashboard/developers/webhooks");
+    router.push("/developers/webhooks");
   };
 
   return (

@@ -15,7 +15,7 @@ const ApiKeys = () => {
     <Layout
       id="developers"
       breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/api-keys" },
+        { title: "Developers", href: "/developers/api-keys" },
         { title: "API Keys" },
       ]}
       {...Content.metaData}>
