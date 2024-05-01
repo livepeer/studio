@@ -32,6 +32,16 @@ let config = {
     unoptimized: true,
     domains: ["cdn.sanity.io", "picsum.photos"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/dashboard",
+        basePath: false,
+        permanent: false,
+      },
+    ];
+  },
 };
 
 if (isStaticBuild) {
@@ -43,10 +53,6 @@ if (isStaticBuild) {
 } else {
   config = {
     ...config,
-    i18n: {
-      locales: ["en", "es"],
-      defaultLocale: "en",
-    },
   };
 }
 
