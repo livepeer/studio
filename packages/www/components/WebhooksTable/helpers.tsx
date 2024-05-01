@@ -66,7 +66,7 @@ export const rowsPageFromState = async (
         id: webhook.id,
         name: {
           children: webhook.name,
-          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          href: `/developers/webhooks/${webhook.id}`,
           css: {
             overflow: "hidden",
             "text-overflow": "ellipsis",
@@ -88,7 +88,7 @@ export const rowsPageFromState = async (
               {webhook.url}
             </Link>
           ),
-          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          href: `/developers/webhooks/${webhook.id}`,
           css: {},
         },
         events: {
@@ -107,20 +107,20 @@ export const rowsPageFromState = async (
               </Button>
             </Tooltip>
           ),
-          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          href: `/developers/webhooks/${webhook.id}`,
           css: {},
         },
 
         lastFailure: {
           date: new Date(webhook?.status?.lastFailure?.timestamp),
           fallback: <p>-</p>,
-          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          href: `/developers/webhooks/${webhook.id}`,
           css: {},
         },
         lastTriggeredAt: {
           date: new Date(webhook?.status?.lastTriggeredAt),
           fallback: <p>-</p>,
-          href: `/dashboard/developers/webhooks/${webhook.id}`,
+          href: `/developers/webhooks/${webhook.id}`,
           css: {},
         },
       };

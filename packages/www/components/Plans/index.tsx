@@ -267,7 +267,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 stripeProductId="prod_O9XuIjn7EqYRVW"
                 onClick={() => {
                   if (!dashboard) {
-                    router.push("/dashboard/register");
+                    router.push("/register");
                   }
                 }}
               />
@@ -349,7 +349,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   if (dashboard) {
                     setIsTourOpen(false);
                   } else {
-                    router.push("/dashboard/register?selectedPlan=1");
+                    router.push("/register?selectedPlan=1");
                   }
                 }}
               />
@@ -511,7 +511,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   if (dashboard) {
                     setIsTourOpen(false);
                   } else {
-                    router.push("/dashboard/register?selectedPlan=2");
+                    router.push("/register?selectedPlan=2");
                   }
                 }}
               />

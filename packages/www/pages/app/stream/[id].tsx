@@ -608,7 +608,7 @@ const ID = () => {
                         detects livestreamer and viewer locations to provide the
                         optimal Livepeer Studio experience.
                         <Link
-                          href="/docs/guides/dashboard/ingest-playback-url-pair"
+                          href="/docs/guides/ingest-playback-url-pair"
                           passHref
                           legacyBehavior>
                           <A target="_blank">

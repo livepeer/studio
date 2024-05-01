@@ -137,7 +137,7 @@ export const rowsPageFromState = async (
         id: asset.id,
         name: {
           id: asset.id,
-          href: `/dashboard/assets/${asset.id}`,
+          href: `/assets/${asset.id}`,
           name: asset.name,
           isStatusFailed,
           errorMessage,
@@ -149,18 +149,18 @@ export const rowsPageFromState = async (
             </Box>
           ),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/assets/${asset.id}`,
+          href: `/assets/${asset.id}`,
         },
         sessionId: {
           children: <Box>{sessionId}</Box>,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/sessions?sessionId=${sessionId}`,
+          href: `/sessions?sessionId=${sessionId}`,
         },
         createdAt: {
           id: asset.id,
           date: new Date(asset.createdAt),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/assets/${asset.id}`,
+          href: `/assets/${asset.id}`,
           asset: asset as Asset, // CreatedAt cell expect SDK asset instead of API
         },
         updatedAt: {
@@ -169,7 +169,7 @@ export const rowsPageFromState = async (
               ? new Date(asset.status.updatedAt)
               : null,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/dashboard/assets/${asset.id}`,
+          href: `/assets/${asset.id}`,
         },
         action: {
           id: asset.id,

@@ -24,9 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - path: packages/www
-            image: livepeerci/www
-            package: www
           - path: packages/api
             image: livepeerci/api
             package: api
