@@ -1,4 +1,5 @@
 import { Player } from "@livepeer/react";
+import { isExport } from "lib/utils";
 import mux from "mux-embed";
 import { useCallback } from "react";
 
@@ -23,16 +24,18 @@ const AppPlayer = ({
   type,
 }: AppPlayerProps) => {
   const mediaElementRef = useCallback((element: HTMLMediaElement) => {
-    mux.monitor(element, {
-      debug: false,
-      data: {
-        env_key: "8oj27fenun6v4ffvrgn6ehc7m",
-        player_name: `Studio Dashboard Player (${
-          type === "asset" ? "Asset" : "Stream"
-        })`,
-        player_env: process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development",
-      },
-    });
+    if (!isExport()) {
+      mux.monitor(element, {
+        debug: false,
+        data: {
+          env_key: "8oj27fenun6v4ffvrgn6ehc7m",
+          player_name: `Studio Dashboard Player (${
+            type === "asset" ? "Asset" : "Stream"
+          })`,
+          player_env: process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development",
+        },
+      });
+    }
   }, []);
 
   return (

@@ -32,6 +32,7 @@ import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import { useJune, events } from "hooks/use-june";
 import { useCallback, useEffect } from "react";
+import { isExport } from "lib/utils";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -237,117 +238,123 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             )}
           </Box>
 
-          <Box>
-            <Link href="/usage" passHref legacyBehavior>
-              <NavLink active={id === "usage"}>
-                <UsageIcon active={id === "usage"} />
-                Usage
-              </NavLink>
-            </Link>
-          </Box>
+          {!isExport() && (
+            <Box>
+              <Link href="/usage" passHref legacyBehavior>
+                <NavLink active={id === "usage"}>
+                  <UsageIcon active={id === "usage"} />
+                  Usage
+                </NavLink>
+              </Link>
+            </Box>
+          )}
 
-          <Box>
-            <Link href="/billing" passHref legacyBehavior>
-              <NavLink active={id === "billing"}>
-                <BillingIcon active={id === "billing"} />
-                Billing
-              </NavLink>
-            </Link>
+          {!isExport() && (
+            <Box>
+              <Link href="/billing" passHref legacyBehavior>
+                <NavLink active={id === "billing"}>
+                  <BillingIcon active={id === "billing"} />
+                  Billing
+                </NavLink>
+              </Link>
 
-            {id?.split("/")[0] === "billing" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                  },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/billing/plans" passHref legacyBehavior>
-                  <NavLink active={id === "billing/plans"}>Plans</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
+              {id?.split("/")[0] === "billing" && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                    },
+                    "> :first-child": {
+                      mt: "$1",
+                    },
+                  }}>
+                  <Link href="/billing/plans" passHref legacyBehavior>
+                    <NavLink active={id === "billing/plans"}>Plans</NavLink>
+                  </Link>
+                </Box>
+              )}
+            </Box>
+          )}
         </Grid>
-        <Flex direction="column" gap={1}>
-          <NavLink
-            href="https://status.livepeer.studio/"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <LoopIcon />
-            <Text
+        {!isExport() && (
+          <Flex direction="column" gap={1}>
+            <NavLink
+              href="https://status.livepeer.studio/"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Status
-            </Text>
-          </NavLink>
+              <LoopIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Status
+              </Text>
+            </NavLink>
 
-          <NavLink
-            href="https://livepeer.canny.io/changelog?labels=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <RocketIcon />
-            <Text
+            <NavLink
+              href="https://livepeer.canny.io/changelog?labels=studio"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Changelog
-            </Text>
-          </NavLink>
+              <RocketIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Changelog
+              </Text>
+            </NavLink>
 
-          <NavLink
-            href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <ChatBubbleIcon />
-            <Text
+            <NavLink
+              href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Feature Requests
-            </Text>
-          </NavLink>
-          <Contact />
-        </Flex>
+              <ChatBubbleIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Feature Requests
+              </Text>
+            </NavLink>
+            <Contact />
+          </Flex>
+        )}
       </Flex>
     </Box>
   );
