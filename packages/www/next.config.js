@@ -250,6 +250,11 @@ let config = {
           },
         ],
       },
+      {
+        source: "/forgot-password",
+        destination: "/dashboard/forgot-password",
+        permanent: false,
+      },
     ];
   },
 };
