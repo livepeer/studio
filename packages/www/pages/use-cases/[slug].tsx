@@ -105,7 +105,7 @@ const UseCase = ({
         imageType="rectangle"
         ctas={[
           {
-            href: "/register",
+            href: "/dashboard/register",
             title: "Get started",
           },
           {
@@ -127,7 +127,7 @@ const UseCase = ({
         reasons={features.reasons}
         ctas={[
           {
-            href: "/register",
+            href: "/dashboard/register",
             title: "Start Building",
           },
           {

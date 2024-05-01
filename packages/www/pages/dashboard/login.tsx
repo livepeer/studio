@@ -9,7 +9,7 @@ import {
   Link as A,
 } from "@livepeer/design-system";
 import { useState } from "react";
-import { useApi, useLoggedIn } from "../hooks";
+import { useApi, useLoggedIn } from "../../hooks";
 import Link from "next/link";
 import { Home as Content } from "content";
 
@@ -85,7 +85,7 @@ const LoginPage = () => {
                     "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
-              <Link href="/register" passHref legacyBehavior>
+              <Link href="/dashboard/register" passHref legacyBehavior>
                 <A
                   css={{
                     "&:hover": {

@@ -408,7 +408,7 @@ const NavigationBase = ({
                           display: "block",
                         },
                       }}>
-                      <Link href="/login" passHref legacyBehavior>
+                      <Link href="/dashboard/login" passHref legacyBehavior>
                         <A>
                           <Button variant="neutral" css={{ mr: "$3" }} size={3}>
                             Sign in
@@ -425,7 +425,7 @@ const NavigationBase = ({
                           display: "block",
                         },
                       }}>
-                      <Link href="/register" passHref legacyBehavior>
+                      <Link href="/dashboard/register" passHref legacyBehavior>
                         <A>
                           <Button variant="green" size={3}>
                             Sign Up
