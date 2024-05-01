@@ -2277,7 +2277,7 @@ components:
           type: string
           description: The user ID associated with the metric
           example: 1bde4o2i6xycudoy
-          
+
         CreatorID:
           type: string
           description: The creator ID associated with the metric

@@ -586,7 +586,7 @@ components:
     webhook:
       table: webhook
       properties:
-        userId: 
+        userId:
           index: true
         events:
           index: true
