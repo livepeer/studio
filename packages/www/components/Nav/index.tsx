@@ -2,7 +2,6 @@ import { Flex, Button, Link as A } from "@livepeer/design-system";
 import { basePath } from "../../lib/utils";
 
 const Nav = () => {
-  console.log(basePath);
   return (
     <Flex
       align="center"
