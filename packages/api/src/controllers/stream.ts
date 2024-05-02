@@ -62,7 +62,6 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 export const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
-const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
 
 // Helper constant to be used in the PUT /pull API to make sure we delete fields
 // from the stream that are not specified in the PUT payload.
@@ -524,7 +523,7 @@ export async function getRecordingFields(
   if (session.version === "v2") {
     const asset = await db.asset.getBySessionId(session.id);
     if (!asset) {
-      return { recordingStatus: "waiting" };
+      return { recordingStatus: isStreamStale(session) ? "none" : "waiting" };
     }
     const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
     const assetPhase = assetWithPlayback.status?.phase;
@@ -533,7 +532,7 @@ export async function getRecordingFields(
         assetPhase == "ready"
           ? "ready"
           : assetPhase == "failed"
-          ? "none"
+          ? "failed"
           : "waiting",
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
