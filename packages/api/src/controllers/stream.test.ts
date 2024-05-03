@@ -1447,7 +1447,6 @@ describe("controllers/stream", () => {
       expect(projectId).toBeDefined();
 
       // then create a new api-key under that project
-      const allowedOrigins = ["http://localhost:3000"];
       newApiKey = await createApiToken({
         client: client,
         projectId: projectId,
