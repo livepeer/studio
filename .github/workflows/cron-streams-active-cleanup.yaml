@@ -1,6 +1,9 @@
 name: "cron: Active streams cleanup"
 
 on:
+  push:
+    branches:
+      - vg/chore/active-cleanup-improv
   schedule:
     - cron: "*/5 * * * *" # run every 5 minutes
 
