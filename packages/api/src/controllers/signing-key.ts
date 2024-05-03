@@ -25,6 +25,7 @@ const fieldsMap: FieldsMap = {
   name: { val: `signing_key.data->>'name'`, type: "full-text" },
   deleted: { val: `signing_key.data->'deleted'`, type: "boolean" },
   createdAt: { val: `signing_key.data->'createdAt'`, type: "int" },
+  projectId: `signing_key.data->>'projectId'`,
   userId: `signing_key.data->>'userId'`,
 };
 
@@ -71,6 +72,12 @@ signingKeyApp.get("/", authorizer({}), async (req, res) => {
       query.push(sql`signing_key.data->>'deleted' IS NULL`);
     }
 
+    query.push(
+      sql`coalesce(signing_key.data->>'projectId', '') = ${
+        req.project?.id || ""
+      }`
+    );
+
     let fields =
       " signing_key.id as id, signing_key.data as data, users.id as usersId, users.data as usersdata";
     if (count) {
@@ -105,6 +112,10 @@ signingKeyApp.get("/", authorizer({}), async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`signing_key.data->>'userId' = ${req.user.id}`);
   query.push(sql`signing_key.data->>'deleted' IS NULL`);
+
+  query.push(
+    sql`coalesce(signing_key.data->>'projectId', '') = ${req.project?.id || ""}`
+  );
 
   let fields = " signing_key.id as id, signing_key.data as data";
   if (count) {
@@ -188,6 +199,7 @@ signingKeyApp.post(
       userId: req.user.id,
       createdAt: Date.now(),
       publicKey: b64PublicKey,
+      projectId: req.project?.id,
     };
 
     await db.signingKey.create(doc);

@@ -9,6 +9,7 @@ import { SigningKey, SigningKeyResponsePayload, User } from "../schema/types";
 import { WithID } from "../store/types";
 import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 import { db } from "../store";
+import { createProject } from "../test-helpers";
 
 // includes auth file tests
 
@@ -48,6 +49,7 @@ describe("controllers/signing-key", () => {
     let samplePrivateKey: string;
     let decodedPublicKey: string;
     let otherPublicKey: string;
+    let projectId: string;
 
     beforeEach(async () => {
       ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
@@ -69,12 +71,18 @@ describe("controllers/signing-key", () => {
         otherSigningKey.publicKey,
         "base64"
       ).toString();
+
+      let project = await createProject(client);
+      projectId = project.id;
+      expect(projectId).toBeDefined();
     });
 
     it("should create a signing key and display the private key only on creation", async () => {
       const preCreationTime = Date.now();
-      let res = await client.post("/access-control/signing-key");
+      let res = await client.post("/access-control/signing-key", { projectId });
+      let resWithoutProject = await client.post("/access-control/signing-key");
       expect(res.status).toBe(201);
+      expect(resWithoutProject.status).toBe(201);
       const created = (await res.json()) as SigningKeyResponsePayload;
       expect(created).toMatchObject({
         id: expect.any(String),
@@ -91,7 +99,9 @@ describe("controllers/signing-key", () => {
     });
 
     it("should list all user signing keys", async () => {
-      const res = await client.get(`/access-control/signing-key`);
+      const res = await client.get(
+        `/access-control/signing-key?projectId=${projectId}`
+      );
       expect(res.status).toBe(200);
     });
 
