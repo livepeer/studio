@@ -1561,27 +1561,28 @@ async function triggerSessionRecordingHooks(
     ? [stream]
     : await db.stream.getActiveSessions(id);
 
-  // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear them on DB.
-  const legacyChildStreams = childStreams.filter((s) => !s.sessionId);
-  await clearIsActiveMany(db, legacyChildStreams);
-
-  const sessionIds = _(childStreams)
-    .map((s) => s.sessionId)
-    .filter() // removes undefined values from legacy streams
-    .uniq() // remove duplicate sessionIds from possibly broken up child streams
+  const streamsBySessionId = _(childStreams)
+    .groupBy("sessionId")
+    .toPairs()
     .value();
-  for (const sessionId of sessionIds) {
+  for (const [sessionId, streamsFromSession] of streamsBySessionId) {
+    if (!sessionId) {
+      // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
+      await clearIsActiveMany(db, streamsFromSession);
+      continue;
+    }
+
     const asset = await db.asset.get(sessionId);
     if (asset) {
-      // if we have an asset, then the recording has already been processed and
-      // we don't need to send a recording.waiting hook.
+      // if we have an asset, then the recording has already been processed and we don't need to send a
+      // recording.waiting hook. also clear the isActive field from child streams.
+      await clearIsActiveMany(db, streamsFromSession);
       continue;
     }
 
     const session = await db.session.get(sessionId);
     if (isCleanup && !shouldCleanUpIsActive(session)) {
-      // The {activeCleanup} logic only checks the parent stream, so we need
-      // to recheck the sessions here to avoid spamming active sessions.
+      // Recheck conditions for the session object in case of a clean-up. In this case it should not, so ignore.
       continue;
     }
 
@@ -1594,8 +1595,7 @@ async function triggerSessionRecordingHooks(
         );
       }
       // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
-      const fromSession = childStreams.filter((s) => s.sessionId === sessionId);
-      await clearIsActiveMany(db, fromSession);
+      await clearIsActiveMany(db, streamsFromSession);
       continue;
     }
 
