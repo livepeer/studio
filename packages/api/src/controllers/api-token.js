@@ -27,7 +27,6 @@ async function enrichApiTokenProjectId(body, req, res) {
   return body;
 }
 
-// Apply the middleware globally
 app.use(mung.jsonAsync(enrichApiTokenProjectId));
 
 app.get("/:id", async (req, res) => {

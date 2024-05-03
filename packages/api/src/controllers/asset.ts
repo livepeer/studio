@@ -626,7 +626,7 @@ app.use(
         !!details,
         req.user.admin
       );
-      // Append defaultProjectId if not present
+
       if (!modifiedAsset.projectId || modifiedAsset.projectId === "") {
         modifiedAsset.projectId = req.user.defaultProjectId;
       }
