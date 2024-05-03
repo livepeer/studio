@@ -1561,8 +1561,15 @@ async function triggerSessionRecordingHooks(
     ? [stream]
     : await db.stream.getActiveSessions(id);
 
-  // remove duplicate sessionIds from possibly broken up child streams
-  const sessionIds = _.uniq(childStreams.map((s) => s.sessionId ?? s.id));
+  // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear them on DB.
+  const legacyChildStreams = childStreams.filter((s) => !s.sessionId);
+  await clearIsActiveMany(db, legacyChildStreams);
+
+  const sessionIds = _(childStreams)
+    .map((s) => s.sessionId)
+    .filter() // removes undefined values from legacy streams
+    .uniq() // remove duplicate sessionIds from possibly broken up child streams
+    .value();
   for (const sessionId of sessionIds) {
     const asset = await db.asset.get(sessionId);
     if (asset) {
@@ -1578,7 +1585,21 @@ async function triggerSessionRecordingHooks(
       continue;
     }
 
-    await publishSingleRecordingWaitingHook(
+    const isStale = isStreamStale(session);
+    if (!session.record || isStale) {
+      if (isStale) {
+        logger.info(
+          `Skipping recording for stale session ` +
+            `session_id=${session.id} last_seen=${session.lastSeen}`
+        );
+      }
+      // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
+      const fromSession = childStreams.filter((s) => s.sessionId === sessionId);
+      await clearIsActiveMany(db, fromSession);
+      continue;
+    }
+
+    await publishDelayedRecordingWaitingHook(
       config,
       session,
       queue,
@@ -1592,24 +1613,10 @@ async function triggerSessionRecordingHooks(
   }
 }
 
-async function publishSingleRecordingWaitingHook(
-  config: CliArgs,
-  session: DBSession,
-  queue: Queue,
-  ingest: string
-) {
-  const isStale = isStreamStale(session);
-  if (!session.record || isStale) {
-    if (isStale) {
-      logger.info(
-        `Skipping recording for stale session ` +
-          `session_id=${session.id} last_seen=${session.lastSeen}`
-      );
-    }
-    return;
-  }
-
-  await publishDelayedRecordingWaitingHook(config, session, queue, ingest);
+async function clearIsActiveMany(db: DB, streams: DBStream[]) {
+  await Promise.all(
+    streams.map((s) => db.stream.update(s.id, { isActive: false }))
+  );
 }
 
 async function publishRecordingStartedHook(
@@ -2153,13 +2160,13 @@ app.post(
     const parentStreamsIds = new Set(
       streams.filter((s) => !s.parentId).map((s) => s.id)
     );
+    streams = _(streams)
+      .filter((s) => parentStreamsIds.has(s.parentId)) // the parent stream cleanup already cleans all children, so skip them
+      .uniqBy((s) => s.sessionId ?? s.id) // recordings are handled by session, so dedup by sessionId if available
+      .value();
 
     const cleanedUp: DBStream[] = [];
     for (const stream of streams) {
-      if (parentStreamsIds.has(stream.parentId)) {
-        // the parent stream cleanup already cleans all children, so skip this
-        continue;
-      }
       const cleaned = triggerCleanUpIsActiveJob(
         req.config,
         stream,
