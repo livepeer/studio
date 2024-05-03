@@ -785,6 +785,21 @@ app.post("/token", validatePost("user"), async (req, res) => {
       ],
     });
   }
+
+  if (!user.defaultProjectId) {
+    const id = uuid();
+    await db.project.create({
+      id: id,
+      name: "My first project",
+      userId: user.id,
+      createdAt: Date.now(),
+    });
+
+    await db.user.update(user.id, {
+      defaultProjectId: id,
+    });
+  }
+
   res.status(201);
   res.json({ id: user.id, email: user.email, token, refreshToken });
 });
