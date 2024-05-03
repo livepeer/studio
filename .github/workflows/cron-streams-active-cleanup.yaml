@@ -26,3 +26,4 @@ jobs:
         with:
           name: cleaned-up-streams-staging
           path: cleaned-up-streams-staging.json
+          retention-days: 30
