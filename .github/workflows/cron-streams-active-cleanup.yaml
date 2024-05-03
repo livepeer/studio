@@ -17,9 +17,6 @@ jobs:
             api-token-secret: LP_STAGING_API_ADMIN_TOKEN
     runs-on: ubuntu-latest
     steps:
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
       - name: Clean-up ${{ matrix.env.name }} active streams
         run: |
           output_file="./cleaned-up-streams-${{ matrix.env.name }}.json"
