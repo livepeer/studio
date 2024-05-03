@@ -176,6 +176,10 @@ components:
         name:
           type: string
           example: test_webhook
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         createdAt:
           type: number
           readOnly: true
