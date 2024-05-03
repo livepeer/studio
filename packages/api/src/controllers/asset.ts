@@ -619,8 +619,19 @@ app.use(
     req
   ) {
     const { details } = toStringValues(req.query);
-    const toExternalAssetFunc = (a: Asset) =>
-      toExternalAsset(a, req.config, !!details, req.user.admin);
+    const toExternalAssetFunc = async (a: Asset) => {
+      const modifiedAsset = await toExternalAsset(
+        a,
+        req.config,
+        !!details,
+        req.user.admin
+      );
+      // Append defaultProjectId if not present
+      if (!modifiedAsset.projectId || modifiedAsset.projectId === "") {
+        modifiedAsset.projectId = req.user.defaultProjectId;
+      }
+      return modifiedAsset;
+    };
 
     if (Array.isArray(data)) {
       return Promise.all(data.map(toExternalAssetFunc));
