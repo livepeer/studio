@@ -6,10 +6,29 @@ import { makeNextHREF, parseOrder, parseFilters } from "./helpers";
 import { authorizer, validatePost } from "../middleware";
 import { AuthPolicy } from "../middleware/authPolicy";
 import { db } from "../store";
+import mung from "express-mung";
 
 const app = Router();
 
 app.use(authorizer({ noApiToken: true }));
+
+async function enrichApiTokenProjectId(body, req, res) {
+  const enrichToken = (token) => {
+    if (!token.projectId || token.projectId === "") {
+      token.projectId = req.user.defaultProjectId;
+    }
+  };
+
+  if (Array.isArray(body)) {
+    body.forEach(enrichToken);
+  } else {
+    enrichToken(body);
+  }
+  return body;
+}
+
+// Apply the middleware globally
+app.use(mung.jsonAsync(enrichApiTokenProjectId));
 
 app.get("/:id", async (req, res) => {
   const { id } = req.params;
