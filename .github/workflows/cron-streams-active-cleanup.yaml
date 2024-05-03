@@ -23,9 +23,9 @@ jobs:
           api_token="${{ secrets[matrix.env.api-token-secret] }}"
 
           curl --fail --request POST \
-          --url 'https://${{ matrix.env.hostname }}/api/stream/job/active-cleanup' \
-          --header "Authorization: Bearer $api_token" \
-          -o $output_file
+            --url 'https://${{ matrix.env.hostname }}/api/stream/job/active-cleanup' \
+            --header "Authorization: Bearer $api_token" \
+            -o $output_file
 
           cleaned_count=$(jq '.cleanedUp | length' $output_file)
           echo "Cleaned up $cleaned_count streams in ${{ matrix.env.name }}"
