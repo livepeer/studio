@@ -483,7 +483,7 @@ export default class WebhookCannon {
   async handleRecordingWaitingChecks(
     sessionId: string,
     attempt = 1
-  ): Promise<string> {
+  ): Promise<void> {
     const session = await db.session.get(sessionId, {
       useReplica: false,
     });
