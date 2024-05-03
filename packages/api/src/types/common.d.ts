@@ -51,7 +51,7 @@ declare global {
 
       checkResourceAccess: (
         resource?: DBOwnedResource,
-        uiAdminOnly = false
+        uiAdminOnly?: boolean
       ) => void;
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;
