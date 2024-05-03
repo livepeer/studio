@@ -69,6 +69,7 @@ export default function ProjectTile({ name, url, id, ...props }) {
               <HiDotsHorizontal />
             </Box>
             <DropdownMenuContent
+              placeholder="Settings"
               css={{
                 border: "1px solid $colors$neutral6",
                 p: "$2",

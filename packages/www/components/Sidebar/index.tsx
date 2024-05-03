@@ -252,6 +252,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
               },
             }}>
             <Avatar
+              placeholder={user?.firstName || user?.email.charAt(0)}
               css={{
                 width: 55,
                 height: 55,
@@ -270,6 +271,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             </Text>
           </Flex>
           <DropdownMenuContent
+            placeholder={"Account"}
             css={{
               border: "1px solid $colors$neutral6",
               width: "12rem",
