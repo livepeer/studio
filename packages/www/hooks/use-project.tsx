@@ -13,12 +13,12 @@ const useProject = () => {
   } = useRouter();
 
   const appendProjectId = (path) => {
-    return `/dashboard/projects/${projectId}${path}`;
+    return `/projects/${projectId}${path}`;
   };
 
   const setCurrentProject = (project, path?: string) => {
     localStorage.setItem("currentProject", project.id);
-    push(`/dashboard/projects/${project.id}${path ?? ""}`);
+    push(`/projects/${project.id}${path ?? ""}`);
   };
 
   return {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Layout from "../../../../layouts/dashboard";
+import Layout from "../../../layouts/dashboard";
 import { Box, Button, useSnackbar } from "@livepeer/design-system";
 import GettingStarted from "components/GettingStarted";
 import UsageSummary from "components/UsageSummary";
@@ -10,18 +10,10 @@ import Banner from "components/Banner";
 
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
-import Ripe, { categories, pages } from "lib/ripe";
-import useProject from "hooks/use-project";
-
-Ripe.trackPage({
-  category: categories.DASHBOARD,
-  name: pages.DASHBOARD_HOME,
-});
 
 const Dashboard = () => {
   const { user, verifyEmail, getUserProduct } = useApi();
   const { emailValid } = user;
-  const { appendProjectId } = useProject();
 
   const [loading, setLoading] = useState(false);
   const product = getUserProduct(user);
@@ -41,14 +33,6 @@ const Dashboard = () => {
       );
     }
   };
-
-  useEffect(() => {
-    Ripe.identifyUser(user.id, {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-    });
-  }, []);
 
   return (
     <Box css={{ p: "$6" }}>
@@ -84,10 +68,7 @@ const Dashboard = () => {
           title="Upgrade"
           description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
           button={
-            <Link
-              href="/dashboard/account/billing/plans"
-              passHref
-              legacyBehavior>
+            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
               <Button
                 variant="primary"
                 as="a"
@@ -109,10 +90,11 @@ const Dashboard = () => {
       <Box css={{ mb: "$8" }}>
         <StreamsTable
           title="Streams"
+          hideFilters={true}
           userId={user.id}
           pageSize={5}
           tableId="dashboardStreamsTable"
-          viewAll={appendProjectId("/streams")}
+          viewAll="/dashboard/streams"
         />
       </Box>
     </Box>
