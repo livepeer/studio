@@ -2161,7 +2161,7 @@ app.post(
       streams.filter((s) => !s.parentId).map((s) => s.id)
     );
     streams = _(streams)
-      .filter((s) => parentStreamsIds.has(s.parentId)) // the parent stream cleanup already cleans all children, so skip them
+      .filter((s) => !parentStreamsIds.has(s.parentId)) // the parent stream cleanup already cleans all children, so skip them
       .uniqBy((s) => s.sessionId ?? s.id) // recordings are handled by session, so dedup by sessionId if available
       .value();
 

@@ -1772,7 +1772,7 @@ describe("controllers/stream", () => {
       expect(stream.isActive).toBe(false);
 
       client.jwtAuth = adminToken;
-      res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      res = await client.post(`/stream/job/active-cleanup`);
       expect(res.status).toBe(200);
       const { cleanedUp } = await res.json();
       expect(cleanedUp).toHaveLength(1);
@@ -1804,7 +1804,7 @@ describe("controllers/stream", () => {
       });
 
       client.jwtAuth = adminToken;
-      res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      res = await client.post(`/stream/job/active-cleanup`);
       expect(res.status).toBe(200);
       const { cleanedUp } = await res.json();
       expect(cleanedUp).toHaveLength(1);
@@ -1817,8 +1817,8 @@ describe("controllers/stream", () => {
       let stream: Stream = await res.json();
 
       const childrenIds: string[] = [];
+      const sessionId = uuid();
       for (let i = 0; i < 3; i++) {
-        const sessionId = uuid();
         res = await client.post(
           `/stream/${stream.id}/stream?sessionId=${sessionId}`,
           {
