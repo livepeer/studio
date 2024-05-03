@@ -1443,17 +1443,18 @@ describe("controllers/stream", () => {
 
       // create a new project
       client.jwtAuth = nonAdminToken;
-      projectId = await createProject(client);
-      expect(projectId).toBeDefined();
+      let project = await createProject(client);
+      expect(project).toBeDefined();
 
       // then create a new api-key under that project
       newApiKey = await createApiToken({
         client: client,
-        projectId: projectId,
+        projectId: project.id,
         jwtAuthToken: nonAdminToken,
       });
       expect(newApiKey).toMatchObject({
         id: expect.any(String),
+        projectId: project.id,
       });
 
       client.jwtAuth = "";
@@ -1465,11 +1466,13 @@ describe("controllers/stream", () => {
           id: uuid(),
           kind: "stream",
           userId: nonAdminUser.id,
-          projectId: projectId,
+          projectId: project.id,
         };
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         expect(res.status).toBe(200);
+        let stream = await res.json();
+        expect(stream.projectId).toEqual(project.id);
       }
     });
 
