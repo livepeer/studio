@@ -17,14 +17,10 @@ const Webhooks = () => {
     <Layout
       id="developers/webhooks"
       breadcrumbs={[
-<<<<<<<< HEAD:packages/www/pages/dashboard/projects/[projectId]/developers/webhooks/index.tsx
         {
           title: "Developers",
           href: appendProjectId("/developers/webhooks"),
         },
-========
-        { title: "Developers", href: "/developers/webhooks" },
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/developers/webhooks/index.tsx
         { title: "Webhooks" },
       ]}
       {...Content.metaData}>

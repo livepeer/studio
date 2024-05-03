@@ -49,14 +49,10 @@ const WebhookDetail = () => {
       id="developers/webhooks"
       breadcrumbs={[
         { title: "Developers" },
-<<<<<<<< HEAD:packages/www/pages/dashboard/projects/[projectId]/developers/webhooks/[id].tsx
         {
           title: "Webhooks",
           href: appendProjectId("/developers/webhooks"),
         },
-========
-        { title: "Webhooks", href: "/developers/webhooks" },
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/developers/webhooks/[id].tsx
         { title: webhookData?.name },
       ]}
       {...Content.metaData}>

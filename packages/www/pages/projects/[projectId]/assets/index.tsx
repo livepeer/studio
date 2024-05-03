@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:packages/www/pages/dashboard/projects/[projectId]/assets/index.tsx
-import Layout from "../../../../../layouts/dashboard";
-========
-import Layout from "../../layouts/dashboard";
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/assets/index.tsx
+import Layout from "../../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import AssetsTable from "components/AssetsTable";

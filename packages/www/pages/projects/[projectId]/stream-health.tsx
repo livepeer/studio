@@ -7,11 +7,7 @@ import {
   TextField,
   Label,
 } from "@livepeer/design-system";
-<<<<<<<< HEAD:packages/www/pages/dashboard/projects/[projectId]/stream-health.tsx
-import Layout from "../../../../layouts/dashboard";
-========
-import Layout from "../layouts/dashboard";
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/stream-health.tsx
+import Layout from "../../../layouts/dashboard";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api/types";

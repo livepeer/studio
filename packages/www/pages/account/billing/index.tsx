@@ -280,14 +280,7 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
-<<<<<<<< HEAD:packages/www/pages/dashboard/account/billing/index.tsx
-            <Link
-              href="/dashboard/account/billing/plans"
-              passHref
-              legacyBehavior>
-========
-            <Link href="/billing/plans" passHref legacyBehavior>
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/billing/index.tsx
+            <Link href="/account/billing/plans" passHref legacyBehavior>
               <A
                 variant="primary"
                 css={{ display: "flex", alignItems: "center" }}>
@@ -361,11 +354,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-<<<<<<<< HEAD:packages/www/pages/dashboard/account/billing/index.tsx
-          <Link href="/dashboard/account/usage" passHref legacyBehavior>
-========
-          <Link href="/usage" passHref legacyBehavior>
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/billing/index.tsx
+          <Link href="/account/billing/usage" passHref legacyBehavior>
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}

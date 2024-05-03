@@ -6,16 +6,7 @@ import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/StreamDetails/StreamOverviewTab";
-<<<<<<<< HEAD:packages/www/pages/dashboard/projects/[projectId]/streams/[id]/index.tsx
-import Ripe, { categories, pages } from "lib/ripe";
 import useProject from "hooks/use-project";
-
-Ripe.trackPage({
-  category: categories.DASHBOARD,
-  name: pages.STREAM,
-});
-========
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/streams/[id]/index.tsx
 
 const refetchInterval = 5 * 1000;
 
@@ -62,11 +53,7 @@ const StreamDetails = () => {
       invalidateStream={invalidateStream}
       setSwitchTab={setCurrentTab}
       breadcrumbs={[
-<<<<<<<< HEAD:packages/www/pages/dashboard/projects/[projectId]/streams/[id]/index.tsx
         { title: "Streams", href: appendProjectId("/streams") },
-========
-        { title: "Streams", href: "/streams" },
->>>>>>>> a55ccc19426eaf2a60fae87b2a1f7abb9c31c7b2:packages/www/pages/streams/[id]/index.tsx
         { title: stream?.name },
       ]}
       embedVideoDialogOpen={embedVideoDialogOpen}
