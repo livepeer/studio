@@ -23,7 +23,7 @@ jobs:
           api_token="${{ secrets[matrix.env.api-token-secret] }}"
 
           curl --fail --request POST \
-          --url 'https://${{ matrix.env.hostname }}/api/stream/job/active-cleanup' \
+          --url 'https://${{ matrix.env.hostname }}/api/stream/job/active-cleanup-notfound' \
           --header "Authorization: Bearer $api_token" \
           -o $output_file
 
