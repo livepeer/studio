@@ -148,16 +148,7 @@ signingKeyApp.get("/", authorizer({}), async (req, res) => {
 signingKeyApp.get("/:id", authorizer({}), async (req, res) => {
   const signingKey = await db.signingKey.get(req.params.id);
 
-  if (
-    !signingKey ||
-    signingKey.deleted ||
-    (req.user.admin !== true && req.user.id !== signingKey.userId)
-  ) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
-  }
+  req.checkResourceAccess(signingKey);
 
   res.json(signingKey);
 });
@@ -217,9 +208,7 @@ signingKeyApp.post(
 signingKeyApp.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const signingKey = await db.signingKey.get(id);
-  if (!signingKey || signingKey.deleted) {
-    throw new NotFoundError(`signing key not found`);
-  }
+  req.checkResourceAccess(signingKey);
   if (!req.user.admin && req.user.id !== signingKey.userId) {
     throw new ForbiddenError(`users may only delete their own signing keys`);
   }
@@ -235,9 +224,7 @@ signingKeyApp.patch(
   async (req, res) => {
     const { id } = req.params;
     const signingKey = await db.signingKey.get(id);
-    if (!signingKey || signingKey.deleted) {
-      return res.status(404).json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(signingKey);
     if (!req.user.admin && req.user.id !== signingKey.userId) {
       return res.status(403).json({
         errors: ["users may change only their own signing key"],
