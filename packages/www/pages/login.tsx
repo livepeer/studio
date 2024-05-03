@@ -1,13 +1,6 @@
-import Layout from "layouts/main";
+import Layout from "layouts/auth";
 import Login from "components/Login";
-import {
-  Flex,
-  Box,
-  Button,
-  Container,
-  Text,
-  Link as A,
-} from "@livepeer/design-system";
+import { Flex, Box, Text, Container, Link as A } from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 import Link from "next/link";
@@ -35,24 +28,17 @@ const LoginPage = () => {
       <Box
         css={{
           position: "relative",
-          height: "100vh",
+          height: "calc(100vh - 70px)",
           display: "flex",
           alignItems: "center",
         }}>
         <Container
           size="3"
           css={{
-            px: "$3",
-            py: "$6",
             width: "100%",
-            "@bp3": {
-              px: "$4",
-            },
           }}>
           <Flex
             css={{
-              alignItems: "center",
-              justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
             }}>
@@ -60,10 +46,10 @@ const LoginPage = () => {
               size="8"
               as="h1"
               css={{
+                textAlign: "center",
                 mb: "$7",
                 fontWeight: 500,
                 lineHeight: "30px",
-                textAlign: "center",
               }}>
               Sign in to your account
             </Text>
@@ -75,7 +61,13 @@ const LoginPage = () => {
               errors={errors}
               loading={loading}
             />
-            <Box css={{ maxWidth: 500, width: "100%" }}>
+            <Box
+              css={{
+                maxWidth: 500,
+                mx: "auto",
+                width: "100%",
+                textAlign: "center",
+              }}>
               <Box
                 css={{
                   width: "100%",
@@ -85,26 +77,19 @@ const LoginPage = () => {
                     "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
-              <Link href="/register" passHref legacyBehavior>
-                <A
-                  css={{
-                    "&:hover": {
-                      textDecoration: "none",
-                    },
-                  }}>
-                  <Button
-                    size="4"
-                    css={{
-                      width: "100%",
-                      fontSize: "$3",
-                      "&:hover": {
-                        textDecoration: "none",
-                      },
-                    }}>
-                    Create new account
-                  </Button>
-                </A>
-              </Link>
+              <Text
+                variant="neutral"
+                css={{
+                  display: "flex",
+                  gap: 10,
+                  width: "100%",
+                  justifyContent: "center",
+                }}>
+                <Box>Don't have an account?</Box>
+                <Link href="/register" passHref legacyBehavior>
+                  <A>Sign up now</A>
+                </Link>
+              </Text>
             </Box>
           </Flex>
         </Container>
@@ -113,5 +98,5 @@ const LoginPage = () => {
   );
 };
 
-LoginPage.theme = "light-theme-green";
+LoginPage.theme = "dark-theme-gray";
 export default LoginPage;

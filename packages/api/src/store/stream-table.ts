@@ -413,6 +413,8 @@ const adminOnlyFields = [
   "broadcasterHost",
   "createdByTokenId",
   "pullLockedAt",
+  "pullLockedBy",
+  "pullRegion",
 ];
 
 const privateFields = [

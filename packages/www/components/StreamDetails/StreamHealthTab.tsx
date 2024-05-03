@@ -6,6 +6,7 @@ import Logger from "components/Logger";
 import Chart from "components/Chart";
 import HealthChecksTable from "components/StreamDetails/HealthChecksTable";
 import { Text, Box, Heading } from "@livepeer/design-system";
+import { useJune, events } from "hooks/use-june";
 
 const ingestInterval = 10 * 1000;
 const maxItems = 6;
@@ -25,6 +26,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
     { name: 0, "Session bitrate": 0 },
   ]);
 
+  const June = useJune();
   const [multiDataChart, setMultiDataChart] = useState<MultistreamChartType[]>(
     []
   );
@@ -32,6 +34,8 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
   const startTime = useMemo(() => Date.now(), []);
 
   const [info, setInfo] = useState<StreamInfo | null>(null);
+
+  June?.track(events.stream.health);
 
   const { getStreamInfo } = useApi();
 

@@ -13,10 +13,11 @@ import {
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../public/img/icons/upcoming.svg";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
+import { useJune, events } from "hooks/use-june";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
@@ -206,6 +207,12 @@ const UsageSummary = () => {
     }
   }, [user]);
 
+  const June = useJune();
+
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.landing.billingCta);
+  }, [June]);
+
   return (
     <>
       <Flex
@@ -231,6 +238,7 @@ const UsageSummary = () => {
             <Flex align="center" css={{ mr: "$3" }}>
               <Tooltip
                 multiline
+                // @ts-ignore
                 content={
                   <Box>
                     Usage minutes may take up to an hour to be reflected.
@@ -297,7 +305,10 @@ const UsageSummary = () => {
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Link href="/dashboard/account/billing" passHref legacyBehavior>
-          <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
+          <A
+            variant="primary"
+            css={{ display: "flex", alignItems: "center" }}
+            onClick={() => trackEvent()}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

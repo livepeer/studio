@@ -55,7 +55,7 @@ const data = _.merge({}, apiData, dbData);
   const ajv = new Ajv({ sourceCode: true });
 
   const index = [];
-  const types = [];
+  let types = [];
 
   for (const [name, schema] of Object.entries(data.components.schemas)) {
     schema.title = name;
@@ -72,7 +72,17 @@ const data = _.merge({}, apiData, dbData);
   const indexPath = path.resolve(validatorDir, "index.js");
   write(indexPath, indexStr);
 
-  const typeStr = types.join("\n");
+  const typeDefinition = `export type InputCreatorId =
+  | {
+      type: "unverified";
+      value: string;
+    }
+  | string;`;
+
+  let typeStr = types.join("\n\n");
+  const cleanedTypeStr = typeStr.split(typeDefinition).join("");
+  typeStr = `${cleanedTypeStr.trim()}\n\n${typeDefinition}`;
+
   const typePath = path.resolve(schemaDir, "types.d.ts");
   write(typePath, typeStr);
 })().catch((err) => {

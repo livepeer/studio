@@ -37,6 +37,7 @@ import Link from "next/link";
 import Spinner from "components/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import TableHeader from "./components/TableHeader";
+import StreamFilter from "components/StreamsTable/StreamFilter";
 
 type Sort<T extends Record<string, unknown>> = {
   id: keyof T;
@@ -58,6 +59,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setNextCursor: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<TFilter[]>>;
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
+  setDataCount: Dispatch<SetStateAction<number | number[]>>;
 };
 
 export type State<T extends Record<string, unknown>> = {
@@ -70,6 +72,7 @@ export type State<T extends Record<string, unknown>> = {
   stringifiedFilters: string;
   selectedRows: Row<T>[];
   pageSize: number;
+  dataCount: number | number[];
   invalidate: () => Promise<void>;
 };
 
@@ -77,6 +80,11 @@ export type FetchResult<T extends Record<string, unknown>> = {
   rows: T[];
   nextCursor: string;
   count: number;
+
+  // Only used in the StreamsTable component
+  unHealtyStreamCount?: number;
+  activeStreamCount?: number;
+  allStreamCount?: number;
 };
 
 export type Fetcher<T extends Record<string, unknown>> = (
@@ -199,6 +207,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               const props = getToggleAllRowsSelectedProps();
               return (
                 <Checkbox
+                  placeholder="Select all rows"
                   css={{ display: "flex" }}
                   onClick={props.onChange}
                   value="toggle-all"
@@ -211,6 +220,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             Cell: ({ row }) => {
               return (
                 <Checkbox
+                  placeholder="Select row"
                   css={{ display: "flex" }}
                   // @ts-ignore
                   value={row.isSelected}
@@ -230,9 +240,13 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
       }
     }
   );
-
   useEffect(() => {
     stateSetter.setSelectedRows(selectedFlatRows);
+    stateSetter.setDataCount([
+      data?.allStreamCount,
+      data?.activeStreamCount,
+      data?.unHealtyStreamCount,
+    ]);
   }, [selectedFlatRows, stateSetter.setSelectedRows]);
 
   useEffect(() => {
@@ -287,10 +301,11 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
     <TableHeader title={title} />
   ) : null;
 
+  const isStreamsTable = state.tableId === "streamsTable";
+
   return (
     <Box>
       <Flex
-        align="end"
         justify="between"
         css={{
           mb: "$3",
@@ -299,10 +314,20 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           pb: border ? "$2" : 0,
         }}>
         {/* Header title */}
-        <Box>{headerComponent}</Box>
+        <Box
+          css={{
+            width: "100%",
+          }}>
+          {headerComponent}
+        </Box>
 
         {/* Header actions */}
-        <Flex css={{ alignItems: "center" }}>
+        <Flex
+          css={{
+            alignItems: "center",
+            position: "absolute",
+            right: "4%",
+          }}>
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
               <Flex css={{ ai: "center", mr: "$3" }}>
@@ -335,11 +360,15 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             </Flex>
           ) : (
             <>
-              {!viewAll && filterItems && (
-                <TableFilter
-                  items={filterItems}
-                  onDone={(e) => onSetFilters(e)}
-                />
+              {!isStreamsTable && (
+                <>
+                  {!viewAll && filterItems && (
+                    <TableFilter
+                      items={filterItems}
+                      onDone={(e) => onSetFilters(e)}
+                    />
+                  )}
+                </>
               )}
               {createAction && (
                 <Button
@@ -538,6 +567,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [nextCursor, setNextCursor] = useState("default");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
+  const [dataCount, setDataCount] = useState<number | number[]>(0);
   const queryClient = useQueryClient();
 
   const stringifiedFilters = useMemo(() => {
@@ -553,6 +583,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       setNextCursor,
       setFilters,
       setSelectedRows,
+      setDataCount,
     }),
     []
   );
@@ -568,6 +599,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       stringifiedFilters,
       selectedRows,
       pageSize,
+      dataCount,
       invalidate: () => queryClient.invalidateQueries(tableId),
     }),
     [
@@ -579,6 +611,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       stringifiedFilters,
       selectedRows,
       pageSize,
+      dataCount,
       queryClient,
       tableId,
     ]
@@ -600,6 +633,7 @@ const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
     () => fetcher(state),
     fetcherOptions
   );
+
   return DataTableComponent({ ...props, tableData });
 };
 

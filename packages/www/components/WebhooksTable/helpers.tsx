@@ -96,6 +96,7 @@ export const rowsPageFromState = async (
           children: (
             <Tooltip
               multiline
+              //@ts-ignore
               content={webhook.events.map((event) => (
                 <Box key={event}>{event}</Box>
               ))}>

@@ -28,12 +28,14 @@ import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
-import CreateProjectDialog from "components/Project/createProjectDialog";
+import { useJune, events } from "hooks/use-june";
+import { useCallback, useEffect, useState } from "react";
+import { isExport } from "lib/utils";
 import { useQuery } from "react-query";
-import { useState } from "react";
-import { FiCheck, FiChevronLeft } from "react-icons/fi";
-import useProject from "hooks/use-project";
+import CreateProjectDialog from "components/Project/createProjectDialog";
 import { User } from "@livepeer.studio/api";
+import useProject from "hooks/use-project";
+import { FiCheck, FiChevronLeft } from "react-icons/fi";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -64,6 +66,7 @@ export type SidebarId =
   | "home"
   | "streams"
   | "streams/sessions"
+  // /stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
   | "developers"
@@ -166,6 +169,21 @@ const settingsSidebarItems = [
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
+  const router = useRouter();
+
+  const June = useJune();
+
+  useEffect(() => {
+    const handleRouteChange = (url, { shallow }) => {
+      if (June) June.page(url);
+    };
+
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [June]);
 
   const { pathname } = useRouter();
 
@@ -443,11 +461,13 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             <LoopIcon />
             <Text
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
               Status
             </Text>

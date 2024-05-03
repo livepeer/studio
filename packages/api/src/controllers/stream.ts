@@ -1,14 +1,12 @@
-import { Router, Request } from "express";
+import { Request, Router } from "express";
+import _ from "lodash";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
-import _ from "lodash";
 
 import logger from "../logger";
-import { authorizer } from "../middleware";
-import { validatePost } from "../middleware";
-import { geolocateMiddleware } from "../middleware";
+import { authorizer, geolocateMiddleware, validatePost } from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -19,7 +17,6 @@ import {
   User,
 } from "../schema/types";
 import { db } from "../store";
-import { DBSession } from "../store/session-table";
 import {
   BadRequestError,
   InternalServerError,
@@ -27,34 +24,35 @@ import {
   TooManyRequestsError,
   UnprocessableEntityError,
 } from "../store/errors";
+import { ensureExperimentSubject } from "../store/experiment-table";
+import messages from "../store/messages";
+import Queue from "../store/queue";
+import { DBSession } from "../store/session-table";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
-import messages from "../store/messages";
+import { fetchWithTimeoutAndRedirects, sleep } from "../util";
+import { withPlaybackUrls } from "./asset";
 import { getBroadcasterHandler } from "./broadcaster";
+import { getClips } from "./clip";
+import { experimentSubjectsOnly } from "./experiment";
 import {
   generateUniquePlaybackId,
   generateUniqueStreamKey,
 } from "./generate-keys";
 import {
+  FieldsMap,
   makeNextHREF,
+  mapInputCreatorId,
   parseFilters,
   parseOrder,
   pathJoin,
-  FieldsMap,
   toStringValues,
-  mapInputCreatorId,
-  triggerCatalystStreamUpdated,
   triggerCatalystPullStart,
   triggerCatalystStreamStopSessions,
+  triggerCatalystStreamUpdated,
 } from "./helpers";
-import wowzaHydrate from "./wowza-hydrate";
-import Queue from "../store/queue";
 import { toExternalSession } from "./session";
-import { withPlaybackUrls } from "./asset";
-import { getClips } from "./clip";
-import { ensureExperimentSubject } from "../store/experiment-table";
-import { experimentSubjectsOnly } from "./experiment";
-import { sleep } from "../util";
+import wowzaHydrate from "./wowza-hydrate";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -235,6 +233,50 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+async function resolvePullUrlAndRegion(
+  stream: NewStreamPayload,
+  ingest: string
+): Promise<{ pullUrl: string; pullRegion: string }> {
+  if (process.env.NODE_ENV === "test") {
+    return { pullUrl: null, pullRegion: null };
+  }
+  const url = new URL(
+    pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
+  );
+  const { lat, lon } = stream.pull?.location ?? {};
+  if (lat && lon) {
+    url.searchParams.set("lat", lat.toString());
+    url.searchParams.set("lon", lon.toString());
+  }
+  const playbackUrl = url.toString();
+  // Send any playback request to catalyst-api, which effectively resolves the region using MistUtilLoad
+  const response = await fetchWithTimeoutAndRedirects(playbackUrl, {});
+  if (response.status !== 200) {
+    // not a correct status code, so we can't determine the region/host
+    return null;
+  }
+  return {
+    pullUrl: extractUrlFrom(response.url),
+    pullRegion: extractRegionFrom(response.url),
+  };
+}
+
+// Extracts Mist URL from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
+export function extractUrlFrom(playbackUrl: string): string {
+  const hostRegex =
+    /(https?:\/\/.+-\w+-catalyst.+\/hls\/.+)not-used-playback\/index.m3u8/;
+  const matches = playbackUrl.match(hostRegex);
+  return matches ? matches[1] : null;
+}
+
+// Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
+export function extractRegionFrom(playbackUrl: string): string {
+  const regionRegex =
+    /https?:\/\/(.+)-\w+-catalyst.+not-used-playback\/index.m3u8/;
+  const matches = playbackUrl.match(regionRegex);
+  return matches ? matches[1] : null;
+}
+
 export function getHLSPlaybackUrl(ingest: string, stream: DBStream) {
   return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
 }
@@ -344,7 +386,8 @@ const fieldsMap: FieldsMap = {
     val: `stream.data->'transcodedSegmentsDuration'`,
     type: "real",
   },
-  isHealthy: { val: `stream.data->'isHealthy'`, type: "boolean" },
+  // isHealthy field is sometimes JSON-`null` so we query it as a string (->>)
+  isHealthy: { val: `stream.data->>'isHealthy'`, type: "boolean" },
 };
 
 app.get("/", authorizer({}), async (req, res) => {
@@ -992,6 +1035,22 @@ const pullStreamKeyAccessors: Record<string, string[]> = {
   "pull.source": ["pull", "source"],
 };
 
+const testCreatorIds: string[] = [
+  "73846_104901225_104901225",
+  "73846_116005487_116003843",
+  "73846_116003843_116003843",
+  "73846_115939837_115939837",
+];
+
+// TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API.
+function fixTrovoProfiles(profiles: Profile[], isMobile: boolean) {
+  return profiles?.map((p) => ({
+    ...p,
+    fps: isMobile && p.fps ? 0 : p.fps,
+    height: p.width === 480 && p.height === 853 ? 854 : p.height,
+  }));
+}
+
 app.put(
   "/pull",
   authorizer({}),
@@ -1000,7 +1059,6 @@ app.put(
   async (req, res) => {
     const { key = "pull.source", waitActive } = toStringValues(req.query);
     const rawPayload = req.body as NewStreamPayload;
-
     if (!rawPayload.pull) {
       return res.status(400).json({
         errors: [`stream pull configuration is required`],
@@ -1009,10 +1067,26 @@ app.put(
 
     // Make the payload compatible with the stream schema to simplify things
     const payload: Partial<DBStream> = {
-      profiles: req.config.defaultStreamProfiles,
       ...rawPayload,
+      profiles:
+        fixTrovoProfiles(rawPayload.profiles, rawPayload.pull.isMobile) ||
+        req.config.defaultStreamProfiles,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
+
+    const payloadLog = {
+      ...db.stream.cleanWriteOnlyResponse(payload as DBStream),
+      pull: {
+        ...payload.pull,
+        source: "REDACTED",
+        headers: "REDACTED",
+        headersList: Object.keys(payload.pull.headers || {}),
+      },
+    };
+    logger.info(
+      `pull request received userId=${req.user.id} ` +
+        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escape string for logfmt
+    );
 
     const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
     if (!keyValue) {
@@ -1046,11 +1120,25 @@ app.put(
     }
     const streamExisted = streams.length === 1;
 
+    const ingest = await getIngestBase(req);
+    const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
+      rawPayload,
+      ingest
+    );
+
     let stream: DBStream;
     if (!streamExisted) {
+      logger.info(
+        `pull request creating a new stream with name=${rawPayload.name}`
+      );
       stream = await handleCreateStream(req);
+      stream.pullRegion = pullRegion;
+      await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
+      logger.info(
+        `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
+      );
       const sleepFor = terminateDelay(oldStream);
       if (sleepFor > 0) {
         console.log(
@@ -1063,8 +1151,14 @@ app.put(
         ...oldStream,
         ...EMPTY_NEW_STREAM_PAYLOAD, // clear all fields that should be set from the payload
         suspended: false,
+        pullRegion,
         ...payload,
       };
+      if (testCreatorIds.includes(stream.creatorId?.value)) {
+        // Temporarily make this API non-idempotent for a couple creatorIds from Trovo, to facilitate testing profiles.
+        // TODO: Remove this once we define the right set of profiles for Trovo and they start sending them correctly.
+        stream.profiles = oldStream.profiles;
+      }
       await db.stream.replace(stream);
       // read from DB again to keep exactly what got saved
       stream = await db.stream.get(stream.id, { useReplica: false });
@@ -1072,9 +1166,12 @@ app.put(
       await triggerCatalystStreamUpdated(req, stream.playbackId);
     }
 
+    // If pullHost was resolved, then stick to that host for triggering Catalyst pull start
+    const playbackUrl = pullUrl
+      ? pathJoin(pullUrl + stream.playbackId, `index.m3u8`)
+      : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      const ingest = await getIngestBase(req);
-      await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
+      await triggerCatalystPullStart(stream, playbackUrl);
     }
 
     res.status(streamExisted ? 200 : 201);
@@ -1088,10 +1185,13 @@ app.put(
 
 app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
-  let { leaseTimeout } = req.body;
+  let { leaseTimeout, host } = req.body;
   if (!leaseTimeout) {
     // Sets the default lock lease to 60s
     leaseTimeout = 60 * 1000;
+  }
+  if (!host) {
+    host = "unknown";
   }
   logger.info(`got /lockPull for stream=${id}`);
 
@@ -1100,24 +1200,37 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  if (stream.isActive) {
-    return res.status(423).end();
-  }
 
+  // We have an issue that some of the streams/sessions are not marked as inactive when they should be.
+  // This is a workaround to clean up the stream in the background
+  const doingActiveCleanup = activeCleanupOne(
+    req.config,
+    stream,
+    req.queue,
+    await getIngestBase(req)
+  );
+
+  // the `isActive` field is only cleared later in background, so we ignore it
+  // in the query below in case we triggered an active cleanup logic above.
+  const leaseDeadline = Date.now() - leaseTimeout;
   const updateRes = await db.stream.update(
     [
       sql`id = ${stream.id}`,
-      sql`COALESCE((data->>'pullLockedAt')::bigint,0) < ${
-        Date.now() - leaseTimeout
-      }`,
+      doingActiveCleanup
+        ? sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${leaseDeadline}))`
+        : sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${leaseDeadline} AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
     ],
-    { pullLockedAt: Date.now() },
+    { pullLockedAt: Date.now(), pullLockedBy: host },
     { throwIfEmpty: false }
   );
 
   if (updateRes.rowCount > 0) {
     res.status(204).end();
+    return;
   }
+  logger.info(
+    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, lastSeen=${stream.lastSeen}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`
+  );
   res.status(423).end();
 });
 
@@ -1677,7 +1790,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess = stream?.userId === req.user.id || req.isUIAdmin;
+    const hasAccess = stream?.userId === req.user.id || req.user.admin;
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1979,7 +2092,11 @@ app.delete("/:id/terminate", authorizer({}), async (req, res) => {
     throw new TooManyRequestsError(`too many terminate requests`);
   }
 
-  await db.stream.update(stream.id, { lastTerminatedAt: Date.now() });
+  await db.stream.update(stream.id, {
+    lastTerminatedAt: Date.now(),
+    pullLockedAt: 0,
+    pullLockedBy: "",
+  });
   // we don't want to update the stream object on the `/terminate` API, so we
   // just throw a single stop call
   await triggerCatalystStreamStopSessions(req, stream.playbackId);

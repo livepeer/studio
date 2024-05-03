@@ -320,6 +320,7 @@ const SaveTargetDialog = ({
                   {profileOpts.map((p) => (
                     <Box key={p.name} css={{ display: "flex", mb: "$2" }}>
                       <Radio
+                        placeholder="Profile"
                         value={p.name}
                         id={`profile-${p.name}`}
                         checked={state.profile === p.name}
@@ -339,6 +340,7 @@ const SaveTargetDialog = ({
 
             <Box css={{ display: "flex" }}>
               <Checkbox
+                placeholder="videoOnly"
                 id="videoOnly"
                 checked={state.videoOnly}
                 onCheckedChange={(checked: boolean) =>

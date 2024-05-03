@@ -1,192 +1,119 @@
-import Layout from "layouts/main";
-import Prefooter from "components/Site/Prefooter";
-import HomeHero from "components/Site/HomeHero";
-import Why from "components/Site/Why";
-import OneAPI from "components/Site/OneAPI";
-import { Home as Content } from "content";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button, Box, Link as A } from "@livepeer/design-system";
-import { FiArrowUpRight } from "react-icons/fi";
-import Ripe, { categories, pages } from "lib/ripe";
+import Layout from "../layouts/dashboard";
+import { Box, Button, useSnackbar } from "@livepeer/design-system";
+import GettingStarted from "components/GettingStarted";
+import UsageSummary from "components/UsageSummary";
+import StreamsTable from "components/StreamsTable";
+import Spinner from "components/Spinner";
+import Banner from "components/Banner";
 
-const networkFeatures = [
-  {
-    icon: {
-      provider: "fi",
-      name: "FiSmile",
-    },
-    title: "Easy-to-use",
-    description:
-      "The Livepeer API untangles the intricate web of video infrastructure workflows, offering developers one unified and intuitive API that can fulfill all video application requirements.",
-  },
-  {
-    icon: {
-      provider: "fi",
-      name: "FiMove",
-    },
-    title: "Scalable",
-    description:
-      "Livepeer Studio harnesses the power the Livepeer Network, drawing a global network of providers to process and deliver video, enabling near-infinite scalability.",
-  },
-  {
-    icon: {
-      provider: "mdi",
-      name: "MdMoneyOff",
-    },
-    title: "Affordable",
-    description: (
-      <Box>
-        Save up to 90% on costs with{" "}
-        <Link href="/pricing" passHref legacyBehavior>
-          <A variant="primary">streamlined pricing</A>
-        </Link>{" "}
-        that takes advantage of the Livepeer Network's open marketplace of
-        infrastructure providers representing access to 70k+ GPUs.
-      </Box>
-    ),
-  },
-  {
-    icon: {
-      provider: "mdi",
-      name: "MdVerified",
-    },
-    title: "Reliable",
-    description:
-      "An always-on, incentivized network and intelligent distribution keeps your application’s video streams flowing 24/7.",
-  },
-  {
-    icon: {
-      provider: "mdi",
-      name: "MdBolt",
-    },
-    title: "Performant",
-    description:
-      "Deliver outstanding performance by leveraging the network's highly competitive infrastructure providers transmitting high-quality video at astonishing speeds.",
-  },
-  {
-    icon: {
-      provider: "fi",
-      name: "FiGlobe",
-    },
-    title: "Open",
-    description:
-      "The Livepeer Network runs on open source software. Tap into a worldwide network of Livepeer experts committed to driving value and solutions.",
-  },
-];
+import { useLoggedIn, useApi } from "hooks";
+import { Dashboard as Content } from "content";
 
-const benefits = [
-  {
-    icon: {
-      provider: "fi",
-      name: "FiMove",
-    },
-    title: "Scalable",
-    description:
-      "Livepeer Studio harnesses the power of the Livepeer Network, drawing a global network of providers to process and deliver video and enabling near-infinite scalability.",
-  },
-  {
-    icon: {
-      provider: "mdi",
-      name: "MdMoneyOff",
-    },
-    title: "Affordable",
-    description: (
-      <Box>
-        Save up to 90% on costs with{" "}
-        <Link href="/pricing" passHref legacyBehavior>
-          <A variant="primary">streamlined pricing</A>
-        </Link>{" "}
-        that takes advantage of the Livepeer Network's open marketplace of
-        infrastructure providers representing access to 70k+ GPUs.
-      </Box>
-    ),
-  },
-  {
-    icon: {
-      provider: "fi",
-      name: "FiSmile",
-    },
-    title: "Easy-to-use",
-    description:
-      "The Livepeer API untangles the intricate web of video infrastructure workflows, offering developers one unified and intuitive API that can fulfill all video application requirements.",
-  },
-  {
-    icon: {
-      provider: "mdi",
-      name: "MdVerified",
-    },
-    title: "Reliable",
-    description:
-      "An always-on, incentivized network and intelligent distribution keeps your application’s video streams flowing 24/7.",
-  },
-  {
-    icon: {
-      provider: "mdi",
-      name: "MdBolt",
-    },
-    title: "Performance",
-    description:
-      "Deliver high-quality video at astonishing speeds by leveraging the Livepeer Network's highly competitive infrastructure providers.",
-  },
-  {
-    icon: {
-      provider: "fi",
-      name: "FiGlobe",
-    },
-    title: "Open",
-    description:
-      "Livepeer Studio runs on open source software. Tap into a worldwide network of Livepeer experts committed to driving value and solutions.",
-  },
-];
+const Dashboard = () => {
+  const { user, verifyEmail, getUserProduct } = useApi();
+  const { emailValid } = user;
 
-Ripe.trackPage({
-  category: categories.HOME,
-  name: pages.LANDING,
-});
+  const [loading, setLoading] = useState(false);
+  const product = getUserProduct(user);
+  const showPromo = user.disabled;
+  const [openSnackbar] = useSnackbar();
 
-const HomePage = () => {
+  const resendVerificationEmail = async () => {
+    setLoading(true);
+    const res = await verifyEmail(user.email);
+    setLoading(false);
+
+    if (res.errors) {
+      openSnackbar(`Errors: ${res.errors.join(", ")}`);
+    } else {
+      openSnackbar(
+        `We've sent you a link to verify your email. Please check your inbox at ${user.email}`
+      );
+    }
+  };
+
   return (
-    <Layout {...Content.metaData}>
-      <HomeHero />
-      <Why
-        backgroundColor="$neutral2"
-        title="Why Livepeer Studio"
-        heading={<Box>A better way for developers to stream video</Box>}
-        reasons={benefits}
-      />
-      <OneAPI />
-      <Why
-        alignment="center"
-        backgroundColor="$neutral2"
-        heading="Powered by the Livepeer Network"
-        description={
-          <Box>
-            Livepeer Studio doesn't use traditional cloud infrastructure, and it
-            doesn't own or operate any GPUs. Instead, it's built on the{" "}
-            <A href="https://livepeer.org" target="_blank">
-              Livepeer Network
-            </A>
-            , an open and distributed global network that enables superior cost,
-            performance, and reliability.
-          </Box>
-        }
-        ctas={[
-          {
-            title: "Learn more",
-            href: "https://livepeer.org/primer",
-            isExternal: true,
-          },
-        ]}
-      />
-      {/* 
-      <Investors backgroundColor="rgb(30 30 33)" />
-      <Testimonials /> */}
+    <Box css={{ p: "$6" }}>
+      {!emailValid && (
+        <Banner
+          title="Verify your email"
+          description="Verify your account with a link via email."
+          button={
+            <Button
+              variant="primary"
+              as="a"
+              size="2"
+              css={{ cursor: "default" }}
+              onClick={() => resendVerificationEmail()}>
+              {loading && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Resend the verification email
+            </Button>
+          }
+          css={{ mb: "$3" }}
+        />
+      )}
+      {showPromo && (
+        <Banner
+          title="Upgrade"
+          description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
+          button={
+            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+              <Button
+                variant="primary"
+                as="a"
+                size="2"
+                css={{ cursor: "default" }}>
+                Upgrade
+              </Button>
+            </Link>
+          }
+          css={{ mb: "$7" }}
+        />
+      )}
+      <Box css={{ mb: "$9" }}>
+        <GettingStarted firstName={user?.firstName} />
+      </Box>
+      <Box css={{ mb: "100px" }}>
+        <UsageSummary />
+      </Box>
+      <Box css={{ mb: "$8" }}>
+        <StreamsTable
+          title="Streams"
+          hideFilters={true}
+          userId={user.id}
+          pageSize={5}
+          tableId="dashboardStreamsTable"
+          viewAll="/dashboard/streams"
+        />
+      </Box>
+    </Box>
+  );
+};
 
-      {/* <Contact backgroundColor="$panel" /> */}
-      <Prefooter />
+const DashboardPage = () => {
+  useLoggedIn();
+  const { user } = useApi();
+
+  if (!user) {
+    return <Layout />;
+  }
+
+  return (
+    <Layout id="home" breadcrumbs={[{ title: "Home" }]} {...Content.metaData}>
+      <Dashboard />
     </Layout>
   );
 };
 
-HomePage.theme = "light-theme-green";
-export default HomePage;
+export default DashboardPage;

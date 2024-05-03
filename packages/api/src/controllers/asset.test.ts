@@ -85,9 +85,11 @@ describe("controllers/asset", () => {
   const createProject = async () => {
     let res = await client.post(`/project`);
     expect(res.status).toBe(201);
-    const project = await res.json();
-    expect(project).toBeDefined();
-    return project;
+    const projectObj = await res.json();
+    expect(projectObj).toMatchObject({
+      id: expect.any(String),
+    });
+    return projectObj.id;
   };
 
   const allowedOrigins = [
@@ -189,7 +191,7 @@ describe("controllers/asset", () => {
     });
   });
 
-  it.only("should import asset (using jwt) for existing project (created with jwt)", async () => {
+  it("should import asset (using jwt) for existing project (created with jwt)", async () => {
     const spec = {
       name: "test",
       url: "https://example.com/test.mp4",
@@ -217,12 +219,11 @@ describe("controllers/asset", () => {
     client.apiKey = adminApiKey;
 
     res = await client.get(`/project/${projectId}`);
-    const project = await res.json();
     expect(res.status).toBe(200);
-    expect(project).toBeDefined(); //api-key be retrieve if adminApiKey is used..
+    expect(await res.json()).toBeDefined(); //api-key be retrieve if adminApiKey is used..
   });
 
-  it.only("should import asset (using api-token) for existing project (created with jwt)", async () => {
+  it("should import asset (using api-token) for existing project (created with jwt)", async () => {
     const spec = {
       name: "test",
       url: "https://example.com/test.mp4",

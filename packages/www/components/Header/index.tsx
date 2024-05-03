@@ -18,8 +18,9 @@ import SupportIcon from "../../public/img/icons/support.svg";
 import DocumentationIcon from "../../public/img/icons/documentation.svg";
 import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../public/img/icons/checked.svg";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useApi, useHubspotForm } from "hooks";
+import { useJune, events } from "hooks/use-june";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -53,6 +54,7 @@ const Header = ({ breadcrumbs = [] }) => {
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
   });
+  const June = useJune();
 
   useEffect(() => {
     if (data) {
@@ -66,6 +68,14 @@ const Header = ({ breadcrumbs = [] }) => {
       setForm({ ...form, email: user.email });
     }
   }, [user]);
+
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.all.documentation);
+  }, [June]);
+
+  const trackFeedbackEvent = useCallback(() => {
+    if (June) June.track(events.all.feedback);
+  }, [June]);
 
   return (
     <Box
@@ -111,6 +121,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 as={A}
                 target="_blank"
                 size={2}
+                onClick={() => trackEvent()}
                 css={{
                   cursor: "default",
                   color: "$hiContrast",
@@ -131,6 +142,7 @@ const Header = ({ breadcrumbs = [] }) => {
             <Button
               ghost
               as={DropdownMenuTrigger}
+              onClick={() => trackFeedbackEvent()}
               size={2}
               css={{
                 mr: "$2",
@@ -147,6 +159,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Box>Feedback</Box>
             </Button>
             <DropdownMenuContent
+              placeholder="Feedback"
               css={{
                 padding: "18px 0 12px",
                 position: "relative",

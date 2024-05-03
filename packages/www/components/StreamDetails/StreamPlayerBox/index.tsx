@@ -11,11 +11,19 @@ import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "@livepeer.studio/api";
 import AssetSharePopup from "../../AssetDetails/AssetSharePopup";
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { FaKey, FaVideo } from "react-icons/fa";
 import { FiVideo } from "react-icons/fi";
 import StreamSetupBox from "../StreamSetupBox";
 import ActiveStream from "./ActiveStream";
+import { useJune, events } from "hooks/use-june";
 
 export type StreamPlayerBoxProps = {
   stream: Stream;
@@ -42,6 +50,7 @@ const StreamPlayerBox = ({
   const [activeTab, setSwitchTab] = useState<"Browser" | "Streaming Software">(
     "Browser"
   );
+  const June = useJune();
 
   const isStreamActiveFromExternal = useMemo(
     () => !isBroadcastLive && stream.isActive,
@@ -59,6 +68,14 @@ const StreamPlayerBox = ({
       setSwitchTab("Browser");
     }
   }, [isBroadcastLive]);
+
+  const trackEventEmbed = useCallback(() => {
+    if (June) June.track(events.stream.embed);
+  }, [June]);
+
+  const trackEventGoLive = useCallback(() => {
+    if (June) June.track(events.stream.goLive);
+  }, [June]);
 
   return (
     <Box
@@ -122,7 +139,10 @@ const StreamPlayerBox = ({
                 Share
               </Button>
             }
-            onEmbedVideoClick={onEmbedVideoClick}
+            onEmbedVideoClick={() => {
+              trackEventEmbed();
+              return onEmbedVideoClick();
+            }}
           />
           <Tooltip
             content={
@@ -136,7 +156,12 @@ const StreamPlayerBox = ({
                 flex: 2,
               }}
               disabled={isStreamActiveFromExternal}
-              onClick={() => setIsBroadcastLive((prev) => !prev)}>
+              onClick={() =>
+                setIsBroadcastLive((prev) => {
+                  prev && trackEventGoLive();
+                  return !prev;
+                })
+              }>
               <Box
                 as={FiVideo}
                 css={{

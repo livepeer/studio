@@ -608,7 +608,7 @@ const ID = () => {
                         detects livestreamer and viewer locations to provide the
                         optimal Livepeer Studio experience.
                         <Link
-                          href="/docs/guides/dashboard/ingest-playback-url-pair"
+                          href="/docs/guides/ingest-playback-url-pair"
                           passHref
                           legacyBehavior>
                           <A target="_blank">
@@ -733,7 +733,6 @@ const ID = () => {
                         <br /> Each recorded session will have a recording .m3u8
                         URL for playback and an MP4 download link.
                         <br />
-                        This feature is currently free.
                       </p>
                     </ReactTooltip>
                   </Box>

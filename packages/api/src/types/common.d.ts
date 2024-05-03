@@ -18,8 +18,10 @@ export interface OrchestratorNodeAddress extends NodeAddress {
 export interface Ingest {
   origin?: string;
   base?: string;
+  baseDirect?: string;
   ingest: string;
   playback: string;
+  playbackDirect?: string;
 }
 
 export interface Price {

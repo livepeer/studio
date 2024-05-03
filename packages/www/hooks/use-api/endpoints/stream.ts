@@ -48,8 +48,9 @@ export const getStreams = async (
     active?: boolean;
     count?: boolean;
   }
-): Promise<[Stream[], string, number]> => {
+): Promise<[Stream[], string, number, number, number, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
+
   const [res, streams] = await context.fetch(
     `/stream?${qs.stringify({
       userId,
@@ -63,12 +64,56 @@ export const getStreams = async (
       projectId,
     })}`
   );
+
+  const [allStreamRes] = await context.fetch(
+    `/stream?${qs.stringify({
+      userId,
+      filters,
+      active: undefined,
+      limit: opts?.limit,
+      count: true,
+      streamsonly: 1,
+    })}`
+  );
+  const [activeStreamRes] = await context.fetch(
+    `/stream?${qs.stringify({
+      userId,
+      filters,
+      active: true,
+      limit: opts?.limit,
+      count: true,
+      streamsonly: 1,
+    })}`
+  );
+
+  const [unHealtyStreamRes] = await context.fetch(
+    `/stream?${qs.stringify({
+      userId,
+      filters,
+      active: true,
+      isHealthy: false,
+      limit: opts?.limit,
+      count: true,
+      streamsonly: 1,
+    })}`
+  );
+
   if (res.status !== 200) {
     throw new Error(streams);
   }
   const nextCursor = getCursor(res.headers.get("link"));
   const count = res.headers.get("X-Total-Count");
-  return [streams, nextCursor, count];
+  const allStreamCount = allStreamRes.headers.get("X-Total-Count");
+  const activeStreamCount = activeStreamRes.headers.get("X-Total-Count");
+  const unHealtyStreamCount = unHealtyStreamRes.headers.get("X-Total-Count");
+  return [
+    streams,
+    nextCursor,
+    count,
+    allStreamCount,
+    activeStreamCount,
+    unHealtyStreamCount,
+  ];
 };
 
 export const getAdminStreams = async ({

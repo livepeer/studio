@@ -116,15 +116,40 @@ async function fireGateWebhook(
     );
   }
   if ("pull" in content && content.pull) {
-    console.log(
-      `access-control: gate: webhook=${
-        webhook.id
-      } statusCode=${statusCode} respSpanId=${resp?.headers.get(
-        "X-Tlive-Spanid"
-      )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
-        process.hrtime(startTime)[1] / 1e6
-      }ms`
-    );
+    try {
+      let referer: string, origin: string;
+      if (payload?.webhookPayload?.headers) {
+        referer = payload?.webhookPayload?.headers["Referer"];
+        origin = payload?.webhookPayload?.headers["Origin"];
+      }
+      let playURL = payload?.webhookPayload?.playURL;
+      let playDomain = payload?.webhookPayload?.playDomain;
+      console.log(
+        `access-control: gate: webhook=${
+          webhook.id
+        } statusCode=${statusCode} respSpanId=${resp?.headers.get(
+          "X-Tlive-Spanid"
+        )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
+          process.hrtime(startTime)[1] / 1e6
+        }ms accessKey=${payload.accessKey} playbackId=${
+          content.playbackId
+        } webhook=${
+          webhook.id
+        } referer=${referer} origin=${origin} playURL=${playURL} playDomain=${playDomain}`
+      );
+    } catch (e) {
+      console.log(
+        `access-control: gate: webhook=${
+          webhook.id
+        } statusCode=${statusCode} respSpanId=${resp?.headers.get(
+          "X-Tlive-Spanid"
+        )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
+          process.hrtime(startTime)[1] / 1e6
+        }ms accessKey=${payload.accessKey} playbackId=${
+          content.playbackId
+        } webhook=${webhook.id}`
+      );
+    }
   } else {
     console.log(
       `access-control: gate: webhook=${

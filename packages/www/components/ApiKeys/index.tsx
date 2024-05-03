@@ -16,6 +16,7 @@ import {
 } from "./helpers";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import { useJune, events } from "hooks/use-june";
 
 const ApiKeysTable = ({
   title = "API Keys",
@@ -32,11 +33,16 @@ const ApiKeysTable = ({
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const columns = useMemo(makeColumns, []);
+  const June = useJune();
 
   const fetcher: Fetcher<ApiKeysTableData> = useCallback(
     async () => rowsPageFromState(userId, getApiTokens),
     [userId]
   );
+
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.developer.apiKeyCreate);
+  }, [June]);
 
   return (
     <>
@@ -50,10 +56,10 @@ const ApiKeysTable = ({
         initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
-        createAction={makeCreateAction(
-          "Create API Key",
-          createDialogState.onOn
-        )}
+        createAction={makeCreateAction("Create API Key", () => {
+          trackEvent();
+          return createDialogState.onOn();
+        })}
       />
 
       <TableStateDeleteDialog

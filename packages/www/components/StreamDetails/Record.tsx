@@ -7,13 +7,21 @@ import {
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "../../hooks";
 import ErrorDialog from "../ErrorDialog";
+import { useJune, events } from "hooks/use-june";
+import { useCallback } from "react";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
   const { patchStream } = useApi();
   const [openSnackbar] = useSnackbar();
   const errorRecordDialogState = useToggleState();
+  const June = useJune();
+
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.stream.recordingToggle);
+  }, [June]);
 
   const onCheckedChange = async () => {
+    trackEvent();
     if (stream.isActive) {
       errorRecordDialogState.onOn();
     } else if (!stream.record) {
@@ -31,6 +39,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
     <Box>
       {isSwitch ? (
         <Switch
+          placeholder="Record mode"
           checked={!!stream.record}
           name="record-mode"
           value={`${!!stream.record}`}

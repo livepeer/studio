@@ -13,18 +13,25 @@ import {
 import Link from "next/link";
 import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
 import useProject from "hooks/use-project";
+import { getBrandName } from "lib/utils";
 
 const GettingStarted = ({ firstName = "" }) => {
   const { appendProjectId } = useProject();
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
-        Welcome to Livepeer Studio{firstName && `, ${firstName}`}
+        Welcome to {getBrandName()}
+        {firstName && `, ${firstName}`}
       </Heading>
       <Box css={{ bc: "$panel" }}>
-        <Accordion type="single" defaultValue="accordion-one">
+        <Accordion
+          placeholder="Getting Started"
+          type="single"
+          defaultValue="accordion-one">
           <AccordionItem value="accordion-one">
-            <AccordionTrigger css={{ color: "$primary12" }}>
+            <AccordionTrigger
+              placeholder="upload video accordion"
+              css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
                 Upload your first video
               </Text>
@@ -73,7 +80,9 @@ const GettingStarted = ({ firstName = "" }) => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="accordion-two">
-            <AccordionTrigger css={{ color: "$primary12" }}>
+            <AccordionTrigger
+              placeholder="Create your first livestream"
+              css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
                 Create your first livestream
               </Text>
@@ -126,7 +135,9 @@ const GettingStarted = ({ firstName = "" }) => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="accordion-three">
-            <AccordionTrigger css={{ color: "$primary12" }}>
+            <AccordionTrigger
+              placeholder="Integrate with your app"
+              css={{ color: "$primary12" }}>
               <Text size="4" css={{ color: "inherit" }}>
                 Integrate with your app
               </Text>

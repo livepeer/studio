@@ -38,7 +38,10 @@ const AssetSharePopup = ({
     <Popover>
       <PopoverTrigger asChild>{triggerNode}</PopoverTrigger>
 
-      <PopoverContent hideArrow={false} css={{ padding: "$2" }}>
+      <PopoverContent
+        placeholder="Share"
+        hideArrow={false}
+        css={{ padding: "$2" }}>
         <Flex
           css={{
             gap: "$1",

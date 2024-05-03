@@ -30,6 +30,7 @@ const SuspendUserModal = ({ user, isOpen, onClose, onSuspend }: Props) => {
 
       <Box sx={{ display: "flex", mt: 2, mb: 2 }}>
         <Checkbox
+          placeholder="isCopyrightInfringiment"
           id="isCopyrightInfringiment"
           checked={isCopyrightInfringiment}
           style={{ color: "black" }}

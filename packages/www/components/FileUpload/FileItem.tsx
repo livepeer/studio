@@ -22,7 +22,11 @@ const FileItem = ({ fileUpload }: { fileUpload: FileUpload }) => {
       {"100% uploaded"}
     </Text>
   ) : (
-    <ProgressBar variant="gray" value={(progress ?? 0) * 100} />
+    <ProgressBar
+      placeholder="Progress bar"
+      variant="gray"
+      value={(progress ?? 0) * 100}
+    />
   );
 
   const accessoryChildren = completed ? (

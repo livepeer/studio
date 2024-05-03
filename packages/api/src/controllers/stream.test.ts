@@ -23,6 +23,7 @@ import {
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
+import { extractUrlFrom, extractRegionFrom } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -549,11 +550,31 @@ describe("controllers/stream", () => {
         const stream = await res.json();
 
         // Mark stream as active
-        await db.stream.update(stream.id, { isActive: true });
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now(),
+        });
 
         // Requesting pull lock should fail, because the stream is active (so it should be replicated instead of being pulled)
         const reslockPull = await client.post(`/stream/${stream.id}/lockPull`);
         expect(reslockPull.status).toBe(423);
+      });
+
+      it("should still lock pull for an active stream that got lost", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Mark stream as active
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now() - 24 * 60 * 60 * 1000,
+        });
+
+        // Requesting pull lock should work, because the stream is not actually active (outdated lastSeen)
+        const reslockPull = await client.post(`/stream/${stream.id}/lockPull`);
+        expect(reslockPull.status).toBe(204);
       });
 
       it("should not lock pull for already locked pull", async () => {
@@ -565,7 +586,11 @@ describe("controllers/stream", () => {
         // Request pull lock by many processes at the same time, only one should acquire a lock
         const promises = [];
         for (let i = 0; i < 10; i++) {
-          promises.push(client.post(`/stream/${stream.id}/lockPull`));
+          promises.push(
+            client.post(`/stream/${stream.id}/lockPull`, {
+              host: `host-${i}`,
+            })
+          );
         }
         const resPulls = await Promise.all(promises);
         expect(resPulls.filter((r) => r.status === 204).length).toBe(1);
@@ -591,6 +616,51 @@ describe("controllers/stream", () => {
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
           { leaseTimeout: 1 }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
+      it("should lock pull for already locked pull if host is the same", async () => {
+        const host = "some-host";
+
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          host,
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { host }
+        );
+        expect(resLockPull2.status).toBe(204);
+      });
+
+      it("should release lock when stream is terminated", async () => {
+        // Create stream pull
+        const res = await client.put("/stream/pull", postMockPullStream);
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        // Request pull lock
+        const resLockPull = await client.post(`/stream/${stream.id}/lockPull`, {
+          host: "host-1",
+        });
+        expect(resLockPull.status).toBe(204);
+
+        // Terminate stream
+        await client.delete(`/stream/${stream.id}/terminate`);
+
+        // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
+        const resLockPull2 = await client.post(
+          `/stream/${stream.id}/lockPull`,
+          { host: "host-2" }
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -662,6 +732,54 @@ describe("controllers/stream", () => {
 
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
+      });
+      it("should extract host from redirected playback url", async () => {
+        expect(
+          extractUrlFrom(
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+");
+        expect(
+          extractUrlFrom(
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe(
+          "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+"
+        );
+        expect(
+          extractUrlFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe(
+          "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+"
+        );
+        expect(
+          extractUrlFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+          )
+        ).toBe(null);
+      });
+      it("should extract region from redirected playback url", async () => {
+        expect(
+          extractRegionFrom(
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("sto");
+        expect(
+          extractRegionFrom(
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("mos2");
+        expect(
+          extractRegionFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+          )
+        ).toBe("fra-staging");
+        expect(
+          extractRegionFrom(
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+          )
+        ).toBe(null);
       });
     });
 

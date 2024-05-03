@@ -99,13 +99,24 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           )}
 
           <Button
-            variant="primary"
+            variant="transparentWhite"
             size={4}
             css={{
+              bc: "#F8F8F8",
+              color: "black",
+              borderRadius: 10,
+              fontWeight: 600,
               width: "100%",
+              fontSize: 14,
+              textDecoration: "none",
+              textTransform: "uppercase",
               mt: "$3",
-              px: "$3",
-              fontSize: "$3",
+              "&:hover": {
+                bc: "rgba(255, 255, 255, .8)",
+                transition: ".2s",
+                color: "black",
+                textDecoration: "none",
+              },
             }}>
             {loading ? "Loading..." : buttonText}
           </Button>
