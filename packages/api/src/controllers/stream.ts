@@ -2141,7 +2141,6 @@ app.post(
     const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
     let [streams] = await jobsDb.stream.find(
       [
-        sql`data->>'parentId' IS NULL`,
         sql`data->>'isActive' = 'true'`,
         sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
       ],
@@ -2151,9 +2150,16 @@ app.post(
     );
 
     const ingest = await getIngestBase(req);
+    const parentStreamsIds = new Set(
+      streams.filter((s) => !s.parentId).map((s) => s.id)
+    );
 
     const cleanedUp: DBStream[] = [];
     for (const stream of streams) {
+      if (parentStreamsIds.has(stream.parentId)) {
+        // the parent stream cleanup already cleans all children, so skip this
+        continue;
+      }
       const cleaned = triggerCleanUpIsActiveJob(
         req.config,
         stream,

@@ -2,28 +2,28 @@ import { json as bodyParserJson } from "body-parser";
 import { v4 as uuid } from "uuid";
 
 import {
-  ObjectStore,
   MultistreamTarget,
+  ObjectStore,
   Stream,
-  StreamPatchPayload,
-  User,
-  StreamSetActivePayload,
   StreamHealthPayload,
+  StreamPatchPayload,
+  StreamSetActivePayload,
+  User,
 } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import {
+  AuxTestServer,
   TestClient,
   clearDatabase,
-  startAuxTestServer,
   setupUsers,
-  AuxTestServer,
+  startAuxTestServer,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
-import { extractUrlFrom, extractRegionFrom, ACTIVE_TIMEOUT } from "./stream";
+import { ACTIVE_TIMEOUT, extractRegionFrom, extractUrlFrom } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -1747,6 +1747,68 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const { cleanedUp } = await res.json();
       expect(cleanedUp).toHaveLength(2);
+    });
+
+    it("should clean lost sessions whose parents are not active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      stream = await db.stream.get(stream.id);
+      expect(stream.isActive).toBe(false);
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(child.id);
+    });
+
+    it("cleans only the parent if both parent and child are lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
     });
   });
 
