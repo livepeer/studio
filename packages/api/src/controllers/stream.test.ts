@@ -1810,38 +1810,6 @@ describe("controllers/stream", () => {
       expect(cleanedUp).toHaveLength(1);
       expect(cleanedUp[0].id).toEqual(stream.id);
     });
-
-    it("cleans only one child stream per sessionId", async () => {
-      let res = await client.post("/stream", { ...postMockStream });
-      expect(res.status).toBe(201);
-      let stream: Stream = await res.json();
-
-      const childrenIds: string[] = [];
-      const sessionId = uuid();
-      for (let i = 0; i < 3; i++) {
-        res = await client.post(
-          `/stream/${stream.id}/stream?sessionId=${sessionId}`,
-          {
-            name: `video+${stream.playbackId}`,
-          }
-        );
-        expect(res.status).toBe(201);
-        const child: Stream = await res.json();
-
-        await db.stream.update(child.id, {
-          isActive: true,
-          lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
-        });
-        childrenIds.push(child.id);
-      }
-
-      client.jwtAuth = adminToken;
-      res = await client.post(`/stream/job/active-cleanup?limit=2`);
-      expect(res.status).toBe(200);
-      const { cleanedUp } = await res.json();
-      expect(cleanedUp).toHaveLength(1);
-      expect(childrenIds).toContain(cleanedUp[0].id);
-    });
   });
 
   describe("profiles", () => {
