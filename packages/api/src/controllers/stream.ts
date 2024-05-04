@@ -331,10 +331,10 @@ function triggerCleanUpIsActiveJob(
   streams: DBStream[],
   queue: Queue,
   ingest: string
-) {
+): [DBStream[], Promise<void>] {
   streams = streams.filter(shouldCleanUpIsActive);
   if (!streams.length) {
-    return [];
+    return [streams, Promise.resolve()];
   }
 
   const parentStreams = streams.filter((s) => !s.parentId);
@@ -342,26 +342,31 @@ function triggerCleanUpIsActiveJob(
   const childStreams = streams
     .filter((s) => s.parentId)
     .filter((s) => !parentStreams.some((p) => p.id === s.parentId));
+  streams = [...parentStreams, ...childStreams];
 
-  setImmediate(async () => {
-    for (const stream of parentStreams) {
-      try {
-        await setStreamActiveWithHooks(
-          jobsDb,
-          config,
-          stream,
-          { isActive: false },
-          queue,
-          ingest,
-          true
-        );
-      } catch (err) {
-        logger.error(
-          `Error sending /setactive hooks for streamId=${stream.id} err=`,
-          err
-        );
-      }
+  const jobPromise = Promise.resolve().then(async () => {
+    try {
+      await Promise.all(
+        parentStreams.map((s) =>
+          setStreamActiveWithHooks(
+            jobsDb,
+            config,
+            s,
+            { isActive: false },
+            queue,
+            ingest,
+            true
+          )
+        )
+      );
+    } catch (err) {
+      const ids = parentStreams.map((s) => s.id);
+      logger.error(
+        `Error sending /setactive hooks for streamIds=${ids} err=`,
+        err
+      );
     }
+
     try {
       await triggerSessionRecordingHooks(
         jobsDb,
@@ -379,7 +384,8 @@ function triggerCleanUpIsActiveJob(
       );
     }
   });
-  return [...parentStreams, ...childStreams];
+
+  return [streams, jobPromise];
 }
 
 async function getIngestBase(req: Request) {
@@ -1225,7 +1231,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
 
   // We have an issue that some of the streams/sessions are not marked as inactive when they should be.
   // This is a workaround to clean up the stream in the background
-  const cleanedUpStreams = triggerCleanUpIsActiveJob(
+  const [cleanedUpStreams] = triggerCleanUpIsActiveJob(
     req.config,
     [stream],
     req.queue,
@@ -2176,12 +2182,13 @@ app.post(
     );
 
     const ingest = await getIngestBase(req);
-    const cleanedUp = triggerCleanUpIsActiveJob(
+    const [cleanedUp, jobPromise] = triggerCleanUpIsActiveJob(
       req.config,
       streams,
       req.queue,
       ingest
     );
+    await jobPromise;
 
     res.status(200);
     res.json({ cleanedUp });
