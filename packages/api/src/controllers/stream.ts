@@ -1556,10 +1556,12 @@ async function triggerSessionRecordingHooks(
   ingest: string,
   isCleanup?: boolean
 ) {
-  const { id, parentId } = stream;
-  const childStreams = parentId
-    ? [stream]
-    : await db.stream.getActiveSessions(id);
+  const { id, parentId, sessionId } = stream;
+  const childStreams = !parentId
+    ? await db.stream.getActiveSessions(id) // parent stream, get all active sessions
+    : sessionId
+    ? await db.stream.find({ sessionId }).then((r) => r[0]) // child stream, get all siblings from same session
+    : [stream]; // legacy stream without sessionId
 
   const streamsBySessionId = _(childStreams)
     .groupBy("sessionId")
