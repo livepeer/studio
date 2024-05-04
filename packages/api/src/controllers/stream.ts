@@ -328,43 +328,58 @@ function withFixedIsActiveMany(streams: DBStream[], filter = false) {
 
 function triggerCleanUpIsActiveJob(
   config: CliArgs,
-  stream: DBStream,
+  streams: DBStream[],
   queue: Queue,
   ingest: string
 ) {
-  if (!shouldCleanUpIsActive(stream)) {
-    return false;
+  streams = streams.filter(shouldCleanUpIsActive);
+  if (!streams.length) {
+    return [];
   }
 
+  const parentStreams = streams.filter((s) => !s.parentId);
+  // skip children whose parents are being cleaned. setStreamActiveWithHooks already cleans all children
+  const childStreams = streams
+    .filter((s) => s.parentId)
+    .filter((s) => !parentStreams.some((p) => p.id === s.parentId));
+
   setImmediate(async () => {
-    try {
-      if (stream.parentId) {
-        // this is a session so trigger the recording.waiting logic to clean-up the isActive field
-        await triggerSessionRecordingHooks(
-          jobsDb,
-          config,
-          stream,
-          queue,
-          ingest,
-          true
-        );
-      } else {
-        const patch = { isActive: false };
+    for (const stream of parentStreams) {
+      try {
         await setStreamActiveWithHooks(
           jobsDb,
           config,
           stream,
-          patch,
+          { isActive: false },
           queue,
           ingest,
           true
         );
+      } catch (err) {
+        logger.error(
+          `Error sending /setactive hooks for streamId=${stream.id} err=`,
+          err
+        );
       }
+    }
+    try {
+      await triggerSessionRecordingHooks(
+        jobsDb,
+        config,
+        childStreams,
+        queue,
+        ingest,
+        true
+      );
     } catch (err) {
-      logger.error("Error sending /setactive hooks err=", err);
+      const ids = childStreams.map((s) => s.id);
+      logger.error(
+        `Error sending recording.waiting hooks for streamIds=${ids} err=`,
+        err
+      );
     }
   });
-  return true;
+  return [...parentStreams, ...childStreams];
 }
 
 async function getIngestBase(req: Request) {
@@ -1210,12 +1225,13 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
 
   // We have an issue that some of the streams/sessions are not marked as inactive when they should be.
   // This is a workaround to clean up the stream in the background
-  const doingActiveCleanup = triggerCleanUpIsActiveJob(
+  const cleanedUpStreams = triggerCleanUpIsActiveJob(
     req.config,
-    stream,
+    [stream],
     req.queue,
     await getIngestBase(req)
   );
+  const doingActiveCleanup = cleanedUpStreams.length > 0;
 
   // the `isActive` field is only cleared later in background, so we ignore it
   // in the query below in case we triggered an active cleanup logic above.
@@ -1528,10 +1544,11 @@ async function setStreamActiveWithHooks(
   }
 
   // opportunistically trigger recording.waiting logic for this stream's sessions
+  const childStreams = await db.stream.getActiveSessions(stream.id);
   triggerSessionRecordingHooks(
     db,
     config,
-    stream,
+    childStreams,
     queue,
     ingest,
     isCleanup
@@ -1551,18 +1568,11 @@ async function setStreamActiveWithHooks(
 async function triggerSessionRecordingHooks(
   db: DB,
   config: CliArgs,
-  stream: DBStream,
+  childStreams: DBStream[],
   queue: Queue,
   ingest: string,
   isCleanup?: boolean
 ) {
-  const { id, parentId, sessionId } = stream;
-  const childStreams = !parentId
-    ? await db.stream.getActiveSessions(id) // parent stream, get all active sessions
-    : sessionId
-    ? await db.stream.find({ sessionId }).then((r) => r[0]) // child stream, get all siblings from same session
-    : [stream]; // legacy stream without sessionId
-
   const streamsBySessionId = _(childStreams)
     .groupBy("sessionId")
     .toPairs()
@@ -2160,26 +2170,12 @@ app.post(
     );
 
     const ingest = await getIngestBase(req);
-    const parentStreamsIds = new Set(
-      streams.filter((s) => !s.parentId).map((s) => s.id)
+    const cleanedUp = triggerCleanUpIsActiveJob(
+      req.config,
+      streams,
+      req.queue,
+      ingest
     );
-    streams = _(streams)
-      .filter((s) => !parentStreamsIds.has(s.parentId)) // the parent stream cleanup already cleans all children, so skip them
-      .uniqBy((s) => s.sessionId ?? s.id) // recordings are handled by session, so dedup by sessionId if available
-      .value();
-
-    const cleanedUp: DBStream[] = [];
-    for (const stream of streams) {
-      const cleaned = triggerCleanUpIsActiveJob(
-        req.config,
-        stream,
-        req.queue,
-        ingest
-      );
-      if (cleaned) {
-        cleanedUp.push(stream);
-      }
-    }
 
     res.status(200);
     res.json({ cleanedUp });
