@@ -1042,7 +1042,7 @@ const testCreatorIds: string[] = [
   "73846_115939837_115939837",
 ];
 
-// TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API.
+// TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API. Maybe never :(
 function fixTrovoProfiles(profiles: Profile[], isMobile: boolean) {
   return profiles?.map((p) => ({
     ...p,
@@ -1066,7 +1066,7 @@ app.put(
     }
 
     // Make the payload compatible with the stream schema to simplify things
-    const payload: Partial<DBStream> = {
+    const payload: Partial<DBStream> & NewStreamPayload = {
       ...rawPayload,
       profiles:
         fixTrovoProfiles(rawPayload.profiles, rawPayload.pull.isMobile) ||
@@ -1131,7 +1131,7 @@ app.put(
       logger.info(
         `pull request creating a new stream with name=${rawPayload.name}`
       );
-      stream = await handleCreateStream(req);
+      stream = await handleCreateStream(req, payload);
       stream.pullRegion = pullRegion;
       await db.stream.replace(stream);
     } else {
@@ -1295,7 +1295,7 @@ app.post(
       }
     }
 
-    const stream = await handleCreateStream(req);
+    const stream = await handleCreateStream(req, req.body);
 
     if (autoStartPull === "true") {
       const ingest = await getIngestBase(req);
@@ -1311,9 +1311,7 @@ app.post(
   }
 );
 
-async function handleCreateStream(req: Request) {
-  const payload = req.body as NewStreamPayload;
-
+async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   const id = uuid();
   const createdAt = Date.now();
   // TODO: Don't create a streamKey if there's a pull source (here and on www)
