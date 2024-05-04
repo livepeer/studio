@@ -1573,11 +1573,17 @@ async function triggerSessionRecordingHooks(
   ingest: string,
   isCleanup?: boolean
 ) {
-  const streamsBySessionId = _(childStreams)
-    .groupBy("sessionId")
-    .toPairs()
-    .value();
-  for (const [sessionId, streamsFromSession] of streamsBySessionId) {
+  const streamsBySessionId: Record<string, DBStream[]> = {};
+  for (const stream of childStreams) {
+    const { sessionId } = stream;
+    if (!streamsBySessionId[sessionId]) {
+      streamsBySessionId[sessionId] = [];
+    }
+    streamsBySessionId[sessionId].push(stream);
+  }
+
+  for (const sessionId in streamsBySessionId) {
+    const streamsFromSession = streamsBySessionId[sessionId];
     if (!sessionId) {
       // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
       await clearIsActiveMany(db, streamsFromSession);
