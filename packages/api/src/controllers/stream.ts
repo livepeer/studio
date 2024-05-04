@@ -1581,14 +1581,14 @@ async function triggerSessionRecordingHooks(
 ) {
   const streamsBySessionId: Record<string, DBStream[]> = {};
   for (const stream of childStreams) {
-    const { sessionId } = stream;
+    const sessionId = stream.sessionId ?? "";
     if (!streamsBySessionId[sessionId]) {
       streamsBySessionId[sessionId] = [];
     }
     streamsBySessionId[sessionId].push(stream);
   }
 
-  for (const sessionId in streamsBySessionId) {
+  for (const sessionId of Object.keys(streamsBySessionId)) {
     const streamsFromSession = streamsBySessionId[sessionId];
     if (!sessionId) {
       // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
