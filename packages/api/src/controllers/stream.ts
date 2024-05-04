@@ -1550,20 +1550,21 @@ async function setStreamActiveWithHooks(
   }
 
   // opportunistically trigger recording.waiting logic for this stream's sessions
-  const childStreams = await db.stream.getActiveSessions(stream.id);
-  triggerSessionRecordingHooks(
-    db,
-    config,
-    childStreams,
-    queue,
-    ingest,
-    isCleanup
-  ).catch((err) => {
-    logger.error(
-      `Error triggering session recording hooks stream_id=${stream.id} err=`,
-      err
-    );
-  });
+  db.stream.getActiveSessions(stream.id).then((childStreams) =>
+    triggerSessionRecordingHooks(
+      db,
+      config,
+      childStreams,
+      queue,
+      ingest,
+      isCleanup
+    ).catch((err) => {
+      logger.error(
+        `Error triggering session recording hooks stream_id=${stream.id} err=`,
+        err
+      );
+    })
+  );
 }
 
 /**
@@ -1581,6 +1582,13 @@ async function triggerSessionRecordingHooks(
 ) {
   const streamsBySessionId: Record<string, DBStream[]> = {};
   for (const stream of childStreams) {
+    if (!stream.parentId) {
+      logger.error(
+        `triggerSessionRecordingHooks: ignoring parent streamId=${stream.id} stream=`,
+        stream
+      );
+      continue;
+    }
     const sessionId = stream.sessionId ?? "";
     if (!streamsBySessionId[sessionId]) {
       streamsBySessionId[sessionId] = [];
@@ -1588,53 +1596,58 @@ async function triggerSessionRecordingHooks(
     streamsBySessionId[sessionId].push(stream);
   }
 
-  for (const sessionId of Object.keys(streamsBySessionId)) {
-    const streamsFromSession = streamsBySessionId[sessionId];
-    if (!sessionId) {
-      // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
-      await clearIsActiveMany(db, streamsFromSession);
-      continue;
-    }
+  await Promise.all(
+    Object.keys(streamsBySessionId).map(async (sessionId) => {
+      const streamsFromSession = streamsBySessionId[sessionId];
+      try {
+        if (!sessionId) {
+          // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
+          await clearIsActiveMany(db, streamsFromSession);
+          return;
+        }
 
-    const asset = await db.asset.get(sessionId);
-    if (asset) {
-      // if we have an asset, then the recording has already been processed and we don't need to send a
-      // recording.waiting hook. also clear the isActive field from child streams.
-      await clearIsActiveMany(db, streamsFromSession);
-      continue;
-    }
+        const asset = await db.asset.get(sessionId);
+        if (asset) {
+          // if we have an asset, then the recording has already been processed and we don't need to send a
+          // recording.waiting hook. also clear the isActive field from child streams.
+          await clearIsActiveMany(db, streamsFromSession);
+          return;
+        }
 
-    const session = await db.session.get(sessionId);
-    if (isCleanup && !shouldCleanUpIsActive(session)) {
-      // Recheck conditions for the session object in case of a clean-up. In this case it should not, so ignore.
-      continue;
-    }
+        const session = await db.session.get(sessionId);
+        if (isCleanup && !shouldCleanUpIsActive(session)) {
+          // Recheck conditions for the session object in case of a clean-up. In this case it should not, so ignore.
+          return;
+        }
 
-    const isStale = isStreamStale(session);
-    if (!session.record || isStale) {
-      if (isStale) {
-        logger.info(
-          `Skipping recording for stale session ` +
-            `session_id=${session.id} last_seen=${session.lastSeen}`
+        const isStale = isStreamStale(session);
+        if (!session.record || isStale) {
+          if (isStale) {
+            logger.info(
+              `Skipping recording for stale session ` +
+                `session_id=${session.id} last_seen=${session.lastSeen}`
+            );
+          }
+          // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
+          await clearIsActiveMany(db, streamsFromSession);
+          return;
+        }
+
+        await publishDelayedRecordingWaitingHook(
+          config,
+          session,
+          queue,
+          ingest
+        );
+      } catch (err) {
+        const ids = streamsFromSession?.map((s) => s?.id);
+        logger.error(
+          `Error handling session recording hooks sessionId=${sessionId} childStreamsIds=${ids} err=`,
+          err
         );
       }
-      // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
-      await clearIsActiveMany(db, streamsFromSession);
-      continue;
-    }
-
-    await publishDelayedRecordingWaitingHook(
-      config,
-      session,
-      queue,
-      ingest
-    ).catch((err) => {
-      logger.error(
-        `Error sending recording.waiting hook for session_id=${session.id} err=`,
-        err
-      );
-    });
-  }
+    })
+  );
 }
 
 async function clearIsActiveMany(db: DB, streams: DBStream[]) {
