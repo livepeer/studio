@@ -7,6 +7,7 @@ on:
 jobs:
   cleanup:
     strategy:
+      fail-fast: false
       matrix:
         env:
           - name: "staging"
