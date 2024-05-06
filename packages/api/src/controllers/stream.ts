@@ -233,6 +233,28 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+export function resolvePullUrlFromExistingStreams(
+  existingStreams: DBStream[]
+): { pullUrl: string; pullRegion: string } {
+  if (existingStreams.length !== 1) {
+    return null;
+  }
+  const stream = existingStreams[0];
+  const lockLeaseTimeout = 60 * 1000; // 1 min
+  if (
+    stream.pullRegion &&
+    stream.pullLockedBy &&
+    stream.pullLockedAt &&
+    stream.pullLockedAt > Date.now() - lockLeaseTimeout
+  ) {
+    return {
+      pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
+      pullRegion: stream.pullRegion,
+    };
+  }
+  return null;
+}
+
 async function resolvePullUrlAndRegion(
   stream: NewStreamPayload,
   ingest: string
@@ -1121,10 +1143,9 @@ app.put(
     const streamExisted = streams.length === 1;
 
     const ingest = await getIngestBase(req);
-    const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
-      rawPayload,
-      ingest
-    );
+    const { pullUrl, pullRegion } =
+      resolvePullUrlFromExistingStreams(streams) ||
+      (await resolvePullUrlAndRegion(rawPayload, ingest));
 
     let stream: DBStream;
     if (!streamExisted) {

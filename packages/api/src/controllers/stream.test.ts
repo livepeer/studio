@@ -23,7 +23,11 @@ import {
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
-import { extractUrlFrom, extractRegionFrom } from "./stream";
+import {
+  resolvePullUrlFromExistingStreams,
+  extractUrlFrom,
+  extractRegionFrom,
+} from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -733,6 +737,73 @@ describe("controllers/stream", () => {
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
+
+      it("should resolve pull url and region from existing stream", async () => {
+        expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: 1714997385837,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
+      });
+
       it("should extract host from redirected playback url", async () => {
         expect(
           extractUrlFrom(
