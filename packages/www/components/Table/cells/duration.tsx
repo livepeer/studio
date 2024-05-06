@@ -1,9 +1,10 @@
+import { Session } from "@livepeer.studio/api";
 import { formatDuration, intervalToDuration } from "date-fns";
 import { CellComponentProps, TableData } from "../types";
 
 export type DurationCellProps = {
   sourceSegmentsDuration: number;
-  status?: string;
+  status?: Session["recordingStatus"];
 };
 
 const DurationCell = <D extends TableData>({
@@ -11,9 +12,14 @@ const DurationCell = <D extends TableData>({
 }: CellComponentProps<D, DurationCellProps>) => {
   if (cell.value.status === "waiting") {
     return "In progress";
+  } else if (cell.value.status === "failed") {
+    return "Failed";
   }
-  if (cell.value.sourceSegmentsDuration === 0) {
-    return "—";
+  if (
+    cell.value.sourceSegmentsDuration === 0 ||
+    cell.value.status !== "ready"
+  ) {
+    return "n/a";
   }
   try {
     const durationMins = Math.round(cell.value.sourceSegmentsDuration / 60);
