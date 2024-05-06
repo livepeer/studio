@@ -295,9 +295,7 @@ export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
  * updated in a long time and thus should be cleaned up.
  */
 function shouldCleanUpIsActive(stream: DBStream | DBSession) {
-  // sessions don't have `isActive` field so we just assume `true`
-  const isActive =
-    stream.kind === "stream" && "isActive" in stream ? stream.isActive : true;
+  const isActive = "isActive" in stream ? stream.isActive : true; // sessions don't have `isActive` field so we just assume `true`
   return (
     isActive &&
     !isNaN(stream.lastSeen) &&
