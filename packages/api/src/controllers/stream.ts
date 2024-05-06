@@ -1556,7 +1556,10 @@ async function triggerSessionRecordingProcessing(
         stream
       );
       continue;
+    } else if (isCleanup && !shouldCleanUpIsActive(stream)) {
+      continue;
     }
+
     const sessionId = stream.sessionId ?? "";
     if (!streamsBySessionId[sessionId]) {
       streamsBySessionId[sessionId] = [];
