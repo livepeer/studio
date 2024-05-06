@@ -342,7 +342,7 @@ function triggerCleanUpIsActiveJob(
     }
 
     try {
-      await triggerSessionRecordingHooks(
+      await triggerSessionRecordingProcessing(
         jobsDb,
         config,
         childStreams,
@@ -1471,7 +1471,7 @@ app.put(
  *
  * @param stream The stream to update which MUST be a parent stream (no
  * parentId). Child streams are processed through the delayed `recording.waiting`
- * events from {@link triggerSessionRecordingHooks}.
+ * events from {@link triggerSessionRecordingProcessing}.
  */
 async function setStreamActiveWithHooks(
   db: DB,
@@ -1515,22 +1515,24 @@ async function setStreamActiveWithHooks(
       });
   }
 
-  // opportunistically trigger recording.waiting logic for this stream's sessions
-  db.stream.getActiveSessions(stream.id).then((childStreams) =>
-    triggerSessionRecordingHooks(
-      db,
-      config,
-      childStreams,
-      queue,
-      ingest,
-      isCleanup
-    ).catch((err) => {
-      logger.error(
-        `Error triggering session recording hooks stream_id=${stream.id} err=`,
-        err
-      );
-    })
-  );
+  if (!patch.isActive) {
+    // opportunistically trigger recording.waiting logic for this stream's sessions
+    db.stream.getActiveSessions(stream.id).then((childStreams) =>
+      triggerSessionRecordingProcessing(
+        db,
+        config,
+        childStreams,
+        queue,
+        ingest,
+        isCleanup
+      ).catch((err) => {
+        logger.error(
+          `Error triggering session recording hooks stream_id=${stream.id} err=`,
+          err
+        );
+      })
+    );
+  }
 }
 
 /**
@@ -1538,7 +1540,7 @@ async function setStreamActiveWithHooks(
  * These recording.waiting events aren't sent directly to the user, but instead
  * the handler will check if the session is actually inactive to fire the hook.
  */
-async function triggerSessionRecordingHooks(
+async function triggerSessionRecordingProcessing(
   db: DB,
   config: CliArgs,
   childStreams: DBStream[],
