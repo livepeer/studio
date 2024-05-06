@@ -300,29 +300,6 @@ function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   return isActive && !isNaN(lastSeen) && Date.now() - lastSeen > ACTIVE_TIMEOUT;
 }
 
-/**
- * Creates an updated stream object with a fixed `isActive` field in case it is lost and needs clean up.
- */
-function withFixedIsActive(stream: DBStream) {
-  return !shouldCleanUpIsActive(stream)
-    ? stream
-    : {
-        ...stream,
-        isActive: false,
-      };
-}
-
-/**
- * Calls {@link withFixedIsActive} on multiple streams, optionally filtering to only the really active streams.
- */
-function withFixedIsActiveMany(streams: DBStream[], filter = false) {
-  streams = streams.map(withFixedIsActive);
-  if (filter) {
-    streams = streams.filter((s) => s.isActive);
-  }
-  return streams;
-}
-
 function triggerCleanUpIsActiveJob(
   config: CliArgs,
   streams: DBStream[],
@@ -502,14 +479,9 @@ app.get("/", authorizer({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
 
-  const filter = active && active !== "false";
-  output = withFixedIsActiveMany(
-    db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(output, req.user.admin)
-    ),
-    filter
+  output = db.stream.addDefaultFieldsMany(
+    db.stream.removePrivateFieldsMany(output, req.user.admin)
   );
-
   res.status(200).json(output);
 });
 
@@ -754,10 +726,8 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   res.json(
-    withFixedIsActiveMany(
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(streams, req.user.admin)
-      )
+    db.stream.addDefaultFieldsMany(
+      db.stream.removePrivateFieldsMany(streams, req.user.admin)
     )
   );
 });
@@ -774,7 +744,6 @@ app.get("/:id", authorizer({}), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  stream = withFixedIsActive(stream);
 
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
@@ -2028,7 +1997,6 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
       errors: ["not found"],
     });
   }
-  stream = withFixedIsActive(stream);
 
   if (!session) {
     // find last session
