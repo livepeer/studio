@@ -1,5 +1,5 @@
 import Router from "express/lib/router";
-import { db } from "../store";
+import { db, jobsDb } from "../store";
 import { authorizer, validatePost } from "../middleware";
 import { products } from "../config";
 import fetch from "node-fetch";
@@ -9,7 +9,6 @@ import { WithID } from "../store/types";
 import { User } from "../schema/types";
 import { Ingest } from "../types/common";
 import { reportUsage } from "./stripe";
-import sql from "sql-template-strings";
 import { Request } from "express";
 
 const app = Router();
@@ -343,7 +342,7 @@ app.post(
     // if time range isn't specified return all usage
     if (!fromTime) {
       let rows = (
-        await db.usage.find(
+        await jobsDb.usage.find(
           {},
           { limit: 1, order: "data->>'date' DESC", useReplica: true }
         )
@@ -360,18 +359,18 @@ app.post(
       toTime = +new Date();
     }
 
-    let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
+    let usageHistory = await jobsDb.stream.usageHistory(fromTime, toTime, {
       useReplica: true,
     });
 
     // store each day of usage
     for (const row of usageHistory) {
-      const dbRow = await req.store.get(`usage/${row.id}`);
+      const dbRow = await jobsDb.usage.get(row.id);
       // if row already exists in cache, update it, otherwise create it
       if (dbRow) {
-        await req.store.replace({ kind: "usage", ...row });
+        await jobsDb.usage.replace({ kind: "usage", ...row });
       } else {
-        await req.store.create({ kind: "usage", ...row });
+        await jobsDb.usage.create({ kind: "usage", ...row });
       }
     }
 

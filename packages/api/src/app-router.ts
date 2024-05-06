@@ -53,11 +53,13 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
   },
 };
 
-export default async function makeApp(params: CliArgs) {
+export default async function appRouter(params: CliArgs) {
   const {
     httpPrefix,
     postgresUrl,
     postgresReplicaUrl,
+    postgresConnPoolSize: pgPoolSize,
+    postgresJobsConnPoolSize: pgJobsPoolSize,
     defaultCacheTtl,
     frontendDomain,
     supportAddr,
@@ -95,11 +97,12 @@ export default async function makeApp(params: CliArgs) {
 
   // Storage init
   const bodyParser = require("body-parser");
-  const [db, store] = await makeStore({
-    postgresUrl,
-    postgresReplicaUrl,
-    appName: ownRegion ? `${ownRegion}-api` : "api",
-  });
+  const appName = ownRegion ? `${ownRegion}-api` : "api";
+  const pgBaseParams = { postgresUrl, postgresReplicaUrl, appName };
+  const [db, jobsDb, store] = await makeStore(
+    { ...pgBaseParams, poolMaxSize: pgPoolSize },
+    { ...pgBaseParams, poolMaxSize: pgJobsPoolSize, appName: `${appName}-jobs` }
+  );
   if (defaultCacheTtl > 0) {
     cache.init({ stdTTL: defaultCacheTtl });
   }
@@ -285,6 +288,7 @@ export default async function makeApp(params: CliArgs) {
     taskScheduler,
     store,
     db,
+    jobsDb,
     queue,
   };
 }

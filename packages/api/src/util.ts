@@ -41,7 +41,7 @@ export const semaphore = () => {
     release: () => {
       resolvePromise();
     },
-    wait: (timeoutMs) => {
+    wait: (timeoutMs: number) => {
       if (!timeoutMs) return promise;
       return Promise.race([promise, sleep(timeoutMs)]);
     },

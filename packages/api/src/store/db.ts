@@ -39,6 +39,7 @@ export interface PostgresParams {
   postgresUrl: string;
   postgresReplicaUrl?: string;
   appName?: string;
+  poolMaxSize?: number; // defaults to 10
 }
 
 type Table<T> = BaseTable<WithID<T>>;
@@ -83,6 +84,7 @@ export class DB {
     postgresUrl,
     postgresReplicaUrl,
     appName = "api",
+    poolMaxSize = 10,
   }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
@@ -98,6 +100,7 @@ export class DB {
       connectionTimeoutMillis: CONNECT_TIMEOUT,
       connectionString: postgresUrl,
       application_name: `${appName}-${hostname()}`,
+      max: poolMaxSize,
     });
 
     if (postgresReplicaUrl) {
@@ -106,6 +109,7 @@ export class DB {
         connectionTimeoutMillis: CONNECT_TIMEOUT,
         connectionString: postgresReplicaUrl,
         application_name: `${appName}-read-${hostname()}`,
+        max: poolMaxSize,
       });
     } else {
       console.log("no replica url found, not using read replica");
@@ -282,4 +286,5 @@ async function ensureDatabase(postgresUrl: string) {
   adminPool.end();
 }
 
-export default new DB();
+export const db = new DB();
+export const jobsDb = new DB();
