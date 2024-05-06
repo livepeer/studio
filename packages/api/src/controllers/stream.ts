@@ -296,11 +296,8 @@ export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
  */
 function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   const isActive = "isActive" in stream ? stream.isActive : true; // sessions don't have `isActive` field so we just assume `true`
-  return (
-    isActive &&
-    !isNaN(stream.lastSeen) &&
-    Date.now() - stream.lastSeen > ACTIVE_TIMEOUT
-  );
+  const lastSeen = stream.lastSeen || stream.createdAt; // child streams are created with `lastSeen` set to 0
+  return isActive && !isNaN(lastSeen) && Date.now() - lastSeen > ACTIVE_TIMEOUT;
 }
 
 /**
@@ -1023,7 +1020,7 @@ app.post(
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : null,
       issues,
-      // do not clear the `lastSeen` field when the stream is not active
+      // do not bump the `lastSeen` field when the stream is not active
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
 
@@ -1713,7 +1710,8 @@ async function publishDelayedRecordingWaitingHook(
 function isStreamStale(s: DBStream, lastSessionStartedAt?: number) {
   const staleThreshold =
     (lastSessionStartedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
-  return s.lastSeen && s.lastSeen < staleThreshold;
+  const lastSeen = s.lastSeen || s.createdAt;
+  return lastSeen && lastSeen < staleThreshold;
 }
 
 // sets 'isActive' field to false for many objects at once
