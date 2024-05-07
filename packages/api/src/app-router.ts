@@ -53,6 +53,9 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
   },
 };
 
+const isTest =
+  process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+
 export default async function appRouter(params: CliArgs) {
   const {
     httpPrefix,
@@ -125,15 +128,12 @@ export default async function appRouter(params: CliArgs) {
     recordCatalystObjectStoreId,
     secondaryRecordObjectStoreId,
     supportAddr,
-    verifyUrls: true,
+    skipUrlVerification: isTest,
     queue,
   });
   await webhookCannon.start();
 
-  if (
-    process.env.NODE_ENV === "test" ||
-    process.env.NODE_ENV === "development"
-  ) {
+  if (isTest) {
     await setupTestTus();
   } else if (vodObjectStoreId) {
     await setupTus(vodObjectStoreId);
