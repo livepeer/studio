@@ -733,6 +733,71 @@ describe("controllers/stream", () => {
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
+
+      it("should fix non-standard 480p profiles", async () => {
+        let res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          presets: undefined,
+          renditions: undefined,
+          wowza: undefined,
+          profiles: [
+            {
+              name: "480p",
+              width: 848,
+              height: 480,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        expect(stream.profiles).toEqual([
+          {
+            name: "480p",
+            width: 854,
+            height: 480,
+            bitrate: 1024,
+            fps: 30, // not mobile, so fps stays the same
+          },
+        ]);
+      });
+
+      it("should fix profiles with fps from mobile streams", async () => {
+        let res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          presets: undefined,
+          renditions: undefined,
+          wowza: undefined,
+          pull: {
+            ...postMockPullStream.pull,
+            isMobile: true,
+          },
+          profiles: [
+            {
+              name: "480p",
+              width: 848,
+              height: 480,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        expect(stream.profiles).toEqual([
+          {
+            name: "480p",
+            width: 854,
+            height: 480,
+            bitrate: 1024,
+            fps: 0,
+          },
+        ]);
+      });
+
       it("should extract host from redirected playback url", async () => {
         expect(
           extractUrlFrom(
