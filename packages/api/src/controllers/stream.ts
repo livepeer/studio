@@ -241,11 +241,12 @@ export function resolvePullUrlFromExistingStreams(
     return null;
   }
   const stream = existingStreams[0];
+  const reuseSameNodeTimeout = 10 * 60 * 1000; // 10 minutes
   if (
     stream.pullRegion &&
     stream.pullLockedBy &&
     stream.pullLockedAt &&
-    stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT
+    stream.pullLockedAt > Date.now() - 10 * reuseSameNodeTimeout
   ) {
     logger.info(
       `pull request created with the same request within 1 min, reusing existing ingest node ${stream.pullLockedBy}`
