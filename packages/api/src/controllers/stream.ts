@@ -254,7 +254,7 @@ export function resolvePullUrlFromExistingStreams(
         stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT))
   ) {
     logger.info(
-      `pull request created with the same request within 1 min, reusing existing ingest node ${stream.pullLockedBy}`
+      `pull request created with the same request within 10 min, reusing existing ingest node ${stream.pullLockedBy}`
     );
     return {
       pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
