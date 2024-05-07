@@ -1,8 +1,8 @@
 import { ConsumeMessage } from "amqplib";
-import { isIP } from "net";
 import dns from "dns";
 import isLocalIP from "is-local-ip";
 import _ from "lodash";
+import { isIP } from "net";
 import { Response } from "node-fetch";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
