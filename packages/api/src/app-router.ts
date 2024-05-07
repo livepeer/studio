@@ -1,33 +1,34 @@
 // import 'express-async-errors' // it monkeypatches, i guess
+import * as fcl from "@onflow/fcl";
 import { Router } from "express";
 import promBundle from "express-prom-bundle";
 import proxy from "http-proxy-middleware";
 import Stripe from "stripe";
-import makeStore from "./store";
-import {
-  errorHandler,
-  healthCheck,
-  subgraph,
-  hardcodedNodes,
-  insecureTest,
-  geolocateMiddleware,
-  authenticateWithCors,
-} from "./middleware";
 import controllers from "./controllers";
-import streamProxy from "./controllers/stream-proxy";
 import apiProxy from "./controllers/api-proxy";
+import { setupTestTus, setupTus } from "./controllers/asset";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
-import WebhookCannon from "./webhooks/cannon";
-import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
-import { CliArgs } from "./parse-cli";
-import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
-import { taskScheduler } from "./task/scheduler";
-import { setupTus, setupTestTus } from "./controllers/asset";
-import * as fcl from "@onflow/fcl";
+import { regionsGetter } from "./controllers/region";
+import streamProxy from "./controllers/stream-proxy";
 import createFrontend from "./frontend";
-import { NotFoundError } from "./store/errors";
+import {
+  authenticateWithCors,
+  errorHandler,
+  geolocateMiddleware,
+  hardcodedNodes,
+  healthCheck,
+  insecureTest,
+  subgraph,
+} from "./middleware";
+import { CliArgs } from "./parse-cli";
+import makeStore from "./store";
 import { cache } from "./store/cache";
+import { PostgresParams } from "./store/db";
+import { NotFoundError } from "./store/errors";
+import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
+import { taskScheduler } from "./task/scheduler";
+import WebhookCannon from "./webhooks/cannon";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -63,6 +64,7 @@ export default async function appRouter(params: CliArgs) {
     postgresReplicaUrl,
     postgresConnPoolSize: pgPoolSize,
     postgresJobsConnPoolSize: pgJobsPoolSize,
+    postgresCreateTables: createTablesOnDb,
     defaultCacheTtl,
     frontendDomain,
     supportAddr,
@@ -101,7 +103,12 @@ export default async function appRouter(params: CliArgs) {
   // Storage init
   const bodyParser = require("body-parser");
   const appName = ownRegion ? `${ownRegion}-api` : "api";
-  const pgBaseParams = { postgresUrl, postgresReplicaUrl, appName };
+  const pgBaseParams: PostgresParams = {
+    postgresUrl,
+    postgresReplicaUrl,
+    createTablesOnDb,
+    appName,
+  };
   const [db, jobsDb, store] = await makeStore(
     { ...pgBaseParams, poolMaxSize: pgPoolSize },
     { ...pgBaseParams, poolMaxSize: pgJobsPoolSize, appName: `${appName}-jobs` }
