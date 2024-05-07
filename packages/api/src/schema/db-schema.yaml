@@ -1,5 +1,14 @@
 components:
   schemas:
+    deactivate-many-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
     access-control-gate-payload:
       type: object
       additionalProperties: false
@@ -1040,15 +1049,49 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
-    new-asset-from-url-payload:
+    new-signing-key-payload:
+      additionalProperties: false
       properties:
-        objectStoreId:
+        name:
           type: string
-          description: Object store ID where the asset is stored
-          writeOnly: true
-          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        catalystPipelineStrategy:
-          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+          description: Name of the signing key
+    signing-key-response-payload:
+      type: object
+      required:
+        - publicKey
+        - privateKey
+      properties:
+        $ref: "#/components/schemas/signing-key/properties"
+        privateKey:
+          type: string
+    stream-set-active-payload:
+      type: object
+      required:
+        - active
+      properties:
+        active:
+          $ref: "#/components/schemas/stream/properties/isActive"
+        hostName:
+          type: string
+          description: Hostname of the Mist server that processes that stream
+        startedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the stream started.
+          example: 1587667174725
+    webhook-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/webhook/properties/name"
+        url:
+          $ref: "#/components/schemas/webhook/properties/url"
+        events:
+          $ref: "#/components/schemas/webhook/properties/events"
+        sharedSecret:
+          $ref: "#/components/schemas/webhook/properties/sharedSecret"
+        streamId:
+          $ref: "#/components/schemas/webhook/properties/streamId"
     ipfs-file-info:
       properties:
         cid:
@@ -1342,3 +1385,12 @@ components:
                       type: string
                     timestamp:
                       type: integer
+    new-asset-from-url-payload:
+      properties:
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        catalystPipelineStrategy:
+          $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"

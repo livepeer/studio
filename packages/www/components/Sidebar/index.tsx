@@ -27,10 +27,12 @@ import {
   AssetsIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import { useJune, events } from "hooks/use-june";
+import { useCallback, useEffect } from "react";
+import { isExport } from "lib/utils";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -61,7 +63,7 @@ export type SidebarId =
   | "home"
   | "streams"
   | "streams/sessions"
-  // /dashboard/stream-health - unhandled in the sidebar
+  // /stream-health - unhandled in the sidebar
   | "streams/health"
   | "assets"
   | "developers"
@@ -73,9 +75,21 @@ export type SidebarId =
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
+  const router = useRouter();
+
   const June = useJune();
 
-  June?.track(`sidebar ${id}`);
+  useEffect(() => {
+    const handleRouteChange = (url, { shallow }) => {
+      if (June) June.page(url);
+    };
+
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [June]);
 
   return (
     <Box
@@ -129,7 +143,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 key="billing-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
-                  Router.push("/dashboard/billing");
+                  Router.push("/billing");
                 }}>
                 Billing
               </DropdownMenuItem>
@@ -157,14 +171,14 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               textDecoration: "none",
             },
           }}>
-          <Link href="/dashboard" passHref legacyBehavior>
+          <Link href="/" passHref legacyBehavior>
             <NavLink active={id === "home"}>
               <HomeIcon active={id === "home"} />
               Home
             </NavLink>
           </Link>
           <Box>
-            <Link href="/dashboard/streams" passHref legacyBehavior>
+            <Link href="/streams" passHref legacyBehavior>
               <NavLink active={id === "streams"}>
                 <StreamIcon active={id === "streams"} />
                 Streams
@@ -179,20 +193,20 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     mt: "$1",
                   },
                 }}>
-                <Link href="/dashboard/sessions" passHref legacyBehavior>
+                <Link href="/sessions" passHref legacyBehavior>
                   <NavLink active={id === "streams/sessions"}>Sessions</NavLink>
                 </Link>
               </Box>
             )}
           </Box>
-          <Link href="/dashboard/assets" passHref legacyBehavior>
+          <Link href="/assets" passHref legacyBehavior>
             <NavLink active={id === "assets"}>
               <AssetsIcon active={id === "assets"} />
               Assets
             </NavLink>
           </Link>
           <Box>
-            <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
+            <Link href="/developers/api-keys" passHref legacyBehavior>
               <NavLink>
                 <TerminalIcon active={id?.split("/")[0] === "developers"} />
                 Developers
@@ -207,24 +221,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     mt: "$1",
                   },
                 }}>
-                <Link
-                  href="/dashboard/developers/api-keys"
-                  passHref
-                  legacyBehavior>
+                <Link href="/developers/api-keys" passHref legacyBehavior>
                   <NavLink active={id === "developers"}>API Keys</NavLink>
                 </Link>
-                <Link
-                  href="/dashboard/developers/signing-keys"
-                  passHref
-                  legacyBehavior>
+                <Link href="/developers/signing-keys" passHref legacyBehavior>
                   <NavLink active={id === "developers/signing-keys"}>
                     Signing Keys
                   </NavLink>
                 </Link>
-                <Link
-                  href="/dashboard/developers/webhooks"
-                  passHref
-                  legacyBehavior>
+                <Link href="/developers/webhooks" passHref legacyBehavior>
                   <NavLink active={id === "developers/webhooks"}>
                     Webhooks
                   </NavLink>
@@ -233,117 +238,123 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             )}
           </Box>
 
-          <Box>
-            <Link href="/dashboard/usage" passHref legacyBehavior>
-              <NavLink active={id === "usage"}>
-                <UsageIcon active={id === "usage"} />
-                Usage
-              </NavLink>
-            </Link>
-          </Box>
+          {!isExport() && (
+            <Box>
+              <Link href="/usage" passHref legacyBehavior>
+                <NavLink active={id === "usage"}>
+                  <UsageIcon active={id === "usage"} />
+                  Usage
+                </NavLink>
+              </Link>
+            </Box>
+          )}
 
-          <Box>
-            <Link href="/dashboard/billing" passHref legacyBehavior>
-              <NavLink active={id === "billing"}>
-                <BillingIcon active={id === "billing"} />
-                Billing
-              </NavLink>
-            </Link>
+          {!isExport() && (
+            <Box>
+              <Link href="/billing" passHref legacyBehavior>
+                <NavLink active={id === "billing"}>
+                  <BillingIcon active={id === "billing"} />
+                  Billing
+                </NavLink>
+              </Link>
 
-            {id?.split("/")[0] === "billing" && (
-              <Box
-                css={{
-                  a: {
-                    pl: 35,
-                  },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/dashboard/billing/plans" passHref legacyBehavior>
-                  <NavLink active={id === "billing/plans"}>Plans</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
+              {id?.split("/")[0] === "billing" && (
+                <Box
+                  css={{
+                    a: {
+                      pl: 35,
+                    },
+                    "> :first-child": {
+                      mt: "$1",
+                    },
+                  }}>
+                  <Link href="/billing/plans" passHref legacyBehavior>
+                    <NavLink active={id === "billing/plans"}>Plans</NavLink>
+                  </Link>
+                </Box>
+              )}
+            </Box>
+          )}
         </Grid>
-        <Flex direction="column" gap={1}>
-          <NavLink
-            href="https://status.livepeer.studio/"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <LoopIcon />
-            <Text
+        {!isExport() && (
+          <Flex direction="column" gap={1}>
+            <NavLink
+              href="https://status.livepeer.studio/"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Status
-            </Text>
-          </NavLink>
+              <LoopIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Status
+              </Text>
+            </NavLink>
 
-          <NavLink
-            href="https://livepeer.canny.io/changelog?labels=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <RocketIcon />
-            <Text
+            <NavLink
+              href="https://livepeer.canny.io/changelog?labels=studio"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Changelog
-            </Text>
-          </NavLink>
+              <RocketIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Changelog
+              </Text>
+            </NavLink>
 
-          <NavLink
-            href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <ChatBubbleIcon />
-            <Text
+            <NavLink
+              href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
+              target="_blank"
               css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
               }}>
-              Feature Requests
-            </Text>
-          </NavLink>
-          <Contact />
-        </Flex>
+              <ChatBubbleIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Feature Requests
+              </Text>
+            </NavLink>
+            <Contact />
+          </Flex>
+        )}
       </Flex>
     </Box>
   );

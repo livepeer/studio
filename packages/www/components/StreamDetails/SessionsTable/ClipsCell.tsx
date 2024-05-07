@@ -31,8 +31,7 @@ const ClipsCell = <D extends TableData>({
     <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>
       {cell.value.clipsCounts > 0 ? (
         <Box css={{ pr: "$1" }}>
-          <Link
-            href={"/dashboard/assets?sourceSessionId=" + cell.value.sessionId}>
+          <Link href={"/assets?sourceSessionId=" + cell.value.sessionId}>
             <Badge size="1" variant="neutral" css={{}}>
               {cell.value.clipsCounts}
             </Badge>

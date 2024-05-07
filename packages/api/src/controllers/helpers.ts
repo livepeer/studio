@@ -523,6 +523,13 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
         q.push(sql``.append(fv).append(sql` = ${filter.value}`));
       } else if (fv.val) {
         if (fv.type === "boolean") {
+          if (typeof filter.value !== "boolean") {
+            throw new Error(
+              `expected boolean value for field "${
+                filter.id
+              }", got: ${JSON.stringify(filter.value)}`
+            );
+          }
           q.push(
             sql``.append(
               `coalesce((${fv.val})::boolean, FALSE) IS ${

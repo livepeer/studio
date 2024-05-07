@@ -1,5 +1,5 @@
 import { ConsumeMessage } from "amqplib";
-import { db } from "../store";
+import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
 import messages from "../store/messages";
 import Queue from "../store/queue";
 import { Asset, Task } from "../schema/types";

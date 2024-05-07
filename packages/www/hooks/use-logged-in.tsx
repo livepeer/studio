@@ -1,5 +1,5 @@
 import useApi from "./use-api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useJune, events } from "hooks/use-june";
 
@@ -16,6 +16,16 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   const emailVerificationMode =
     process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
+  const trackEvent = useCallback(
+    (user) => {
+      if (June)
+        June?.identify(user.id, {
+          email: user.email,
+        });
+    },
+    [June]
+  );
+
   useEffect(() => {
     if (shouldBeLoggedIn === true) {
       if (!token) {
@@ -27,12 +37,11 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
     // console.log(shouldBeLoggedIn, user);
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
-      process.env.NODE_ENV === "production" &&
-        June?.identify(user.id, user.email);
+      process.env.NODE_ENV === "production" && trackEvent(user);
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
-        router.replace(next ? next.toString() : "/dashboard");
+        router.replace(next ? next.toString() : "/");
       }
     }
   }, [user, token, next]);

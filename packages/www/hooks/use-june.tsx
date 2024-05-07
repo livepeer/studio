@@ -49,7 +49,6 @@ export function useJune() {
       let response = AnalyticsBrowser.load({
         writeKey: "3VINzqYVjfOxFyIr",
       });
-      console.log("response", response);
       setAnalytics(response);
     };
     loadAnalytics();

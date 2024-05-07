@@ -68,23 +68,10 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           display: "flex",
           flexDirection: "column",
           mb: "$3",
-          ml: "auto",
-          mr: "auto",
           maxWidth: 500,
+          mx: "auto",
         }}>
         <form id={id} onSubmit={submit}>
-          <Text
-            variant="neutral"
-            size={1}
-            css={{
-              fontWeight: 600,
-              mb: "$1",
-              fontSize: "11px",
-              textTransform: "uppercase",
-            }}>
-            Account
-          </Text>
-
           <TextField
             size="3"
             id="email"
@@ -146,10 +133,21 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
             disabled={loading ? true : false}
             size={4}
             css={{
+              bc: "#F8F8F8",
+              color: "black",
+              borderRadius: 10,
+              fontWeight: 600,
               width: "100%",
+              fontSize: 14,
+              textDecoration: "none",
+              textTransform: "uppercase",
               mt: "$3",
-              px: "$3",
-              fontSize: "$3",
+              "&:hover": {
+                bc: "rgba(255, 255, 255, .8)",
+                transition: ".2s",
+                color: "black",
+                textDecoration: "none",
+              },
             }}>
             {loading ? "Loading..." : buttonText}
           </Button>

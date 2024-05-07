@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../public/img/icons/upcoming.svg";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
@@ -209,6 +209,10 @@ const UsageSummary = () => {
 
   const June = useJune();
 
+  const trackEvent = useCallback(() => {
+    if (June) June.track(events.landing.billingCta);
+  }, [June]);
+
   return (
     <>
       <Flex
@@ -300,11 +304,11 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/dashboard/billing" passHref legacyBehavior>
+        <Link href="/billing" passHref legacyBehavior>
           <A
             variant="primary"
             css={{ display: "flex", alignItems: "center" }}
-            onClick={() => June.track(events.landing.billingCta)}>
+            onClick={() => trackEvent()}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

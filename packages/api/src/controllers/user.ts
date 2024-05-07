@@ -436,7 +436,7 @@ app.post("/", validatePost("user"), async (req, res) => {
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
-          `/verify?${qs.stringify({
+          `/dashboard/verify?${qs.stringify({
             email: lowercaseEmail,
             emailValidToken,
             selectedPlan,
@@ -554,7 +554,7 @@ app.patch("/:id/email", authorizer({}), async (req, res) => {
       buttonText: "Verify Email",
       buttonUrl: frontendUrl(
         req,
-        `/verify-new-email?${qs.stringify({
+        `/dashboard/verify-new-email?${qs.stringify({
           emailValidToken,
           email: lowerCaseEmail,
         })}`
@@ -735,12 +735,11 @@ app.patch("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   const { directPlayback } = req.body;
 
-  if (directPlayback) {
+  if (typeof directPlayback !== "undefined") {
     await db.user.update(id, { directPlayback });
   }
 
-  res.status(204);
-  res.end();
+  res.status(204).end();
 });
 
 app.post("/token", validatePost("user"), async (req, res) => {
@@ -906,7 +905,7 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
           subject: `User ${user.email} signed up with Livepeer!`,
           preheader: "We have a new verified user",
           buttonText: "Log into livepeer",
-          buttonUrl: frontendUrl(req, "/login"),
+          buttonUrl: frontendUrl(req, "/dashboard/login"),
           unsubscribe: unsubscribeUrl(req),
           text: [
             `User ${user.email} has signed up and verified their email with Livepeer!`,
@@ -980,7 +979,11 @@ async function sendVerificationEmail(req: Request, user: User, selectedPlan) {
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
-          `/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
+          `/dashboard/verify?${qs.stringify({
+            email,
+            emailValidToken,
+            selectedPlan,
+          })}`
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
@@ -1069,7 +1072,7 @@ app.post(
         buttonText: "Reset Password",
         buttonUrl: frontendUrl(
           req,
-          `/reset-password?${qs.stringify({ email, resetToken })}`
+          `/dashboard/reset-password?${qs.stringify({ email, resetToken })}`
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [

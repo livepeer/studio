@@ -11,7 +11,14 @@ import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "@livepeer.studio/api";
 import AssetSharePopup from "../../AssetDetails/AssetSharePopup";
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { FaKey, FaVideo } from "react-icons/fa";
 import { FiVideo } from "react-icons/fi";
 import StreamSetupBox from "../StreamSetupBox";
@@ -61,6 +68,14 @@ const StreamPlayerBox = ({
       setSwitchTab("Browser");
     }
   }, [isBroadcastLive]);
+
+  const trackEventEmbed = useCallback(() => {
+    if (June) June.track(events.stream.embed);
+  }, [June]);
+
+  const trackEventGoLive = useCallback(() => {
+    if (June) June.track(events.stream.goLive);
+  }, [June]);
 
   return (
     <Box
@@ -125,7 +140,7 @@ const StreamPlayerBox = ({
               </Button>
             }
             onEmbedVideoClick={() => {
-              June.track(events.stream.embed);
+              trackEventEmbed();
               return onEmbedVideoClick();
             }}
           />
@@ -143,7 +158,7 @@ const StreamPlayerBox = ({
               disabled={isStreamActiveFromExternal}
               onClick={() =>
                 setIsBroadcastLive((prev) => {
-                  prev && June.track(events.stream.goLive);
+                  prev && trackEventGoLive();
                   return !prev;
                 })
               }>

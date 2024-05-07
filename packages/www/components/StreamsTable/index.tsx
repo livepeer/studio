@@ -37,12 +37,14 @@ const StreamsTable = ({
   tableId,
   userId,
   viewAll,
+  hideFilters,
 }: {
   title: string;
   pageSize?: number;
   userId: string;
   tableId: string;
   viewAll?: string;
+  hideFilters?: boolean;
 }) => {
   const router = useRouter();
   const { getStreams, createStream, deleteStream, deleteStreams } = useApi();
@@ -69,7 +71,7 @@ const StreamsTable = ({
       await state.invalidate();
       const query = router.query.admin === "true" ? { admin: true } : {};
       await router.push({
-        pathname: `/dashboard/streams/${newStream.id}`,
+        pathname: `/streams/${newStream.id}`,
         query,
       });
     },
@@ -182,20 +184,22 @@ const StreamsTable = ({
               <ActiveStreamsBadge />
             </TableHeader>
             <>
-              <Flex
-                gap={4}
-                css={{
-                  my: "$4",
-                }}>
-                {filterCategory.map((category, index) => (
-                  <TypeFilterCard
-                    name={category}
-                    value={state?.dataCount[index] || "0"}
-                    isActive={filter === category}
-                    handleClick={() => handleFilterType(category)}
-                  />
-                ))}
-              </Flex>
+              {!hideFilters && (
+                <Flex
+                  gap={4}
+                  css={{
+                    my: "$4",
+                  }}>
+                  {filterCategory.map((category, index) => (
+                    <TypeFilterCard
+                      name={category}
+                      value={state?.dataCount[index] || "0"}
+                      isActive={filter === category}
+                      handleClick={() => handleFilterType(category)}
+                    />
+                  ))}
+                </Flex>
+              )}
               {!viewAll && filterItems && (
                 <StreamFilter
                   activeFilters={state.filters}
