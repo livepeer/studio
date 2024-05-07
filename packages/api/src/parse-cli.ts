@@ -153,6 +153,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "number",
         default: 5,
       },
+      "postgres-create-tables": {
+        describe:
+          "create tables and indexes on the database if they don't exist",
+        type: "boolean",
+        default: true,
+      },
       "default-cache-ttl": {
         describe: "default TTL for entries cached in memory, in seconds",
         type: "number",

@@ -64,6 +64,7 @@ export default async function appRouter(params: CliArgs) {
     postgresReplicaUrl,
     postgresConnPoolSize: pgPoolSize,
     postgresJobsConnPoolSize: pgJobsPoolSize,
+    postgresCreateTables: createTablesOnDb,
     defaultCacheTtl,
     frontendDomain,
     supportAddr,
@@ -102,7 +103,12 @@ export default async function appRouter(params: CliArgs) {
   // Storage init
   const bodyParser = require("body-parser");
   const appName = ownRegion ? `${ownRegion}-api` : "api";
-  const pgBaseParams = { postgresUrl, postgresReplicaUrl, appName };
+  const pgBaseParams: PostgresParams = {
+    postgresUrl,
+    postgresReplicaUrl,
+    createTablesOnDb,
+    appName,
+  };
   const [db, jobsDb, store] = await makeStore(
     { ...pgBaseParams, poolMaxSize: pgPoolSize },
     { ...pgBaseParams, poolMaxSize: pgJobsPoolSize, appName: `${appName}-jobs` }
