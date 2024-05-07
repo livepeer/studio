@@ -9,7 +9,7 @@ export default async function makeStore(
   jobsDbParams: PostgresParams
 ): Promise<[DB, DB, Model]> {
   await db.start(dbParams);
-  await jobsDb.start(jobsDbParams);
+  await jobsDb.start({ ...jobsDbParams, createTablesOnDb: false });
   const store = new Model(db);
   return [db, jobsDb, store];
 }

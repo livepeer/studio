@@ -38,6 +38,7 @@ export interface PostgresParams {
   postgresReplicaUrl?: string;
   appName?: string;
   poolMaxSize?: number; // defaults to 10
+  createTablesOnDb?: boolean; // defaults to true
 }
 
 type Table<T> = BaseTable<WithID<T>>;
@@ -83,6 +84,7 @@ export class DB {
     postgresReplicaUrl,
     appName = "api",
     poolMaxSize = 10,
+    createTablesOnDb = true,
   }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
@@ -115,7 +117,7 @@ export class DB {
 
     await this.query("SELECT NOW()");
     await this.replicaQuery("SELECT NOW()");
-    await this.makeTables();
+    await this.makeTables(createTablesOnDb);
   }
 
   async close() {
@@ -125,7 +127,7 @@ export class DB {
     await this.pool.end();
   }
 
-  async makeTables() {
+  async makeTables(createTablesOnDb: boolean) {
     const schemas = schema.components.schemas;
     this.stream = new StreamTable({ db: this, schema: schemas["stream"] });
     this.objectStore = makeTable<ObjectStore>({
@@ -181,15 +183,17 @@ export class DB {
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
     this.project = makeTable<Project>({ db: this, schema: schemas["project"] });
 
-    const tables = Object.entries(schema.components.schemas).filter(
-      ([name, schema]) => "table" in schema && schema.table
-    );
-    await Promise.all(
-      tables.map(([name, schema]) => {
-        const camelName = kebabToCamel(name);
-        return this[camelName].ensureTable();
-      })
-    );
+    if (createTablesOnDb) {
+      const tables = Object.entries(schema.components.schemas).filter(
+        ([name, schema]) => "table" in schema && schema.table
+      );
+      await Promise.all(
+        tables.map(([name, schema]) => {
+          const camelName = kebabToCamel(name);
+          return this[camelName].ensureTable();
+        })
+      );
+    }
   }
 
   queryWithOpts<T, I extends any[] = any[]>(
