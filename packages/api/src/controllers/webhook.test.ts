@@ -1,6 +1,8 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
 import { sleep } from "../util";
+import { jobsDb } from "../store";
+import { Webhook } from "../schema/types";
 
 let server;
 let mockAdminUser;
@@ -288,8 +290,22 @@ describe("controllers/webhook", () => {
       });
       expect(setActiveRes).toBeDefined();
       expect(setActiveRes.status).toBe(204);
-      // const setActiveResJson = await setActiveRes.json()
-      // expect(setActiveResJson).toBeDefined()
+
+      let hooksCalled = 0;
+      for (let i = 0; i < 5 && hooksCalled < 2; i++) {
+        await sleep(500);
+
+        hooksCalled = 0;
+        for (const id of [webhookResJson.id, webhookResJson2.id]) {
+          const res = await client.get(`/webhook/${id}`);
+          expect(res.status).toBe(200);
+          const { status } = (await res.json()) as Webhook;
+          if (status.lastTriggeredAt >= now) {
+            hooksCalled++;
+          }
+        }
+      }
+      expect(hooksCalled).toBe(2);
     }, 20000);
 
     it("records webhook logs", async () => {

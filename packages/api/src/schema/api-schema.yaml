@@ -847,6 +847,7 @@ components:
           enum:
             - waiting
             - ready
+            - failed
             - none
         recordingUrl:
           type: string

@@ -1,27 +1,27 @@
 import { ConsumeMessage } from "amqplib";
 import { promises as dns } from "dns";
 import isLocalIP from "is-local-ip";
+import _ from "lodash";
 import { Response } from "node-fetch";
-import { v4 as uuid } from "uuid";
 import { parse as parseUrl } from "url";
-import { DB } from "../store/db";
-import { DBSession } from "../store/session-table";
+import { v4 as uuid } from "uuid";
+import { createAsset, primaryStorageExperiment } from "../controllers/asset";
+import { generateUniquePlaybackId } from "../controllers/generate-keys";
+import { sendgridEmail, sign } from "../controllers/helpers";
+import { buildRecordingUrl } from "../controllers/session";
+import { USER_SESSION_TIMEOUT } from "../controllers/stream";
+import logger from "../logger";
+import { WebhookLog } from "../schema/types";
+import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
+import { BadRequestError, UnprocessableEntityError } from "../store/errors";
+import { isExperimentSubject } from "../store/experiment-table";
 import messages from "../store/messages";
 import Queue from "../store/queue";
-import { DBWebhook } from "../store/webhook-table";
-import { fetchWithTimeout, RequestInitWithTimeout, sleep } from "../util";
-import logger from "../logger";
-import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
-import { taskScheduler } from "../task/scheduler";
-import { generateUniquePlaybackId } from "../controllers/generate-keys";
-import { createAsset, primaryStorageExperiment } from "../controllers/asset";
+import { DBSession } from "../store/session-table";
 import { DBStream } from "../store/stream-table";
-import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { BadRequestError, UnprocessableEntityError } from "../store/errors";
-import { db } from "../store";
-import { buildRecordingUrl } from "../controllers/session";
-import { isExperimentSubject } from "../store/experiment-table";
-import { WebhookLog } from "../schema/types";
+import { DBWebhook } from "../store/webhook-table";
+import { taskScheduler } from "../task/scheduler";
+import { RequestInitWithTimeout, fetchWithTimeout, sleep } from "../util";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -483,7 +483,7 @@ export default class WebhookCannon {
   async handleRecordingWaitingChecks(
     sessionId: string,
     attempt = 1
-  ): Promise<string> {
+  ): Promise<void> {
     const session = await db.session.get(sessionId, {
       useReplica: false,
     });
@@ -491,11 +491,16 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session not found");
     }
 
-    const { lastSeen, sourceSegments } = session;
+    const [childStreams] = await db.stream.find({ sessionId });
+    const lastSeen = _(childStreams)
+      .concat(session)
+      .map((s) => s.lastSeen || s.createdAt)
+      .max();
+    const hasSourceSegments = _(childStreams)
+      .concat(session)
+      .some((s) => !!s.sourceSegments);
+
     const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
-    if (!lastSeen || !sourceSegments) {
-      throw new UnprocessableEntityError("Session is unused");
-    }
     if (lastSeen > activeThreshold) {
       if (attempt >= 5) {
         throw new UnprocessableEntityError("Session is still active");
@@ -508,12 +513,19 @@ export default class WebhookCannon {
 
     // if we got to this point, it means we're confident this session is inactive
     // and we can set the child streams isActive=false
-    const [childStreams] = await db.stream.find({ sessionId });
     await Promise.all(
       childStreams.map((child) => {
         return db.stream.update(child.id, { isActive: false });
       })
     );
+
+    if (!lastSeen && !hasSourceSegments) {
+      logger.info(
+        `Skipping unused session sessionId=${session.id} childStreamCount=${childStreams.length}`
+      );
+      return;
+    }
+
     const res = await db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");

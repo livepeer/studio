@@ -142,6 +142,17 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "url of a postgres read replica database",
         type: "string",
       },
+      "postgres-conn-pool-size": {
+        describe: "size of the main postgres connection pool",
+        type: "number",
+        default: 10,
+      },
+      "postgres-jobs-conn-pool-size": {
+        describe:
+          "size of the postgres connection pool used for background jobs",
+        type: "number",
+        default: 5,
+      },
       "default-cache-ttl": {
         describe: "default TTL for entries cached in memory, in seconds",
         type: "number",

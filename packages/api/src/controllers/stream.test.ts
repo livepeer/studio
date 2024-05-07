@@ -2,23 +2,23 @@ import { json as bodyParserJson } from "body-parser";
 import { v4 as uuid } from "uuid";
 
 import {
-  ObjectStore,
   MultistreamTarget,
+  ObjectStore,
   Stream,
-  StreamPatchPayload,
-  User,
-  StreamSetActivePayload,
   StreamHealthPayload,
+  StreamPatchPayload,
+  StreamSetActivePayload,
+  User,
 } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import {
+  AuxTestServer,
   TestClient,
   clearDatabase,
-  startAuxTestServer,
   setupUsers,
-  AuxTestServer,
+  startAuxTestServer,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
@@ -28,6 +28,7 @@ import {
   extractUrlFrom,
   extractRegionFrom,
 } from "./stream";
+import { ACTIVE_TIMEOUT, extractRegionFrom, extractUrlFrom } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -1359,7 +1360,7 @@ describe("controllers/stream", () => {
     });
   });
 
-  describe("webhooks", () => {
+  describe("incoming hooks", () => {
     let stream: Stream;
     let data;
     let res;
@@ -1726,6 +1727,160 @@ describe("controllers/stream", () => {
           });
         });
       });
+    });
+  });
+
+  describe("active clean-up", () => {
+    let webhookServer: AuxTestServer;
+    let hookSem: ReturnType<typeof semaphore>;
+    let hookPayload: any;
+
+    beforeAll(async () => {
+      webhookServer = await startAuxTestServer();
+      webhookServer.app.use(bodyParserJson());
+      webhookServer.app.post("/captain/hook", bodyParserJson(), (req, res) => {
+        hookPayload = req.body;
+        hookSem.release();
+        res.status(204).end();
+      });
+    });
+
+    afterAll(() => webhookServer.close());
+
+    beforeEach(async () => {
+      hookPayload = undefined;
+      hookSem = semaphore();
+
+      client.jwtAuth = nonAdminToken;
+      await client.post("/webhook", {
+        name: "stream-idle-hook",
+        events: ["stream.idle"],
+        url: `http://localhost:${webhookServer.port}/captain/hook`,
+      });
+    });
+
+    const waitHookCalled = async () => {
+      await hookSem.wait(3000);
+      expect(hookPayload).toBeDefined();
+      hookSem = semaphore();
+    };
+
+    it("should not clean streams that are still active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT / 2,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(0);
+    });
+
+    it("should clean streams that are active but lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
+
+      await waitHookCalled();
+
+      const updatedStream = await db.stream.get(stream.id);
+      expect(updatedStream.isActive).toBe(false);
+    });
+
+    it("should clean multiple streams at once, respecting limit", async () => {
+      for (let i = 0; i < 3; i++) {
+        let res = await client.post("/stream", { ...postMockStream });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+        });
+      }
+
+      client.jwtAuth = adminToken;
+      const res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(2);
+    });
+
+    it("should clean lost sessions whose parents are not active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      stream = await db.stream.get(stream.id);
+      expect(stream.isActive).toBe(false);
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(child.id);
+    });
+
+    it("cleans only the parent if both parent and child are lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
     });
   });
 
