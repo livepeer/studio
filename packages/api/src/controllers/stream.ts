@@ -247,6 +247,9 @@ export function resolvePullUrlFromExistingStreams(
     stream.pullLockedAt &&
     stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT
   ) {
+    logger.info(
+      `pull request created with the same request within 1 min, reusing existing ingest node ${stream.pullLockedBy}`
+    );
     return {
       pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
       pullRegion: stream.pullRegion,
