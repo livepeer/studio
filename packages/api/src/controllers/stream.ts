@@ -2189,7 +2189,7 @@ app.post(
       ],
       {
         limit,
-        order: null,
+        order: "data->>'lastSeen' DESC",
       }
     );
 

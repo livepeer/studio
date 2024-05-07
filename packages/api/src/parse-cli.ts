@@ -1,5 +1,8 @@
-import Yargs, { Options, Argv } from "yargs";
-import yargsToMist from "./yargs-to-mist";
+import { ErrorObject, ValidateFunction } from "ajv";
+import Yargs, { Argv, Options } from "yargs";
+import { FfmpegProfile } from "./schema/types";
+import profileValidator from "./schema/validators/ffmpeg-profile";
+import { defaultTaskExchange } from "./store/queue";
 import {
   CamelKeys,
   Ingest,
@@ -7,10 +10,7 @@ import {
   OrchestratorNodeAddress,
   Price,
 } from "./types/common";
-import { defaultTaskExchange } from "./store/queue";
-import { FfmpegProfile } from "./schema/types";
-import profileValidator from "./schema/validators/ffmpeg-profile";
-import { ValidateFunction, ErrorObject } from "ajv";
+import yargsToMist from "./yargs-to-mist";
 
 const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://arweave.net/",
@@ -152,6 +152,12 @@ export default function parseCli(argv?: string | readonly string[]) {
           "size of the postgres connection pool used for background jobs",
         type: "number",
         default: 5,
+      },
+      "postgres-create-tables": {
+        describe:
+          "create tables and indexes on the database if they don't exist",
+        type: "boolean",
+        default: true,
       },
       "default-cache-ttl": {
         describe: "default TTL for entries cached in memory, in seconds",
