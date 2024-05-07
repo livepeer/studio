@@ -63,6 +63,7 @@ export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 export const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
 const DEFAULT_PULL_LOCK_LEASE_TIMEOUT = 60 * 1000; // 1 min
+const PULL_REUSE_SAME_NODE_TIMEOUT = 10 * 60 * 1000; // 10 min
 
 // Helper constant to be used in the PUT /pull API to make sure we delete fields
 // from the stream that are not specified in the PUT payload.
@@ -234,6 +235,9 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+// Reuse the same node for pulling the stream in two cases:
+// 1. if the same pull request is created within 1 min (this prevents race condition between different nodes executing /lockPull)
+// 2. if the same stream was stopped within 10 min (this prevents Mist delays in stopping/starting the stream)
 export function resolvePullUrlFromExistingStreams(
   existingStreams: DBStream[]
 ): { pullUrl: string; pullRegion: string } {
@@ -241,12 +245,13 @@ export function resolvePullUrlFromExistingStreams(
     return null;
   }
   const stream = existingStreams[0];
-  const reuseSameNodeTimeout = 10 * 60 * 1000; // 10 minutes
   if (
     stream.pullRegion &&
     stream.pullLockedBy &&
-    stream.pullLockedAt &&
-    stream.pullLockedAt > Date.now() - 10 * reuseSameNodeTimeout
+    ((stream.pullLockedAt &&
+      stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT) ||
+      (stream.lastSeen &&
+        stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT))
   ) {
     logger.info(
       `pull request created with the same request within 1 min, reusing existing ingest node ${stream.pullLockedBy}`

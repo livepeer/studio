@@ -803,6 +803,22 @@ describe("controllers/stream", () => {
             "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
           pullRegion: "fra",
         });
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+              lastSeen: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
       });
 
       it("should extract host from redirected playback url", async () => {
