@@ -24,11 +24,11 @@ import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
 import {
+  ACTIVE_TIMEOUT,
   resolvePullUrlFromExistingStreams,
-  extractUrlFrom,
   extractRegionFrom,
+  extractUrlFrom,
 } from "./stream";
-import { ACTIVE_TIMEOUT, extractRegionFrom, extractUrlFrom } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 

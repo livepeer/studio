@@ -62,6 +62,7 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 export const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
+const DEFAULT_PULL_LOCK_LEASE_TIMEOUT = 60 * 1000; // 1 min
 
 // Helper constant to be used in the PUT /pull API to make sure we delete fields
 // from the stream that are not specified in the PUT payload.
@@ -240,12 +241,11 @@ export function resolvePullUrlFromExistingStreams(
     return null;
   }
   const stream = existingStreams[0];
-  const lockLeaseTimeout = 60 * 1000; // 1 min
   if (
     stream.pullRegion &&
     stream.pullLockedBy &&
     stream.pullLockedAt &&
-    stream.pullLockedAt > Date.now() - lockLeaseTimeout
+    stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT
   ) {
     return {
       pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
@@ -1201,8 +1201,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   let { leaseTimeout, host } = req.body;
   if (!leaseTimeout) {
-    // Sets the default lock lease to 60s
-    leaseTimeout = 60 * 1000;
+    leaseTimeout = DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
   }
   if (!host) {
     host = "unknown";
