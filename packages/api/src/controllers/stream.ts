@@ -246,8 +246,12 @@ export function resolvePullUrlFromExistingStreams(
   }
   const stream = existingStreams[0];
   const hasPullInfo = stream.pullRegion && stream.pullLockedBy;
-  const pullLockedRecently = stream.pullLockedAt && stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
-  const stoppedRecently = stream.lastSeen && stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT;
+  const pullLockedRecently =
+    stream.pullLockedAt &&
+    stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
+  const stoppedRecently =
+    stream.lastSeen &&
+    stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT;
   if (hasPullInfo && (pullLockedRecently || stoppedRecently)) {
     logger.info(
       `pull request created with the same request within 10 min, reusing existing ingest node ${stream.pullLockedBy}`
