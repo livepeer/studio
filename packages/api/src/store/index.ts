@@ -1,5 +1,5 @@
+import { DB, PostgresParams, db, jobsDb } from "./db";
 import Model from "./model";
-import { db, jobsDb, DB, PostgresParams } from "./db";
 
 export { db, jobsDb };
 

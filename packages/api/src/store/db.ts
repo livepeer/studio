@@ -1,35 +1,33 @@
+import { hostname } from "os";
 import { Pool, QueryConfig, QueryResult } from "pg";
 import { parse as parseUrl, format as stringifyUrl } from "url";
-import { hostname } from "os";
 
 import logger from "../logger";
 import schema from "../schema/schema.json";
 import {
-  ObjectStore,
   ApiToken,
-  User,
-  PasswordResetToken,
-  Usage,
-  Region,
-  Session,
-  SigningKey,
-  Room,
-  Attestation,
   JwtRefreshToken,
-  WebhookLog,
+  ObjectStore,
+  PasswordResetToken,
   Project,
+  Region,
+  Room,
+  SigningKey,
+  Usage,
+  User,
+  WebhookLog,
 } from "../schema/types";
-import BaseTable, { TableOptions } from "./table";
-import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
-import { QueryOptions, WithID } from "./types";
-import MultistreamTargetTable from "./multistream-table";
-import WebhookTable from "./webhook-table";
 import AssetTable from "./asset-table";
-import TaskTable from "./task-table";
-import ExperimentTable from "./experiment-table";
 import AttestationTable from "./attestation-table";
-import SessionTable, { DBSession } from "./session-table";
+import ExperimentTable from "./experiment-table";
+import MultistreamTargetTable from "./multistream-table";
+import SessionTable from "./session-table";
+import StreamTable from "./stream-table";
+import BaseTable, { TableOptions } from "./table";
+import TaskTable from "./task-table";
+import { QueryOptions, WithID } from "./types";
+import WebhookTable from "./webhook-table";
 
 // Should be configurable, perhaps?
 export const CONNECT_TIMEOUT =
