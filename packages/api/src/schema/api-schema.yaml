@@ -552,6 +552,7 @@ components:
                 - true
                 - 0
                 - 1
+                - 2
               description: |-
                 If true, the stream will be pulled from a mobile source.
               default: false
