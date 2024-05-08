@@ -57,7 +57,7 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
 const isTest =
   process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
 
-export async function initClients(params: CliArgs) {
+export async function initClients(params: CliArgs, serviceName = "api") {
   const {
     postgresUrl,
     postgresReplicaUrl,
@@ -72,7 +72,7 @@ export async function initClients(params: CliArgs) {
   } = params;
 
   // Storage init
-  const appName = ownRegion ? `${ownRegion}-api` : "api";
+  const appName = ownRegion ? `${ownRegion}-${serviceName}` : serviceName;
   const pgBaseParams: PostgresParams = {
     postgresUrl,
     postgresReplicaUrl,
@@ -91,6 +91,10 @@ export async function initClients(params: CliArgs) {
   const queue: Queue = amqpUrl
     ? await RabbitQueue.connect(amqpUrl, amqpTasksExchange)
     : new NoopQueue();
+
+  process.on("beforeExit", (code) => {
+    queue.close();
+  });
 
   if (!stripeSecretKey) {
     console.warn(
@@ -163,21 +167,16 @@ export default async function appRouter(params: CliArgs) {
   });
   await webhookCannon.start();
 
+  process.on("beforeExit", () => {
+    webhookCannon.stop();
+    taskScheduler.stop();
+  });
+
   if (isTest) {
     await setupTestTus();
   } else if (vodObjectStoreId) {
     await setupTus(vodObjectStoreId);
   }
-
-  process.on("beforeExit", (code) => {
-    queue.close();
-    webhookCannon.stop();
-  });
-
-  process.on("beforeExit", (code) => {
-    queue.close();
-    taskScheduler.stop();
-  });
 
   // Logging, JSON parsing, store injection
   const app = Router();

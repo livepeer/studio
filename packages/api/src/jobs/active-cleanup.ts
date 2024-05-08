@@ -14,7 +14,7 @@ export default async function runActiveCleanup(config: CliArgs) {
   if (!config.ingest?.length) {
     throw new Error("ingest not configured");
   }
-  const { jobsDb, queue } = await initClients(config);
+  const { jobsDb, queue } = await initClients(config, "active-cleanup-job");
   const { activeCleanupLimit: limit, ingest } = config;
 
   const activeThreshold = Date.now() - ACTIVE_TIMEOUT;

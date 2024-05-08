@@ -17,7 +17,7 @@ const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://gateway.arweave.net/",
 ];
 
-const JOB_TYPES = ["active-cleanup"] as const;
+const JOB_TYPES = ["active-cleanup", "create-db-tables"] as const;
 
 const yargs = Yargs() as unknown as Argv;
 
