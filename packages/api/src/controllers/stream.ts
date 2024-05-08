@@ -1071,7 +1071,7 @@ function fixTrovoProfiles(profiles: Profile[], isMobile: boolean) {
   return profiles?.map((p) => ({
     ...p,
     fps: isMobile && p.fps ? 0 : p.fps,
-    height: p.width === 480 && p.height === 853 ? 854 : p.height,
+    width: p.height === 480 && Math.abs(854 - p.width) <= 6 ? 854 : p.width,
   }));
 }
 
