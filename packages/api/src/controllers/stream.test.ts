@@ -25,9 +25,9 @@ import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
 import {
   ACTIVE_TIMEOUT,
-  resolvePullUrlFromExistingStreams,
   extractRegionFrom,
   extractUrlFrom,
+  resolvePullUrlFromExistingStreams,
 } from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
@@ -801,6 +801,7 @@ describe("controllers/stream", () => {
             fps: 0,
           },
         ]);
+      });
 
       it("should resolve pull url and region from existing stream", async () => {
         expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
