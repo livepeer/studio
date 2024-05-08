@@ -23,7 +23,12 @@ import {
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
-import { ACTIVE_TIMEOUT, extractRegionFrom, extractUrlFrom } from "./stream";
+import {
+  ACTIVE_TIMEOUT,
+  resolvePullUrlFromExistingStreams,
+  extractRegionFrom,
+  extractUrlFrom,
+} from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -796,6 +801,87 @@ describe("controllers/stream", () => {
             fps: 0,
           },
         ]);
+
+      it("should resolve pull url and region from existing stream", async () => {
+        expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: 1714997385837,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+              lastSeen: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
       });
 
       it("should extract host from redirected playback url", async () => {
