@@ -381,7 +381,7 @@ function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   return isActive && !isNaN(lastSeen) && Date.now() - lastSeen > ACTIVE_TIMEOUT;
 }
 
-function triggerCleanUpIsActiveJob(
+export function triggerCleanUpIsActiveJob(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
@@ -2192,8 +2192,7 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   return response;
 });
 
-// queries for all the streams with active clean up pending and triggers the
-// clean up logic for them.
+// TODO: Remove this API once we migrate to kubernetes cronjobs
 app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),

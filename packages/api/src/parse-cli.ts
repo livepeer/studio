@@ -17,6 +17,8 @@ const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://gateway.arweave.net/",
 ];
 
+const JOB_TYPES = ["active-cleanup"] as const;
+
 const yargs = Yargs() as unknown as Argv;
 
 function coerceArr(arg: any) {
@@ -511,6 +513,17 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "boolean",
         default: true,
       },
+      job: {
+        describe:
+          "run a specific job from start to finish instead of Studio API",
+        type: "string",
+        choices: JOB_TYPES,
+      },
+      "active-cleanup-limit": {
+        describe: "job/active-cleanup: max number of streams to clean up",
+        type: "number",
+        default: 1000,
+      },
       "stream-info-service": {
         describe: "start the Stream Info service instead of Studio API",
         type: "boolean",
@@ -586,7 +599,9 @@ export default function parseCli(argv?: string | readonly string[]) {
     .help()
     .parse(argv);
   // yargs returns a Promise even tho we don't have any async middlewares
-  const parsed = parsedProm as Awaited<typeof parsedProm>;
+  const parsed = parsedProm as Awaited<typeof parsedProm> & {
+    job?: (typeof JOB_TYPES)[number];
+  };
   const mistOutput = yargsToMist(allOptions);
   if (parsed.json === true) {
     console.log(JSON.stringify(mistOutput));

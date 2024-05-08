@@ -57,51 +57,21 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
 const isTest =
   process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
 
-export default async function appRouter(params: CliArgs) {
+export async function initClients(params: CliArgs) {
   const {
-    httpPrefix,
     postgresUrl,
     postgresReplicaUrl,
     postgresConnPoolSize: pgPoolSize,
     postgresJobsConnPoolSize: pgJobsPoolSize,
     postgresCreateTables: createTablesOnDb,
     defaultCacheTtl,
-    frontendDomain,
-    supportAddr,
-    sendgridTemplateId,
-    sendgridApiKey,
-    vodObjectStoreId,
-    vodCatalystObjectStoreId,
-    secondaryVodObjectStoreId,
-    recordCatalystObjectStoreId,
-    secondaryRecordObjectStoreId,
     ownRegion,
-    subgraphUrl,
-    fallbackProxy,
-    orchestrators = [],
-    broadcasters = [],
-    ingest = [],
-    prices = [],
-    corsJwtAllowlist,
-    insecureTestToken,
     stripeSecretKey,
     amqpUrl,
     amqpTasksExchange,
-    returnRegionInOrchestrator,
-    halfRegionOrchestratorsUntrusted,
-    frontend,
   } = params;
 
-  if (supportAddr || sendgridTemplateId || sendgridApiKey) {
-    if (!(supportAddr && sendgridTemplateId && sendgridApiKey)) {
-      throw new Error(
-        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
-      );
-    }
-  }
-
   // Storage init
-  const bodyParser = require("body-parser");
   const appName = ownRegion ? `${ownRegion}-api` : "api";
   const pgBaseParams: PostgresParams = {
     postgresUrl,
@@ -121,6 +91,59 @@ export default async function appRouter(params: CliArgs) {
   const queue: Queue = amqpUrl
     ? await RabbitQueue.connect(amqpUrl, amqpTasksExchange)
     : new NoopQueue();
+
+  if (!stripeSecretKey) {
+    console.warn(
+      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
+    );
+  }
+  const stripe = stripeSecretKey
+    ? new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" })
+    : null;
+
+  return {
+    db,
+    jobsDb,
+    store,
+    queue,
+    stripe,
+  };
+}
+
+export default async function appRouter(params: CliArgs) {
+  const {
+    httpPrefix,
+    frontendDomain,
+    supportAddr,
+    sendgridTemplateId,
+    sendgridApiKey,
+    vodObjectStoreId,
+    vodCatalystObjectStoreId,
+    secondaryVodObjectStoreId,
+    recordCatalystObjectStoreId,
+    secondaryRecordObjectStoreId,
+    subgraphUrl,
+    fallbackProxy,
+    orchestrators = [],
+    broadcasters = [],
+    ingest = [],
+    prices = [],
+    corsJwtAllowlist,
+    insecureTestToken,
+    returnRegionInOrchestrator,
+    halfRegionOrchestratorsUntrusted,
+    frontend,
+  } = params;
+
+  if (supportAddr || sendgridTemplateId || sendgridApiKey) {
+    if (!(supportAddr && sendgridTemplateId && sendgridApiKey)) {
+      throw new Error(
+        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
+      );
+    }
+  }
+
+  const { db, jobsDb, store, queue, stripe } = await initClients(params);
 
   // Task Scheduler
   await taskScheduler.start(params, queue);
@@ -156,16 +179,7 @@ export default async function appRouter(params: CliArgs) {
     taskScheduler.stop();
   });
 
-  if (!stripeSecretKey) {
-    console.warn(
-      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
-    );
-  }
-  const stripe = stripeSecretKey
-    ? new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" })
-    : null;
   // Logging, JSON parsing, store injection
-
   const app = Router();
   app.use(healthCheck);
   app.use(promBundle(PROM_BUNDLE_OPTS));
@@ -199,6 +213,7 @@ export default async function appRouter(params: CliArgs) {
 
   // stripe webhook requires raw body
   // https://github.com/stripe/stripe-node/issues/331
+  const bodyParser = require("body-parser");
   app.use("/api/stripe/webhook", bodyParser.raw({ type: "*/*" }));
   app.use(bodyParser.json());
 
