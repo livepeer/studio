@@ -1067,7 +1067,7 @@ const testCreatorIds: string[] = [
 ];
 
 // TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API. Maybe never :(
-function fixTrovoProfiles(profiles: Profile[], isMobile: boolean) {
+function fixTrovoProfiles(profiles: Profile[], isMobile: boolean | 0 | 1) {
   return profiles?.map((p) => ({
     ...p,
     fps: isMobile && p.fps ? 0 : p.fps,
