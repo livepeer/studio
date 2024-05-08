@@ -62,6 +62,8 @@ type MultistreamTargetRef = MultistreamOptions["targets"][number];
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 export const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
+const DEFAULT_PULL_LOCK_LEASE_TIMEOUT = 60 * 1000; // 1 min
+const PULL_REUSE_SAME_NODE_TIMEOUT = 10 * 60 * 1000; // 10 min
 
 // Helper constant to be used in the PUT /pull API to make sure we delete fields
 // from the stream that are not specified in the PUT payload.
@@ -231,6 +233,35 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
       });
     })
   );
+}
+
+// Reuse the same node for pulling the stream in two cases:
+// 1. if the same pull request is created within 1 min (this prevents race condition between different nodes executing /lockPull)
+// 2. if the same stream was stopped within 10 min (this prevents Mist delays in stopping/starting the stream)
+export function resolvePullUrlFromExistingStreams(
+  existingStreams: DBStream[]
+): { pullUrl: string; pullRegion: string } {
+  if (existingStreams.length !== 1) {
+    return null;
+  }
+  const stream = existingStreams[0];
+  const hasPullInfo = stream.pullRegion && stream.pullLockedBy;
+  const pullLockedRecently =
+    stream.pullLockedAt &&
+    stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
+  const stoppedRecently =
+    stream.lastSeen &&
+    stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT;
+  if (hasPullInfo && (pullLockedRecently || stoppedRecently)) {
+    logger.info(
+      `pull request created with the same request within 10 min, reusing existing ingest node ${stream.pullLockedBy}`
+    );
+    return {
+      pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
+      pullRegion: stream.pullRegion,
+    };
+  }
+  return null;
 }
 
 async function resolvePullUrlAndRegion(
@@ -1114,10 +1145,9 @@ app.put(
     const streamExisted = streams.length === 1;
 
     const ingest = await getIngestBase(req);
-    const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
-      rawPayload,
-      ingest
-    );
+    const { pullUrl, pullRegion } =
+      resolvePullUrlFromExistingStreams(streams) ||
+      (await resolvePullUrlAndRegion(rawPayload, ingest));
 
     let stream: DBStream;
     if (!streamExisted) {
@@ -1180,8 +1210,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   let { leaseTimeout, host } = req.body;
   if (!leaseTimeout) {
-    // Sets the default lock lease to 60s
-    leaseTimeout = 60 * 1000;
+    leaseTimeout = DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
   }
   if (!host) {
     host = "unknown";
