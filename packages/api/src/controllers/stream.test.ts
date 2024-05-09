@@ -777,7 +777,7 @@ describe("controllers/stream", () => {
           wowza: undefined,
           pull: {
             ...postMockPullStream.pull,
-            isMobile: true,
+            isMobile: 2,
           },
           profiles: [
             {
