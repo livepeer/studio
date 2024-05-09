@@ -99,9 +99,7 @@ describe("controllers/signing-key", () => {
     });
 
     it("should list all user signing keys", async () => {
-      const res = await client.get(
-        `/access-control/signing-key?projectId=${projectId}`
-      );
+      const res = await client.get(`/access-control/signing-key`);
       expect(res.status).toBe(200);
     });
 

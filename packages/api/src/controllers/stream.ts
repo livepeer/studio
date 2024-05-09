@@ -189,7 +189,7 @@ async function validateMultistreamOpts(
 
 async function validateStreamPlaybackPolicy(
   playbackPolicy: DBStream["playbackPolicy"],
-  userId: string
+  req: Request
 ) {
   if (
     playbackPolicy?.type === "lit_signing_condition" ||
@@ -207,7 +207,7 @@ async function validateStreamPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
-    if (webhook.userId !== userId) {
+    if (!hasAccessToResource(req, webhook)) {
       throw new BadRequestError(
         `webhook ${playbackPolicy.webhookId} not found`
       );
@@ -727,6 +727,8 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const { userId } = req.params;
   let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
+  let projectId = req.token?.projectId;
+
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403);
     return res.json({
@@ -736,6 +738,7 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const query = [
     sql`data->>'deleted' IS NULL`,
     sql`data->>'userId' = ${userId}`,
+    sql`coalesce(data->>'projectId', '') = ${projectId || ""}`,
   ];
   if (streamsonly) {
     query.push(sql`data->>'parentId' IS NULL`);
@@ -1350,7 +1353,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   };
   doc = wowzaHydrate(doc);
 
-  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req);
 
   doc.profiles = hackMistSettings(req, doc.profiles);
   doc.multistream = await validateMultistreamOpts(
@@ -1742,13 +1745,7 @@ app.post(
       return res.json({ errors: ["stream not found"] });
     }
 
-    if (
-      stream.userId !== req.user.id ||
-      (stream.projectId ?? "") !== (req.project?.id ?? "")
-    ) {
-      res.status(404);
-      return res.json({ errors: ["stream not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     const newTarget = await validateMultistreamTarget(
       req.user.id,
@@ -1784,18 +1781,7 @@ app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
 
   const stream = await db.stream.get(id);
 
-  if (!stream || stream.deleted) {
-    res.status(404);
-    return res.json({ errors: ["stream not found"] });
-  }
-
-  if (
-    stream.userId !== req.user.id ||
-    (stream.projectId ?? "") !== (req.project?.id ?? "")
-  ) {
-    res.status(404);
-    return res.json({ errors: ["stream not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   let multistream: DBStream["multistream"] = stream.multistream ?? {
     targets: [],
@@ -1831,7 +1817,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess = hasAccessToResource(req, stream, true);
+    const hasAccess = hasAccessToResource(req, stream);
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1880,7 +1866,7 @@ app.patch(
     }
 
     if (playbackPolicy) {
-      await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+      await validateStreamPlaybackPolicy(playbackPolicy, req);
 
       patch = { ...patch, playbackPolicy };
     }
@@ -1911,14 +1897,7 @@ app.patch(
 app.patch("/:id/record", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.projectId ?? "") !== (req.project?.id ?? "")
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   if (stream.parentId) {
     res.status(400);
     return res.json({ errors: ["can't set for session"] });
@@ -1971,8 +1950,7 @@ app.delete("/", authorizer({}), async (req, res) => {
     const streams = await db.stream.getMany(ids);
     if (
       streams.length !== ids.length ||
-      streams.some((s) => s.userId !== req.user.id) ||
-      streams.some((s) => s.projectId !== req.project.id)
+      streams.some((s) => !hasAccessToResource(req, s))
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });

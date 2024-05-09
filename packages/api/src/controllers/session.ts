@@ -1,7 +1,7 @@
 import { Router, Request } from "express";
 import sql from "sql-template-strings";
 
-import { authorizer } from "../middleware";
+import { authorizer, hasAccessToResource } from "../middleware";
 import { User, Project } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
@@ -151,9 +151,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
-    ((session.userId !== req.user.id ||
-      (session.projectId ?? "") !== (req.project?.id ?? "") ||
-      session.deleted) &&
+    (hasAccessToResource(req, session) &&
       !req.user.admin &&
       !LVPR_SDK_EMAILS.includes(req.user.email))
   ) {

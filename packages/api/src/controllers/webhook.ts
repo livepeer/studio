@@ -1,5 +1,5 @@
 import { URL } from "url";
-import { authorizer } from "../middleware";
+import { authorizer, hasAccessToResource } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
@@ -267,8 +267,7 @@ app.delete("/", authorizer({}), async (req, res) => {
     const webhooks = await db.webhook.getMany(ids);
     if (
       webhooks.length !== ids.length ||
-      webhooks.some((s) => s.deleted || s.userId !== req.user.id) ||
-      webhooks.some((s) => (s.projectId ?? "") !== (req.project?.id ?? ""))
+      webhooks.some((s) => !hasAccessToResource(req, s))
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });
