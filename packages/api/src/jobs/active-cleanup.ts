@@ -6,15 +6,21 @@ import {
 } from "../controllers/stream";
 import logger from "../logger";
 import { CliArgs } from "../parse-cli";
+import { DB } from "../store/db";
+import Queue from "../store/queue";
 
 // queries for all the streams with active clean up pending and triggers the
 // clean up logic for them.
-export default async function runActiveCleanup(config: CliArgs) {
+export default async function activeCleanup(
+  config: CliArgs,
+  clients?: { jobsDb: DB; queue: Queue }
+) {
   const startTime = process.hrtime();
   if (!config.ingest?.length) {
     throw new Error("ingest not configured");
   }
-  const { jobsDb, queue } = await initClients(config, "active-cleanup-job");
+  const { jobsDb, queue } =
+    clients ?? (await initClients(config, "active-cleanup-job"));
   const { activeCleanupLimit: limit, ingest } = config;
 
   const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
@@ -42,4 +48,5 @@ export default async function runActiveCleanup(config: CliArgs) {
   logger.info(
     `Ran active-cleanup job. elapsedTime=${elapsedTimeSec}s limit=${limit} numCleanedUp=${cleanedUp.length}`
   );
+  return cleanedUp;
 }

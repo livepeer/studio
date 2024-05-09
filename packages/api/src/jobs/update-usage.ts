@@ -1,11 +1,17 @@
+import Stripe from "stripe";
 import { initClients } from "../app-router";
 import { reportUsage } from "../controllers/stripe";
 import logger from "../logger";
 import { CliArgs } from "../parse-cli";
+import { DB } from "../store/db";
 
-export default async function updateUsage(config: CliArgs) {
+export default async function updateUsage(
+  config: CliArgs,
+  clients?: { jobsDb: DB; stripe: Stripe }
+) {
   const startTime = process.hrtime();
-  const { jobsDb, stripe } = await initClients(config, "update-usage-job");
+  const { jobsDb, stripe } =
+    clients ?? (await initClients(config, "update-usage-job"));
 
   let {
     updateUsageFrom: fromTime,
@@ -61,4 +67,5 @@ export default async function updateUsage(config: CliArgs) {
   logger.info(
     `Ran update-usage job. elapsedTime=${elapsedTimeSec}s from=${fromTime} to=${toTime} numUpdatedUsers=${updatedUsers.length}`
   );
+  return { usageHistory, updatedUsers };
 }

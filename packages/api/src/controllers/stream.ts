@@ -5,6 +5,7 @@ import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
+import activeCleanup from "../jobs/active-cleanup";
 import logger from "../logger";
 import {
   authorizer,
@@ -2192,32 +2193,20 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   return response;
 });
 
-// TODO: Remove this API once we migrate to kubernetes cronjobs
+// Runs the active-cleanup job on-demand if necessary
 app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
     const limit = parseInt(req.query.limit?.toString()) || 1000;
-    const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
-    let [streams] = await jobsDb.stream.find(
-      [
-        sql`data->>'isActive' = 'true'`,
-        sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
-      ],
-      {
-        limit,
-        order: "data->>'lastSeen' DESC",
-      }
-    );
 
-    const ingest = await getIngestBase(req);
-    const [cleanedUp, jobPromise] = triggerCleanUpIsActiveJob(
-      req.config,
-      streams,
-      req.queue,
-      ingest
+    const cleanedUp = await activeCleanup(
+      {
+        ...req.config,
+        activeCleanupLimit: limit,
+      },
+      { jobsDb, queue: req.queue }
     );
-    await jobPromise;
 
     res.status(200);
     res.json({ cleanedUp });

@@ -3,13 +3,13 @@ import Router from "express/lib/router";
 import fetch from "node-fetch";
 import qs from "qs";
 import { products } from "../config";
+import updateUsage from "../jobs/update-usage";
 import { authorizer, validatePost } from "../middleware";
 import { User } from "../schema/types";
 import { db, jobsDb } from "../store";
 import { NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import { Ingest } from "../types/common";
-import { reportUsage } from "./stripe";
 
 const app = Router();
 
@@ -337,7 +337,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
   res.json(overage, usagePercentages);
 });
 
-// TODO: Delete this API once we migrate to Kubernetes cronjobs
+// Runs the update-usage job on demand if necessary
 app.post(
   "/update",
   authorizer({ anyAdmin: true }),
@@ -345,43 +345,15 @@ app.post(
   async (req, res) => {
     let { fromTime, toTime } = req.query;
 
-    // if time range isn't specified return all usage
-    if (!fromTime) {
-      let rows = (
-        await jobsDb.usage.find(
-          {},
-          { limit: 1, order: "data->>'date' DESC", useReplica: true }
-        )
-      )[0];
-
-      if (rows.length) {
-        fromTime = rows[0].date; // get last updated date from cache
-      } else {
-        fromTime = +new Date(2020, 0); // start at beginning
-      }
-    }
-
-    if (!toTime) {
-      toTime = +new Date();
-    }
-
-    let usageHistory = await jobsDb.stream.usageHistory(fromTime, toTime, {
-      useReplica: true,
-    });
-
-    // store each day of usage
-    for (const row of usageHistory) {
-      const dbRow = await jobsDb.usage.get(row.id);
-      // if row already exists in cache, update it, otherwise create it
-      if (dbRow) {
-        await jobsDb.usage.replace({ kind: "usage", ...row });
-      } else {
-        await jobsDb.usage.create({ kind: "usage", ...row });
-      }
-    }
-
-    // New automated billing usage report
-    await reportUsage(req.stripe, req.config, req.token.id);
+    const { usageHistory } = await updateUsage(
+      {
+        ...req.config,
+        updateUsageFrom: fromTime,
+        updateUsageTo: toTime,
+        updateUsageApiToken: req.token.id,
+      },
+      { jobsDb, stripe: req.stripe }
+    );
 
     res.status(200);
     res.json(usageHistory);
