@@ -89,7 +89,7 @@ export async function initClients(params: CliArgs, serviceName = "api") {
 
   // RabbitMQ
   const queue: Queue = amqpUrl
-    ? await RabbitQueue.connect(amqpUrl, amqpTasksExchange)
+    ? await RabbitQueue.connect(amqpUrl, appName, amqpTasksExchange)
     : new NoopQueue();
 
   process.on("beforeExit", (code) => {
