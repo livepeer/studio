@@ -1071,9 +1071,10 @@ function fixedTrovoProfiles({
   profiles,
   pull: { isMobile },
 }: NewStreamPayload) {
+  const isMobileCamera = isMobile === 2; // 0: not mobile, 1: mobile screen share, 2: mobile camera
   return profiles?.map((p) => ({
     ...p,
-    fps: isMobile && p.fps ? 0 : p.fps,
+    fps: isMobileCamera && p.fps ? 0 : p.fps,
     width: p.height === 480 && Math.abs(854 - p.width) <= 6 ? 854 : p.width,
   }));
 }
