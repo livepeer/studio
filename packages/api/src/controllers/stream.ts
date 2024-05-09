@@ -704,15 +704,7 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.isUIAdmin) ||
-    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
     kind: "stream",
@@ -809,16 +801,8 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
     kind: "stream",
     query: { playbackId: req.params.playbackId },
   });
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id ||
-      (stream.projectId ?? "") !== (req.project?.id ?? "") ||
-      stream.deleted) &&
-      !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+
+  req.checkResourceAccess(stream);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
@@ -834,16 +818,7 @@ app.get("/key/:streamKey", authorizer({}), async (req, res) => {
     { streamKey: req.params.streamKey },
     { useReplica }
   );
-  if (
-    !docs.length ||
-    ((docs[0].userId !== req.user.id ||
-      (docs[0].projectId ?? "" !== req.project?.id ?? "") ||
-      docs[0].deleted) &&
-      !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(docs[0]);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
@@ -893,17 +868,7 @@ app.post(
       stream = await db.stream.get(req.params.streamId);
     }
 
-    if (
-      !stream ||
-      ((stream.userId !== req.user.id ||
-        (stream.projectId ?? "") !== (req.project?.id ?? "") ||
-        stream.deleted) &&
-        !(req.user.admin && !stream.deleted))
-    ) {
-      // do not reveal that stream exists
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     const sessionId = req.query.sessionId?.toString();
     const region = req.config.ownRegion;
@@ -1980,15 +1945,7 @@ app.patch("/:id/record", authorizer({}), async (req, res) => {
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.user.admin) ||
-    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   await db.stream.update(stream.id, {
     deleted: true,
@@ -2046,19 +2003,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
     isSession = true;
     stream = await db.stream.get(stream.parentId);
   }
-  if (
-    !stream ||
-    (!req.user.admin &&
-      (stream.deleted ||
-        stream.userId !== req.user.id ||
-        (stream.projectId ?? "") !== (req.project?.id ?? "")))
-  ) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
-  }
-
+  req.checkResourceAccess(stream);
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
@@ -2119,16 +2064,7 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   }
   const { suspended } = req.body;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin &&
-      (stream.deleted ||
-        stream.userId !== req.user.id ||
-        (stream.projectId ?? "") !== (req.project?.id ?? "")))
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   await db.stream.update(stream.id, { suspended });
   if (suspended) {
     // now kill live stream
@@ -2145,16 +2081,7 @@ app.post(
   async (req, res) => {
     const { id } = req.params;
     const stream = await db.stream.get(id);
-    if (
-      !stream ||
-      (!req.user.admin &&
-        (stream.deleted ||
-          stream.userId !== req.user.id ||
-          (stream.projectId ?? "") !== (req.project?.id ?? "")))
-    ) {
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     if (!stream.pull) {
       res.status(400);
@@ -2171,16 +2098,7 @@ app.post(
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin &&
-      (stream.deleted ||
-        stream.userId !== req.user.id ||
-        (stream.projectId ?? "") !== (req.project?.id ?? "")))
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   if (terminateDelay(stream) > 0) {
     throw new TooManyRequestsError(`too many terminate requests`);

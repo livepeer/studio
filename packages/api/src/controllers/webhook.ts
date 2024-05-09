@@ -175,16 +175,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   logger.info(`webhook params ${req.params.id}`);
 
   const webhook = await db.webhook.get(req.params.id);
-  if (
-    !webhook ||
-    ((webhook.deleted ||
-      webhook.userId !== req.user.id ||
-      (webhook.projectId ?? "") !== (req.project?.id ?? "")) &&
-      !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(webhook);
 
   res.status(200);
   res.json(webhook);
@@ -193,16 +184,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
   // modify a specific webhook
   const webhook = await req.store.get(`webhook/${req.body.id}`);
-  if (
-    (webhook.userId !== req.user.id ||
-      webhook.deleted ||
-      (webhook.projectId ?? "") !== (req.project?.id ?? "")) &&
-    !req.user.admin
-  ) {
-    // do not reveal that webhooks exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(webhook);
 
   const { id, userId, projectId, createdAt } = webhook;
   const doc = validateWebhookPayload(
@@ -233,15 +215,7 @@ app.patch(
       throw new NotFoundError(`webhook not found`);
     }
 
-    if (
-      (webhook.userId !== req.user.id ||
-        webhook.deleted ||
-        (webhook.projectId ?? "") !== (req.project?.id ?? "")) &&
-      !req.user.admin
-    ) {
-      // do not reveal that webhooks exists
-      throw new NotFoundError(`webhook not found`);
-    }
+    req.checkResourceAccess(webhook);
 
     const { id, userId, projectId, createdAt, kind } = webhook;
 
@@ -268,17 +242,7 @@ app.patch(
 app.delete("/:id", authorizer({}), async (req, res) => {
   // delete a specific webhook
   const webhook = await db.webhook.get(req.params.id);
-  if (
-    !webhook ||
-    ((webhook.deleted ||
-      webhook.userId !== req.user.id ||
-      (webhook.projectId ?? "") !== (req.project?.id ?? "")) &&
-      !req.isUIAdmin)
-  ) {
-    // do not reveal that webhooks exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(webhook, true);
 
   try {
     await db.webhook.markDeleted(webhook.id);
