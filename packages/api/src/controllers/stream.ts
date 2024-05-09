@@ -6,7 +6,12 @@ import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
 import logger from "../logger";
-import { authorizer, geolocateMiddleware, validatePost } from "../middleware";
+import {
+  authorizer,
+  geolocateMiddleware,
+  validatePost,
+  hasAccessToResource,
+} from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -617,15 +622,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    (stream.deleted && !req.isUIAdmin) ||
-    (stream.userId !== req.user.id && !req.isUIAdmin) ||
-    ((stream.projectId ?? "") !== (req.project?.id ?? "") && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   let filterOut;
   const query = [];
@@ -777,18 +774,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
   const { forceUrl } = req.query;
   let stream = await db.stream.get(req.params.id);
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id ||
-      (stream.projectId ?? "") !== (req.project?.id ?? "") ||
-      stream.deleted) &&
-      !req.user.admin)
-  ) {
-    // do not reveal that stream exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-
+  req.checkResourceAccess(stream);
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -1880,10 +1866,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess =
-      stream?.userId === req.user.id ||
-      (stream?.projectId ?? "" !== req.project?.id ?? "") ||
-      req.isUIAdmin;
+    const hasAccess = hasAccessToResource(req, stream, true);
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
