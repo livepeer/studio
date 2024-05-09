@@ -6,38 +6,38 @@ import qs from "qs";
 import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
+import sql from "sql-template-strings";
 import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
 import { authorizer, validatePost } from "../middleware";
+import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
+import { CliArgs } from "../parse-cli";
 import {
   CreateCustomer,
   CreateSubscription,
-  PasswordResetTokenRequest,
+  DisableUserPayload,
   PasswordResetConfirm,
+  PasswordResetTokenRequest,
+  RefreshTokenPayload,
+  SuspendUserPayload,
   UpdateSubscription,
   User,
-  SuspendUserPayload,
-  DisableUserPayload,
-  RefreshTokenPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import {
+  FieldsMap,
   makeNextHREF,
-  sendgridEmail,
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridEmail,
   sendgridValidateEmail,
   toStringValues,
-  FieldsMap,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
-import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
-import sql from "sql-template-strings";
-import { CliArgs } from "../parse-cli";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -115,11 +115,12 @@ export const frontendUrl = (
   {
     headers: { "x-forwarded-proto": proto },
     config: { frontendDomain },
-  }: Request,
+  }: Pick<Request, "headers" | "config">,
   path: string
 ) => `${proto || "https"}://${frontendDomain}${path}`;
 
-export const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
+export const unsubscribeUrl = (req: Pick<Request, "headers" | "config">) =>
+  frontendUrl(req, "/contact");
 
 export async function terminateUserStreams(
   req: Request,

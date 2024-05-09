@@ -1,7 +1,7 @@
-import sql from "sql-template-strings";
-import Table from "./table";
-import { Stream } from "../schema/types";
 import { QueryResult, QueryResultRow } from "pg";
+import sql from "sql-template-strings";
+import { Stream } from "../schema/types";
+import Table from "./table";
 import { DBLegacyObject, QueryOptions, WithID } from "./types";
 
 interface UsageData {
@@ -135,7 +135,7 @@ export default class StreamTable extends Table<DBStream> {
       ORDER BY day
     `;
 
-    let usage = [];
+    let usage: WithID<UsageData>[] = [];
 
     let res: QueryResult<DBUsageHistoryData>;
     res = await this.db.queryWithOpts(q1, opts);

@@ -1,15 +1,15 @@
+import { Request } from "express";
 import Router from "express/lib/router";
-import { db, jobsDb } from "../store";
-import { authorizer, validatePost } from "../middleware";
-import { products } from "../config";
 import fetch from "node-fetch";
 import qs from "qs";
+import { products } from "../config";
+import { authorizer, validatePost } from "../middleware";
+import { User } from "../schema/types";
+import { db, jobsDb } from "../store";
 import { NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
-import { User } from "../schema/types";
 import { Ingest } from "../types/common";
 import { reportUsage } from "./stripe";
-import { Request } from "express";
 
 const app = Router();
 
@@ -160,7 +160,10 @@ export const getUsagePercentageOfLimit = async (product, usage) => {
   return usagePercentageOfLimit;
 };
 
-export async function getRecentlyActiveHackers(req: Request) {
+export async function getRecentlyActiveHackers(
+  ingests: Ingest[],
+  adminToken: string
+) {
   // Current date in milliseconds
   const currentDateMillis = new Date().getTime();
   const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
@@ -168,13 +171,11 @@ export async function getRecentlyActiveHackers(req: Request) {
   // One month ago unix millis timestamp
   const cutOffDate = currentDateMillis - oneMonthMillis;
 
-  const ingests = await req.getIngest();
-
   const users = await getRecentlyActiveUsers(
     cutOffDate,
     currentDateMillis,
     ingests[0].origin,
-    req.token.id
+    adminToken
   );
 
   let activeHackers = [];
@@ -251,7 +252,11 @@ app.get(
   "/recently-active",
   authorizer({ anyAdmin: true }),
   async (req: Request, res) => {
-    const recentlyActiveHackers = await getRecentlyActiveHackers(req);
+    const ingests = await req.getIngest();
+    const recentlyActiveHackers = await getRecentlyActiveHackers(
+      ingests,
+      req.token.id
+    );
 
     res.status(200);
     res.json(recentlyActiveHackers);
@@ -332,6 +337,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
   res.json(overage, usagePercentages);
 });
 
+// TODO: Delete this API once we migrate to Kubernetes cronjobs
 app.post(
   "/update",
   authorizer({ anyAdmin: true }),
@@ -375,8 +381,7 @@ app.post(
     }
 
     // New automated billing usage report
-    let token = req.token.id;
-    await reportUsage(req, token);
+    await reportUsage(req.stripe, req.config, req.token.id);
 
     res.status(200);
     res.json(usageHistory);

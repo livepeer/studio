@@ -1,29 +1,41 @@
-import { Router, Request } from "express";
-import { db, jobsDb } from "../store";
-import { products } from "../config";
+import { Router } from "express";
 import sql from "sql-template-strings";
-import { sendgridEmailPaymentFailed, sendgridEmail } from "./helpers";
-import { WithID } from "../store/types";
-import { User } from "../schema/types";
+import Stripe from "stripe";
+import { products } from "../config";
 import { authorizer } from "../middleware";
+import { CliArgs } from "../parse-cli";
+import { User } from "../schema/types";
+import { db, jobsDb } from "../store";
+import { WithID } from "../store/types";
+import { Ingest } from "../types/common";
+import { sleep } from "../util";
+import { sendgridEmail, sendgridEmailPaymentFailed } from "./helpers";
 import { getRecentlyActiveHackers, getUsageData } from "./usage";
 import {
-  notifyUser,
-  getUsageNotifications,
   HACKER_DISABLE_CUTOFF_DATE,
+  getUsageNotifications,
+  notifyUser,
 } from "./utils/notification";
-import { sleep } from "../util";
 
 const app = Router();
 const HELP_EMAIL = "help@livepeer.org";
 
-export const reportUsage = async (req: Request, adminToken: string) => {
-  let payAsYouGoUsers = await getPayAsYouGoUsers(req);
+export const reportUsage = async (
+  stripe: Stripe,
+  config: CliArgs,
+  adminToken: string
+) => {
+  let payAsYouGoUsers = await getPayAsYouGoUsers(config.ingest, adminToken);
 
   let updatedUsers = [];
   for (const user of payAsYouGoUsers) {
     try {
-      let userUpdated = await reportUsageForUser(req, user, adminToken);
+      let userUpdated = await reportUsageForUser(
+        stripe,
+        config,
+        user,
+        adminToken
+      );
       updatedUsers.push(userUpdated);
     } catch (e) {
       console.log(`
@@ -42,7 +54,7 @@ export const reportUsage = async (req: Request, adminToken: string) => {
   };
 };
 
-async function getPayAsYouGoUsers(req: Request) {
+async function getPayAsYouGoUsers(ingests: Ingest[], adminToken: string) {
   const [users] = await jobsDb.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
@@ -53,14 +65,15 @@ async function getPayAsYouGoUsers(req: Request) {
     }
   );
 
-  const hackerUsers = await getRecentlyActiveHackers(req);
+  const hackerUsers = await getRecentlyActiveHackers(ingests, adminToken);
 
   const payAsYouGoUsers = [...users, ...hackerUsers];
   return payAsYouGoUsers;
 }
 
 async function reportUsageForUser(
-  req: Request,
+  stripe: Stripe,
+  config: CliArgs,
   user: WithID<User>,
   adminToken: string,
   actuallyReport: boolean = true,
@@ -78,7 +91,7 @@ async function reportUsageForUser(
     };
   }
 
-  const userSubscription = await req.stripe.subscriptions.retrieve(
+  const userSubscription = await stripe.subscriptions.retrieve(
     user.stripeCustomerSubscriptionId
   );
 
@@ -90,17 +103,15 @@ async function reportUsageForUser(
     billingCycleEnd = to;
   }
 
-  const ingests = await req.getIngest();
-
   const usageData = await getUsageData(
     user,
     billingCycleStart,
     billingCycleEnd,
-    ingests,
+    config.ingest,
     adminToken
   );
 
-  const subscriptionItems = await req.stripe.subscriptionItems.list({
+  const subscriptionItems = await stripe.subscriptionItems.list({
     subscription: user.stripeCustomerSubscriptionId,
   });
 
@@ -110,7 +121,7 @@ async function reportUsageForUser(
   );
 
   if (usageNotifications.length > 0) {
-    await notifyUser(usageNotifications, user, req);
+    await notifyUser(usageNotifications, user, { headers: {}, config });
   }
 
   if (actuallyReport) {
@@ -126,8 +137,8 @@ async function reportUsageForUser(
       usage: reporting usage to stripe for user=${user.id} email=${user.email} from=${billingCycleStart} to=${billingCycleEnd}
     `);
     await sendUsageRecordToStripe(
+      stripe,
       user,
-      req,
       subscriptionItemsByLookupKey,
       usageData.overUsage
     );
@@ -147,8 +158,8 @@ async function reportUsageForUser(
 }
 
 const sendUsageRecordToStripe = async (
+  stripe: Stripe,
   user: WithID<User>,
-  req: Request,
   subscriptionItemsByLookupKey,
   overUsage
 ) => {
@@ -156,7 +167,7 @@ const sendUsageRecordToStripe = async (
   await Promise.all(
     products[user.stripeProductId].usage.map(async (product) => {
       if (product.name === "Transcoding") {
-        await req.stripe.subscriptionItems.createUsageRecord(
+        await stripe.subscriptionItems.createUsageRecord(
           subscriptionItemsByLookupKey["transcoding_usage"],
           {
             quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
@@ -165,7 +176,7 @@ const sendUsageRecordToStripe = async (
           }
         );
       } else if (product.name === "Delivery") {
-        await req.stripe.subscriptionItems.createUsageRecord(
+        await stripe.subscriptionItems.createUsageRecord(
           subscriptionItemsByLookupKey["tstreaming_usage"],
           {
             quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
@@ -174,7 +185,7 @@ const sendUsageRecordToStripe = async (
           }
         );
       } else if (product.name === "Storage") {
-        await req.stripe.subscriptionItems.createUsageRecord(
+        await stripe.subscriptionItems.createUsageRecord(
           subscriptionItemsByLookupKey["tstorage_usage"],
           {
             quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),

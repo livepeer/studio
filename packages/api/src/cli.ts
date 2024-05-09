@@ -5,6 +5,7 @@ import "./dotenv";
 import makeApp from "./index";
 import runActiveCleanup from "./jobs/active-cleanup";
 import createDbTables from "./jobs/create-db-tables";
+import updateUsage from "./jobs/update-usage";
 import parseCli from "./parse-cli";
 
 if (require.main === module) {
@@ -15,6 +16,8 @@ if (require.main === module) {
     runActiveCleanup(args);
   } else if (args.job === "create-db-tables") {
     createDbTables(args);
+  } else if (args.job === "update-usage") {
+    updateUsage(args);
   } else {
     makeApp(args);
   }

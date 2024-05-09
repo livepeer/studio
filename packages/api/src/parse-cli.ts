@@ -17,7 +17,11 @@ const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://gateway.arweave.net/",
 ];
 
-const JOB_TYPES = ["active-cleanup", "create-db-tables"] as const;
+const JOB_TYPES = [
+  "active-cleanup",
+  "create-db-tables",
+  "update-usage",
+] as const;
 
 const yargs = Yargs() as unknown as Argv;
 
@@ -523,6 +527,21 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "job/active-cleanup: max number of streams to clean up",
         type: "number",
         default: 1000,
+      },
+      "update-usage-from": {
+        describe:
+          "job/update-usage: unix millis timestamp for start time of update usage job",
+        type: "number",
+      },
+      "update-usage-to": {
+        describe:
+          "job/update-usage: unix millis timestamp for end time of update usage job",
+        type: "number",
+      },
+      "update-usage-api-token": {
+        describe:
+          "job/update-usage: Admin API token to be used in the update usage job internal calls",
+        type: "string",
       },
       "stream-info-service": {
         describe: "start the Stream Info service instead of Studio API",
