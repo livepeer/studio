@@ -185,9 +185,7 @@ describe("controllers/stream", () => {
           projectId: i > 2 ? projectId : undefined,
         } as DBStream;
         await server.store.create(document);
-        const res = await client.get(
-          `/stream/${document.id}/?projectId=${projectId}`
-        );
+        const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
         expect(stream).toEqual(server.db.stream.addDefaultFields(document));
       }
