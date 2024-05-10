@@ -736,6 +736,10 @@ export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
 }
 
 export async function addDefaultProjectId(body, req: Request, res: Response) {
+  if (req.user.admin) {
+    return body;
+  }
+
   const enrichResponse = (document) => {
     if (!document.projectId || document.projectId === "") {
       document.projectId = req.user.defaultProjectId;
