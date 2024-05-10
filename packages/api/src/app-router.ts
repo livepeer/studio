@@ -57,21 +57,16 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
 const isTest =
   process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
 
-export async function initClients(params: CliArgs, serviceName = "api") {
+export async function initDb(params: CliArgs, serviceName = "api") {
   const {
     postgresUrl,
     postgresReplicaUrl,
     postgresConnPoolSize: pgPoolSize,
     postgresJobsConnPoolSize: pgJobsPoolSize,
     postgresCreateTables: createTablesOnDb,
-    defaultCacheTtl,
     ownRegion,
-    stripeSecretKey,
-    amqpUrl,
-    amqpTasksExchange,
   } = params;
 
-  // Storage init
   const appName = ownRegion ? `${ownRegion}-${serviceName}` : serviceName;
   const pgBaseParams: PostgresParams = {
     postgresUrl,
@@ -83,11 +78,25 @@ export async function initClients(params: CliArgs, serviceName = "api") {
     { ...pgBaseParams, poolMaxSize: pgPoolSize },
     { ...pgBaseParams, poolMaxSize: pgJobsPoolSize, appName: `${appName}-jobs` }
   );
+  return { db, jobsDb, store };
+}
+
+export async function initClients(params: CliArgs, serviceName = "api") {
+  const {
+    defaultCacheTtl,
+    ownRegion,
+    stripeSecretKey,
+    amqpUrl,
+    amqpTasksExchange,
+  } = params;
+
+  const { db, jobsDb, store } = await initDb(params, serviceName);
   if (defaultCacheTtl > 0) {
     cache.init({ stdTTL: defaultCacheTtl });
   }
 
   // RabbitMQ
+  const appName = ownRegion ? `${ownRegion}-${serviceName}` : serviceName;
   const queue: Queue = amqpUrl
     ? await RabbitQueue.connect(amqpUrl, appName, amqpTasksExchange)
     : new NoopQueue();

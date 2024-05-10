@@ -7,7 +7,7 @@ import updateUsage from "./update-usage";
 
 type JobFunc = (config: CliArgs) => Promise<void | { logContext?: string }>;
 
-const jobFuncs: Record<JobType, JobFunc> = {
+export const jobFuncs: Record<JobType, JobFunc> = {
   "active-cleanup": activeCleanup,
   "create-db-tables": createDbTables,
   "update-usage": updateUsage,
