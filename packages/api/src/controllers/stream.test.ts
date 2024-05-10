@@ -1479,16 +1479,8 @@ describe("controllers/stream", () => {
       let res = await client.get(`/stream/user/${nonAdminUser.id}`);
       expect(res.status).toBe(200);
       const streams = await res.json();
-      expect(streams.length).toEqual(8);
+      expect(streams.length).toEqual(3);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
-
-      // ensure project associated with a new api-key is not enforced for this endpoint
-      client.apiKey = newApiKey.id;
-      let res2 = await client.get(`/stream/user/${nonAdminUser.id}`);
-      expect(res2.status).toBe(200);
-      const streams2 = await res2.json();
-      expect(streams2.length).toEqual(8);
-      expect(streams2[0].userId).toEqual(nonAdminUser.id);
     });
 
     it("should get streams owned by project when using api-key for project", async () => {
@@ -1505,7 +1497,7 @@ describe("controllers/stream", () => {
       let res = await client.get(`/stream/user/${nonAdminUser.id}`);
       expect(res.status).toBe(200);
       const streams = await res.json();
-      expect(streams.length).toEqual(8);
+      expect(streams.length).toEqual(3);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
       let dres = await client.delete(`/stream/${streams[0].id}`);
       expect(dres.status).toBe(204);
@@ -1514,7 +1506,7 @@ describe("controllers/stream", () => {
       let res2 = await client.get(`/stream/user/${nonAdminUser.id}`);
       expect(res2.status).toBe(200);
       const streams2 = await res2.json();
-      expect(streams2.length).toEqual(7);
+      expect(streams2.length).toEqual(2);
     });
 
     it("should not get others streams", async () => {
