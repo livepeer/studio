@@ -4,7 +4,6 @@ import {
   ACTIVE_TIMEOUT,
   triggerCleanUpIsActiveJob,
 } from "../controllers/stream";
-import logger from "../logger";
 import { CliArgs } from "../parse-cli";
 import { DB } from "../store/db";
 import Queue from "../store/queue";
@@ -15,7 +14,6 @@ export default async function activeCleanup(
   config: CliArgs,
   clients?: { jobsDb: DB; queue: Queue }
 ) {
-  const startTime = process.hrtime();
   if (!config.ingest?.length) {
     throw new Error("ingest not configured");
   }
@@ -43,10 +41,8 @@ export default async function activeCleanup(
   );
   await jobPromise;
 
-  const elapsedTime = process.hrtime(startTime);
-  const elapsedTimeSec = elapsedTime[0] + elapsedTime[1] / 1e9;
-  logger.info(
-    `Ran active-cleanup job. elapsedTime=${elapsedTimeSec}s limit=${limit} numCleanedUp=${cleanedUp.length}`
-  );
-  return cleanedUp;
+  return {
+    cleanedUp,
+    logContext: `limit=${limit} numCleanedUp=${cleanedUp.length}`,
+  };
 }

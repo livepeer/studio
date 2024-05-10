@@ -9,7 +9,6 @@ export default async function updateUsage(
   config: CliArgs,
   clients?: { jobsDb: DB; stripe: Stripe }
 ) {
-  const startTime = process.hrtime();
   const { jobsDb, stripe } =
     clients ?? (await initClients(config, "update-usage-job"));
 
@@ -62,10 +61,9 @@ export default async function updateUsage(
   // New automated billing usage report
   const { updatedUsers } = await reportUsage(stripe, config, token);
 
-  const elapsedTime = process.hrtime(startTime);
-  const elapsedTimeSec = elapsedTime[0] + elapsedTime[1] / 1e9;
-  logger.info(
-    `Ran update-usage job. elapsedTime=${elapsedTimeSec}s from=${fromTime} to=${toTime} numUpdatedUsers=${updatedUsers.length}`
-  );
-  return { usageHistory, updatedUsers };
+  return {
+    usageHistory,
+    updatedUsers,
+    logContext: `from=${fromTime} to=${toTime} numUpdatedUsers=${updatedUsers.length}`,
+  };
 }

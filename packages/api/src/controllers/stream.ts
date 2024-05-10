@@ -2200,7 +2200,7 @@ app.post(
   async (req, res) => {
     const limit = parseInt(req.query.limit?.toString()) || 1000;
 
-    const cleanedUp = await activeCleanup(
+    const { cleanedUp } = await activeCleanup(
       {
         ...req.config,
         activeCleanupLimit: limit,

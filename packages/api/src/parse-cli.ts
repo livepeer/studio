@@ -23,6 +23,8 @@ const JOB_TYPES = [
   "update-usage",
 ] as const;
 
+export type JobType = (typeof JOB_TYPES)[number];
+
 const yargs = Yargs() as unknown as Argv;
 
 function coerceArr(arg: any) {
@@ -523,6 +525,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         choices: JOB_TYPES,
       },
+      "job-timeout-sec": {
+        describe: "job timeout in seconds",
+        type: "number",
+        default: 120,
+      },
       "active-cleanup-limit": {
         describe: "job/active-cleanup: max number of streams to clean up",
         type: "number",
@@ -618,9 +625,7 @@ export default function parseCli(argv?: string | readonly string[]) {
     .help()
     .parse(argv);
   // yargs returns a Promise even tho we don't have any async middlewares
-  const parsed = parsedProm as Awaited<typeof parsedProm> & {
-    job?: (typeof JOB_TYPES)[number];
-  };
+  const parsed = parsedProm as Awaited<typeof parsedProm> & { job?: JobType };
   const mistOutput = yargsToMist(allOptions);
   if (parsed.json === true) {
     console.log(JSON.stringify(mistOutput));
