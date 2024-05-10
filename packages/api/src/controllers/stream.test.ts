@@ -1898,7 +1898,11 @@ describe("controllers/stream", () => {
             id: expect.stringMatching(uuidRegex),
             webhookId: webhookObj.id,
             event: "stream.detection",
-            stream: { ...stream, streamKey: undefined },
+            stream: {
+              ...stream,
+              streamKey: undefined,
+              projectId: expect.any(String),
+            },
             payload: { sceneClassification, seqNo: 1 },
           });
         });

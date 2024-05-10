@@ -144,7 +144,7 @@ describe("controllers/asset", () => {
           type: "url",
           url: spec.url,
         },
-        projectId: "", //should be blank when using jwt and projectId not specified as query-param
+        projectId: expect.any(String), //should have a default project id
         status: { phase: "waiting" },
       });
 
