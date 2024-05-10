@@ -3,10 +3,11 @@ import fetch, { RequestInit } from "node-fetch";
 import { v4 as uuid } from "uuid";
 
 import schema from "./schema/schema.json";
-import { User } from "./schema/types";
+import { ApiToken, User } from "./schema/types";
 import { TestServer } from "./test-server";
 import fs from "fs";
 import jwt, { VerifyOptions } from "jsonwebtoken";
+import { WithID } from "./store/types";
 
 const vhostUrl = (vhost: string) =>
   `http://guest:guest@127.0.0.1:15672/api/vhosts/${vhost}`;
@@ -215,7 +216,7 @@ export async function createApiToken({
   projectId: string;
   tokenName?: string;
   jwtAuthToken: string;
-}): Promise<string> {
+}): Promise<WithID<ApiToken>> {
   client.jwtAuth = jwtAuthToken;
   let res = await client.post(`/api-token/?projectId=${projectId}`, {
     name: tokenName,

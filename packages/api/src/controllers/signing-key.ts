@@ -190,7 +190,7 @@ signingKeyApp.post(
       userId: req.user.id,
       createdAt: Date.now(),
       publicKey: b64PublicKey,
-      projectId: req.project?.id,
+      projectId: req.project?.id ?? "",
     };
 
     await db.signingKey.create(doc);

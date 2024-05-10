@@ -2,10 +2,16 @@ import serverPromise, { TestServer } from "../test-server";
 import {
   TestClient,
   clearDatabase,
+  createApiToken,
   setupUsers,
   verifyJwt,
 } from "../test-helpers";
-import { SigningKey, SigningKeyResponsePayload, User } from "../schema/types";
+import {
+  ApiToken,
+  SigningKey,
+  SigningKeyResponsePayload,
+  User,
+} from "../schema/types";
 import { WithID } from "../store/types";
 import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 import { db } from "../store";
@@ -50,6 +56,7 @@ describe("controllers/signing-key", () => {
     let decodedPublicKey: string;
     let otherPublicKey: string;
     let projectId: string;
+    let apiKeyWithProject: WithID<ApiToken>;
 
     beforeEach(async () => {
       ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
@@ -71,24 +78,36 @@ describe("controllers/signing-key", () => {
         otherSigningKey.publicKey,
         "base64"
       ).toString();
-
+      // create a new project
+      client.jwtAuth = nonAdminToken;
       let project = await createProject(client);
+      expect(project).toBeDefined();
       projectId = project.id;
-      expect(projectId).toBeDefined();
+      apiKeyWithProject = await createApiToken({
+        client: client,
+        projectId: project.id,
+        jwtAuthToken: nonAdminToken,
+      });
+      expect(apiKeyWithProject).toMatchObject({
+        id: expect.any(String),
+        projectId: projectId,
+      });
+      projectId = project.id;
     });
 
     it("should create a signing key and display the private key only on creation", async () => {
       const preCreationTime = Date.now();
-      let res = await client.post("/access-control/signing-key", { projectId });
-      let resWithoutProject = await client.post("/access-control/signing-key");
+      client.jwtAuth = "";
+      client.apiKey = apiKeyWithProject.id;
+      let res = await client.post("/access-control/signing-key");
       expect(res.status).toBe(201);
-      expect(resWithoutProject.status).toBe(201);
       const created = (await res.json()) as SigningKeyResponsePayload;
       expect(created).toMatchObject({
         id: expect.any(String),
         privateKey: expect.any(String),
         publicKey: expect.any(String),
         createdAt: expect.any(Number),
+        projectId: projectId,
       });
       expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
       res = await client.get(`/access-control/signing-key/${created.id}`);
@@ -99,11 +118,26 @@ describe("controllers/signing-key", () => {
     });
 
     it("should list all user signing keys", async () => {
+      client.jwtAuth = nonAdminToken;
+      client.apiKey = null;
+      let sigKeyWithoutProject = await client.post(
+        "/access-control/signing-key"
+      );
+      expect(sigKeyWithoutProject.status).toBe(201);
+      client.jwtAuth = "";
+      client.apiKey = apiKeyWithProject.id;
+      let sigkey = await client.post("/access-control/signing-key");
+      expect(sigkey.status).toBe(201);
       const res = await client.get(`/access-control/signing-key`);
       expect(res.status).toBe(200);
+      const output = await res.json();
+      expect(output).toHaveLength(1);
+      expect(output[0].projectId).toBe(projectId);
     });
 
     it("should create a JWT using the private key and verify it with the public key", async () => {
+      client.jwtAuth = "";
+      client.apiKey = apiKeyWithProject.id;
       const expiration = Math.floor(Date.now() / 1000) + 1000;
       const payload: JwtPayload = {
         sub: "b0dcxvwml48mxt2s",
@@ -128,6 +162,11 @@ describe("controllers/signing-key", () => {
     });
 
     it("should allow disable and enable the signing key & change the name", async () => {
+      client.jwtAuth = "";
+      client.apiKey = apiKeyWithProject.id;
+      let sigkey = await client.post("/access-control/signing-key");
+      expect(sigkey.status).toBe(201);
+      let signingKey = await sigkey.json();
       let res = await client.patch(
         `/access-control/signing-key/${signingKey.id}`,
         {
@@ -152,6 +191,11 @@ describe("controllers/signing-key", () => {
     });
 
     it("should delete the signing key", async () => {
+      client.jwtAuth = "";
+      client.apiKey = apiKeyWithProject.id;
+      let sigkey = await client.post("/access-control/signing-key");
+      expect(sigkey.status).toBe(201);
+      let signingKey = await sigkey.json();
       let res = await client.delete(
         `/access-control/signing-key/${signingKey.id}`
       );

@@ -1466,8 +1466,13 @@ describe("controllers/stream", () => {
           userId: nonAdminUser.id,
           projectId: project.id,
         };
-        await server.store.create(document);
-        const res = await client.get(`/stream/${document.id}`);
+        const resCreate = await client.post("/stream", {
+          ...postMockStream,
+          name: "videorec+samplePlaybackId",
+        });
+        expect(resCreate.status).toBe(201);
+        const createdStream = await resCreate.json();
+        const res = await client.get(`/stream/${createdStream.id}`);
         expect(res.status).toBe(200);
         let stream = await res.json();
         expect(stream.projectId).toEqual(project.id);
