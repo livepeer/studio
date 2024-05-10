@@ -151,8 +151,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
-    (hasAccessToResource(req, session) &&
-      !req.user.admin &&
+    (!hasAccessToResource(req, session) &&
       !LVPR_SDK_EMAILS.includes(req.user.email))
   ) {
     // do not reveal that session exists
