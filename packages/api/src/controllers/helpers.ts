@@ -735,21 +735,43 @@ export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
     : inputId;
 }
 
-export async function addDefaultProjectId(body, req: Request, res: Response) {
+export async function addDefaultProjectId(
+  body: any,
+  req: Request,
+  res: Response
+) {
   if (req.user.admin) {
     return body;
   }
 
   const enrichResponse = (document) => {
-    if (!document.projectId || document.projectId === "") {
-      document.projectId = req.user.defaultProjectId;
+    // Enrich direct properties of the document if userId is present
+    if ("id" in document && "userId" in document) {
+      if (!document.projectId || document.projectId === "") {
+        document.projectId = req.user.defaultProjectId;
+      }
     }
   };
 
+  // Look for subobjects
   if (Array.isArray(body)) {
-    body.forEach(enrichResponse);
-  } else {
+    body.forEach((item) => {
+      if (typeof item === "object" && item !== null) {
+        Object.values(item).forEach((subItem) => {
+          if (typeof subItem === "object" && subItem !== null) {
+            enrichResponse(subItem);
+          }
+        });
+      }
+    });
+  } else if (typeof body === "object" && body !== null) {
+    Object.values(body).forEach((subItem) => {
+      if (typeof subItem === "object" && subItem !== null) {
+        enrichResponse(subItem);
+      }
+    });
     enrichResponse(body);
   }
+
   return body;
 }
