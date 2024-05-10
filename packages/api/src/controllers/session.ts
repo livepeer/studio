@@ -1,8 +1,8 @@
 import { Router, Request } from "express";
 import sql from "sql-template-strings";
 
-import { authorizer } from "../middleware";
-import { User } from "../schema/types";
+import { authorizer, hasAccessToResource } from "../middleware";
+import { User, Project } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
 import { pathJoin } from "../controllers/helpers";
@@ -36,6 +36,7 @@ const fieldsMap: FieldsMap = {
   userId: `session.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `session.data->>'parentId'`,
+  projectId: `session.data->>'projectId'`,
   record: { val: `session.data->'record'`, type: "boolean" },
   sourceSegments: `session.data->'sourceSegments'`,
   transcodedSegments: {
@@ -65,10 +66,14 @@ app.get("/", authorizer({}), async (req, res, next) => {
     limit = undefined;
   }
 
+  const query = parseFilters(fieldsMap, filters);
+
   if (!req.user.admin) {
     userId = req.user.id;
+    query.push(
+      sql`coalesce(session.data->>'projectId', '') = ${req.project?.id || ""}`
+    );
   }
-  const query = parseFilters(fieldsMap, filters);
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`(session.data->>'deleted')::boolean IS false`);
   }
@@ -146,8 +151,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
-    ((session.userId !== req.user.id || session.deleted) &&
-      !req.user.admin &&
+    (!hasAccessToResource(req, session) &&
       !LVPR_SDK_EMAILS.includes(req.user.email))
   ) {
     // do not reveal that session exists

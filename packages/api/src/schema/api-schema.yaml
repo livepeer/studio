@@ -176,6 +176,10 @@ components:
         name:
           type: string
           example: test_webhook
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         createdAt:
           type: number
           readOnly: true
@@ -611,6 +615,10 @@ components:
               height: 720
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         record:
           description: |
             Should this stream be recorded? Uses default settings. For more
@@ -841,6 +849,10 @@ components:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         record:
           description: >
             Whether the stream should be recorded. Uses default settings. For
@@ -1250,6 +1262,15 @@ components:
           readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
+    new-signing-key-payload:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Name of the signing key
+        projectId:
+          type: string
+          description: Project ID to which this signing key belongs
     new-asset-payload:
       additionalProperties: false
       required:
@@ -2093,6 +2114,10 @@ components:
           type: boolean
           description: Disable the signing key to allow rotation safely
           example: false
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb
     user:
       type: object
       required:
