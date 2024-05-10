@@ -630,11 +630,6 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   query.push(sql`(data->'lastSeen')::bigint > 0`);
   query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
   query.push(sql`data->>'partialSession' IS NULL`);
-  if (!req.isUIAdmin) {
-    query.push(
-      sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`
-    );
-  }
   if (record) {
     if (record === "true" || record === "1") {
       query.push(sql`data->>'record' = 'true'`);
