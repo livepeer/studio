@@ -102,7 +102,9 @@ export default class WebhookCannon {
     try {
       ack = await this.processWebhookEvent(event);
     } catch (err) {
-      ack = isRuntimeError(err);
+      // only ack the event if it's a runtime error (could lead to webhooks accumulating indefinitely) or an explicit
+      // unprocessable entity error, thrown for bad messages by processWebhookEvent.
+      ack = isRuntimeError(err) || err instanceof UnprocessableEntityError;
       console.log("handleEventQueue Error ", err);
     } finally {
       if (ack) {
@@ -129,10 +131,6 @@ export default class WebhookCannon {
           `Error handling recording.waiting event sessionId=${sessionId} err=`,
           e
         );
-        // only ack the event if it's an explicit unprocessable entity error
-        if (e instanceof UnprocessableEntityError) {
-          return true;
-        }
         throw e;
       }
     }
@@ -154,7 +152,7 @@ export default class WebhookCannon {
       });
       if (!stream) {
         // if stream isn't found. don't fire the webhook, log an error
-        throw new Error(
+        throw new UnprocessableEntityError(
           `webhook Cannon: onTrigger: Stream Not found , streamId: ${streamId}`
         );
       }
@@ -166,10 +164,13 @@ export default class WebhookCannon {
     }
 
     let user = await db.user.get(userId);
-    if (!user || user.suspended) {
-      // if user isn't found. don't fire the webhook, log an error
-      throw new Error(
-        `webhook Cannon: onTrigger: User Not found , userId: ${userId}`
+    if (!user) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: User not found userId=${userId}`
+      );
+    } else if (user.suspended) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: User suspended userId=${userId}`
       );
     }
 
@@ -393,7 +394,7 @@ export default class WebhookCannon {
         if (isSuccess(resp)) {
           // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
-          return true;
+          return;
         }
         if (resp.status >= 500) {
           await this.retry(
