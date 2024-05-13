@@ -25,7 +25,6 @@ describe("active-cleanup", () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
     jest.restoreAllMocks();
     cache.storage = null;
   });
