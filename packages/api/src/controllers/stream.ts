@@ -1645,7 +1645,7 @@ async function triggerSessionRecordingProcessing(
   for (const stream of childStreams) {
     if (!stream.parentId) {
       logger.error(
-        `triggerSessionRecordingHooks: ignoring parent streamId=${stream.id} stream=`,
+        `triggerSessionRecordingProcessing: ignoring parent streamId=${stream.id} stream=`,
         stream
       );
       continue;
@@ -1663,9 +1663,13 @@ async function triggerSessionRecordingProcessing(
   await Promise.all(
     Object.keys(streamsBySessionId).map(async (sessionId) => {
       const streamsFromSession = streamsBySessionId[sessionId];
+      const streamsIds = streamsFromSession.map((s) => s.id).join(",");
       try {
         if (!sessionId) {
           // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
+          logger.info(
+            `triggerSessionRecordingProcessing: Clearing isActive for recording v1 child streams sessionId=${sessionId} childStreamsIds=${streamsIds}`
+          );
           await clearIsActiveMany(db, streamsFromSession);
           return;
         }
@@ -1674,6 +1678,9 @@ async function triggerSessionRecordingProcessing(
         if (asset) {
           // if we have an asset, then the recording has already been processed and we don't need to send a
           // recording.waiting hook. also clear the isActive field from child streams.
+          logger.info(
+            `triggerSessionRecordingProcessing: Clearing isActive for already processed session sessionId=${sessionId} assetId=${asset.id}`
+          );
           await clearIsActiveMany(db, streamsFromSession);
           return;
         }
@@ -1688,8 +1695,11 @@ async function triggerSessionRecordingProcessing(
         if (!session.record || isStale) {
           if (isStale) {
             logger.info(
-              `Skipping recording for stale session ` +
-                `session_id=${session.id} last_seen=${session.lastSeen}`
+              `triggerSessionRecordingProcessing: Skipping recording for stale session sessionId=${session.id} lastSeen=${session.lastSeen} childStreamsIds=${streamsIds}`
+            );
+          } else {
+            logger.info(
+              `triggerSessionRecordingProcessing: Clearing isActive for session without recording enabled sessionId=${session.id} childStreamsIds=${streamsIds}`
             );
           }
           // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
@@ -1697,6 +1707,9 @@ async function triggerSessionRecordingProcessing(
           return;
         }
 
+        logger.info(
+          `triggerSessionRecordingProcessing: Triggering recording.waiting hook sessionId=${sessionId} childStreamsIds=${streamsIds}`
+        );
         await publishDelayedRecordingWaitingHook(
           config,
           session,
