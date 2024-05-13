@@ -4,7 +4,7 @@ import * as appRouter from "../app-router";
 import * as streamController from "../controllers/stream";
 import { cache } from "../store/cache";
 import { DB } from "../store/db";
-import { NoopQueue, RabbitQueue } from "../store/queue";
+import Queue, { NoopQueue, RabbitQueue } from "../store/queue";
 import { rabbitMgmt } from "../test-helpers";
 import params, { testId } from "../test-params";
 import activeCleanup from "./active-cleanup";
@@ -13,6 +13,7 @@ describe("active-cleanup", () => {
   // There are further functional tests under controllers/stream.test.ts "active clean-up"
 
   let db: DB;
+  let initClientsSpy: jest.SpyInstance;
 
   beforeAll(async () => {
     db = new DB();
@@ -24,9 +25,26 @@ describe("active-cleanup", () => {
     await rabbitMgmt.deleteVhost(testId);
   });
 
+  let queue: Queue;
+
+  beforeEach(() => {
+    const originalInitClient = appRouter.initClients;
+    initClientsSpy = jest
+      .spyOn(appRouter, "initClients")
+      .mockImplementation(async (params, name) => {
+        const result = await originalInitClient(params, name);
+        queue = result.queue;
+        jest.spyOn(queue, "consume");
+        jest.spyOn(queue, "delayedPublishWebhook");
+        return result;
+      });
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
     cache.storage = null;
+    queue?.close();
+    queue = null;
   });
 
   const mockStream = (isActive: boolean, lastSeen: number) => {
@@ -41,29 +59,20 @@ describe("active-cleanup", () => {
   };
 
   it("should not call initClients if clients are passed", async () => {
-    const initSpy = jest.spyOn(appRouter, "initClients");
-
     await activeCleanup(params, { jobsDb: db, queue: new NoopQueue() });
 
-    expect(initSpy).not.toHaveBeenCalled();
+    expect(initClientsSpy).not.toHaveBeenCalled();
   });
 
   it("does not register any queue event handlers", async () => {
-    const originalInitClient = appRouter.initClients;
-    const initSpy = jest
-      .spyOn(appRouter, "initClients")
-      .mockImplementation(async (params, name) => {
-        const result = await originalInitClient(params, name);
-        jest.spyOn(result.queue, "consume");
-        return result;
-      });
-
     await activeCleanup(params);
 
-    expect(initSpy).toHaveBeenCalledTimes(1);
-    expect(initSpy).toHaveBeenLastCalledWith(params, "active-cleanup-job");
+    expect(initClientsSpy).toHaveBeenCalledTimes(1);
+    expect(initClientsSpy).toHaveBeenLastCalledWith(
+      params,
+      "active-cleanup-job"
+    );
 
-    const { queue } = await initSpy.mock.results[0].value;
     expect(queue.consume).not.toHaveBeenCalled();
   });
 
@@ -106,16 +115,6 @@ describe("active-cleanup", () => {
   });
 
   it("publishes messages for cleaned up streams", async () => {
-    const originalInitClient = appRouter.initClients;
-    const initSpy = jest
-      .spyOn(appRouter, "initClients")
-      .mockImplementation(async (params, name) => {
-        const result = await originalInitClient(params, name);
-        jest.spyOn(result.queue, "consume");
-        jest.spyOn(result.queue, "delayedPublishWebhook");
-        return result;
-      });
-
     const parentId = uuid();
     const lastSeen = Date.now() - streamController.ACTIVE_TIMEOUT - 1;
     const session = await db.session.create({
@@ -134,8 +133,7 @@ describe("active-cleanup", () => {
 
     await activeCleanup(params);
 
-    expect(initSpy).toHaveBeenCalledTimes(1);
-    const { queue } = await initSpy.mock.results[0].value;
+    expect(initClientsSpy).toHaveBeenCalledTimes(1);
 
     expect(queue.consume).not.toHaveBeenCalled();
     expect(queue.delayedPublishWebhook).toHaveBeenCalledTimes(1);
@@ -145,17 +143,19 @@ describe("active-cleanup", () => {
       expect.any(Number),
       "recording_waiting_delayed_events"
     );
-    expect(queue.delayedPublishWebhook.mock.calls[0][1]).toMatchObject({
-      type: "webhook_event",
-      streamId: session.parentId,
-      event: "recording.waiting",
-      userId: session.userId,
-      sessionId: session.id,
-      payload: {
-        session: {
-          id: session.id,
+    expect((queue.delayedPublishWebhook as any).mock.calls[0][1]).toMatchObject(
+      {
+        type: "webhook_event",
+        streamId: session.parentId,
+        event: "recording.waiting",
+        userId: session.userId,
+        sessionId: session.id,
+        payload: {
+          session: {
+            id: session.id,
+          },
         },
-      },
-    });
+      }
+    );
   });
 });
