@@ -2264,7 +2264,9 @@ components:
           type: number
           example: 200000
     playback-policy:
-      type: object
+      type:
+        - object
+        - "null"
       description:
         Whether the playback policy for a asset or stream is public or signed
       additionalProperties: false
