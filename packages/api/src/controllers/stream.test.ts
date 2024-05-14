@@ -19,8 +19,6 @@ import {
   clearDatabase,
   setupUsers,
   startAuxTestServer,
-  createProject,
-  createApiToken,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
@@ -115,7 +113,6 @@ describe("controllers/stream", () => {
   let nonAdminUser: User;
   let nonAdminToken: string;
   let nonAdminApiKey: string;
-  let projectId: string;
 
   beforeEach(async () => {
     await server.store.create(mockStore);
@@ -130,9 +127,6 @@ describe("controllers/stream", () => {
       nonAdminApiKey,
     } = await setupUsers(server, mockAdminUser, mockNonAdminUser));
     client.jwtAuth = adminToken;
-
-    projectId = await createProject(client);
-    expect(projectId).toBeDefined();
   });
 
   describe("basic CRUD with JWT authorization", () => {
@@ -142,7 +136,6 @@ describe("controllers/stream", () => {
         const document = {
           id: uuid(),
           kind: "stream",
-          projectId: i > 7 ? projectId : undefined,
         };
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -158,31 +151,6 @@ describe("controllers/stream", () => {
           id: uuid(),
           kind: "stream",
           deleted: i > 3 ? true : undefined,
-          projectId: i > 2 ? projectId : undefined,
-        } as DBStream;
-        await server.store.create(document);
-        const res = await client.get(`/stream/${document.id}`);
-        const stream = await res.json();
-        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
-      }
-
-      const res = await client.get("/stream");
-      expect(res.status).toBe(200);
-      const streams = await res.json();
-      expect(streams.length).toEqual(4);
-      const resAll = await client.get("/stream?all=1");
-      expect(resAll.status).toBe(200);
-      const streamsAll = await resAll.json();
-      expect(streamsAll.length).toEqual(5);
-    });
-
-    it("should get all streams with admin authorization and specific projectId in query param", async () => {
-      for (let i = 0; i < 5; i += 1) {
-        const document = {
-          id: uuid(),
-          kind: "stream",
-          deleted: i > 3 ? true : undefined,
-          projectId: i > 2 ? projectId : undefined,
         } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -1425,9 +1393,7 @@ describe("controllers/stream", () => {
   });
 
   describe("stream endpoint with api key", () => {
-    let newApiKey;
     beforeEach(async () => {
-      // create streams without a projectId
       for (let i = 0; i < 5; i += 1) {
         const document = {
           id: uuid(),
@@ -1438,45 +1404,7 @@ describe("controllers/stream", () => {
         const res = await client.get(`/stream/${document.id}`);
         expect(res.status).toBe(200);
       }
-
-      // create a new project
-      client.jwtAuth = nonAdminToken;
-      let project = await createProject(client);
-      expect(project).toBeDefined();
-
-      // then create a new api-key under that project
-      newApiKey = await createApiToken({
-        client: client,
-        projectId: project.id,
-        jwtAuthToken: nonAdminToken,
-      });
-      expect(newApiKey).toMatchObject({
-        id: expect.any(String),
-        projectId: project.id,
-      });
-
       client.jwtAuth = "";
-      client.apiKey = newApiKey.id;
-
-      // create streams with a projectId
-      for (let i = 0; i < 5; i += 1) {
-        const document = {
-          id: uuid(),
-          kind: "stream",
-          userId: nonAdminUser.id,
-          projectId: project.id,
-        };
-        const resCreate = await client.post("/stream", {
-          ...postMockStream,
-          name: "videorec+samplePlaybackId",
-        });
-        expect(resCreate.status).toBe(201);
-        const createdStream = await resCreate.json();
-        const res = await client.get(`/stream/${createdStream.id}`);
-        expect(res.status).toBe(200);
-        let stream = await res.json();
-        expect(stream.projectId).toEqual(project.id);
-      }
     });
 
     it("should get own streams", async () => {
@@ -1485,22 +1413,6 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
-      expect(streams[0].userId).toEqual(nonAdminUser.id);
-
-      client.apiKey = newApiKey.id;
-      let res2 = await client.get(`/stream/user/${nonAdminUser.id}`);
-      expect(res2.status).toBe(200);
-      const streams2 = await res2.json();
-      expect(streams2.length).toEqual(5);
-      expect(streams2[0].userId).toEqual(nonAdminUser.id);
-    });
-
-    it("should get streams owned by project when using api-key for project", async () => {
-      client.apiKey = newApiKey.id;
-      let res = await client.get(`/stream/`);
-      expect(res.status).toBe(200);
-      const streams = await res.json();
-      expect(streams.length).toEqual(5);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
     });
 
