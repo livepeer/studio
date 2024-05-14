@@ -558,12 +558,8 @@ components:
               example:
                 Authorization: "Bearer 123"
             isMobile:
-              type:
-                - boolean
-                - integer
+              type: integer
               enum:
-                - false
-                - true
                 - 0
                 - 1
                 - 2
@@ -2447,7 +2443,7 @@ components:
             - source
           properties:
             live:
-              type: number
+              type: integer
               enum:
                 - 0
                 - 1
