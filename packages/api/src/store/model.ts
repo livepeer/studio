@@ -191,8 +191,4 @@ export default class Model implements IStore {
 
     return responses;
   }
-
-  async close() {
-    return this.db.close();
-  }
 }

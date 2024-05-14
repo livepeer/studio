@@ -41,7 +41,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
-        router.replace(next ? next.toString() : "/dashboard");
+        router.replace(next ? next.toString() : "/");
       }
     }
   }, [user, token, next]);

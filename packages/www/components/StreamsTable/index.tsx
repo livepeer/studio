@@ -71,7 +71,7 @@ const StreamsTable = ({
       await state.invalidate();
       const query = router.query.admin === "true" ? { admin: true } : {};
       await router.push({
-        pathname: `/dashboard/streams/${newStream.id}`,
+        pathname: `/streams/${newStream.id}`,
         query,
       });
     },

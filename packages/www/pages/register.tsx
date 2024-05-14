@@ -1,4 +1,4 @@
-import Layout from "layouts/main";
+import Layout from "layouts/auth";
 import { withRecaptcha } from "layouts/withRecaptcha";
 import Login from "../components/Login";
 import Register from "../components/Register";
@@ -38,9 +38,9 @@ const RegisterPage = () => {
     if (email && emailValidToken) {
       verify(email, emailValidToken).then(() => {
         if (selectedPlan === "1") {
-          router.replace("/dashboard/billing/plans?promptUpgrade=true");
+          router.replace("/billing/plans?promptUpgrade=true");
         } else {
-          router.replace("/dashboard");
+          router.replace("/");
         }
       });
     }
@@ -51,7 +51,7 @@ const RegisterPage = () => {
       if (emailVerificationMode && user.emailValid === false) {
         router.replace("/verify");
       } else {
-        router.replace("/dashboard");
+        router.replace("/");
       }
     }
   }, [user]);
@@ -105,22 +105,17 @@ const RegisterPage = () => {
       <Box
         css={{
           position: "relative",
-          height: "100vh",
+          height: "calc(100vh - 70px)",
           display: "flex",
           alignItems: "center",
         }}>
         <Container
           size="3"
           css={{
-            px: "$3",
             width: "100%",
-            "@bp3": {
-              px: "$4",
-            },
           }}>
           <Flex
             css={{
-              alignItems: "center",
               justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
@@ -133,7 +128,7 @@ const RegisterPage = () => {
               loading={loading}
               errors={errors}
             />
-            <Box css={{ maxWidth: 500, width: "100%" }}>
+            <Box css={{ maxWidth: 500, mx: "auto", width: "100%" }}>
               <Box
                 css={{
                   width: "100%",
@@ -143,23 +138,19 @@ const RegisterPage = () => {
                     "linear-gradient(to right,transparent,rgba(255,255,255,0.1) 50%,transparent)",
                 }}
               />
-              <Link href="/login" passHref legacyBehavior>
-                <A
-                  css={{
-                    cursor: "default",
-                    "&:hover": {
-                      textDecoration: "none",
-                    },
-                  }}>
-                  <Button
-                    size="4"
-                    css={{
-                      width: "100%",
-                    }}>
-                    Sign in instead
-                  </Button>
-                </A>
-              </Link>
+              <Text
+                variant="neutral"
+                css={{
+                  display: "flex",
+                  gap: 10,
+                  with: "100%",
+                  justifyContent: "center",
+                }}>
+                Have an account?
+                <Link href="/login" passHref legacyBehavior>
+                  <A>Sign in instead</A>
+                </Link>
+              </Text>
             </Box>
           </Flex>
         </Container>
@@ -169,6 +160,6 @@ const RegisterPage = () => {
 };
 
 const RegisterPageWithRecaptcha: any = withRecaptcha(RegisterPage);
-RegisterPageWithRecaptcha.theme = "light-theme-green";
+RegisterPageWithRecaptcha.theme = "dark-theme-gray";
 
 export default RegisterPageWithRecaptcha;

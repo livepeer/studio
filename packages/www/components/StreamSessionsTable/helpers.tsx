@@ -102,7 +102,7 @@ export const rowsPageFromState = async (
               Created by stream <b>{stream.parentStream.name}</b>
             </>
           ) : null,
-          href: `/dashboard/streams/${stream.parentId}`,
+          href: `/streams/${stream.parentId}`,
         },
         recordingUrl: {
           id: stream.id,

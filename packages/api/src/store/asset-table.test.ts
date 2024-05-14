@@ -1,5 +1,5 @@
 import setupPromise from "../test-server";
-import db from "./db";
+import { db } from ".";
 
 beforeAll(async () => {
   await setupPromise;

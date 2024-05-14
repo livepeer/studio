@@ -49,7 +49,7 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
     await state.invalidate();
     const query = router.query.admin === "true" ? { admin: true } : {};
     await router.push({
-      pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,
+      pathname: `/developers/webhooks/${newWebhook.id}`,
       query,
     });
   };

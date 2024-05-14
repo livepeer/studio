@@ -2,28 +2,35 @@ import { json as bodyParserJson } from "body-parser";
 import { v4 as uuid } from "uuid";
 
 import {
-  ObjectStore,
   MultistreamTarget,
+  ObjectStore,
   Stream,
-  StreamPatchPayload,
-  User,
-  StreamSetActivePayload,
   StreamHealthPayload,
+  StreamPatchPayload,
+  StreamSetActivePayload,
+  User,
 } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import {
+  AuxTestServer,
   TestClient,
   clearDatabase,
-  startAuxTestServer,
   setupUsers,
-  AuxTestServer,
+  startAuxTestServer,
+  createProject,
+  createApiToken,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
-import { extractUrlFrom, extractRegionFrom } from "./stream";
+import {
+  ACTIVE_TIMEOUT,
+  extractRegionFrom,
+  extractUrlFrom,
+  resolvePullUrlFromExistingStreams,
+} from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -108,6 +115,7 @@ describe("controllers/stream", () => {
   let nonAdminUser: User;
   let nonAdminToken: string;
   let nonAdminApiKey: string;
+  let projectId: string;
 
   beforeEach(async () => {
     await server.store.create(mockStore);
@@ -122,6 +130,9 @@ describe("controllers/stream", () => {
       nonAdminApiKey,
     } = await setupUsers(server, mockAdminUser, mockNonAdminUser));
     client.jwtAuth = adminToken;
+
+    projectId = await createProject(client);
+    expect(projectId).toBeDefined();
   });
 
   describe("basic CRUD with JWT authorization", () => {
@@ -131,6 +142,7 @@ describe("controllers/stream", () => {
         const document = {
           id: uuid(),
           kind: "stream",
+          projectId: i > 7 ? projectId : undefined,
         };
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -146,6 +158,31 @@ describe("controllers/stream", () => {
           id: uuid(),
           kind: "stream",
           deleted: i > 3 ? true : undefined,
+          projectId: i > 2 ? projectId : undefined,
+        } as DBStream;
+        await server.store.create(document);
+        const res = await client.get(`/stream/${document.id}`);
+        const stream = await res.json();
+        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
+      }
+
+      const res = await client.get("/stream");
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(streams.length).toEqual(4);
+      const resAll = await client.get("/stream?all=1");
+      expect(resAll.status).toBe(200);
+      const streamsAll = await resAll.json();
+      expect(streamsAll.length).toEqual(5);
+    });
+
+    it("should get all streams with admin authorization and specific projectId in query param", async () => {
+      for (let i = 0; i < 5; i += 1) {
+        const document = {
+          id: uuid(),
+          kind: "stream",
+          deleted: i > 3 ? true : undefined,
+          projectId: i > 2 ? projectId : undefined,
         } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -733,6 +770,153 @@ describe("controllers/stream", () => {
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
+
+      it("should fix non-standard 480p profiles", async () => {
+        let res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          presets: undefined,
+          renditions: undefined,
+          wowza: undefined,
+          profiles: [
+            {
+              name: "480p",
+              width: 848,
+              height: 480,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        expect(stream.profiles).toEqual([
+          {
+            name: "480p",
+            width: 854,
+            height: 480,
+            bitrate: 1024,
+            fps: 30, // not mobile, so fps stays the same
+          },
+        ]);
+      });
+
+      it("should fix profiles with fps from mobile streams", async () => {
+        let res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          presets: undefined,
+          renditions: undefined,
+          wowza: undefined,
+          pull: {
+            ...postMockPullStream.pull,
+            isMobile: 2,
+          },
+          profiles: [
+            {
+              name: "480p",
+              width: 848,
+              height: 480,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        expect(stream.profiles).toEqual([
+          {
+            name: "480p",
+            width: 854,
+            height: 480,
+            bitrate: 1024,
+            fps: 0,
+          },
+        ]);
+      });
+
+      it("should resolve pull url and region from existing stream", async () => {
+        expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: 1714997385837,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+              lastSeen: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
+      });
+
       it("should extract host from redirected playback url", async () => {
         expect(
           extractUrlFrom(
@@ -1241,7 +1425,9 @@ describe("controllers/stream", () => {
   });
 
   describe("stream endpoint with api key", () => {
+    let newApiKey;
     beforeEach(async () => {
+      // create streams without a projectId
       for (let i = 0; i < 5; i += 1) {
         const document = {
           id: uuid(),
@@ -1252,7 +1438,45 @@ describe("controllers/stream", () => {
         const res = await client.get(`/stream/${document.id}`);
         expect(res.status).toBe(200);
       }
+
+      // create a new project
+      client.jwtAuth = nonAdminToken;
+      let project = await createProject(client);
+      expect(project).toBeDefined();
+
+      // then create a new api-key under that project
+      newApiKey = await createApiToken({
+        client: client,
+        projectId: project.id,
+        jwtAuthToken: nonAdminToken,
+      });
+      expect(newApiKey).toMatchObject({
+        id: expect.any(String),
+        projectId: project.id,
+      });
+
       client.jwtAuth = "";
+      client.apiKey = newApiKey.id;
+
+      // create streams with a projectId
+      for (let i = 0; i < 5; i += 1) {
+        const document = {
+          id: uuid(),
+          kind: "stream",
+          userId: nonAdminUser.id,
+          projectId: project.id,
+        };
+        const resCreate = await client.post("/stream", {
+          ...postMockStream,
+          name: "videorec+samplePlaybackId",
+        });
+        expect(resCreate.status).toBe(201);
+        const createdStream = await resCreate.json();
+        const res = await client.get(`/stream/${createdStream.id}`);
+        expect(res.status).toBe(200);
+        let stream = await res.json();
+        expect(stream.projectId).toEqual(project.id);
+      }
     });
 
     it("should get own streams", async () => {
@@ -1261,6 +1485,22 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
+      expect(streams[0].userId).toEqual(nonAdminUser.id);
+
+      client.apiKey = newApiKey.id;
+      let res2 = await client.get(`/stream/user/${nonAdminUser.id}`);
+      expect(res2.status).toBe(200);
+      const streams2 = await res2.json();
+      expect(streams2.length).toEqual(5);
+      expect(streams2[0].userId).toEqual(nonAdminUser.id);
+    });
+
+    it("should get streams owned by project when using api-key for project", async () => {
+      client.apiKey = newApiKey.id;
+      let res = await client.get(`/stream/`);
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(streams.length).toEqual(5);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
     });
 
@@ -1288,7 +1528,7 @@ describe("controllers/stream", () => {
     });
   });
 
-  describe("webhooks", () => {
+  describe("incoming hooks", () => {
     let stream: Stream;
     let data;
     let res;
@@ -1655,6 +1895,160 @@ describe("controllers/stream", () => {
           });
         });
       });
+    });
+  });
+
+  describe("active clean-up", () => {
+    let webhookServer: AuxTestServer;
+    let hookSem: ReturnType<typeof semaphore>;
+    let hookPayload: any;
+
+    beforeAll(async () => {
+      webhookServer = await startAuxTestServer();
+      webhookServer.app.use(bodyParserJson());
+      webhookServer.app.post("/captain/hook", bodyParserJson(), (req, res) => {
+        hookPayload = req.body;
+        hookSem.release();
+        res.status(204).end();
+      });
+    });
+
+    afterAll(() => webhookServer.close());
+
+    beforeEach(async () => {
+      hookPayload = undefined;
+      hookSem = semaphore();
+
+      client.jwtAuth = nonAdminToken;
+      await client.post("/webhook", {
+        name: "stream-idle-hook",
+        events: ["stream.idle"],
+        url: `http://localhost:${webhookServer.port}/captain/hook`,
+      });
+    });
+
+    const waitHookCalled = async () => {
+      await hookSem.wait(3000);
+      expect(hookPayload).toBeDefined();
+      hookSem = semaphore();
+    };
+
+    it("should not clean streams that are still active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT / 2,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(0);
+    });
+
+    it("should clean streams that are active but lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
+
+      await waitHookCalled();
+
+      const updatedStream = await db.stream.get(stream.id);
+      expect(updatedStream.isActive).toBe(false);
+    });
+
+    it("should clean multiple streams at once, respecting limit", async () => {
+      for (let i = 0; i < 3; i++) {
+        let res = await client.post("/stream", { ...postMockStream });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+        });
+      }
+
+      client.jwtAuth = adminToken;
+      const res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(2);
+    });
+
+    it("should clean lost sessions whose parents are not active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      stream = await db.stream.get(stream.id);
+      expect(stream.isActive).toBe(false);
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(child.id);
+    });
+
+    it("cleans only the parent if both parent and child are lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
     });
   });
 

@@ -21,6 +21,13 @@ export interface DBLegacyObject extends DBObject {
   data: Object;
 }
 
+export interface DBOwnedResource extends DBObject {
+  // these are never really optional, but we don't have them as required in some schemas
+  userId?: string;
+  projectId?: string;
+  deleted?: boolean;
+}
+
 export type WithID<T> = T & { id: string };
 
 export interface FindQuery {

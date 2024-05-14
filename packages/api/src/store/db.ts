@@ -1,35 +1,33 @@
+import { hostname } from "os";
 import { Pool, QueryConfig, QueryResult } from "pg";
 import { parse as parseUrl, format as stringifyUrl } from "url";
-import { hostname } from "os";
 
 import logger from "../logger";
 import schema from "../schema/schema.json";
 import {
-  ObjectStore,
   ApiToken,
-  User,
-  PasswordResetToken,
-  Usage,
-  Region,
-  Session,
-  SigningKey,
-  Room,
-  Attestation,
   JwtRefreshToken,
-  WebhookLog,
+  ObjectStore,
+  PasswordResetToken,
   Project,
+  Region,
+  Room,
+  SigningKey,
+  Usage,
+  User,
+  WebhookLog,
 } from "../schema/types";
-import BaseTable, { TableOptions } from "./table";
-import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
-import { QueryOptions, WithID } from "./types";
-import MultistreamTargetTable from "./multistream-table";
-import WebhookTable from "./webhook-table";
 import AssetTable from "./asset-table";
-import TaskTable from "./task-table";
-import ExperimentTable from "./experiment-table";
 import AttestationTable from "./attestation-table";
-import SessionTable, { DBSession } from "./session-table";
+import ExperimentTable from "./experiment-table";
+import MultistreamTargetTable from "./multistream-table";
+import SessionTable from "./session-table";
+import StreamTable from "./stream-table";
+import BaseTable, { TableOptions } from "./table";
+import TaskTable from "./task-table";
+import { QueryOptions, WithID } from "./types";
+import WebhookTable from "./webhook-table";
 
 // Should be configurable, perhaps?
 export const CONNECT_TIMEOUT =
@@ -39,6 +37,8 @@ export interface PostgresParams {
   postgresUrl: string;
   postgresReplicaUrl?: string;
   appName?: string;
+  poolMaxSize?: number; // defaults to 10
+  createTablesOnDb?: boolean; // defaults to true
 }
 
 type Table<T> = BaseTable<WithID<T>>;
@@ -83,6 +83,8 @@ export class DB {
     postgresUrl,
     postgresReplicaUrl,
     appName = "api",
+    poolMaxSize = 10,
+    createTablesOnDb = true,
   }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
@@ -98,6 +100,7 @@ export class DB {
       connectionTimeoutMillis: CONNECT_TIMEOUT,
       connectionString: postgresUrl,
       application_name: `${appName}-${hostname()}`,
+      max: poolMaxSize,
     });
 
     if (postgresReplicaUrl) {
@@ -106,6 +109,7 @@ export class DB {
         connectionTimeoutMillis: CONNECT_TIMEOUT,
         connectionString: postgresReplicaUrl,
         application_name: `${appName}-read-${hostname()}`,
+        max: poolMaxSize,
       });
     } else {
       console.log("no replica url found, not using read replica");
@@ -113,7 +117,7 @@ export class DB {
 
     await this.query("SELECT NOW()");
     await this.replicaQuery("SELECT NOW()");
-    await this.makeTables();
+    await this.makeTables(createTablesOnDb);
   }
 
   async close() {
@@ -123,7 +127,7 @@ export class DB {
     await this.pool.end();
   }
 
-  async makeTables() {
+  async makeTables(createTablesOnDb: boolean) {
     const schemas = schema.components.schemas;
     this.stream = new StreamTable({ db: this, schema: schemas["stream"] });
     this.objectStore = makeTable<ObjectStore>({
@@ -179,15 +183,17 @@ export class DB {
     this.room = makeTable<Room>({ db: this, schema: schemas["room"] });
     this.project = makeTable<Project>({ db: this, schema: schemas["project"] });
 
-    const tables = Object.entries(schema.components.schemas).filter(
-      ([name, schema]) => "table" in schema && schema.table
-    );
-    await Promise.all(
-      tables.map(([name, schema]) => {
-        const camelName = kebabToCamel(name);
-        return this[camelName].ensureTable();
-      })
-    );
+    if (createTablesOnDb) {
+      const tables = Object.entries(schema.components.schemas).filter(
+        ([name, schema]) => "table" in schema && schema.table
+      );
+      await Promise.all(
+        tables.map(([name, schema]) => {
+          const camelName = kebabToCamel(name);
+          return this[camelName].ensureTable();
+        })
+      );
+    }
   }
 
   queryWithOpts<T, I extends any[] = any[]>(
@@ -282,4 +288,5 @@ async function ensureDatabase(postgresUrl: string) {
   adminPool.end();
 }
 
-export default new DB();
+export const db = new DB();
+export const jobsDb = new DB();

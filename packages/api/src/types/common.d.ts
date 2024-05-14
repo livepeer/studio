@@ -49,6 +49,10 @@ declare global {
       isNeverExpiringJWT?: boolean;
       token?: WithID<ApiToken>;
 
+      checkResourceAccess: (
+        resource?: DBOwnedResource,
+        uiAdminOnly?: boolean
+      ) => void;
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;
       getIngest?: () => Promise<Ingest[]>;
@@ -88,7 +92,6 @@ export interface IStore {
   ready: Promise<void>;
 
   get<T extends StoredObject>(id: string, cleanWriteOnly?: boolean): Promise<T>;
-  close(): Promise<void>;
   replace(data: StoredObject): Promise<void>;
   list<T = StoredObject>(
     args: IStoreListArgs

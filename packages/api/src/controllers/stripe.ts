@@ -1,5 +1,5 @@
 import { Router, Request } from "express";
-import { db } from "../store";
+import { db, jobsDb } from "../store";
 import { products } from "../config";
 import sql from "sql-template-strings";
 import { sendgridEmailPaymentFailed, sendgridEmail } from "./helpers";
@@ -10,7 +10,6 @@ import { getRecentlyActiveHackers, getUsageData } from "./usage";
 import {
   notifyUser,
   getUsageNotifications,
-  notifyMissingPaymentMethod,
   HACKER_DISABLE_CUTOFF_DATE,
 } from "./utils/notification";
 import { sleep } from "../util";
@@ -28,7 +27,7 @@ export const reportUsage = async (req: Request, adminToken: string) => {
       updatedUsers.push(userUpdated);
     } catch (e) {
       console.log(`
-        Failed to create usage record for user=${user.id} with error=${e.message} 
+        Failed to create usage record for user=${user.id} with error=${e.message}
       `);
       updatedUsers.push({
         id: user.id,
@@ -44,7 +43,7 @@ export const reportUsage = async (req: Request, adminToken: string) => {
 };
 
 async function getPayAsYouGoUsers(req: Request) {
-  const [users] = await db.user.find(
+  const [users] = await jobsDb.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
     ],

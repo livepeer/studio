@@ -33,11 +33,10 @@
     "go-livepeer:broadcaster": "bin/livepeer -broadcaster -datadir ./bin/broadcaster -orchAddr 127.0.0.1:3086 -rtmpAddr 0.0.0.0:3035 -httpAddr :3085 -cliAddr :3075 -v 6 -authWebhookUrl http://127.0.0.1:3004/api/stream/hook -orchWebhookUrl http://127.0.0.1:3004/api/orchestrator",
     "go-livepeer:orchestrator": "bin/livepeer -orchestrator -datadir ./bin/orchestrator -transcoder -serviceAddr 127.0.0.1:3086 -cliAddr :3076 -v 6",
     "test": "POSTGRES_CONNECT_TIMEOUT=120000 jest -i --silent \"${PWD}/src\"",
+    "test-single": "POSTGRES_CONNECT_TIMEOUT=120000 jest -i --silent \"${PWD}/src/controllers/+$filename.+\"",
     "test:dev": "jest \"${PWD}/src\" -i --silent --watch",
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
     "coverage": "yarn run test --coverage",
-    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
-    "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node18-${process.env.GOOS ?? os.platform()}-${process.env.GOARCH ?? os.arch()}`')",
     "esbuild": "yarn run compile-schemas && node esbuild.mjs"
   },
   "dependencies": {
@@ -92,6 +91,7 @@
     "livekit-server-sdk": "^1.2.5",
     "lodash": "^4.17.21",
     "m3u8-parser": "^4.4.0",
+    "mime": "^3.0.0",
     "minio": "^7.0.12",
     "morgan": "^1.9.1",
     "mqtt": "^4.2.6",
@@ -144,7 +144,6 @@
     "npm-run-all": "^4.1.5",
     "nyc": "^14.0.0",
     "parcel": "^1.12.4",
-    "pkg": "^5.8.1",
     "prettier": "^2.6.2",
     "redoc-cli": "^0.8.3",
     "tus-js-client": "^3.0.0-0",
@@ -162,28 +161,11 @@
     ]
   },
   "browserslist": [
-    "node 10"
+    "node 16"
   ],
   "types": "src/schema/types.d.ts",
   "nodemonConfig": {
     "delay": "250"
-  },
-  "pkg": {
-    "targets": [
-      "node18-macos-arm64",
-      "node18-macos-x64",
-      "node18-linux-arm64",
-      "node18-linux-x64",
-      "node18-windows-x64"
-    ],
-    "assets": [
-      "../www/.next",
-      "../www/next.config.js",
-      "../../node_modules/dom-helpers/**/*",
-      "../../node_modules/react-icons/**/*",
-      "../../node_modules/next-mdx-remote/**/*",
-      "../../node_modules/livekit-server-sdk/**/*"
-    ]
   },
   "jest": {
     "testTimeout": 30000
