@@ -259,7 +259,11 @@ describe("controllers/access-control", () => {
         stream: `video+${gatedAsset.playbackId}`,
         type: "accessKey",
         accessKey: signingKey.publicKey,
-        origin: "https://example.com",
+        webhookPayload: {
+          headers: {
+            origin: "https://example.com",
+          },
+        },
       });
       expect(res3.status).toBe(403);
     });
