@@ -242,6 +242,28 @@ describe("controllers/access-control", () => {
       expect(res.status).toBe(404);
     });
 
+    it("should not allow playback if origin is not in playback.allowedOrigins", async () => {
+      const webhook = await db.webhook.create({
+        id: uuid(),
+        name: "test",
+        url: `http://localhost:3004/api/access-control/webhook-test`,
+        events: ["playback.accessControl"],
+      });
+      gatedAsset.playbackPolicy.webhookId = webhook.id;
+      gatedAsset.playbackPolicy.type = "webhook";
+      gatedAsset.playbackPolicy.allowedOrigins = ["http://localhost:3000"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      const res3 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: signingKey.publicKey,
+        origin: "https://example.com",
+      });
+      expect(res3.status).toBe(403);
+    });
+
     it("should allow playback on public playbackId with and without a public key provided", async () => {
       client.jwtAuth = adminToken;
       const res = await client.post("/access-control/gate", {
