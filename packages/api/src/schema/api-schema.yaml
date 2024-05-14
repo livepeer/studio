@@ -591,7 +591,9 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          type: array
+          type:
+            - array
+            - "null"
           default:
             - name: 240p0
               fps: 0
@@ -1327,7 +1329,9 @@ components:
           type: boolean
           description: Decides if the output video should include C2PA signature
         profiles:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             $ref: "#/components/schemas/transcode-profile"
         targetSegmentSizeSecs:
