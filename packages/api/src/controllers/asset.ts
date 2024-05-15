@@ -862,7 +862,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
           "vod-thumbs-off",
           req.user?.id
         )),
-        profiles,
+        ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task,
         targetSegmentSizeSecs,
       },
     },
@@ -897,7 +897,7 @@ app.post(
     let playbackId = await generateUniquePlaybackId(id);
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
-    const { encryption, c2pa } = req.body as NewAssetPayload;
+    const { encryption, c2pa, profiles } = req.body as NewAssetPayload;
     if (encryption) {
       if (encryption.encryptedKey) {
         if (!isValidBase64(encryption.encryptedKey)) {
@@ -944,6 +944,7 @@ app.post(
           catalystPipelineStrategy: catalystPipelineStrategy(req),
           encryption,
           c2pa,
+          ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
       },
       null,

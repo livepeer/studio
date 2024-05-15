@@ -1358,8 +1358,8 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   }
 
   let doc: DBStream = {
-    profiles: req.config.defaultStreamProfiles,
     ...payload,
+    profiles: payload.profiles || req.config.defaultStreamProfiles,
     kind: "stream",
     userId: req.user.id,
     creatorId: mapInputCreatorId(payload.creatorId),
