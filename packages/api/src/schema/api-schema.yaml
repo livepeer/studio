@@ -593,9 +593,7 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          type:
-            - array
-            - "null"
+          type: array
           default:
             - name: 240p0
               fps: 0
