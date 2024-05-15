@@ -6,19 +6,13 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   Button,
-  Badge,
 } from "@livepeer/design-system";
-import { GoDotFill } from "react-icons/go";
-import Image from "next/image";
 import React from "react";
-import { sanitizeUrl } from "lib/url-sanitizer";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { HiDotsHorizontal } from "react-icons/hi";
-import Link from "next/link";
 import { NavLink, generalSidebarItems } from "components/Sidebar";
 import useProject from "hooks/use-project";
 
-export default function ProjectTile({ name, url, id, ...props }) {
+export default function ProjectTile({ name, id, ...props }) {
   const { setCurrentProject, activeProjectId } = useProject();
 
   const navigate = (id, path) => {
@@ -32,12 +26,24 @@ export default function ProjectTile({ name, url, id, ...props }) {
 
   return (
     <Box
+      onClick={() => {
+        navigate(id, "/");
+      }}
       css={{
+        bc: "$neutral2",
         border: "1px solid",
         borderColor: "$neutral6",
         p: "$4",
         width: "100%",
         borderRadius: "11px",
+        cursor: "pointer",
+        minHeight: 130,
+        transition: ".2s",
+        "&:hover": {
+          cursor: "pointer",
+          transition: ".2s",
+          borderColor: "$hiContrast",
+        },
       }}>
       <Flex direction={"column"}>
         <Flex align={"center"} justify={"between"}>
@@ -46,15 +52,6 @@ export default function ProjectTile({ name, url, id, ...props }) {
               fontWeight: 500,
             }}>
             {name || "Untitled project"}
-            {activeProjectId === id && (
-              <Badge
-                variant={"green"}
-                css={{
-                  ml: "$2",
-                }}>
-                Active
-              </Badge>
-            )}
           </Text>
           <DropdownMenu>
             <Box
@@ -105,23 +102,13 @@ export default function ProjectTile({ name, url, id, ...props }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </Flex>
-        <Text
-          css={{
-            mt: "$1",
-            color: "$neutral10",
-          }}>
-          {sanitizeUrl(url)}
-        </Text>
       </Flex>
       <Button
         onClick={() => {
           navigate(id, "/");
         }}
-        css={{
-          padding: "18px",
-          fontSize: "13px",
-          marginTop: "40px",
-        }}>
+        css={{ mt: 40 }}
+        size={1}>
         Open Project
       </Button>
     </Box>

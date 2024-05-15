@@ -161,7 +161,7 @@ const Usage = () => {
   }
   return (
     <Layout
-      id="account/usage"
+      id="settings/usage"
       breadcrumbs={[{ title: "Usage" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>

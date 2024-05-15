@@ -190,7 +190,7 @@ const Billing = () => {
   }
   return (
     <Layout
-      id="account/billing"
+      id="settings/billing"
       breadcrumbs={[{ title: "Billing" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
@@ -280,7 +280,7 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
-            <Link href="/account/billing/plans" passHref legacyBehavior>
+            <Link href="/settings/billing/plans" passHref legacyBehavior>
               <A
                 variant="primary"
                 css={{ display: "flex", alignItems: "center" }}>
@@ -354,7 +354,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Link href="/account/billing/usage" passHref legacyBehavior>
+          <Link href="/settings/billing/usage" passHref legacyBehavior>
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}

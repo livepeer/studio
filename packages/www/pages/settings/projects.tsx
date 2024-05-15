@@ -26,7 +26,7 @@ const WorkspaceProjects = () => {
 
   return (
     <Layout
-      id="account/projects"
+      id="settings/projects"
       breadcrumbs={[{ title: "Projects" }]}
       {...Content.metaData}>
       <Box
@@ -81,11 +81,9 @@ const WorkspaceProjects = () => {
           }}>
           {data?.map((project, i) => (
             <ProjectTile
-              key={i}
+              key={`project-tile${i}`}
               id={project.id}
               name={project.name}
-              // TODO: use the correct URL
-              url={"https://example.com/projects/" + project.name}
             />
           ))}
         </Grid>
