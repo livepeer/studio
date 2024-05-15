@@ -1,4 +1,4 @@
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { Box } from "@livepeer/design-system";
 
@@ -17,13 +17,7 @@ const TextCell = <D extends TableData>({
   return (
     <Box css={{ lineHeight: 1.5 }}>
       {cell.value.tooltipChildren ? (
-        <ReactTooltip
-          id={pid}
-          className="tooltip"
-          place="top"
-          type="dark"
-          effect="solid"
-          delayShow={500}>
+        <ReactTooltip id={pid} className="tooltip" place="top" delayShow={500}>
           {cell.value.tooltipChildren}
         </ReactTooltip>
       ) : null}

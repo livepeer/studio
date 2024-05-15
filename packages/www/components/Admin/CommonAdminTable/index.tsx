@@ -13,7 +13,7 @@ import {
   useRowSelect,
 } from "react-table";
 import Help from "../../../public/img/help.svg";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { User, Stream } from "@livepeer.studio/api";
 import "regenerator-runtime/runtime";
 
@@ -48,12 +48,7 @@ export const StreamName = ({
   return (
     <Box>
       {stream.createdByTokenName ? (
-        <ReactTooltip
-          id={pid}
-          className="tooltip"
-          place="top"
-          type="dark"
-          effect="solid">
+        <ReactTooltip id={pid} className="tooltip" place="top">
           Created by token <b>{stream.createdByTokenName}</b>
         </ReactTooltip>
       ) : null}
@@ -96,9 +91,7 @@ export const RelativeTime = ({
           <ReactTooltip
             id={`tooltip-${idpref}`}
             className="tooltip"
-            place="top"
-            type="dark"
-            effect="solid">
+            place="top">
             {toolTip}
           </ReactTooltip>
           <span data-tip data-for={`tooltip-${idpref}`}>
@@ -120,12 +113,7 @@ export const UserName = ({ user }: { user: User }) => {
         overflow: "hidden",
         textOverflow: "ellipsis",
       }}>
-      <ReactTooltip
-        id={tid}
-        className="tooltip"
-        place="top"
-        type="dark"
-        effect="solid">
+      <ReactTooltip id={tid} className="tooltip" place="top">
         <span>{user.id}</span>
         <span>{user.firstName}</span>
         <span>{user.lastName}</span>
@@ -311,7 +299,7 @@ const CommonAdminTable = ({
                 </Button>
                 <Button
                   variant="secondarySmall"
-                  disabled={rows.length < rowsPerPage || nextCursor === ""}
+                  disabled={rows.length < +rowsPerPage || nextCursor === ""}
                   sx={{ margin: 0, ml: 2, padding: "2px", px: "4px" }}
                   onClick={() => {
                     prevCursor.push(cursor);
@@ -461,9 +449,7 @@ const CommonAdminTable = ({
                             <ReactTooltip
                               id={`tooltip-multiorder`}
                               className="tooltip"
-                              place="top"
-                              type="dark"
-                              effect="solid">
+                              place="top">
                               To multi-sort (sort by two column simultaneously)
                               hold shift while clicking on second column name.
                             </ReactTooltip>

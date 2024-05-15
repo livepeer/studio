@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 
 export type TextCellProps = {
@@ -18,12 +18,7 @@ const TextCell = <D extends TableData>({
   return (
     <div>
       {cell.value.tooltipChildren ? (
-        <ReactTooltip
-          id={pid}
-          className="tooltip"
-          place="top"
-          type="dark"
-          effect="solid">
+        <ReactTooltip id={pid} className="tooltip" place="top">
           {cell.value.tooltipChildren}
         </ReactTooltip>
       ) : null}

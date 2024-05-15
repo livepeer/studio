@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import {
   Spinner,
   Box,
@@ -724,9 +724,7 @@ const ID = () => {
                     <ReactTooltip
                       id={`tooltip-record-${stream.id}`}
                       className="tooltip"
-                      place="top"
-                      type="dark"
-                      effect="solid">
+                      place="top">
                       <p>
                         When checked, transcoded streaming sessions will be
                         recorded and stored by Livepeer Studio.
@@ -802,9 +800,7 @@ const ID = () => {
                     <ReactTooltip
                       id={`tooltip-suspend-${stream.id}`}
                       className="tooltip"
-                      place="top"
-                      type="dark"
-                      effect="solid">
+                      place="top">
                       <p>
                         When turned on, any active stream sessions will
                         immediately end.
