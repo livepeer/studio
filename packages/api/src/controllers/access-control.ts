@@ -245,17 +245,17 @@ app.post(
 
     let origin: string = null;
     if (req.body?.webhookPayload?.headers) {
-      origin = req.body?.webhookPayload?.headers["Origin"];
+      origin = req.body?.webhookPayload?.headers["origin"];
     }
 
-    if (req.body.origin) {
+    if (origin) {
       if (allowedOrigins.length > 0) {
         if (!allowedOrigins.includes(origin)) {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but origin=${origin} not in allowed origins=${allowedOrigins}, disallowing playback
           `);
           throw new ForbiddenError(
-            "Content is gated and origin not in allowed origins"
+            `Content is gated and origin not in allowed origins`
           );
         }
       }
