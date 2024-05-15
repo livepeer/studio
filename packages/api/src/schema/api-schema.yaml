@@ -3397,7 +3397,7 @@ paths:
             schema:
               $ref: "#/components/schemas/new-asset-payload"
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -3457,7 +3457,7 @@ paths:
             schema:
               $ref: "#/components/schemas/new-asset-from-url-payload"
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
