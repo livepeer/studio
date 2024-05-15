@@ -9,11 +9,12 @@ export default function Dashboard() {
   const { push } = useRouter();
   useEffect(() => {
     const currentProject = localStorage.getItem("currentProject");
-
+    console.log(currentProject);
     if (currentProject) {
       console.log("Redirecting to project: ", currentProject);
       push(`/projects/${currentProject}`);
     }
+    push(`/account/projects/`);
   }, []);
   return <div />;
 }

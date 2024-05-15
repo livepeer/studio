@@ -271,7 +271,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             </Text>
           </Flex>
           <DropdownMenuContent
-            placeholder={"Account"}
+            placeholder="Account"
             css={{
               border: "1px solid $colors$neutral6",
               width: "12rem",
@@ -389,13 +389,13 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 Create new project
               </Flex>
               <Flex
-                onClick={() => setShowCreateProjectAlert(true)}
+                onClick={() => Router.push("/account/projects")}
                 align={"center"}
                 css={{
                   color: "$neutral12",
                   cursor: "default",
                 }}>
-                View all project
+                View all projects
               </Flex>
             </Flex>
           </Box>
@@ -568,8 +568,8 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
               textDecoration: "none",
             },
           }}>
-          {settingsSidebarItems.map((item) => (
-            <Box>
+          {settingsSidebarItems.map((item, i) => (
+            <Box key={`settings-sidebar-${i}`}>
               <Link href={item.path} passHref legacyBehavior>
                 <NavLink active={id === item.id}>
                   {item.icon}

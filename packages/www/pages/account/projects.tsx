@@ -79,8 +79,9 @@ const WorkspaceProjects = () => {
             gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
             gap: "$5",
           }}>
-          {data?.map((project) => (
+          {data?.map((project, i) => (
             <ProjectTile
+              key={i}
               id={project.id}
               name={project.name}
               // TODO: use the correct URL
