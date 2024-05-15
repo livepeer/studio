@@ -3463,6 +3463,26 @@ paths:
             schema:
               $ref: "#/components/schemas/new-asset-from-url-payload"
       responses:
+        "200":
+          description: Import in progress
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - asset
+                  - task
+                properties:
+                  asset:
+                    $ref: "#/components/schemas/asset"
+                  task:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 34d7618e-fd42-4798-acf5-19504616a11e
+                x-speakeasy-name-override: data
         "201":
           description: Success
           content:
