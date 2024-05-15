@@ -661,7 +661,11 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: "#/components/schemas/stream/properties/profiles"
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         record:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
@@ -695,7 +699,11 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: "#/components/schemas/stream/properties/profiles"
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
@@ -1306,7 +1314,9 @@ components:
           type: boolean
           description: Decides if the output video should include C2PA signature
         profiles:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             $ref: "#/components/schemas/transcode-profile"
         targetSegmentSizeSecs:
