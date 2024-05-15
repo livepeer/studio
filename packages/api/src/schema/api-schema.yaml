@@ -671,7 +671,11 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: "#/components/schemas/stream/properties/profiles"
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         record:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
@@ -705,7 +709,11 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: "#/components/schemas/stream/properties/profiles"
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
