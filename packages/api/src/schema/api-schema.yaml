@@ -3464,7 +3464,7 @@ paths:
               $ref: "#/components/schemas/new-asset-from-url-payload"
       responses:
         "200":
-          description: Import in progress
+          description: Upload in progress
           content:
             application/json:
               schema:
@@ -3478,6 +3478,8 @@ paths:
                     $ref: "#/components/schemas/asset"
                   task:
                     type: object
+                    required:
+                      - id
                     properties:
                       id:
                         type: string
