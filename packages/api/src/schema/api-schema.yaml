@@ -554,13 +554,19 @@ components:
               example:
                 Authorization: "Bearer 123"
             isMobile:
-              type: integer
-              enum:
-                - 0
-                - 1
-                - 2
+              oneOf:
+                - type: integer
+                  enum:
+                    - 0
+                    - 1
+                    - 2
+                  description: |-
+                    0: not mobile, 1: mobile screen share, 2: mobile camera.
+                - type: boolean
+                  description: |-
+                    If true, the stream will be pulled from a mobile source.
               description: |-
-                If true, the stream will be pulled from a mobile source.
+                Indicates whether the stream will be pulled from a mobile source.
               default: 0
             location:
               type: object
