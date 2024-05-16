@@ -4295,6 +4295,17 @@ paths:
             The creator ID to filter the query results
           schema:
             type: string
+        - name: "breakdownBy[]"
+          in: query
+          description: |
+            The list of fields to break down the query results. Currently the
+            only supported breakdown is by `creatorId`.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - creatorId
       responses:
         "200":
           description: A Usage Metric object
