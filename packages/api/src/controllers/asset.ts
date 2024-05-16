@@ -496,6 +496,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
     timestamp: asset.createdAt,
     event: "asset.created",
     userId: asset.userId,
+    projectId: asset.projectId,
     payload: {
       asset: {
         id: asset.id,
@@ -786,13 +787,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   if (!asset || asset.deleted) {
     throw new NotFoundError(`Asset not found`);
   }
-
-  if (req.user.admin !== true && req.user.id !== asset.userId) {
-    throw new ForbiddenError(
-      "user can only request information on their own assets"
-    );
-  }
-
+  req.checkResourceAccess(asset);
   res.json(asset);
 });
 

@@ -270,6 +270,7 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
         timestamp: Date.now(),
         event: "stream.idle",
         streamId: stream.id,
+        projectId: stream.projectId,
         userId: user.id,
       });
     })
@@ -1586,6 +1587,7 @@ async function setStreamActiveWithHooks(
         streamId: stream.id,
         event: event,
         userId: stream.userId,
+        projectId: stream.projectId,
       })
       .catch((err) => {
         logger.error(
@@ -1719,6 +1721,7 @@ async function publishRecordingStartedHook(
     timestamp: Date.now(),
     streamId: session.parentId,
     userId: session.userId,
+    projectId: session.projectId,
     event: "recording.started",
     payload: { session: await toExternalSession(config, session, ingest) },
   });
@@ -1742,6 +1745,7 @@ async function publishDelayedRecordingWaitingHook(
       streamId: session.parentId,
       event: "recording.waiting",
       userId: session.userId,
+      projectId: session.projectId,
       sessionId: session.id,
       payload: {
         session: {
@@ -2425,6 +2429,7 @@ app.post(
       streamId: stream.id,
       event: "stream.detection",
       userId: stream.userId,
+      projectId: stream.projectId,
       payload: {
         seqNo,
         sceneClassification,
