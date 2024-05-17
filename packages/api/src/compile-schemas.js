@@ -72,16 +72,26 @@ const data = _.merge({}, apiData, dbData);
   const indexPath = path.resolve(validatorDir, "index.js");
   write(indexPath, indexStr);
 
-  const typeDefinition = `export type InputCreatorId =
+  const creatorIdTypeDefinition = `export type InputCreatorId =
   | {
       type: "unverified";
       value: string;
     }
   | string;`;
 
+  const playbackPolicyTypeDefinition = "export type PlaybackPolicy1 = null;";
+  const playbackPolicy2TypeDefinition =
+    "export type PlaybackPolicy2 = PlaybackPolicy | PlaybackPolicy1;";
+
   let typeStr = types.join("\n\n");
-  const cleanedTypeStr = typeStr.split(typeDefinition).join("");
-  typeStr = `${cleanedTypeStr.trim()}\n\n${typeDefinition}`;
+  const cleanedTypeStr = typeStr
+    .split(creatorIdTypeDefinition)
+    .join("")
+    .split(playbackPolicyTypeDefinition)
+    .join("")
+    .split(playbackPolicy2TypeDefinition)
+    .join("");
+  typeStr = `${cleanedTypeStr.trim()}\n\n${creatorIdTypeDefinition}\n\n${playbackPolicyTypeDefinition}\n\n${playbackPolicy2TypeDefinition}`;
 
   const typePath = path.resolve(schemaDir, "types.d.ts");
   write(typePath, typeStr);

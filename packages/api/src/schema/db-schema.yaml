@@ -586,13 +586,7 @@ components:
     webhook:
       table: webhook
       properties:
-        kind:
-          type: string
-          example: webhook
-          readOnly: true
         userId:
-          readOnly: true
-          type: string
           index: true
         events:
           index: true
@@ -890,15 +884,11 @@ components:
       table: session
       properties:
         kind:
-          type: string
-          example: stream
           readOnly: true
         version:
           type: string
           description: Version of the session object
         userId:
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
         lastSeen:
           index: true
@@ -924,9 +914,6 @@ components:
       table: multistream_target
       properties:
         userId:
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          readOnly: true
           index: true
     asset:
       table: asset
@@ -936,11 +923,7 @@ components:
         playbackId:
           index: true
         userId:
-          readOnly: true
           index: true
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          description: owner of the asset
         source:
           oneOf:
             - properties:
@@ -1078,20 +1061,6 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
-    webhook-patch-payload:
-      type: object
-      additionalProperties: false
-      properties:
-        name:
-          $ref: "#/components/schemas/webhook/properties/name"
-        url:
-          $ref: "#/components/schemas/webhook/properties/url"
-        events:
-          $ref: "#/components/schemas/webhook/properties/events"
-        sharedSecret:
-          $ref: "#/components/schemas/webhook/properties/sharedSecret"
-        streamId:
-          $ref: "#/components/schemas/webhook/properties/streamId"
     ipfs-file-info:
       properties:
         cid:
@@ -1316,10 +1285,7 @@ components:
         id:
           index: true
         userId:
-          readOnly: true
           index: true
-          type: string
-          example: 78df0075-b5f3-4683-a618-1086faca35dc
         deleted:
           type: boolean
           default: false
@@ -1394,3 +1360,17 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+    webhook-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/webhook/properties/name"
+        url:
+          $ref: "#/components/schemas/webhook/properties/url"
+        events:
+          $ref: "#/components/schemas/webhook/properties/events"
+        sharedSecret:
+          $ref: "#/components/schemas/webhook/properties/sharedSecret"
+        streamId:
+          $ref: "#/components/schemas/webhook/properties/streamId"
