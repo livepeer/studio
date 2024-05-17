@@ -69,15 +69,6 @@ const addQuery = (
 
 const composeIngestUrl = (ingestUrlStr: string, streamKeyStr: string) => {
   const ingestUrl = parseUrlSafe(ingestUrlStr);
-  if (streamKeyStr) {
-    if (streamKeyStr.includes("?")) {
-      streamKeyStr += "?";
-    }
-  } else {
-    if (ingestUrlStr.includes("?")) {
-      ingestUrlStr += "?";
-    }
-  }
   if (!streamKeyStr || !ingestUrl) {
     return ingestUrl;
   }
@@ -85,6 +76,9 @@ const composeIngestUrl = (ingestUrlStr: string, streamKeyStr: string) => {
   switch (ingestUrl.protocol) {
     case "rtmp:":
     case "rtmps:":
+      if (streamKeyStr.includes("?") && !streamKeyStr.endsWith("?")) {
+        streamKeyStr += "?";
+      }
       const streamKey = parseUrlSafe(streamKeyStr);
       if (streamKey?.pathname) {
         ingestUrl.pathname = pathJoin2(ingestUrl.pathname, streamKey.pathname);
