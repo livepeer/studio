@@ -67,7 +67,7 @@ const addQuery = (
   url.search = `?${querystring.stringify(url.query)}`;
 };
 
-const composeIngestUrl = (ingestUrlStr, streamKeyStr) => {
+const composeIngestUrl = (ingestUrlStr: string, streamKeyStr: string) => {
   const ingestUrl = parseUrlSafe(ingestUrlStr);
   if (!streamKeyStr || !ingestUrl) {
     return ingestUrl;
