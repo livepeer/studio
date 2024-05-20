@@ -284,6 +284,50 @@ describe("controllers/access-control", () => {
       );
     });
 
+    it("should allow playback with corresponding origin", async () => {
+      gatedAsset.playbackPolicy.type = "jwt";
+      gatedAsset.playbackPolicy.allowedOrigins = ["http://localhost:3000"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      let asset = await db.asset.get(gatedAsset.id);
+      expect(asset.playbackPolicy.allowedOrigins).toEqual([
+        "http://localhost:3000",
+      ]);
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+        webhookPayload: {
+          headers: {
+            origin: "http://localhost:3000",
+          },
+        },
+      });
+      expect(res.status).toBe(200);
+    });
+
+    it("should allow playback with wildcard origin", async () => {
+      gatedAsset.playbackPolicy.type = "jwt";
+      gatedAsset.playbackPolicy.allowedOrigins = ["*"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      let asset = await db.asset.get(gatedAsset.id);
+      expect(asset.playbackPolicy.allowedOrigins).toEqual(["*"]);
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+        webhookPayload: {
+          headers: {
+            origin: "http://localhost:3000",
+          },
+        },
+      });
+      expect(res.status).toBe(200);
+    });
+
     it("should allow playback on public playbackId with and without a public key provided", async () => {
       client.jwtAuth = adminToken;
       const res = await client.post("/access-control/gate", {
