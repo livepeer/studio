@@ -209,12 +209,20 @@ async function validateStreamPlaybackPolicy(
     const allowedOrigins = playbackPolicy?.allowedOrigins;
     if (allowedOrigins) {
       if (allowedOrigins.length > 0) {
+        if (allowedOrigins.length === 1 && allowedOrigins[0] === "*") {
+          return true;
+        }
         const allowedOriginsValid = allowedOrigins.every((origin) => {
+          if (origin.endsWith("/")) {
+            return false;
+          }
+
           const url = new URL(origin);
           return (
             ["http:", "https:"].includes(url.protocol) &&
             url.hostname &&
-            url.port
+            url.port &&
+            url.pathname === ""
           );
         });
         if (!allowedOriginsValid) {

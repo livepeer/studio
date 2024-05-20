@@ -250,13 +250,19 @@ app.post(
 
     if (origin) {
       if (allowedOrigins.length > 0) {
-        if (!allowedOrigins.includes(origin)) {
+        if (allowedOrigins.includes("*")) {
           console.log(`
-            access-control: gate: content with playbackId=${playbackId} is gated but origin=${origin} not in allowed origins=${allowedOrigins}, disallowing playback
+            access-control: gate: content with playbackId=${playbackId} is gated, wildcard origin allowed
           `);
-          throw new ForbiddenError(
-            `Content is gated and origin not in allowed origins`
-          );
+        } else {
+          if (!allowedOrigins.includes(origin)) {
+            console.log(`
+              access-control: gate: content with playbackId=${playbackId} is gated but origin=${origin} not in allowed origins=${allowedOrigins}, disallowing playback
+            `);
+            throw new ForbiddenError(
+              `Content is gated and origin not in allowed origins`
+            );
+          }
         }
       }
     }
