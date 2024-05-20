@@ -2282,6 +2282,13 @@ components:
             Interval (in seconds) at which the playback policy should be
             refreshed (default 600 seconds)
           example: 600
+        allowedOrigins:
+          type: array
+          description:
+            List of allowed origins for CORS playback
+            (<scheme>://<hostname>:<port>, <scheme>://<hostname>)
+          items:
+            type: string
     usage-metric:
       type: object
       description: |

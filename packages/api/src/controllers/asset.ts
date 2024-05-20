@@ -287,6 +287,35 @@ async function validateAssetPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
+    const allowedOrigins = playbackPolicy?.allowedOrigins;
+    if (allowedOrigins) {
+      try {
+        if (allowedOrigins.length > 0) {
+          const isWildcardOrigin =
+            allowedOrigins.length === 1 && allowedOrigins[0] === "*";
+          if (!isWildcardOrigin) {
+            const isValidOrigin = (origin) => {
+              if (origin.endsWith("/")) return false;
+              const url = new URL(origin);
+              return (
+                ["http:", "https:"].includes(url.protocol) &&
+                url.hostname &&
+                (url.port === "" || Number(url.port) > 0) &&
+                url.pathname === ""
+              );
+            };
+            const allowedOriginsValid = allowedOrigins.every(isValidOrigin);
+            if (!allowedOriginsValid) {
+              throw new BadRequestError(
+                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>"
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.log(`Error validating allowedOrigins: ${err}`);
+      }
+    }
   }
   if (encryption?.encryptedKey) {
     if (!playbackPolicy) {

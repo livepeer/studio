@@ -37,6 +37,9 @@ components:
         webhookHeaders:
           type: object
           description: Headers to be used in the request to the webhook
+        origin:
+          type: string
+          description: Origin url requesting playback
     object-store-patch-payload:
       type: object
       additionalProperties: false
