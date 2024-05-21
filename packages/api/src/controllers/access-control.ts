@@ -247,7 +247,7 @@ app.post(
     const referer = req.body?.webhookPayload?.headers?.Referer;
 
     if (origin || origin === "") {
-      if (origin === "null") {
+      if (origin === "null" || origin === "") {
         origin = referer;
         console.log(
           `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`
