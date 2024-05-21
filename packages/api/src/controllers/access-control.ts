@@ -243,9 +243,15 @@ app.post(
       return res.end();
     }
 
-    const origin = req.body?.webhookPayload?.headers?.Origin;
+    let origin = req.body?.webhookPayload?.headers?.Origin;
 
     if (origin) {
+      if (origin === "null") {
+        origin = req.body?.webhookPayload?.headers?.Referer;
+        console.log(
+          `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`
+        );
+      }
       if (allowedOrigins.length > 0) {
         if (allowedOrigins.includes("*")) {
           console.log(`
