@@ -258,7 +258,7 @@ describe("controllers/access-control", () => {
         pub: "notExistingPubKey",
         webhookPayload: {
           headers: {
-            origin: "https://example.com",
+            Origin: "https://example.com",
           },
         },
       });
@@ -273,7 +273,7 @@ describe("controllers/access-control", () => {
         pub: "notExistingPubKey",
         webhookPayload: {
           headers: {
-            origin: "http://localhost:3000",
+            Origin: "http://localhost:3000",
           },
         },
       });
@@ -300,7 +300,7 @@ describe("controllers/access-control", () => {
         pub: signingKey.publicKey,
         webhookPayload: {
           headers: {
-            origin: "http://localhost:3000",
+            Origin: "http://localhost:3000",
           },
         },
       });
@@ -321,7 +321,7 @@ describe("controllers/access-control", () => {
         pub: signingKey.publicKey,
         webhookPayload: {
           headers: {
-            origin: "http://localhost:3000",
+            Origin: "http://localhost:3000",
           },
         },
       });
