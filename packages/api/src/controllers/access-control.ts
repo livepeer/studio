@@ -252,6 +252,10 @@ app.post(
           `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`
         );
       }
+
+      origin = decodeURIComponent(origin); // Decode the origin or referer
+      origin = origin.replace(/\/$/, ""); // Strip trailing slashes
+
       if (allowedOrigins.length > 0) {
         if (allowedOrigins.includes("*")) {
           console.log(`
