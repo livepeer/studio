@@ -244,10 +244,11 @@ app.post(
     }
 
     let origin = req.body?.webhookPayload?.headers?.Origin;
+    const referer = req.body?.webhookPayload?.headers?.Referer;
 
-    if (origin) {
-      if (origin === "null") {
-        origin = req.body?.webhookPayload?.headers?.Referer;
+    if (origin || origin === "") {
+      if (origin === "null" || origin === "") {
+        origin = referer;
         console.log(
           `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`
         );
