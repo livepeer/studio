@@ -4,21 +4,11 @@ import Sidebar, { SidebarId } from "components/Sidebar";
 import Header from "components/Header";
 import FileUpload from "components/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
-import { getStripe, isExport, isProduction } from "../lib/utils";
-import ReactGA from "react-ga";
+import { getStripe, isExport } from "../lib/utils";
 import Router from "next/router";
-import { useEffect, useMemo } from "react";
-import { hotjar } from "react-hotjar";
+import { useMemo } from "react";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
-
-if (!isExport()) {
-  if (process.env.NODE_ENV === "production") {
-    ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
-  } else {
-    ReactGA.initialize("test", { testMode: true });
-  }
-}
 
 // Track client-side page views with Segment & HubSpot
 if (!isExport() && process.env.NODE_ENV === "production") {
@@ -62,13 +52,6 @@ function DashboardLayout({
   requireLoggedIn = true,
 }: Props) {
   const stripePromise = useMemo(() => getStripe(), []);
-
-  useEffect(() => {
-    if (isProduction()) {
-      ReactGA.pageview(window.location.pathname + window.location.search);
-      hotjar.initialize(2525106, 6);
-    }
-  }, []);
 
   let seo = {
     title,
