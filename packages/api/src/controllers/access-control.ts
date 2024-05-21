@@ -243,7 +243,7 @@ app.post(
       return res.end();
     }
 
-    const origin = req.body?.webhookPayload?.headers?.origin;
+    const origin = req.body?.webhookPayload?.headers?.Origin;
 
     if (origin) {
       if (allowedOrigins.length > 0) {
