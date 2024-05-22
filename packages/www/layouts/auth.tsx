@@ -3,6 +3,7 @@ import Router from "next/router";
 import { NextSeo } from "next-seo";
 import Nav from "components/Nav";
 import { basePath } from "../lib/utils";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 // Track client-side page views with Segment & HubSpot
 if (process.env.NODE_ENV === "production") {
@@ -68,6 +69,9 @@ function Layout({
 
   return (
     <>
+      {!isExport() && process.env.NODE_ENV === "production" && (
+        <GoogleTagManager gtmId="GTM-TGRTS75P" />
+      )}
       <NextSeo {...seo} />
 
       <Flex

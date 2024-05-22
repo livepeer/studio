@@ -9,6 +9,7 @@ import Router from "next/router";
 import { useMemo } from "react";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 // Track client-side page views with Segment & HubSpot
 if (!isExport() && process.env.NODE_ENV === "production") {
@@ -78,6 +79,9 @@ function DashboardLayout({
 
   return (
     <>
+      {!isExport() && process.env.NODE_ENV === "production" && (
+        <GoogleTagManager gtmId="GTM-TGRTS75P" />
+      )}
       <Box className="dashboard">
         <Elements stripe={stripePromise}>
           <Head>
