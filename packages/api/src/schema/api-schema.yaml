@@ -4408,8 +4408,10 @@ paths:
         - in: query
           name: record
           schema:
-            type: integer
-            example: 1
+            oneOf:
+              - type: boolean
+              - type: integer
+            example: true
           description: |
             Flag indicating if the response should only include recorded
             sessions
