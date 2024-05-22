@@ -700,9 +700,11 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  query.push(
-    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
-  );
+  if (req.project?.id) {
+    query.push(
+      sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
+    );
+  }
   if (req.user.admin && deleting) {
     const deletionThreshold = new Date(
       Date.now() - DELETE_ASSET_DELAY
