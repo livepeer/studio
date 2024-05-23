@@ -740,15 +740,20 @@ export async function addDefaultProjectId(
   req: Request,
   res: Response
 ) {
-  if (req.user.admin) {
-    return body;
-  }
-
   const enrichResponse = (document) => {
     // Enrich direct properties of the document if userId is present
     if ("id" in document && "userId" in document) {
       if (!document.projectId || document.projectId === "") {
         document.projectId = req.user.defaultProjectId;
+      }
+    }
+  };
+
+  const enrichResponseWithUserProjectId = (document) => {
+    // Enrich direct properties of the document with the projectId of the owner
+    if ("id" in document && "userId" in document && "user" in document) {
+      if (!document.projectId || document.projectId === "") {
+        document.projectId = document.user.defaultProjectId;
       }
     }
   };
@@ -759,7 +764,11 @@ export async function addDefaultProjectId(
       if (typeof item === "object" && item !== null) {
         Object.values(item).forEach((subItem) => {
           if (typeof subItem === "object" && subItem !== null) {
-            enrichResponse(subItem);
+            if (req.user.admin) {
+              enrichResponseWithUserProjectId(subItem);
+            } else {
+              enrichResponse(subItem);
+            }
           }
         });
       }
@@ -767,7 +776,11 @@ export async function addDefaultProjectId(
   } else if (typeof body === "object" && body !== null) {
     Object.values(body).forEach((subItem) => {
       if (typeof subItem === "object" && subItem !== null) {
-        enrichResponse(subItem);
+        if (req.user.admin) {
+          enrichResponseWithUserProjectId(subItem);
+        } else {
+          enrichResponse(subItem);
+        }
       }
     });
     enrichResponse(body);
