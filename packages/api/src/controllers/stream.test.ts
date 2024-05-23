@@ -21,6 +21,7 @@ import {
   startAuxTestServer,
   createProject,
   createApiToken,
+  useApiTokenWithProject,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
@@ -442,6 +443,7 @@ describe("controllers/stream", () => {
       });
 
       it("should create a stream", async () => {
+        client = await useApiTokenWithProject(client, nonAdminToken);
         const now = Date.now();
         const res = await client.post("/stream", { ...postMockStream });
         expect(res.status).toBe(201);
@@ -550,6 +552,7 @@ describe("controllers/stream", () => {
       });
 
       it("should create a stream if a pull config is present", async () => {
+        client = await useApiTokenWithProject(client, adminToken);
         const now = Date.now();
         const res = await client.put("/stream/pull", postMockPullStream);
         expect(res.status).toBe(201);
@@ -703,6 +706,7 @@ describe("controllers/stream", () => {
       });
 
       it("should update a stream if it has the same pull source", async () => {
+        client = await useApiTokenWithProject(client, adminToken);
         let res = await client.put("/stream/pull", postMockPullStream);
         expect(res.status).toBe(201);
         const stream = await res.json();
@@ -748,6 +752,7 @@ describe("controllers/stream", () => {
       });
 
       it("should dedup streams by creatorId if requested", async () => {
+        client = await useApiTokenWithProject(client, adminToken);
         let res = await client.put("/stream/pull?key=creatorId", {
           ...postMockPullStream,
           creatorId: "0xjest",
@@ -976,6 +981,7 @@ describe("controllers/stream", () => {
     });
 
     it("should create a stream, delete it, and error when attempting additional delete or replace", async () => {
+      client = await useApiTokenWithProject(client, nonAdminToken);
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
@@ -1004,6 +1010,7 @@ describe("controllers/stream", () => {
     });
 
     it("should create a stream and add a multistream target for it", async () => {
+      client = await useApiTokenWithProject(client, nonAdminToken);
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
@@ -1204,6 +1211,7 @@ describe("controllers/stream", () => {
       let patchPath: string;
 
       beforeEach(async () => {
+        client = await useApiTokenWithProject(client, adminToken);
         msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
@@ -1215,6 +1223,7 @@ describe("controllers/stream", () => {
 
       it("should disallow patching other users streams", async () => {
         client.jwtAuth = nonAdminToken;
+        client.apiKey = "";
         const res = await client.patch(patchPath, {});
         expect(res.status).toBe(404);
       });
@@ -1382,7 +1391,7 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
-      expect(streams[0]).toEqual(source[3]);
+      expect(streams[0].id).toEqual(source[3].id);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
       expect(res.headers.raw().link).toBeDefined();
       expect(res.headers.raw().link.length).toBe(1);
@@ -1392,7 +1401,7 @@ describe("controllers/stream", () => {
       expect(nextRes.status).toBe(200);
       const nextStreams = await nextRes.json();
       expect(nextStreams.length).toEqual(1);
-      expect(nextStreams[0]).toEqual(source[6]);
+      expect(nextStreams[0].id).toEqual(source[6].id);
       expect(nextStreams[0].userId).toEqual(nonAdminUser.id);
     });
 

@@ -1,5 +1,5 @@
 import serverPromise from "../test-server";
-import { TestClient, clearDatabase, createProject } from "../test-helpers";
+import { TestClient, clearDatabase } from "../test-helpers";
 import { sleep } from "../util";
 import { jobsDb } from "../store";
 import { Webhook } from "../schema/types";
@@ -282,8 +282,9 @@ describe("controllers/webhook", () => {
       expect(stream.kind).toBe("stream");
       expect(stream.name).toBe("eli_is_very_cool");
       expect(stream.createdAt).toBeGreaterThanOrEqual(now);
-      const document = await server.store.get(`stream/${stream.id}`);
-      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+      const document = await client.get(`/stream/${stream.id}`);
+      const gotStream = await document.json();
+      expect(server.db.stream.addDefaultFields(gotStream)).toEqual(stream);
 
       // trigger
       const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
