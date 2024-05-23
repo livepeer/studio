@@ -743,7 +743,10 @@ export async function addDefaultProjectId(
   const enrichResponse = (document) => {
     // Enrich direct properties of the document if userId is present
     if ("id" in document && "userId" in document) {
-      if (!document.projectId || document.projectId === "") {
+      if (
+        (!document.projectId || document.projectId === "") &&
+        document.user?.defaultProjectId
+      ) {
         document.projectId = req.user.defaultProjectId;
       }
     }
@@ -752,7 +755,10 @@ export async function addDefaultProjectId(
   const enrichResponseWithUserProjectId = (document) => {
     // Enrich direct properties of the document with the projectId of the owner
     if ("id" in document && "userId" in document && "user" in document) {
-      if (!document.projectId || document.projectId === "") {
+      if (
+        (!document.projectId || document.projectId === "") &&
+        document.user?.defaultProjectId
+      ) {
         document.projectId = document.user.defaultProjectId;
       }
     }
