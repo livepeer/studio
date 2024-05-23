@@ -745,7 +745,7 @@ export async function addDefaultProjectId(
     if ("id" in document && "userId" in document) {
       if (
         (!document.projectId || document.projectId === "") &&
-        document.user?.defaultProjectId
+        req.user?.defaultProjectId
       ) {
         document.projectId = req.user.defaultProjectId;
       }
