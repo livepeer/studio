@@ -2253,7 +2253,7 @@ components:
         - object
         - "null"
       description:
-        Whether the playback policy for a asset or stream is public or signed
+        Whether the playback policy for an asset or stream is public or signed
       additionalProperties: false
       required:
         - type
