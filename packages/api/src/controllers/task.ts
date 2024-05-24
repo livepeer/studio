@@ -321,8 +321,10 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   const user = await db.user.get(task.userId);
   if (!user) {
     return res.status(500).json({ errors: ["task user not found"] });
-  } else if (user.suspended) {
-    return res.status(403).json({ errors: ["task user is suspended"] });
+  } else if (user.suspended || user.disabled) {
+    return res.status(403).json({
+      errors: [`task user is ${user.suspended ? "suspended" : "disabled"}`],
+    });
   }
 
   const { phase, retries } = task.status;
