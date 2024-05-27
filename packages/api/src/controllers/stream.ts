@@ -331,6 +331,7 @@ export function extractUrlFrom(playbackUrl: string): string {
 
 // Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
 export function extractRegionFrom(playbackUrl: string): string {
+  return "non-existing-region";
   const regionRegex =
     /https?:\/\/(.+)-\w+-catalyst.+not-used-playback\/index.m3u8/;
   const matches = playbackUrl.match(regionRegex);
