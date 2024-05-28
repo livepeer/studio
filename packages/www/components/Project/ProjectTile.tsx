@@ -42,7 +42,7 @@ export default function ProjectTile({ name, id, ...props }) {
         "&:hover": {
           cursor: "pointer",
           transition: ".2s",
-          borderColor: "$hiContrast",
+          borderColor: "$neutral9",
         },
       }}>
       <Flex direction={"column"}>

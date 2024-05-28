@@ -200,7 +200,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         justifyContent: "flex-end",
         bottom: 0,
       }}>
-      {pathname.includes("settings") ? (
+      {pathname.includes("settings/") ? (
         <SettingsSidebar id={id} user={user} />
       ) : (
         <GeneralSidebar id={id} user={user} />

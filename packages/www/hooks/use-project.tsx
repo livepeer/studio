@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 export const projectId =
   typeof window !== "undefined" && localStorage.getItem("currentProject");
 
+export const PROJECT_ID_KEY = "selectedProject";
+
 const useProject = () => {
   const {
     query: { projectId },
@@ -17,7 +19,7 @@ const useProject = () => {
   };
 
   const setCurrentProject = (project, path?: string) => {
-    localStorage.setItem("currentProject", project.id);
+    localStorage.setItem(PROJECT_ID_KEY, project.id);
     push(`/projects/${project.id}${path ?? ""}`);
   };
 
