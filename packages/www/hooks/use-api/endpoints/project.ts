@@ -1,14 +1,7 @@
 import qs from "qs";
 import { ApiState } from "../types";
 import { SetStateAction } from "react";
-
-// temporary:
-// TODO: Import the Project type from @livpeer.studio/api
-type Project = {
-  id: string;
-  name: string;
-  createdAt: number;
-};
+import { Project } from "@livepeer.studio/api";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;

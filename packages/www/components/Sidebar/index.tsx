@@ -215,10 +215,6 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
   const { setCurrentProject, activeProjectId, appendProjectId } = useProject();
 
-  const goBack = () => {
-    Router.push("");
-  };
-
   const onCreateClick = async (projectName: string) => {
     const project = await createProject({
       name: projectName,
