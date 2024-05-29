@@ -10,7 +10,7 @@ import {
   Flex,
 } from "@livepeer/design-system";
 import ProjectTile from "components/Project/ProjectTile";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
 import useProject from "hooks/use-project";
 import { useState } from "react";
@@ -20,11 +20,19 @@ const WorkspaceProjects = () => {
   useLoggedIn();
   const { user, getProjects, createProject } = useApi();
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
+  const { setCurrentProject } = useProject();
+
+  const queryClient = useQueryClient();
 
   const onCreateClick = async (projectName: string) => {
     const project = await createProject({
       name: projectName,
     });
+
+    setCurrentProject(project, false);
+    setShowCreateProjectAlert(false);
+
+    queryClient.invalidateQueries("projects");
   };
 
   const { data } = useQuery("projects", getProjects);

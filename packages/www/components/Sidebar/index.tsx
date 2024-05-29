@@ -30,7 +30,7 @@ import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import { useJune } from "hooks/use-june";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { User } from "@livepeer.studio/api";
 import useProject from "hooks/use-project";
@@ -213,11 +213,17 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
   const { setCurrentProject, activeProjectId, appendProjectId } = useProject();
+  const queryClient = useQueryClient();
 
   const onCreateClick = async (projectName: string) => {
     const project = await createProject({
       name: projectName,
     });
+
+    setCurrentProject(project);
+    setShowCreateProjectAlert(false);
+
+    queryClient.invalidateQueries("projects");
   };
 
   const { data } = useQuery("projects", getProjects);

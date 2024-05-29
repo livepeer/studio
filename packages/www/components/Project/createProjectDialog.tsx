@@ -51,6 +51,7 @@ const CreateProjectDialog = ({
               console.error(error);
             } finally {
               setCreating(false);
+              setProjectName("");
             }
           }}>
           <Flex direction="column" gap="2">

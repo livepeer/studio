@@ -19,9 +19,9 @@ const useProject = () => {
     return `/projects/${activeProjectId}${path}`;
   };
 
-  const setCurrentProject = (project, path?: string) => {
+  const setCurrentProject = (project, shouldRedirect = true) => {
     localStorage.setItem(PROJECT_ID_KEY, project.id);
-    push(`/projects/${project.id}${path ?? ""}`);
+    shouldRedirect && push(`/projects/${project.id}`);
   };
 
   return {
