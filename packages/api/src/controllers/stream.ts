@@ -328,7 +328,7 @@ export function extractUrlFrom(
   playbackId: string
 ): string {
   const hostRegex = new RegExp(
-    `https?:\/\/.+-\w+-catalyst.+\/hls\/.+)ingest-${playbackId}\/index.m3u8`
+    `(https?:\/\/.+-\\w+-catalyst.+\/hls\/.+)ingest-${playbackId}\/index.m3u8`
   );
   const matches = playbackUrl.match(hostRegex);
   return matches ? matches[1] : null;
@@ -340,7 +340,7 @@ export function extractRegionFrom(
   playbackId: string
 ): string {
   const regionRegex = new RegExp(
-    `https?:\/\/(.+)-\w+-catalyst.+ingest-${playbackId}\/index.m3u8`
+    `https?:\/\/(.+)-\\w+-catalyst.+ingest-${playbackId}\/index.m3u8`
   );
   const matches = playbackUrl.match(regionRegex);
   return matches ? matches[1] : null;

@@ -888,48 +888,56 @@ describe("controllers/stream", () => {
       it("should extract host from redirected playback url", async () => {
         expect(
           extractUrlFrom(
-            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+");
         expect(
           extractUrlFrom(
-            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe(
           "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+"
         );
         expect(
           extractUrlFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe(
           "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+"
         );
         expect(
           extractUrlFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
+            "12345-67890"
           )
         ).toBe(null);
       });
       it("should extract region from redirected playback url", async () => {
         expect(
           extractRegionFrom(
-            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("sto");
         expect(
           extractRegionFrom(
-            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("mos2");
         expect(
           extractRegionFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("fra-staging");
         expect(
           extractRegionFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
+            "12345-67890"
           )
         ).toBe(null);
       });
