@@ -5,7 +5,6 @@
  */
 
 import { useApi } from "hooks";
-import useProject from "hooks/use-project";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useQuery } from "react-query";

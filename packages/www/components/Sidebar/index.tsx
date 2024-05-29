@@ -412,6 +412,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             }}>
             {data?.map((project) => (
               <DropdownMenuItem
+                key={project.id}
                 css={{
                   py: "$1",
                   px: "$2",

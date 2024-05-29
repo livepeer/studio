@@ -217,3 +217,12 @@ export const DashboardSettingsGeneral = {
     url: makeCompleteUrl(),
   },
 };
+
+export const DashboardProjects = {
+  metaData: {
+    title: makeCompleteTitle("Projects"),
+    description:
+      "Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.",
+    url: makeCompleteUrl(),
+  },
+};

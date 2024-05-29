@@ -1,6 +1,6 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import { DashboardStreams as Content } from "content";
+import { DashboardProjects as Content } from "content";
 import {
   Box,
   Heading,
@@ -12,12 +12,21 @@ import {
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery } from "react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
+import useProject from "hooks/use-project";
+import { useState } from "react";
+import CreateProjectDialog from "components/Project/createProjectDialog";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
-  const { user } = useApi();
+  const { user, getProjects, createProject } = useApi();
+  const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
 
-  const { getProjects } = useApi();
+  const onCreateClick = async (projectName: string) => {
+    const project = await createProject({
+      name: projectName,
+    });
+  };
+
   const { data } = useQuery("projects", getProjects);
 
   if (!user) {
@@ -81,13 +90,19 @@ const WorkspaceProjects = () => {
           }}>
           {data?.map((project, i) => (
             <ProjectTile
-              key={`project-tile${i}`}
+              key={`project-tile-${i}`}
               id={project.id}
               name={project.name}
             />
           ))}
         </Grid>
       </Box>
+
+      <CreateProjectDialog
+        onCreate={onCreateClick}
+        onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
+        isOpen={showCreateProjectAlert}
+      />
     </Layout>
   );
 };

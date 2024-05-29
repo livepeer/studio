@@ -13,10 +13,6 @@ import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { useQuery } from "react-query";
 import useProject from "hooks/use-project";
-import { ImageIcon, RocketIcon } from "@radix-ui/react-icons";
-import { GoRocket } from "react-icons/go";
-import { FaImage, FaImages } from "react-icons/fa";
-import { FiImage } from "react-icons/fi";
 
 const Settings = () => {
   useLoggedIn();
