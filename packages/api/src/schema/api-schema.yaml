@@ -2253,7 +2253,7 @@ components:
         - object
         - "null"
       description:
-        Whether the playback policy for a asset or stream is public or signed
+        Whether the playback policy for an asset or stream is public or signed
       additionalProperties: false
       required:
         - type
@@ -4408,8 +4408,10 @@ paths:
         - in: query
           name: record
           schema:
-            type: integer
-            example: 1
+            oneOf:
+              - type: boolean
+              - type: integer
+            example: true
           description: |
             Flag indicating if the response should only include recorded
             sessions
