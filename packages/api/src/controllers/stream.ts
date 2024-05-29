@@ -295,13 +295,14 @@ export function resolvePullUrlFromExistingStreams(
 
 async function resolvePullUrlAndRegion(
   stream: NewStreamPayload,
-  ingest: string
+  ingest: string,
+  playbackId: string
 ): Promise<{ pullUrl: string; pullRegion: string }> {
   if (process.env.NODE_ENV === "test") {
     return { pullUrl: null, pullRegion: null };
   }
   const url = new URL(
-    pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
+    pathJoin(ingest, `hls`, `ingest-${playbackId}`, `index.m3u8`)
   );
   const { lat, lon } = stream.pull?.location ?? {};
   if (lat && lon) {
@@ -316,23 +317,31 @@ async function resolvePullUrlAndRegion(
     return null;
   }
   return {
-    pullUrl: extractUrlFrom(response.url),
-    pullRegion: extractRegionFrom(response.url),
+    pullUrl: extractUrlFrom(response.url, playbackId),
+    pullRegion: extractRegionFrom(response.url, playbackId),
   };
 }
 
 // Extracts Mist URL from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
-export function extractUrlFrom(playbackUrl: string): string {
-  const hostRegex =
-    /(https?:\/\/.+-\w+-catalyst.+\/hls\/.+)not-used-playback\/index.m3u8/;
+export function extractUrlFrom(
+  playbackUrl: string,
+  playbackId: string
+): string {
+  const hostRegex = new RegExp(
+    `(https?:\/\/.+-\\w+-catalyst.+\/hls\/.+)ingest-${playbackId}\/index.m3u8`
+  );
   const matches = playbackUrl.match(hostRegex);
   return matches ? matches[1] : null;
 }
 
 // Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
-export function extractRegionFrom(playbackUrl: string): string {
-  const regionRegex =
-    /https?:\/\/(.+)-\w+-catalyst.+not-used-playback\/index.m3u8/;
+export function extractRegionFrom(
+  playbackUrl: string,
+  playbackId: string
+): string {
+  const regionRegex = new RegExp(
+    `https?:\/\/(.+)-\\w+-catalyst.+ingest-${playbackId}\/index.m3u8`
+  );
   const matches = playbackUrl.match(regionRegex);
   return matches ? matches[1] : null;
 }
@@ -1177,9 +1186,7 @@ app.put(
     const streamExisted = streams.length === 1;
 
     const ingest = await getIngestBase(req);
-    const { pullUrl, pullRegion } =
-      resolvePullUrlFromExistingStreams(streams) ||
-      (await resolvePullUrlAndRegion(rawPayload, ingest));
+    let streamPullUrl: string;
 
     let stream: DBStream;
     if (!streamExisted) {
@@ -1187,10 +1194,24 @@ app.put(
         `pull request creating a new stream with name=${rawPayload.name}`
       );
       stream = await handleCreateStream(req, payload);
+      const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
+        rawPayload,
+        ingest,
+        stream.playbackId
+      );
+      streamPullUrl = pullUrl;
       stream.pullRegion = pullRegion;
       await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
+      const { pullUrl, pullRegion } =
+        resolvePullUrlFromExistingStreams(streams) ||
+        (await resolvePullUrlAndRegion(
+          rawPayload,
+          ingest,
+          oldStream.playbackId
+        ));
+      streamPullUrl = pullUrl;
       logger.info(
         `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
       );
@@ -1222,8 +1243,8 @@ app.put(
     }
 
     // If pullHost was resolved, then stick to that host for triggering Catalyst pull start
-    const playbackUrl = pullUrl
-      ? pathJoin(pullUrl + stream.playbackId, `index.m3u8`)
+    const playbackUrl = streamPullUrl
+      ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
       await triggerCatalystPullStart(stream, playbackUrl);
