@@ -19,7 +19,7 @@ export default function Dashboard() {
     if (selectedProject) {
       push(`/projects/${selectedProject}`);
     } else if (projects?.length > 0) {
-      push(`/projects/${projects[0].id}`);
+      push(`/projects/${projects.reverse()?.[0].id}`);
     }
   }, [projects]);
   return <div />;

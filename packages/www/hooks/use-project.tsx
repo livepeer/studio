@@ -1,21 +1,22 @@
-import { useQuery, useQueryClient } from "react-query";
-import useApi from "./use-api";
-import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
-
-export const projectId =
-  typeof window !== "undefined" && localStorage.getItem("currentProject");
 
 export const PROJECT_ID_KEY = "selectedProject";
 
+export const projectId =
+  typeof window !== "undefined" && localStorage.getItem(PROJECT_ID_KEY);
+
 const useProject = () => {
   const {
-    query: { projectId },
+    query: { projectId: routerProjectId },
     push,
   } = useRouter();
 
+  const activeProjectId =
+    routerProjectId ||
+    (typeof window !== "undefined" && localStorage.getItem(PROJECT_ID_KEY));
+
   const appendProjectId = (path) => {
-    return `/projects/${projectId}${path}`;
+    return `/projects/${activeProjectId}${path}`;
   };
 
   const setCurrentProject = (project, path?: string) => {
@@ -25,9 +26,7 @@ const useProject = () => {
 
   return {
     appendProjectId,
-    activeProjectId:
-      projectId ??
-      (typeof window !== "undefined" && localStorage.getItem("currentProject")),
+    activeProjectId,
     setCurrentProject,
   };
 };

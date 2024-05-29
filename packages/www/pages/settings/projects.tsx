@@ -72,6 +72,7 @@ const WorkspaceProjects = () => {
               </Text>
             </Flex>
             <Button
+              onClick={() => setShowCreateProjectAlert(true)}
               css={{
                 p: "$3",
                 marginTop: "2rem",

@@ -28,9 +28,8 @@ import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
-import { useJune, events } from "hooks/use-june";
-import { useCallback, useEffect, useState } from "react";
-import { isExport } from "lib/utils";
+import { useJune } from "hooks/use-june";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { User } from "@livepeer.studio/api";
@@ -551,13 +550,11 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             <LoopIcon />
             <Text
               css={{
-                color: "$neutral10",
-                transition: "color .3s",
-                textDecoration: "none",
-                "&:hover": {
-                  color: "$neutral11",
-                  transition: "color .3s",
-                },
+                display: "flex",
+                backgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+                fontSize: "$1",
               }}>
               Status
             </Text>
