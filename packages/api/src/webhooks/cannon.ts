@@ -585,6 +585,7 @@ export default class WebhookCannon {
         {
           upload: {
             url: url,
+            profiles: session.recordingSpec?.profiles,
             thumbnails: !(await isExperimentSubject(
               "vod-thumbs-off",
               session.userId
