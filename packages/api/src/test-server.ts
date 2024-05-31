@@ -2,9 +2,9 @@
  * This file is imported from all the integration tests. It boots up a server based on the provided argv.
  */
 import fs from "fs-extra";
-import { v4 as uuid } from "uuid";
-import path from "path";
 import os from "os";
+import path from "path";
+import { v4 as uuid } from "uuid";
 
 import makeApp, { AppServer } from "./index";
 import argParser from "./parse-cli";
@@ -38,6 +38,7 @@ params.sendgridTemplateId = sendgridTemplateId;
 params.sendgridApiKey = sendgridApiKey;
 params.postgresUrl = `postgresql://postgres@127.0.0.1/${testId}`;
 params.recordObjectStoreId = "mock_store";
+params.recordCatalystObjectStoreId = "mock_store";
 params.vodObjectStoreId = "mock_vod_store";
 params.trustedIpfsGateways = [
   "https://ipfs.example.com/ipfs/",
