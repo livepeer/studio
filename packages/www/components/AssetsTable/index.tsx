@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useApi } from "hooks";
 import Table, {
   useTableState,
@@ -37,7 +37,7 @@ const AssetsTable = ({
   const { getAssets, uploadAssets, deleteAsset, getTasks, getFileUploads } =
     useApi();
   const [openSnackbar] = useSnackbar();
-  const { appendProjectId } = useProjectContext();
+  const { appendProjectId, projectId } = useProjectContext();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
     pageSize,
@@ -81,8 +81,12 @@ const AssetsTable = ({
         onDeleteAsset,
         appendProjectId
       ),
-    [userId]
+    [userId, appendProjectId]
   );
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <>

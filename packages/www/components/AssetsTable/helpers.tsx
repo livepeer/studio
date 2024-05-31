@@ -14,7 +14,6 @@ import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { State } from "../Table";
 import TableEmptyState from "../Table/components/TableEmptyState";
 import { useApi } from "hooks";
-import { useProjectContext } from "context/ProjectContext";
 
 type ApiClient = ReturnType<typeof useApi>;
 

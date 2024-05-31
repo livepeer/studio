@@ -58,13 +58,15 @@ const StreamsTable = ({
     initialOrder: sortByToString(DefaultSortBy),
   });
   const columns = useMemo(makeColumns, []);
-  const { appendProjectId } = useProjectContext();
+  const { appendProjectId, projectId } = useProjectContext();
 
   const fetcher: Fetcher<StreamsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, userId, getStreams, appendProjectId),
     [userId]
   );
+
+  console.log(projectId);
 
   const onCreateClick = useCallback(
     async (streamName: string) => {
@@ -87,6 +89,10 @@ const StreamsTable = ({
     stateSetter.setPrevCursors([]);
     stateSetter.setFilters(e);
   };
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   const handleFilterType = (type: string) => {
     stateSetter.setCursor("");

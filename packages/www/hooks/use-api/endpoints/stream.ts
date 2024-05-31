@@ -75,6 +75,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
+      projectId,
     })}`
   );
   const [activeStreamRes] = await context.fetch(
@@ -85,6 +86,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
+      projectId,
     })}`
   );
 
@@ -97,6 +99,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
+      projectId,
     })}`
   );
 

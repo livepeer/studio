@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useApi } from "../../hooks";
 import Table, {
   DefaultSortBy,
@@ -28,6 +28,7 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
     useApi();
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
+  const { projectId } = useProjectContext();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
     tableId: "webhooksTable",
     initialOrder: sortByToString(DefaultSortBy),
@@ -55,6 +56,10 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
       query,
     });
   };
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <Box css={{ p: "$6", mb: "$8" }}>
