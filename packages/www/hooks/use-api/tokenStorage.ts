@@ -1,5 +1,3 @@
-import { PROJECT_ID_KEY } from "hooks/use-project";
-
 export const TOKEN_KEY = "PERSISTENT_TOKEN";
 export const REFRESH_TOKEN_KEY = "REFRESH_TOKEN";
 
@@ -35,7 +33,6 @@ export const clearTokens = () => {
   try {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.remove(PROJECT_ID_KEY);
   } catch (err) {
     console.error(`Error clearing persistent token: ${err.message}.`);
   }

@@ -8,7 +8,7 @@ import { HttpError } from "../../../lib/utils";
 import { ApiState, StreamInfo } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
-import { PROJECT_ID_KEY, projectId } from "hooks/use-project";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
