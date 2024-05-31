@@ -85,6 +85,7 @@ const EMPTY_NEW_STREAM_PAYLOAD: Required<
   multistream: undefined,
   pull: undefined,
   record: undefined,
+  recordingSpec: undefined,
   userTags: undefined,
   creatorId: undefined,
   playbackPolicy: undefined,
