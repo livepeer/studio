@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
-import { Tooltip as ReactTooltip } from "react-tooltip";
+import ReactTooltip from "react-tooltip";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "hooks";
 import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
