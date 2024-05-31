@@ -4,7 +4,6 @@ import { NextSeo } from "next-seo";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
-import ReactGA from "react-ga";
 import "lazysizes";
 import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router from "next/router";
@@ -24,12 +23,6 @@ interface Props {
   preview?: boolean;
   backgroundColor?: string;
   customNav?: React.ReactNode;
-}
-
-if (process.env.NODE_ENV === "production") {
-  ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
-} else {
-  ReactGA.initialize("test", { testMode: true });
 }
 
 // Track client-side page views with Segment & HubSpot
@@ -54,13 +47,6 @@ const Layout = ({
   backgroundColor = "$loContrast",
   customNav,
 }: Props) => {
-  useEffect(() => {
-    if (window.location.hostname === "livepeer.studio") {
-      ReactGA.pageview(window.location.pathname + window.location.search);
-      hotjar.initialize(2525106, 6);
-    }
-  }, []);
-
   let seo = {
     title,
     description,

@@ -1,17 +1,22 @@
 /** @jsxImportSource @emotion/react */
-import { jsx } from "theme-ui";
+import { Session } from "@livepeer.studio/api";
 import { formatDuration, intervalToDuration } from "date-fns";
 import { CellComponentProps, TableData } from "../types";
 
-export type DurationCellProps = { duration: number; status?: string };
+export type DurationCellProps = {
+  duration: number;
+  status?: Session["recordingStatus"];
+};
 
 const DurationCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, DurationCellProps>) => {
   if (cell.value.status === "waiting") {
     return "In progress";
+  } else if (cell.value.status === "failed") {
+    return "Failed";
   }
-  if (cell.value.duration === 0) {
+  if (cell.value.duration === 0 || cell.value.status !== "ready") {
     return "n/a";
   }
   try {

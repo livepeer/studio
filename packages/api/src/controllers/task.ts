@@ -1,27 +1,26 @@
-import { authorizer } from "../middleware";
-import { validatePost } from "../middleware";
 import { Router } from "express";
 import mung from "express-mung";
-import { v4 as uuid } from "uuid";
 import _ from "lodash";
+import sql from "sql-template-strings";
+import { v4 as uuid } from "uuid";
+import { authorizer, validatePost } from "../middleware";
+import { CliArgs } from "../parse-cli";
+import { Asset, Task } from "../schema/types";
+import { db } from "../store";
+import { taskOutputToIpfsStorage } from "../store/asset-table";
+import { TooManyRequestsError } from "../store/errors";
+import { WithID } from "../store/types";
+import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
 import {
+  FieldsMap,
+  deleteCredentials,
   makeNextHREF,
   parseFilters,
   parseOrder,
-  toStringValues,
-  FieldsMap,
   reqUseReplica,
-  deleteCredentials,
   sqlQueryGroup,
+  toStringValues,
 } from "./helpers";
-import { db } from "../store";
-import sql from "sql-template-strings";
-import { Asset, Task } from "../schema/types";
-import { WithID } from "../store/types";
-import { assetEncryptionWithoutKey, withIpfsUrls } from "./asset";
-import { taskOutputToIpfsStorage } from "../store/asset-table";
-import { TooManyRequestsError } from "../store/errors";
-import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -321,7 +320,11 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
 
   const user = await db.user.get(task.userId);
   if (!user) {
-    return res.status(500).json({ errors: ["user not found"] });
+    return res.status(500).json({ errors: ["task user not found"] });
+  } else if (user.suspended || user.disabled) {
+    return res.status(403).json({
+      errors: [`task user is ${user.suspended ? "suspended" : "disabled"}`],
+    });
   }
 
   const { phase, retries } = task.status;

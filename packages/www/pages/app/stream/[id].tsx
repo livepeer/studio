@@ -258,8 +258,9 @@ const ID = () => {
       } else if ("errors" in info) {
         throw new Error(info.errors.toString());
       }
-      setStream(info.stream);
-      setStreamOwner(info.user);
+
+      setStream(info.stream as Stream);
+      setStreamOwner(info.user as User);
     } catch (err) {
       console.error(err); // todo: surface this
     }

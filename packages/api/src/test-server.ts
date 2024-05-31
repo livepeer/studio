@@ -9,7 +9,6 @@ import os from "os";
 import makeApp, { AppServer } from "./index";
 import argParser from "./parse-cli";
 import { rabbitMgmt, startAuxTestServer } from "./test-helpers";
-import bodyParser from "body-parser";
 
 const dbPath = path.resolve(os.tmpdir(), "livepeer", uuid());
 const clientId = "EXPECTED_AUDIENCE";
@@ -88,6 +87,7 @@ async function setupServer() {
       await server.close();
     },
     db: server.db,
+    jobsDb: server.jobsDb,
     queue: server.queue,
     webhook: server.webhook,
     taskScheduler: server.taskScheduler,

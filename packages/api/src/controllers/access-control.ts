@@ -219,6 +219,7 @@ app.post(
     }
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
+    const allowedOrigins = content.playbackPolicy?.allowedOrigins ?? [];
 
     let config: Partial<GateConfig> = {};
 
@@ -240,6 +241,38 @@ app.post(
     ) {
       res.status(204);
       return res.end();
+    }
+
+    let origin = req.body?.webhookPayload?.headers?.Origin;
+    const referer = req.body?.webhookPayload?.headers?.Referer;
+
+    if (origin || origin === "") {
+      if (origin === "null" || origin === "") {
+        origin = referer;
+        console.log(
+          `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`
+        );
+      }
+
+      origin = decodeURIComponent(origin); // Decode the origin or referer
+      origin = origin.replace(/\/$/, ""); // Strip trailing slashes
+
+      if (allowedOrigins.length > 0) {
+        if (allowedOrigins.includes("*")) {
+          console.log(`
+            access-control: gate: content with playbackId=${playbackId} is gated, wildcard origin allowed
+          `);
+        } else {
+          if (!allowedOrigins.includes(origin)) {
+            console.log(`
+              access-control: gate: content with playbackId=${playbackId} is gated but origin=${origin} not in allowed origins=${allowedOrigins}, disallowing playback
+            `);
+            throw new ForbiddenError(
+              `Content is gated and origin not in allowed origins`
+            );
+          }
+        }
+      }
     }
 
     switch (playbackPolicyType) {

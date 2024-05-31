@@ -1,27 +1,28 @@
 import { ConsumeMessage } from "amqplib";
-import { promises as dns } from "dns";
+import dns from "dns";
 import isLocalIP from "is-local-ip";
+import _ from "lodash";
+import { isIP } from "net";
 import { Response } from "node-fetch";
-import { v4 as uuid } from "uuid";
 import { parse as parseUrl } from "url";
-import { DB } from "../store/db";
-import { DBSession } from "../store/session-table";
+import { v4 as uuid } from "uuid";
+import { createAsset, primaryStorageExperiment } from "../controllers/asset";
+import { generateUniquePlaybackId } from "../controllers/generate-keys";
+import { sendgridEmail, sign } from "../controllers/helpers";
+import { buildRecordingUrl } from "../controllers/session";
+import { USER_SESSION_TIMEOUT } from "../controllers/stream";
+import logger from "../logger";
+import { WebhookLog } from "../schema/types";
+import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
+import { BadRequestError, UnprocessableEntityError } from "../store/errors";
+import { isExperimentSubject } from "../store/experiment-table";
 import messages from "../store/messages";
 import Queue from "../store/queue";
-import { DBWebhook } from "../store/webhook-table";
-import { fetchWithTimeout, RequestInitWithTimeout, sleep } from "../util";
-import logger from "../logger";
-import { sign, sendgridEmail, pathJoin } from "../controllers/helpers";
-import { taskScheduler } from "../task/scheduler";
-import { generateUniquePlaybackId } from "../controllers/generate-keys";
-import { createAsset, primaryStorageExperiment } from "../controllers/asset";
+import { DBSession } from "../store/session-table";
 import { DBStream } from "../store/stream-table";
-import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { BadRequestError, UnprocessableEntityError } from "../store/errors";
-import { db } from "../store";
-import { buildRecordingUrl } from "../controllers/session";
-import { isExperimentSubject } from "../store/experiment-table";
-import { WebhookLog } from "../schema/types";
+import { DBWebhook } from "../store/webhook-table";
+import { taskScheduler } from "../task/scheduler";
+import { RequestInitWithTimeout, fetchWithTimeout, sleep } from "../util";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -42,7 +43,7 @@ function isRuntimeError(err: any): boolean {
 
 export default class WebhookCannon {
   running: boolean;
-  verifyUrls: boolean;
+  skipUrlVerification: boolean;
   frontendDomain: string;
   sendgridTemplateId: string;
   sendgridApiKey: string;
@@ -51,7 +52,7 @@ export default class WebhookCannon {
   secondaryVodObjectStoreId: string;
   recordCatalystObjectStoreId: string;
   secondaryRecordObjectStoreId: string;
-  resolver: any;
+  resolver: dns.promises.Resolver;
   queue: Queue;
   constructor({
     frontendDomain,
@@ -62,11 +63,11 @@ export default class WebhookCannon {
     secondaryVodObjectStoreId,
     recordCatalystObjectStoreId,
     secondaryRecordObjectStoreId,
-    verifyUrls,
+    skipUrlVerification,
     queue,
   }) {
     this.running = true;
-    this.verifyUrls = verifyUrls;
+    this.skipUrlVerification = skipUrlVerification;
     this.frontendDomain = frontendDomain;
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
@@ -75,7 +76,7 @@ export default class WebhookCannon {
     this.secondaryVodObjectStoreId = secondaryVodObjectStoreId;
     this.recordCatalystObjectStoreId = recordCatalystObjectStoreId;
     this.secondaryRecordObjectStoreId = secondaryRecordObjectStoreId;
-    this.resolver = new dns.Resolver();
+    this.resolver = new dns.promises.Resolver();
     this.queue = queue;
     // this.start();
   }
@@ -101,7 +102,9 @@ export default class WebhookCannon {
     try {
       ack = await this.processWebhookEvent(event);
     } catch (err) {
-      ack = isRuntimeError(err);
+      // only ack the event if it's a runtime error (could lead to webhooks accumulating indefinitely) or an explicit
+      // unprocessable entity error, thrown for bad messages by processWebhookEvent.
+      ack = isRuntimeError(err) || err instanceof UnprocessableEntityError;
       console.log("handleEventQueue Error ", err);
     } finally {
       if (ack) {
@@ -128,10 +131,6 @@ export default class WebhookCannon {
           `Error handling recording.waiting event sessionId=${sessionId} err=`,
           e
         );
-        // only ack the event if it's an explicit unprocessable entity error
-        if (e instanceof UnprocessableEntityError) {
-          return true;
-        }
         throw e;
       }
     }
@@ -153,7 +152,7 @@ export default class WebhookCannon {
       });
       if (!stream) {
         // if stream isn't found. don't fire the webhook, log an error
-        throw new Error(
+        throw new UnprocessableEntityError(
           `webhook Cannon: onTrigger: Stream Not found , streamId: ${streamId}`
         );
       }
@@ -165,10 +164,13 @@ export default class WebhookCannon {
     }
 
     let user = await db.user.get(userId);
-    if (!user || user.suspended) {
-      // if user isn't found. don't fire the webhook, log an error
-      throw new Error(
-        `webhook Cannon: onTrigger: User Not found , userId: ${userId}`
+    if (!user) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: User not found userId=${userId}`
+      );
+    } else if (user.suspended) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: User suspended userId=${userId}`
       );
     }
 
@@ -208,8 +210,7 @@ export default class WebhookCannon {
       return;
     }
     try {
-      // TODO Activate URL Verification
-      await this._fireHook(trigger, false);
+      await this._fireHook(trigger);
     } catch (err) {
       console.log("_fireHook error", err);
       await this.retry(trigger, null, err);
@@ -221,10 +222,6 @@ export default class WebhookCannon {
   stop() {
     // this.db.queue.unsetMsgHandler();
     this.running = false;
-  }
-
-  disableUrlVerify() {
-    this.verifyUrls = false;
   }
 
   public calcBackoff = (lastInterval?: number): number => {
@@ -328,7 +325,7 @@ export default class WebhookCannon {
     );
   }
 
-  async _fireHook(trigger: messages.WebhookTrigger, verifyUrl = true) {
+  async _fireHook(trigger: messages.WebhookTrigger) {
     const { event, webhook, stream, user } = trigger;
     if (!event || !webhook || !user) {
       console.error(
@@ -338,34 +335,15 @@ export default class WebhookCannon {
       return;
     }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
-    let ips, urlObj, isLocal;
-    if (verifyUrl) {
-      try {
-        urlObj = parseUrl(webhook.url);
-        if (urlObj.host) {
-          ips = await this.resolver.resolve4(urlObj.hostname);
-        }
-      } catch (e) {
-        console.error("error: ", e);
-        throw e;
-      }
-    }
 
-    // This is mainly useful for local testing
-    if (user.admin || verifyUrl === false) {
-      isLocal = false;
-    } else {
-      try {
-        if (ips && ips.length) {
-          isLocal = isLocalIP(ips[0]);
-        } else {
-          isLocal = true;
-        }
-      } catch (e) {
-        console.error("isLocal Error", isLocal, e);
-        throw e;
-      }
-    }
+    const { ips, isLocal } = await this.checkIsLocalIp(
+      webhook.url,
+      user.admin
+    ).catch((e) => {
+      console.error("error checking if is local IP: ", e);
+      return { ips: [], isLocal: false };
+    });
+
     if (isLocal) {
       // don't fire this webhook.
       console.log(
@@ -416,7 +394,7 @@ export default class WebhookCannon {
         if (isSuccess(resp)) {
           // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
-          return true;
+          return;
         }
         if (resp.status >= 500) {
           await this.retry(
@@ -464,6 +442,37 @@ export default class WebhookCannon {
     }
   }
 
+  public async checkIsLocalIp(url: string, isAdmin: boolean) {
+    if (isAdmin || this.skipUrlVerification) {
+      // this is mainly useful for local testing
+      return { ips: [], isLocal: false };
+    }
+
+    const emptyIfNotFound = (err) => {
+      if ([dns.NODATA, dns.NOTFOUND, dns.BADFAMILY].includes(err.code)) {
+        return [] as string[];
+      }
+      throw err;
+    };
+
+    const { hostname } = parseUrl(url);
+    if (["localhost", "ip6-localhost", "ip6-loopback"].includes(hostname)) {
+      // dns.resolve functions do not take /etc/hosts into account, so we need to handle these separately
+      const ips = hostname === "localhost" ? ["127.0.0.1"] : ["::1"];
+      return { ips, isLocal: true };
+    }
+
+    const ips = isIP(hostname)
+      ? [hostname]
+      : await Promise.all([
+          this.resolver.resolve4(hostname).catch(emptyIfNotFound),
+          this.resolver.resolve6(hostname).catch(emptyIfNotFound),
+        ]).then((ipsArrs) => ipsArrs.flat());
+
+    const isLocal = ips.some(isLocalIP);
+    return { ips, isLocal };
+  }
+
   async storeTriggerStatus(
     webhook: DBWebhook,
     triggerTime: number,
@@ -483,7 +492,7 @@ export default class WebhookCannon {
   async handleRecordingWaitingChecks(
     sessionId: string,
     attempt = 1
-  ): Promise<string> {
+  ): Promise<void> {
     const session = await db.session.get(sessionId, {
       useReplica: false,
     });
@@ -491,11 +500,16 @@ export default class WebhookCannon {
       throw new UnprocessableEntityError("Session not found");
     }
 
-    const { lastSeen, sourceSegments } = session;
+    const [childStreams] = await db.stream.find({ sessionId });
+    const lastSeen = _(childStreams)
+      .concat(session)
+      .map((s) => s.lastSeen || s.createdAt)
+      .max();
+    const hasSourceSegments = _(childStreams)
+      .concat(session)
+      .some((s) => !!s.sourceSegments);
+
     const activeThreshold = Date.now() - USER_SESSION_TIMEOUT;
-    if (!lastSeen || !sourceSegments) {
-      throw new UnprocessableEntityError("Session is unused");
-    }
     if (lastSeen > activeThreshold) {
       if (attempt >= 5) {
         throw new UnprocessableEntityError("Session is still active");
@@ -508,12 +522,19 @@ export default class WebhookCannon {
 
     // if we got to this point, it means we're confident this session is inactive
     // and we can set the child streams isActive=false
-    const [childStreams] = await db.stream.find({ sessionId });
     await Promise.all(
       childStreams.map((child) => {
         return db.stream.update(child.id, { isActive: false });
       })
     );
+
+    if (!lastSeen && !hasSourceSegments) {
+      logger.info(
+        `Skipping unused session sessionId=${session.id} childStreamCount=${childStreams.length}`
+      );
+      return;
+    }
+
     const res = await db.asset.get(sessionId);
     if (res) {
       throw new UnprocessableEntityError("Session recording already handled");

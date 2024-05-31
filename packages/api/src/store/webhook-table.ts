@@ -49,12 +49,14 @@ export default class WebhookTable extends Table<DBWebhook> {
   }
 
   async updateStatus(id: string, status: DBWebhook["status"]) {
+    const statusStr = JSON.stringify(status);
     const res = await this.db.query(
-      `UPDATE ${
-        this.name
-      } SET data = jsonb_set(data, '{status}', case when data->'status' is null then '{}' else data->'status' end || '${JSON.stringify(
-        status
-      )}') WHERE id = '${id}'`
+      sql``
+        .append(`UPDATE ${this.name} `) // table name can't be parameterized, append a raw string
+        .append(
+          sql`SET data = jsonb_set(data, '{status}', case when data->'status' is null then '{}' else data->'status' end || ${statusStr}) `
+        )
+        .append(sql`WHERE id = ${id}`)
     );
 
     if (res.rowCount < 1) {

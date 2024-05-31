@@ -16,7 +16,8 @@ import {
   StreamSetActivePayload,
   User,
 } from "../schema/types";
-import { db } from "../store";
+import { db, jobsDb } from "../store";
+import { DB } from "../store/db";
 import {
   BadRequestError,
   InternalServerError,
@@ -59,9 +60,10 @@ type MultistreamOptions = DBStream["multistream"];
 type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
-const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
+export const ACTIVE_TIMEOUT = 90 * 1000; // 90 sec
 const STALE_SESSION_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours
-const MAX_WAIT_STREAM_ACTIVE = 2 * 60 * 1000; // 2 min
+const DEFAULT_PULL_LOCK_LEASE_TIMEOUT = 60 * 1000; // 1 min
+const PULL_REUSE_SAME_NODE_TIMEOUT = 10 * 60 * 1000; // 10 min
 
 // Helper constant to be used in the PUT /pull API to make sure we delete fields
 // from the stream that are not specified in the PUT payload.
@@ -204,6 +206,35 @@ async function validateStreamPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
+    const allowedOrigins = playbackPolicy?.allowedOrigins;
+    if (allowedOrigins) {
+      try {
+        if (allowedOrigins.length > 0) {
+          const isWildcardOrigin =
+            allowedOrigins.length === 1 && allowedOrigins[0] === "*";
+          if (!isWildcardOrigin) {
+            const isValidOrigin = (origin) => {
+              if (origin.endsWith("/")) return false;
+              const url = new URL(origin);
+              return (
+                ["http:", "https:"].includes(url.protocol) &&
+                url.hostname &&
+                (url.port === "" || Number(url.port) > 0) &&
+                url.pathname === ""
+              );
+            };
+            const allowedOriginsValid = allowedOrigins.every(isValidOrigin);
+            if (!allowedOriginsValid) {
+              throw new BadRequestError(
+                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>"
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.log(`Error validating allowedOrigins: ${err}`);
+      }
+    }
   }
 }
 
@@ -233,15 +264,45 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+// Reuse the same node for pulling the stream in two cases:
+// 1. if the same pull request is created within 1 min (this prevents race condition between different nodes executing /lockPull)
+// 2. if the same stream was stopped within 10 min (this prevents Mist delays in stopping/starting the stream)
+export function resolvePullUrlFromExistingStreams(
+  existingStreams: DBStream[]
+): { pullUrl: string; pullRegion: string } {
+  if (existingStreams.length !== 1) {
+    return null;
+  }
+  const stream = existingStreams[0];
+  const hasPullInfo = stream.pullRegion && stream.pullLockedBy;
+  const pullLockedRecently =
+    stream.pullLockedAt &&
+    stream.pullLockedAt > Date.now() - DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
+  const stoppedRecently =
+    stream.lastSeen &&
+    stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT;
+  if (hasPullInfo && (pullLockedRecently || stoppedRecently)) {
+    logger.info(
+      `pull request created with the same request within 10 min, reusing existing ingest node ${stream.pullLockedBy}`
+    );
+    return {
+      pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
+      pullRegion: stream.pullRegion,
+    };
+  }
+  return null;
+}
+
 async function resolvePullUrlAndRegion(
   stream: NewStreamPayload,
-  ingest: string
+  ingest: string,
+  playbackId: string
 ): Promise<{ pullUrl: string; pullRegion: string }> {
   if (process.env.NODE_ENV === "test") {
     return { pullUrl: null, pullRegion: null };
   }
   const url = new URL(
-    pathJoin(ingest, `hls`, "not-used-playback", `index.m3u8`)
+    pathJoin(ingest, `hls`, `ingest-${playbackId}`, `index.m3u8`)
   );
   const { lat, lon } = stream.pull?.location ?? {};
   if (lat && lon) {
@@ -256,23 +317,31 @@ async function resolvePullUrlAndRegion(
     return null;
   }
   return {
-    pullUrl: extractUrlFrom(response.url),
-    pullRegion: extractRegionFrom(response.url),
+    pullUrl: extractUrlFrom(response.url, playbackId),
+    pullRegion: extractRegionFrom(response.url, playbackId),
   };
 }
 
 // Extracts Mist URL from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
-export function extractUrlFrom(playbackUrl: string): string {
-  const hostRegex =
-    /(https?:\/\/.+-\w+-catalyst.+\/hls\/.+)not-used-playback\/index.m3u8/;
+export function extractUrlFrom(
+  playbackUrl: string,
+  playbackId: string
+): string {
+  const hostRegex = new RegExp(
+    `(https?:\/\/.+-\\w+-catalyst.+\/hls\/.+)ingest-${playbackId}\/index.m3u8`
+  );
   const matches = playbackUrl.match(hostRegex);
   return matches ? matches[1] : null;
 }
 
 // Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
-export function extractRegionFrom(playbackUrl: string): string {
-  const regionRegex =
-    /https?:\/\/(.+)-\w+-catalyst.+not-used-playback\/index.m3u8/;
+export function extractRegionFrom(
+  playbackUrl: string,
+  playbackId: string
+): string {
+  const regionRegex = new RegExp(
+    `https?:\/\/(.+)-\\w+-catalyst.+ingest-${playbackId}\/index.m3u8`
+  );
   const matches = playbackUrl.match(regionRegex);
   return matches ? matches[1] : null;
 }
@@ -293,65 +362,72 @@ export function getFLVPlaybackUrl(ingest: string, stream: DBStream) {
  * Returns whether the stream is currently tagged as active but hasn't been
  * updated in a long time and thus should be cleaned up.
  */
-function shouldActiveCleanup(stream: DBStream | DBSession) {
+function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   const isActive = "isActive" in stream ? stream.isActive : true; // sessions don't have `isActive` field so we just assume `true`
-  return (
-    isActive &&
-    !isNaN(stream.lastSeen) &&
-    Date.now() - stream.lastSeen > ACTIVE_TIMEOUT
-  );
+  const lastSeen = stream.lastSeen || stream.createdAt; // child streams are created with `lastSeen` set to 0
+  return isActive && !isNaN(lastSeen) && Date.now() - lastSeen > ACTIVE_TIMEOUT;
 }
 
-function activeCleanupOne(
-  config: CliArgs,
-  stream: DBStream,
-  queue: Queue,
-  ingest: string
-) {
-  if (!shouldActiveCleanup(stream)) {
-    return false;
-  }
-
-  setImmediate(async () => {
-    try {
-      if (stream.parentId) {
-        // this is a session so trigger the recording.waiting logic to clean-up the isActive field
-        await triggerSessionRecordingHooks(config, stream, queue, ingest, true);
-      } else {
-        const patch = { isActive: false };
-        await setStreamActiveWithHooks(
-          config,
-          stream,
-          patch,
-          queue,
-          ingest,
-          true
-        );
-      }
-    } catch (err) {
-      logger.error("Error sending /setactive hooks err=", err);
-    }
-  });
-
-  stream.isActive = false;
-  return true;
-}
-
-function activeCleanup(
+function triggerCleanUpIsActiveJob(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
-  ingest: string,
-  filterToActiveOnly = false
-) {
-  let hasStreamsToClean = false;
-  for (const stream of streams) {
-    hasStreamsToClean ||= activeCleanupOne(config, stream, queue, ingest);
+  ingest: string
+): [DBStream[], Promise<void>] {
+  streams = streams.filter(shouldCleanUpIsActive);
+  if (!streams.length) {
+    return [streams, Promise.resolve()];
   }
-  if (filterToActiveOnly && hasStreamsToClean) {
-    return streams.filter((s) => s.isActive); // activeCleanupOne monkey patches the stream object
-  }
-  return streams;
+
+  const parentStreams = streams.filter((s) => !s.parentId);
+  // skip children whose parents are being cleaned. setStreamActiveWithHooks already cleans all children
+  const childStreams = streams
+    .filter((s) => s.parentId)
+    .filter((s) => !parentStreams.some((p) => p.id === s.parentId));
+  streams = [...parentStreams, ...childStreams];
+
+  const jobPromise = Promise.resolve().then(async () => {
+    try {
+      await Promise.all(
+        parentStreams.map((s) =>
+          setStreamActiveWithHooks(
+            jobsDb,
+            config,
+            s,
+            { isActive: false },
+            queue,
+            ingest,
+            true
+          )
+        )
+      );
+    } catch (err) {
+      const ids = parentStreams.map((s) => s.id);
+      logger.error(
+        `Error sending /setactive hooks for streamIds=${ids} err=`,
+        err
+      );
+    }
+
+    try {
+      await triggerSessionRecordingProcessing(
+        jobsDb,
+        config,
+        childStreams,
+        queue,
+        ingest,
+        true
+      );
+    } catch (err) {
+      const ids = childStreams.map((s) => s.id);
+      logger.error(
+        `Error sending recording.waiting hooks for streamIds=${ids} err=`,
+        err
+      );
+    }
+  });
+
+  return [streams, jobPromise];
 }
 
 async function getIngestBase(req: Request) {
@@ -451,7 +527,7 @@ app.get("/", authorizer({}), async (req, res) => {
     fields = fields + ", count(*) OVER() AS count";
   }
   const from = `stream left join users on stream.data->>'userId' = users.id`;
-  const [output, newCursor] = await db.stream.find(query, {
+  let [output, newCursor] = await db.stream.find(query, {
     limit,
     cursor,
     fields,
@@ -467,23 +543,14 @@ app.get("/", authorizer({}), async (req, res) => {
     },
   });
 
-  const ingest = await getIngestBase(req);
-  res.status(200);
-
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(
-    activeCleanup(
-      req.config,
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(output, req.user.admin)
-      ),
-      req.queue,
-      ingest,
-      !!active
-    )
+
+  output = db.stream.addDefaultFieldsMany(
+    db.stream.removePrivateFieldsMany(output, req.user.admin)
   );
+  res.status(200).json(output);
 });
 
 export async function getRecordingPlaybackUrl(
@@ -525,7 +592,7 @@ export async function getRecordingFields(
   if (session.version === "v2") {
     const asset = await db.asset.getBySessionId(session.id);
     if (!asset) {
-      return { recordingStatus: "waiting" };
+      return { recordingStatus: isStreamStale(session) ? "none" : "waiting" };
     }
     const assetWithPlayback = await withPlaybackUrls(config, ingest, asset);
     const assetPhase = assetWithPlayback.status?.phase;
@@ -534,7 +601,7 @@ export async function getRecordingFields(
         assetPhase == "ready"
           ? "ready"
           : assetPhase == "failed"
-          ? "none"
+          ? "failed"
           : "waiting",
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
@@ -727,13 +794,8 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   res.json(
-    activeCleanup(
-      req.config,
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(streams, req.user.admin)
-      ),
-      req.queue,
-      ingest
+    db.stream.addDefaultFieldsMany(
+      db.stream.removePrivateFieldsMany(streams, req.user.admin)
     )
   );
 });
@@ -750,7 +812,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
+
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -995,7 +1057,7 @@ app.post(
     const patch: Partial<DBSession & DBStream> = {
       isHealthy: payload.is_active ? payload.is_healthy : null,
       issues,
-      // do not clear the `lastSeen` field when the stream is not active
+      // do not bump the `lastSeen` field when the stream is not active
       ...(payload.is_active ? { lastSeen: Date.now() } : null),
     };
 
@@ -1042,12 +1104,16 @@ const testCreatorIds: string[] = [
   "73846_115939837_115939837",
 ];
 
-// TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API.
-function fixTrovoProfiles(profiles: Profile[], isMobile: boolean) {
+// TODO: Remove this logic once Trovo starts sending correct profiles to the /pull API. Maybe never :(
+function fixedTrovoProfiles({
+  profiles,
+  pull: { isMobile },
+}: NewStreamPayload) {
+  const isMobileCamera = isMobile === 2; // 0: not mobile, 1: mobile screen share, 2: mobile camera
   return profiles?.map((p) => ({
     ...p,
-    fps: isMobile && p.fps ? 0 : p.fps,
-    height: p.width === 480 && p.height === 853 ? 854 : p.height,
+    fps: isMobileCamera && p.fps ? 0 : p.fps,
+    width: p.height === 480 && Math.abs(854 - p.width) <= 6 ? 854 : p.width,
   }));
 }
 
@@ -1066,11 +1132,10 @@ app.put(
     }
 
     // Make the payload compatible with the stream schema to simplify things
-    const payload: Partial<DBStream> = {
+    const payload: Partial<DBStream> & NewStreamPayload = {
       ...rawPayload,
       profiles:
-        fixTrovoProfiles(rawPayload.profiles, rawPayload.pull.isMobile) ||
-        req.config.defaultStreamProfiles,
+        fixedTrovoProfiles(rawPayload) || req.config.defaultStreamProfiles,
       creatorId: mapInputCreatorId(rawPayload.creatorId),
     };
 
@@ -1121,21 +1186,32 @@ app.put(
     const streamExisted = streams.length === 1;
 
     const ingest = await getIngestBase(req);
-    const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
-      rawPayload,
-      ingest
-    );
+    let streamPullUrl: string;
 
     let stream: DBStream;
     if (!streamExisted) {
       logger.info(
         `pull request creating a new stream with name=${rawPayload.name}`
       );
-      stream = await handleCreateStream(req);
+      stream = await handleCreateStream(req, payload);
+      const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
+        rawPayload,
+        ingest,
+        stream.playbackId
+      );
+      streamPullUrl = pullUrl;
       stream.pullRegion = pullRegion;
       await db.stream.replace(stream);
     } else {
       const oldStream = streams[0];
+      const { pullUrl, pullRegion } =
+        resolvePullUrlFromExistingStreams(streams) ||
+        (await resolvePullUrlAndRegion(
+          rawPayload,
+          ingest,
+          oldStream.playbackId
+        ));
+      streamPullUrl = pullUrl;
       logger.info(
         `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
       );
@@ -1167,8 +1243,8 @@ app.put(
     }
 
     // If pullHost was resolved, then stick to that host for triggering Catalyst pull start
-    const playbackUrl = pullUrl
-      ? pathJoin(pullUrl + stream.playbackId, `index.m3u8`)
+    const playbackUrl = streamPullUrl
+      ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
       await triggerCatalystPullStart(stream, playbackUrl);
@@ -1187,8 +1263,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   let { leaseTimeout, host } = req.body;
   if (!leaseTimeout) {
-    // Sets the default lock lease to 60s
-    leaseTimeout = 60 * 1000;
+    leaseTimeout = DEFAULT_PULL_LOCK_LEASE_TIMEOUT;
   }
   if (!host) {
     host = "unknown";
@@ -1203,12 +1278,13 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
 
   // We have an issue that some of the streams/sessions are not marked as inactive when they should be.
   // This is a workaround to clean up the stream in the background
-  const doingActiveCleanup = activeCleanupOne(
+  const [cleanedUpStreams] = triggerCleanUpIsActiveJob(
     req.config,
-    stream,
+    [stream],
     req.queue,
     await getIngestBase(req)
   );
+  const doingActiveCleanup = cleanedUpStreams.length > 0;
 
   // the `isActive` field is only cleared later in background, so we ignore it
   // in the query below in case we triggered an active cleanup logic above.
@@ -1295,7 +1371,7 @@ app.post(
       }
     }
 
-    const stream = await handleCreateStream(req);
+    const stream = await handleCreateStream(req, req.body);
 
     if (autoStartPull === "true") {
       const ingest = await getIngestBase(req);
@@ -1311,9 +1387,7 @@ app.post(
   }
 );
 
-async function handleCreateStream(req: Request) {
-  const payload = req.body as NewStreamPayload;
-
+async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   const id = uuid();
   const createdAt = Date.now();
   // TODO: Don't create a streamKey if there's a pull source (here and on www)
@@ -1334,8 +1408,8 @@ async function handleCreateStream(req: Request) {
   }
 
   let doc: DBStream = {
-    profiles: req.config.defaultStreamProfiles,
     ...payload,
+    profiles: payload.profiles || req.config.defaultStreamProfiles,
     kind: "stream",
     userId: req.user.id,
     creatorId: mapInputCreatorId(payload.creatorId),
@@ -1437,6 +1511,7 @@ app.put(
       region: req.config.ownRegion,
     };
     await setStreamActiveWithHooks(
+      db,
       req.config,
       stream,
       patch,
@@ -1477,9 +1552,10 @@ app.put(
  *
  * @param stream The stream to update which MUST be a parent stream (no
  * parentId). Child streams are processed through the delayed `recording.waiting`
- * events from {@link triggerSessionRecordingHooks}.
+ * events from {@link triggerSessionRecordingProcessing}.
  */
 async function setStreamActiveWithHooks(
+  db: DB,
   config: CliArgs,
   stream: DBStream,
   patch: Partial<DBStream> & { isActive: boolean },
@@ -1520,15 +1596,24 @@ async function setStreamActiveWithHooks(
       });
   }
 
-  // opportunistically trigger recording.waiting logic for this stream's sessions
-  triggerSessionRecordingHooks(config, stream, queue, ingest, isCleanup).catch(
-    (err) => {
-      logger.error(
-        `Error triggering session recording hooks stream_id=${stream.id} err=`,
-        err
-      );
-    }
-  );
+  if (!patch.isActive) {
+    // opportunistically trigger recording.waiting logic for this stream's sessions
+    db.stream.getActiveSessions(stream.id).then((childStreams) =>
+      triggerSessionRecordingProcessing(
+        db,
+        config,
+        childStreams,
+        queue,
+        ingest,
+        isCleanup
+      ).catch((err) => {
+        logger.error(
+          `Error triggering session recording hooks stream_id=${stream.id} err=`,
+          err
+        );
+      })
+    );
+  }
 }
 
 /**
@@ -1536,67 +1621,91 @@ async function setStreamActiveWithHooks(
  * These recording.waiting events aren't sent directly to the user, but instead
  * the handler will check if the session is actually inactive to fire the hook.
  */
-async function triggerSessionRecordingHooks(
+async function triggerSessionRecordingProcessing(
+  db: DB,
   config: CliArgs,
-  stream: DBStream,
+  childStreams: DBStream[],
   queue: Queue,
   ingest: string,
   isCleanup?: boolean
 ) {
-  const { id, parentId } = stream;
-  const childStreams = parentId
-    ? [stream]
-    : await db.stream.getActiveSessions(id);
-
-  // remove duplicate sessionIds from possibly broken up child streams
-  const sessionIds = _.uniq(childStreams.map((s) => s.sessionId ?? s.id));
-  for (const sessionId of sessionIds) {
-    const asset = await db.asset.get(sessionId);
-    if (asset) {
-      // if we have an asset, then the recording has already been processed and
-      // we don't need to send a recording.waiting hook.
-      continue;
-    }
-
-    const session = await db.session.get(sessionId);
-    if (isCleanup && !shouldActiveCleanup(session)) {
-      // The {activeCleanupOne} logic only checks the parent stream, so we need
-      // to recheck the sessions here to avoid spamming active sessions.
-      continue;
-    }
-
-    await publishSingleRecordingWaitingHook(
-      config,
-      session,
-      queue,
-      ingest
-    ).catch((err) => {
+  const streamsBySessionId: Record<string, DBStream[]> = {};
+  for (const stream of childStreams) {
+    if (!stream.parentId) {
       logger.error(
-        `Error sending recording.waiting hook for session_id=${session.id} err=`,
-        err
+        `triggerSessionRecordingHooks: ignoring parent streamId=${stream.id} stream=`,
+        stream
       );
-    });
+      continue;
+    } else if (isCleanup && !shouldCleanUpIsActive(stream)) {
+      continue;
+    }
+
+    const sessionId = stream.sessionId ?? "";
+    if (!streamsBySessionId[sessionId]) {
+      streamsBySessionId[sessionId] = [];
+    }
+    streamsBySessionId[sessionId].push(stream);
   }
+
+  await Promise.all(
+    Object.keys(streamsBySessionId).map(async (sessionId) => {
+      const streamsFromSession = streamsBySessionId[sessionId];
+      try {
+        if (!sessionId) {
+          // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
+          await clearIsActiveMany(db, streamsFromSession);
+          return;
+        }
+
+        const asset = await db.asset.get(sessionId);
+        if (asset) {
+          // if we have an asset, then the recording has already been processed and we don't need to send a
+          // recording.waiting hook. also clear the isActive field from child streams.
+          await clearIsActiveMany(db, streamsFromSession);
+          return;
+        }
+
+        const session = await db.session.get(sessionId);
+        if (isCleanup && !shouldCleanUpIsActive(session)) {
+          // Recheck conditions for the session object in case of a clean-up. In this case it should not, so ignore.
+          return;
+        }
+
+        const isStale = isStreamStale(session);
+        if (!session.record || isStale) {
+          if (isStale) {
+            logger.info(
+              `Skipping recording for stale session ` +
+                `session_id=${session.id} last_seen=${session.lastSeen}`
+            );
+          }
+          // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
+          await clearIsActiveMany(db, streamsFromSession);
+          return;
+        }
+
+        await publishDelayedRecordingWaitingHook(
+          config,
+          session,
+          queue,
+          ingest
+        );
+      } catch (err) {
+        const ids = streamsFromSession?.map((s) => s?.id);
+        logger.error(
+          `Error handling session recording hooks sessionId=${sessionId} childStreamsIds=${ids} err=`,
+          err
+        );
+      }
+    })
+  );
 }
 
-async function publishSingleRecordingWaitingHook(
-  config: CliArgs,
-  session: DBSession,
-  queue: Queue,
-  ingest: string
-) {
-  const isStale = isStreamStale(session);
-  if (!session.record || isStale) {
-    if (isStale) {
-      logger.info(
-        `Skipping recording for stale session ` +
-          `session_id=${session.id} last_seen=${session.lastSeen}`
-      );
-    }
-    return;
-  }
-
-  await publishDelayedRecordingWaitingHook(config, session, queue, ingest);
+async function clearIsActiveMany(db: DB, streams: DBStream[]) {
+  await Promise.all(
+    streams.map((s) => db.stream.update(s.id, { isActive: false }))
+  );
 }
 
 async function publishRecordingStartedHook(
@@ -1656,7 +1765,8 @@ async function publishDelayedRecordingWaitingHook(
 function isStreamStale(s: DBStream, lastSessionStartedAt?: number) {
   const staleThreshold =
     (lastSessionStartedAt ?? Date.now()) - STALE_SESSION_TIMEOUT;
-  return s.lastSeen && s.lastSeen < staleThreshold;
+  const lastSeen = s.lastSeen || s.createdAt;
+  return lastSeen && lastSeen < staleThreshold;
 }
 
 // sets 'isActive' field to false for many objects at once
@@ -1973,7 +2083,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
       errors: ["not found"],
     });
   }
-  activeCleanupOne(req.config, stream, req.queue, await getIngestBase(req));
+
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
@@ -2116,6 +2226,39 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   let response = await getClips(stream, req, res);
   return response;
 });
+
+// queries for all the streams with active clean up pending and triggers the
+// clean up logic for them.
+app.post(
+  "/job/active-cleanup",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    const limit = parseInt(req.query.limit?.toString()) || 1000;
+    const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
+    let [streams] = await jobsDb.stream.find(
+      [
+        sql`data->>'isActive' = 'true'`,
+        sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
+      ],
+      {
+        limit,
+        order: "data->>'lastSeen' DESC",
+      }
+    );
+
+    const ingest = await getIngestBase(req);
+    const [cleanedUp, jobPromise] = triggerCleanUpIsActiveJob(
+      req.config,
+      streams,
+      req.queue,
+      ingest
+    );
+    await jobPromise;
+
+    res.status(200);
+    res.json({ cleanedUp });
+  }
+);
 
 // Hooks
 
