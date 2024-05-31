@@ -2,7 +2,7 @@ import { v4 as uuid } from "uuid";
 import jwt from "jsonwebtoken";
 
 import { User } from "../schema/types";
-import db from "../store/db";
+import { db } from "../store";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import sql from "sql-template-strings";

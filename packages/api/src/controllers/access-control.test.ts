@@ -242,6 +242,92 @@ describe("controllers/access-control", () => {
       expect(res.status).toBe(404);
     });
 
+    it("should not allow playback if origin is not in playback.allowedOrigins", async () => {
+      gatedAsset.playbackPolicy.type = "jwt";
+      gatedAsset.playbackPolicy.allowedOrigins = ["http://localhost:3000"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      let asset = await db.asset.get(gatedAsset.id);
+      expect(asset.playbackPolicy.allowedOrigins).toEqual([
+        "http://localhost:3000",
+      ]);
+      const res3 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: "notExistingPubKey",
+        webhookPayload: {
+          headers: {
+            Origin: "https://example.com",
+          },
+        },
+      });
+      expect(res3.status).toBe(403);
+      let resJson = await res3.json();
+      expect(resJson.errors[0]).toBe(
+        `Content is gated and origin not in allowed origins`
+      );
+      const res4 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: "notExistingPubKey",
+        webhookPayload: {
+          headers: {
+            Origin: "http://localhost:3000",
+          },
+        },
+      });
+      expect(res4.status).toBe(403);
+      let resJson2 = await res4.json();
+      expect(resJson2.errors[0]).toBe(
+        "Content is gated and corresponding public key not found"
+      );
+    });
+
+    it("should allow playback with corresponding origin", async () => {
+      gatedAsset.playbackPolicy.type = "jwt";
+      gatedAsset.playbackPolicy.allowedOrigins = ["http://localhost:3000"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      let asset = await db.asset.get(gatedAsset.id);
+      expect(asset.playbackPolicy.allowedOrigins).toEqual([
+        "http://localhost:3000",
+      ]);
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+        webhookPayload: {
+          headers: {
+            Origin: "http://localhost:3000",
+          },
+        },
+      });
+      expect(res.status).toBe(200);
+    });
+
+    it("should allow playback with wildcard origin", async () => {
+      gatedAsset.playbackPolicy.type = "jwt";
+      gatedAsset.playbackPolicy.allowedOrigins = ["*"];
+      await db.asset.update(gatedAsset.id, {
+        playbackPolicy: gatedAsset.playbackPolicy,
+      });
+      let asset = await db.asset.get(gatedAsset.id);
+      expect(asset.playbackPolicy.allowedOrigins).toEqual(["*"]);
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+        webhookPayload: {
+          headers: {
+            Origin: "http://localhost:3000",
+          },
+        },
+      });
+      expect(res.status).toBe(200);
+    });
+
     it("should allow playback on public playbackId with and without a public key provided", async () => {
       client.jwtAuth = adminToken;
       const res = await client.post("/access-control/gate", {

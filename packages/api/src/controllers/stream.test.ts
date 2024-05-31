@@ -2,28 +2,33 @@ import { json as bodyParserJson } from "body-parser";
 import { v4 as uuid } from "uuid";
 
 import {
-  ObjectStore,
   MultistreamTarget,
+  ObjectStore,
   Stream,
-  StreamPatchPayload,
-  User,
-  StreamSetActivePayload,
   StreamHealthPayload,
+  StreamPatchPayload,
+  StreamSetActivePayload,
+  User,
 } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import {
+  AuxTestServer,
   TestClient,
   clearDatabase,
-  startAuxTestServer,
   setupUsers,
-  AuxTestServer,
+  startAuxTestServer,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 import { generateUniquePlaybackId } from "./generate-keys";
-import { extractUrlFrom, extractRegionFrom } from "./stream";
+import {
+  ACTIVE_TIMEOUT,
+  extractRegionFrom,
+  extractUrlFrom,
+  resolvePullUrlFromExistingStreams,
+} from "./stream";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
@@ -733,51 +738,206 @@ describe("controllers/stream", () => {
         const document = await db.stream.get(stream.id);
         expect(db.stream.addDefaultFields(document)).toEqual(updatedStream);
       });
+
+      it("should fix non-standard 480p profiles", async () => {
+        let res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          presets: undefined,
+          renditions: undefined,
+          wowza: undefined,
+          profiles: [
+            {
+              name: "480p",
+              width: 848,
+              height: 480,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        expect(stream.profiles).toEqual([
+          {
+            name: "480p",
+            width: 854,
+            height: 480,
+            bitrate: 1024,
+            fps: 30, // not mobile, so fps stays the same
+          },
+        ]);
+      });
+
+      it("should fix profiles with fps from mobile streams", async () => {
+        let res = await client.put("/stream/pull", {
+          ...postMockPullStream,
+          presets: undefined,
+          renditions: undefined,
+          wowza: undefined,
+          pull: {
+            ...postMockPullStream.pull,
+            isMobile: 2,
+          },
+          profiles: [
+            {
+              name: "480p",
+              width: 848,
+              height: 480,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+
+        expect(stream.profiles).toEqual([
+          {
+            name: "480p",
+            width: 854,
+            height: 480,
+            bitrate: 1024,
+            fps: 0,
+          },
+        ]);
+      });
+
+      it("should resolve pull url and region from existing stream", async () => {
+        expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: 1714997385837,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual(null);
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
+        expect(
+          resolvePullUrlFromExistingStreams([
+            {
+              id: "id-1",
+              name: "stream-1",
+              pullRegion: "fra",
+              pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
+              pullLockedAt: Date.now() - 2 * 60 * 1000,
+              lastSeen: Date.now(),
+            },
+          ])
+        ).toStrictEqual({
+          pullUrl:
+            "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
+          pullRegion: "fra",
+        });
+      });
+
       it("should extract host from redirected playback url", async () => {
         expect(
           extractUrlFrom(
-            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+");
         expect(
           extractUrlFrom(
-            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe(
           "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+"
         );
         expect(
           extractUrlFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe(
           "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+"
         );
         expect(
           extractUrlFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
+            "12345-67890"
           )
         ).toBe(null);
       });
       it("should extract region from redirected playback url", async () => {
         expect(
           extractRegionFrom(
-            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("sto");
         expect(
           extractRegionFrom(
-            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("mos2");
         expect(
           extractRegionFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890"
           )
         ).toBe("fra-staging");
         expect(
           extractRegionFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
+            "12345-67890"
           )
         ).toBe(null);
       });
@@ -1288,7 +1448,7 @@ describe("controllers/stream", () => {
     });
   });
 
-  describe("webhooks", () => {
+  describe("incoming hooks", () => {
     let stream: Stream;
     let data;
     let res;
@@ -1655,6 +1815,160 @@ describe("controllers/stream", () => {
           });
         });
       });
+    });
+  });
+
+  describe("active clean-up", () => {
+    let webhookServer: AuxTestServer;
+    let hookSem: ReturnType<typeof semaphore>;
+    let hookPayload: any;
+
+    beforeAll(async () => {
+      webhookServer = await startAuxTestServer();
+      webhookServer.app.use(bodyParserJson());
+      webhookServer.app.post("/captain/hook", bodyParserJson(), (req, res) => {
+        hookPayload = req.body;
+        hookSem.release();
+        res.status(204).end();
+      });
+    });
+
+    afterAll(() => webhookServer.close());
+
+    beforeEach(async () => {
+      hookPayload = undefined;
+      hookSem = semaphore();
+
+      client.jwtAuth = nonAdminToken;
+      await client.post("/webhook", {
+        name: "stream-idle-hook",
+        events: ["stream.idle"],
+        url: `http://localhost:${webhookServer.port}/captain/hook`,
+      });
+    });
+
+    const waitHookCalled = async () => {
+      await hookSem.wait(3000);
+      expect(hookPayload).toBeDefined();
+      hookSem = semaphore();
+    };
+
+    it("should not clean streams that are still active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT / 2,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(0);
+    });
+
+    it("should clean streams that are active but lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
+
+      await waitHookCalled();
+
+      const updatedStream = await db.stream.get(stream.id);
+      expect(updatedStream.isActive).toBe(false);
+    });
+
+    it("should clean multiple streams at once, respecting limit", async () => {
+      for (let i = 0; i < 3; i++) {
+        let res = await client.post("/stream", { ...postMockStream });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        await db.stream.update(stream.id, {
+          isActive: true,
+          lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+        });
+      }
+
+      client.jwtAuth = adminToken;
+      const res = await client.post(`/stream/job/active-cleanup?limit=2`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(2);
+    });
+
+    it("should clean lost sessions whose parents are not active", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      stream = await db.stream.get(stream.id);
+      expect(stream.isActive).toBe(false);
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(child.id);
+    });
+
+    it("cleans only the parent if both parent and child are lost", async () => {
+      let res = await client.post("/stream", { ...postMockStream });
+      expect(res.status).toBe(201);
+      let stream: Stream = await res.json();
+
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${stream.id}/stream?sessionId=${sessionId}`,
+        {
+          name: `video+${stream.playbackId}`,
+        }
+      );
+      expect(res.status).toBe(201);
+      const child: Stream = await res.json();
+
+      await db.stream.update(child.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+      await db.stream.update(stream.id, {
+        isActive: true,
+        lastSeen: Date.now() - ACTIVE_TIMEOUT - 1,
+      });
+
+      client.jwtAuth = adminToken;
+      res = await client.post(`/stream/job/active-cleanup`);
+      expect(res.status).toBe(200);
+      const { cleanedUp } = await res.json();
+      expect(cleanedUp).toHaveLength(1);
+      expect(cleanedUp[0].id).toEqual(stream.id);
     });
   });
 

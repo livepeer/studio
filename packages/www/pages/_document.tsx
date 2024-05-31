@@ -197,6 +197,25 @@ const MyDocument = () => {
         {process.env.NODE_ENV === "production" && !isExport() && (
           <script dangerouslySetInnerHTML={{ __html: renderSnippet() }} />
         )}
+
+        {/* Google Tag Manager */}
+        {process.env.NODE_ENV === "production" && !isExport() && (
+          <>
+            {/* Google Tag Manager */}
+            <script
+              async
+              src="https://www.googletagmanager.com/gtag/js?id=G-BWKBMMBE8Y"></script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-BWKBMMBE8Y');
+            `,
+              }}></script>
+          </>
+        )}
       </Head>
       <body>
         <Main />

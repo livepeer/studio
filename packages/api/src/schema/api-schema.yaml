@@ -176,6 +176,15 @@ components:
         name:
           type: string
           example: test_webhook
+        kind:
+          type: string
+          example: webhook
+          readOnly: true
+          deprecated: true
+        userId:
+          type: string
+          readOnly: true
+          deprecated: true
         createdAt:
           type: number
           readOnly: true
@@ -448,6 +457,7 @@ components:
         kind:
           type: string
           example: stream
+          deprecated: true
         creatorId:
           $ref: "#/components/schemas/creator-id"
         userTags:
@@ -544,10 +554,20 @@ components:
               example:
                 Authorization: "Bearer 123"
             isMobile:
-              type: boolean
+              oneOf:
+                - type: integer
+                  enum:
+                    - 0
+                    - 1
+                    - 2
+                  description: |-
+                    0: not mobile, 1: mobile screen share, 2: mobile camera.
+                - type: boolean
+                  description: |-
+                    If true, the stream will be pulled from a mobile source.
               description: |-
-                If true, the stream will be pulled from a mobile source.
-              default: false
+                Indicates whether the stream will be pulled from a mobile source.
+              default: 0
             location:
               type: object
               description: |-
@@ -635,7 +655,9 @@ components:
             Timestamp (in milliseconds) when the stream was last terminated
         userId:
           type: string
+          readOnly: true
           example: "we7818e7-610a-4057-8f6f-b785dc1e6f88"
+          deprecated: true
         renditions:
           type: object
     new-stream-payload:
@@ -653,7 +675,11 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: "#/components/schemas/stream/properties/profiles"
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         record:
           $ref: "#/components/schemas/stream/properties/record"
         multistream:
@@ -687,7 +713,11 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          $ref: "#/components/schemas/stream/properties/profiles"
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
@@ -719,21 +749,25 @@ components:
           type: boolean
           description: Indicates whether the stream is currently live or not.
         is_healthy:
-          type: boolean
-          description: Indicates whether the stream is healthy or not.
+          oneOf:
+            - type: "null"
+            - type: "boolean"
+          description: "Indicates whether the stream is healthy or not."
         issues:
-          type: string
+          oneOf:
+            - type: "null"
+            - type: "string"
           description: |
-            Raw issues affecting the stream as described by Mist, if any. We
-            don't expose those to the end-user, showing only human_issues
-            instead.
+            "Raw issues affecting the stream as described by Mist, if any. We don't expose those to the end-user, showing only human_issues instead."
         human_issues:
-          type: array
-          description: |
-            A string array of human-readable errors describing issues affecting
-            the stream, if any.
-          items:
-            type: string
+          oneOf:
+            - type: "null"
+            - type: "array"
+              items:
+                type: "string"
+          description:
+            "A string array of human-readable errors describing issues affecting
+            the stream, if any."
         tracks:
           type: object
           description: |
@@ -785,6 +819,15 @@ components:
           type: string
           readOnly: true
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          example: stream
+          deprecated: true
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          deprecated: true
         name:
           type: string
           example: test_session
@@ -847,6 +890,7 @@ components:
           enum:
             - waiting
             - ready
+            - failed
             - none
         recordingUrl:
           type: string
@@ -868,8 +912,6 @@ components:
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
     error:
-      required:
-        - errors
       type: object
       properties:
         errors:
@@ -892,6 +934,11 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          deprecated: true
         url:
           type: string
           writeOnly: true
@@ -937,6 +984,11 @@ components:
           description: >-
             The playback ID to use with the Playback Info endpoint to retrieve
             playback URLs.
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          deprecated: true
         staticMp4:
           type: boolean
           writeOnly: true
@@ -1252,8 +1304,6 @@ components:
             The name of the asset. This is not necessarily the filename - it can
             be a custom name or title.
           example: filename.mp4
-        projectId:
-          $ref: "#/components/schemas/asset"
         staticMp4:
           type: boolean
           description: Whether to generate MP4s for the asset.
@@ -1297,7 +1347,9 @@ components:
           type: boolean
           description: Decides if the output video should include C2PA signature
         profiles:
-          type: array
+          type:
+            - array
+            - "null"
           items:
             $ref: "#/components/schemas/transcode-profile"
         targetSegmentSizeSecs:
@@ -2066,6 +2118,11 @@ components:
           type: string
           description: Name of the signing key
           example: key1
+        userId:
+          type: string
+          readOnly: true
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
+          deprecated: true
         createdAt:
           readOnly: true
           type: number
@@ -2192,9 +2249,11 @@ components:
           type: number
           example: 200000
     playback-policy:
-      type: object
+      type:
+        - object
+        - "null"
       description:
-        Whether the playback policy for a asset or stream is public or signed
+        Whether the playback policy for an asset or stream is public or signed
       additionalProperties: false
       required:
         - type
@@ -2221,21 +2280,23 @@ components:
             Interval (in seconds) at which the playback policy should be
             refreshed (default 600 seconds)
           example: 600
+        allowedOrigins:
+          type: array
+          description:
+            List of allowed origins for CORS playback
+            (<scheme>://<hostname>:<port>, <scheme>://<hostname>)
+          items:
+            type: string
     usage-metric:
       type: object
       description: |
         An individual metric about usage of a user.
-      required:
-        - UserID
-        - CreatorID
-        - DeliveryUsageMins
-        - TotalUsageMins
-        - StorageUsageMins
       properties:
         UserID:
           type: string
           description: The user ID associated with the metric
           example: 1bde4o2i6xycudoy
+
         CreatorID:
           type: string
           description: The creator ID associated with the metric
@@ -2378,7 +2439,7 @@ components:
             - source
           properties:
             live:
-              type: number
+              type: integer
               enum:
                 - 0
                 - 1
@@ -2934,9 +2995,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/multistream-target"
+                $ref: "#/components/schemas/multistream-target"
                 x-speakeasy-name-override: data
         default:
           description: Error
@@ -3044,6 +3103,12 @@ paths:
         To create a new webhook, you need to make an API call with the events
         you want to listen for and the URL that will be called when those events
         occur.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/webhook"
       responses:
         "200":
           description: Success
@@ -3097,6 +3162,12 @@ paths:
       operationId: updateWebhook
       tags:
         - webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/webhook"
       responses:
         "200":
           description: Success
@@ -3378,6 +3449,9 @@ paths:
                     $ref: "#/components/schemas/asset"
                   task:
                     type: object
+                    required:
+                      - id
+                    additionalProperties: false
                     properties:
                       id:
                         type: string
@@ -3404,7 +3478,7 @@ paths:
               $ref: "#/components/schemas/new-asset-from-url-payload"
       responses:
         "200":
-          description: Success
+          description: Upload in progress
           content:
             application/json:
               schema:
@@ -3418,6 +3492,32 @@ paths:
                     $ref: "#/components/schemas/asset"
                   task:
                     type: object
+                    required:
+                      - id
+                    additionalProperties: false
+                    properties:
+                      id:
+                        type: string
+                        example: 34d7618e-fd42-4798-acf5-19504616a11e
+                x-speakeasy-name-override: data
+        "201":
+          description: Upload started
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - asset
+                  - task
+                properties:
+                  asset:
+                    $ref: "#/components/schemas/asset"
+                  task:
+                    type: object
+                    required:
+                      - id
+                    additionalProperties: false
                     properties:
                       id:
                         type: string
@@ -4159,9 +4259,6 @@ paths:
                 description: |
                   A simplified metric object about aggregate viewership of an
                   asset. Either playbackId or dStorageUrl will be set.
-                required:
-                  - viewCount
-                  - playtimeMins
                 properties:
                   playbackId:
                     $ref: >-
@@ -4218,6 +4315,17 @@ paths:
             The creator ID to filter the query results
           schema:
             type: string
+        - name: "breakdownBy[]"
+          in: query
+          description: |
+            The list of fields to break down the query results. Currently the
+            only supported breakdown is by `creatorId`.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - creatorId
       responses:
         "200":
           description: A Usage Metric object
@@ -4300,8 +4408,10 @@ paths:
         - in: query
           name: record
           schema:
-            type: integer
-            example: 1
+            oneOf:
+              - type: boolean
+              - type: integer
+            example: true
           description: |
             Flag indicating if the response should only include recorded
             sessions

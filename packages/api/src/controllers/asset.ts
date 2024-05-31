@@ -287,6 +287,35 @@ async function validateAssetPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
+    const allowedOrigins = playbackPolicy?.allowedOrigins;
+    if (allowedOrigins) {
+      try {
+        if (allowedOrigins.length > 0) {
+          const isWildcardOrigin =
+            allowedOrigins.length === 1 && allowedOrigins[0] === "*";
+          if (!isWildcardOrigin) {
+            const isValidOrigin = (origin) => {
+              if (origin.endsWith("/")) return false;
+              const url = new URL(origin);
+              return (
+                ["http:", "https:"].includes(url.protocol) &&
+                url.hostname &&
+                (url.port === "" || Number(url.port) > 0) &&
+                url.pathname === ""
+              );
+            };
+            const allowedOriginsValid = allowedOrigins.every(isValidOrigin);
+            if (!allowedOriginsValid) {
+              throw new BadRequestError(
+                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>"
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.log(`Error validating allowedOrigins: ${err}`);
+      }
+    }
   }
   if (encryption?.encryptedKey) {
     if (!playbackPolicy) {
@@ -674,7 +703,7 @@ app.get("/", authorizer({}), async (req, res) => {
   query.push(
     sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
   );
-  if (req.user.admin && deleting) {
+  if (req.user.admin && deleting === "true") {
     const deletionThreshold = new Date(
       Date.now() - DELETE_ASSET_DELAY
     ).toISOString();
@@ -804,88 +833,85 @@ app.post(
   }
 );
 
-const uploadWithUrlHandler: RequestHandler = async (req, res) => {
-  let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
-    req.body as NewAssetFromUrlPayload;
-  if (!url) {
-    return res.status(422).json({
-      errors: [`Must provide a "url" field for the asset contents`],
-    });
-  }
-  if (encryption) {
-    if (encryption.encryptedKey) {
-      if (!isValidBase64(encryption.encryptedKey)) {
-        return res.status(422).json({
-          errors: [`"encryptedKey" must be valid base64`],
-        });
-      }
-    }
-  }
-
-  const id = uuid();
-  const playbackId = await generateUniquePlaybackId(id);
-  const newAsset = await validateAssetPayload(req, id, playbackId, Date.now(), {
-    type: "url",
-    url,
-    encryption: assetEncryptionWithoutKey(encryption),
-  });
-  const dupAsset = await db.asset.findDuplicateUrlUpload(
-    url,
-    req.user.id,
-    req.project?.id
-  );
-  if (dupAsset) {
-    const [task] = await db.task.find({ outputAssetId: dupAsset.id });
-    if (!task.length) {
-      console.error("Found asset with no task", dupAsset);
-      // proceed as a regular new asset
-    } else {
-      // return the existing asset and task, as if created now, with a slightly
-      // different status code (200, not 201). Should be transparent to clients.
-      res.status(200).json({ asset: dupAsset, task: { id: task[0].id } });
-      return;
-    }
-  }
-
-  await ensureQueueCapacity(req.config, req.user.id);
-
-  const asset = await createAsset(newAsset, req.queue);
-  const task = await req.taskScheduler.createAndScheduleTask(
-    "upload",
-    {
-      upload: {
-        url,
-        c2pa,
-        catalystPipelineStrategy: catalystPipelineStrategy(req),
-        encryption,
-        thumbnails: !(await isExperimentSubject(
-          "vod-thumbs-off",
-          req.user?.id
-        )),
-        profiles,
-        targetSegmentSizeSecs,
-      },
-    },
-    undefined,
-    asset
-  );
-
-  res.status(201);
-  res.json({ asset, task: { id: task.id } });
-};
-
 app.post(
   "/upload/url",
   authorizer({}),
   validatePost("new-asset-from-url-payload"),
-  uploadWithUrlHandler
-);
-// TODO: Remove this at some point. Registered only for backward compatibility.
-app.post(
-  "/import",
-  authorizer({}),
-  validatePost("new-asset-payload"),
-  uploadWithUrlHandler
+  async (req, res) => {
+    let { url, encryption, c2pa, profiles, targetSegmentSizeSecs } =
+      req.body as NewAssetFromUrlPayload;
+    if (!url) {
+      return res.status(422).json({
+        errors: [`Must provide a "url" field for the asset contents`],
+      });
+    }
+    if (encryption) {
+      if (encryption.encryptedKey) {
+        if (!isValidBase64(encryption.encryptedKey)) {
+          return res.status(422).json({
+            errors: [`"encryptedKey" must be valid base64`],
+          });
+        }
+      }
+    }
+
+    const id = uuid();
+    const playbackId = await generateUniquePlaybackId(id);
+    const newAsset = await validateAssetPayload(
+      req,
+      id,
+      playbackId,
+      Date.now(),
+      {
+        type: "url",
+        url,
+        encryption: assetEncryptionWithoutKey(encryption),
+      }
+    );
+    const dupAsset = await db.asset.findDuplicateUrlUpload(
+      url,
+      req.user.id,
+      req.project?.id
+    );
+    if (dupAsset) {
+      const [task] = await db.task.find({ outputAssetId: dupAsset.id });
+      if (!task.length) {
+        console.error("Found asset with no task", dupAsset);
+        // proceed as a regular new asset
+      } else {
+        // return the existing asset and task, as if created now, with a slightly
+        // different status code (200, not 201). Should be transparent to clients.
+        res.status(200).json({ asset: dupAsset, task: { id: task[0].id } });
+        return;
+      }
+    }
+
+    await ensureQueueCapacity(req.config, req.user.id);
+
+    const asset = await createAsset(newAsset, req.queue);
+    const task = await req.taskScheduler.createAndScheduleTask(
+      "upload",
+      {
+        upload: {
+          url,
+          c2pa,
+          catalystPipelineStrategy: catalystPipelineStrategy(req),
+          encryption,
+          thumbnails: !(await isExperimentSubject(
+            "vod-thumbs-off",
+            req.user?.id
+          )),
+          ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task,
+          targetSegmentSizeSecs,
+        },
+      },
+      undefined,
+      asset
+    );
+
+    res.status(201);
+    res.json({ asset, task: { id: task.id } });
+  }
 );
 
 app.post(
@@ -897,7 +923,7 @@ app.post(
     let playbackId = await generateUniquePlaybackId(id);
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
-    const { encryption, c2pa } = req.body as NewAssetPayload;
+    const { encryption, c2pa, profiles } = req.body as NewAssetPayload;
     if (encryption) {
       if (encryption.encryptedKey) {
         if (!isValidBase64(encryption.encryptedKey)) {
@@ -944,6 +970,7 @@ app.post(
           catalystPipelineStrategy: catalystPipelineStrategy(req),
           encryption,
           c2pa,
+          ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
       },
       null,

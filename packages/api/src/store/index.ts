@@ -1,13 +1,15 @@
+import { DB, PostgresParams, db, jobsDb } from "./db";
 import Model from "./model";
-import db, { DB, PostgresParams } from "./db";
 
-export { db };
+export { db, jobsDb };
 
 // Helper function to start database and boot up legacy store
 export default async function makeStore(
-  params: PostgresParams
-): Promise<[DB, Model]> {
-  await db.start(params);
+  dbParams: PostgresParams,
+  jobsDbParams: PostgresParams
+): Promise<[DB, DB, Model]> {
+  await db.start(dbParams);
+  await jobsDb.start({ ...jobsDbParams, createTablesOnDb: false });
   const store = new Model(db);
-  return [db, store];
+  return [db, jobsDb, store];
 }

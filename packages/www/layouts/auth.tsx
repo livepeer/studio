@@ -1,18 +1,8 @@
 import { Flex, Box } from "@livepeer/design-system";
-import ReactGA from "react-ga";
 import Router from "next/router";
-import { useEffect } from "react";
 import { NextSeo } from "next-seo";
-import { hotjar } from "react-hotjar";
-import GoogleTagManager from "components/GoogleTagManager";
 import Nav from "components/Nav";
 import { basePath } from "../lib/utils";
-
-if (process.env.NODE_ENV === "production") {
-  ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
-} else {
-  ReactGA.initialize("test", { testMode: true });
-}
 
 // Track client-side page views with Segment & HubSpot
 if (process.env.NODE_ENV === "production") {
@@ -52,13 +42,6 @@ function Layout({
   preview = false,
   css = {},
 }: Props) {
-  useEffect(() => {
-    if (window.location.hostname === "livepeer.studio") {
-      ReactGA.pageview(window.location.pathname + window.location.search);
-      hotjar.initialize(2525106, 6);
-    }
-  }, []);
-
   let seo = {
     title,
     description,
@@ -86,7 +69,6 @@ function Layout({
   return (
     <>
       <NextSeo {...seo} />
-      <GoogleTagManager />
 
       <Flex
         className="main"

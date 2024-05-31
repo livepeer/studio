@@ -1,7 +1,7 @@
 import sql from "sql-template-strings";
 
 import { Experiment } from "../schema/types";
-import db from "./db";
+import { db } from "./db";
 import { ForbiddenError, NotFoundError } from "./errors";
 import Table from "./table";
 import { WithID } from "./types";
