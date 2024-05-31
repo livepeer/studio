@@ -1,7 +1,7 @@
 import { CellComponentProps, TableData } from "../types";
 import { Box } from "@livepeer/design-system";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import { Tooltip as ReactTooltip } from "react-tooltip";
+import ReactTooltip from "react-tooltip";
 
 export type NameCellProps = {
   id?: string;

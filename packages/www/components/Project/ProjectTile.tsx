@@ -13,21 +13,17 @@ import { NavLink, generalSidebarItems } from "components/Sidebar";
 import { useProjectContext } from "context/ProjectContext";
 import { useRouter } from "next/router";
 
-export default function ProjectTile({ name, id, ...props }) {
-  const { setProjectId } = useProjectContext();
+export default function ProjectTile({ name, id }) {
+  const { setProjectId, appendProjectId } = useProjectContext();
   const { push } = useRouter();
 
   const navigate = (id, path) => {
     setProjectId(id);
-
-    push(path);
+    push(appendProjectId(path));
   };
 
   return (
     <Box
-      onClick={() => {
-        navigate(id, "/");
-      }}
       css={{
         bc: "$neutral2",
         border: "1px solid",

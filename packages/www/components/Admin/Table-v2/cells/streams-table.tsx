@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import { Stream } from "@livepeer.studio/api";
 import { Box } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
-import { Tooltip as ReactTooltip } from "react-tooltip";
+import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import Help from "../../../../public/img/help.svg";
 
