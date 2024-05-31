@@ -952,30 +952,37 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
 
-    const record = stream.record;
-    const recordObjectStoreId =
-      stream.recordObjectStoreId ||
-      (record ? req.config.recordObjectStoreId : undefined);
+    const {
+      id: parentId,
+      playbackId,
+      userId,
+      objectStoreId,
+      record,
+      recordingSpec,
+      recordObjectStoreId = record ? req.config.recordObjectStoreId : undefined,
+    } = stream;
+    const profiles = hackMistSettings(
+      req,
+      useParentProfiles ? stream.profiles : req.body.profiles
+    );
     const childStream: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
-      userId: stream.userId,
+      userId,
       renditions: {},
-      objectStoreId: stream.objectStoreId,
+      profiles,
+      objectStoreId,
       record,
+      recordingSpec,
       recordObjectStoreId,
       sessionId,
       id,
       createdAt,
-      parentId: stream.id,
+      parentId,
       region,
       lastSeen: 0,
       isActive: true,
     });
-    childStream.profiles = hackMistSettings(
-      req,
-      useParentProfiles ? stream.profiles : childStream.profiles
-    );
 
     const existingSession = await db.session.get(sessionId);
     if (existingSession) {
@@ -985,9 +992,9 @@ app.post(
     } else {
       const session: DBSession = {
         id: sessionId,
-        parentId: stream.id,
-        playbackId: stream.playbackId,
-        userId: stream.userId,
+        parentId,
+        playbackId,
+        userId,
         kind: "session",
         version: "v2",
         name: req.body.name,
@@ -1002,8 +1009,9 @@ app.post(
         ingestRate: 0,
         outgoingRate: 0,
         deleted: false,
-        profiles: childStream.profiles,
+        profiles,
         record,
+        recordingSpec,
         recordObjectStoreId,
         recordingStatus: record ? "waiting" : undefined,
       };
