@@ -8,6 +8,7 @@ import {
 } from "@livepeer.studio/api";
 import { getCursor } from "../helpers";
 import { trackPageView } from "../tracking";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -35,6 +36,7 @@ export const getSigningKeys = async (opts?: {
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
+      projectId,
     })}`
   );
   const nextCursor = getCursor(res.headers.get("link"));
@@ -46,7 +48,8 @@ export const createSigningKey = async (
   params
 ): Promise<SigningKeyResponsePayload> => {
   trackPageView(params.email, "/create-signing-key");
-  const [res, token] = await context.fetch(`/access-control/signing-key`, {
+  const url = `/access-control/signing-key?projectId=${projectId}`;
+  const [res, token] = await context.fetch(url, {
     method: "POST",
     body: JSON.stringify(params),
     headers: {
@@ -60,7 +63,8 @@ export const createSigningKey = async (
 };
 
 export const deleteSigningKey = async (id: string): Promise<void> => {
-  const [res, body] = await context.fetch(`/access-control/signing-key/${id}`, {
+  const url = `/access-control/signing-key/${id}?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
   });
   if (res.status !== 204) {

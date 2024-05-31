@@ -63,7 +63,9 @@ export const createApiToken = async (params): Promise<ApiToken> => {
 };
 
 export const deleteApiToken = async (id: string): Promise<void> => {
-  const [res, body] = await context.fetch(`/api-token/${id}`, {
+  const url = `/api-token/${id}?projectId=${projectId}`;
+
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
   });
   if (res.status !== 204) {

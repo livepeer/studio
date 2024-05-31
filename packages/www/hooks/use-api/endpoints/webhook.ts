@@ -44,7 +44,8 @@ export const getWebhooks = async (
 };
 
 export const getWebhook = async (webhookId): Promise<Webhook> => {
-  const [res, webhook] = await context.fetch(`/webhook/${webhookId}`);
+  const url = `/webhook/${webhookId}?projectId=${projectId}`;
+  const [res, webhook] = await context.fetch(url);
   if (res.status !== 200) {
     throw webhook && typeof webhook === "object"
       ? { ...webhook, status: res.status }
@@ -54,16 +55,14 @@ export const getWebhook = async (webhookId): Promise<Webhook> => {
 };
 
 export const createWebhook = async (params): Promise<Webhook> => {
-  const [res, webhook] = await context.fetch(
-    `/webhook?projectId=${projectId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(params),
-      headers: {
-        "content-type": "application/json",
-      },
-    }
-  );
+  const url = `/webhook?projectId=${projectId}`;
+  const [res, webhook] = await context.fetch(url, {
+    method: "POST",
+    body: JSON.stringify(params),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
 
   if (res.status !== 201) {
     throw new Error(webhook.errors.join(", "));
@@ -72,7 +71,8 @@ export const createWebhook = async (params): Promise<Webhook> => {
 };
 
 export const updateWebhook = async (id, params): Promise<Webhook> => {
-  const [res, webhook] = await context.fetch(`/webhook/${id}`, {
+  const url = `/webhook/${id}?projectId=${projectId}`;
+  const [res, webhook] = await context.fetch(url, {
     method: "PUT",
     body: JSON.stringify(params),
     headers: {
@@ -87,7 +87,8 @@ export const updateWebhook = async (id, params): Promise<Webhook> => {
 };
 
 export const deleteWebhook = async (id: string): Promise<void> => {
-  const [res, body] = await context.fetch(`/webhook/${id}`, {
+  const url = `/webhook/${id}?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
   });
   if (res.status !== 204) {
@@ -96,7 +97,8 @@ export const deleteWebhook = async (id: string): Promise<void> => {
 };
 
 export const deleteWebhooks = async (ids: Array<string>): Promise<void> => {
-  const [res, body] = await context.fetch(`/webhook`, {
+  const url = `/webhook?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
     body: JSON.stringify({ ids }),
     headers: {
@@ -115,7 +117,7 @@ export const getWebhookLogs = async (
   const f = filters ? JSON.stringify(filters) : undefined;
 
   const [res, logs] = await context.fetch(
-    `/webhook/${webhookId}/log?${qs.stringify({ filters: f })}`
+    `/webhook/${webhookId}/log?${qs.stringify({ filters: f, projectId })}`
   );
   if (res.status !== 200) {
     throw logs && typeof logs === "object"
@@ -129,15 +131,13 @@ export const resendWebhook = async (params: {
   webhookId: string;
   logId: string;
 }): Promise<WebhookLogs> => {
-  const [res, webhook] = await context.fetch(
-    `/webhook/${params.webhookId}/log/${params.logId}/resend`,
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-    }
-  );
+  const url = `/webhook/${params.webhookId}/log/${params.logId}/resend?projectId=${projectId}`;
+  const [res, webhook] = await context.fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+  });
 
   if (res.status !== 200) {
     throw new Error(webhook.errors.join(", "));

@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Box } from "@theme-ui/components";
-import { Tooltip as ReactTooltip } from "react-tooltip";
+import ReactTooltip from "react-tooltip";
 
 type RelativeTimeProps = {
   id: string;

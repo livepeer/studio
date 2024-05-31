@@ -19,7 +19,8 @@ export const setSharedScope = (
 };
 
 export const createAsset = async (params): Promise<Asset> => {
-  const [res, asset] = await context.fetch(`/asset/import`, {
+  const url = `/asset/import?projectId=${projectId}`;
+  const [res, asset] = await context.fetch(url, {
     method: "POST",
     body: JSON.stringify(params),
     headers: {
@@ -39,19 +40,18 @@ export const uploadAssets = async (
   onError?: (file: File, error: Error) => void,
   onProgress?: (file: File, progress: number) => void
 ): Promise<void> => {
+  const url = `/asset/request-upload?projectId=${projectId}`;
+
   const requestAssetUpload = async (
     params
   ): Promise<{ tusEndpoint: string }> => {
-    const [res, assetUpload] = await context.fetch(
-      `/asset/request-upload?projectId=${projectId}`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-        headers: {
-          "content-type": "application/json",
-        },
-      }
-    );
+    const [res, assetUpload] = await context.fetch(url, {
+      method: "POST",
+      body: JSON.stringify(params),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
     if (!res.ok) {
       throw new Error(assetUpload.errors.join(", "));
@@ -174,7 +174,9 @@ export const getAssets = async (
 };
 
 export const getAsset = async (assetId): Promise<Asset> => {
-  const [res, asset] = await context.fetch(`/asset/${assetId}?details=1`);
+  const url = `/asset/${assetId}?details=1&projectId=${projectId}`;
+
+  const [res, asset] = await context.fetch(url);
   if (res.status !== 200) {
     throw asset && typeof asset === "object"
       ? { ...asset, status: res.status }
@@ -187,7 +189,9 @@ export const patchAsset = async (
   assetId: string,
   patch: AssetPatchPayload
 ): Promise<void> => {
-  const [res, body] = await context.fetch(`/asset/${assetId}`, {
+  const url = `/asset/${assetId}?projectId=${projectId}`;
+
+  const [res, body] = await context.fetch(url, {
     method: "PATCH",
     body: JSON.stringify(patch),
     headers: {
@@ -201,7 +205,9 @@ export const patchAsset = async (
 };
 
 export const deleteAsset = async (assetId): Promise<void> => {
-  const [res] = await context.fetch(`/asset/${assetId}`, {
+  const url = `/asset/${assetId}?projectId=${projectId}`;
+
+  const [res] = await context.fetch(url, {
     method: "DELETE",
   });
   if (res.status !== 204) {
