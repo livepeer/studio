@@ -2791,8 +2791,8 @@
     tweetnacl-util "^0.15.1"
     utf-8-validate "^5.0.8"
 
-"@livepeer.studio/api@^0.16.2", "@livepeer.studio/api@file:/Users/suhail/Documents/GitHub/studio/packages/api":
-  version "0.16.2"
+"@livepeer.studio/api@^0.17.0", "@livepeer.studio/api@file:/Users/suhail/Documents/GitHub/studio/packages/api":
+  version "0.17.0"
   resolved "file:packages/api"
   dependencies:
     "@aws-sdk/client-s3" "^3.421.0"
@@ -2868,15 +2868,15 @@
     wolfy87-eventemitter "^5.2.9"
     yargs "^17.3.1"
 
-"@livepeer.studio/www@^0.16.2", "@livepeer.studio/www@file:/Users/suhail/Documents/GitHub/studio/packages/www":
-  version "0.16.2"
+"@livepeer.studio/www@^0.17.0", "@livepeer.studio/www@file:/Users/suhail/Documents/GitHub/studio/packages/www":
+  version "0.17.0"
   resolved "file:packages/www"
   dependencies:
     "@emotion/core" "^10.0.17"
     "@emotion/react" "^11.4.0"
     "@emotion/styled" "^10.0.23"
     "@june-so/analytics-next" "^2.0.0"
-    "@livepeer.studio/api" "^0.16.2"
+    "@livepeer.studio/api" "^0.17.0"
     "@livepeer/design-system" "1.1.0"
     "@livepeer/react" "^3.1.9"
     "@mdx-js/loader" "^1.6.16"
