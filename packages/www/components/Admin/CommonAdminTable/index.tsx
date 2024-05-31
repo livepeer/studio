@@ -13,7 +13,7 @@ import {
   useRowSelect,
 } from "react-table";
 import Help from "../../../public/img/help.svg";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { User, Stream } from "@livepeer.studio/api";
 import "regenerator-runtime/runtime";
 

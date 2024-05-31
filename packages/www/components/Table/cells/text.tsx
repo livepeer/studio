@@ -1,4 +1,4 @@
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { Box } from "@livepeer/design-system";
 

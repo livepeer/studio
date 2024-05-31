@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import {
   Spinner,
   Box,

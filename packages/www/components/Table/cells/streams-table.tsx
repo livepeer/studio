@@ -1,6 +1,6 @@
 import { Stream } from "@livepeer.studio/api";
 import { Box, Flex, styled } from "@livepeer/design-system";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
 

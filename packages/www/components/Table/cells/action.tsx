@@ -2,7 +2,7 @@ import { CellComponentProps, TableData } from "../types";
 import { Box, Button } from "@livepeer/design-system";
 import Spinner from "components/Spinner";
 import { TrashIcon } from "@radix-ui/react-icons";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { useState } from "react";
 
 const DeleteActionCell = ({

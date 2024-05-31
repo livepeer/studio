@@ -5,7 +5,7 @@ import { UploadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 

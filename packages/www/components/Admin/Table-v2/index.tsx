@@ -11,7 +11,7 @@ import {
 } from "react-table";
 import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import Help from "../../../public/img/help.svg";
 import Checkbox from "components/Admin/Checkbox";
 import {
