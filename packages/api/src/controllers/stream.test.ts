@@ -2262,6 +2262,48 @@ describe("controllers/stream", () => {
         "http://example-public/playback_id/output.mp4"
       );
     });
+
+    it("should propagate stream configs to child stream and session", async () => {
+      // create parent stream
+      const configs = {
+        record: true,
+        recordingSpec: {
+          profiles: [
+            {
+              name: "720p",
+              bitrate: 2000000,
+              fps: 30,
+              width: 1280,
+              height: 720,
+            },
+          ],
+        },
+      };
+      let res = await client.post(`/stream`, {
+        ...smallStream,
+        ...configs,
+      });
+      expect(res.status).toBe(201);
+      const parent = await res.json();
+      expect(parent).toMatchObject(configs);
+
+      // call transcoding hook
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${parent.id}/stream?sessionId=${sessionId}`,
+        {
+          name: "session1",
+        }
+      );
+      expect(res.status).toBe(201);
+      const childStream = await res.json();
+      expect(childStream.parentId).toEqual(parent.id);
+      expect(childStream.sessionId).toEqual(sessionId);
+      expect(childStream).toMatchObject(configs);
+
+      const session = await db.session.get(sessionId);
+      expect(session).toMatchObject(configs);
+    });
   });
 });
 
