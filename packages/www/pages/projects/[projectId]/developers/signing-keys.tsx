@@ -3,12 +3,12 @@ import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardSigningKeys as Content } from "content";
 import SigningKeysTable from "components/SigningKeysTable";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const SigningKeys = () => {
   useLoggedIn();
   const { user } = useApi();
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   if (!user) {
     return <Layout />;

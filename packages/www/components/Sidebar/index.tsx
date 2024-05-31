@@ -33,8 +33,8 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { User } from "@livepeer.studio/api";
-import useProject from "hooks/use-project";
 import { FiCheck, FiChevronLeft } from "react-icons/fi";
+import { useProjectContext } from "context/ProjectContext";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -212,7 +212,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const { createProject, getProjects, logout } = useApi();
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
-  const { setCurrentProject, activeProjectId, appendProjectId } = useProject();
+  const { setProjectId, projectId, appendProjectId } = useProjectContext();
   const queryClient = useQueryClient();
 
   const onCreateClick = async (projectName: string) => {
@@ -220,7 +220,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
       name: projectName,
     });
 
-    setCurrentProject(project);
+    setProjectId(project.id);
     setShowCreateProjectAlert(false);
 
     queryClient.invalidateQueries("projects");
@@ -228,7 +228,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
   const { data } = useQuery("projects", getProjects);
 
-  const activeProject = data?.find((project) => project.id === activeProjectId);
+  const activeProject = data?.find((project) => project.id === projectId);
 
   return (
     <>
@@ -400,6 +400,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
           <TopBottomChevron />
         </Flex>
         <DropdownMenuContent
+          placeholder={"Projects"}
           css={{
             border: "1px solid $colors$neutral6",
             p: "$3",
@@ -429,14 +430,14 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 }}>
                 <Flex
                   onClick={() => {
-                    setCurrentProject(project);
+                    setProjectId(project.id);
                   }}
                   css={{ width: "100%" }}
                   key={project.id}
                   align={"center"}
                   justify={"between"}>
                   <Text size={2}>{project.name || "Untitled project"}</Text>
-                  {activeProjectId === project.id && <FiCheck />}
+                  {projectId === project.id && <FiCheck />}
                 </Flex>
               </DropdownMenuItem>
             ))}
@@ -623,7 +624,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 };
 
 const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
   const goBack = () => {
     Router.push(appendProjectId("/"));
   };

@@ -17,7 +17,7 @@ import {
   rowsPageFromState,
 } from "./helpers";
 import { makeCreateAction } from "../Table/helpers";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -37,7 +37,7 @@ const AssetsTable = ({
   const { getAssets, uploadAssets, deleteAsset, getTasks, getFileUploads } =
     useApi();
   const [openSnackbar] = useSnackbar();
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
     pageSize,

@@ -1,7 +1,7 @@
 import { CellComponentProps, TableData } from "components/Table/types";
 import { Box, Link, Badge } from "@livepeer/design-system";
 import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 function makeMP4Url(url: string, profileName: string): string {
   if (url.endsWith(".mp4")) {
@@ -27,7 +27,7 @@ const ClipsCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, ClipsCellProps>) => {
   const id = cell.value.id;
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   return (
     <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>

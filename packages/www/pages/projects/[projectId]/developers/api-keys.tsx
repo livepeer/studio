@@ -3,12 +3,12 @@ import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import ApiKeysTable from "components/ApiKeys";
 import { DashboardAPIKeys as Content } from "content";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const ApiKeys = () => {
   useLoggedIn();
   const { user } = useApi();
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   if (!user) {
     return <Layout />;

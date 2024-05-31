@@ -1,34 +1,22 @@
-import { useRouter } from "next/router";
+import { useProjectContext } from "context/ProjectContext";
+import { useEffect } from "react";
 
-export const PROJECT_ID_KEY = "selectedProject";
+export let projectId = "";
 
-export const projectId =
-  typeof window !== "undefined" && localStorage.getItem(PROJECT_ID_KEY);
-
-const useProject = () => {
-  const {
-    query: { projectId: routerProjectId },
-    push,
-  } = useRouter();
-
-  const activeProjectId =
-    routerProjectId ||
-    (typeof window !== "undefined" && localStorage.getItem(PROJECT_ID_KEY));
-
-  const appendProjectId = (path) => {
-    return `/projects/${activeProjectId}${path}`;
-  };
-
-  const setCurrentProject = (project, shouldRedirect = true) => {
-    localStorage.setItem(PROJECT_ID_KEY, project.id);
-    shouldRedirect && push(`/projects/${project.id}`);
-  };
-
-  return {
-    appendProjectId,
-    activeProjectId,
-    setCurrentProject,
-  };
+export const updateProjectId = (id: string) => {
+  projectId = id;
 };
 
-export default useProject;
+const useSyncProjectId = () => {
+  const { projectId: contextProjectId } = useProjectContext();
+
+  useEffect(() => {
+    if (contextProjectId) {
+      updateProjectId(contextProjectId);
+    }
+  }, [contextProjectId]);
+
+  return projectId;
+};
+
+export default useSyncProjectId;

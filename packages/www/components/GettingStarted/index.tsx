@@ -12,11 +12,12 @@ import {
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
+
 import { getBrandName } from "lib/utils";
 
 const GettingStarted = ({ firstName = "" }) => {
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>

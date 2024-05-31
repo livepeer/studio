@@ -21,7 +21,7 @@ import {
 import { makeSelectAction, makeCreateAction } from "../Table/helpers";
 import TableHeader from "../Table/components/TableHeader";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 import StreamFilter from "./StreamFilter";
 import { Flex } from "@livepeer/design-system";
 import TypeFilterCard from "components/TypeFilterCard";
@@ -58,7 +58,7 @@ const StreamsTable = ({
     initialOrder: sortByToString(DefaultSortBy),
   });
   const columns = useMemo(makeColumns, []);
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   const fetcher: Fetcher<StreamsTableData> = useCallback(
     async (state) =>

@@ -6,7 +6,7 @@ import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/StreamDetails/StreamOverviewTab";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const refetchInterval = 5 * 1000;
 
@@ -15,7 +15,7 @@ const StreamDetails = () => {
   const queryClient = useQueryClient();
   const { getStream } = useApi();
   const { getHealth } = useAnalyzer();
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
   const [currentTab, setCurrentTab] = useState<"Overview" | "Health">(
     "Overview"
   );

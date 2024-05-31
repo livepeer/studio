@@ -12,15 +12,15 @@ import {
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery, useQueryClient } from "react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
-import useProject from "hooks/use-project";
 import { useState } from "react";
 import CreateProjectDialog from "components/Project/createProjectDialog";
+import { useProjectContext } from "context/ProjectContext";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
   const { user, getProjects, createProject } = useApi();
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
-  const { setCurrentProject } = useProject();
+  const { setProjectId } = useProjectContext();
 
   const queryClient = useQueryClient();
 
@@ -29,7 +29,7 @@ const WorkspaceProjects = () => {
       name: projectName,
     });
 
-    setCurrentProject(project, false);
+    setProjectId(project.id);
     setShowCreateProjectAlert(false);
 
     queryClient.invalidateQueries("projects");

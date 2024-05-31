@@ -1,6 +1,6 @@
 import { styled, Box } from "@livepeer/design-system";
 import { useApi } from "hooks";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 import { usePathname } from "next/navigation";
 import { Children, isValidElement } from "react";
 import { useQuery } from "react-query";
@@ -42,7 +42,7 @@ function insertSeparators(items) {
 }
 
 const Breadcrumbs = ({ children }) => {
-  const { activeProjectId } = useProject();
+  const { projectId } = useProjectContext();
   const { getProjects } = useApi();
   const { data } = useQuery("projects", getProjects);
   const pathname = usePathname();
@@ -80,8 +80,8 @@ const Breadcrumbs = ({ children }) => {
       </Box>
     );
   } else {
-    if (activeProjectId) {
-      const project = data?.find((project) => project.id === activeProjectId);
+    if (projectId) {
+      const project = data?.find((project) => project.id === projectId);
       allItems.unshift(
         <Box
           as="li"

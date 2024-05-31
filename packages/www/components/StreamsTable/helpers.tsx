@@ -7,7 +7,7 @@ import TableEmptyState from "../Table/components/TableEmptyState";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 export type StreamsTableData = {
   id: string;

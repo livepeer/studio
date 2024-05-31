@@ -2,12 +2,12 @@ import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
 import WebhooksTable from "components/WebhooksTable";
 import { DashboardWebhooks as Content } from "content";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const Webhooks = () => {
   useLoggedIn();
   const { user } = useApi();
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   if (!user) {
     return <Layout />;

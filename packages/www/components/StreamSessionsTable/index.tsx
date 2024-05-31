@@ -14,7 +14,7 @@ import {
   rowsPageFromState,
   StreamSessionsTableData,
 } from "./helpers";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId } = useApi();
@@ -24,7 +24,7 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   });
   const [openSnackbar] = useSnackbar();
   const columns = useMemo(makeColumns, []);
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   const fetcher: Fetcher<StreamSessionsTableData> = useCallback(
     async (state) =>

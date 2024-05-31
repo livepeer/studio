@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "react-query";
 import WebhookDetails from "components/WebhookDetails";
 import { DashboardWebhooks as Content } from "content";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const WebhookDetail = () => {
   useLoggedIn();
@@ -13,7 +13,7 @@ const WebhookDetail = () => {
   const [logFilters, setLogFilters] = useState();
 
   const { getWebhook, getWebhookLogs } = useApi();
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   const router = useRouter();
   const { id } = router.query;

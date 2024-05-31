@@ -6,7 +6,7 @@ import AssetDetail from "layouts/assetDetail";
 import AssetOverviewTab from "components/AssetDetails/AssetOverviewTab";
 import AssetEventLogTab from "components/AssetDetails/AssetEventLogTab";
 import { Asset } from "@livepeer.studio/api";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const refetchInterval = 5 * 1000;
 
@@ -18,7 +18,7 @@ const AssetDetails = () => {
   );
   const [editAssetDialogOpen, setEditAssetDialogOpen] = useState(false);
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
-  const { appendProjectId } = useProject();
+  const { appendProjectId } = useProjectContext();
 
   const { query } = router;
   const id = query.id as string;

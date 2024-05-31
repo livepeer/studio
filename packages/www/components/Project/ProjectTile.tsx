@@ -10,18 +10,17 @@ import {
 import React from "react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { NavLink, generalSidebarItems } from "components/Sidebar";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
+import { useRouter } from "next/router";
 
 export default function ProjectTile({ name, id, ...props }) {
-  const { setCurrentProject, activeProjectId } = useProject();
+  const { setProjectId } = useProjectContext();
+  const { push } = useRouter();
 
   const navigate = (id, path) => {
-    setCurrentProject(
-      {
-        id,
-      },
-      path
-    );
+    setProjectId(id);
+
+    push(path);
   };
 
   return (

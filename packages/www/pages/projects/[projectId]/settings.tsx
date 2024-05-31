@@ -12,16 +12,16 @@ import { DashboardSettingsGeneral as Content } from "content";
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { useQuery } from "react-query";
-import useProject from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 const Settings = () => {
   useLoggedIn();
   const { user, getProject } = useApi();
-  const { activeProjectId } = useProject();
+  const { projectId } = useProjectContext();
 
   const { data } = useQuery(
-    ["project", activeProjectId],
-    () => getProject(activeProjectId),
+    ["project", projectId],
+    () => getProject(projectId),
     {
       onSuccess(data) {
         setProjectName(data.name);
