@@ -25,6 +25,19 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [router.query.projectId]);
 
+  useEffect(() => {
+    {
+      if (projectId) {
+        router.replace({
+          query: {
+            ...router.query,
+            projectId,
+          },
+        });
+      }
+    }
+  }, [projectId]);
+
   const appendProjectId = (path: string) => {
     return `/projects/${projectId}${path}`;
   };
