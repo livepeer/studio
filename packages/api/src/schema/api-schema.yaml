@@ -922,6 +922,12 @@ components:
             example:
               - id not provided
               - user not found
+    multistream-target-input:
+      oneOf:
+        - $ref: "#/components/schemas/multistream-target"
+        - type: array
+          items:
+            $ref: "#/components/schemas/multistream-target"
     multistream-target:
       type: object
       required:
