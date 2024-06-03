@@ -35,7 +35,7 @@ export const getEndpoint = () => {
     return "https://livepeer.monster";
   }
   if (isDevelopment()) {
-    return "http://localhost:3004";
+    return "https://livepeer.monster";
   }
   if (typeof document !== "undefined") {
     return `${document.location.protocol}//${document.location.host}`;

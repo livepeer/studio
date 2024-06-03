@@ -11,7 +11,7 @@ import {
 } from "react-table";
 import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import Help from "../../../public/img/help.svg";
 import Checkbox from "components/Admin/Checkbox";
 import {
@@ -294,16 +294,10 @@ const Table = <T extends Record<string, unknown>>({
                               top: "50%",
                               transform: "translateY(-50%)",
                             }}>
-                            <ReactTooltip
-                              id={`tooltip-multiorder`}
-                              className="tooltip"
-                              place="top">
-                              To multi-sort (sort by two column simultaneously)
-                              hold shift while clicking on second column name.
-                            </ReactTooltip>
+                            <Tooltip id={`tooltip-multiorder`} />
                             <Help
-                              data-tip
-                              data-for={`tooltip-multiorder`}
+                              data-tooltip-id={`tooltip-multiorder`}
+                              data-tooltip-content={`To multi-sort (sort by two column simultaneously) hold shift while clicking on second column name.`}
                               sx={{
                                 cursor: "pointer",
                                 ml: 1,

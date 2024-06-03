@@ -1,6 +1,6 @@
 import { Stream } from "@livepeer.studio/api";
 import { Box, Flex, styled } from "@livepeer/design-system";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
 
@@ -93,16 +93,10 @@ const RenditionsDetailsCell = <D extends TableData>({
       {detailsTooltip ? (
         <Flex css={{ alignItems: "center" }}>
           <Flex>
-            <ReactTooltip
-              id={`tooltip-details-${stream.id}`}
-              className="tooltip"
-              place="top"
-              delayShow={500}>
-              {detailsTooltip}
-            </ReactTooltip>
+            <Tooltip id={`tooltip-details-${stream.id}`} />
             <StyledQuestionMarkIcon
-              data-tip
-              data-for={`tooltip-details-${stream.id}`}
+              data-tooltip-id={`tooltip-details-${stream.id}`}
+              data-tooltip-content={detailsTooltip}
             />
           </Flex>
         </Flex>
