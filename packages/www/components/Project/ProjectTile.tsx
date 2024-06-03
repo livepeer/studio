@@ -46,7 +46,7 @@ export default function ProjectTile({ name, id }) {
             css={{
               fontWeight: 500,
             }}>
-            {name || "Untitled project"}
+            {name}
           </Text>
           <DropdownMenu>
             <Box

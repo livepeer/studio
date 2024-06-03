@@ -395,7 +395,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             css={{
               color: "$neutral11",
             }}>
-            {activeProject?.name || "Untitled project"}
+            {activeProject?.name}
           </Text>
           <TopBottomChevron />
         </Flex>
@@ -436,7 +436,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                   key={project.id}
                   align={"center"}
                   justify={"between"}>
-                  <Text size={2}>{project.name || "Untitled project"}</Text>
+                  <Text size={2}>{project.name}</Text>
                   {projectId === project.id && <FiCheck />}
                 </Flex>
               </DropdownMenuItem>

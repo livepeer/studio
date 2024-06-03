@@ -11,6 +11,10 @@ const Assets = () => {
   if (!user) {
     return <Layout />;
   }
+
+  const data = {
+    disableSizeLimit: true,
+  };
   return (
     <Layout
       id="assets"

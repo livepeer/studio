@@ -91,9 +91,7 @@ const Breadcrumbs = ({ children }) => {
             lineHeight: 1.5,
           }}
           key="project">
-          <Box css={{ display: "inline-flex" }}>
-            {project?.name || "Untitled Project"}
-          </Box>
+          <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
         </Box>
       );
     }
