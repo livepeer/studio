@@ -840,7 +840,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(db.stream.addDefaultFields(stream));
 });
 
-// returns stream by steamKey
+// returns stream by playbackId
 app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
   const stream = await cache.getOrSet(
     `strm-stream-by-playback-${req.params.playbackId}`,
@@ -872,7 +872,7 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
   );
 });
 
-// returns stream by steamKey
+// returns stream by streamKey
 app.get("/key/:streamKey", authorizer({}), async (req, res) => {
   const useReplica = req.query.main !== "true";
   const [docs] = await db.stream.find(
