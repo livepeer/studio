@@ -139,4 +139,48 @@ app.post("/", authorizer({}), async (req, res) => {
   res.json(project);
 });
 
+app.patch("/:id", authorizer({}), async (req, res) => {
+  const project = await db.project.get(req.params.id, {
+    useReplica: false,
+  });
+
+  if (!project || project.deleted) {
+    throw new NotFoundError(`project not found`);
+  }
+
+  if (req.user.admin !== true && req.user.id !== project.userId) {
+    throw new ForbiddenError("user can only update their own projects");
+  }
+
+  const { name } = req.body;
+
+  await db.project.update(req.params.id, {
+    name: name,
+  });
+
+  res.status(204);
+  res.end();
+});
+
+app.delete("/:id", authorizer({}), async (req, res) => {
+  const project = await db.project.get(req.params.id, {
+    useReplica: false,
+  });
+
+  if (!project || project.deleted) {
+    throw new NotFoundError(`project not found`);
+  }
+
+  if (req.user.admin !== true && req.user.id !== project.userId) {
+    throw new ForbiddenError("user can only delete their own projects");
+  }
+
+  // TODO: Cascade delete
+
+  await db.project.delete(req.params.id);
+
+  res.status(204);
+  res.end();
+});
+
 export default app;
