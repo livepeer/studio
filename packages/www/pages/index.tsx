@@ -8,17 +8,17 @@ import { useApi } from "hooks";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useQuery } from "react-query";
-import { projectId as selectedProject } from "hooks/use-project";
+import { useProjectContext } from "context/ProjectContext";
 
 export default function Dashboard() {
   const { push } = useRouter();
   const { getProjects } = useApi();
+  const { setProjectId } = useProjectContext();
   const { data: projects } = useQuery("projects", getProjects);
 
   useEffect(() => {
-    if (selectedProject) {
-      push(`/projects/${selectedProject}`);
-    } else if (projects?.length > 0) {
+    if (projects?.length > 0) {
+      setProjectId(projects.reverse()?.[0].id);
       push(`/projects/${projects.reverse()?.[0].id}`);
     }
   }, [projects]);

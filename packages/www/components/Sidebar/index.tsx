@@ -211,6 +211,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const { createProject, getProjects, logout } = useApi();
 
+  const { push } = useRouter();
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
   const { setProjectId, projectId, appendProjectId } = useProjectContext();
   const queryClient = useQueryClient();
@@ -229,6 +230,20 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const { data } = useQuery("projects", getProjects);
 
   const activeProject = data?.find((project) => project.id === projectId);
+
+  const isResourcePage = () => {
+    const path = window.location.pathname;
+
+    const resourceKeywords = ["/streams/", "/assets/", "/webhooks/"];
+
+    for (const keyword of resourceKeywords) {
+      if (path.includes(keyword)) {
+        return keyword;
+      }
+    }
+
+    return false;
+  };
 
   return (
     <>
