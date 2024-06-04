@@ -2,6 +2,7 @@ import qs from "qs";
 import { ApiState } from "../types";
 import { SetStateAction } from "react";
 import { Project } from "@livepeer.studio/api";
+import { HttpError } from "lib/utils";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -58,4 +59,19 @@ export const deleteProject = async (projectId) => {
       ? { ...project, status: res.status }
       : new Error(project);
   }
+};
+
+export const updateProject = async (projectId, params): Promise<Project> => {
+  const [res, body] = await context.fetch(`/project/${projectId}`, {
+    method: "PATCH",
+    body: JSON.stringify(params),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  if (res.status !== 204) {
+    throw new HttpError(res.status, body);
+  }
+  return res;
 };

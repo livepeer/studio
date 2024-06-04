@@ -11,12 +11,13 @@ import {
 import { DashboardSettingsGeneral as Content } from "content";
 import React, { useRef, useState } from "react";
 import Image from "next/image";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useProjectContext } from "context/ProjectContext";
+import { useRouter } from "next/router";
 
 const Settings = () => {
   useLoggedIn();
-  const { user, getProject } = useApi();
+  const { user, getProject, deleteProject, updateProject } = useApi();
   const { projectId } = useProjectContext();
 
   const { data } = useQuery(
@@ -33,14 +34,23 @@ const Settings = () => {
   const [projectName, setProjectName] = useState<string | null>();
   const logoRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = () => {
-    console.log("Project Name: ", projectName);
-    console.log("Project Logo: ", projectLogo);
+  const handleSubmit = async () => {
+    if (!projectName) {
+      alert("Project name is required");
+      return;
+    }
+
+    await updateProject(projectId, {
+      name: projectName,
+    });
+
+    window.location.reload();
   };
 
-  const deleteProject = () => {
+  const confirmDeleteProject = () => {
     if (confirm("Are you sure you want to delete this project?")) {
-      console.log("Project deleted");
+      deleteProject(projectId);
+      alert("Project deleted successfully");
     }
   };
 
@@ -208,7 +218,7 @@ const Settings = () => {
               you can do so below.
             </Text>
             <Button
-              onClick={deleteProject}
+              onClick={confirmDeleteProject}
               css={{
                 p: "$4",
                 fontSize: "$2",

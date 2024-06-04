@@ -19,7 +19,7 @@ export default function ProjectTile({ name, id }) {
 
   const navigate = (id, path) => {
     setProjectId(id);
-    push(appendProjectId(path));
+    push("/projects/" + id + path);
   };
 
   return (
