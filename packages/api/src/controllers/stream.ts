@@ -54,6 +54,7 @@ import {
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
+import { cache } from "../store/cache";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -839,14 +840,23 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(db.stream.addDefaultFields(stream));
 });
 
-// returns stream by steamKey
+// returns stream by playbackId
 app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
-  const {
-    data: [stream],
-  } = await req.store.queryObjects<DBStream>({
-    kind: "stream",
-    query: { playbackId: req.params.playbackId },
-  });
+  const stream = await cache.getOrSet(
+    `strm-stream-by-playback-${req.params.playbackId}`,
+    async () => {
+      const {
+        data: [stream],
+      } = await req.store.queryObjects<DBStream>({
+        kind: "stream",
+        query: { playbackId: req.params.playbackId },
+      });
+
+      return stream;
+    },
+    5
+  );
+
   if (
     !stream ||
     ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
@@ -862,7 +872,7 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
   );
 });
 
-// returns stream by steamKey
+// returns stream by streamKey
 app.get("/key/:streamKey", authorizer({}), async (req, res) => {
   const useReplica = req.query.main !== "true";
   const [docs] = await db.stream.find(
