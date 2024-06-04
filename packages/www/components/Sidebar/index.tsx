@@ -446,6 +446,12 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 <Flex
                   onClick={() => {
                     setProjectId(project.id);
+                    if (isResourcePage()) {
+                      const path = isResourcePage() as string;
+                      push(`/projects/${project.id}${path}`, null, {
+                        shallow: false,
+                      });
+                    }
                   }}
                   css={{ width: "100%" }}
                   key={project.id}
