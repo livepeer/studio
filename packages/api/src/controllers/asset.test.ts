@@ -221,6 +221,15 @@ describe("controllers/asset", () => {
     res = await client.get(`/project/${projectId}`);
     expect(res.status).toBe(200);
     expect(await res.json()).toBeDefined(); //api-key be retrieve if adminApiKey is used..
+
+    res = await client.get(
+      `/asset?limit=10&allUsers=true&filters=[{"id":"playbackId","value":"${asset.playbackId}"}]`
+    );
+    expect(res.status).toBe(200);
+    let assets = await res.json();
+    expect(assets).toHaveLength(1);
+    expect(assets[0].projectId).toBe(projectId);
+    expect(assets[0].playbackId).toBe(asset.playbackId);
   });
 
   it("should import asset (using api-token) for existing project (created with jwt)", async () => {

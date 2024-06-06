@@ -175,9 +175,8 @@ app.delete("/:id", authorizer({}), async (req, res) => {
     throw new ForbiddenError("user can only delete their own projects");
   }
 
-  // TODO: Cascade delete
-
-  await db.project.delete(req.params.id);
+  //await db.project.delete(req.params.id);
+  // Todo: Long running cronjob for cascade delete
 
   res.status(204);
   res.end();
