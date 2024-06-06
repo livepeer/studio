@@ -9,8 +9,8 @@ import logger from "../logger";
 import {
   authorizer,
   geolocateMiddleware,
-  validatePost,
   hasAccessToResource,
+  validatePost,
 } from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
@@ -20,9 +20,9 @@ import {
   StreamPatchPayload,
   StreamSetActivePayload,
   User,
-  Project,
 } from "../schema/types";
 import { db, jobsDb } from "../store";
+import { cache } from "../store/cache";
 import { DB } from "../store/db";
 import {
   BadRequestError,
@@ -60,7 +60,6 @@ import {
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
-import { cache } from "../store/cache";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -91,6 +90,7 @@ const EMPTY_NEW_STREAM_PAYLOAD: Required<
   multistream: undefined,
   pull: undefined,
   record: undefined,
+  recordingSpec: undefined,
   userTags: undefined,
   creatorId: undefined,
   playbackPolicy: undefined,
@@ -922,31 +922,39 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
 
-    const record = stream.record;
-    const recordObjectStoreId =
-      stream.recordObjectStoreId ||
-      (record ? req.config.recordObjectStoreId : undefined);
+    const {
+      id: parentId,
+      playbackId,
+      userId,
+      projectId,
+      objectStoreId,
+      record,
+      recordingSpec,
+      recordObjectStoreId = record ? req.config.recordObjectStoreId : undefined,
+    } = stream;
+    const profiles = hackMistSettings(
+      req,
+      useParentProfiles ? stream.profiles : req.body.profiles
+    );
     const childStream: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
-      userId: stream.userId,
-      projectId: stream.projectId,
+      userId,
+      projectId,
       renditions: {},
-      objectStoreId: stream.objectStoreId,
+      profiles,
+      objectStoreId,
       record,
+      recordingSpec,
       recordObjectStoreId,
       sessionId,
       id,
       createdAt,
-      parentId: stream.id,
+      parentId,
       region,
       lastSeen: 0,
       isActive: true,
     });
-    childStream.profiles = hackMistSettings(
-      req,
-      useParentProfiles ? stream.profiles : childStream.profiles
-    );
 
     const existingSession = await db.session.get(sessionId);
     if (existingSession) {
@@ -956,10 +964,10 @@ app.post(
     } else {
       const session: DBSession = {
         id: sessionId,
-        parentId: stream.id,
-        playbackId: stream.playbackId,
-        userId: stream.userId,
-        projectId: stream.projectId,
+        parentId,
+        playbackId,
+        userId,
+        projectId,
         kind: "session",
         version: "v2",
         name: req.body.name,
@@ -974,8 +982,9 @@ app.post(
         ingestRate: 0,
         outgoingRate: 0,
         deleted: false,
-        profiles: childStream.profiles,
+        profiles,
         record,
+        recordingSpec,
         recordObjectStoreId,
         recordingStatus: record ? "waiting" : undefined,
       };

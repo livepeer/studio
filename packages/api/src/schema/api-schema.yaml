@@ -637,6 +637,21 @@ components:
             customization, create and configure an object store.
           type: boolean
           example: false
+        recordingSpec:
+          type: object
+          description: |
+            Configuration for recording the stream. This can only be set if
+            `record` is true.
+          additionalProperties: false
+          properties:
+            profiles:
+              type: array
+              items:
+                $ref: "#/components/schemas/ffmpeg-profile"
+              description: |
+                Profiles to record the stream in. If not specified, the stream
+                will be recorded in the same profiles as the stream itself. Keep
+                in mind that the source rendition will always be recorded.
         multistream:
           type: object
           additionalProperties: false
@@ -690,6 +705,8 @@ components:
             $ref: "#/components/schemas/ffmpeg-profile"
         record:
           $ref: "#/components/schemas/stream/properties/record"
+        recordingSpec:
+          $ref: "#/components/schemas/stream/properties/recordingSpec"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
         userTags:
@@ -923,6 +940,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+        recordingSpec:
+          $ref: "#/components/schemas/stream/properties/recordingSpec"
     error:
       type: object
       properties:
