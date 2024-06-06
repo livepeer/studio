@@ -191,7 +191,7 @@ describe("controllers/asset", () => {
     });
   });
 
-  it("should import asset (using jwt) for existing project (created with jwt)", async () => {
+  it("should import asset (using jwt) for existing project (created with jwt) and list with filters", async () => {
     const spec = {
       name: "test",
       url: "https://example.com/test.mp4",
@@ -261,6 +261,25 @@ describe("controllers/asset", () => {
     const project = await res.json();
     expect(res.status).toBe(200);
     expect(project.id).toBeDefined();
+  });
+
+  it("should import asset when projectId is not passed and list with projectId", async () => {
+    const spec = {
+      name: "test",
+      url: "https://example.com/test.mp4",
+    };
+    let res = await client.post(`/asset/upload/url`, spec);
+    expect(res.status).toBe(201);
+    const { asset, task } = await res.json();
+
+    client.jwtAuth = null;
+    client.apiKey = adminApiKey;
+
+    res = await client.get(`/asset?limit=10&allUsers=true`);
+    expect(res.status).toBe(200);
+    let assets = await res.json();
+    expect(assets).toHaveLength(1);
+    expect(assets[0].projectId).toBe(asset.projectId);
   });
 
   it("should NOT import asset (using api-key) when projectId passed as ouery-param", async () => {
