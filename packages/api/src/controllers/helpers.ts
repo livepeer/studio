@@ -16,6 +16,8 @@ import * as nativeCrypto from "crypto";
 import { DBStream } from "../store/stream-table";
 import { fetchWithTimeoutAndRedirects, sleep } from "../util";
 import logger from "../logger";
+import { db } from "../store";
+import { v4 as uuid } from "uuid";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
@@ -733,6 +735,14 @@ export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
   return typeof inputId === "string"
     ? { type: "unverified", value: inputId }
     : inputId;
+}
+
+export function getProjectId(req: Request): string {
+  let projectId = req.user.defaultProjectId ?? "";
+  if (req.project?.id) {
+    projectId = req.project.id;
+  }
+  return projectId;
 }
 
 export async function addDefaultProjectId(

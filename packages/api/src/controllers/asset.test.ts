@@ -282,7 +282,7 @@ describe("controllers/asset", () => {
         type: "url",
         url: spec.url,
       },
-      projectId: "", //should be blank when using an existing api-key and new project was created
+      projectId: adminUser.defaultProjectId,
       status: { phase: "waiting" },
     });
   });

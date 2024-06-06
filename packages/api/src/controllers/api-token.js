@@ -75,10 +75,6 @@ app.get("/", async (req, res) => {
 
   if (!userId) {
     const query = parseFilters(fieldsMap, filters);
-    query.push(
-      sql`coalesce(api_token.data->>'projectId', '') = ${req.project?.id || ""}`
-    );
-
     let fields =
       " api_token.id as id, api_token.data as data, users.id as usersId, users.data as usersdata";
     if (count) {
@@ -116,9 +112,13 @@ app.get("/", async (req, res) => {
   }
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`api_token.data->>'userId' = ${userId}`);
-  query.push(
-    sql`coalesce(api_token.data->>'projectId', '') = ${req.project?.id || ""}`
-  );
+  if (!req.user.admin) {
+    query.push(
+      sql`coalesce(api_token.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`
+    );
+  }
 
   let fields = " api_token.id as id, api_token.data as data";
   if (count) {

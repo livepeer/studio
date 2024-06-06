@@ -3,6 +3,7 @@ import { Request, Response, Router } from "express";
 import {
   FieldsMap,
   addDefaultProjectId,
+  getProjectId,
   makeNextHREF,
   parseFilters,
   parseOrder,
@@ -76,12 +77,6 @@ signingKeyApp.get("/", authorizer({}), async (req, res) => {
       query.push(sql`signing_key.data->>'deleted' IS NULL`);
     }
 
-    query.push(
-      sql`coalesce(signing_key.data->>'projectId', '') = ${
-        req.project?.id || ""
-      }`
-    );
-
     let fields =
       " signing_key.id as id, signing_key.data as data, users.id as usersId, users.data as usersdata";
     if (count) {
@@ -118,7 +113,9 @@ signingKeyApp.get("/", authorizer({}), async (req, res) => {
   query.push(sql`signing_key.data->>'deleted' IS NULL`);
 
   query.push(
-    sql`coalesce(signing_key.data->>'projectId', '') = ${req.project?.id || ""}`
+    sql`coalesce(signing_key.data->>'projectId', ${
+      req.user.defaultProjectId || ""
+    }) = ${req.project?.id || ""}`
   );
 
   let fields = " signing_key.id as id, signing_key.data as data";
@@ -188,13 +185,14 @@ signingKeyApp.post(
     let b64PublicKey = Buffer.from(keypair.publicKey).toString("base64");
     let b64PrivateKey = Buffer.from(keypair.privateKey).toString("base64");
 
+    const projectId = getProjectId(req);
     var doc: WithID<SigningKey> = {
       id,
       name: req.body.name || "Signing Key " + (output.length + 1),
       userId: req.user.id,
       createdAt: Date.now(),
       publicKey: b64PublicKey,
-      projectId: req.project?.id ?? "",
+      projectId,
     };
 
     await db.signingKey.create(doc);

@@ -49,6 +49,7 @@ import {
 import {
   FieldsMap,
   addDefaultProjectId,
+  getProjectId,
   makeNextHREF,
   mapInputCreatorId,
   parseFilters,
@@ -503,7 +504,9 @@ app.get("/", authorizer({}), async (req, res) => {
   if (!req.user.admin) {
     userId = req.user.id;
     query.push(
-      sql`coalesce(stream.data->>'projectId', '') = ${req.project?.id || ""}`
+      sql`coalesce(stream.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`
     );
   }
   if (!all || all === "false" || !req.user.admin) {
@@ -767,8 +770,6 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const { userId } = req.params;
   let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
-  let projectId = req.token?.projectId;
-
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403);
     return res.json({
@@ -778,8 +779,14 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const query = [
     sql`data->>'deleted' IS NULL`,
     sql`data->>'userId' = ${userId}`,
-    sql`coalesce(data->>'projectId', '') = ${projectId || ""}`,
   ];
+  if (!req.user.admin) {
+    query.push(
+      sql`coalesce(data->>'projectId', ${req.user.defaultProjectId || ""}) = ${
+        req.project?.id || ""
+      }`
+    );
+  }
   if (streamsonly) {
     query.push(sql`data->>'parentId' IS NULL`);
   } else if (sessionsonly) {
@@ -1169,7 +1176,9 @@ app.put(
       [
         sql`data->>'userId' = ${req.user.id}`,
         sql`data->>'deleted' IS NULL`,
-        sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
+        sql`coalesce(data->>'projectId', ${
+          req.user.defaultProjectId || ""
+        }) = ${req.project?.id || ""}`,
         ...filters,
       ],
       { useReplica: false }
@@ -1341,7 +1350,9 @@ app.post(
           sql`data->>'userId' = ${req.user.id}`,
           sql`data->>'deleted' IS NULL`,
           sql`data->'pull'->>'source' = ${payload.pull.source}`,
-          sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
+          sql`coalesce(data->>'projectId', ${
+            req.user.defaultProjectId || ""
+          }) = ${req.project?.id || ""}`,
         ],
         { useReplica: false }
       );
@@ -1415,7 +1426,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     renditions: {},
     objectStoreId,
     id,
-    projectId: req.project?.id ?? "",
+    projectId: req.project?.id,
     createdAt,
     streamKey,
     playbackId,

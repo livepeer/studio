@@ -240,7 +240,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    projectId: req.project?.id ?? "",
+    projectId: req.project?.id,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
@@ -712,9 +712,14 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  query.push(
-    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
-  );
+  if (!req.user.admin) {
+    query.push(
+      sql`coalesce(asset.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`
+    );
+  }
+
   if (req.user.admin && deleting === "true") {
     const deletionThreshold = new Date(
       Date.now() - DELETE_ASSET_DELAY
