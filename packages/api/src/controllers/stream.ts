@@ -6,7 +6,12 @@ import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
 import logger from "../logger";
-import { authorizer, geolocateMiddleware, validatePost } from "../middleware";
+import {
+  authorizer,
+  geolocateMiddleware,
+  hasAccessToResource,
+  validatePost,
+} from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -17,6 +22,7 @@ import {
   User,
 } from "../schema/types";
 import { db, jobsDb } from "../store";
+import { cache } from "../store/cache";
 import { DB } from "../store/db";
 import {
   BadRequestError,
@@ -54,7 +60,6 @@ import {
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
-import { cache } from "../store/cache";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -185,7 +190,7 @@ async function validateMultistreamOpts(
 
 async function validateStreamPlaybackPolicy(
   playbackPolicy: DBStream["playbackPolicy"],
-  userId: string
+  req: Request
 ) {
   if (
     playbackPolicy?.type === "lit_signing_condition" ||
@@ -203,7 +208,7 @@ async function validateStreamPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
-    if (webhook.userId !== userId) {
+    if (!hasAccessToResource(req, webhook)) {
       throw new BadRequestError(
         `webhook ${playbackPolicy.webhookId} not found`
       );
@@ -453,6 +458,7 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
   playbackId: `stream.data->>'playbackId'`,
+  projectId: `stream.data->>'projectId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
   suspended: { val: `stream.data->'suspended'`, type: "boolean" },
   sourceSegmentsDuration: {
@@ -486,11 +492,14 @@ app.get("/", authorizer({}), async (req, res) => {
     limit = undefined;
   }
 
+  const query = parseFilters(fieldsMap, filters);
+
   if (!req.user.admin) {
     userId = req.user.id;
+    query.push(
+      sql`coalesce(stream.data->>'projectId', '') = ${req.project?.id || ""}`
+    );
   }
-
-  const query = parseFilters(fieldsMap, filters);
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`stream.data->>'deleted' IS NULL`);
   }
@@ -652,14 +661,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    (stream.deleted && !req.isUIAdmin) ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   let filterOut;
   const query = [];
@@ -736,14 +738,7 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
     kind: "stream",
@@ -766,16 +761,18 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const { userId } = req.params;
   let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
+  let projectId = req.token?.projectId;
+
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403);
     return res.json({
       errors: ["user can only request information on their own streams"],
     });
   }
-
   const query = [
     sql`data->>'deleted' IS NULL`,
     sql`data->>'userId' = ${userId}`,
+    sql`coalesce(data->>'projectId', '') = ${projectId || ""}`,
   ];
   if (streamsonly) {
     query.push(sql`data->>'parentId' IS NULL`);
@@ -806,15 +803,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
   const { forceUrl } = req.query;
   let stream = await db.stream.get(req.params.id);
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
-  ) {
-    // do not reveal that stream exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-
+  req.checkResourceAccess(stream);
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -858,13 +847,7 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
     5
   );
 
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
@@ -880,13 +863,7 @@ app.get("/key/:streamKey", authorizer({}), async (req, res) => {
     { streamKey: req.params.streamKey },
     { useReplica }
   );
-  if (
-    !docs.length ||
-    ((docs[0].userId !== req.user.id || docs[0].deleted) && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(docs[0]);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
@@ -936,15 +913,7 @@ app.post(
       stream = await db.stream.get(req.params.streamId);
     }
 
-    if (
-      !stream ||
-      ((stream.userId !== req.user.id || stream.deleted) &&
-        !(req.user.admin && !stream.deleted))
-    ) {
-      // do not reveal that stream exists
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     const sessionId = req.query.sessionId?.toString();
     const region = req.config.ownRegion;
@@ -957,6 +926,7 @@ app.post(
       id: parentId,
       playbackId,
       userId,
+      projectId,
       objectStoreId,
       record,
       recordingSpec,
@@ -970,6 +940,7 @@ app.post(
       ...req.body,
       kind: "stream",
       userId,
+      projectId,
       renditions: {},
       profiles,
       objectStoreId,
@@ -988,7 +959,7 @@ app.post(
     const existingSession = await db.session.get(sessionId);
     if (existingSession) {
       logger.info(
-        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId}`
+        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId} stream.projectId=${stream.projectId}`
       );
     } else {
       const session: DBSession = {
@@ -996,6 +967,7 @@ app.post(
         parentId,
         playbackId,
         userId,
+        projectId,
         kind: "session",
         version: "v2",
         name: req.body.name,
@@ -1037,9 +1009,9 @@ app.post(
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
-      }' playbackid=${stream.playbackId} session_id=${id} elapsed=${
-        Date.now() - start
-      }ms`
+      }' playbackid=${stream.playbackId} session_id=${id} projectid=${
+        stream.projectId
+      } elapsed=${Date.now() - start}ms`
     );
   }
 );
@@ -1191,6 +1163,7 @@ app.put(
       [
         sql`data->>'userId' = ${req.user.id}`,
         sql`data->>'deleted' IS NULL`,
+        sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
         ...filters,
       ],
       { useReplica: false }
@@ -1362,6 +1335,7 @@ app.post(
           sql`data->>'userId' = ${req.user.id}`,
           sql`data->>'deleted' IS NULL`,
           sql`data->'pull'->>'source' = ${payload.pull.source}`,
+          sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
         ],
         { useReplica: false }
       );
@@ -1435,6 +1409,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     renditions: {},
     objectStoreId,
     id,
+    projectId: req.project?.id ?? "",
     createdAt,
     streamKey,
     playbackId,
@@ -1444,7 +1419,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   };
   doc = wowzaHydrate(doc);
 
-  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req);
 
   doc.profiles = hackMistSettings(req, doc.profiles);
   doc.multistream = await validateMultistreamOpts(
@@ -1836,10 +1811,7 @@ app.post(
       return res.json({ errors: ["stream not found"] });
     }
 
-    if (stream.userId !== req.user.id) {
-      res.status(404);
-      return res.json({ errors: ["stream not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     const newTarget = await validateMultistreamTarget(
       req.user.id,
@@ -1875,15 +1847,7 @@ app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
 
   const stream = await db.stream.get(id);
 
-  if (!stream || stream.deleted) {
-    res.status(404);
-    return res.json({ errors: ["stream not found"] });
-  }
-
-  if (stream.userId !== req.user.id) {
-    res.status(404);
-    return res.json({ errors: ["stream not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   let multistream: DBStream["multistream"] = stream.multistream ?? {
     targets: [],
@@ -1919,7 +1883,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess = stream?.userId === req.user.id || req.user.admin;
+    const hasAccess = hasAccessToResource(req, stream);
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1968,7 +1932,7 @@ app.patch(
     }
 
     if (playbackPolicy) {
-      await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+      await validateStreamPlaybackPolicy(playbackPolicy, req);
 
       patch = { ...patch, playbackPolicy };
     }
@@ -1999,10 +1963,7 @@ app.patch(
 app.patch("/:id/record", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (!stream || stream.deleted) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   if (stream.parentId) {
     res.status(400);
     return res.json({ errors: ["can't set for session"] });
@@ -2029,14 +1990,7 @@ app.patch("/:id/record", authorizer({}), async (req, res) => {
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   await db.stream.update(stream.id, {
     deleted: true,
@@ -2062,7 +2016,7 @@ app.delete("/", authorizer({}), async (req, res) => {
     const streams = await db.stream.getMany(ids);
     if (
       streams.length !== ids.length ||
-      streams.some((s) => s.userId !== req.user.id)
+      streams.some((s) => !hasAccessToResource(req, s))
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -2093,16 +2047,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
     isSession = true;
     stream = await db.stream.get(stream.parentId);
   }
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
-  }
-
+  req.checkResourceAccess(stream);
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
@@ -2163,13 +2108,7 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   }
   const { suspended } = req.body;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   await db.stream.update(stream.id, { suspended });
   if (suspended) {
     // now kill live stream
@@ -2186,13 +2125,7 @@ app.post(
   async (req, res) => {
     const { id } = req.params;
     const stream = await db.stream.get(id);
-    if (
-      !stream ||
-      (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-    ) {
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     if (!stream.pull) {
       res.status(400);
@@ -2209,13 +2142,7 @@ app.post(
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   if (terminateDelay(stream) > 0) {
     throw new TooManyRequestsError(`too many terminate requests`);

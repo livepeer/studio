@@ -49,6 +49,10 @@ declare global {
       isNeverExpiringJWT?: boolean;
       token?: WithID<ApiToken>;
 
+      checkResourceAccess: (
+        resource?: DBOwnedResource,
+        uiAdminOnly?: boolean
+      ) => void;
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;
       getIngest?: () => Promise<Ingest[]>;
