@@ -1,7 +1,8 @@
 import { authorizer, validatePost } from "../middleware";
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import {
   FieldsMap,
+  addDefaultProjectId,
   makeNextHREF,
   parseFilters,
   parseOrder,
@@ -19,6 +20,7 @@ import {
 } from "../schema/types";
 import { WithID } from "../store/types";
 import { SignOptions, sign } from "jsonwebtoken";
+import mung from "express-mung";
 
 const fieldsMap: FieldsMap = {
   id: `signing_key.ID`,
@@ -54,6 +56,8 @@ async function generateSigningKeys() {
 }
 
 const signingKeyApp = Router();
+
+signingKeyApp.use(mung.jsonAsync(addDefaultProjectId));
 
 signingKeyApp.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(

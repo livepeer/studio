@@ -22,6 +22,7 @@ import {
   reqUseReplica,
   isValidBase64,
   mapInputCreatorId,
+  addDefaultProjectId,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -613,6 +614,8 @@ export async function toExternalAsset(
   return a;
 }
 
+app.use(mung.jsonAsync(addDefaultProjectId));
+
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
@@ -627,9 +630,6 @@ app.use(
         req.user.admin
       );
 
-      if (!modifiedAsset.projectId || modifiedAsset.projectId === "") {
-        modifiedAsset.projectId = req.user.defaultProjectId;
-      }
       return modifiedAsset;
     };
 

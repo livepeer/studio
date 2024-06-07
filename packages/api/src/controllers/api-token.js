@@ -2,7 +2,12 @@ import Router from "express/lib/router";
 import { v4 as uuid } from "uuid";
 import sql from "sql-template-strings";
 
-import { makeNextHREF, parseOrder, parseFilters } from "./helpers";
+import {
+  makeNextHREF,
+  parseOrder,
+  parseFilters,
+  addDefaultProjectId,
+} from "./helpers";
 import { authorizer, validatePost } from "../middleware";
 import { AuthPolicy } from "../middleware/authPolicy";
 import { db } from "../store";
@@ -12,22 +17,7 @@ const app = Router();
 
 app.use(authorizer({ noApiToken: true }));
 
-async function enrichApiTokenProjectId(body, req, res) {
-  const enrichToken = (token) => {
-    if (!token.projectId || token.projectId === "") {
-      token.projectId = req.user.defaultProjectId;
-    }
-  };
-
-  if (Array.isArray(body)) {
-    body.forEach(enrichToken);
-  } else {
-    enrichToken(body);
-  }
-  return body;
-}
-
-app.use(mung.jsonAsync(enrichApiTokenProjectId));
+app.use(mung.jsonAsync(addDefaultProjectId));
 
 app.get("/:id", async (req, res) => {
   const { id } = req.params;

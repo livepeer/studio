@@ -4,7 +4,7 @@ import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
-import express, { Request } from "express";
+import express, { Request, Response } from "express";
 import sql, { SQLStatement } from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
@@ -733,4 +733,19 @@ export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
   return typeof inputId === "string"
     ? { type: "unverified", value: inputId }
     : inputId;
+}
+
+export async function addDefaultProjectId(body, req: Request, res: Response) {
+  const enrichResponse = (document) => {
+    if (!document.projectId || document.projectId === "") {
+      document.projectId = req.user.defaultProjectId;
+    }
+  };
+
+  if (Array.isArray(body)) {
+    body.forEach(enrichResponse);
+  } else {
+    enrichResponse(body);
+  }
+  return body;
 }

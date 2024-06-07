@@ -1,4 +1,4 @@
-import { Request, Router } from "express";
+import { Request, Response, Router } from "express";
 import _ from "lodash";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
@@ -48,6 +48,7 @@ import {
 } from "./generate-keys";
 import {
   FieldsMap,
+  addDefaultProjectId,
   makeNextHREF,
   mapInputCreatorId,
   parseFilters,
@@ -60,6 +61,8 @@ import {
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
+import { cache } from "../store/cache";
+import mung from "express-mung";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -118,6 +121,8 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
     return profile;
   });
 };
+
+app.use(mung.jsonAsync(addDefaultProjectId));
 
 async function validateMultistreamTarget(
   userId: string,
