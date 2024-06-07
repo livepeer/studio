@@ -4,7 +4,7 @@ import fetch from "node-fetch";
 import qs from "qs";
 import { products } from "../config";
 import updateUsage from "../jobs/update-usage";
-import { authorizer, validatePost } from "../middleware";
+import { authorizer } from "../middleware";
 import { User } from "../schema/types";
 import { db, jobsDb } from "../store";
 import { NotFoundError } from "../store/errors";
@@ -338,26 +338,21 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
 });
 
 // Runs the update-usage job on demand if necessary
-app.post(
-  "/update",
-  authorizer({ anyAdmin: true }),
-  validatePost("usage"),
-  async (req, res) => {
-    let { fromTime, toTime } = req.query;
+app.post("/update", authorizer({ anyAdmin: true }), async (req, res) => {
+  let { fromTime, toTime } = req.query;
 
-    const { usageHistory } = await updateUsage(
-      {
-        ...req.config,
-        updateUsageFrom: fromTime,
-        updateUsageTo: toTime,
-        updateUsageApiToken: req.token.id,
-      },
-      { jobsDb, stripe: req.stripe }
-    );
+  const { usageHistory } = await updateUsage(
+    {
+      ...req.config,
+      updateUsageFrom: fromTime,
+      updateUsageTo: toTime,
+      updateUsageApiToken: req.token.id,
+    },
+    { jobsDb, stripe: req.stripe }
+  );
 
-    res.status(200);
-    res.json(usageHistory);
-  }
-);
+  res.status(200);
+  res.json(usageHistory);
+});
 
 export default app;
