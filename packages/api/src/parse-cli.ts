@@ -560,6 +560,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         ] as FfmpegProfile[]),
         coerce: coerceJsonProfileArr("default-stream-profiles"),
       },
+      // this is actually handled raw on ./logger.js but we declare it here so yargs recognizes it
+      verbose: {
+        describe: "enable verbose logging",
+        type: "boolean",
+      },
     })
     .usage(
       `
