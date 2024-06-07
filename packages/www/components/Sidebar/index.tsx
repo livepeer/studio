@@ -211,7 +211,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
   const { createProject, getProjects, logout } = useApi();
 
-  const { push } = useRouter();
+  const router = useRouter();
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
   const { setProjectId, projectId, appendProjectId } = useProjectContext();
   const queryClient = useQueryClient();
@@ -448,9 +448,8 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                     setProjectId(project.id);
                     if (isResourcePage()) {
                       const path = isResourcePage() as string;
-                      push(`/projects/${project.id}${path}`, null, {
-                        shallow: false,
-                      });
+                      const newUrl = `/dashboard/projects/${project.id}${path}`;
+                      window.location.assign(newUrl);
                     }
                   }}
                   css={{ width: "100%" }}
