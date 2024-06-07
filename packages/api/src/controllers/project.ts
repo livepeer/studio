@@ -1,5 +1,5 @@
-import { Request, Router } from "express";
-import { authorizer, validatePost } from "../middleware";
+import { Router } from "express";
+import { authorizer } from "../middleware";
 import { db } from "../store";
 import { v4 as uuid } from "uuid";
 import {
@@ -8,13 +8,7 @@ import {
   parseOrder,
   toStringValues,
 } from "./helpers";
-import {
-  NotFoundError,
-  ForbiddenError,
-  BadRequestError,
-  BadGatewayError,
-  InternalServerError,
-} from "../store/errors";
+import { NotFoundError, ForbiddenError } from "../store/errors";
 import sql from "sql-template-strings";
 import { WithID } from "../store/types";
 import { Project } from "../schema/types";
