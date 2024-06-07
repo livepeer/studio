@@ -750,8 +750,11 @@ export async function addDefaultProjectId(
   req: Request,
   res: Response
 ) {
+  const deepClone = (obj) => {
+    return JSON.parse(JSON.stringify(obj));
+  };
+
   const enrichResponse = (document) => {
-    // Enrich direct properties of the document if userId is present
     if ("id" in document && "userId" in document) {
       if (
         (!document.projectId || document.projectId === "") &&
@@ -763,7 +766,6 @@ export async function addDefaultProjectId(
   };
 
   const enrichResponseWithUserProjectId = (document) => {
-    // Enrich direct properties of the document with the projectId of the owner
     if ("id" in document && "userId" in document && "user" in document) {
       if (
         (!document.projectId || document.projectId === "") &&
@@ -774,33 +776,35 @@ export async function addDefaultProjectId(
     }
   };
 
-  // Look for subobjects
-  if (Array.isArray(body)) {
-    body.forEach((item) => {
-      if (typeof item === "object" && item !== null) {
-        Object.values(item).forEach((subItem) => {
-          if (typeof subItem === "object" && subItem !== null) {
-            if (req.user.admin) {
-              enrichResponseWithUserProjectId(subItem);
-            } else {
-              enrichResponse(subItem);
-            }
+  const clonedBody = deepClone(body);
+
+  const processItem = (item) => {
+    if (typeof item === "object" && item !== null) {
+      if (req.user.admin) {
+        enrichResponseWithUserProjectId(item);
+      } else {
+        enrichResponse(item);
+      }
+
+      Object.values(item).forEach((subItem) => {
+        if (typeof subItem === "object" && subItem !== null) {
+          if (req.user.admin) {
+            enrichResponseWithUserProjectId(subItem);
+          } else {
+            enrichResponse(subItem);
           }
-        });
-      }
-    });
-  } else if (typeof body === "object" && body !== null) {
-    Object.values(body).forEach((subItem) => {
-      if (typeof subItem === "object" && subItem !== null) {
-        if (req.user.admin) {
-          enrichResponseWithUserProjectId(subItem);
-        } else {
-          enrichResponse(subItem);
         }
-      }
+      });
+    }
+  };
+
+  if (Array.isArray(clonedBody)) {
+    clonedBody.forEach((item) => {
+      processItem(item);
     });
-    enrichResponse(body);
+  } else if (typeof clonedBody === "object" && clonedBody !== null) {
+    processItem(clonedBody);
   }
 
-  return body;
+  return clonedBody;
 }

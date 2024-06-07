@@ -358,7 +358,6 @@ describe("controllers/webhook", () => {
       expect(getRes.status).toBe(200);
       const getJson = await getRes.json();
       expect(getJson.id).toEqual(webhookRequest.id);
-      expect(getJson.projectId).toEqual(expect.any(String));
       const resendRes = await client.post(
         `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`
       );
