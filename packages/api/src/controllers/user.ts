@@ -1500,6 +1500,8 @@ app.post(
   }
 );
 
+// Utility to migrate users to defaultProjects
+// To call once and then we can remove it
 app.post(
   "/migrate/userDefaultProject",
   authorizer({ anyAdmin: true }),
