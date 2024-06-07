@@ -22,7 +22,6 @@ import {
   User,
 } from "../schema/types";
 import { db, jobsDb } from "../store";
-import { cache } from "../store/cache";
 import { DB } from "../store/db";
 import {
   BadRequestError,
