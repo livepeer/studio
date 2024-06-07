@@ -564,6 +564,7 @@ export default class WebhookCannon {
           id,
           playbackId,
           userId: session.userId,
+          projectId: session.projectId,
           createdAt: session.createdAt,
           source: { type: "recording", sessionId: session.id },
           status: { phase: "waiting", updatedAt: Date.now() },

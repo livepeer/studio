@@ -1,5 +1,5 @@
-import { Request, Router } from "express";
-import { authorizer, validatePost } from "../middleware";
+import { Router } from "express";
+import { authorizer } from "../middleware";
 import { db } from "../store";
 import { v4 as uuid } from "uuid";
 import {
@@ -8,13 +8,7 @@ import {
   parseOrder,
   toStringValues,
 } from "./helpers";
-import {
-  NotFoundError,
-  ForbiddenError,
-  BadRequestError,
-  BadGatewayError,
-  InternalServerError,
-} from "../store/errors";
+import { NotFoundError, ForbiddenError } from "../store/errors";
 import sql from "sql-template-strings";
 import { WithID } from "../store/types";
 import { Project } from "../schema/types";
@@ -137,6 +131,48 @@ app.post("/", authorizer({}), async (req, res) => {
 
   res.status(201);
   res.json(project);
+});
+
+app.patch("/:id", authorizer({}), async (req, res) => {
+  const project = await db.project.get(req.params.id, {
+    useReplica: false,
+  });
+
+  if (!project || project.deleted) {
+    throw new NotFoundError(`project not found`);
+  }
+
+  if (req.user.admin !== true && req.user.id !== project.userId) {
+    throw new ForbiddenError("user can only update their own projects");
+  }
+
+  const { name } = req.body;
+
+  await db.project.update(req.params.id, {
+    name: name,
+  });
+
+  res.status(204);
+  res.end();
+});
+
+app.delete("/:id", authorizer({}), async (req, res) => {
+  const project = await db.project.get(req.params.id, {
+    useReplica: false,
+  });
+
+  if (!project || project.deleted) {
+    throw new NotFoundError(`project not found`);
+  }
+
+  if (req.user.admin !== true && req.user.id !== project.userId) {
+    throw new ForbiddenError("user can only delete their own projects");
+  }
+
+  // Todo: Long running cronjob for cascade delete
+
+  res.status(204);
+  res.end();
 });
 
 export default app;
