@@ -1,10 +1,11 @@
-import { Request, Response, Router } from "express";
+import { Request, Router } from "express";
 import _ from "lodash";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
+import mung from "express-mung";
 import logger from "../logger";
 import {
   authorizer,
@@ -22,6 +23,7 @@ import {
   User,
 } from "../schema/types";
 import { db, jobsDb } from "../store";
+import { cache } from "../store/cache";
 import { DB } from "../store/db";
 import {
   BadRequestError,
@@ -48,7 +50,6 @@ import {
 import {
   FieldsMap,
   addDefaultProjectId,
-  getProjectId,
   makeNextHREF,
   mapInputCreatorId,
   parseFilters,
@@ -61,8 +62,6 @@ import {
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
-import { cache } from "../store/cache";
-import mung from "express-mung";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -381,7 +380,7 @@ function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   return isActive && !isNaN(lastSeen) && Date.now() - lastSeen > ACTIVE_TIMEOUT;
 }
 
-function triggerCleanUpIsActiveJob(
+export function triggerCleanUpIsActiveJob(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
@@ -1644,7 +1643,7 @@ async function triggerSessionRecordingProcessing(
   for (const stream of childStreams) {
     if (!stream.parentId) {
       logger.error(
-        `triggerSessionRecordingHooks: ignoring parent streamId=${stream.id} stream=`,
+        `triggerSessionRecordingProcessing: ignoring parent streamId=${stream.id} stream=`,
         stream
       );
       continue;
@@ -1662,9 +1661,13 @@ async function triggerSessionRecordingProcessing(
   await Promise.all(
     Object.keys(streamsBySessionId).map(async (sessionId) => {
       const streamsFromSession = streamsBySessionId[sessionId];
+      const streamsIds = streamsFromSession.map((s) => s.id).join(",");
       try {
         if (!sessionId) {
           // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
+          logger.info(
+            `triggerSessionRecordingProcessing: Clearing isActive for recording v1 child streams sessionId=${sessionId} childStreamsIds=${streamsIds}`
+          );
           await clearIsActiveMany(db, streamsFromSession);
           return;
         }
@@ -1673,6 +1676,9 @@ async function triggerSessionRecordingProcessing(
         if (asset) {
           // if we have an asset, then the recording has already been processed and we don't need to send a
           // recording.waiting hook. also clear the isActive field from child streams.
+          logger.info(
+            `triggerSessionRecordingProcessing: Clearing isActive for already processed session sessionId=${sessionId} assetId=${asset.id}`
+          );
           await clearIsActiveMany(db, streamsFromSession);
           return;
         }
@@ -1687,8 +1693,11 @@ async function triggerSessionRecordingProcessing(
         if (!session.record || isStale) {
           if (isStale) {
             logger.info(
-              `Skipping recording for stale session ` +
-                `session_id=${session.id} last_seen=${session.lastSeen}`
+              `triggerSessionRecordingProcessing: Skipping recording for stale session sessionId=${session.id} lastSeen=${session.lastSeen} childStreamsIds=${streamsIds}`
+            );
+          } else {
+            logger.info(
+              `triggerSessionRecordingProcessing: Clearing isActive for session without recording enabled sessionId=${session.id} childStreamsIds=${streamsIds}`
             );
           }
           // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
@@ -1696,6 +1705,9 @@ async function triggerSessionRecordingProcessing(
           return;
         }
 
+        logger.info(
+          `triggerSessionRecordingProcessing: Triggering recording.waiting hook sessionId=${sessionId} childStreamsIds=${streamsIds}`
+        );
         await publishDelayedRecordingWaitingHook(
           config,
           session,
@@ -2192,33 +2204,23 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   return response;
 });
 
-// queries for all the streams with active clean up pending and triggers the
-// clean up logic for them.
+// Runs the active-cleanup job on-demand if necessary
 app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    const limit = parseInt(req.query.limit?.toString()) || 1000;
-    const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
-    let [streams] = await jobsDb.stream.find(
-      [
-        sql`data->>'isActive' = 'true'`,
-        sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
-      ],
-      {
-        limit,
-        order: "data->>'lastSeen' DESC",
-      }
-    );
+    // import the job dynamically to avoid circular dependencies
+    const { default: activeCleanup } = await import("../jobs/active-cleanup");
 
-    const ingest = await getIngestBase(req);
-    const [cleanedUp, jobPromise] = triggerCleanUpIsActiveJob(
-      req.config,
-      streams,
-      req.queue,
-      ingest
+    const limit = parseInt(req.query.limit?.toString()) || 1000;
+
+    const { cleanedUp } = await activeCleanup(
+      {
+        ...req.config,
+        activeCleanupLimit: limit,
+      },
+      { jobsDb, queue: req.queue }
     );
-    await jobPromise;
 
     res.status(200);
     res.json({ cleanedUp });

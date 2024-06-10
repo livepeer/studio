@@ -57,15 +57,75 @@ const PROM_BUNDLE_OPTS: promBundle.Opts = {
 const isTest =
   process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
 
-export default async function appRouter(params: CliArgs) {
+export async function initDb(params: CliArgs, serviceName = "api") {
   const {
-    httpPrefix,
     postgresUrl,
     postgresReplicaUrl,
     postgresConnPoolSize: pgPoolSize,
     postgresJobsConnPoolSize: pgJobsPoolSize,
     postgresCreateTables: createTablesOnDb,
+    ownRegion,
+  } = params;
+
+  const appName = ownRegion ? `${ownRegion}-${serviceName}` : serviceName;
+  const pgBaseParams: PostgresParams = {
+    postgresUrl,
+    postgresReplicaUrl,
+    createTablesOnDb,
+    appName,
+  };
+  const [db, jobsDb, store] = await makeStore(
+    { ...pgBaseParams, poolMaxSize: pgPoolSize },
+    { ...pgBaseParams, poolMaxSize: pgJobsPoolSize, appName: `${appName}-jobs` }
+  );
+  return { db, jobsDb, store };
+}
+
+export async function initClients(params: CliArgs, serviceName = "api") {
+  const {
     defaultCacheTtl,
+    ownRegion,
+    stripeSecretKey,
+    amqpUrl,
+    amqpTasksExchange,
+  } = params;
+
+  const { db, jobsDb, store } = await initDb(params, serviceName);
+  if (defaultCacheTtl > 0) {
+    cache.init({ stdTTL: defaultCacheTtl });
+  }
+
+  // RabbitMQ
+  const appName = ownRegion ? `${ownRegion}-${serviceName}` : serviceName;
+  const queue: Queue = amqpUrl
+    ? await RabbitQueue.connect(amqpUrl, appName, amqpTasksExchange)
+    : new NoopQueue();
+
+  process.on("beforeExit", (code) => {
+    queue.close();
+  });
+
+  if (!stripeSecretKey) {
+    console.warn(
+      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
+    );
+  }
+  const stripe = stripeSecretKey
+    ? new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" })
+    : null;
+
+  return {
+    db,
+    jobsDb,
+    store,
+    queue,
+    stripe,
+  };
+}
+
+export default async function appRouter(params: CliArgs) {
+  const {
+    httpPrefix,
     frontendDomain,
     supportAddr,
     sendgridTemplateId,
@@ -75,7 +135,6 @@ export default async function appRouter(params: CliArgs) {
     secondaryVodObjectStoreId,
     recordCatalystObjectStoreId,
     secondaryRecordObjectStoreId,
-    ownRegion,
     subgraphUrl,
     fallbackProxy,
     orchestrators = [],
@@ -84,9 +143,6 @@ export default async function appRouter(params: CliArgs) {
     prices = [],
     corsJwtAllowlist,
     insecureTestToken,
-    stripeSecretKey,
-    amqpUrl,
-    amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
     frontend,
@@ -100,27 +156,7 @@ export default async function appRouter(params: CliArgs) {
     }
   }
 
-  // Storage init
-  const bodyParser = require("body-parser");
-  const appName = ownRegion ? `${ownRegion}-api` : "api";
-  const pgBaseParams: PostgresParams = {
-    postgresUrl,
-    postgresReplicaUrl,
-    createTablesOnDb,
-    appName,
-  };
-  const [db, jobsDb, store] = await makeStore(
-    { ...pgBaseParams, poolMaxSize: pgPoolSize },
-    { ...pgBaseParams, poolMaxSize: pgJobsPoolSize, appName: `${appName}-jobs` }
-  );
-  if (defaultCacheTtl > 0) {
-    cache.init({ stdTTL: defaultCacheTtl });
-  }
-
-  // RabbitMQ
-  const queue: Queue = amqpUrl
-    ? await RabbitQueue.connect(amqpUrl, amqpTasksExchange)
-    : new NoopQueue();
+  const { db, jobsDb, store, queue, stripe } = await initClients(params);
 
   // Task Scheduler
   await taskScheduler.start(params, queue);
@@ -140,32 +176,18 @@ export default async function appRouter(params: CliArgs) {
   });
   await webhookCannon.start();
 
+  process.on("beforeExit", () => {
+    webhookCannon.stop();
+    taskScheduler.stop();
+  });
+
   if (isTest) {
     await setupTestTus();
   } else if (vodObjectStoreId) {
     await setupTus(vodObjectStoreId);
   }
 
-  process.on("beforeExit", (code) => {
-    queue.close();
-    webhookCannon.stop();
-  });
-
-  process.on("beforeExit", (code) => {
-    queue.close();
-    taskScheduler.stop();
-  });
-
-  if (!stripeSecretKey) {
-    console.warn(
-      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
-    );
-  }
-  const stripe = stripeSecretKey
-    ? new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" })
-    : null;
   // Logging, JSON parsing, store injection
-
   const app = Router();
   app.use(healthCheck);
   app.use(promBundle(PROM_BUNDLE_OPTS));
@@ -199,6 +221,7 @@ export default async function appRouter(params: CliArgs) {
 
   // stripe webhook requires raw body
   // https://github.com/stripe/stripe-node/issues/331
+  const bodyParser = require("body-parser");
   app.use("/api/stripe/webhook", bodyParser.raw({ type: "*/*" }));
   app.use(bodyParser.json());
 

@@ -1,10 +1,9 @@
-import { sendgridEmail } from "../helpers";
-import { frontendUrl, unsubscribeUrl } from "../user";
-import { db } from "../../store";
-import { sendgridEmailPaymentFailed } from "../helpers";
-import { WithID } from "../../store/types";
 import { Request } from "express";
 import { User } from "../../schema/types";
+import { db } from "../../store";
+import { WithID } from "../../store/types";
+import { sendgridEmail, sendgridEmailPaymentFailed } from "../helpers";
+import { frontendUrl, unsubscribeUrl } from "../user";
 
 export const HACKER_DISABLE_CUTOFF_DATE = 1698793200000;
 
@@ -83,7 +82,17 @@ export const getUsageNotifications = async (
   return notifications;
 };
 
-export const notifyUser = async (notifications, user: User, req: Request) => {
+type Notification = {
+  type: string;
+  title: string;
+  message: string;
+};
+
+export const notifyUser = async (
+  notifications: Notification[],
+  user: User,
+  req: Pick<Request, "headers" | "config">
+) => {
   for (let notification of notifications) {
     if (user.notifications?.usage?.[notification.type]) {
       continue;
