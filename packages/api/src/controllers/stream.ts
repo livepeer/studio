@@ -1,11 +1,11 @@
-import { Request, Response, Router } from "express";
+import { Request, Router } from "express";
 import _ from "lodash";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
-import activeCleanup from "../jobs/active-cleanup";
+import mung from "express-mung";
 import logger from "../logger";
 import {
   authorizer,
@@ -23,6 +23,7 @@ import {
   User,
 } from "../schema/types";
 import { db, jobsDb } from "../store";
+import { cache } from "../store/cache";
 import { DB } from "../store/db";
 import {
   BadRequestError,
@@ -49,7 +50,6 @@ import {
 import {
   FieldsMap,
   addDefaultProjectId,
-  getProjectId,
   makeNextHREF,
   mapInputCreatorId,
   parseFilters,
@@ -62,8 +62,6 @@ import {
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
-import { cache } from "../store/cache";
-import mung from "express-mung";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -2211,6 +2209,9 @@ app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
+    // import the job dynamically to avoid circular dependencies
+    const { default: activeCleanup } = await import("../jobs/active-cleanup");
+
     const limit = parseInt(req.query.limit?.toString()) || 1000;
 
     const { cleanedUp } = await activeCleanup(

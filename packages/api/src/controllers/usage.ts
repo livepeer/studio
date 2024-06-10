@@ -3,7 +3,6 @@ import Router from "express/lib/router";
 import fetch from "node-fetch";
 import qs from "qs";
 import { products } from "../config";
-import updateUsage from "../jobs/update-usage";
 import { authorizer } from "../middleware";
 import { User } from "../schema/types";
 import { db, jobsDb } from "../store";
@@ -339,6 +338,9 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
 
 // Runs the update-usage job on demand if necessary
 app.post("/update", authorizer({ anyAdmin: true }), async (req, res) => {
+  // import the job dynamically to avoid circular dependencies
+  const { default: updateUsage } = await import("../jobs/update-usage");
+
   let { fromTime, toTime } = req.query;
 
   const { usageHistory } = await updateUsage(
