@@ -17,7 +17,13 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  const [projectId, setProjectId] = useState<string>("");
+  const [projectId, setProjectId] = useState<string>(() => {
+    // Get initial value from localStorage if it exists
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("projectId") || "";
+    }
+    return "";
+  });
 
   useEffect(() => {
     if (router.query.projectId) {
@@ -26,15 +32,15 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
   }, [router.query.projectId]);
 
   useEffect(() => {
-    {
-      if (projectId) {
-        router.replace({
-          query: {
-            ...router.query,
-            projectId,
-          },
-        });
-      }
+    if (projectId) {
+      // Save projectId to localStorage
+      localStorage.setItem("projectId", projectId);
+      router.replace({
+        query: {
+          ...router.query,
+          projectId,
+        },
+      });
     }
   }, [projectId]);
 

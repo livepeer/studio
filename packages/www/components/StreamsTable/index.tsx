@@ -66,8 +66,6 @@ const StreamsTable = ({
     [userId]
   );
 
-  console.log(projectId);
-
   const onCreateClick = useCallback(
     async (streamName: string) => {
       const newStream = await createStream({

@@ -30,9 +30,7 @@ const Settings = () => {
     }
   );
 
-  const [projectLogo, setProjectLogo] = useState<File | null>(null);
   const [projectName, setProjectName] = useState<string | null>();
-  const logoRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async () => {
     if (!projectName) {
@@ -101,61 +99,6 @@ const Settings = () => {
             borderBottom: "1px solid",
             borderColor: "$neutral6",
           }}>
-          <Flex
-            direction={"column"}
-            css={{
-              mb: "$4",
-              width: "100%",
-            }}>
-            <Box
-              css={{
-                fontWeight: 500,
-                mb: "$3",
-              }}>
-              Logo
-            </Box>
-            {!projectLogo ? (
-              <Flex
-                onClick={() => logoRef.current?.click()}
-                justify={"center"}
-                align="center"
-                css={{
-                  width: "90px",
-                  height: "90px",
-                  background: "$neutral3",
-                  borderRadius: "$3",
-                }}
-              />
-            ) : (
-              <Image
-                onClick={() => logoRef.current?.click()}
-                src={URL.createObjectURL(projectLogo)}
-                alt="Project logo"
-                style={{
-                  borderRadius: "12px",
-                }}
-                width={90}
-                height={90}
-              />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              style={{
-                display: "none",
-              }}
-              ref={logoRef}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setProjectLogo(file);
-                }
-              }}
-            />
-            <Text variant="neutral" size="3" css={{ mt: "$3" }}>
-              Pick a logo for your project. Recommended size is 256x256px.
-            </Text>
-          </Flex>
           <Flex
             direction={"column"}
             css={{

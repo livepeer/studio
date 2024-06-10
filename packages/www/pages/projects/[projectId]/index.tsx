@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Layout from "../../../layouts/dashboard";
 import { Box, Button, useSnackbar } from "@livepeer/design-system";
@@ -10,12 +10,14 @@ import Banner from "components/Banner";
 
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
+import FeaturesModel from "components/FeaturesModel";
 
 const Dashboard = () => {
   const { user, verifyEmail, getUserProduct } = useApi();
   const { emailValid } = user;
 
   const [loading, setLoading] = useState(false);
+  const [shouldShowFeature, setShouldShowFeature] = useState(false);
   const product = getUserProduct(user);
   const showPromo = user.disabled;
   const [openSnackbar] = useSnackbar();
@@ -97,6 +99,7 @@ const Dashboard = () => {
           viewAll="/dashboard/streams"
         />
       </Box>
+      <FeaturesModel />
     </Box>
   );
 };
