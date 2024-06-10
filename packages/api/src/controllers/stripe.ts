@@ -324,7 +324,6 @@ app.post("/webhook", async (req, res) => {
         if (paidInvoices.length === 0) {
           await db.user.update(user.id, {
             disabled: true,
-            suspended: true,
           });
           await sendgridEmail({
             email: HELP_EMAIL,
@@ -340,6 +339,22 @@ app.post("/webhook", async (req, res) => {
             text: [
               `Customer ${user.email} has been disabled due to failed payment.`,
             ].join("\n\n"),
+          });
+          await sendgridEmail({
+            email: user.email,
+            supportAddr: req.config.supportAddr,
+            sendgridTemplateId: req.config.sendgridTemplateId,
+            sendgridApiKey: req.config.sendgridApiKey,
+            subject: "Your Livepeer Studio account has been disabled",
+            preheader: "Please update your payment method",
+            buttonText: "Go to Dashboard",
+            buttonUrl: "https://livepeer.studio/dashboard/billing",
+            unsubscribe: "",
+            text: `
+              Your Livepeer Studio account has been disabled due to a failed payment.
+              
+              Please update your payment method to reactivate your account.
+            `,
           });
         }
       }
