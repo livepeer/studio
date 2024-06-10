@@ -71,6 +71,7 @@ describe("webhook cannon", () => {
       console.log("postgres NAME", server.postgresUrl);
     } catch (error) {
       console.log("caught server error ", error);
+      throw error;
     }
     postMockStream =
       require("../controllers/wowza-hydrate.test-data.json").stream;
