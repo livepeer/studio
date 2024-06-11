@@ -1018,6 +1018,10 @@ components:
           description:
             Timestamp (in milliseconds) at which the asset was deleted
           example: 1587667174725
+        status:
+          properties:
+            phase:
+              index: true
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
