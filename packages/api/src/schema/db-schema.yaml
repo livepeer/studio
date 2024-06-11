@@ -957,7 +957,6 @@ components:
         deleted:
           type: boolean
           description: Set to true when the asset is deleted
-          index: true
         sourcePlaybackReady:
           type: boolean
           description: Whether source playback is ready
@@ -1019,39 +1018,10 @@ components:
           description:
             Timestamp (in milliseconds) at which the asset was deleted
           example: 1587667174725
-          index: true
         status:
-          readOnly: true
-          type: object
-          additionalProperties: false
-          required:
-            - phase
-            - updatedAt
-          description: Status of the asset
           properties:
             phase:
-              type: string
-              description: Phase of the asset
               index: true
-              enum:
-                - uploading
-                - waiting
-                - processing
-                - ready
-                - failed
-                - deleting
-                - deleted
-            updatedAt:
-              type: number
-              description:
-                Timestamp (in milliseconds) at which the asset was last updated
-              example: 1587667174725
-            progress:
-              type: number
-              description: Current progress of the task creating this asset.
-            errorMessage:
-              type: string
-              description: Error message if the asset creation failed.
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
