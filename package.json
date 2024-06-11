@@ -20,15 +20,14 @@
     "cz": "git-cz",
     "coverage": "lerna run coverage --ignore @livepeer.studio/www && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' ./coverage/lcov.info",
     "depcheck": "lerna exec --no-sort --concurrency=1 --stream 'depcheck --specials=bin --ignores='babel-*' .'",
-    "prepare": "run-s prettier:check prepare:lerna",
-    "prepare:lerna": "lerna run prepare --stream --ignore @livepeer.studio/www && lerna run build --stream",
+    "prepare": "simple-git-hooks && yarn run prepare:lerna",
+    "prepare:lerna": "lerna run prepare --stream --ignore @livepeer.studio/www",
     "lerna-run": "lerna run --stream",
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
     "test": "cd packages/api && yarn run test",
     "dev": "touch .env.local && cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
     "updated": "lerna updated --json",
-    "postinstall": "lerna run --stream postinstall",
     "prettier:base": "prettier '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'",
     "prettier": "yarn run prettier:base --write",
     "prettier:check": "yarn run prettier:base --check",
@@ -36,19 +35,17 @@
     "esbuild": "cd packages/www && yarn run static && cd ../api && yarn run esbuild"
   },
   "devDependencies": {
-    "@commitlint/cli": "^16.2.3",
-    "@commitlint/config-conventional": "^16.2.1",
+    "@commitlint/cli": "^19.2.2",
+    "@commitlint/config-conventional": "^19.2.2",
     "@livepeer/prettier-config": "^1.0.2",
-    "commitizen": "^4.2.4",
-    "cz-conventional-changelog": "^2.1.0",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
     "depcheck": "^1.4.3",
-    "flow-bin": "^0.97.0",
-    "husky": "^4.2.5",
-    "lcov-result-merger": "^3.0.0",
-    "lerna": "^7.2.0",
-    "prettier": "^2.6.2",
-    "pretty-quick": "^3.1.0",
-    "vercel": "^19.2.0"
+    "husky": "^9.0.11",
+    "lcov-result-merger": "^5.0.1",
+    "lerna": "^8.1.3",
+    "prettier": "^3.3.2",
+    "simple-git-hooks": "^2.11.1"
   },
   "config": {
     "commitizen": {
@@ -56,13 +53,11 @@
     }
   },
   "dependencies": {
-    "cross-env": "^5.2.0",
-    "lint-staged": "^10.1.7"
+    "cross-env": "^7.0.3",
+    "lint-staged": "^15.2.5"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+  "simple-git-hooks": {
+    "pre-commit": "yarn lint-staged"
   },
   "lint-staged": {
     "*.{ts,js,css,html,md,tsx,mdx,yaml,yml}": "prettier --write"
