@@ -2,6 +2,7 @@ import { Router } from "express";
 import sql from "sql-template-strings";
 import Stripe from "stripe";
 import { products } from "../config";
+import logger from "../logger";
 import { authorizer } from "../middleware";
 import { CliArgs } from "../parse-cli";
 import { User } from "../schema/types";
@@ -46,7 +47,7 @@ export const reportUsage = async (
         );
         updatedUsers.push(userUpdated);
       } catch (e) {
-        console.log(
+        logger.error(
           `Failed to create usage record for user=${user.id} with error=${e.message}`
         );
         updatedUsers.push({
@@ -149,7 +150,7 @@ async function reportUsageForUser(
       },
       {} as Record<string, string>
     );
-    console.log(`
+    logger.info(`
       usage: reporting usage to stripe for user=${user.id} email=${user.email} from=${billingCycleStart} to=${billingCycleEnd}
     `);
     await sendUsageRecordToStripe(
@@ -294,7 +295,7 @@ app.post("/webhook", async (req, res) => {
 
     const user = users[0];
 
-    console.log(`
+    logger.info(`
        invoice=${invoice.id} payment failed for user=${user.id} notifying support team
     `);
 
@@ -307,7 +308,7 @@ app.post("/webhook", async (req, res) => {
         let diff = now - lastNotification;
         let days = diff / (1000 * 60 * 60 * 24);
         if (days < 7) {
-          console.log(`
+          logger.warn(`
             Not sending email for payment failure of user=${user.id} because team was notified less than 7 days ago
           `);
           return res.sendStatus(200);
@@ -385,7 +386,7 @@ app.post("/webhook", async (req, res) => {
         }
       }
     } catch (e) {
-      console.log(`
+      logger.error(`
         Failed to send email for payment failure of user=${user.id} with error=${e.message}
       `);
     }
@@ -491,7 +492,7 @@ app.post(
           user.stripeCustomerSubscriptionId
         );
       } catch (e) {
-        console.log(`
+        logger.error(`
             error- subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
           `);
         await db.user.update(user.id, {
