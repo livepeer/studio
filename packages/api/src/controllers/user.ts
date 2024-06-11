@@ -6,38 +6,38 @@ import qs from "qs";
 import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
+import sql from "sql-template-strings";
 import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
 import { authorizer, validatePost } from "../middleware";
+import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
+import { CliArgs } from "../parse-cli";
 import {
   CreateCustomer,
   CreateSubscription,
-  PasswordResetTokenRequest,
+  DisableUserPayload,
   PasswordResetConfirm,
+  PasswordResetTokenRequest,
+  RefreshTokenPayload,
+  SuspendUserPayload,
   UpdateSubscription,
   User,
-  SuspendUserPayload,
-  DisableUserPayload,
-  RefreshTokenPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import {
+  FieldsMap,
   makeNextHREF,
-  sendgridEmail,
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridEmail,
   sendgridValidateEmail,
   toStringValues,
-  FieldsMap,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
-import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
-import sql from "sql-template-strings";
-import { CliArgs } from "../parse-cli";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -115,11 +115,12 @@ export const frontendUrl = (
   {
     headers: { "x-forwarded-proto": proto },
     config: { frontendDomain },
-  }: Request,
+  }: Pick<Request, "headers" | "config">,
   path: string
 ) => `${proto || "https"}://${frontendDomain}${path}`;
 
-export const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
+export const unsubscribeUrl = (req: Pick<Request, "headers" | "config">) =>
+  frontendUrl(req, "/contact");
 
 export async function terminateUserStreams(
   req: Request,
@@ -396,6 +397,13 @@ app.post("/", validatePost("user"), async (req, res) => {
     };
   }
 
+  let project = await db.project.create({
+    id: uuid(),
+    name: "My default project",
+    userId: id,
+    createdAt: Date.now(),
+  });
+
   await db.user.create({
     kind: "user",
     id: id,
@@ -410,6 +418,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     lastName,
     organization,
     phone,
+    defaultProjectId: project.id,
     ...stripeFields,
   });
 
@@ -785,6 +794,21 @@ app.post("/token", validatePost("user"), async (req, res) => {
       ],
     });
   }
+
+  if (!user.defaultProjectId) {
+    const id = uuid();
+    await db.project.create({
+      id: id,
+      name: "My default project",
+      userId: user.id,
+      createdAt: Date.now(),
+    });
+
+    await db.user.update(user.id, {
+      defaultProjectId: id,
+    });
+  }
+
   res.status(201);
   res.json({ id: user.id, email: user.email, token, refreshToken });
 });
@@ -1474,6 +1498,55 @@ app.post(
       stripePaymentMethodId
     );
     res.status(200).json(paymentMethod);
+  }
+);
+
+// Utility to migrate users to defaultProjects
+// To call once and then we can remove it
+app.post(
+  "/migrate/userDefaultProject",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    // parse limit from querystring
+    const limit = parseInt(req.query.limit?.toString() || "100");
+
+    const [users] = await db.user.find(
+      [
+        sql`(users.data->>'defaultProjectId' = '' OR users.data->>'defaultProjectId' IS NULL)`,
+        sql`(users.data->>'admin' = 'false' OR users.data->>'admin' IS NULL)`,
+      ],
+      { limit }
+    );
+
+    const results = [];
+
+    for (const user of users) {
+      const project = await db.project.create({
+        id: uuid(),
+        name: "My default project",
+        userId: user.id,
+        createdAt: Date.now(),
+      });
+
+      const defaultProjectId = project.id;
+      await db.user.update(user.id, {
+        defaultProjectId,
+      });
+
+      results.push({
+        id: user.id,
+        defaultProjectId,
+      });
+    }
+
+    res.status(200).json({
+      migrated: results.length,
+      total: users.length,
+      users: results.map(({ id, defaultProjectId }) => ({
+        id,
+        defaultProjectId,
+      })),
+    });
   }
 );
 

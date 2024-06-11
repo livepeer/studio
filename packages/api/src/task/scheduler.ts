@@ -258,6 +258,7 @@ export class TaskScheduler {
             streamId: session.parentId,
             event: "recording.ready",
             userId: session.userId,
+            projectId: session.projectId,
             sessionId: session.id,
             payload: {
               recordingUrl: externalSession?.recordingUrl,
@@ -623,6 +624,7 @@ export class TaskScheduler {
       timestamp,
       event,
       userId: asset.userId,
+      projectId: asset.projectId,
       payload: {
         asset: {
           id: asset.id,
@@ -641,6 +643,7 @@ export class TaskScheduler {
         timestamp,
         event: assetEvent,
         userId: asset.userId,
+        projectId: asset.projectId,
         payload: {
           id: asset.id,
           snapshot,

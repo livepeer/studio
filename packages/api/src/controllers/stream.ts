@@ -5,8 +5,14 @@ import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
+import mung from "express-mung";
 import logger from "../logger";
-import { authorizer, geolocateMiddleware, validatePost } from "../middleware";
+import {
+  authorizer,
+  geolocateMiddleware,
+  hasAccessToResource,
+  validatePost,
+} from "../middleware";
 import { CliArgs } from "../parse-cli";
 import {
   DetectionWebhookPayload,
@@ -17,6 +23,7 @@ import {
   User,
 } from "../schema/types";
 import { db, jobsDb } from "../store";
+import { cache } from "../store/cache";
 import { DB } from "../store/db";
 import {
   BadRequestError,
@@ -42,6 +49,7 @@ import {
 } from "./generate-keys";
 import {
   FieldsMap,
+  addDefaultProjectId,
   makeNextHREF,
   mapInputCreatorId,
   parseFilters,
@@ -84,6 +92,7 @@ const EMPTY_NEW_STREAM_PAYLOAD: Required<
   multistream: undefined,
   pull: undefined,
   record: undefined,
+  recordingSpec: undefined,
   userTags: undefined,
   creatorId: undefined,
   playbackPolicy: undefined,
@@ -111,6 +120,8 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
     return profile;
   });
 };
+
+app.use(mung.jsonAsync(addDefaultProjectId));
 
 async function validateMultistreamTarget(
   userId: string,
@@ -183,7 +194,7 @@ async function validateMultistreamOpts(
 
 async function validateStreamPlaybackPolicy(
   playbackPolicy: DBStream["playbackPolicy"],
-  userId: string
+  req: Request
 ) {
   if (
     playbackPolicy?.type === "lit_signing_condition" ||
@@ -201,7 +212,7 @@ async function validateStreamPlaybackPolicy(
         `webhook ${playbackPolicy.webhookId} not found`
       );
     }
-    if (webhook.userId !== userId) {
+    if (!hasAccessToResource(req, webhook)) {
       throw new BadRequestError(
         `webhook ${playbackPolicy.webhookId} not found`
       );
@@ -258,6 +269,7 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
         timestamp: Date.now(),
         event: "stream.idle",
         streamId: stream.id,
+        projectId: stream.projectId,
         userId: user.id,
       });
     })
@@ -368,7 +380,7 @@ function shouldCleanUpIsActive(stream: DBStream | DBSession) {
   return isActive && !isNaN(lastSeen) && Date.now() - lastSeen > ACTIVE_TIMEOUT;
 }
 
-function triggerCleanUpIsActiveJob(
+export function triggerCleanUpIsActiveJob(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
@@ -451,6 +463,7 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
   playbackId: `stream.data->>'playbackId'`,
+  projectId: `stream.data->>'projectId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
   suspended: { val: `stream.data->'suspended'`, type: "boolean" },
   sourceSegmentsDuration: {
@@ -484,11 +497,16 @@ app.get("/", authorizer({}), async (req, res) => {
     limit = undefined;
   }
 
+  const query = parseFilters(fieldsMap, filters);
+
   if (!req.user.admin) {
     userId = req.user.id;
+    query.push(
+      sql`coalesce(stream.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`
+    );
   }
-
-  const query = parseFilters(fieldsMap, filters);
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`stream.data->>'deleted' IS NULL`);
   }
@@ -650,14 +668,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    (stream.deleted && !req.isUIAdmin) ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   let filterOut;
   const query = [];
@@ -734,14 +745,7 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
   const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream, true);
 
   const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
     kind: "stream",
@@ -770,11 +774,17 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
       errors: ["user can only request information on their own streams"],
     });
   }
-
   const query = [
     sql`data->>'deleted' IS NULL`,
     sql`data->>'userId' = ${userId}`,
   ];
+  if (!req.user.admin) {
+    query.push(
+      sql`coalesce(data->>'projectId', ${req.user.defaultProjectId || ""}) = ${
+        req.project?.id || ""
+      }`
+    );
+  }
   if (streamsonly) {
     query.push(sql`data->>'parentId' IS NULL`);
   } else if (sessionsonly) {
@@ -804,15 +814,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
   const { forceUrl } = req.query;
   let stream = await db.stream.get(req.params.id);
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
-  ) {
-    // do not reveal that stream exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-
+  req.checkResourceAccess(stream);
   // fixup 'user' session
   if (!raw && stream.lastSessionId) {
     const lastSession = await db.stream.get(stream.lastSessionId);
@@ -839,21 +841,24 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(db.stream.addDefaultFields(stream));
 });
 
-// returns stream by steamKey
+// returns stream by playbackId
 app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
-  const {
-    data: [stream],
-  } = await req.store.queryObjects<DBStream>({
-    kind: "stream",
-    query: { playbackId: req.params.playbackId },
-  });
-  if (
-    !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  const stream = await cache.getOrSet(
+    `strm-stream-by-playback-${req.params.playbackId}`,
+    async () => {
+      const {
+        data: [stream],
+      } = await req.store.queryObjects<DBStream>({
+        kind: "stream",
+        query: { playbackId: req.params.playbackId },
+      });
+
+      return stream;
+    },
+    5
+  );
+
+  req.checkResourceAccess(stream);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
@@ -862,20 +867,14 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
   );
 });
 
-// returns stream by steamKey
+// returns stream by streamKey
 app.get("/key/:streamKey", authorizer({}), async (req, res) => {
   const useReplica = req.query.main !== "true";
   const [docs] = await db.stream.find(
     { streamKey: req.params.streamKey },
     { useReplica }
   );
-  if (
-    !docs.length ||
-    ((docs[0].userId !== req.user.id || docs[0].deleted) && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(docs[0]);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
@@ -925,15 +924,7 @@ app.post(
       stream = await db.stream.get(req.params.streamId);
     }
 
-    if (
-      !stream ||
-      ((stream.userId !== req.user.id || stream.deleted) &&
-        !(req.user.admin && !stream.deleted))
-    ) {
-      // do not reveal that stream exists
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     const sessionId = req.query.sessionId?.toString();
     const region = req.config.ownRegion;
@@ -942,42 +933,52 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
 
-    const record = stream.record;
-    const recordObjectStoreId =
-      stream.recordObjectStoreId ||
-      (record ? req.config.recordObjectStoreId : undefined);
+    const {
+      id: parentId,
+      playbackId,
+      userId,
+      projectId,
+      objectStoreId,
+      record,
+      recordingSpec,
+      recordObjectStoreId = record ? req.config.recordObjectStoreId : undefined,
+    } = stream;
+    const profiles = hackMistSettings(
+      req,
+      useParentProfiles ? stream.profiles : req.body.profiles
+    );
     const childStream: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
-      userId: stream.userId,
+      userId,
+      projectId,
       renditions: {},
-      objectStoreId: stream.objectStoreId,
+      profiles,
+      objectStoreId,
       record,
+      recordingSpec,
       recordObjectStoreId,
       sessionId,
       id,
       createdAt,
-      parentId: stream.id,
+      parentId,
       region,
       lastSeen: 0,
       isActive: true,
     });
-    childStream.profiles = hackMistSettings(
-      req,
-      useParentProfiles ? stream.profiles : childStream.profiles
-    );
 
     const existingSession = await db.session.get(sessionId);
     if (existingSession) {
       logger.info(
-        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId}`
+        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId} stream.projectId=${stream.projectId}`
       );
     } else {
       const session: DBSession = {
         id: sessionId,
-        parentId: stream.id,
-        playbackId: stream.playbackId,
-        userId: stream.userId,
+        parentId,
+        playbackId,
+        userId,
+        projectId,
         kind: "session",
         version: "v2",
         name: req.body.name,
@@ -992,8 +993,9 @@ app.post(
         ingestRate: 0,
         outgoingRate: 0,
         deleted: false,
-        profiles: childStream.profiles,
+        profiles,
         record,
+        recordingSpec,
         recordObjectStoreId,
         recordingStatus: record ? "waiting" : undefined,
       };
@@ -1018,9 +1020,9 @@ app.post(
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
-      }' playbackid=${stream.playbackId} session_id=${id} elapsed=${
-        Date.now() - start
-      }ms`
+      }' playbackid=${stream.playbackId} session_id=${id} projectid=${
+        stream.projectId
+      } elapsed=${Date.now() - start}ms`
     );
   }
 );
@@ -1172,6 +1174,9 @@ app.put(
       [
         sql`data->>'userId' = ${req.user.id}`,
         sql`data->>'deleted' IS NULL`,
+        sql`coalesce(data->>'projectId', ${
+          req.user.defaultProjectId || ""
+        }) = ${req.project?.id || ""}`,
         ...filters,
       ],
       { useReplica: false }
@@ -1343,6 +1348,9 @@ app.post(
           sql`data->>'userId' = ${req.user.id}`,
           sql`data->>'deleted' IS NULL`,
           sql`data->'pull'->>'source' = ${payload.pull.source}`,
+          sql`coalesce(data->>'projectId', ${
+            req.user.defaultProjectId || ""
+          }) = ${req.project?.id || ""}`,
         ],
         { useReplica: false }
       );
@@ -1416,6 +1424,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     renditions: {},
     objectStoreId,
     id,
+    projectId: req.project?.id,
     createdAt,
     streamKey,
     playbackId,
@@ -1425,7 +1434,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   };
   doc = wowzaHydrate(doc);
 
-  await validateStreamPlaybackPolicy(doc.playbackPolicy, req.user.id);
+  await validateStreamPlaybackPolicy(doc.playbackPolicy, req);
 
   doc.profiles = hackMistSettings(req, doc.profiles);
   doc.multistream = await validateMultistreamOpts(
@@ -1587,6 +1596,7 @@ async function setStreamActiveWithHooks(
         streamId: stream.id,
         event: event,
         userId: stream.userId,
+        projectId: stream.projectId,
       })
       .catch((err) => {
         logger.error(
@@ -1633,7 +1643,7 @@ async function triggerSessionRecordingProcessing(
   for (const stream of childStreams) {
     if (!stream.parentId) {
       logger.error(
-        `triggerSessionRecordingHooks: ignoring parent streamId=${stream.id} stream=`,
+        `triggerSessionRecordingProcessing: ignoring parent streamId=${stream.id} stream=`,
         stream
       );
       continue;
@@ -1651,9 +1661,13 @@ async function triggerSessionRecordingProcessing(
   await Promise.all(
     Object.keys(streamsBySessionId).map(async (sessionId) => {
       const streamsFromSession = streamsBySessionId[sessionId];
+      const streamsIds = streamsFromSession.map((s) => s.id).join(",");
       try {
         if (!sessionId) {
           // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
+          logger.info(
+            `triggerSessionRecordingProcessing: Clearing isActive for recording v1 child streams sessionId=${sessionId} childStreamsIds=${streamsIds}`
+          );
           await clearIsActiveMany(db, streamsFromSession);
           return;
         }
@@ -1662,6 +1676,9 @@ async function triggerSessionRecordingProcessing(
         if (asset) {
           // if we have an asset, then the recording has already been processed and we don't need to send a
           // recording.waiting hook. also clear the isActive field from child streams.
+          logger.info(
+            `triggerSessionRecordingProcessing: Clearing isActive for already processed session sessionId=${sessionId} assetId=${asset.id}`
+          );
           await clearIsActiveMany(db, streamsFromSession);
           return;
         }
@@ -1676,8 +1693,11 @@ async function triggerSessionRecordingProcessing(
         if (!session.record || isStale) {
           if (isStale) {
             logger.info(
-              `Skipping recording for stale session ` +
-                `session_id=${session.id} last_seen=${session.lastSeen}`
+              `triggerSessionRecordingProcessing: Skipping recording for stale session sessionId=${session.id} lastSeen=${session.lastSeen} childStreamsIds=${streamsIds}`
+            );
+          } else {
+            logger.info(
+              `triggerSessionRecordingProcessing: Clearing isActive for session without recording enabled sessionId=${session.id} childStreamsIds=${streamsIds}`
             );
           }
           // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
@@ -1685,6 +1705,9 @@ async function triggerSessionRecordingProcessing(
           return;
         }
 
+        logger.info(
+          `triggerSessionRecordingProcessing: Triggering recording.waiting hook sessionId=${sessionId} childStreamsIds=${streamsIds}`
+        );
         await publishDelayedRecordingWaitingHook(
           config,
           session,
@@ -1720,6 +1743,7 @@ async function publishRecordingStartedHook(
     timestamp: Date.now(),
     streamId: session.parentId,
     userId: session.userId,
+    projectId: session.projectId,
     event: "recording.started",
     payload: { session: await toExternalSession(config, session, ingest) },
   });
@@ -1743,6 +1767,7 @@ async function publishDelayedRecordingWaitingHook(
       streamId: session.parentId,
       event: "recording.waiting",
       userId: session.userId,
+      projectId: session.projectId,
       sessionId: session.id,
       payload: {
         session: {
@@ -1817,10 +1842,7 @@ app.post(
       return res.json({ errors: ["stream not found"] });
     }
 
-    if (stream.userId !== req.user.id) {
-      res.status(404);
-      return res.json({ errors: ["stream not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     const newTarget = await validateMultistreamTarget(
       req.user.id,
@@ -1856,15 +1878,7 @@ app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
 
   const stream = await db.stream.get(id);
 
-  if (!stream || stream.deleted) {
-    res.status(404);
-    return res.json({ errors: ["stream not found"] });
-  }
-
-  if (stream.userId !== req.user.id) {
-    res.status(404);
-    return res.json({ errors: ["stream not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   let multistream: DBStream["multistream"] = stream.multistream ?? {
     targets: [],
@@ -1900,7 +1914,7 @@ app.patch(
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
-    const hasAccess = stream?.userId === req.user.id || req.user.admin;
+    const hasAccess = hasAccessToResource(req, stream);
     if (!exists || !hasAccess) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -1949,7 +1963,7 @@ app.patch(
     }
 
     if (playbackPolicy) {
-      await validateStreamPlaybackPolicy(playbackPolicy, req.user.id);
+      await validateStreamPlaybackPolicy(playbackPolicy, req);
 
       patch = { ...patch, playbackPolicy };
     }
@@ -1980,10 +1994,7 @@ app.patch(
 app.patch("/:id/record", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (!stream || stream.deleted) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   if (stream.parentId) {
     res.status(400);
     return res.json({ errors: ["can't set for session"] });
@@ -2010,14 +2021,7 @@ app.patch("/:id/record", authorizer({}), async (req, res) => {
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   await db.stream.update(stream.id, {
     deleted: true,
@@ -2043,7 +2047,7 @@ app.delete("/", authorizer({}), async (req, res) => {
     const streams = await db.stream.getMany(ids);
     if (
       streams.length !== ids.length ||
-      streams.some((s) => s.userId !== req.user.id)
+      streams.some((s) => !hasAccessToResource(req, s))
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });
@@ -2074,16 +2078,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
     isSession = true;
     stream = await db.stream.get(stream.parentId);
   }
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
-  }
-
+  req.checkResourceAccess(stream);
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
@@ -2144,13 +2139,7 @@ app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   }
   const { suspended } = req.body;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
   await db.stream.update(stream.id, { suspended });
   if (suspended) {
     // now kill live stream
@@ -2167,13 +2156,7 @@ app.post(
   async (req, res) => {
     const { id } = req.params;
     const stream = await db.stream.get(id);
-    if (
-      !stream ||
-      (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-    ) {
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
+    req.checkResourceAccess(stream);
 
     if (!stream.pull) {
       res.status(400);
@@ -2190,13 +2173,7 @@ app.post(
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
-  if (
-    !stream ||
-    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(stream);
 
   if (terminateDelay(stream) > 0) {
     throw new TooManyRequestsError(`too many terminate requests`);
@@ -2227,33 +2204,23 @@ app.get("/:id/clips", authorizer({}), async (req, res) => {
   return response;
 });
 
-// queries for all the streams with active clean up pending and triggers the
-// clean up logic for them.
+// Runs the active-cleanup job on-demand if necessary
 app.post(
   "/job/active-cleanup",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    const limit = parseInt(req.query.limit?.toString()) || 1000;
-    const activeThreshold = Date.now() - ACTIVE_TIMEOUT;
-    let [streams] = await jobsDb.stream.find(
-      [
-        sql`data->>'isActive' = 'true'`,
-        sql`(data->>'lastSeen')::bigint < ${activeThreshold}`,
-      ],
-      {
-        limit,
-        order: "data->>'lastSeen' DESC",
-      }
-    );
+    // import the job dynamically to avoid circular dependencies
+    const { default: activeCleanup } = await import("../jobs/active-cleanup");
 
-    const ingest = await getIngestBase(req);
-    const [cleanedUp, jobPromise] = triggerCleanUpIsActiveJob(
-      req.config,
-      streams,
-      req.queue,
-      ingest
+    const limit = parseInt(req.query.limit?.toString()) || 1000;
+
+    const { cleanedUp } = await activeCleanup(
+      {
+        ...req.config,
+        activeCleanupLimit: limit,
+      },
+      { jobsDb, queue: req.queue }
     );
-    await jobPromise;
 
     res.status(200);
     res.json({ cleanedUp });
@@ -2474,6 +2441,7 @@ app.post(
       streamId: stream.id,
       event: "stream.detection",
       userId: stream.userId,
+      projectId: stream.projectId,
       payload: {
         seqNo,
         sceneClassification,

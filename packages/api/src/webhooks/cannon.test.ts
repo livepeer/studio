@@ -1,13 +1,21 @@
 import fetch from "node-fetch";
-import serverPromise, { TestServer } from "../test-server";
+import { v4 as uuid } from "uuid";
+
+import { sign } from "../controllers/helpers";
+import { USER_SESSION_TIMEOUT } from "../controllers/stream";
+import { ObjectStore, Stream, User, Webhook } from "../schema/types";
+import { db } from "../store";
+import { DBSession } from "../store/session-table";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
 import {
+  AuxTestServer,
   TestClient,
   clearDatabase,
   startAuxTestServer,
-  AuxTestServer,
 } from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
-import { sign } from "../controllers/helpers";
 
 const bodyParser = require("body-parser");
 jest.setTimeout(15000);
@@ -17,10 +25,11 @@ describe("webhook cannon", () => {
   let webhookServer: AuxTestServer;
   let testHost;
 
-  let mockAdminUser;
-  let mockNonAdminUser;
-  let postMockStream;
-  let mockWebhook;
+  let mockAdminUser: User;
+  let mockNonAdminUser: User;
+  let postMockStream: Stream;
+  let mockStore: WithID<ObjectStore>;
+  let mockWebhook: Webhook;
   let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
 
   async function setupUsers(server) {
@@ -62,6 +71,7 @@ describe("webhook cannon", () => {
       console.log("postgres NAME", server.postgresUrl);
     } catch (error) {
       console.log("caught server error ", error);
+      throw error;
     }
     postMockStream =
       require("../controllers/wowza-hydrate.test-data.json").stream;
@@ -108,7 +118,13 @@ describe("webhook cannon", () => {
 
     webhookServer = await startAuxTestServer(30000);
     testHost = `http://127.0.0.1:${webhookServer.port}`;
-    console.log("beforeALL done");
+
+    mockStore = {
+      id: "mock_store",
+      url: `s3+http://localhost:${webhookServer.port}/bucket-name`,
+      publicUrl: `http://localhost:${webhookServer.port}/bucket-name`,
+      userId: mockAdminUser.id,
+    };
   });
 
   afterAll(async () => {
@@ -118,6 +134,8 @@ describe("webhook cannon", () => {
   beforeEach(async () => {
     ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
       await setupUsers(server));
+
+    await db.objectStore.create(mockStore);
   });
 
   afterEach(async () => {
@@ -159,12 +177,13 @@ describe("webhook cannon", () => {
     beforeAll(() => {
       webhookServer.app.use(bodyParser.json());
       webhookServer.app.use((req, res, next) => {
-        console.log("WEBHOOK WORKS , body", req.body);
-        const signatureHeader = String(req.headers["livepeer-signature"]);
-        const signature: string = signatureHeader.split(",")[1].split("=")[1];
-        expect(signature).toEqual(
-          sign(JSON.stringify(req.body), mockWebhook.sharedSecret)
-        );
+        if (req.path.startsWith("/webhook")) {
+          const signatureHeader = String(req.headers["livepeer-signature"]);
+          const signature: string = signatureHeader.split(",")[1].split("=")[1];
+          expect(signature).toEqual(
+            sign(JSON.stringify(req.body), mockWebhook.sharedSecret)
+          );
+        }
         next();
       });
       webhookServer.app.post("/webhook", (req, res) => {
@@ -394,6 +413,145 @@ describe("webhook cannon", () => {
 
       await Promise.all(sems.map((s) => s.wait(3000)));
       expect(calledCounts).toEqual([4, 2]);
+    });
+
+    describe("recording.waiting handling", () => {
+      let parentStream: DBStream;
+      let childStream: DBStream;
+      let session: DBSession;
+
+      beforeEach(async () => {
+        // create parent stream
+        let res = await client.post(`/stream`, {
+          ...postMockStream,
+          record: true,
+          recordingSpec: {
+            profiles: [
+              {
+                name: "720p",
+                bitrate: 2000000,
+                fps: 30,
+                width: 1280,
+                height: 720,
+              },
+            ],
+          },
+        });
+        expect(res.status).toBe(201);
+        parentStream = await res.json();
+
+        // create child stream and session
+        const sessionId = uuid();
+        res = await client.post(
+          `/stream/${parentStream.id}/stream?sessionId=${sessionId}`,
+          {
+            name: "session1",
+          }
+        );
+        expect(res.status).toBe(201);
+        childStream = await res.json();
+        expect(childStream).toMatchObject({
+          sessionId,
+          parentId: parentStream.id,
+          isActive: true,
+        });
+
+        session = await db.session.get(sessionId);
+        expect(session).toMatchObject({ id: sessionId });
+
+        const lastSeen = Date.now() - 2 * USER_SESSION_TIMEOUT;
+        await db.stream.update(childStream.id, { lastSeen });
+        await db.session.update(session.id, {
+          lastSeen,
+          sourceSegments: 1,
+        });
+
+        webhookServer.app.all("/bucket-name/*", (req, res) => {
+          console.log("req.url", req.url);
+          res.end("a good file");
+        });
+      });
+
+      it("should create asset from recording.waiting event", async () => {
+        const res = await client.post("/webhook", {
+          ...mockWebhook,
+          name: "test-recording-waiting",
+          events: ["recording.waiting"],
+        });
+        expect(res.status).toBe(201);
+        const webhook = await res.json();
+        expect(webhook.userId).toEqual(nonAdminUser.id);
+
+        const sem = semaphore();
+        let called = false;
+        webhookCallback = () => {
+          called = true;
+          sem.release();
+        };
+
+        await server.queue.publishWebhook("events.recording.waiting", {
+          type: "webhook_event",
+          id: "webhook_test_12",
+          timestamp: Date.now(),
+          streamId: parentStream.id,
+          sessionId: session.id,
+          event: "recording.waiting",
+          userId: nonAdminUser.id,
+        });
+
+        await sem.wait(3000);
+        expect(called).toBe(true);
+
+        const asset = await db.asset.get(session.id);
+        expect(asset).toMatchObject({
+          id: session.id,
+          userId: nonAdminUser.id,
+          source: {
+            type: "recording",
+            sessionId: session.id,
+          },
+          status: {
+            phase: "waiting",
+          },
+        });
+      });
+
+      it("should propagate recording spec to upload task", async () => {
+        const res = await client.post("/webhook", {
+          ...mockWebhook,
+          name: "test-recording-waiting",
+          events: ["recording.waiting"],
+        });
+        expect(res.status).toBe(201);
+        const webhook = await res.json();
+        expect(webhook.userId).toEqual(nonAdminUser.id);
+
+        const sem = semaphore();
+        let called = false;
+        webhookCallback = () => {
+          called = true;
+          sem.release();
+        };
+
+        await server.queue.publishWebhook("events.recording.waiting", {
+          type: "webhook_event",
+          id: "webhook_test_12",
+          timestamp: Date.now(),
+          streamId: parentStream.id,
+          sessionId: session.id,
+          event: "recording.waiting",
+          userId: nonAdminUser.id,
+        });
+
+        await sem.wait(3000);
+        expect(called).toBe(true);
+
+        const [tasks] = await db.task.find({ outputAssetId: session.id });
+        expect(tasks).toHaveLength(1);
+        expect(tasks[0].params?.upload).toMatchObject({
+          profiles: parentStream.recordingSpec.profiles,
+        });
+      });
     });
   });
 

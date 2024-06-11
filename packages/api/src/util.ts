@@ -11,7 +11,7 @@ export interface RequestInitWithRedirects extends RequestInitWithTimeout {
 export const timeout = <T>(ms: number, fn: () => Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
     const handle = setTimeout(() => {
-      reject(Error("timed out"));
+      reject(new Error(`Timed oout after ${ms}ms`));
     }, ms);
 
     fn()
