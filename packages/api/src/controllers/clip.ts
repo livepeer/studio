@@ -177,7 +177,6 @@ app.post(
         user: owner,
         token: req.token,
         config: req.config,
-        project: req.project,
       },
       id,
       uPlaybackId,
@@ -225,7 +224,6 @@ const fieldsMap = {
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
-  projectId: `asset.data->>'projectId'`,
   playbackId: `asset.data->>'playbackId'`,
   sourceType: `asset.data->'source'->>'type'`,
   sourceSessionId: `asset.data->'source'->>'sessionId'`,
@@ -270,12 +268,6 @@ export const getClips = async (
 
   let output: WithID<Asset>[];
   let newCursor: string;
-
-  if (!req.user.admin) {
-    query.push(
-      sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
-    );
-  }
 
   query.push(sql`asset.data->>'userId' = ${req.user.id}`);
 

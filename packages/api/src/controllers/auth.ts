@@ -69,7 +69,6 @@ app.all(
       : userIds.find((id) => !!id) || req.user.id;
     res.header("x-livepeer-user-id", userId);
     res.header("x-livepeer-is-caller-admin", req.user.admin ? "true" : "false");
-    res.header("x-livepeer-project-id", req.project?.id || "");
 
     res.status(204).end();
   }

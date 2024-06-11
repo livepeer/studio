@@ -84,8 +84,7 @@ export function hasAccessToResource(
     isAdmin ||
     (!resource.deleted &&
       resource.userId === user.id &&
-      (resource.projectId ?? user.defaultProjectId ?? "") ===
-        (project?.id ?? ""))
+      (resource.projectId ?? "") === (project?.id ?? ""))
   );
 }
 
@@ -189,10 +188,6 @@ function authenticator(): RequestHandler {
 
     req.token = tokenObject;
     req.user = user;
-
-    if (!projectId) {
-      projectId = req.user.defaultProjectId;
-    }
 
     if (projectId) {
       project = await getProject(req, projectId);

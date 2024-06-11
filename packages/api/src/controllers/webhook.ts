@@ -4,19 +4,11 @@ import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import { v4 as uuid } from "uuid";
-import {
-  makeNextHREF,
-  parseFilters,
-  parseOrder,
-  FieldsMap,
-  addDefaultProjectId,
-  getProjectId,
-} from "./helpers";
+import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
 import webhookLog from "./webhook-log";
-import mung from "express-mung";
 
 function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
   try {
@@ -35,7 +27,7 @@ function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
   return {
     id,
     userId,
-    projectId,
+    projectId: projectId ?? "",
     createdAt,
     kind: "webhook",
     name: payload.name,
@@ -47,8 +39,6 @@ function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
 }
 
 const app = Router();
-
-app.use(mung.jsonAsync(addDefaultProjectId));
 
 app.use("/:id/log", webhookLog);
 
@@ -77,6 +67,9 @@ app.get("/", authorizer({}), async (req, res) => {
     if (!all || all === "false") {
       query.push(sql`webhook.data->>'deleted' IS NULL`);
     }
+    query.push(
+      sql`coalesce(webhook.data->>'projectId', '') = ${req.project?.id || ""}`
+    );
 
     let fields =
       " webhook.id as id, webhook.data as data, users.id as usersId, users.data as usersdata";
@@ -109,9 +102,7 @@ app.get("/", authorizer({}), async (req, res) => {
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
   query.push(
-    sql`coalesce(webhook.data->>'projectId', ${
-      req.user.defaultProjectId || ""
-    }) = ${req.project?.id || ""}`
+    sql`coalesce(webhook.data->>'projectId', '') = ${req.project?.id || ""}`
   );
 
   if (!all || all === "false" || !req.user.admin) {

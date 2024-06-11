@@ -144,7 +144,7 @@ describe("controllers/asset", () => {
           type: "url",
           url: spec.url,
         },
-        projectId: expect.any(String), //should have a default project id
+        projectId: "", //should be blank when using jwt and projectId not specified as query-param
         status: { phase: "waiting" },
       });
 
@@ -191,7 +191,7 @@ describe("controllers/asset", () => {
     });
   });
 
-  it("should import asset (using jwt) for existing project (created with jwt) and list with filters", async () => {
+  it("should import asset (using jwt) for existing project (created with jwt)", async () => {
     const spec = {
       name: "test",
       url: "https://example.com/test.mp4",
@@ -221,15 +221,6 @@ describe("controllers/asset", () => {
     res = await client.get(`/project/${projectId}`);
     expect(res.status).toBe(200);
     expect(await res.json()).toBeDefined(); //api-key be retrieve if adminApiKey is used..
-
-    res = await client.get(
-      `/asset?limit=10&allUsers=true&filters=[{"id":"playbackId","value":"${asset.playbackId}"}]`
-    );
-    expect(res.status).toBe(200);
-    let assets = await res.json();
-    expect(assets).toHaveLength(1);
-    expect(assets[0].projectId).toBe(projectId);
-    expect(assets[0].playbackId).toBe(asset.playbackId);
   });
 
   it("should import asset (using api-token) for existing project (created with jwt)", async () => {
@@ -263,25 +254,6 @@ describe("controllers/asset", () => {
     expect(project.id).toBeDefined();
   });
 
-  it("should import asset when projectId is not passed and list with projectId", async () => {
-    const spec = {
-      name: "test",
-      url: "https://example.com/test.mp4",
-    };
-    let res = await client.post(`/asset/upload/url`, spec);
-    expect(res.status).toBe(201);
-    const { asset, task } = await res.json();
-
-    client.jwtAuth = null;
-    client.apiKey = adminApiKey;
-
-    res = await client.get(`/asset?limit=10&allUsers=true`);
-    expect(res.status).toBe(200);
-    let assets = await res.json();
-    expect(assets).toHaveLength(1);
-    expect(assets[0].projectId).toBe(asset.projectId);
-  });
-
   it("should NOT import asset (using api-key) when projectId passed as ouery-param", async () => {
     const spec = {
       name: "test",
@@ -310,7 +282,7 @@ describe("controllers/asset", () => {
         type: "url",
         url: spec.url,
       },
-      projectId: adminUser.defaultProjectId,
+      projectId: "", //should be blank when using an existing api-key and new project was created
       status: { phase: "waiting" },
     });
   });

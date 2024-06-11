@@ -5,7 +5,7 @@ import { authorizer, hasAccessToResource } from "../middleware";
 import { User, Project } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
-import { addDefaultProjectId, pathJoin } from "../controllers/helpers";
+import { pathJoin } from "../controllers/helpers";
 import { fetchWithTimeout } from "../util";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
@@ -25,7 +25,6 @@ import {
 import { LVPR_SDK_EMAILS, getClips } from "./clip";
 import { NotFoundError } from "../store/errors";
 import { cache } from "../store/cache";
-import mung from "express-mung";
 
 const app = Router();
 
@@ -58,8 +57,6 @@ const fieldsMap: FieldsMap = {
   outgoingRate: { val: `session.data->'outgoingRate'`, type: "real" },
   recordingStatus: `session.data->'recordingStatus'`,
 };
-
-app.use(mung.jsonAsync(addDefaultProjectId));
 
 app.get("/", authorizer({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId, count } =

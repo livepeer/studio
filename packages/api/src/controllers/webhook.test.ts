@@ -9,7 +9,6 @@ let mockAdminUser;
 let mockNonAdminUser;
 let postMockStream;
 let mockWebhook;
-let projectId;
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
@@ -274,17 +273,16 @@ describe("controllers/webhook", () => {
 
       // create a stream object
       const now = Date.now();
-      postMockStream.name = "eli_is_very_cool"; // :D
+      postMockStream.name = "eli_is_cool"; // :D
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
       expect(stream.id).toBeDefined();
       expect(stream.kind).toBe("stream");
-      expect(stream.name).toBe("eli_is_very_cool");
+      expect(stream.name).toBe("eli_is_cool");
       expect(stream.createdAt).toBeGreaterThanOrEqual(now);
-      const document = await client.get(`/stream/${stream.id}`);
-      const gotStream = await document.json();
-      expect(server.db.stream.addDefaultFields(gotStream)).toEqual(stream);
+      const document = await server.store.get(`stream/${stream.id}`);
+      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
 
       // trigger
       const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
@@ -357,7 +355,8 @@ describe("controllers/webhook", () => {
       );
       expect(getRes.status).toBe(200);
       const getJson = await getRes.json();
-      expect(getJson.id).toEqual(webhookRequest.id);
+      expect(getJson).toEqual(webhookRequest);
+
       const resendRes = await client.post(
         `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`
       );

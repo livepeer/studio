@@ -4,13 +4,11 @@ import { ObjectStore, User } from "../schema/types";
 import { db } from "../store";
 import { v4 as uuid } from "uuid";
 import {
-  addDefaultProjectId,
   deleteCredentials,
   getS3PresignedUrl,
   toObjectStoreUrl,
   toWeb3StorageUrl,
 } from "./helpers";
-import { Request, Response } from "express";
 
 let server: TestServer;
 
@@ -232,62 +230,5 @@ describe("convert w3 storage to object store URL", () => {
     expect(() => toWeb3StorageUrl(storageObj)).toThrow(
       "undefined property 'credentials.proof'"
     );
-  });
-
-  it("should append default project id", async () => {
-    const mockAsset = {
-      id: "asset1",
-      userId: "test",
-      user: {
-        id: "test",
-        admin: false,
-        defaultProjectId: "defaultProject1",
-      },
-      projectId: undefined,
-    };
-    const mockAsset2 = {
-      id: "asset2",
-      userId: "test",
-      projectId: undefined,
-      user: {
-        id: "test",
-        admin: false,
-        defaultProjectId: "defaultProject1",
-      },
-    };
-
-    const assetList = [mockAsset, mockAsset2];
-
-    let mockReq: Request = {
-      user: {
-        id: "test",
-        admin: false,
-        defaultProjectId: "defaultProject1",
-      },
-      project: {
-        id: "test",
-      },
-    } as Request;
-
-    let mockRes: Response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    } as any as Response;
-
-    // nonAdmin + singleAsset
-    let result = await addDefaultProjectId(mockAsset, mockReq, mockRes);
-    expect(result.projectId).toBe("defaultProject1");
-    expect(assetList[0].projectId).toBe(undefined);
-    // nonAdmin + multipleAssets
-    result = await addDefaultProjectId(assetList, mockReq, mockRes);
-    expect(result[0].projectId).toBe("defaultProject1");
-    mockReq.user.admin = true;
-    mockReq.user.defaultProjectId = "adminProjectId";
-    // admin + singleAsset
-    result = await addDefaultProjectId(mockAsset, mockReq, mockRes);
-    expect(result.projectId).toBe("defaultProject1");
-    // admin + multipleAssets
-    result = await addDefaultProjectId(assetList, mockReq, mockRes);
-    expect(result[0].projectId).toBe("defaultProject1");
   });
 });
