@@ -1194,9 +1194,6 @@ components:
         directPlayback:
           type: boolean
           default: false
-        defaultProjectId:
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         kind:
           type: string
           readOnly: true

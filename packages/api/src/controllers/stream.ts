@@ -5,7 +5,6 @@ import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
-import mung from "express-mung";
 import logger from "../logger";
 import {
   authorizer,
@@ -49,7 +48,6 @@ import {
 } from "./generate-keys";
 import {
   FieldsMap,
-  addDefaultProjectId,
   makeNextHREF,
   mapInputCreatorId,
   parseFilters,
@@ -120,8 +118,6 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
     return profile;
   });
 };
-
-app.use(mung.jsonAsync(addDefaultProjectId));
 
 async function validateMultistreamTarget(
   userId: string,
@@ -269,7 +265,6 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
         timestamp: Date.now(),
         event: "stream.idle",
         streamId: stream.id,
-        projectId: stream.projectId,
         userId: user.id,
       });
     })
@@ -502,9 +497,7 @@ app.get("/", authorizer({}), async (req, res) => {
   if (!req.user.admin) {
     userId = req.user.id;
     query.push(
-      sql`coalesce(stream.data->>'projectId', ${
-        req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`
+      sql`coalesce(stream.data->>'projectId', '') = ${req.project?.id || ""}`
     );
   }
   if (!all || all === "false" || !req.user.admin) {
@@ -768,6 +761,8 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const { userId } = req.params;
   let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
+  let projectId = req.token?.projectId;
+
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403);
     return res.json({
@@ -777,14 +772,8 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   const query = [
     sql`data->>'deleted' IS NULL`,
     sql`data->>'userId' = ${userId}`,
+    sql`coalesce(data->>'projectId', '') = ${projectId || ""}`,
   ];
-  if (!req.user.admin) {
-    query.push(
-      sql`coalesce(data->>'projectId', ${req.user.defaultProjectId || ""}) = ${
-        req.project?.id || ""
-      }`
-    );
-  }
   if (streamsonly) {
     query.push(sql`data->>'parentId' IS NULL`);
   } else if (sessionsonly) {
@@ -1174,9 +1163,7 @@ app.put(
       [
         sql`data->>'userId' = ${req.user.id}`,
         sql`data->>'deleted' IS NULL`,
-        sql`coalesce(data->>'projectId', ${
-          req.user.defaultProjectId || ""
-        }) = ${req.project?.id || ""}`,
+        sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
         ...filters,
       ],
       { useReplica: false }
@@ -1348,9 +1335,7 @@ app.post(
           sql`data->>'userId' = ${req.user.id}`,
           sql`data->>'deleted' IS NULL`,
           sql`data->'pull'->>'source' = ${payload.pull.source}`,
-          sql`coalesce(data->>'projectId', ${
-            req.user.defaultProjectId || ""
-          }) = ${req.project?.id || ""}`,
+          sql`coalesce(data->>'projectId', '') = ${req.project?.id || ""}`,
         ],
         { useReplica: false }
       );
@@ -1424,7 +1409,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     renditions: {},
     objectStoreId,
     id,
-    projectId: req.project?.id,
+    projectId: req.project?.id ?? "",
     createdAt,
     streamKey,
     playbackId,
@@ -1596,7 +1581,6 @@ async function setStreamActiveWithHooks(
         streamId: stream.id,
         event: event,
         userId: stream.userId,
-        projectId: stream.projectId,
       })
       .catch((err) => {
         logger.error(
@@ -1743,7 +1727,6 @@ async function publishRecordingStartedHook(
     timestamp: Date.now(),
     streamId: session.parentId,
     userId: session.userId,
-    projectId: session.projectId,
     event: "recording.started",
     payload: { session: await toExternalSession(config, session, ingest) },
   });
@@ -1767,7 +1750,6 @@ async function publishDelayedRecordingWaitingHook(
       streamId: session.parentId,
       event: "recording.waiting",
       userId: session.userId,
-      projectId: session.projectId,
       sessionId: session.id,
       payload: {
         session: {
@@ -2441,7 +2423,6 @@ app.post(
       streamId: stream.id,
       event: "stream.detection",
       userId: stream.userId,
-      projectId: stream.projectId,
       payload: {
         seqNo,
         sceneClassification,
