@@ -100,7 +100,7 @@ describe("controllers/asset", () => {
 
   const createApiToken = async (
     cors: ApiToken["access"]["cors"],
-    projectId: string
+    projectId: string,
   ) => {
     client.jwtAuth = nonAdminToken;
     let res = await client.post(`/api-token/?projectId=${projectId}`, {
@@ -200,7 +200,7 @@ describe("controllers/asset", () => {
 
     let res = await client.post(
       `/asset/upload/url/?projectId=${projectId}`,
-      spec
+      spec,
     );
     expect(res.status).toBe(201);
     const { asset, task } = await res.json();
@@ -223,7 +223,7 @@ describe("controllers/asset", () => {
     expect(await res.json()).toBeDefined(); //api-key be retrieve if adminApiKey is used..
 
     res = await client.get(
-      `/asset?limit=10&allUsers=true&filters=[{"id":"playbackId","value":"${asset.playbackId}"}]`
+      `/asset?limit=10&allUsers=true&filters=[{"id":"playbackId","value":"${asset.playbackId}"}]`,
     );
     expect(res.status).toBe(200);
     let assets = await res.json();
@@ -296,7 +296,7 @@ describe("controllers/asset", () => {
     // BadRequest is expected if projectId is passed in as query-param
     let res = await client.post(
       `/asset/upload/url/?projectId=${projectId}`,
-      spec
+      spec,
     );
     expect(res.status).toBe(400);
 
@@ -405,7 +405,7 @@ describe("controllers/asset", () => {
           const prefix = url.substring(0, url.lastIndexOf("/") + 1);
 
           let res = await client.post(
-            `/asset/migrate/dstorage-urls?urlPrefix=${prefix}`
+            `/asset/migrate/dstorage-urls?urlPrefix=${prefix}`,
           );
           expect(res.status).toBe(200);
 
@@ -674,7 +674,7 @@ describe("controllers/asset", () => {
     const testStoragePatch = async (
       patchedStorage: AssetPatchPayload["storage"],
       expectedStorage?: Asset["storage"],
-      expectedErrors?: any[]
+      expectedErrors?: any[],
     ) => {
       let res = await client.patch(`/asset/${asset.id}`, {
         storage: patchedStorage,
@@ -707,7 +707,7 @@ describe("controllers/asset", () => {
             spec: {},
           },
           status: expect.any(Object),
-        }
+        },
       );
       await testStoragePatch({ ipfs: false }, undefined, [
         "Cannot remove asset from IPFS",
@@ -718,7 +718,7 @@ describe("controllers/asset", () => {
       await testStoragePatch(
         { ipfs: { nftMetadata: { a: "b" } } } as any,
         null,
-        [expect.stringContaining("should NOT have additional properties")]
+        [expect.stringContaining("should NOT have additional properties")],
       );
       await testStoragePatch(
         { ipfs: {} },
@@ -727,7 +727,7 @@ describe("controllers/asset", () => {
             spec: {},
           },
           status: expect.any(Object),
-        }
+        },
       );
       await testStoragePatch({ ipfs: null }, undefined, [
         "Cannot remove asset from IPFS",
@@ -765,7 +765,7 @@ describe("controllers/asset", () => {
 
       await testStoragePatch(
         { ipfs: { spec: { nftMetadata: { b: "c", a: "b" } } } },
-        expectedStorage
+        expectedStorage,
       );
 
       patch.ipfs.spec.nftMetadata = { d: "e" };
@@ -781,7 +781,7 @@ describe("controllers/asset", () => {
     let assetFromIpfs: WithID<Asset>;
 
     const createAsset = async (
-      payload: Omit<Asset, "id" | "playbackId" | "userId">
+      payload: Omit<Asset, "id" | "playbackId" | "userId">,
     ) => {
       const id = uuid();
       const playbackId = await generateUniquePlaybackId(id);
@@ -791,7 +791,7 @@ describe("controllers/asset", () => {
           playbackId,
           userId: nonAdminUser.id,
           ...payload,
-        })
+        }),
       );
     };
 
@@ -864,11 +864,11 @@ describe("controllers/asset", () => {
     it("should find asset by NFT metadata CID", async () => {
       await expectFindAsset(
         `filters=[{"id":"nftMetadataCid","value":"somethingelse"}]`,
-        false
+        false,
       );
       await expectFindAsset(
         `filters=[{"id":"nftMetadataCid","value":"${asset.storage.ipfs.nftMetadata.cid}"}]`,
-        true
+        true,
       );
     });
 
@@ -876,7 +876,7 @@ describe("controllers/asset", () => {
       await expectFindAsset(`cid=${asset.storage.ipfs.nftMetadata.cid}`, false);
       await expectFindAsset(
         `filter=[{"id":"nftMetadataCid","value":"${asset.storage.ipfs.cid}"}]`,
-        false
+        false,
       );
     });
 
@@ -884,7 +884,7 @@ describe("controllers/asset", () => {
       await expectFindAsset(`name=${asset.name}`, false);
       await expectFindAsset(
         `filters=[{"id":"name","value":"${asset.name}"}]`,
-        true
+        true,
       );
     });
   });
@@ -902,7 +902,7 @@ describe("controllers/asset", () => {
       filePath: string,
       tusEndpoint: string,
       shouldAbort: boolean,
-      resumeFrom?: number
+      resumeFrom?: number,
     ) => {
       const file = await fs.readFile(filePath);
       const { size } = await fs.stat(filePath);
@@ -911,7 +911,7 @@ describe("controllers/asset", () => {
           const upload = new tus.Upload(file, {
             endpoint: tusEndpoint,
             urlStorage: new (tus as any).FileUrlStorage(
-              `${os.tmpdir()}/metadata`
+              `${os.tmpdir()}/metadata`,
             ),
             chunkSize: 1024 * 1024 * 1,
             metadata: {
@@ -924,7 +924,7 @@ describe("controllers/asset", () => {
             },
             onProgress(bytesUploaded, bytesTotal) {
               const percentage = parseFloat(
-                ((bytesUploaded / bytesTotal) * 100).toFixed(2)
+                ((bytesUploaded / bytesTotal) * 100).toFixed(2),
               );
               if (resumeFrom) {
                 expect(percentage).toBeGreaterThanOrEqual(resumeFrom);
@@ -945,7 +945,7 @@ describe("controllers/asset", () => {
             upload.resumeFromPreviousUpload(previousUploads[0]);
           }
           upload.start();
-        }
+        },
       );
       if (shouldAbort) {
         expect(uploadPercentage).toBeGreaterThan(0);
@@ -969,7 +969,7 @@ describe("controllers/asset", () => {
         task: { id: taskId },
       } = await res.json();
       expect(
-        tusEndpoint?.startsWith(`http://test/api/asset/upload/tus?token=`)
+        tusEndpoint?.startsWith(`http://test/api/asset/upload/tus?token=`),
       ).toBe(true);
       tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
 

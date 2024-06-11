@@ -9,7 +9,7 @@ const useHubspotForm = ({ portalId, formId }) => {
   const url = useMemo(
     () =>
       `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`,
-    [portalId, formId]
+    [portalId, formId],
   );
 
   const fetchData = async () => {

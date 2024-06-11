@@ -78,7 +78,7 @@ describe("controllers/object-stores", () => {
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
-        false
+        false,
       );
       nonAdminUser = { ...nonAdminUserRes, emailValid: true };
       await server.store.replace(nonAdminUser);
@@ -142,7 +142,7 @@ describe("controllers/object-stores", () => {
       }
 
       const res = await client.get(
-        `/object-store?userId=${store.userId}&limit=11`
+        `/object-store?userId=${store.userId}&limit=11`,
       );
       const objStores = await res.json();
       expect(res.headers.raw().link).toBeDefined();
@@ -187,7 +187,7 @@ describe("controllers/object-stores", () => {
 
     it("should not accept missing property for creating an object store", async () => {
       const postMockStoreMissingProp = JSON.parse(
-        JSON.stringify(postMockStore)
+        JSON.stringify(postMockStore),
       );
       delete postMockStoreMissingProp["url"];
       const res = await client.post("/object-store", {
@@ -271,7 +271,7 @@ describe("controllers/object-stores", () => {
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
-        false
+        false,
       );
       nonAdminUser = { ...nonAdminUserRes, emailValid: true };
       await server.store.replace(nonAdminUser);
@@ -324,7 +324,7 @@ describe("controllers/object-stores", () => {
       const objStore = await res.json();
       expect(res.status).toBe(401);
       expect(objStore.errors[0]).toBe(
-        `no user found from authorization header: Bearer ${tokenId}`
+        `no user found from authorization header: Bearer ${tokenId}`,
       );
     });
   });

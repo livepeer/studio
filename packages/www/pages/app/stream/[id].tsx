@@ -331,7 +331,7 @@ const ID = () => {
   const getIngestURL = (
     stream: Stream,
     showKey: boolean,
-    i: number
+    i: number,
   ): string => {
     const key = showKey ? stream.streamKey : "";
     return i < ingest.length ? pathJoin(ingest[i].ingest, key) : key || "";
@@ -874,7 +874,7 @@ const ID = () => {
                         sec (
                         {formatNumber(
                           (stream.sourceSegmentsDuration || 0) / 60,
-                          2
+                          2,
                         )}{" "}
                         min)
                       </Cell>
@@ -882,12 +882,12 @@ const ID = () => {
                       <Cell>
                         {formatNumber(
                           stream.transcodedSegmentsDuration || 0,
-                          0
+                          0,
                         )}{" "}
                         sec (
                         {formatNumber(
                           (stream.transcodedSegmentsDuration || 0) / 60,
-                          2
+                          2,
                         )}{" "}
                         min)
                       </Cell>

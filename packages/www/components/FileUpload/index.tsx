@@ -14,12 +14,12 @@ const FileUpload = () => {
 
   const hasPendingFileUploads = useMemo(
     () => fileUploads.some((file) => !file.completed),
-    [fileUploads]
+    [fileUploads],
   );
 
   const items = useMemo(
     () => filteredItemsToShow(fileUploads, latestGetAssetsResult ?? []),
-    [fileUploads, latestGetAssetsResult]
+    [fileUploads, latestGetAssetsResult],
   );
 
   useEffect(() => {

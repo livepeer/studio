@@ -360,8 +360,8 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
             {filter === "all"
               ? totalWebhookLogs
               : filter === "succeeded"
-              ? totalSucceededWebhookLogs
-              : totalFailedWebhookLogs}
+                ? totalSucceededWebhookLogs
+                : totalFailedWebhookLogs}
           </Text>
         </Box>
       ))}

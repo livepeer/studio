@@ -29,7 +29,7 @@ export default async function hash(password, salt) {
     passphraseKey,
     { name: "PBKDF2" },
     false,
-    ["deriveBits", "deriveKey"]
+    ["deriveBits", "deriveKey"],
   );
   const webKey = await crypto.subtle.deriveKey(
     {
@@ -52,7 +52,7 @@ export default async function hash(password, salt) {
     true,
 
     // this web crypto object will only be allowed for these functions
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
   const buffer = await crypto.subtle.exportKey("raw", webKey);
 

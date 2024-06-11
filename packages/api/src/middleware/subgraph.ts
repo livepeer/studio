@@ -50,7 +50,7 @@ export default function subgraphMiddleware({
         const transcoders = (await res.json()).data.transcoders;
         cachedResp = transcoders
           .filter(
-            (tr) => !(tr.id.toLowerCase() in blockList) && !!tr.serviceURI
+            (tr) => !(tr.id.toLowerCase() in blockList) && !!tr.serviceURI,
           )
           .map((tr) => ({ address: tr.serviceURI, score: defaultScore }));
 

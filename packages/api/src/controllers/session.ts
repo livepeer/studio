@@ -74,7 +74,7 @@ app.get("/", authorizer({}), async (req, res, next) => {
   if (!req.user.admin) {
     userId = req.user.id;
     query.push(
-      sql`coalesce(session.data->>'projectId', '') = ${req.project?.id || ""}`
+      sql`coalesce(session.data->>'projectId', '') = ${req.project?.id || ""}`,
     );
   }
   if (!all || all === "false" || !req.user.admin) {
@@ -144,8 +144,14 @@ app.get("/", authorizer({}), async (req, res, next) => {
   }
   let sessions = await Promise.all(
     output.map(async (session) =>
-      toExternalSession(req.config, session, ingest, !!forceUrl, req.user.admin)
-    )
+      toExternalSession(
+        req.config,
+        session,
+        ingest,
+        !!forceUrl,
+        req.user.admin,
+      ),
+    ),
   );
   res.json(sessions);
 });
@@ -169,7 +175,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     const { url } = await buildRecordingUrl(
       session,
       req.config.recordCatalystObjectStoreId,
-      req.config.secondaryRecordObjectStoreId
+      req.config.secondaryRecordObjectStoreId,
     );
     originalRecordingUrl = url;
     session.sourceRecordingUrl = originalRecordingUrl;
@@ -182,7 +188,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     session,
     ingest,
     false,
-    req.user.admin
+    req.user.admin,
   );
 
   res.json(session);
@@ -206,7 +212,7 @@ export async function toExternalSession(
   obj: DBSession,
   ingest: string,
   forceUrl = false,
-  isAdmin = false
+  isAdmin = false,
 ): Promise<DBSession> {
   obj = await withRecordingFields(config, ingest, obj, forceUrl);
   if (!isAdmin) {
@@ -246,14 +252,14 @@ export async function getRunningRecording(content: DBStream, req: Request) {
   return await buildRecordingUrl(
     session,
     req.config.recordCatalystObjectStoreId,
-    req.config.secondaryRecordObjectStoreId
+    req.config.secondaryRecordObjectStoreId,
   );
 }
 
 export async function buildRecordingUrl(
   session: DBSession,
   recordCatalystObjectStoreId: string,
-  secondaryRecordObjectStoreId: string
+  secondaryRecordObjectStoreId: string,
 ) {
   return (
     (await buildSingleRecordingUrl(session, recordCatalystObjectStoreId)) ??
@@ -268,7 +274,7 @@ export async function buildRecordingUrl(
 
 async function buildSingleRecordingUrl(
   session: DBSession,
-  objectStoreId: string
+  objectStoreId: string,
 ) {
   const os = await db.objectStore.get(objectStoreId, { useCache: true });
 

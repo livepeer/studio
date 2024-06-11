@@ -19,7 +19,7 @@ export default winston.createLogger({
       return `${timestamp} [${level}]: ${message} ${
         Object.keys(extra).length ? JSON.stringify(extra, null, 2) : ""
       }`;
-    })
+    }),
   ),
   transports: [new winston.transports.Console()],
 });

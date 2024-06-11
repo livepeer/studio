@@ -194,7 +194,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         disableSortBy: true,
       },
     ],
-    []
+    [],
   );
 
   const data: StreamsTableData[] = useMemo(() => {
@@ -225,10 +225,10 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
   const handleRowSelectionChange = useCallback(
     (rows: Row<StreamsTableData>[]) => {
       setSelectedStreams(
-        rows.map((r) => streams.find((s) => s.id === r.original.id))
+        rows.map((r) => streams.find((s) => s.id === r.original.id)),
       );
     },
-    [streams]
+    [streams],
   );
 
   return (

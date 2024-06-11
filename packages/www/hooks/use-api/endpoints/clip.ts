@@ -9,7 +9,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -21,7 +21,7 @@ export const getClipsBySessionId = async (
   limit: number = 20,
   order?: string,
   filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
+  count?: boolean,
 ): Promise<[Array<Asset>, string, number]> => {
   const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
   const uri = `/clip/${sessionId}?${qs.stringify({

@@ -342,7 +342,7 @@ const CommonAdminTable = ({
         },
         ...columns,
       ]);
-    }
+    },
   );
 
   useEffect(() => {
@@ -441,7 +441,7 @@ const CommonAdminTable = ({
                     }}
                     align="left"
                     {...column.getHeaderProps(
-                      column.getSortByToggleProps({ title: "" })
+                      column.getSortByToggleProps({ title: "" }),
                     )}
                     key={`header-column-${columnIndex}`}>
                     <Flex sx={{ mr: "-18px" }}>

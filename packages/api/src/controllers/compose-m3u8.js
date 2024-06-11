@@ -24,7 +24,7 @@ export default async (urls, { limit, rewrite } = {}) => {
       } catch (err) {
         // No problem, we expect sometimes they don't exist
       }
-    })
+    }),
   );
 
   if (broadcasters.length === 0) {
@@ -183,7 +183,7 @@ export const handleMasterPlaylist = (broadcasters) => {
     const { width, height } = playlist.attributes.RESOLUTION;
     // Todo: kinda hardcoded to what go-livepeer provides right now
     output.push(
-      `#EXT-X-STREAM-INF:PROGRAM-ID=${programId},BANDWIDTH=${bandwidth},RESOLUTION=${width}x${height}`
+      `#EXT-X-STREAM-INF:PROGRAM-ID=${programId},BANDWIDTH=${bandwidth},RESOLUTION=${width}x${height}`,
     );
     output.push(playlist.uri);
   }

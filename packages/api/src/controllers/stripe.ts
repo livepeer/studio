@@ -23,7 +23,7 @@ const HELP_EMAIL = "help@livepeer.org";
 export const reportUsage = async (
   stripe: Stripe,
   config: CliArgs,
-  adminToken: string
+  adminToken: string,
 ) => {
   let payAsYouGoUsers = await getPayAsYouGoUsers(config.ingest, adminToken);
 
@@ -34,7 +34,7 @@ export const reportUsage = async (
         stripe,
         config,
         user,
-        adminToken
+        adminToken,
       );
       updatedUsers.push(userUpdated);
     } catch (e) {
@@ -62,7 +62,7 @@ async function getPayAsYouGoUsers(ingests: Ingest[], adminToken: string) {
     {
       limit: 9999999999,
       useReplica: true,
-    }
+    },
   );
 
   const hackerUsers = await getRecentlyActiveHackers(ingests, adminToken);
@@ -79,7 +79,7 @@ async function reportUsageForUser(
   actuallyReport: boolean = true,
   forceReport: boolean = false,
   from?: number,
-  to?: number
+  to?: number,
 ) {
   // make sure this func takes at least 100ms to avoid incurring into stripe rate limits
   const sleepProm = sleep(100);
@@ -95,7 +95,7 @@ async function reportUsageForUser(
   }
 
   const userSubscription = await stripe.subscriptions.retrieve(
-    user.stripeCustomerSubscriptionId
+    user.stripeCustomerSubscriptionId,
   );
 
   let billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
@@ -111,7 +111,7 @@ async function reportUsageForUser(
     billingCycleStart,
     billingCycleEnd,
     config.ingest,
-    adminToken
+    adminToken,
   );
 
   const subscriptionItems = await stripe.subscriptionItems.list({
@@ -120,7 +120,7 @@ async function reportUsageForUser(
 
   const usageNotifications = await getUsageNotifications(
     usageData.usagePercentages,
-    user
+    user,
   );
 
   if (usageNotifications.length > 0) {
@@ -134,7 +134,7 @@ async function reportUsageForUser(
         acc[item.price.lookup_key] = item.id;
         return acc;
       },
-      {} as Record<string, string>
+      {} as Record<string, string>,
     );
     console.log(`
       usage: reporting usage to stripe for user=${user.id} email=${user.email} from=${billingCycleStart} to=${billingCycleEnd}
@@ -143,7 +143,7 @@ async function reportUsageForUser(
       stripe,
       user,
       subscriptionItemsByLookupKey,
-      usageData.overUsage
+      usageData.overUsage,
     );
   }
 
@@ -163,7 +163,7 @@ const sendUsageRecordToStripe = async (
   stripe: Stripe,
   user: WithID<User>,
   subscriptionItemsByLookupKey,
-  overUsage
+  overUsage,
 ) => {
   // Invoice items based on overusage
   await Promise.all(
@@ -175,7 +175,7 @@ const sendUsageRecordToStripe = async (
             quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       } else if (product.name === "Delivery") {
         await stripe.subscriptionItems.createUsageRecord(
@@ -184,7 +184,7 @@ const sendUsageRecordToStripe = async (
             quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       } else if (product.name === "Storage") {
         await stripe.subscriptionItems.createUsageRecord(
@@ -193,10 +193,10 @@ const sendUsageRecordToStripe = async (
             quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       }
-    })
+    }),
   );
 };
 
@@ -224,7 +224,7 @@ app.post("/webhook", async (req, res) => {
 
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
-      { useReplica: false }
+      { useReplica: false },
     );
 
     if (users.length < 1) {
@@ -242,7 +242,7 @@ app.post("/webhook", async (req, res) => {
         invoice.period_end,
         {
           useReplica: false,
-        }
+        },
       );
 
       // Invoice items based on usage
@@ -261,7 +261,7 @@ app.post("/webhook", async (req, res) => {
               subscription: user.stripeCustomerSubscriptionId,
             });
           }
-        })
+        }),
       );
     }
   } else if (event.type === "invoice.payment_failed") {
@@ -271,7 +271,7 @@ app.post("/webhook", async (req, res) => {
 
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
-      { useReplica: false }
+      { useReplica: false },
     );
 
     if (users.length < 1) {
@@ -331,7 +331,7 @@ app.post("/webhook", async (req, res) => {
         });
 
         let paidInvoices = allCustomerInvoices.data.filter(
-          (invoice) => invoice.status === "paid" && invoice.amount_due > 0
+          (invoice) => invoice.status === "paid" && invoice.amount_due > 0,
         );
 
         if (paidInvoices.length === 0) {
@@ -402,7 +402,7 @@ app.patch(
 
     if (stripeCustomerSubscriptionId) {
       const subscription = await req.stripe.subscriptions.retrieve(
-        stripeCustomerSubscriptionId
+        stripeCustomerSubscriptionId,
       );
 
       if (!subscription) {
@@ -433,7 +433,7 @@ app.patch(
 
     res.status(200);
     return res.json({ result: "user subscription updated" });
-  }
+  },
 );
 
 app.post(
@@ -475,7 +475,7 @@ app.post(
 
       try {
         subscription = await req.stripe.subscriptions.retrieve(
-          user.stripeCustomerSubscriptionId
+          user.stripeCustomerSubscriptionId,
         );
       } catch (e) {
         console.log(`
@@ -530,7 +530,7 @@ app.post(
               price: item.id,
             })),
           ],
-        }
+        },
       );
 
       await db.user.update(user.id, {
@@ -553,7 +553,7 @@ app.post(
     res.json({
       result: "Migrated user with email " + user.email + " to enterprise plan",
     });
-  }
+  },
 );
 
 export default app;

@@ -88,13 +88,13 @@ let configWithPlugins = withPlugins(
       ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
       : []),
   ],
-  config
+  config,
 );
 
 if (!isStaticBuild) {
   configWithPlugins = withSentryConfig(
     configWithPlugins,
-    SentryWebpackPluginOptions
+    SentryWebpackPluginOptions,
   );
 }
 

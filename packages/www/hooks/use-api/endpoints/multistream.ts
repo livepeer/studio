@@ -11,7 +11,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -19,7 +19,7 @@ export const setSharedScope = (
 
 export const createMultistreamTarget = async (
   id: string,
-  input: Omit<MultistreamTarget, "id">
+  input: Omit<MultistreamTarget, "id">,
 ): Promise<MultistreamTarget> => {
   const [res, target] = await context.fetch("/multistream/target", {
     method: "POST",
@@ -35,7 +35,7 @@ export const createMultistreamTarget = async (
 };
 
 export const getMultistreamTarget = async (
-  id: string
+  id: string,
 ): Promise<MultistreamTarget> => {
   const uri = `/multistream/target/${id}`;
   const [res, target] = await context.fetch(uri);
@@ -47,7 +47,7 @@ export const getMultistreamTarget = async (
 
 export const patchMultistreamTarget = async (
   id: string,
-  patch: MultistreamTargetPatchPayload
+  patch: MultistreamTargetPatchPayload,
 ): Promise<void> => {
   const [res, body] = await context.fetch(`/multistream/target/${id}`, {
     method: "PATCH",
