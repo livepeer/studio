@@ -13,8 +13,6 @@ describe("assets table", () => {
     const indexes = res.rows?.map((r: any) => r.indexname).sort();
     expect(indexes).toEqual([
       "asset_creatorId_value",
-      "asset_deleted",
-      "asset_deletedAt",
       "asset_id",
       "asset_playbackId",
       "asset_playbackRecordingId",
