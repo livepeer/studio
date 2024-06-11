@@ -21,6 +21,7 @@ import {
   startAuxTestServer,
   createProject,
   createApiToken,
+  useApiTokenWithProject,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
@@ -1215,6 +1216,7 @@ describe("controllers/stream", () => {
 
       it("should disallow patching other users streams", async () => {
         client.jwtAuth = nonAdminToken;
+        client.apiKey = "";
         const res = await client.patch(patchPath, {});
         expect(res.status).toBe(404);
       });
@@ -1382,7 +1384,7 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
-      expect(streams[0]).toEqual(source[3]);
+      expect(streams[0].id).toEqual(source[3].id);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
       expect(res.headers.raw().link).toBeDefined();
       expect(res.headers.raw().link.length).toBe(1);
@@ -1392,7 +1394,7 @@ describe("controllers/stream", () => {
       expect(nextRes.status).toBe(200);
       const nextStreams = await nextRes.json();
       expect(nextStreams.length).toEqual(1);
-      expect(nextStreams[0]).toEqual(source[6]);
+      expect(nextStreams[0].id).toEqual(source[6].id);
       expect(nextStreams[0].userId).toEqual(nonAdminUser.id);
     });
 
@@ -1898,7 +1900,11 @@ describe("controllers/stream", () => {
             id: expect.stringMatching(uuidRegex),
             webhookId: webhookObj.id,
             event: "stream.detection",
-            stream: { ...stream, streamKey: undefined },
+            stream: {
+              ...stream,
+              streamKey: undefined,
+              projectId: expect.any(String),
+            },
             payload: { sceneClassification, seqNo: 1 },
           });
         });

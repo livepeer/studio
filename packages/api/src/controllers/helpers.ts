@@ -4,7 +4,7 @@ import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
-import express, { Request } from "express";
+import express, { Request, Response } from "express";
 import sql, { SQLStatement } from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
@@ -16,6 +16,8 @@ import * as nativeCrypto from "crypto";
 import { DBStream } from "../store/stream-table";
 import { fetchWithTimeoutAndRedirects, sleep } from "../util";
 import logger from "../logger";
+import { db } from "../store";
+import { v4 as uuid } from "uuid";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
@@ -733,4 +735,76 @@ export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
   return typeof inputId === "string"
     ? { type: "unverified", value: inputId }
     : inputId;
+}
+
+export function getProjectId(req: Request): string {
+  let projectId = req.user.defaultProjectId ?? "";
+  if (req.project?.id) {
+    projectId = req.project.id;
+  }
+  return projectId;
+}
+
+export async function addDefaultProjectId(
+  body: any,
+  req: Request,
+  res: Response
+) {
+  const deepClone = (obj) => {
+    return JSON.parse(JSON.stringify(obj));
+  };
+
+  const enrichResponse = (document) => {
+    if ("id" in document && "userId" in document) {
+      if (
+        (!document.projectId || document.projectId === "") &&
+        req.user?.defaultProjectId
+      ) {
+        document.projectId = req.user.defaultProjectId;
+      }
+    }
+  };
+
+  const enrichResponseWithUserProjectId = (document) => {
+    if ("id" in document && "userId" in document && "user" in document) {
+      if (
+        (!document.projectId || document.projectId === "") &&
+        document.user?.defaultProjectId
+      ) {
+        document.projectId = document.user.defaultProjectId;
+      }
+    }
+  };
+
+  const clonedBody = deepClone(body);
+
+  const processItem = (item) => {
+    if (typeof item === "object" && item !== null) {
+      if (req.user.admin) {
+        enrichResponseWithUserProjectId(item);
+      } else {
+        enrichResponse(item);
+      }
+
+      Object.values(item).forEach((subItem) => {
+        if (typeof subItem === "object" && subItem !== null) {
+          if (req.user.admin) {
+            enrichResponseWithUserProjectId(subItem);
+          } else {
+            enrichResponse(subItem);
+          }
+        }
+      });
+    }
+  };
+
+  if (Array.isArray(clonedBody)) {
+    clonedBody.forEach((item) => {
+      processItem(item);
+    });
+  } else if (typeof clonedBody === "object" && clonedBody !== null) {
+    processItem(clonedBody);
+  }
+
+  return clonedBody;
 }

@@ -206,6 +206,21 @@ export async function createProject(client: TestClient) {
   return project;
 }
 
+export async function useApiTokenWithProject(
+  client: TestClient,
+  token: string
+) {
+  client.jwtAuth = token;
+  const project = await createProject(client);
+  const newApiKey = await createApiToken({
+    client: client,
+    projectId: project.id,
+    jwtAuthToken: token,
+  });
+  client.apiKey = newApiKey.id;
+  return client;
+}
+
 export async function createApiToken({
   client,
   projectId,
