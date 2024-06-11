@@ -28,7 +28,7 @@ function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
 
   if (!payload.events && !payload.event) {
     throw new UnprocessableEntityError(
-      `must provide "events" field with subscriptions`
+      `must provide "events" field with subscriptions`,
     );
   }
 
@@ -111,7 +111,7 @@ app.get("/", authorizer({}), async (req, res) => {
   query.push(
     sql`coalesce(webhook.data->>'projectId', ${
       req.user.defaultProjectId || ""
-    }) = ${req.project?.id || ""}`
+    }) = ${req.project?.id || ""}`,
   );
 
   if (!all || all === "false" || !req.user.admin) {
@@ -167,7 +167,7 @@ app.post("/", authorizer({}), validatePost("webhook"), async (req, res) => {
     req.user.id,
     req.project?.id,
     Date.now(),
-    req.body
+    req.body,
   );
   try {
     await req.store.create(doc);
@@ -201,7 +201,7 @@ app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
     userId,
     projectId,
     createdAt,
-    req.body
+    req.body,
   );
   try {
     await req.store.replace(doc);
@@ -245,7 +245,7 @@ app.patch(
     });
 
     res.status(204).end();
-  }
+  },
 );
 
 app.delete("/:id", authorizer({}), async (req, res) => {

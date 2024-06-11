@@ -63,7 +63,7 @@ export const makeColumns = () => [
 export const rowsPageFromState = async (
   state: State<StreamsTableData>,
   userId: string,
-  getStreams: Function
+  getStreams: Function,
 ): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
   let isHealthy: boolean;

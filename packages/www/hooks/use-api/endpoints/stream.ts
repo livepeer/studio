@@ -14,14 +14,14 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
 };
 
 export const getStreamInfo = async (
-  id: string
+  id: string,
 ): Promise<[Response, StreamInfo | ApiError]> => {
   let [res, info] = await context.fetch(`/stream/${id}/info`);
   return [res, info as StreamInfo | ApiError];
@@ -46,7 +46,7 @@ export const getStreams = async (
     order?: string;
     active?: boolean;
     count?: boolean;
-  }
+  },
 ): Promise<[Stream[], string, number, number, number, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
 
@@ -60,7 +60,7 @@ export const getStreams = async (
       cursor: opts?.cursor,
       count: opts?.count,
       streamsonly: 1,
-    })}`
+    })}`,
   );
 
   const [allStreamRes] = await context.fetch(
@@ -71,7 +71,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
-    })}`
+    })}`,
   );
   const [activeStreamRes] = await context.fetch(
     `/stream?${qs.stringify({
@@ -81,7 +81,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
-    })}`
+    })}`,
   );
 
   const [unHealtyStreamRes] = await context.fetch(
@@ -93,7 +93,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
-    })}`
+    })}`,
   );
 
   if (res.status !== 200) {
@@ -146,7 +146,7 @@ export const getAdminStreams = async ({
       nonLivepeerOnly,
       userId,
       sessionsonly,
-    })}`
+    })}`,
   );
   const nextCursor = getCursor(res.headers.get("link"));
   return [streams, nextCursor, res];
@@ -154,7 +154,7 @@ export const getAdminStreams = async ({
 
 export const generateJwt = async (playbackId: string): Promise<string> => {
   const [res] = await context.fetch(
-    `/access-control/signing-key/jwt/${playbackId}`
+    `/access-control/signing-key/jwt/${playbackId}`,
   );
   if (res.status !== 200) {
     throw new Error(JSON.stringify(res.body));
@@ -219,7 +219,7 @@ export const deleteStreams = async (ids: Array<string>): Promise<void> => {
 
 export const patchStream = async (
   streamId: string,
-  patch: StreamPatchPayload
+  patch: StreamPatchPayload,
 ): Promise<void> => {
   const [res, body] = await context.fetch(`/stream/${streamId}`, {
     method: "PATCH",

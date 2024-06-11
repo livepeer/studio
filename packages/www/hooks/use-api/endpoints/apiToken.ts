@@ -10,7 +10,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -24,7 +24,7 @@ export const getApiTokens = async (
     cursor?: string;
     order?: string;
     count?: boolean;
-  }
+  },
 ): Promise<[Array<ApiToken> | ApiError, string, Response, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
   const [res, tokens] = await context.fetch(
@@ -35,7 +35,7 @@ export const getApiTokens = async (
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
-    })}`
+    })}`,
   );
   const nextCursor = getCursor(res.headers.get("link"));
   const count = res.headers.get("X-Total-Count");

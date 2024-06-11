@@ -36,7 +36,7 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
 
   const fetcher: Fetcher<WebhooksTableData> = useCallback(
     async (state) => rowsPageFromState(state, getWebhooks),
-    [getWebhooks, user.id]
+    [getWebhooks, user.id],
   );
 
   const onCreateSubmit = async ({ events, name, url, sharedSecret }) => {
@@ -68,7 +68,7 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
           "Create webhook",
-          createDialogState.onOn
+          createDialogState.onOn,
         )}
       />
 

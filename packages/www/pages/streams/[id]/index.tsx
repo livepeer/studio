@@ -15,7 +15,7 @@ const StreamDetails = () => {
   const { getStream } = useApi();
   const { getHealth } = useAnalyzer();
   const [currentTab, setCurrentTab] = useState<"Overview" | "Health">(
-    "Overview"
+    "Overview",
   );
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
 
@@ -33,7 +33,7 @@ const StreamDetails = () => {
       }
       return queryClient.invalidateQueries([id]);
     },
-    [queryClient, id]
+    [queryClient, id],
   );
 
   const { data: streamHealth } = useQuery({

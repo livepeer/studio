@@ -59,7 +59,7 @@ export const makeColumns = () => [
     sortType: (...params: SortTypeArgs) =>
       numberSort(
         "original.sourceSegmentsDuration.sourceSegmentsDuration",
-        ...params
+        ...params,
       ),
   },
   {
@@ -74,7 +74,7 @@ export const rowsPageFromState = async (
   state: State<StreamSessionsTableData>,
   userId: string,
   getStreamSessionsByUserId: Function,
-  openSnackbar: Function
+  openSnackbar: Function,
 ): Promise<RowsPageFromStateResult<StreamSessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessionsByUserId(
     userId,
@@ -84,7 +84,7 @@ export const rowsPageFromState = async (
     formatFiltersForApiRequest(state.filters, {
       parseNumber: (n) => n * 60,
     }),
-    true
+    true,
   );
 
   return {

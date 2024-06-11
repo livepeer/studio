@@ -72,7 +72,7 @@ const AssetsTable = ({
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
-    [userId]
+    [userId],
   );
 
   return (

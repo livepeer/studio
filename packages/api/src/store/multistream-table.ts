@@ -52,7 +52,7 @@ export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
     id: string,
     userId: string,
     isAdmin: boolean,
-    opts?: GetOptions
+    opts?: GetOptions,
   ) {
     const target = await super.get(id, opts);
     return isAdmin || userId === target?.userId ? target : null;

@@ -23,7 +23,7 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
           email: user.email,
         });
     },
-    [June]
+    [June],
   );
 
   useEffect(() => {

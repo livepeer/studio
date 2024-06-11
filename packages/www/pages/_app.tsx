@@ -61,7 +61,7 @@ const globalStyles = globalCss({
 const themes: any = getThemes();
 const themeMap = {};
 Object.keys(themes).map(
-  (key, _index) => (themeMap[themes[key].className] = themes[key].className)
+  (key, _index) => (themeMap[themes[key].className] = themes[key].className),
 );
 
 const livepeerClient = createReactClient({
@@ -117,9 +117,7 @@ const App = ({ Component, pageProps }) => {
             <QueryClientProvider client={queryClient}>
               <ApiProvider>
                 <AnalyzerProvider>
-                  <LivepeerConfig
-                    theme={livepeerTheme}
-                    client={livepeerClient}>
+                  <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
                     <DefaultSeo {...SEO} />
                     <Component {...pageProps} />
                   </LivepeerConfig>

@@ -9,7 +9,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -20,7 +20,7 @@ export const getStreamSessions = async (
   cursor?: string,
   limit: number = 20,
   filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
+  count?: boolean,
 ): Promise<[Array<Stream>, string, number]> => {
   const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
   const uri = `/session?${qs.stringify({
@@ -44,7 +44,7 @@ export const getSession = async (
   cursor?: string,
   limit: number = 20,
   filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
+  count?: boolean,
 ): Promise<[Session, string, number]> => {
   const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
   const uri = `/session/${id}?${qs.stringify({
@@ -68,7 +68,7 @@ export const getStreamSessionsByUserId = async (
   limit: number = 20,
   order?: string,
   filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
+  count?: boolean,
 ): Promise<[Array<Stream>, string, number]> => {
   const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
   const uri = `/session?${qs.stringify({

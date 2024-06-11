@@ -13,7 +13,7 @@ const AssetDetails = () => {
   const router = useRouter();
   const { getAsset, getTotalViews } = useApi();
   const [currentTab, setCurrentTab] = useState<"Overview" | "Event Logs">(
-    "Overview"
+    "Overview",
   );
   const [editAssetDialogOpen, setEditAssetDialogOpen] = useState(false);
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
@@ -27,7 +27,7 @@ const AssetDetails = () => {
     {
       refetchInterval,
       enabled: Boolean(id),
-    }
+    },
   );
 
   const { data: totalViews } = useQuery(
@@ -36,7 +36,7 @@ const AssetDetails = () => {
     {
       refetchInterval,
       enabled: Boolean(id),
-    }
+    },
   );
 
   return (

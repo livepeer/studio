@@ -70,7 +70,7 @@ describe("active-cleanup", () => {
     expect(initClientsSpy).toHaveBeenCalledTimes(1);
     expect(initClientsSpy).toHaveBeenLastCalledWith(
       params,
-      "active-cleanup-job"
+      "active-cleanup-job",
     );
 
     expect(queue.consume).not.toHaveBeenCalled();
@@ -85,20 +85,20 @@ describe("active-cleanup", () => {
     // 3 active streams
     for (let i = 0; i < 3; i++) {
       await db.stream.create(
-        mockStream(true, now - streamController.ACTIVE_TIMEOUT / 2)
+        mockStream(true, now - streamController.ACTIVE_TIMEOUT / 2),
       );
     }
     // 3 inactive streams
     for (let i = 0; i < 3; i++) {
       await db.stream.create(
-        mockStream(false, now - streamController.ACTIVE_TIMEOUT - 5000)
+        mockStream(false, now - streamController.ACTIVE_TIMEOUT - 5000),
       );
     }
     // 3 active lost streams, only these should be cleaned up
     let expectedCleanedUp = [];
     for (let i = 0; i <= 3; i++) {
       const stream = await db.stream.create(
-        mockStream(true, now - streamController.ACTIVE_TIMEOUT - i)
+        mockStream(true, now - streamController.ACTIVE_TIMEOUT - i),
       );
       expectedCleanedUp.push(stream);
     }
@@ -110,7 +110,7 @@ describe("active-cleanup", () => {
       params,
       expectedCleanedUp,
       expect.any(RabbitQueue),
-      params.ingest[0].base
+      params.ingest[0].base,
     );
   });
 
@@ -141,7 +141,7 @@ describe("active-cleanup", () => {
       "events.recording.waiting",
       expect.anything(),
       expect.any(Number),
-      "recording_waiting_delayed_events"
+      "recording_waiting_delayed_events",
     );
     expect((queue.delayedPublishWebhook as any).mock.calls[0][1]).toMatchObject(
       {
@@ -155,7 +155,7 @@ describe("active-cleanup", () => {
             id: session.id,
           },
         },
-      }
+      },
     );
   });
 });

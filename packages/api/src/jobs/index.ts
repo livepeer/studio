@@ -19,7 +19,7 @@ export async function runJob(jobName: JobType, config: CliArgs): Promise<void> {
   logger.info(`Starting job. job=${jobName}`);
   try {
     const result = await timeout(config.jobTimeoutSec * 1000, () =>
-      jobFuncs[jobName](config)
+      jobFuncs[jobName](config),
     );
 
     const elapsedTime = process.hrtime(startTime);
@@ -27,14 +27,14 @@ export async function runJob(jobName: JobType, config: CliArgs): Promise<void> {
 
     const logCtx = result && result.logContext;
     logger.info(
-      `Ran job successfully. job=${jobName} time=${elapsedTimeSec}s ${logCtx}`
+      `Ran job successfully. job=${jobName} time=${elapsedTimeSec}s ${logCtx}`,
     );
     process.exit(0);
   } catch (error) {
     logger.error(
       `Job failed. job=${jobName} error=${JSON.stringify(
-        error.message || error
-      )} stack=${JSON.stringify(error.stack)}`
+        error.message || error,
+      )} stack=${JSON.stringify(error.stack)}`,
     );
     process.exit(1);
   }

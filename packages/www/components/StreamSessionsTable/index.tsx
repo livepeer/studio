@@ -30,9 +30,9 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         state,
         user.id,
         getStreamSessionsByUserId,
-        openSnackbar
+        openSnackbar,
       ),
-    [getStreamSessionsByUserId, user.id]
+    [getStreamSessionsByUserId, user.id],
   );
 
   return (
