@@ -13,12 +13,15 @@ describe("assets table", () => {
     const indexes = res.rows?.map((r: any) => r.indexname).sort();
     expect(indexes).toEqual([
       "asset_creatorId_value",
+      "asset_deleted",
+      "asset_deletedAt",
       "asset_id",
       "asset_playbackId",
       "asset_playbackRecordingId",
       "asset_sourceAssetId",
       "asset_source_sessionId",
       "asset_source_url",
+      "asset_status_phase",
       "asset_storage_ipfs_cid",
       "asset_storage_ipfs_nftMetadata_cid",
       "asset_userId",
