@@ -81,6 +81,9 @@ async function reportUsageForUser(
   from?: number,
   to?: number
 ) {
+  // make sure this func takes at least 100ms to avoid incurring into stripe rate limits
+  const sleepProm = sleep(100);
+
   if (!forceReport && (user.email.endsWith("@livepeer.org") || user.admin)) {
     return {
       id: user.id,
@@ -144,8 +147,7 @@ async function reportUsageForUser(
     );
   }
 
-  // Sleep to avoid to incur into stripe rate limits
-  await sleep(100);
+  await sleepProm;
 
   return {
     id: user.id,
