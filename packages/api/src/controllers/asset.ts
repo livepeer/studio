@@ -22,6 +22,7 @@ import {
   reqUseReplica,
   isValidBase64,
   mapInputCreatorId,
+  addDefaultProjectId,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -239,7 +240,7 @@ export async function validateAssetPayload(
     name: payload.name,
     source,
     staticMp4: payload.staticMp4,
-    projectId: req.project?.id ?? "",
+    projectId: req.project?.id,
     creatorId: mapInputCreatorId(payload.creatorId),
     playbackPolicy,
     objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
@@ -495,6 +496,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
     timestamp: asset.createdAt,
     event: "asset.created",
     userId: asset.userId,
+    projectId: asset.projectId,
     payload: {
       asset: {
         id: asset.id,
@@ -613,14 +615,24 @@ export async function toExternalAsset(
   return a;
 }
 
+app.use(mung.jsonAsync(addDefaultProjectId));
+
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
     const { details } = toStringValues(req.query);
-    const toExternalAssetFunc = (a: Asset) =>
-      toExternalAsset(a, req.config, !!details, req.user.admin);
+    const toExternalAssetFunc = async (a: Asset) => {
+      const modifiedAsset = await toExternalAsset(
+        a,
+        req.config,
+        !!details,
+        req.user.admin
+      );
+
+      return modifiedAsset;
+    };
 
     if (Array.isArray(data)) {
       return Promise.all(data.map(toExternalAssetFunc));
@@ -700,9 +712,14 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  query.push(
-    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
-  );
+  if (!req.user.admin) {
+    query.push(
+      sql`coalesce(asset.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`
+    );
+  }
+
   if (req.user.admin && deleting === "true") {
     const deletionThreshold = new Date(
       Date.now() - DELETE_ASSET_DELAY
@@ -775,13 +792,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   if (!asset || asset.deleted) {
     throw new NotFoundError(`Asset not found`);
   }
-
-  if (req.user.admin !== true && req.user.id !== asset.userId) {
-    throw new ForbiddenError(
-      "user can only request information on their own assets"
-    );
-  }
-
+  req.checkResourceAccess(asset);
   res.json(asset);
 });
 
