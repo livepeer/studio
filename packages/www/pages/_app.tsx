@@ -13,7 +13,6 @@ import {
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { ApiProvider, getEndpoint } from "hooks/use-api";
 import { getBrandName, isDevelopment, isExport, isStaging } from "lib/utils";
-import { MetaMaskProvider } from "metamask-react";
 import { DefaultSeo } from "next-seo";
 import { ThemeProvider } from "next-themes";
 import Head from "next/head";
@@ -116,18 +115,16 @@ const App = ({ Component, pageProps }) => {
           }}>
           <SnackbarProvider>
             <QueryClientProvider client={queryClient}>
-              <MetaMaskProvider>
-                <ApiProvider>
-                  <AnalyzerProvider>
-                    <LivepeerConfig
-                      theme={livepeerTheme}
-                      client={livepeerClient}>
-                      <DefaultSeo {...SEO} />
-                      <Component {...pageProps} />
-                    </LivepeerConfig>
-                  </AnalyzerProvider>
-                </ApiProvider>
-              </MetaMaskProvider>
+              <ApiProvider>
+                <AnalyzerProvider>
+                  <LivepeerConfig
+                    theme={livepeerTheme}
+                    client={livepeerClient}>
+                    <DefaultSeo {...SEO} />
+                    <Component {...pageProps} />
+                  </LivepeerConfig>
+                </AnalyzerProvider>
+              </ApiProvider>
             </QueryClientProvider>
           </SnackbarProvider>
         </ThemeProvider>
