@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi } from "../../hooks";
 import Table, {
   DefaultSortBy,
@@ -17,6 +17,7 @@ import {
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 import { useJune, events } from "hooks/use-june";
+import { useProjectContext } from "context/ProjectContext";
 
 const ApiKeysTable = ({
   title = "API Keys",
@@ -32,6 +33,7 @@ const ApiKeysTable = ({
   });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
+  const { projectId } = useProjectContext();
   const columns = useMemo(makeColumns, []);
   const June = useJune();
 
@@ -43,6 +45,10 @@ const ApiKeysTable = ({
   const trackEvent = useCallback(() => {
     if (June) June.track(events.developer.apiKeyCreate);
   }, [June]);
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <>

@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import { Stream } from "@livepeer.studio/api";
 import { Box } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import Help from "../../../../public/img/help.svg";
 
@@ -91,23 +91,16 @@ const RenditionsDetailsCell = <D extends TableData>({
       {detailsTooltip ? (
         <Flex sx={{ alignItems: "center" }}>
           <Flex>
-            <ReactTooltip
-              id={`tooltip-details-${stream.id}`}
-              className="tooltip"
-              place="top"
-              type="dark"
-              effect="solid">
-              {detailsTooltip}
-            </ReactTooltip>
             <Help
-              data-tip
-              data-for={`tooltip-details-${stream.id}`}
+              data-tooltip-id={`tooltip-details-${stream.id}`}
+              content={`${detailsTooltip}`}
               sx={{
                 color: "muted",
                 cursor: "pointer",
                 ml: 1,
               }}
             />
+            <Tooltip id={`tooltip-details-${stream.id}`} />
           </Flex>
         </Flex>
       ) : null}

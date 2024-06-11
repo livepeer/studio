@@ -3,6 +3,7 @@ import { Session, Stream } from "@livepeer.studio/api";
 import { ApiState } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -29,6 +30,7 @@ export const getStreamSessions = async (
     parentId: id,
     filters: stringifiedFilters,
     count,
+    projectId,
   })}`;
   const [res, streams] = await context.fetch(uri);
   if (res.status !== 200) {
@@ -52,6 +54,7 @@ export const getSession = async (
     cursor,
     filters: stringifiedFilters,
     count,
+    projectId,
   })}`;
   const [res, session] = await context.fetch(uri);
   if (res.status !== 200) {
@@ -78,6 +81,7 @@ export const getStreamSessionsByUserId = async (
     userId,
     filters: stringifiedFilters,
     count,
+    projectId,
   })}`;
   const [res, streams] = await context.fetch(uri);
   if (res.status !== 200) {

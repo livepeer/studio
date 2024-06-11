@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import {
   Spinner,
   Box,
@@ -710,8 +710,8 @@ const ID = () => {
                           alignItems: "center",
                         }}>
                         <Help
-                          data-tip
-                          data-for={`tooltip-record-${stream.id}`}
+                          data-tooltip-id={`tooltip-record-${stream.id}`}
+                          data-tooltip-content={`When checked, transcoded streaming sessions will be recorded and stored by Livepeer Studio. Each recorded session will have a recording .m3u8 URL for playback and an MP4 download link.`}
                           sx={{
                             color: "muted",
                             cursor: "pointer",
@@ -722,20 +722,7 @@ const ID = () => {
                         />
                       </Flex>
                     </Flex>
-                    <ReactTooltip
-                      id={`tooltip-record-${stream.id}`}
-                      className="tooltip"
-                      place="top"
-                      type="dark"
-                      effect="solid">
-                      <p>
-                        When checked, transcoded streaming sessions will be
-                        recorded and stored by Livepeer Studio.
-                        <br /> Each recorded session will have a recording .m3u8
-                        URL for playback and an MP4 download link.
-                        <br />
-                      </p>
-                    </ReactTooltip>
+                    <Tooltip id={`tooltip-record-${stream.id}`} />
                   </Box>
                   <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                     <hr />
@@ -788,8 +775,8 @@ const ID = () => {
                           alignItems: "center",
                         }}>
                         <Help
-                          data-tip
-                          data-for={`tooltip-suspend-${stream.id}`}
+                          data-tooltip-id={`tooltip-suspend-${stream.id}`}
+                          data-tooltip-content={`When turned on, any active stream sessions will immediately end. New sessions will be prevented from starting until turned off.`}
                           sx={{
                             color: "muted",
                             cursor: "pointer",
@@ -800,20 +787,7 @@ const ID = () => {
                         />
                       </Flex>
                     </Flex>
-                    <ReactTooltip
-                      id={`tooltip-suspend-${stream.id}`}
-                      className="tooltip"
-                      place="top"
-                      type="dark"
-                      effect="solid">
-                      <p>
-                        When turned on, any active stream sessions will
-                        immediately end.
-                        <br />
-                        New sessions will be prevented from starting until
-                        turned off.
-                      </p>
-                    </ReactTooltip>
+                    <Tooltip id={`tooltip-suspend-${stream.id}`} />
                   </Box>
                   <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                     <hr />

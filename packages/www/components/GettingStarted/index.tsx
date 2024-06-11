@@ -12,9 +12,12 @@ import {
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
+import { useProjectContext } from "context/ProjectContext";
+
 import { getBrandName } from "lib/utils";
 
 const GettingStarted = ({ firstName = "" }) => {
+  const { appendProjectId } = useProjectContext();
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
@@ -44,7 +47,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 </Text>
               </Box>
               <Flex align="center" gap={2}>
-                <Link href="/assets" passHref legacyBehavior>
+                <Link href={appendProjectId("/assets")} passHref legacyBehavior>
                   <Button
                     variant="primary"
                     css={{
@@ -96,7 +99,10 @@ const GettingStarted = ({ firstName = "" }) => {
                 </Text>
               </Box>
               <Flex align="center" gap={2}>
-                <Link href="/streams" passHref legacyBehavior>
+                <Link
+                  href={appendProjectId("/streams")}
+                  passHref
+                  legacyBehavior>
                   <Button
                     variant="primary"
                     css={{
@@ -146,7 +152,7 @@ const GettingStarted = ({ firstName = "" }) => {
               </Text>
               <Flex align="center" gap={2}>
                 <Link
-                  href="dashboard/developers/api-keys"
+                  href={appendProjectId("/developers/api-keys")}
                   passHref
                   legacyBehavior>
                   <Button

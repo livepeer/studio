@@ -5,7 +5,7 @@ import { UploadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
@@ -21,21 +21,11 @@ const FailedProcessing = ({ id, errorMessage }) => {
   const tooltipId = `tooltip-error-${id}`;
   return (
     <>
-      {errorMessage !== undefined && (
-        <ReactTooltip
-          id={tooltipId}
-          className="tooltip"
-          place="top"
-          type="dark"
-          effect="solid"
-          delayShow={500}>
-          {errorMessage}
-        </ReactTooltip>
-      )}
+      {errorMessage !== undefined && <ReactTooltip id={tooltipId} />}
       <Badge
-        data-tip
-        data-for={tooltipId}
+        data-tooltip-id={tooltipId}
         size="1"
+        data-tooltip-content={errorMessage}
         variant="red"
         css={{ padding: "0 $2" }}>
         Internal error processing file
