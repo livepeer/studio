@@ -25,33 +25,46 @@ export const reportUsage = async (
   config: CliArgs,
   adminToken: string
 ) => {
-  let payAsYouGoUsers = await getPayAsYouGoUsers(config.ingest, adminToken);
+  const payAsYouGoUsers = await getPayAsYouGoUsers(config.ingest, adminToken);
 
-  let updatedUsers = [];
-  for (const user of payAsYouGoUsers) {
-    try {
-      let userUpdated = await reportUsageForUser(
-        stripe,
-        config,
-        user,
-        adminToken
-      );
-      updatedUsers.push(userUpdated);
-    } catch (e) {
-      console.log(`
-        Failed to create usage record for user=${user.id} with error=${e.message}
-      `);
-      updatedUsers.push({
-        id: user.id,
-        usageReported: false,
-        error: e.message,
-      });
+  const updatedUsers = [];
+  const pendingUsers = payAsYouGoUsers.slice();
+
+  const processUser = async () => {
+    while (true) {
+      const user = pendingUsers.pop();
+      if (!user) {
+        return;
+      }
+
+      try {
+        const userUpdated = await reportUsageForUser(
+          stripe,
+          config,
+          user,
+          adminToken
+        );
+        updatedUsers.push(userUpdated);
+      } catch (e) {
+        console.log(
+          `Failed to create usage record for user=${user.id} with error=${e.message}`
+        );
+        updatedUsers.push({
+          id: user.id,
+          usageReported: false,
+          error: e.message,
+        });
+      }
     }
-  }
-
-  return {
-    updatedUsers: updatedUsers,
   };
+
+  const workers = [];
+  for (let i = 0; i < config.updateUsageConcurrency; i++) {
+    workers.push(processUser());
+  }
+  await Promise.all(workers);
+
+  return { updatedUsers };
 };
 
 async function getPayAsYouGoUsers(ingests: Ingest[], adminToken: string) {
@@ -365,7 +378,7 @@ app.post("/webhook", async (req, res) => {
             unsubscribe: "",
             text: `
               Your Livepeer Studio account has been disabled due to a failed payment.
-              
+
               Please update your payment method to reactivate your account.
             `,
           });
