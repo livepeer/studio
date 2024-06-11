@@ -100,12 +100,10 @@
   },
   "lint-staged": {
     "*.js": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ],
     "*.mdx?": [
-      "prettier --write --parser mdx",
-      "git add"
+      "prettier --write --parser mdx"
     ]
   },
   "bin": "server.js"
