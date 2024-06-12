@@ -135,6 +135,7 @@
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/numeral": "^2.0.2",
     "@types/react-table": "^7.0.5",
+    "@types/react-tooltip": "^4.2.4",
     "@types/segment-analytics": "^0.0.32",
     "@types/theme-ui": "0.3.1",
     "@types/title": "^3.4.0",
