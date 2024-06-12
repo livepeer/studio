@@ -35,7 +35,7 @@
     "@radix-ui/react-icons": "^1.1.1",
     "@radix-ui/react-switch": "^0.0.13",
     "@radix-ui/themes": "^1.1.2",
-    "@sanity/block-content-to-react": "^2.0.7",
+    "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/client": "^1.149.2",
     "@sanity/image-url": "^0.140.17",
     "@segment/snippet": "^4.9.0",
