@@ -21,6 +21,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [removeAdminModal, setRemoveAdminModal] = useState(false);
   const [suspendModal, setSuspendModal] = useState(false);
   const [unsuspendModal, setUnsuspendModal] = useState(false);
+  const [enterpriseModal, setEnterpriseModal] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
   const [lastCursor, setLastCursor] = useState("");
   const [lastOrder, setLastOrder] = useState("");
@@ -28,13 +29,15 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState("");
 
-  const { getUsers, makeUserAdmin, setUserSuspended } = useApi();
+  const { getUsers, makeUserAdmin, setUserSuspended, makeUserEnterprise } =
+    useApi();
 
   const close = () => {
     setAdminModal(false);
     setRemoveAdminModal(false);
     setSuspendModal(false);
     setUnsuspendModal(false);
+    setEnterpriseModal(false);
   };
 
   const getProductName = (productId) =>
@@ -208,6 +211,34 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           </Flex>
         </Modal>
       )}
+      {enterpriseModal && selectedUser && (
+        <Modal onClose={close}>
+          <h3>Make User Enterprise</h3>
+          <p>
+            Are you sure you want to subscribe the user "{selectedUser.email}"
+            to the Enterprise plan?
+          </p>
+          <Flex sx={{ justifyContent: "flex-end" }}>
+            <Button
+              type="button"
+              variant="outlineSmall"
+              onClick={close}
+              sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="primarySmall"
+              onClick={() => {
+                makeUserEnterprise(selectedUser.id)
+                  .then(refetch)
+                  .finally(close);
+              }}>
+              Make User Enterprise
+            </Button>
+          </Flex>
+        </Modal>
+      )}
       {removeAdminModal && selectedUser && (
         <Modal onClose={close}>
           <h3>Remove Admin Rights</h3>
@@ -275,6 +306,16 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           sx={{ ml: "1em" }}
           onClick={() => selectedUser && setUnsuspendModal(true)}>
           Unsuspend User
+        </Button>
+        <Button
+          variant="outlineSmall"
+          disabled={
+            !selectedUser ||
+            selectedUser.stripeProductId == "prod_OTTbwpzxNLMNSh"
+          }
+          sx={{ ml: "1em" }}
+          onClick={() => selectedUser && setEnterpriseModal(true)}>
+          Make enterprise
         </Button>
       </CommonAdminTable>
     </Container>
