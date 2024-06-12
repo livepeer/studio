@@ -22,6 +22,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "../css/hubspot.scss";
 import "../css/markdown.css";
 import "../css/recaptcha.css";
+import "../css/custom.css";
 import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
 
