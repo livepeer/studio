@@ -567,6 +567,7 @@ export default class WebhookCannon {
           projectId: session.projectId,
           createdAt: session.createdAt,
           source: { type: "recording", sessionId: session.id },
+          profiles: session.recordingSpec?.profiles,
           status: { phase: "waiting", updatedAt: Date.now() },
           name: `live-${startedAt}`,
           objectStoreId:
