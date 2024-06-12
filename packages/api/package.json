@@ -86,7 +86,7 @@
     "http-proxy-middleware": "^0.20.0",
     "is-local-ip": "^1.1.0",
     "isomorphic-webcrypto": "^2.3.8",
-    "js-yaml": "^3.13.1",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "livekit-server-sdk": "^1.2.5",
     "lodash": "^4.17.21",
