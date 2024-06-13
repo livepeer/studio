@@ -18,9 +18,17 @@ export async function runJob(jobName: JobType, config: CliArgs): Promise<void> {
 
   logger.info(`Starting job. job=${jobName}`);
   try {
-    const result = await timeout(config.jobTimeoutSec * 1000, () =>
-      jobFuncs[jobName](config),
-    );
+    const sigterm = new Promise<never>((_, reject) => {
+      process.on("SIGTERM", () => {
+        logger.warn("SIGTERM received, terminating immediately...");
+        reject(new Error("Job was terminated by SIGTERM"));
+      });
+    });
+    const job = timeout(config.jobTimeoutSec * 1000, () => {
+      return jobFuncs[jobName](config);
+    });
+
+    const result = await Promise.race([job, sigterm]);
 
     const elapsedTime = process.hrtime(startTime);
     const elapsedTimeSec = elapsedTime[0] + elapsedTime[1] / 1e9;

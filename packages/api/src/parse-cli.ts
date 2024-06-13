@@ -550,6 +550,12 @@ export default function parseCli(argv?: string | readonly string[]) {
           "job/update-usage: Admin API token to be used in the update usage job internal calls",
         type: "string",
       },
+      "update-usage-concurrency": {
+        describe:
+          "job/update-usage: number of concurrent workers to run for updating users usage",
+        type: "number",
+        default: 10,
+      },
       "stream-info-service": {
         describe: "start the Stream Info service instead of Studio API",
         type: "boolean",
