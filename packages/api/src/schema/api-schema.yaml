@@ -1112,6 +1112,15 @@ components:
                     ID of the asset from which this asset was created.
         creatorId:
           $ref: "#/components/schemas/creator-id"
+        profiles:
+          type: array
+          description: |
+            Requested profiles for the asset to be transcoded into. Currently
+            only supported for livestream recording assets, configured through
+            the `stream.recordingSpec` field. If this is not present it means
+            that default profiles were derived from the input metadata.
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
         storage:
           additionalProperties: false
           properties:
