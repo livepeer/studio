@@ -22,6 +22,9 @@ const SentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
+/**
+ * @type {import('next').NextConfig}
+ */
 let config = {
   basePath: "/dashboard",
   publicRuntimeConfig: { basePath: "/dashboard" },
