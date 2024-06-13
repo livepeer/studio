@@ -9,28 +9,28 @@ import {
   Button,
 } from "@livepeer/design-system";
 import { DashboardSettingsGeneral as Content } from "content";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { useQuery, useQueryClient } from "react-query";
 import { useProjectContext } from "context/ProjectContext";
 import { useRouter } from "next/router";
+import DeleteProjectDialog from "components/Project/deleteProjectDialog";
+import { Project } from "@livepeer.studio/api";
 
 const Settings = () => {
   useLoggedIn();
   const { user, getProject, deleteProject, updateProject } = useApi();
   const { projectId } = useProjectContext();
+  const [open, setOpen] = useState(false);
 
-  const { data } = useQuery(
-    ["project", projectId],
-    () => getProject(projectId),
-    {
-      onSuccess(data) {
-        setProjectName(data.name);
-      },
-    }
-  );
+  const { data } = useQuery([projectId], () => getProject(projectId), {
+    onSuccess(data) {
+      setProjectName(data.name);
+    },
+  });
 
   const [projectName, setProjectName] = useState<string | null>();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async () => {
     if (!projectName) {
@@ -46,10 +46,24 @@ const Settings = () => {
   };
 
   const confirmDeleteProject = () => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      deleteProject(projectId);
-      alert("Project deleted successfully");
-    }
+    // if (confirm("Are you sure you want to delete this project?")) {
+    //   deleteProject(projectId);
+    //   alert("Project deleted successfully");
+    // }
+  };
+
+  const invalidateProject = useCallback(
+    (optimistic?: Project) => {
+      if (optimistic) {
+        queryClient.setQueryData([projectId], optimistic);
+      }
+      return queryClient.invalidateQueries([projectId]);
+    },
+    [queryClient, projectId]
+  );
+
+  const onOpenChange = (open: boolean) => {
+    setOpen(open);
   };
 
   if (!user) {
@@ -94,8 +108,8 @@ const Settings = () => {
         </Box>
         <Box
           css={{
-            mb: "$9",
-            pb: "$8",
+            mb: "$7",
+            pb: "$7",
             borderBottom: "1px solid",
             borderColor: "$neutral6",
           }}>
@@ -161,7 +175,9 @@ const Settings = () => {
               you can do so below.
             </Text>
             <Button
-              onClick={confirmDeleteProject}
+              onClick={() => {
+                setOpen(true);
+              }}
               css={{
                 p: "$4",
                 fontSize: "$2",
@@ -175,6 +191,12 @@ const Settings = () => {
           </Flex>
         </Box>
       </Box>
+      <DeleteProjectDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        project={data}
+        invalidate={invalidateProject}
+      />
     </Layout>
   );
 };

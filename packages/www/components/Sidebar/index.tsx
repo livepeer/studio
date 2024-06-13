@@ -377,7 +377,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                   e.preventDefault();
                   logout();
                 }}>
-                <Text size="2">Logout</Text>
+                <Text size="2">Log out</Text>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
