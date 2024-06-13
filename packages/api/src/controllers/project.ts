@@ -23,7 +23,9 @@ const fieldsMap = {
 } as const;
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, order, all, filters, count } = toStringValues(req.query);
+  let { limit, cursor, order, all, filters, count, allUsers } = toStringValues(
+    req.query,
+  );
 
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -40,7 +42,7 @@ app.get("/", authorizer({}), async (req, res) => {
 
   let output: WithID<Project>[];
   let newCursor: string;
-  if (req.user.admin) {
+  if (req.user.admin && allUsers && allUsers !== "false") {
     let fields =
       " project.id as id, project.data as data, users.id as usersId, users.data as usersdata";
     if (count) {
