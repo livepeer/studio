@@ -49,7 +49,7 @@ const Billing = () => {
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
-    null,
+    null
   );
   const June = useJune();
 
@@ -58,7 +58,7 @@ const Billing = () => {
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
       const [_res, paymentMethod] = await getPaymentMethod(
-        user.stripeCustomerPaymentMethodId,
+        user.stripeCustomerPaymentMethodId
       );
       return paymentMethod;
     }
@@ -138,8 +138,8 @@ const Billing = () => {
           units: overusage.TotalUsageMins,
           total: Number(
             (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
-              2,
-            ),
+              2
+            )
           ),
         },
         deliveryBill: {
@@ -147,7 +147,7 @@ const Billing = () => {
           total: Number(
             (
               overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
         storageBill: {
@@ -155,7 +155,7 @@ const Billing = () => {
           total: Number(
             (
               overusage.StorageUsageMins * payAsYouGoData.usage[2].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
       };
@@ -171,7 +171,7 @@ const Billing = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        subscription?.status,
+        subscription?.status
       );
     };
 
@@ -222,14 +222,14 @@ const Billing = () => {
               {subscription && (
                 <Flex>
                   {new Date(
-                    subscription.current_period_start * 1000,
+                    subscription.current_period_start * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}{" "}
                   to{" "}
                   {new Date(
-                    subscription.current_period_end * 1000,
+                    subscription.current_period_end * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -329,7 +329,7 @@ const Billing = () => {
                 <PaymentMethod data={data} />
               </>
             ) : (
-              "No payment method on file."
+              <Text variant="neutral">No payment method on file.</Text>
             )}
           </Flex>
         </Box>

@@ -46,7 +46,6 @@
     "@cloudflare/kv-asset-handler": "^0.0.11",
     "@lit-protocol/sdk-nodejs": "^1.1.241",
     "@livepeer.studio/www": "^0.18.0",
-    "@livepeer/sdk": "1.0.0-alpha.7",
     "@onflow/fcl": "^1.3.2",
     "@peculiar/webcrypto": "^1.2.3",
     "@sendgrid/client": "^7.6.0",

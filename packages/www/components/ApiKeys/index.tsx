@@ -37,7 +37,7 @@ const ApiKeysTable = ({
 
   const fetcher: Fetcher<ApiKeysTableData> = useCallback(
     async () => rowsPageFromState(userId, getApiTokens),
-    [userId],
+    [userId]
   );
 
   const trackEvent = useCallback(() => {
@@ -56,7 +56,7 @@ const ApiKeysTable = ({
         initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
-        createAction={makeCreateAction("Create API Key", () => {
+        createAction={makeCreateAction("Create API key", () => {
           trackEvent();
           return createDialogState.onOn();
         })}

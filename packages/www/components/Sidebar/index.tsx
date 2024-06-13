@@ -1,38 +1,40 @@
 import {
-  styled,
-  Box,
-  Flex,
-  Text,
   Link as A,
   Avatar,
-  Grid,
+  Box,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuTrigger,
   DropdownMenuItem,
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
+  DropdownMenuTrigger,
+  Flex,
+  Grid,
+  Text,
+  styled,
 } from "@livepeer/design-system";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import ThemeSwitch from "../ThemeSwitch";
-import Link from "next/link";
 import {
+  BookmarkFilledIcon,
+  BookmarkIcon,
+  ChatBubbleIcon,
+  ChevronDownIcon,
+  LoopIcon,
+  RocketIcon,
+} from "@radix-ui/react-icons";
+import { useJune } from "hooks/use-june";
+import { isExport } from "lib/utils";
+import Link from "next/link";
+import Router, { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useApi } from "../../hooks";
+import ThemeSwitch from "../ThemeSwitch";
+import {
+  AssetsIcon,
+  BillingIcon,
   HomeIcon,
   StreamIcon,
   TerminalIcon,
-  BillingIcon,
   UsageIcon,
-  AssetsIcon,
 } from "./NavIcons";
-import { useApi } from "../../hooks";
-import Router, { useRouter } from "next/router";
-import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
-import Contact from "../Contact";
-import { useJune, events } from "hooks/use-june";
-import { useCallback, useEffect } from "react";
-import { isExport } from "lib/utils";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -279,6 +281,31 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         {!isExport() && (
           <Flex direction="column" gap={1}>
             <NavLink
+              href="https://docs.livepeer.org"
+              target="_blank"
+              css={{
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
+              }}>
+              <BookmarkIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Documentation
+              </Text>
+            </NavLink>
+
+            <NavLink
               href="https://status.livepeer.studio/"
               target="_blank"
               css={{
@@ -352,7 +379,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 Feature Requests
               </Text>
             </NavLink>
-            <Contact />
           </Flex>
         )}
       </Flex>
