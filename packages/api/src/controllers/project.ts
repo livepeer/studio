@@ -106,7 +106,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
   if (req.user.admin !== true && req.user.id !== project.userId) {
     throw new ForbiddenError(
-      "user can only request information on their own projects",
+      "user can only request information on their own projects"
     );
   }
 
