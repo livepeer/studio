@@ -9,7 +9,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -22,7 +22,7 @@ export const getWebhooks = async (
   filters?: Array<{ id: string; value: string | object }>,
   limit?: number,
   cursor?: string,
-  count?: boolean
+  count?: boolean,
 ): Promise<[Webhook[], string, Response, number]> => {
   const f = filters ? JSON.stringify(filters) : undefined;
   const [res, streams] = await context.fetch(
@@ -34,7 +34,7 @@ export const getWebhooks = async (
       cursor,
       filters: f,
       count,
-    })}`
+    })}`,
   );
   const nextCursor = getCursor(res.headers.get("link"));
   const c = res.headers.get("X-Total-Count");
@@ -105,12 +105,12 @@ export const deleteWebhooks = async (ids: Array<string>): Promise<void> => {
 
 export const getWebhookLogs = async (
   webhookId,
-  filters = null
+  filters = null,
 ): Promise<WebhookLogs[]> => {
   const f = filters ? JSON.stringify(filters) : undefined;
 
   const [res, logs] = await context.fetch(
-    `/webhook/${webhookId}/log?${qs.stringify({ filters: f })}`
+    `/webhook/${webhookId}/log?${qs.stringify({ filters: f })}`,
   );
   if (res.status !== 200) {
     throw logs && typeof logs === "object"
@@ -131,7 +131,7 @@ export const resendWebhook = async (params: {
       headers: {
         "content-type": "application/json",
       },
-    }
+    },
   );
 
   if (res.status !== 200) {

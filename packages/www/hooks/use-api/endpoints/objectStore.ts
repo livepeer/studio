@@ -9,7 +9,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -20,7 +20,7 @@ export const getObjectStore = async (
   order?: string,
   filters?: Array<{ id: string; value: string }>,
   limit?: number,
-  cursor?: string
+  cursor?: string,
 ): Promise<[Array<Webhook> | ApiError, string, Response]> => {
   const f = filters ? JSON.stringify(filters) : undefined;
   const [res, streams] = await context.fetch(
@@ -30,7 +30,7 @@ export const getObjectStore = async (
       limit,
       cursor,
       filters: f,
-    })}`
+    })}`,
   );
   const nextCursor = getCursor(res.headers.get("link"));
   return [streams, nextCursor, res];
@@ -53,7 +53,7 @@ export const createObjectStore = async (params): Promise<ObjectStore> => {
 
 export const disableObjectStore = async (
   id: string,
-  disabled: boolean
+  disabled: boolean,
 ): Promise<[Response, boolean | ApiError]> => {
   const [res, body] = await context.fetch(`/object-store/${id}`, {
     method: "PATCH",

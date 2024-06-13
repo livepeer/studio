@@ -5,7 +5,6 @@
       "message": "chore(release): publish %s"
     }
   },
-  "lerna": "2.9.0",
   "npmClient": "yarn",
   "packages": ["packages/**"],
   "version": "0.18.0"

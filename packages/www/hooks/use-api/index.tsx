@@ -46,7 +46,7 @@ const endpoint = getEndpoint();
 
 const makeContext = (
   state: ApiState,
-  setState: React.Dispatch<React.SetStateAction<ApiState>>
+  setState: React.Dispatch<React.SetStateAction<ApiState>>,
 ) => {
   const context = {
     ...state,

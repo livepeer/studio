@@ -88,7 +88,7 @@ export type FetchResult<T extends Record<string, unknown>> = {
 };
 
 export type Fetcher<T extends Record<string, unknown>> = (
-  state: State<T>
+  state: State<T>,
 ) => Promise<FetchResult<T>>;
 
 export type TableData<T extends Record<string, unknown>> = {
@@ -238,7 +238,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           ...columns,
         ]);
       }
-    }
+    },
   );
   useEffect(() => {
     stateSetter.setSelectedRows(selectedFlatRows);
@@ -432,7 +432,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           }}
                           {...column.getHeaderProps(
                             // @ts-ignore
-                            column.getSortByToggleProps()
+                            column.getSortByToggleProps(),
                           )}>
                           <Flex
                             css={{
@@ -585,7 +585,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       setSelectedRows,
       setDataCount,
     }),
-    []
+    [],
   );
 
   const state: State<T> = useMemo(
@@ -614,7 +614,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       dataCount,
       queryClient,
       tableId,
-    ]
+    ],
   );
 
   return { state, stateSetter };
@@ -631,7 +631,7 @@ const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
   const tableData: UseQueryResult<FetchResult<T>> = useQuery(
     queryKey,
     () => fetcher(state),
-    fetcherOptions
+    fetcherOptions,
   );
 
   return DataTableComponent({ ...props, tableData });

@@ -42,7 +42,7 @@ const PastInvoicesTable = ({ invoices }) => {
                 {
                   products[
                     invoice.lines.data.filter(
-                      (item) => item.type === "subscription"
+                      (item) => item.type === "subscription",
                     )[0]?.plan.product
                   ]?.name
                 }{" "}

@@ -56,7 +56,7 @@ export const makeColumns = () => [
 
 export const rowsPageFromState = async (
   userId: string,
-  getApiTokens: Function
+  getApiTokens: Function,
 ): Promise<RowsPageFromStateResult<ApiKeysTableData>> => {
   const [tokens, nextCursor, resp, count] = await getApiTokens(userId, {
     count: true,
@@ -86,7 +86,7 @@ export const rowsPageFromState = async (
       cors: {
         children: <CorsCell cors={token.access?.cors} />,
       },
-    })
+    }),
   );
 
   return {

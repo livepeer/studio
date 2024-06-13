@@ -46,7 +46,7 @@ const TableStateDeleteDialog = ({
         await deleteMultipleFunction(ids);
       } else if (ids.length > 1) {
         const promises = state.selectedRows.map(async (row) =>
-          deleteFunction(row.original.id)
+          deleteFunction(row.original.id),
         );
         await Promise.all(promises);
       } else if (ids.length === 1) {

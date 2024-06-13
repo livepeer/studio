@@ -33,7 +33,7 @@ export default () => {
     if (data) {
       formEl.current.reset();
       openSnackbar(
-        "Thank you for getting in touch. Our team will get back to you soon."
+        "Thank you for getting in touch. Our team will get back to you soon.",
       );
       setOpen(false);
     }

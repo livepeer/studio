@@ -12,7 +12,7 @@ export function parseCli() {
 
     Options my also be provided as LP_API_ prefixed environment variables, e.g. LP_API_PORT=5000 is the same as --port=5000.
 
-    `
+    `,
     )
     .env("LP_API_")
     //.strict(true)

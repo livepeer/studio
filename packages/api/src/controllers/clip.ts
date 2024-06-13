@@ -41,7 +41,7 @@ const MAX_PROCESSING_CLIPS = 5;
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
-    req
+    req,
   ) {
     const { details } = toStringValues(req.query);
     const toExternalAssetFunc = (a: Asset) =>
@@ -60,7 +60,7 @@ app.use(
       };
     }
     return data;
-  })
+  }),
 );
 
 app.post(
@@ -92,7 +92,7 @@ app.post(
 
     if (!owner) {
       throw new NotFoundError(
-        "Content not found - unable to find owner of content"
+        "Content not found - unable to find owner of content",
       );
     }
 
@@ -106,7 +106,7 @@ app.post(
         clip: user=${clippingUser.email} does not have permission to clip stream=${content.id} - owner=${owner?.id}
       `);
       throw new ForbiddenError(
-        "You do not have permission to clip this stream"
+        "You do not have permission to clip this stream",
       );
     }
 
@@ -118,7 +118,7 @@ app.post(
       requesterId,
       req.user.id,
       "clip",
-      5
+      5,
     );
 
     if (processingClips.length >= MAX_PROCESSING_CLIPS && !clippingUser.admin) {
@@ -137,18 +137,18 @@ app.post(
         }
         if (session.parentId !== content.id) {
           throw new NotFoundError(
-            "The provided session id does not belong to this stream"
+            "The provided session id does not belong to this stream",
           );
         }
         ({ url, objectStoreId } = await buildRecordingUrl(
           session,
           req.config.recordCatalystObjectStoreId,
-          req.config.secondaryRecordObjectStoreId
+          req.config.secondaryRecordObjectStoreId,
         ));
       } else {
         ({ url, session, objectStoreId } = await getRunningRecording(
           content,
-          req
+          req,
         ));
       }
     } else {
@@ -186,7 +186,7 @@ app.post(
         type: "clip",
         playbackId,
         ...(isStream ? { sessionId: session.id } : { assetId: content.id }),
-      }
+      },
     );
 
     asset = await createAsset(asset, req.queue);
@@ -210,14 +210,14 @@ app.post(
       null,
       asset,
       owner.id,
-      requesterId
+      requesterId,
     );
 
     res.json({
       task: { id: task.id },
       asset,
     });
-  }
+  },
 );
 
 const fieldsMap = {
@@ -253,7 +253,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 export const getClips = async (
   content: DBSession | DBStream | WithID<Asset>,
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   let { limit, cursor, all, allUsers, order, filters, count, cid, ...otherQs } =
     toStringValues(req.query);
@@ -273,7 +273,7 @@ export const getClips = async (
 
   if (!req.user.admin) {
     query.push(
-      sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
+      sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`,
     );
   }
 
@@ -316,8 +316,8 @@ export const getClips = async (
 
       query.push(
         sql`asset.data->'source'->>'sessionId' IN `.append(
-          sqlQueryGroup(sessionIds)
-        )
+          sqlQueryGroup(sessionIds),
+        ),
       );
 
       break;
