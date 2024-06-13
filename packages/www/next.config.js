@@ -51,7 +51,7 @@ if (isStaticBuild) {
   config = {
     ...config,
     output: "standalone",
-    distDir: "static-build-app",
+    distDir: "static-build",
   };
 } else {
   config = {
