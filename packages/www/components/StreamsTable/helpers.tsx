@@ -92,11 +92,6 @@ export const rowsPageFromState = async (
       id: stream.id,
       value: stream.name,
       children: <Text size={2}>{stream.name}</Text>,
-      tooltipChildren: stream.createdByTokenName ? (
-        <>
-          Created by token <b>{stream.createdByTokenName}</b>
-        </>
-      ) : null,
       href: `/streams/${stream.id}`,
     },
     details: { stream },

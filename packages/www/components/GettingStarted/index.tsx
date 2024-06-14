@@ -36,14 +36,11 @@ const GettingStarted = ({ firstName = "" }) => {
             </AccordionTrigger>
             <AccordionContent>
               <Box>
-                <Text
-                  variant="neutral"
-                  size="3"
-                  css={{ mb: "$3", lineHeight: "23px" }}>
+                <Text variant="neutral" css={{ mb: "$3", lineHeight: "23px" }}>
                   Upload a video asset for on-demand playback.
                 </Text>
               </Box>
-              <Flex align="center" gap={2}>
+              <Flex align="center" wrap="wrap" gap={2}>
                 <Link href="/assets" passHref legacyBehavior>
                   <Button
                     variant="primary"
