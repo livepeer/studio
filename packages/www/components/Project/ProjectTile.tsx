@@ -11,16 +11,10 @@ import React from "react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { NavLink, generalSidebarItems } from "components/Sidebar";
 import { useProjectContext } from "context/ProjectContext";
-import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function ProjectTile({ name, id }) {
-  const { setProjectId, appendProjectId } = useProjectContext();
-  const { push } = useRouter();
-
-  const navigate = (id, path) => {
-    setProjectId(id);
-    push("/projects/" + id + path);
-  };
+  const { setProjectId } = useProjectContext();
 
   return (
     <Box
@@ -85,12 +79,11 @@ export default function ProjectTile({ name, id }) {
                     width: "100%",
                   }}>
                   {generalSidebarItems.map((item) => (
-                    <Box
-                      onClick={() => {
-                        navigate(id, item.path);
-                      }}>
+                    <Link
+                      onClick={() => setProjectId(id)}
+                      href={`/projects/${id}/${item.path}`}>
                       <NavLink key={item.title}>{item.title}</NavLink>
-                    </Box>
+                    </Link>
                   ))}
                 </Flex>
               </Box>
@@ -98,12 +91,7 @@ export default function ProjectTile({ name, id }) {
           </DropdownMenu>
         </Flex>
       </Flex>
-      <Button
-        onClick={() => {
-          navigate(id, "/");
-        }}
-        css={{ mt: 40 }}
-        size={1}>
+      <Button css={{ mt: 40 }} size={1}>
         Open Project
       </Button>
     </Box>

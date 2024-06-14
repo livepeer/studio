@@ -8,6 +8,7 @@ import {
   Grid,
   Button,
   Flex,
+  Link,
 } from "@livepeer/design-system";
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery, useQueryClient } from "react-query";
@@ -98,11 +99,15 @@ const WorkspaceProjects = () => {
             gap: "$5",
           }}>
           {data?.map((project, i) => (
-            <ProjectTile
-              key={`project-tile-${i}`}
-              id={project.id}
-              name={project.name}
-            />
+            <Link
+              onClick={() => setProjectId(project.id)}
+              href={`/dashboard/projects/${project.id}/`}>
+              <ProjectTile
+                key={`project-tile-${i}`}
+                id={project.id}
+                name={project.name}
+              />
+            </Link>
           ))}
         </Grid>
       </Box>
