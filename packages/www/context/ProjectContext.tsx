@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 interface ProjectContextType {
   projectId: string;
   setProjectId: (id: string) => void;
+  clearProjectId: () => void;
   appendProjectId: (path: string) => string;
 }
 
@@ -48,9 +49,14 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     return `/projects/${projectId}${path}`;
   };
 
+  const clearProjectId = () => {
+    setProjectId("");
+    localStorage.removeItem("projectId");
+  };
+
   return (
     <ProjectContext.Provider
-      value={{ projectId, setProjectId, appendProjectId }}>
+      value={{ projectId, setProjectId, appendProjectId, clearProjectId }}>
       {children}
     </ProjectContext.Provider>
   );

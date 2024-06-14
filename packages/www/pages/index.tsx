@@ -22,8 +22,11 @@ export default function Dashboard() {
     if (projectId) {
       push(`/projects/${projectId}`);
     } else if (projects && projects.length > 0) {
-      setProjectId(projects[0].id);
-      push(`/projects/${projects[0].id}`);
+      const project = projects.find((project) => project.name !== "");
+      if (project) {
+        setProjectId(project.id);
+        push(`/projects/${project.id}`);
+      }
     }
   }, [projectId, projects]);
   return <div />;

@@ -213,7 +213,8 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
   const router = useRouter();
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
-  const { setProjectId, projectId, appendProjectId } = useProjectContext();
+  const { setProjectId, projectId, appendProjectId, clearProjectId } =
+    useProjectContext();
   const queryClient = useQueryClient();
 
   const onCreateClick = async (projectName: string) => {
@@ -376,6 +377,7 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                 onSelect={(e) => {
                   e.preventDefault();
                   logout();
+                  clearProjectId();
                 }}>
                 <Text size="2">Log out</Text>
               </DropdownMenuItem>
@@ -410,7 +412,9 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             css={{
               color: "$neutral11",
             }}>
-            {activeProject?.name}
+            {activeProject?.name.toLowerCase().includes("my default project")
+              ? "Default Project"
+              : activeProject?.name}
           </Text>
           <TopBottomChevron />
         </Flex>
@@ -457,9 +461,11 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                   align={"center"}
                   justify={"between"}>
                   <Text size={2}>
-                    {project.name.toLowerCase().includes("my default project")
+                    {project?.name
+                      ?.toLowerCase()
+                      ?.includes("my default project")
                       ? "Default Project"
-                      : project.name}
+                      : project?.name}
                   </Text>
                   {projectId === project.id && <FiCheck />}
                 </Flex>
