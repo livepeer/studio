@@ -456,7 +456,11 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                   key={project.id}
                   align={"center"}
                   justify={"between"}>
-                  <Text size={2}>{project.name}</Text>
+                  <Text size={2}>
+                    {project.name.toLowerCase().includes("my default project")
+                      ? "Default Project"
+                      : project.name}
+                  </Text>
                   {projectId === project.id && <FiCheck />}
                 </Flex>
               </DropdownMenuItem>

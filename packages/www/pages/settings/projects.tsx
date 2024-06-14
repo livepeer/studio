@@ -105,7 +105,11 @@ const WorkspaceProjects = () => {
               <ProjectTile
                 key={`project-tile-${i}`}
                 id={project.id}
-                name={project.name}
+                name={
+                  project.name.toLowerCase().includes("my default project")
+                    ? "Default Project"
+                    : project.name
+                }
               />
             </Link>
           ))}
