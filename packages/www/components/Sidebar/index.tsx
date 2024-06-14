@@ -246,6 +246,23 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
     return false;
   };
 
+  const isActive = (item: any) => {
+    if (id === item.id) {
+      return true;
+    }
+    return false;
+  };
+
+  const isParentActive = (item: any) => {
+    if (id === item.id) {
+      return true;
+    }
+    if (item.children) {
+      return item.children.some((child: any) => id === child.id);
+    }
+    return false;
+  };
+
   return (
     <>
       <CreateProjectDialog
@@ -538,14 +555,14 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             },
           }}>
           {generalSidebarItems.map((item) => (
-            <Box>
+            <Box key={item.id}>
               <Link href={appendProjectId(item.path)} passHref legacyBehavior>
-                <NavLink active={id === item.id}>
+                <NavLink active={isActive(item)}>
                   {item.icon}
                   {item.title}
                 </NavLink>
               </Link>
-              {item.children && id === item.id && (
+              {item.children && isParentActive(item) && (
                 <Box
                   css={{
                     a: {
@@ -556,9 +573,10 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                   {item.children.map((child) => (
                     <Link
                       href={appendProjectId(child.path)}
+                      key={child.id}
                       passHref
                       legacyBehavior>
-                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                      <NavLink active={isActive(child)}>{child.title}</NavLink>
                     </Link>
                   ))}
                 </Box>
