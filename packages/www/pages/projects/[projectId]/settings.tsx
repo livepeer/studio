@@ -110,8 +110,8 @@ const Settings = () => {
           css={{
             mb: "$7",
             pb: "$7",
-            borderBottom: "1px solid",
-            borderColor: "$neutral6",
+            // borderBottom: "1px solid",
+            // borderColor: "$neutral6",
           }}>
           <Flex
             direction={"column"}
@@ -151,6 +151,10 @@ const Settings = () => {
             Update
           </Button>
         </Box>
+
+        {/* 
+          Commented out the delete project button for now as we are launching without this feature (for now)
+          
         <Box>
           <Flex
             direction={"column"}
@@ -190,6 +194,7 @@ const Settings = () => {
             </Button>
           </Flex>
         </Box>
+      */}
       </Box>
       <DeleteProjectDialog
         open={open}
