@@ -715,8 +715,21 @@ components:
             $ref: "#/components/schemas/stream/properties/profiles/description"
         record:
           $ref: "#/components/schemas/stream/properties/record"
+        # Same as recordingSpec but allowing null for the profiles field (same reason as above).
         recordingSpec:
-          $ref: "#/components/schemas/stream/properties/recordingSpec"
+          type: object
+          description:
+            $ref: "#/components/schemas/stream/properties/recordingSpec/description"
+          additionalProperties: false
+          properties:
+            profiles:
+              type:
+                - array
+                - "null"
+              items:
+                $ref: "#/components/schemas/transcode-profile"
+              description:
+                $ref: "#/components/schemas/stream/properties/recordingSpec/properties/profiles/description"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
         userTags:

@@ -1405,7 +1405,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     playbackId += "-test";
   }
 
-  const { objectStoreId } = payload;
+  let { objectStoreId, recordingSpec } = payload;
   if (objectStoreId) {
     const store = await db.objectStore.get(objectStoreId);
     if (!store || store.deleted || store.disabled) {
@@ -1415,10 +1415,25 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     }
   }
 
+  if (recordingSpec) {
+    if (!payload.record) {
+      throw new BadRequestError(
+        `recordingSpec is only supported with record=true`,
+      );
+    }
+    if (!recordingSpec.profiles) {
+      // remove null profiles from the recordingSpec. it's only supported on the
+      // input as an SDK workaround but we want to avoid serializing them as null.
+      const { profiles, ...rest } = recordingSpec;
+      recordingSpec = rest;
+    }
+  }
+
   let doc: DBStream = {
     ...payload,
-    profiles: payload.profiles || req.config.defaultStreamProfiles,
     kind: "stream",
+    profiles: payload.profiles || req.config.defaultStreamProfiles,
+    recordingSpec,
     userId: req.user.id,
     creatorId: mapInputCreatorId(payload.creatorId),
     renditions: {},
