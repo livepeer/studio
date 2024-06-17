@@ -762,6 +762,8 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           $ref: "#/components/schemas/new-stream-payload/properties/profiles"
+        recordingSpec:
+          $ref: "#/components/schemas/new-stream-payload/properties/recordingSpec"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
