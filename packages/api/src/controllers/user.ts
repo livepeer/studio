@@ -6,38 +6,38 @@ import qs from "qs";
 import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
+import sql from "sql-template-strings";
 import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
 import { authorizer, validatePost } from "../middleware";
+import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
+import { CliArgs } from "../parse-cli";
 import {
   CreateCustomer,
   CreateSubscription,
-  PasswordResetTokenRequest,
+  DisableUserPayload,
   PasswordResetConfirm,
+  PasswordResetTokenRequest,
+  RefreshTokenPayload,
+  SuspendUserPayload,
   UpdateSubscription,
   User,
-  SuspendUserPayload,
-  DisableUserPayload,
-  RefreshTokenPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import {
+  FieldsMap,
   makeNextHREF,
-  sendgridEmail,
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridEmail,
   sendgridValidateEmail,
   toStringValues,
-  FieldsMap,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
-import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
-import sql from "sql-template-strings";
-import { CliArgs } from "../parse-cli";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -77,7 +77,7 @@ async function findUserByEmail(email: string, useReplica = true) {
   // Look for user by lowercase email
   const [lowercaseUsers] = await db.user.find(
     { email: email.toLowerCase() },
-    { useReplica }
+    { useReplica },
   );
   if (lowercaseUsers?.length === 1) {
     return lowercaseUsers[0];
@@ -97,12 +97,12 @@ async function findUserByEmail(email: string, useReplica = true) {
 
 async function isEmailRegistered(
   email: string,
-  useReplica = true
+  useReplica = true,
 ): Promise<boolean> {
   // Check if lowercase email is already registered
   const [lowercaseUsers] = await db.user.find(
     { email: email.toLowerCase() },
-    { useReplica }
+    { useReplica },
   );
   if (lowercaseUsers?.length > 0) return true;
 
@@ -115,15 +115,16 @@ export const frontendUrl = (
   {
     headers: { "x-forwarded-proto": proto },
     config: { frontendDomain },
-  }: Request,
-  path: string
+  }: Pick<Request, "headers" | "config">,
+  path: string,
 ) => `${proto || "https"}://${frontendDomain}${path}`;
 
-export const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
+export const unsubscribeUrl = (req: Pick<Request, "headers" | "config">) =>
+  frontendUrl(req, "/contact");
 
 export async function terminateUserStreams(
   req: Request,
-  userId: string
+  userId: string,
 ): Promise<void> {
   const [streams] = await db.stream.find([
     sql`stream.data->>'parentId' IS NULL`,
@@ -135,7 +136,7 @@ export async function terminateUserStreams(
       await triggerCatalystStreamStopSessions(req, stream.playbackId);
     } catch (err) {
       logger.error(
-        `error suspending stream id=${stream.id} userId=${userId} err=${err}`
+        `error suspending stream id=${stream.id} userId=${userId} err=${err}`,
       );
     }
   }
@@ -157,7 +158,7 @@ async function createSubscription(
   stripe: Stripe,
   stripeProductId: StripeProductIDs,
   stripeCustomerId: string,
-  withPayAsYouGo: boolean
+  withPayAsYouGo: boolean,
 ) {
   const existing = await stripe.subscriptions.list({
     customer: stripeCustomerId,
@@ -194,7 +195,7 @@ async function createSubscription(
 
 function signUserJwt(
   userId: string,
-  { jwtAudience, jwtSecret, jwtAccessTokenTtl }: CliArgs
+  { jwtAudience, jwtSecret, jwtAccessTokenTtl }: CliArgs,
 ) {
   return jwt.sign({ sub: userId, aud: jwtAudience }, jwtSecret, {
     algorithm: "HS256",
@@ -317,7 +318,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     try {
       const recaptchaScore = await recaptchaVerify(
         recaptchaToken,
-        req.config.recaptchaSecretKey
+        req.config.recaptchaSecretKey,
       );
       if (recaptchaScore < 0.5) {
         res.status(400);
@@ -368,7 +369,7 @@ app.post("/", validatePost("user"), async (req, res) => {
   if (!oneUser) {
     logger.warn("!!!!!!!!!!!!!!!!!!!");
     logger.warn(
-      `first user detected, promoting new admin userId=${id} email=${email}`
+      `first user detected, promoting new admin userId=${id} email=${email}`,
     );
     logger.warn("!!!!!!!!!!!!!!!!!!!");
     admin = true;
@@ -383,7 +384,7 @@ app.post("/", validatePost("user"), async (req, res) => {
       req.stripe,
       defaultProductId,
       customer.id,
-      true
+      true,
     );
     if (!subscription) {
       res.status(400);
@@ -395,6 +396,13 @@ app.post("/", validatePost("user"), async (req, res) => {
       stripeProductId: defaultProductId,
     };
   }
+
+  let project = await db.project.create({
+    id: uuid(),
+    name: "My default project",
+    userId: id,
+    createdAt: Date.now(),
+  });
 
   await db.user.create({
     kind: "user",
@@ -410,6 +418,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     lastName,
     organization,
     phone,
+    defaultProjectId: project.id,
     ...stripeFields,
   });
 
@@ -440,7 +449,7 @@ app.post("/", validatePost("user"), async (req, res) => {
             email: lowercaseEmail,
             emailValidToken,
             selectedPlan,
-          })}`
+          })}`,
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
@@ -557,7 +566,7 @@ app.patch("/:id/email", authorizer({}), async (req, res) => {
         `/dashboard/verify-new-email?${qs.stringify({
           emailValidToken,
           email: lowerCaseEmail,
-        })}`
+        })}`,
       ),
       unsubscribe: unsubscribeUrl(req),
       text: ["Please verify your new email address."].join("\n\n"),
@@ -593,7 +602,7 @@ app.get("/verify/new-email", async (req, res) => {
 });
 
 const suspensionEmailText = (
-  emailTemplate: SuspendUserPayload["emailTemplate"]
+  emailTemplate: SuspendUserPayload["emailTemplate"],
 ) => {
   switch (emailTemplate) {
     case "copyright":
@@ -630,7 +639,7 @@ app.patch(
     if (suspended) {
       terminateUserStreams(req, id).catch((err) => {
         logger.error(
-          `error terminating user streams id=${id} email=${email} err=${err}`
+          `error terminating user streams id=${id} email=${email} err=${err}`,
         );
       });
     }
@@ -658,14 +667,14 @@ app.patch(
         });
       } catch (err) {
         logger.error(
-          `error sending suspension email to user=${email} err=${err}`
+          `error sending suspension email to user=${email} err=${err}`,
         );
       }
     }
 
     res.status(204);
     res.end();
-  }
+  },
 );
 
 app.patch(
@@ -690,7 +699,7 @@ app.patch(
     if (disabled) {
       terminateUserStreams(req, id).catch((err) => {
         logger.error(
-          `error terminating user streams id=${id} email=${email} err=${err}`
+          `error terminating user streams id=${id} email=${email} err=${err}`,
         );
       });
     }
@@ -721,14 +730,14 @@ app.patch(
         });
       } catch (err) {
         logger.error(
-          `error sending disabled email to user=${email} err=${err}`
+          `error sending disabled email to user=${email} err=${err}`,
         );
       }
     }
 
     res.status(204);
     res.end();
-  }
+  },
 );
 
 app.patch("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -785,6 +794,21 @@ app.post("/token", validatePost("user"), async (req, res) => {
       ],
     });
   }
+
+  if (!user.defaultProjectId) {
+    const id = uuid();
+    await db.project.create({
+      id: id,
+      name: "My default project",
+      userId: user.id,
+      createdAt: Date.now(),
+    });
+
+    await db.user.update(user.id, {
+      defaultProjectId: id,
+    });
+  }
+
   res.status(201);
   res.json({ id: user.id, email: user.email, token, refreshToken });
 });
@@ -802,7 +826,7 @@ app.post(
       refreshTokenObj.revoked
     ) {
       console.log(
-        `Refresh attempt with invalid refresh token=${refreshToken} expiresAt=${refreshTokenObj?.expiresAt} revoked=${refreshTokenObj?.revoked}`
+        `Refresh attempt with invalid refresh token=${refreshToken} expiresAt=${refreshTokenObj?.expiresAt} revoked=${refreshTokenObj?.revoked}`,
       );
       return res.status(401).json({ errors: ["invalid refresh token"] });
     }
@@ -812,7 +836,7 @@ app.post(
       req.config.jwtAccessTokenTtl * 1000 * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO;
     if (timeSinceLastRefresh < minReuseDelay) {
       console.log(
-        `Revoking token due to potential malicious use of refreshToken=${refreshToken}`
+        `Revoking token due to potential malicious use of refreshToken=${refreshToken}`,
       );
       await db.jwtRefreshToken.update(refreshToken, {
         revoked: true,
@@ -857,7 +881,7 @@ app.post(
 
     res.status(201);
     res.json({ token, refreshToken: newRefreshToken });
-  }
+  },
 );
 
 // Utility to migrate from the never-expiring JWTs from the dashboard to
@@ -885,7 +909,7 @@ app.post(
 
     res.status(201);
     res.json({ token, refreshToken: newRefreshToken });
-  }
+  },
 );
 
 app.post("/verify", validatePost("user-verification"), async (req, res) => {
@@ -983,7 +1007,7 @@ async function sendVerificationEmail(req: Request, user: User, selectedPlan) {
             email,
             emailValidToken,
             selectedPlan,
-          })}`
+          })}`,
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
@@ -1036,7 +1060,7 @@ app.post(
 
     const userResp = await db.user.get(user.id);
     res.status(200).json(cleanUserFields(userResp));
-  }
+  },
 );
 
 app.post(
@@ -1072,7 +1096,7 @@ app.post(
         buttonText: "Reset Password",
         buttonUrl: frontendUrl(
           req,
-          `/dashboard/reset-password?${qs.stringify({ email, resetToken })}`
+          `/dashboard/reset-password?${qs.stringify({ email, resetToken })}`,
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
@@ -1088,7 +1112,7 @@ app.post(
     }
 
     const newToken = db.passwordResetToken.cleanWriteOnlyResponse(
-      await db.passwordResetToken.get(id)
+      await db.passwordResetToken.get(id),
     );
     if (newToken) {
       res.status(201);
@@ -1097,7 +1121,7 @@ app.post(
       res.status(403);
       res.json({ errors: ["error creating password reset token"] });
     }
-  }
+  },
 );
 
 app.post(
@@ -1109,7 +1133,7 @@ app.post(
     await db.user.update(user.id, { admin: req.body.admin });
     user = await db.user.get(user.id);
     res.status(200).json(cleanUserFields(user, req.user.admin));
-  }
+  },
 );
 
 app.post(
@@ -1129,7 +1153,7 @@ app.post(
 
     if (!customer) {
       logger.warn(
-        `deprecated /create-customer API used. userEmail=${user.email} createdAt=${user.createdAt}`
+        `deprecated /create-customer API used. userEmail=${user.email} createdAt=${user.createdAt}`,
       );
       customer = await getOrCreateCustomer(req.stripe, email);
       await db.user.update(user.id, {
@@ -1141,7 +1165,7 @@ app.post(
       res.status(400);
       res.json({ errors: ["error creating customer"] });
     }
-  }
+  },
 );
 
 app.post(
@@ -1152,7 +1176,7 @@ app.post(
   async (req, res) => {
     const [users] = await db.user.find(
       { stripeCustomerId: req.body.stripeCustomerId },
-      { useReplica: false }
+      { useReplica: false },
     );
     if (users.length < 1 || users[0].id !== req.user.id) {
       res.status(404);
@@ -1164,7 +1188,7 @@ app.post(
       req.body.stripeCustomerPaymentMethodId,
       {
         customer: req.body.stripeCustomerId,
-      }
+      },
     );
 
     const customer = await req.stripe.customers.update(
@@ -1173,7 +1197,7 @@ app.post(
         invoice_settings: {
           default_payment_method: req.body.stripeCustomerPaymentMethodId,
         },
-      }
+      },
     );
 
     // Update user's payment method
@@ -1183,7 +1207,7 @@ app.post(
       ccBrand: paymentMethod.card.brand,
     });
     res.json(customer);
-  }
+  },
 );
 
 app.post(
@@ -1195,7 +1219,7 @@ app.post(
       req.body as CreateSubscription;
     const [users] = await db.user.find(
       { stripeCustomerId: stripeCustomerId },
-      { useReplica: false }
+      { useReplica: false },
     );
     if (users.length < 1) {
       res.status(404);
@@ -1204,25 +1228,25 @@ app.post(
     let user = users[0];
     if (user.stripeCustomerSubscriptionId) {
       const subscription = await req.stripe.subscriptions.retrieve(
-        user.stripeCustomerSubscriptionId
+        user.stripeCustomerSubscriptionId,
       );
       return res.send(subscription);
     }
     logger.warn(
-      `deprecated /create-subscription API used. userEmail=${user.email} createdAt=${user.createdAt}`
+      `deprecated /create-subscription API used. userEmail=${user.email} createdAt=${user.createdAt}`,
     );
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (stripeCustomerPaymentMethodId) {
       logger.warn(
-        `attaching payment method through /create-subscription. userEmail=${user.email} createdAt=${user.createdAt}`
+        `attaching payment method through /create-subscription. userEmail=${user.email} createdAt=${user.createdAt}`,
       );
       try {
         const paymentMethod = await req.stripe.paymentMethods.attach(
           stripeCustomerPaymentMethodId,
           {
             customer: stripeCustomerId,
-          }
+          },
         );
         // Update user's payment method
         await db.user.update(user.id, {
@@ -1247,7 +1271,7 @@ app.post(
       req.stripe,
       stripeProductId,
       stripeCustomerId,
-      false
+      false,
     );
     if (!subscription) {
       return res
@@ -1261,7 +1285,7 @@ app.post(
       stripeCustomerSubscriptionId: subscription.id,
     });
     res.send(subscription);
-  }
+  },
 );
 
 app.post(
@@ -1273,7 +1297,7 @@ app.post(
     const payload = req.body as UpdateSubscription;
     const [users] = await db.user.find(
       { stripeCustomerId: payload.stripeCustomerId },
-      { useReplica: false }
+      { useReplica: false },
     );
     if (
       users.length < 1 ||
@@ -1291,7 +1315,7 @@ app.post(
           payload.stripeCustomerPaymentMethodId,
           {
             customer: payload.stripeCustomerId,
-          }
+          },
         );
         // Update user's payment method in our db
         await db.user.update(user.id, {
@@ -1318,7 +1342,7 @@ app.post(
 
     // Get the subscription
     const subscription = await req.stripe.subscriptions.retrieve(
-      payload.stripeCustomerSubscriptionId
+      payload.stripeCustomerSubscriptionId,
     );
 
     // Get the prices associated with the subscription
@@ -1345,7 +1369,7 @@ app.post(
               price: item.id,
             })),
           ],
-        }
+        },
       );
     } else {
       let payAsYouGoItems = [];
@@ -1380,7 +1404,7 @@ app.post(
             })),
             ...payAsYouGoItems,
           ],
-        }
+        },
       );
     }
 
@@ -1399,7 +1423,7 @@ app.post(
       planChangedAt: Date.now(),
     });
     res.send(updatedSubscription);
-  }
+  },
 );
 
 app.post(
@@ -1414,10 +1438,10 @@ app.post(
       return res.status(403).json({ errors: ["access forbidden"] });
     }
     const subscription = await req.stripe.subscriptions.retrieve(
-      stripeCustomerSubscriptionId
+      stripeCustomerSubscriptionId,
     );
     res.status(200).json(subscription);
-  }
+  },
 );
 
 app.post(
@@ -1433,7 +1457,7 @@ app.post(
       customer: stripeCustomerId,
     });
     res.status(200).json(invoices);
-  }
+  },
 );
 
 app.post(
@@ -1458,7 +1482,7 @@ app.post(
       invoices,
       subscriptionItems,
     });
-  }
+  },
 );
 
 app.post(
@@ -1471,10 +1495,59 @@ app.post(
       return res.status(403).json({ errors: ["access forbidden"] });
     }
     const paymentMethod = await req.stripe.paymentMethods.retrieve(
-      stripePaymentMethodId
+      stripePaymentMethodId,
     );
     res.status(200).json(paymentMethod);
-  }
+  },
+);
+
+// Utility to migrate users to defaultProjects
+// To call once and then we can remove it
+app.post(
+  "/migrate/userDefaultProject",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    // parse limit from querystring
+    const limit = parseInt(req.query.limit?.toString() || "100");
+
+    const [users] = await db.user.find(
+      [
+        sql`(users.data->>'defaultProjectId' = '' OR users.data->>'defaultProjectId' IS NULL)`,
+        sql`(users.data->>'admin' = 'false' OR users.data->>'admin' IS NULL)`,
+      ],
+      { limit },
+    );
+
+    const results = [];
+
+    for (const user of users) {
+      const project = await db.project.create({
+        id: uuid(),
+        name: "My default project",
+        userId: user.id,
+        createdAt: Date.now(),
+      });
+
+      const defaultProjectId = project.id;
+      await db.user.update(user.id, {
+        defaultProjectId,
+      });
+
+      results.push({
+        id: user.id,
+        defaultProjectId,
+      });
+    }
+
+    res.status(200).json({
+      migrated: results.length,
+      total: users.length,
+      users: results.map(({ id, defaultProjectId }) => ({
+        id,
+        defaultProjectId,
+      })),
+    });
+  },
 );
 
 export default app;

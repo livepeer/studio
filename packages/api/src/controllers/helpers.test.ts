@@ -4,11 +4,13 @@ import { ObjectStore, User } from "../schema/types";
 import { db } from "../store";
 import { v4 as uuid } from "uuid";
 import {
+  addDefaultProjectId,
   deleteCredentials,
   getS3PresignedUrl,
   toObjectStoreUrl,
   toWeb3StorageUrl,
 } from "./helpers";
+import { Request, Response } from "express";
 
 let server: TestServer;
 
@@ -35,41 +37,41 @@ describe("controllers/helpers", () => {
 
     it("should support old object store URLs with region", async () => {
       const presignedUrl = await makePresignedUrl(
-        "s3+http://localhost:8000/test-region/test-bucket"
+        "s3+http://localhost:8000/test-region/test-bucket",
       );
       expect(presignedUrl).toMatch(
-        /^http:\/\/localhost:8000\/test-bucket\/test\.txt.+test-region.+$/
+        /^http:\/\/localhost:8000\/test-bucket\/test\.txt.+test-region.+$/,
       );
     });
 
     it("should support new object store URLs without region", async () => {
       const presignedUrl = await makePresignedUrl(
-        "s3+https://localhost:8000/test-bucket"
+        "s3+https://localhost:8000/test-bucket",
       );
       expect(presignedUrl).toMatch(
-        /^https:\/\/localhost:8000\/test-bucket\/test\.txt.+ignored.+$/
+        /^https:\/\/localhost:8000\/test-bucket\/test\.txt.+ignored.+$/,
       );
     });
 
     it("should support access credentials", async () => {
       const presignedUrl = await makePresignedUrl(
-        "s3+https://poweruser:secretpwd@localhost:8000/test-bucket"
+        "s3+https://poweruser:secretpwd@localhost:8000/test-bucket",
       );
       expect(presignedUrl).toMatch(
-        /^https:\/\/localhost:8000\/test-bucket\/test\.txt.+poweruser.+$/
+        /^https:\/\/localhost:8000\/test-bucket\/test\.txt.+poweruser.+$/,
       );
       expect(presignedUrl).not.toContain("secretpwd");
     });
 
     it("should NOT support invalid object store URLs", async () => {
       await expect(
-        makePresignedUrl("not-s3://localhost:8000/test-bucket")
+        makePresignedUrl("not-s3://localhost:8000/test-bucket"),
       ).rejects.toThrow(/not-s3:/);
       await expect(
-        makePresignedUrl("s3+https://localhost:8000/")
+        makePresignedUrl("s3+https://localhost:8000/"),
       ).rejects.toThrow(/"\/"/);
       await expect(
-        makePresignedUrl("s3+https://localhost:8000/region/bucket/path")
+        makePresignedUrl("s3+https://localhost:8000/region/bucket/path"),
       ).rejects.toThrow(/"\/region\/bucket\/path"/);
     });
   });
@@ -85,7 +87,7 @@ describe("controllers/helpers", () => {
         },
       };
       expect(toObjectStoreUrl(storageObj)).toBe(
-        "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI%2FK7MDENG%2FbPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
+        "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI%2FK7MDENG%2FbPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket",
       );
     });
 
@@ -98,7 +100,7 @@ describe("controllers/helpers", () => {
         },
       };
       expect(() => toObjectStoreUrl(storageObj)).toThrow(
-        "undefined property 'endpoint'"
+        "undefined property 'endpoint'",
       );
     });
 
@@ -112,7 +114,7 @@ describe("controllers/helpers", () => {
         },
       };
       expect(() => toObjectStoreUrl(storageObj)).toThrow(
-        "undefined property 'endpoint'"
+        "undefined property 'endpoint'",
       );
     });
 
@@ -125,7 +127,7 @@ describe("controllers/helpers", () => {
         },
       };
       expect(() => toObjectStoreUrl(storageObj)).toThrow(
-        "undefined property 'bucket'"
+        "undefined property 'bucket'",
       );
     });
 
@@ -135,7 +137,7 @@ describe("controllers/helpers", () => {
         bucket: "testbucket",
       };
       expect(() => toObjectStoreUrl(storageObj)).toThrow(
-        "undefined property 'credentials'"
+        "undefined property 'credentials'",
       );
     });
 
@@ -150,7 +152,7 @@ describe("controllers/helpers", () => {
         additionalProperty: "someAdditionalProperty",
       };
       expect(() => toObjectStoreUrl(storageObj)).toThrow(
-        "undefined property 'credentials'"
+        "undefined property 'credentials'",
       );
     });
   });
@@ -159,26 +161,26 @@ describe("controllers/helpers", () => {
     it("should delete credentials form object store URL", () => {
       expect(
         deleteCredentials(
-          "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket"
-        )
+          "s3+https://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY@gateway.storjshare.io/testbucket",
+        ),
       ).toBe("s3+https://***:***@gateway.storjshare.io/testbucket");
     });
 
     it("should not modify a standard URL", () => {
       expect(
         deleteCredentials(
-          "https://s3.amazonaws.com/my-bucket/path/filename.mp4"
-        )
+          "https://s3.amazonaws.com/my-bucket/path/filename.mp4",
+        ),
       ).toBe("https://s3.amazonaws.com/my-bucket/path/filename.mp4");
     });
 
     it("should not modify incorrect object store URL", () => {
       expect(
         deleteCredentials(
-          "s3+https://USERNAME_NO_PASSWORD:@gateway.storjshare.io/testbucket"
-        )
+          "s3+https://USERNAME_NO_PASSWORD:@gateway.storjshare.io/testbucket",
+        ),
       ).toBe(
-        "s3+https://USERNAME_NO_PASSWORD:@gateway.storjshare.io/testbucket"
+        "s3+https://USERNAME_NO_PASSWORD:@gateway.storjshare.io/testbucket",
       );
     });
   });
@@ -194,7 +196,7 @@ describe("convert w3 storage to object store URL", () => {
       },
     };
     expect(toWeb3StorageUrl(storageObj)).toBe(
-      "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_@/"
+      "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_@/",
     );
   });
 
@@ -207,7 +209,7 @@ describe("convert w3 storage to object store URL", () => {
       },
     };
     expect(toWeb3StorageUrl(storageObj)).toBe(
-      "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_@/"
+      "w3s://EaJlcm9vdHOAZ3ZlcnNpb24BmgIBcRIg2uxHpcPYSWNtifMKFkPC7IEDvFDCxCd3ADViv0coV7SnYXNYRO2hA0AnblHEW38s3lSlcwaDjPn-_@/",
     );
   });
 
@@ -217,7 +219,7 @@ describe("convert w3 storage to object store URL", () => {
     };
     // @ts-expect-error
     expect(() => toWeb3StorageUrl(storageObj)).toThrow(
-      "undefined property 'credentials.proof'"
+      "undefined property 'credentials.proof'",
     );
   });
 
@@ -228,7 +230,64 @@ describe("convert w3 storage to object store URL", () => {
     };
     // @ts-expect-error
     expect(() => toWeb3StorageUrl(storageObj)).toThrow(
-      "undefined property 'credentials.proof'"
+      "undefined property 'credentials.proof'",
     );
+  });
+
+  it("should append default project id", async () => {
+    const mockAsset = {
+      id: "asset1",
+      userId: "test",
+      user: {
+        id: "test",
+        admin: false,
+        defaultProjectId: "defaultProject1",
+      },
+      projectId: undefined,
+    };
+    const mockAsset2 = {
+      id: "asset2",
+      userId: "test",
+      projectId: undefined,
+      user: {
+        id: "test",
+        admin: false,
+        defaultProjectId: "defaultProject1",
+      },
+    };
+
+    const assetList = [mockAsset, mockAsset2];
+
+    let mockReq: Request = {
+      user: {
+        id: "test",
+        admin: false,
+        defaultProjectId: "defaultProject1",
+      },
+      project: {
+        id: "test",
+      },
+    } as Request;
+
+    let mockRes: Response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as any as Response;
+
+    // nonAdmin + singleAsset
+    let result = await addDefaultProjectId(mockAsset, mockReq, mockRes);
+    expect(result.projectId).toBe("defaultProject1");
+    expect(assetList[0].projectId).toBe(undefined);
+    // nonAdmin + multipleAssets
+    result = await addDefaultProjectId(assetList, mockReq, mockRes);
+    expect(result[0].projectId).toBe("defaultProject1");
+    mockReq.user.admin = true;
+    mockReq.user.defaultProjectId = "adminProjectId";
+    // admin + singleAsset
+    result = await addDefaultProjectId(mockAsset, mockReq, mockRes);
+    expect(result.projectId).toBe("defaultProject1");
+    // admin + multipleAssets
+    result = await addDefaultProjectId(assetList, mockReq, mockRes);
+    expect(result[0].projectId).toBe("defaultProject1");
   });
 });

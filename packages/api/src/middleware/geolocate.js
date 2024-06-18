@@ -38,7 +38,7 @@ function geoLocateFactory({ first = true, region = "region" }) {
       const res = await fetch(upstreamUrl);
       if (res.status !== 200) {
         const err = new Error(
-          `${upstreamUrl} HTTP ${res.status}: ${await res.text()}`
+          `${upstreamUrl} HTTP ${res.status}: ${await res.text()}`,
         );
         errors.push(err);
         throw err;

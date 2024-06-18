@@ -32,7 +32,7 @@ export const checkIsExternal = (href: string) => {
 const getHrefWithQuery = (
   asPath: string,
   newQueryParams?: QueryParams,
-  override = true
+  override = true,
 ) => {
   const uri = new URL(asPath, originURL);
 
@@ -61,7 +61,7 @@ export type TransitionOptions = Parameters<NextRouter["push"]>["2"];
 const makeQuery = (
   router: NextRouter,
   queryParams: QueryParams,
-  opts?: { replace?: boolean } & TransitionOptions
+  opts?: { replace?: boolean } & TransitionOptions,
 ) => {
   const url = getHrefWithQuery(router.asPath, queryParams);
   const replace = opts?.replace;

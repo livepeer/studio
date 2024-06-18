@@ -81,7 +81,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
         accessor: "lastSeen",
       },
     ],
-    [nextCursor, lastFilters]
+    [nextCursor, lastFilters],
   );
 
   const filtersDesc = [
@@ -124,7 +124,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
   const refecth = () => {
     fetchData(
       { order: lastOrder, cursor: lastCursor, filters: lastFilters },
-      true
+      true,
     );
   };
 

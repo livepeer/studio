@@ -1,48 +1,74 @@
-import { Router, Request } from "express";
-import { db, jobsDb } from "../store";
-import { products } from "../config";
+import { Router } from "express";
 import sql from "sql-template-strings";
-import { sendgridEmailPaymentFailed, sendgridEmail } from "./helpers";
-import { WithID } from "../store/types";
-import { User } from "../schema/types";
+import Stripe from "stripe";
+import { products } from "../config";
+import logger from "../logger";
 import { authorizer } from "../middleware";
+import { CliArgs } from "../parse-cli";
+import { User } from "../schema/types";
+import { db, jobsDb } from "../store";
+import { WithID } from "../store/types";
+import { Ingest } from "../types/common";
+import { sleep } from "../util";
+import { sendgridEmail, sendgridEmailPaymentFailed } from "./helpers";
 import { getRecentlyActiveHackers, getUsageData } from "./usage";
 import {
-  notifyUser,
-  getUsageNotifications,
   HACKER_DISABLE_CUTOFF_DATE,
+  getUsageNotifications,
+  notifyUser,
 } from "./utils/notification";
-import { sleep } from "../util";
 
 const app = Router();
 const HELP_EMAIL = "help@livepeer.org";
 
-export const reportUsage = async (req: Request, adminToken: string) => {
-  let payAsYouGoUsers = await getPayAsYouGoUsers(req);
+export const reportUsage = async (
+  stripe: Stripe,
+  config: CliArgs,
+  adminToken: string,
+) => {
+  const payAsYouGoUsers = await getPayAsYouGoUsers(config.ingest, adminToken);
 
-  let updatedUsers = [];
-  for (const user of payAsYouGoUsers) {
-    try {
-      let userUpdated = await reportUsageForUser(req, user, adminToken);
-      updatedUsers.push(userUpdated);
-    } catch (e) {
-      console.log(`
-        Failed to create usage record for user=${user.id} with error=${e.message}
-      `);
-      updatedUsers.push({
-        id: user.id,
-        usageReported: false,
-        error: e.message,
-      });
+  const updatedUsers = [];
+  const pendingUsers = payAsYouGoUsers.slice();
+
+  const processUser = async () => {
+    while (true) {
+      const user = pendingUsers.pop();
+      if (!user) {
+        return;
+      }
+
+      try {
+        const userUpdated = await reportUsageForUser(
+          stripe,
+          config,
+          user,
+          adminToken,
+        );
+        updatedUsers.push(userUpdated);
+      } catch (e) {
+        logger.error(
+          `Failed to create usage record for user=${user.id} with error=${e.message}`,
+        );
+        updatedUsers.push({
+          id: user.id,
+          usageReported: false,
+          error: e.message,
+        });
+      }
     }
-  }
-
-  return {
-    updatedUsers: updatedUsers,
   };
+
+  const workers = [];
+  for (let i = 0; i < config.updateUsageConcurrency; i++) {
+    workers.push(processUser());
+  }
+  await Promise.all(workers);
+
+  return { updatedUsers };
 };
 
-async function getPayAsYouGoUsers(req: Request) {
+async function getPayAsYouGoUsers(ingests: Ingest[], adminToken: string) {
   const [users] = await jobsDb.user.find(
     [
       sql`users.data->>'stripeProductId' IN ('growth_1', 'scale_1', 'prod_O9XtHhI6rbTT1B','prod_O9XtcfOSMjSD5L')`,
@@ -50,24 +76,28 @@ async function getPayAsYouGoUsers(req: Request) {
     {
       limit: 9999999999,
       useReplica: true,
-    }
+    },
   );
 
-  const hackerUsers = await getRecentlyActiveHackers(req);
+  const hackerUsers = await getRecentlyActiveHackers(ingests, adminToken);
 
   const payAsYouGoUsers = [...users, ...hackerUsers];
   return payAsYouGoUsers;
 }
 
 async function reportUsageForUser(
-  req: Request,
+  stripe: Stripe,
+  config: CliArgs,
   user: WithID<User>,
   adminToken: string,
   actuallyReport: boolean = true,
   forceReport: boolean = false,
   from?: number,
-  to?: number
+  to?: number,
 ) {
+  // make sure this func takes at least 100ms to avoid incurring into stripe rate limits
+  const sleepProm = sleep(100);
+
   if (!forceReport && (user.email.endsWith("@livepeer.org") || user.admin)) {
     return {
       id: user.id,
@@ -78,8 +108,8 @@ async function reportUsageForUser(
     };
   }
 
-  const userSubscription = await req.stripe.subscriptions.retrieve(
-    user.stripeCustomerSubscriptionId
+  const userSubscription = await stripe.subscriptions.retrieve(
+    user.stripeCustomerSubscriptionId,
   );
 
   let billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
@@ -90,27 +120,25 @@ async function reportUsageForUser(
     billingCycleEnd = to;
   }
 
-  const ingests = await req.getIngest();
-
   const usageData = await getUsageData(
     user,
     billingCycleStart,
     billingCycleEnd,
-    ingests,
-    adminToken
+    config.ingest,
+    adminToken,
   );
 
-  const subscriptionItems = await req.stripe.subscriptionItems.list({
+  const subscriptionItems = await stripe.subscriptionItems.list({
     subscription: user.stripeCustomerSubscriptionId,
   });
 
   const usageNotifications = await getUsageNotifications(
     usageData.usagePercentages,
-    user
+    user,
   );
 
   if (usageNotifications.length > 0) {
-    await notifyUser(usageNotifications, user, req);
+    await notifyUser(usageNotifications, user, { headers: {}, config });
   }
 
   if (actuallyReport) {
@@ -120,21 +148,20 @@ async function reportUsageForUser(
         acc[item.price.lookup_key] = item.id;
         return acc;
       },
-      {} as Record<string, string>
+      {} as Record<string, string>,
     );
-    console.log(`
+    logger.info(`
       usage: reporting usage to stripe for user=${user.id} email=${user.email} from=${billingCycleStart} to=${billingCycleEnd}
     `);
     await sendUsageRecordToStripe(
+      stripe,
       user,
-      req,
       subscriptionItemsByLookupKey,
-      usageData.overUsage
+      usageData.overUsage,
     );
   }
 
-  // Sleep to avoid to incur into stripe rate limits
-  await sleep(100);
+  await sleepProm;
 
   return {
     id: user.id,
@@ -147,43 +174,43 @@ async function reportUsageForUser(
 }
 
 const sendUsageRecordToStripe = async (
+  stripe: Stripe,
   user: WithID<User>,
-  req: Request,
   subscriptionItemsByLookupKey,
-  overUsage
+  overUsage,
 ) => {
   // Invoice items based on overusage
   await Promise.all(
     products[user.stripeProductId].usage.map(async (product) => {
       if (product.name === "Transcoding") {
-        await req.stripe.subscriptionItems.createUsageRecord(
+        await stripe.subscriptionItems.createUsageRecord(
           subscriptionItemsByLookupKey["transcoding_usage"],
           {
             quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       } else if (product.name === "Delivery") {
-        await req.stripe.subscriptionItems.createUsageRecord(
+        await stripe.subscriptionItems.createUsageRecord(
           subscriptionItemsByLookupKey["tstreaming_usage"],
           {
             quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       } else if (product.name === "Storage") {
-        await req.stripe.subscriptionItems.createUsageRecord(
+        await stripe.subscriptionItems.createUsageRecord(
           subscriptionItemsByLookupKey["tstorage_usage"],
           {
             quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       }
-    })
+    }),
   );
 };
 
@@ -211,7 +238,7 @@ app.post("/webhook", async (req, res) => {
 
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
-      { useReplica: false }
+      { useReplica: false },
     );
 
     if (users.length < 1) {
@@ -229,7 +256,7 @@ app.post("/webhook", async (req, res) => {
         invoice.period_end,
         {
           useReplica: false,
-        }
+        },
       );
 
       // Invoice items based on usage
@@ -248,7 +275,7 @@ app.post("/webhook", async (req, res) => {
               subscription: user.stripeCustomerSubscriptionId,
             });
           }
-        })
+        }),
       );
     }
   } else if (event.type === "invoice.payment_failed") {
@@ -258,7 +285,7 @@ app.post("/webhook", async (req, res) => {
 
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
-      { useReplica: false }
+      { useReplica: false },
     );
 
     if (users.length < 1) {
@@ -268,7 +295,7 @@ app.post("/webhook", async (req, res) => {
 
     const user = users[0];
 
-    console.log(`
+    logger.info(`
        invoice=${invoice.id} payment failed for user=${user.id} notifying support team
     `);
 
@@ -281,7 +308,7 @@ app.post("/webhook", async (req, res) => {
         let diff = now - lastNotification;
         let days = diff / (1000 * 60 * 60 * 24);
         if (days < 7) {
-          console.log(`
+          logger.warn(`
             Not sending email for payment failure of user=${user.id} because team was notified less than 7 days ago
           `);
           return res.sendStatus(200);
@@ -318,13 +345,12 @@ app.post("/webhook", async (req, res) => {
         });
 
         let paidInvoices = allCustomerInvoices.data.filter(
-          (invoice) => invoice.status === "paid" && invoice.amount_due > 0
+          (invoice) => invoice.status === "paid" && invoice.amount_due > 0,
         );
 
         if (paidInvoices.length === 0) {
           await db.user.update(user.id, {
             disabled: true,
-            suspended: true,
           });
           await sendgridEmail({
             email: HELP_EMAIL,
@@ -341,10 +367,26 @@ app.post("/webhook", async (req, res) => {
               `Customer ${user.email} has been disabled due to failed payment.`,
             ].join("\n\n"),
           });
+          await sendgridEmail({
+            email: user.email,
+            supportAddr: req.config.supportAddr,
+            sendgridTemplateId: req.config.sendgridTemplateId,
+            sendgridApiKey: req.config.sendgridApiKey,
+            subject: "Your Livepeer Studio account has been disabled",
+            preheader: "Please update your payment method",
+            buttonText: "Go to Dashboard",
+            buttonUrl: "https://livepeer.studio/dashboard/billing",
+            unsubscribe: "",
+            text: `
+              Your Livepeer Studio account has been disabled due to a failed payment.
+
+              Please update your payment method to reactivate your account.
+            `,
+          });
         }
       }
     } catch (e) {
-      console.log(`
+      logger.error(`
         Failed to send email for payment failure of user=${user.id} with error=${e.message}
       `);
     }
@@ -374,7 +416,7 @@ app.patch(
 
     if (stripeCustomerSubscriptionId) {
       const subscription = await req.stripe.subscriptions.retrieve(
-        stripeCustomerSubscriptionId
+        stripeCustomerSubscriptionId,
       );
 
       if (!subscription) {
@@ -405,7 +447,7 @@ app.patch(
 
     res.status(200);
     return res.json({ result: "user subscription updated" });
-  }
+  },
 );
 
 app.post(
@@ -447,10 +489,10 @@ app.post(
 
       try {
         subscription = await req.stripe.subscriptions.retrieve(
-          user.stripeCustomerSubscriptionId
+          user.stripeCustomerSubscriptionId,
         );
       } catch (e) {
-        console.log(`
+        logger.error(`
             error- subscription not found for user=${user.id} email=${user.email} subscriptionId=${user.stripeCustomerSubscriptionId}
           `);
         await db.user.update(user.id, {
@@ -502,7 +544,7 @@ app.post(
               price: item.id,
             })),
           ],
-        }
+        },
       );
 
       await db.user.update(user.id, {
@@ -525,7 +567,7 @@ app.post(
     res.json({
       result: "Migrated user with email " + user.email + " to enterprise plan",
     });
-  }
+  },
 );
 
 export default app;

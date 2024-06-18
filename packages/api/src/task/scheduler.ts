@@ -70,7 +70,7 @@ export class TaskScheduler {
       event = JSON.parse(data.content.toString());
       console.log(
         "events: got task result message",
-        JSON.stringify(event, null, 2)
+        JSON.stringify(event, null, 2),
       );
     } catch (err) {
       console.log("events: error parsing task message", err);
@@ -117,13 +117,13 @@ export class TaskScheduler {
       } else {
         if (task.status.retries) {
           console.log(
-            `task retry process error: err=max retries reached taskId=${task.id}`
+            `task retry process error: err=max retries reached taskId=${task.id}`,
           );
         }
         await this.failTask(task, event.error.message);
       }
       console.log(
-        `task event process error: err="${event.error.message}" unretriable=${event.error.unretriable}`
+        `task event process error: err="${event.error.message}" unretriable=${event.error.unretriable}`,
       );
       return true;
     }
@@ -136,7 +136,7 @@ export class TaskScheduler {
         if (!assetSpec) {
           const error = "bad task output: missing assetSpec";
           console.error(
-            `task event process error: err=${error} taskId=${event.task.id}`
+            `task event process error: err=${error} taskId=${event.task.id}`,
           );
           await this.failTask(task, error, event.output);
           return true;
@@ -210,7 +210,7 @@ export class TaskScheduler {
   }
 
   async processTaskResultPartial(
-    event: messages.TaskResultPartial
+    event: messages.TaskResultPartial,
   ): Promise<boolean> {
     const tasks = await db.task.find({ id: event.task.id });
     if (!tasks?.length || !tasks[0].length) {
@@ -249,7 +249,7 @@ export class TaskScheduler {
             this.config,
             session,
             null,
-            true
+            true,
           );
           await this.queue.publishWebhook("events.recording.ready", {
             type: "webhook_event",
@@ -258,6 +258,7 @@ export class TaskScheduler {
             streamId: session.parentId,
             event: "recording.ready",
             userId: session.userId,
+            projectId: session.projectId,
             sessionId: session.id,
             payload: {
               recordingUrl: externalSession?.recordingUrl,
@@ -277,7 +278,7 @@ export class TaskScheduler {
   public async failTask(
     task: WithID<Task>,
     error: string,
-    output?: Task["output"]
+    output?: Task["output"],
   ) {
     const baseStatus: Task["status"] & Asset["status"] = {
       phase: "failed",
@@ -344,7 +345,7 @@ export class TaskScheduler {
     inputAsset?: Asset,
     outputAsset?: Asset,
     userId?: string,
-    requesterId?: string
+    requesterId?: string,
   ) {
     const task = await this.createTask(
       type,
@@ -352,7 +353,7 @@ export class TaskScheduler {
       inputAsset,
       outputAsset,
       userId,
-      requesterId
+      requesterId,
     );
 
     let uId = inputAsset?.userId || outputAsset?.userId || userId;
@@ -375,7 +376,7 @@ export class TaskScheduler {
     inputAsset?: Asset,
     outputAsset?: Asset,
     userId?: string,
-    requesterId?: string
+    requesterId?: string,
   ) {
     const task = await db.task.create({
       id: uuid(),
@@ -428,8 +429,8 @@ export class TaskScheduler {
       this.failTask(task, "Failed to enqueue task").catch((err) =>
         console.error(
           `Error failing task after enqueue error: taskId=${task.id} err=`,
-          err
-        )
+          err,
+        ),
       );
       throw new Error(`Failed to enqueue task: ${err}`);
     }
@@ -438,7 +439,7 @@ export class TaskScheduler {
   async retryTask(
     task: WithID<Task>,
     errorMessage: string,
-    forceRetry?: boolean
+    forceRetry?: boolean,
   ) {
     let retries = (task.status.retries ?? 0) + 1;
     if (forceRetry) {
@@ -468,15 +469,15 @@ export class TaskScheduler {
   async updateTask(
     task: WithID<Task>,
     updates: Pick<Task, "scheduledAt" | "status" | "output" | "sourceReadyAt">,
-    filters?: { allowedPhases: Array<Task["status"]["phase"]> }
+    filters?: { allowedPhases: Array<Task["status"]["phase"]> },
   ) {
     updates = this.deleteCredentials(task, updates);
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
       query.push(
         sql`data->'status'->>'phase' IN `.append(
-          sqlQueryGroup(filters.allowedPhases)
-        )
+          sqlQueryGroup(filters.allowedPhases),
+        ),
       );
     }
     const res = await db.task.update(query, updates);
@@ -518,7 +519,7 @@ export class TaskScheduler {
 
   private deleteCredentials(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output" | "params">
+    updates: Pick<Task, "status" | "output" | "params">,
   ): Pick<Task, "status" | "output" | "params"> {
     // We should remove this at some point and do not store credentials at all
     const isTerminal =
@@ -587,7 +588,7 @@ export class TaskScheduler {
   async updateAsset(
     asset: string | Asset,
     updates: Partial<Asset>,
-    filters?: { allowedPhases: Array<Asset["status"]["phase"]> }
+    filters?: { allowedPhases: Array<Asset["status"]["phase"]> },
   ) {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
@@ -604,8 +605,8 @@ export class TaskScheduler {
     if (filters?.allowedPhases) {
       query.push(
         sql`data->'status'->>'phase' IN `.append(
-          sqlQueryGroup(filters.allowedPhases)
-        )
+          sqlQueryGroup(filters.allowedPhases),
+        ),
       );
     }
     const res = await db.asset.update(query, updates);
@@ -623,6 +624,7 @@ export class TaskScheduler {
       timestamp,
       event,
       userId: asset.userId,
+      projectId: asset.projectId,
       payload: {
         asset: {
           id: asset.id,
@@ -641,6 +643,7 @@ export class TaskScheduler {
         timestamp,
         event: assetEvent,
         userId: asset.userId,
+        projectId: asset.projectId,
         payload: {
           id: asset.id,
           snapshot,
@@ -654,7 +657,7 @@ export async function ensureQueueCapacity(config: CliArgs, userId: string) {
   const numScheduled = await db.task.countScheduledTasks(userId);
   if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
     throw new TooManyRequestsError(
-      `user ${userId} has reached the maximum number of pending tasks`
+      `user ${userId} has reached the maximum number of pending tasks`,
     );
   }
 }

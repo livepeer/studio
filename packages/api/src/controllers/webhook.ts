@@ -1,16 +1,24 @@
 import { URL } from "url";
-import { authorizer } from "../middleware";
+import { authorizer, hasAccessToResource } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import { v4 as uuid } from "uuid";
-import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
+import {
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  FieldsMap,
+  addDefaultProjectId,
+  getProjectId,
+} from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
 import webhookLog from "./webhook-log";
+import mung from "express-mung";
 
-function validateWebhookPayload(id, userId, createdAt, payload) {
+function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
   try {
     new URL(payload.url);
   } catch (e) {
@@ -20,13 +28,14 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
 
   if (!payload.events && !payload.event) {
     throw new UnprocessableEntityError(
-      `must provide "events" field with subscriptions`
+      `must provide "events" field with subscriptions`,
     );
   }
 
   return {
     id,
     userId,
+    projectId,
     createdAt,
     kind: "webhook",
     name: payload.name,
@@ -39,6 +48,8 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
 
 const app = Router();
 
+app.use(mung.jsonAsync(addDefaultProjectId));
+
 app.use("/:id/log", webhookLog);
 
 const fieldsMap: FieldsMap = {
@@ -50,6 +61,7 @@ const fieldsMap: FieldsMap = {
   createdAt: { val: `webhook.data->'createdAt'`, type: "int" },
   userId: `webhook.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
+  projectId: `webhook.data->>'projectId'`,
   sharedSecret: `webhook.data->>'sharedSecret'`,
 };
 
@@ -96,6 +108,11 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
+  query.push(
+    sql`coalesce(webhook.data->>'projectId', ${
+      req.user.defaultProjectId || ""
+    }) = ${req.project?.id || ""}`,
+  );
 
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`webhook.data->>'deleted' IS NULL`);
@@ -145,7 +162,13 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
 
 app.post("/", authorizer({}), validatePost("webhook"), async (req, res) => {
   const id = uuid();
-  const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
+  const doc = validateWebhookPayload(
+    id,
+    req.user.id,
+    req.project?.id,
+    Date.now(),
+    req.body,
+  );
   try {
     await req.store.create(doc);
   } catch (e) {
@@ -161,13 +184,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   logger.info(`webhook params ${req.params.id}`);
 
   const webhook = await db.webhook.get(req.params.id);
-  if (
-    !webhook ||
-    ((webhook.deleted || webhook.userId !== req.user.id) && !req.user.admin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(webhook);
 
   res.status(200);
   res.json(webhook);
@@ -176,14 +193,16 @@ app.get("/:id", authorizer({}), async (req, res) => {
 app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
   // modify a specific webhook
   const webhook = await req.store.get(`webhook/${req.body.id}`);
-  if ((webhook.userId !== req.user.id || webhook.deleted) && !req.user.admin) {
-    // do not reveal that webhooks exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(webhook);
 
-  const { id, userId, createdAt } = webhook;
-  const doc = validateWebhookPayload(id, userId, createdAt, req.body);
+  const { id, userId, projectId, createdAt } = webhook;
+  const doc = validateWebhookPayload(
+    id,
+    userId,
+    projectId,
+    createdAt,
+    req.body,
+  );
   try {
     await req.store.replace(doc);
   } catch (e) {
@@ -205,15 +224,9 @@ app.patch(
       throw new NotFoundError(`webhook not found`);
     }
 
-    if (
-      (webhook.userId !== req.user.id || webhook.deleted) &&
-      !req.user.admin
-    ) {
-      // do not reveal that webhooks exists
-      throw new NotFoundError(`webhook not found`);
-    }
+    req.checkResourceAccess(webhook);
 
-    const { id, userId, createdAt, kind } = webhook;
+    const { id, userId, projectId, createdAt, kind } = webhook;
 
     if (req.body.streamId) {
       const stream = await db.stream.get(req.body.streamId);
@@ -232,20 +245,13 @@ app.patch(
     });
 
     res.status(204).end();
-  }
+  },
 );
 
 app.delete("/:id", authorizer({}), async (req, res) => {
   // delete a specific webhook
   const webhook = await db.webhook.get(req.params.id);
-  if (
-    !webhook ||
-    ((webhook.deleted || webhook.userId !== req.user.id) && !req.isUIAdmin)
-  ) {
-    // do not reveal that webhooks exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+  req.checkResourceAccess(webhook, true);
 
   try {
     await db.webhook.markDeleted(webhook.id);
@@ -270,7 +276,7 @@ app.delete("/", authorizer({}), async (req, res) => {
     const webhooks = await db.webhook.getMany(ids);
     if (
       webhooks.length !== ids.length ||
-      webhooks.some((s) => s.deleted || s.userId !== req.user.id)
+      webhooks.some((s) => !hasAccessToResource(req, s))
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });

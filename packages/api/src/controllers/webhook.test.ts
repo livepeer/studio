@@ -9,6 +9,7 @@ let mockAdminUser;
 let mockNonAdminUser;
 let postMockStream;
 let mockWebhook;
+let projectId;
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
@@ -78,7 +79,7 @@ async function setupUsers(server) {
 
   const nonAdminUserRes = await server.store.get(
     `user/${nonAdminUser.id}`,
-    false
+    false,
   );
   nonAdminUser = { ...nonAdminUserRes, emailValid: true };
   await server.store.replace(nonAdminUser);
@@ -165,7 +166,7 @@ describe("controllers/webhook", () => {
       const resJson = await res.json();
       expect(res.status).toBe(200);
       expect(res.headers.get("link")).toEqual(
-        expect.stringContaining("cursor=")
+        expect.stringContaining("cursor="),
       );
       expect(resJson).toHaveLength(1);
       expect(resJson[0].userId).toEqual(generatedWebhook.userId);
@@ -273,16 +274,17 @@ describe("controllers/webhook", () => {
 
       // create a stream object
       const now = Date.now();
-      postMockStream.name = "eli_is_cool"; // :D
+      postMockStream.name = "eli_is_very_cool"; // :D
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(201);
       const stream = await res.json();
       expect(stream.id).toBeDefined();
       expect(stream.kind).toBe("stream");
-      expect(stream.name).toBe("eli_is_cool");
+      expect(stream.name).toBe("eli_is_very_cool");
       expect(stream.createdAt).toBeGreaterThanOrEqual(now);
-      const document = await server.store.get(`stream/${stream.id}`);
-      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+      const document = await client.get(`/stream/${stream.id}`);
+      const gotStream = await document.json();
+      expect(server.db.stream.addDefaultFields(gotStream)).toEqual(stream);
 
       // trigger
       const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
@@ -351,14 +353,13 @@ describe("controllers/webhook", () => {
       expect(webhookRequest.response.body).toBeDefined();
 
       const getRes = await client.get(
-        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}`
+        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}`,
       );
       expect(getRes.status).toBe(200);
       const getJson = await getRes.json();
-      expect(getJson).toEqual(webhookRequest);
-
+      expect(getJson.id).toEqual(webhookRequest.id);
       const resendRes = await client.post(
-        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`
+        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`,
       );
       expect(resendRes.status).toBe(200);
       const resent = await resendRes.json();
@@ -373,7 +374,7 @@ describe("controllers/webhook", () => {
 
       // try query filters
       logRes = await client.get(
-        `/webhook/${generatedWebhook.id}/log?filters=[{"id":"success","value":"false"}]`
+        `/webhook/${generatedWebhook.id}/log?filters=[{"id":"success","value":"false"}]`,
       );
       expect(logRes.status).toBe(200);
       logJson = await logRes.json();

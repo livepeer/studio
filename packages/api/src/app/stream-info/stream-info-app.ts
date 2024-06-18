@@ -200,7 +200,7 @@ class statusPoller {
 
         if (si.stream?.id !== getStreamId(mid)) {
           console.log(
-            `stream id changed from ${si.stream?.id} to ${getStreamId(mid)}`
+            `stream id changed from ${si.stream?.id} to ${getStreamId(mid)}`,
           );
           // save the old stream info so it's properly housekept later
           this.seenStreams.set(`old_${mid}_${si.stream?.id}`, si);
@@ -266,7 +266,7 @@ class statusPoller {
 
   private async housekeepSeenStreams(
     activeStreams?: MasterPlaylistDictionary,
-    force?: boolean
+    force?: boolean,
   ) {
     for (const [mid, si] of this.seenStreams) {
       if (activeStreams && mid in activeStreams) {
@@ -395,7 +395,7 @@ export default async function makeApp(params: CliArgs) {
         .listen(port, () => {
           listenPort = listener.address().port;
           logger.info(
-            `Stream info server listening on http://0.0.0.0:${listenPort}`
+            `Stream info server listening on http://0.0.0.0:${listenPort}`,
           );
           resolve();
         })

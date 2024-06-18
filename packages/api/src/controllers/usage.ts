@@ -1,15 +1,14 @@
+import { Request } from "express";
 import Router from "express/lib/router";
-import { db, jobsDb } from "../store";
-import { authorizer, validatePost } from "../middleware";
-import { products } from "../config";
 import fetch from "node-fetch";
 import qs from "qs";
+import { products } from "../config";
+import { authorizer } from "../middleware";
+import { User } from "../schema/types";
+import { db, jobsDb } from "../store";
 import { NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
-import { User } from "../schema/types";
 import { Ingest } from "../types/common";
-import { reportUsage } from "./stripe";
-import { Request } from "express";
 
 const app = Router();
 
@@ -18,7 +17,7 @@ export const getBillingUsage = async (
   fromTime: number,
   toTime: number,
   baseUrl: string,
-  adminToken: string
+  adminToken: string,
 ) => {
   // Fetch usage data from /data/usage endpoint
   const usage = await fetch(
@@ -31,7 +30,7 @@ export const getBillingUsage = async (
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
-    }
+    },
   ).then((res) => res.json());
 
   return usage;
@@ -41,7 +40,7 @@ export const getRecentlyActiveUsers = async (
   fromTime: number,
   toTime: number,
   baseUrl: string,
-  adminToken: string
+  adminToken: string,
 ) => {
   // Fetch usage data from /data/usage endpoint
   const users = await fetch(
@@ -53,7 +52,7 @@ export const getRecentlyActiveUsers = async (
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
-    }
+    },
   ).then((res) => res.json());
 
   return users;
@@ -64,7 +63,7 @@ export const getViewers = async (
   fromTime: number,
   toTime: number,
   baseUrl: string,
-  adminToken: string
+  adminToken: string,
 ) => {
   try {
     // Fetch viewership data from /data/views endpoint
@@ -78,7 +77,7 @@ export const getViewers = async (
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
-      }
+      },
     ).then((res) => res.json());
 
     let viewers = 0;
@@ -113,15 +112,15 @@ export const calculateOverUsage = async (product, usage) => {
   const overUsage = {
     TotalUsageMins: Math.max(
       usage?.TotalUsageMins - (limits.transcoding || 0),
-      0
+      0,
     ),
     DeliveryUsageMins: Math.max(
       usage?.DeliveryUsageMins - (limits.streaming || 0),
-      0
+      0,
     ),
     StorageUsageMins: Math.max(
       usage?.StorageUsageMins - (limits.storage || 0),
-      0
+      0,
     ),
   };
 
@@ -160,7 +159,10 @@ export const getUsagePercentageOfLimit = async (product, usage) => {
   return usagePercentageOfLimit;
 };
 
-export async function getRecentlyActiveHackers(req: Request) {
+export async function getRecentlyActiveHackers(
+  ingests: Ingest[],
+  adminToken: string,
+) {
   // Current date in milliseconds
   const currentDateMillis = new Date().getTime();
   const oneMonthMillis = 31 * 24 * 60 * 60 * 1000;
@@ -168,13 +170,11 @@ export async function getRecentlyActiveHackers(req: Request) {
   // One month ago unix millis timestamp
   const cutOffDate = currentDateMillis - oneMonthMillis;
 
-  const ingests = await req.getIngest();
-
   const users = await getRecentlyActiveUsers(
     cutOffDate,
     currentDateMillis,
     ingests[0].origin,
-    req.token.id
+    adminToken,
   );
 
   let activeHackers = [];
@@ -199,24 +199,24 @@ export async function getUsageData(
   billingCycleStart: number,
   billingCycleEnd: number,
   ingests: Ingest[],
-  adminToken: string
+  adminToken: string,
 ) {
   const billingUsage = await getBillingUsage(
     user.id,
     billingCycleStart,
     billingCycleEnd,
     ingests[0].origin,
-    adminToken
+    adminToken,
   );
 
   const overUsage = await calculateOverUsage(
     products[user.stripeProductId],
-    billingUsage
+    billingUsage,
   );
 
   const usagePercentages = await getUsagePercentageOfLimit(
     products[user.stripeProductId],
-    billingUsage
+    billingUsage,
   );
 
   return {
@@ -240,7 +240,7 @@ app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
     toTime,
     {
       useReplica: true,
-    }
+    },
   );
 
   res.status(200);
@@ -251,11 +251,15 @@ app.get(
   "/recently-active",
   authorizer({ anyAdmin: true }),
   async (req: Request, res) => {
-    const recentlyActiveHackers = await getRecentlyActiveHackers(req);
+    const ingests = await req.getIngest();
+    const recentlyActiveHackers = await getRecentlyActiveHackers(
+      ingests,
+      req.token.id,
+    );
 
     res.status(200);
     res.json(recentlyActiveHackers);
-  }
+  },
 );
 
 app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -280,7 +284,7 @@ app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     ingests[0].origin,
-    req.token.id
+    req.token.id,
   );
 
   res.status(200);
@@ -315,72 +319,42 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     ingests[0].origin,
-    req.token.id
+    req.token.id,
   );
 
   const overage = await calculateOverUsage(
     products[user.stripeProductId],
-    usage
+    usage,
   );
 
   const usagePercentages = await getUsagePercentageOfLimit(
     products[user.stripeProductId],
-    usage
+    usage,
   );
 
   res.status(200);
   res.json(overage, usagePercentages);
 });
 
-app.post(
-  "/update",
-  authorizer({ anyAdmin: true }),
-  validatePost("usage"),
-  async (req, res) => {
-    let { fromTime, toTime } = req.query;
+// Runs the update-usage job on demand if necessary
+app.post("/update", authorizer({ anyAdmin: true }), async (req, res) => {
+  // import the job dynamically to avoid circular dependencies
+  const { default: updateUsage } = await import("../jobs/update-usage");
 
-    // if time range isn't specified return all usage
-    if (!fromTime) {
-      let rows = (
-        await jobsDb.usage.find(
-          {},
-          { limit: 1, order: "data->>'date' DESC", useReplica: true }
-        )
-      )[0];
+  let { fromTime, toTime } = req.query;
 
-      if (rows.length) {
-        fromTime = rows[0].date; // get last updated date from cache
-      } else {
-        fromTime = +new Date(2020, 0); // start at beginning
-      }
-    }
+  const { usageHistory } = await updateUsage(
+    {
+      ...req.config,
+      updateUsageFrom: fromTime,
+      updateUsageTo: toTime,
+      updateUsageApiToken: req.token.id,
+    },
+    { jobsDb, stripe: req.stripe },
+  );
 
-    if (!toTime) {
-      toTime = +new Date();
-    }
-
-    let usageHistory = await jobsDb.stream.usageHistory(fromTime, toTime, {
-      useReplica: true,
-    });
-
-    // store each day of usage
-    for (const row of usageHistory) {
-      const dbRow = await jobsDb.usage.get(row.id);
-      // if row already exists in cache, update it, otherwise create it
-      if (dbRow) {
-        await jobsDb.usage.replace({ kind: "usage", ...row });
-      } else {
-        await jobsDb.usage.create({ kind: "usage", ...row });
-      }
-    }
-
-    // New automated billing usage report
-    let token = req.token.id;
-    await reportUsage(req, token);
-
-    res.status(200);
-    res.json(usageHistory);
-  }
-);
+  res.status(200);
+  res.json(usageHistory);
+});
 
 export default app;

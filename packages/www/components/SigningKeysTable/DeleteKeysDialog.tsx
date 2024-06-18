@@ -32,12 +32,12 @@ const DeleteKeysDialog = ({
   const onDeleteSigningKeys = useCallback(async () => {
     setIsDeleting(true);
     await Promise.all(
-      state.selectedRows.map((row) => deleteSigningKey(row.id))
+      state.selectedRows.map((row) => deleteSigningKey(row.id)),
     );
     openSnackbar(
       `${state.selectedRows.length} signing key${
         state.selectedRows.length > 1 ? "s" : ""
-      } deleted.`
+      } deleted.`,
     );
     setIsDeleting(false);
     await state.invalidate();

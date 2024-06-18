@@ -3,10 +3,11 @@ import fetch, { RequestInit } from "node-fetch";
 import { v4 as uuid } from "uuid";
 
 import schema from "./schema/schema.json";
-import { User } from "./schema/types";
+import { ApiToken, User } from "./schema/types";
 import { TestServer } from "./test-server";
 import fs from "fs";
 import jwt, { VerifyOptions } from "jsonwebtoken";
+import { WithID } from "./store/types";
 
 const vhostUrl = (vhost: string) =>
   `http://guest:guest@127.0.0.1:15672/api/vhosts/${vhost}`;
@@ -24,14 +25,14 @@ export async function clearDatabase(server: TestServer) {
     .map((s) => ("table" in s ? s.table : null))
     .filter((t) => !!t);
   await Promise.all(
-    tables.map((t) => server?.db?.query(`TRUNCATE TABLE ${t}`))
+    tables.map((t) => server?.db?.query(`TRUNCATE TABLE ${t}`)),
   );
 }
 
 export function verifyJwt(
   token: string,
   publicKey: string,
-  verifyOptions?: VerifyOptions
+  verifyOptions?: VerifyOptions,
 ) {
   try {
     return jwt.verify(token, publicKey, verifyOptions);
@@ -137,7 +138,7 @@ export class TestClient {
       {
         ...args,
         headers,
-      }
+      },
     );
     return res;
   }
@@ -199,12 +200,53 @@ export class TestClient {
   }
 }
 
+export async function createProject(client: TestClient) {
+  let res = await client.post(`/project`);
+  const project = await res.json();
+  return project;
+}
+
+export async function useApiTokenWithProject(
+  client: TestClient,
+  token: string,
+) {
+  client.jwtAuth = token;
+  const project = await createProject(client);
+  const newApiKey = await createApiToken({
+    client: client,
+    projectId: project.id,
+    jwtAuthToken: token,
+  });
+  client.apiKey = newApiKey.id;
+  return client;
+}
+
+export async function createApiToken({
+  client,
+  projectId,
+  tokenName = "test",
+  jwtAuthToken,
+}: {
+  client: TestClient;
+  projectId: string;
+  tokenName?: string;
+  jwtAuthToken: string;
+}): Promise<WithID<ApiToken>> {
+  client.jwtAuth = jwtAuthToken;
+  let res = await client.post(`/api-token/?projectId=${projectId}`, {
+    name: tokenName,
+  });
+  client.jwtAuth = null;
+  const apiKeyObj = await res.json();
+  return apiKeyObj;
+}
+
 export async function createUser(
   server: TestServer,
   client: TestClient,
   userData: User,
   admin: boolean,
-  emailValid: boolean
+  emailValid: boolean,
 ) {
   const userRes = await client.post(`/user`, userData);
   let user = await userRes.json();
@@ -230,7 +272,7 @@ export async function setupUsers(
   server: TestServer,
   admin: User,
   nonAdmin: User,
-  emailValid = true
+  emailValid = true,
 ) {
   const client = new TestClient({ server });
   const {

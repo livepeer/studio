@@ -17,6 +17,14 @@ const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
   "https://gateway.arweave.net/",
 ];
 
+const JOB_TYPES = [
+  "active-cleanup",
+  "create-db-tables",
+  "update-usage",
+] as const;
+
+export type JobType = (typeof JOB_TYPES)[number];
+
 const yargs = Yargs() as unknown as Argv;
 
 function coerceArr(arg: any) {
@@ -97,7 +105,7 @@ function coerceJsonProfileArr(flagName: string) {
     }
     if (errors.length > 0) {
       throw new Error(
-        `--${flagName} validation error: ${JSON.stringify(errors)}`
+        `--${flagName} validation error: ${JSON.stringify(errors)}`,
       );
     }
     return profiles;
@@ -313,7 +321,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           const split = supportAddr.split("/");
           if (split.length !== 2) {
             throw new Error(
-              `supportAddr should be of the form name / email, got ${supportAddr} `
+              `supportAddr should be of the form name / email, got ${supportAddr} `,
             );
           }
           return split as [string, string];
@@ -511,6 +519,43 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "boolean",
         default: true,
       },
+      job: {
+        describe:
+          "run a specific job from start to finish instead of Studio API",
+        type: "string",
+        choices: JOB_TYPES,
+      },
+      "job-timeout-sec": {
+        describe: "job timeout in seconds",
+        type: "number",
+        default: 120,
+      },
+      "active-cleanup-limit": {
+        describe: "job/active-cleanup: max number of streams to clean up",
+        type: "number",
+        default: 1000,
+      },
+      "update-usage-from": {
+        describe:
+          "job/update-usage: unix millis timestamp for start time of update usage job",
+        type: "number",
+      },
+      "update-usage-to": {
+        describe:
+          "job/update-usage: unix millis timestamp for end time of update usage job",
+        type: "number",
+      },
+      "update-usage-api-token": {
+        describe:
+          "job/update-usage: Admin API token to be used in the update usage job internal calls",
+        type: "string",
+      },
+      "update-usage-concurrency": {
+        describe:
+          "job/update-usage: number of concurrent workers to run for updating users usage",
+        type: "number",
+        default: 10,
+      },
       "stream-info-service": {
         describe: "start the Stream Info service instead of Studio API",
         type: "boolean",
@@ -560,6 +605,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         ] as FfmpegProfile[]),
         coerce: coerceJsonProfileArr("default-stream-profiles"),
       },
+      // this is actually handled raw on ./logger.js but we declare it here so yargs recognizes it
+      verbose: {
+        describe: "enable verbose logging",
+        type: "boolean",
+      },
     })
     .usage(
       `
@@ -569,19 +619,19 @@ export default function parseCli(argv?: string | readonly string[]) {
 
     --broadcaster and --orchestrator options should be of the form
     [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
-    `
+    `,
     )
     .strict(
-      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
+      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development",
     )
     .env("LP_API_")
     .strict(
-      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
+      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development",
     )
     .help()
     .parse(argv);
   // yargs returns a Promise even tho we don't have any async middlewares
-  const parsed = parsedProm as Awaited<typeof parsedProm>;
+  const parsed = parsedProm as Awaited<typeof parsedProm> & { job?: JobType };
   const mistOutput = yargsToMist(allOptions);
   if (parsed.json === true) {
     console.log(JSON.stringify(mistOutput));

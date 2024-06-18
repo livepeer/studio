@@ -1,7 +1,7 @@
 import { URL } from "url";
 import basicAuth from "basic-auth";
 import corsLib, { CorsOptions } from "cors";
-import { Request, RequestHandler, Response } from "express";
+import { Request, RequestHandler } from "express";
 import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
 import { ApiToken, User, Project } from "../schema/types";
@@ -10,8 +10,9 @@ import {
   ForbiddenError,
   BadRequestError,
   UnauthorizedError,
+  NotFoundError,
 } from "../store/errors";
-import { WithID } from "../store/types";
+import { DBOwnedResource, WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
 
@@ -45,7 +46,7 @@ function isAuthorized(
   method: string,
   path: string,
   rules: AuthRule[],
-  httpPrefix?: string
+  httpPrefix?: string,
 ) {
   try {
     const policy = new AuthPolicy(rules);
@@ -61,13 +62,31 @@ function isAuthorized(
 
 export async function getProject(req: Request, projectId: string) {
   const project = projectId
-    ? await db.project.get(projectId)
+    ? await db.project.get(projectId, { useCache: true })
     : { id: "", name: "default", userId: req.user.id };
   if (!req.user.admin && req.user.id !== project.userId) {
     throw new ForbiddenError(`invalid user`);
   }
 
   return project;
+}
+
+export function hasAccessToResource(
+  { isUIAdmin, user, project }: Pick<Request, "isUIAdmin" | "user" | "project">,
+  resource?: DBOwnedResource,
+  uiAdminOnly = false,
+) {
+  if (!resource || !user) {
+    return false;
+  }
+  const isAdmin = uiAdminOnly ? isUIAdmin : user.admin;
+  return (
+    isAdmin ||
+    (!resource.deleted &&
+      resource.userId === user.id &&
+      (resource.projectId ?? user.defaultProjectId ?? "") ===
+        (project?.id ?? ""))
+  );
 }
 
 /**
@@ -141,7 +160,7 @@ function authenticator(): RequestHandler {
           Date.now() > NEVER_EXPIRING_JWT_CUTOFF_DATE
         ) {
           throw new UnauthorizedError(
-            "legacy access token detected. please log in again"
+            "legacy access token detected. please log in again",
           );
         }
         tracking.recordUser(userId);
@@ -153,7 +172,7 @@ function authenticator(): RequestHandler {
       }
     } else {
       throw new UnauthorizedError(
-        `unsupported authorization header scheme: ${rawAuthScheme}`
+        `unsupported authorization header scheme: ${rawAuthScheme}`,
       );
     }
 
@@ -161,7 +180,7 @@ function authenticator(): RequestHandler {
 
     if (!user) {
       throw new UnauthorizedError(
-        `no user found from authorization header: ${authHeader}`
+        `no user found from authorization header: ${authHeader}`,
       );
     }
     if (user.suspended) {
@@ -171,6 +190,10 @@ function authenticator(): RequestHandler {
     req.token = tokenObject;
     req.user = user;
 
+    if (!projectId) {
+      projectId = req.user.defaultProjectId;
+    }
+
     if (projectId) {
       project = await getProject(req, projectId);
       req.project = project;
@@ -178,6 +201,15 @@ function authenticator(): RequestHandler {
 
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
+
+    req.checkResourceAccess = (
+      resource?: DBOwnedResource,
+      uiAdminOnly = false,
+    ) => {
+      if (!hasAccessToResource(req, resource, uiAdminOnly)) {
+        throw new NotFoundError("not found");
+      }
+    };
 
     return next();
   };
@@ -343,7 +375,7 @@ function authorizer(params: AuthzParams): RequestHandler {
     const resOrigin = res.getHeader("access-control-allow-origin")?.toString();
     if (reqOrigin && reqOrigin !== resOrigin) {
       throw new ForbiddenError(
-        `credential disallows CORS access from origin ${reqOrigin}`
+        `credential disallows CORS access from origin ${reqOrigin}`,
       );
     }
 
@@ -353,7 +385,7 @@ function authorizer(params: AuthzParams): RequestHandler {
       user.createdAt > EMAIL_VERIFICATION_CUTOFF_DATE;
     if (verifyEmail && !user.emailValid) {
       throw new ForbiddenError(
-        `user ${user.email} has not been verified. please check your inbox for verification email.`
+        `user ${user.email} has not been verified. please check your inbox for verification email.`,
       );
     }
 
@@ -362,7 +394,7 @@ function authorizer(params: AuthzParams): RequestHandler {
     }
     if (token?.access?.cors && req.user.admin) {
       throw new ForbiddenError(
-        `cors access is not available to admins (how did you get this API key?)`
+        `cors access is not available to admins (how did you get this API key?)`,
       );
     }
     const accessRules = tokenAccessRules(token);
@@ -378,7 +410,7 @@ function authorizer(params: AuthzParams): RequestHandler {
         throw new ForbiddenError(
           isRestrictedCors(token)
             ? "access forbidden for CORS-enabled API key with restricted access"
-            : "credential has insufficent privileges"
+            : "credential has insufficent privileges",
         );
       }
     }

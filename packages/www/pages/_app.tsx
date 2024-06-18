@@ -12,16 +12,15 @@ import {
 } from "@livepeer/react";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { ApiProvider, getEndpoint } from "hooks/use-api";
-import { getBrandName, isDevelopment, isExport, isStaging } from "lib/utils";
-import { MetaMaskProvider } from "metamask-react";
+import { getBrandName } from "lib/utils";
 import { DefaultSeo } from "next-seo";
 import { ThemeProvider } from "next-themes";
 import Head from "next/head";
-import Script from "next/script";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "../css/hubspot.scss";
 import "../css/markdown.css";
 import "../css/recaptcha.css";
+import "../css/tailwind.css";
 import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
 
@@ -62,7 +61,7 @@ const globalStyles = globalCss({
 const themes: any = getThemes();
 const themeMap = {};
 Object.keys(themes).map(
-  (key, _index) => (themeMap[themes[key].className] = themes[key].className)
+  (key, _index) => (themeMap[themes[key].className] = themes[key].className),
 );
 
 const livepeerClient = createReactClient({
@@ -116,18 +115,14 @@ const App = ({ Component, pageProps }) => {
           }}>
           <SnackbarProvider>
             <QueryClientProvider client={queryClient}>
-              <MetaMaskProvider>
-                <ApiProvider>
-                  <AnalyzerProvider>
-                    <LivepeerConfig
-                      theme={livepeerTheme}
-                      client={livepeerClient}>
-                      <DefaultSeo {...SEO} />
-                      <Component {...pageProps} />
-                    </LivepeerConfig>
-                  </AnalyzerProvider>
-                </ApiProvider>
-              </MetaMaskProvider>
+              <ApiProvider>
+                <AnalyzerProvider>
+                  <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
+                    <DefaultSeo {...SEO} />
+                    <Component {...pageProps} />
+                  </LivepeerConfig>
+                </AnalyzerProvider>
+              </ApiProvider>
             </QueryClientProvider>
           </SnackbarProvider>
         </ThemeProvider>

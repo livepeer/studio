@@ -32,6 +32,7 @@ namespace messages {
     event: EventKey;
     userId: string;
     sessionId?: string;
+    projectId?: string;
     // Additional information about the event to be sent to the user on the
     // webhook request.
     payload?: TPayload;

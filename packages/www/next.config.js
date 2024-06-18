@@ -22,6 +22,9 @@ const SentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
+/**
+ * @type {import('next').NextConfig}
+ */
 let config = {
   basePath: "/dashboard",
   publicRuntimeConfig: { basePath: "/dashboard" },
@@ -48,7 +51,7 @@ if (isStaticBuild) {
   config = {
     ...config,
     output: "standalone",
-    distDir: "static-build-app",
+    distDir: "static-build",
   };
 } else {
   config = {
@@ -88,13 +91,13 @@ let configWithPlugins = withPlugins(
       ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
       : []),
   ],
-  config
+  config,
 );
 
 if (!isStaticBuild) {
   configWithPlugins = withSentryConfig(
     configWithPlugins,
-    SentryWebpackPluginOptions
+    SentryWebpackPluginOptions,
   );
 }
 

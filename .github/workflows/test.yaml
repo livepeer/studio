@@ -52,6 +52,9 @@ jobs:
       - name: yarn install
         run: yarn install --frozen-lockfile
 
+      - name: yarn lint
+        run: yarn run prettier:check
+
       - name: yarn tests without coverage
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"

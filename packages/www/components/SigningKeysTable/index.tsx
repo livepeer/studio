@@ -39,7 +39,7 @@ const SigningKeysTable = ({
 
   const fetcher: Fetcher<SigningKeysTableData> = useCallback(
     async (state) => rowsPageFromState(state, getSigningKeys),
-    []
+    [],
   );
 
   return (
@@ -55,8 +55,8 @@ const SigningKeysTable = ({
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
-          "Create signing Key",
-          createDialogState.onOn
+          "Create signing key",
+          createDialogState.onOn,
         )}
       />
 

@@ -19,6 +19,9 @@ import {
   clearDatabase,
   setupUsers,
   startAuxTestServer,
+  createProject,
+  createApiToken,
+  useApiTokenWithProject,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
@@ -113,6 +116,7 @@ describe("controllers/stream", () => {
   let nonAdminUser: User;
   let nonAdminToken: string;
   let nonAdminApiKey: string;
+  let projectId: string;
 
   beforeEach(async () => {
     await server.store.create(mockStore);
@@ -127,6 +131,9 @@ describe("controllers/stream", () => {
       nonAdminApiKey,
     } = await setupUsers(server, mockAdminUser, mockNonAdminUser));
     client.jwtAuth = adminToken;
+
+    projectId = await createProject(client);
+    expect(projectId).toBeDefined();
   });
 
   describe("basic CRUD with JWT authorization", () => {
@@ -136,6 +143,7 @@ describe("controllers/stream", () => {
         const document = {
           id: uuid(),
           kind: "stream",
+          projectId: i > 7 ? projectId : undefined,
         };
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -151,6 +159,31 @@ describe("controllers/stream", () => {
           id: uuid(),
           kind: "stream",
           deleted: i > 3 ? true : undefined,
+          projectId: i > 2 ? projectId : undefined,
+        } as DBStream;
+        await server.store.create(document);
+        const res = await client.get(`/stream/${document.id}`);
+        const stream = await res.json();
+        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
+      }
+
+      const res = await client.get("/stream");
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(streams.length).toEqual(4);
+      const resAll = await client.get("/stream?all=1");
+      expect(resAll.status).toBe(200);
+      const streamsAll = await resAll.json();
+      expect(streamsAll.length).toEqual(5);
+    });
+
+    it("should get all streams with admin authorization and specific projectId in query param", async () => {
+      for (let i = 0; i < 5; i += 1) {
+        const document = {
+          id: uuid(),
+          kind: "stream",
+          deleted: i > 3 ? true : undefined,
+          projectId: i > 2 ? projectId : undefined,
         } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -244,7 +277,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          "multistream target profile not found"
+          "multistream target profile not found",
         );
       });
 
@@ -271,7 +304,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `must have either an "id" or a "spec"`
+          `must have either an "id" or a "spec"`,
         );
       });
 
@@ -291,7 +324,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `must have either an "id" or a "spec"`
+          `must have either an "id" or a "spec"`,
         );
       });
 
@@ -314,7 +347,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `multistream target {id,profile} must be unique`
+          `multistream target {id,profile} must be unique`,
         );
 
         // Should allow same ID if using different profiles
@@ -594,7 +627,7 @@ describe("controllers/stream", () => {
           promises.push(
             client.post(`/stream/${stream.id}/lockPull`, {
               host: `host-${i}`,
-            })
+            }),
           );
         }
         const resPulls = await Promise.all(promises);
@@ -620,7 +653,7 @@ describe("controllers/stream", () => {
         // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
-          { leaseTimeout: 1 }
+          { leaseTimeout: 1 },
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -642,7 +675,7 @@ describe("controllers/stream", () => {
         // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
-          { host }
+          { host },
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -665,7 +698,7 @@ describe("controllers/stream", () => {
         // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
-          { host: "host-2" }
+          { host: "host-2" },
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -694,7 +727,7 @@ describe("controllers/stream", () => {
       it("should fail to dedup streams by a random key", async () => {
         let res = await client.put(
           "/stream/pull?key=invalid",
-          postMockPullStream
+          postMockPullStream,
         );
         expect(res.status).toBe(400);
         const errors = await res.json();
@@ -706,7 +739,7 @@ describe("controllers/stream", () => {
       it("should fail to dedup streams by creatorId if not provided", async () => {
         let res = await client.put(
           "/stream/pull?key=creatorId",
-          postMockPullStream
+          postMockPullStream,
         );
         expect(res.status).toBe(400);
         const errors = await res.json();
@@ -806,7 +839,7 @@ describe("controllers/stream", () => {
       it("should resolve pull url and region from existing stream", async () => {
         expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
         expect(
-          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }])
+          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }]),
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -817,7 +850,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: 1714997385837,
             },
-          ])
+          ]),
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -828,7 +861,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: Date.now() - 2 * 60 * 1000,
             },
-          ])
+          ]),
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -839,7 +872,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: Date.now(),
             },
-          ])
+          ]),
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -850,7 +883,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "",
               pullLockedAt: Date.now(),
             },
-          ])
+          ]),
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -861,7 +894,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: Date.now(),
             },
-          ])
+          ]),
         ).toStrictEqual({
           pullUrl:
             "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
@@ -877,7 +910,7 @@ describe("controllers/stream", () => {
               pullLockedAt: Date.now() - 2 * 60 * 1000,
               lastSeen: Date.now(),
             },
-          ])
+          ]),
         ).toStrictEqual({
           pullUrl:
             "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
@@ -888,49 +921,57 @@ describe("controllers/stream", () => {
       it("should extract host from redirected playback url", async () => {
         expect(
           extractUrlFrom(
-            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
-          )
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe("https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+");
         expect(
           extractUrlFrom(
-            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
-          )
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe(
-          "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+"
+          "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+",
         );
         expect(
           extractUrlFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
-          )
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe(
-          "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+"
+          "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+",
         );
         expect(
           extractUrlFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
-          )
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe(null);
       });
       it("should extract region from redirected playback url", async () => {
         expect(
           extractRegionFrom(
-            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
-          )
+            "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe("sto");
         expect(
           extractRegionFrom(
-            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+not-used-playback/index.m3u8"
-          )
+            "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe("mos2");
         expect(
           extractRegionFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+not-used-playback/index.m3u8"
-          )
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe("fra-staging");
         expect(
           extractRegionFrom(
-            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8"
-          )
+            "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
+            "12345-67890",
+          ),
         ).toBe(null);
       });
     });
@@ -978,7 +1019,7 @@ describe("controllers/stream", () => {
           profile: "source",
           videoOnly: false,
           spec: { name: "target-name", url: "rtmp://test/test" },
-        }
+        },
       );
       expect(res2.status).toBe(200);
       const body = await res2.json();
@@ -988,7 +1029,7 @@ describe("controllers/stream", () => {
     describe("set active and heartbeat", () => {
       const callSetActive = async (
         streamId: string,
-        payload: StreamSetActivePayload
+        payload: StreamSetActivePayload,
       ) => {
         const res = await client.put(`/stream/${streamId}/setactive`, payload);
         expect(res.status).toBe(204);
@@ -1175,6 +1216,7 @@ describe("controllers/stream", () => {
 
       it("should disallow patching other users streams", async () => {
         client.jwtAuth = nonAdminToken;
+        client.apiKey = "";
         const res = await client.patch(patchPath, {});
         expect(res.status).toBe(404);
       });
@@ -1342,7 +1384,7 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
-      expect(streams[0]).toEqual(source[3]);
+      expect(streams[0].id).toEqual(source[3].id);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
       expect(res.headers.raw().link).toBeDefined();
       expect(res.headers.raw().link.length).toBe(1);
@@ -1352,7 +1394,7 @@ describe("controllers/stream", () => {
       expect(nextRes.status).toBe(200);
       const nextStreams = await nextRes.json();
       expect(nextStreams.length).toEqual(1);
-      expect(nextStreams[0]).toEqual(source[6]);
+      expect(nextStreams[0].id).toEqual(source[6].id);
       expect(nextStreams[0].userId).toEqual(nonAdminUser.id);
     });
 
@@ -1393,7 +1435,9 @@ describe("controllers/stream", () => {
   });
 
   describe("stream endpoint with api key", () => {
+    let newApiKey;
     beforeEach(async () => {
+      // create streams without a projectId
       for (let i = 0; i < 5; i += 1) {
         const document = {
           id: uuid(),
@@ -1404,7 +1448,45 @@ describe("controllers/stream", () => {
         const res = await client.get(`/stream/${document.id}`);
         expect(res.status).toBe(200);
       }
+
+      // create a new project
+      client.jwtAuth = nonAdminToken;
+      let project = await createProject(client);
+      expect(project).toBeDefined();
+
+      // then create a new api-key under that project
+      newApiKey = await createApiToken({
+        client: client,
+        projectId: project.id,
+        jwtAuthToken: nonAdminToken,
+      });
+      expect(newApiKey).toMatchObject({
+        id: expect.any(String),
+        projectId: project.id,
+      });
+
       client.jwtAuth = "";
+      client.apiKey = newApiKey.id;
+
+      // create streams with a projectId
+      for (let i = 0; i < 5; i += 1) {
+        const document = {
+          id: uuid(),
+          kind: "stream",
+          userId: nonAdminUser.id,
+          projectId: project.id,
+        };
+        const resCreate = await client.post("/stream", {
+          ...postMockStream,
+          name: "videorec+samplePlaybackId",
+        });
+        expect(resCreate.status).toBe(201);
+        const createdStream = await resCreate.json();
+        const res = await client.get(`/stream/${createdStream.id}`);
+        expect(res.status).toBe(200);
+        let stream = await res.json();
+        expect(stream.projectId).toEqual(project.id);
+      }
     });
 
     it("should get own streams", async () => {
@@ -1413,6 +1495,22 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
+      expect(streams[0].userId).toEqual(nonAdminUser.id);
+
+      client.apiKey = newApiKey.id;
+      let res2 = await client.get(`/stream/user/${nonAdminUser.id}`);
+      expect(res2.status).toBe(200);
+      const streams2 = await res2.json();
+      expect(streams2.length).toEqual(5);
+      expect(streams2[0].userId).toEqual(nonAdminUser.id);
+    });
+
+    it("should get streams owned by project when using api-key for project", async () => {
+      client.apiKey = newApiKey.id;
+      let res = await client.get(`/stream/`);
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(streams.length).toEqual(5);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
     });
 
@@ -1520,7 +1618,7 @@ describe("controllers/stream", () => {
         const testBasic = async (
           userPassword: string,
           statusCode: number,
-          error?: string
+          error?: string,
         ) => {
           client.jwtAuth = undefined;
           client.basicAuth = userPassword;
@@ -1544,7 +1642,7 @@ describe("controllers/stream", () => {
           await testBasic(
             `${nonAdminUser.id}:${adminApiKey}`,
             401,
-            expect.stringMatching(/no token .+ found/)
+            expect.stringMatching(/no token .+ found/),
           );
         });
 
@@ -1552,7 +1650,7 @@ describe("controllers/stream", () => {
           await testBasic(
             `${nonAdminUser.id}:${nonAdminApiKey}`,
             403,
-            expect.stringContaining("admin")
+            expect.stringContaining("admin"),
           );
         });
       });
@@ -1585,7 +1683,7 @@ describe("controllers/stream", () => {
         const res = await client.post("/stream/hook/health", payload);
         expect(res.status).toBe(204);
         const stream = await server.db.stream.getByPlaybackId(
-          payload.stream_name.split("+", 2)[1]
+          payload.stream_name.split("+", 2)[1],
         );
         return stream;
       };
@@ -1742,7 +1840,7 @@ describe("controllers/stream", () => {
               hookPayload = req.body;
               hookSem.release();
               res.status(204).end();
-            }
+            },
           );
           genMockWebhook = () => ({
             id: uuid(),
@@ -1802,7 +1900,11 @@ describe("controllers/stream", () => {
             id: expect.stringMatching(uuidRegex),
             webhookId: webhookObj.id,
             event: "stream.detection",
-            stream: { ...stream, streamKey: undefined },
+            stream: {
+              ...stream,
+              streamKey: undefined,
+              projectId: expect.any(String),
+            },
             payload: { sceneClassification, seqNo: 1 },
           });
         });
@@ -1911,7 +2013,7 @@ describe("controllers/stream", () => {
         `/stream/${stream.id}/stream?sessionId=${sessionId}`,
         {
           name: `video+${stream.playbackId}`,
-        }
+        },
       );
       expect(res.status).toBe(201);
       const child: Stream = await res.json();
@@ -1941,7 +2043,7 @@ describe("controllers/stream", () => {
         `/stream/${stream.id}/stream?sessionId=${sessionId}`,
         {
           name: `video+${stream.playbackId}`,
-        }
+        },
       );
       expect(res.status).toBe(201);
       const child: Stream = await res.json();
@@ -2072,7 +2174,7 @@ describe("controllers/stream", () => {
               profile: "H264ConstrainedHigh",
               ...profile,
             };
-          })
+          }),
         );
       }
     });
@@ -2121,7 +2223,7 @@ describe("controllers/stream", () => {
         {
           ...smallStream,
           name: "stream1",
-        }
+        },
       );
       expect(res.status).toBe(201);
       let stream1 = await res.json();
@@ -2181,7 +2283,7 @@ describe("controllers/stream", () => {
         {
           ...smallStream,
           name: "stream2",
-        }
+        },
       );
       expect(res.status).toBe(201);
       let stream2 = await res.json();
@@ -2248,11 +2350,53 @@ describe("controllers/stream", () => {
       expect(sessions).toHaveLength(1);
       expect(sessions[0].id).toEqual(sessionId);
       expect(sessions[0].recordingUrl).toEqual(
-        "http://example-public/playback_id/output.m3u8"
+        "http://example-public/playback_id/output.m3u8",
       );
       expect(sessions[0].mp4Url).toEqual(
-        "http://example-public/playback_id/output.mp4"
+        "http://example-public/playback_id/output.mp4",
       );
+    });
+
+    it("should propagate stream configs to child stream and session", async () => {
+      // create parent stream
+      const configs = {
+        record: true,
+        recordingSpec: {
+          profiles: [
+            {
+              name: "720p",
+              bitrate: 2000000,
+              fps: 30,
+              width: 1280,
+              height: 720,
+            },
+          ],
+        },
+      };
+      let res = await client.post(`/stream`, {
+        ...smallStream,
+        ...configs,
+      });
+      expect(res.status).toBe(201);
+      const parent = await res.json();
+      expect(parent).toMatchObject(configs);
+
+      // call transcoding hook
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${parent.id}/stream?sessionId=${sessionId}`,
+        {
+          name: "session1",
+        },
+      );
+      expect(res.status).toBe(201);
+      const childStream = await res.json();
+      expect(childStream.parentId).toEqual(parent.id);
+      expect(childStream.sessionId).toEqual(sessionId);
+      expect(childStream).toMatchObject(configs);
+
+      const session = await db.session.get(sessionId);
+      expect(session).toMatchObject(configs);
     });
   });
 });

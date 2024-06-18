@@ -27,7 +27,7 @@ function insertSeparators(items) {
         current,
         <BreadcrumbsSeparator aria-hidden key={`separator-${index}`}>
           /
-        </BreadcrumbsSeparator>
+        </BreadcrumbsSeparator>,
       );
     } else {
       acc.push(current);

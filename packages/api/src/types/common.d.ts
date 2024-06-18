@@ -49,6 +49,10 @@ declare global {
       isNeverExpiringJWT?: boolean;
       token?: WithID<ApiToken>;
 
+      checkResourceAccess: (
+        resource?: DBOwnedResource,
+        uiAdminOnly?: boolean,
+      ) => void;
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;
       getIngest?: () => Promise<Ingest[]>;
@@ -90,18 +94,18 @@ export interface IStore {
   get<T extends StoredObject>(id: string, cleanWriteOnly?: boolean): Promise<T>;
   replace(data: StoredObject): Promise<void>;
   list<T = StoredObject>(
-    args: IStoreListArgs
+    args: IStoreListArgs,
   ): Promise<{ data: Array<T>; cursor: string }>;
   listKeys(
     prefix: string,
     cursor?: string,
-    limit?: number
+    limit?: number,
   ): Promise<[Array<string>, string]>;
   query(
-    args: IStoreQueryArgs
+    args: IStoreQueryArgs,
   ): Promise<{ data: Array<string>; cursor: string }>;
   queryObjects<T = StoredObject>(
-    args: IStoreQueryObjectsArgs
+    args: IStoreQueryObjectsArgs,
   ): Promise<{ data: Array<T>; cursor: string }>;
   deleteKey(key: string): Promise<void>;
   delete(id: string): Promise<void>;
@@ -113,12 +117,12 @@ export interface IStoreBackend {
   listKeys(
     prefix: string,
     cursor: any,
-    limit: number
+    limit: number,
   ): Promise<[Array<string>, any]>;
   list(
     prefix: string,
     cursor: any,
-    limit: number
+    limit: number,
   ): Promise<{ data: Array<StoredObject>; cursor: any }>;
   get(id: string): Promise<StoredObject>;
   create(key: string, data: StoredObject): Promise<StoredObject>;

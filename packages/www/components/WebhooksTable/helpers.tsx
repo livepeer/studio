@@ -46,7 +46,7 @@ export const makeColumns = () => [
 
 export const rowsPageFromState = async (
   state,
-  getWebhooks: Function
+  getWebhooks: Function,
 ): Promise<RowsPageFromStateResult<WebhooksTableData>> => {
   const [webhooks, nextCursor, _res, count] = await getWebhooks(
     false,
@@ -55,7 +55,7 @@ export const rowsPageFromState = async (
     null,
     state.pageSize,
     state.cursor,
-    true
+    true,
   );
 
   return {
