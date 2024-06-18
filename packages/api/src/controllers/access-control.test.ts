@@ -102,23 +102,10 @@ describe("controllers/access-control", () => {
       webhookResponseBody = "";
     });
 
-    it("should allow playback on gated asset", async () => {
+    it("should allow playback on gated asset and include viewer limit info", async () => {
       client.jwtAuth = adminToken;
-      const res = await client.post("/access-control/gate", {
-        stream: `video+${gatedAsset.playbackId}`,
-        type: "accessKey",
-        accessKey: "foo",
-      });
-      expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({});
-      await hookSem.wait(3000);
-    });
 
-    it("should include viewer limit per user", async () => {
-      client.jwtAuth = adminToken;
-      const userId = gatedAsset.userId;
-      await db.user.update(userId, { viewerLimit: 10 });
-
+      await db.user.update(gatedAsset.userId, { viewerLimit: 10 });
       const res = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "accessKey",
@@ -126,24 +113,20 @@ describe("controllers/access-control", () => {
       });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({
-        user_id: userId,
+        user_id: gatedAsset.userId,
         viewer_limit_per_user: 10,
       });
-    });
 
-    it("should not include viewer limit per user if viewerLimit is 0", async () => {
-      client.jwtAuth = adminToken;
-      const userId = gatedAsset.userId;
-      await db.user.update(userId, { viewerLimit: 10 });
-      await db.user.update(userId, { viewerLimit: 0 });
-
-      const res = await client.post("/access-control/gate", {
+      await db.user.update(gatedAsset.userId, { viewerLimit: 0 });
+      const res2 = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "accessKey",
         accessKey: "foo",
       });
-      expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({});
+      expect(res2.status).toBe(200);
+      expect(await res2.json()).toEqual({});
+
+      await hookSem.wait(3000);
     });
 
     it("should deny for non 2xx", async () => {
