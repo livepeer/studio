@@ -969,6 +969,10 @@ app.post(
           url: downloadUrl,
           catalystPipelineStrategy: catalystPipelineStrategy(req),
           encryption,
+          thumbnails: !(await isExperimentSubject(
+            "vod-thumbs-off",
+            req.user?.id
+          )),
           c2pa,
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
