@@ -39,7 +39,7 @@ import {
   triggerCatalystStreamStopSessions,
 } from "./helpers";
 
-const adminOnlyFields = ["verifiedAt", "planChangedAt"];
+const adminOnlyFields = ["verifiedAt", "planChangedAt", "viewerLimit"];
 
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
@@ -742,10 +742,18 @@ app.patch(
 
 app.patch("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
-  const { directPlayback } = req.body;
+  const { directPlayback, viewerLimit } = req.body;
 
+  const updateDoc = {};
   if (typeof directPlayback !== "undefined") {
-    await db.user.update(id, { directPlayback });
+    updateDoc["directPlayback"] = directPlayback;
+  }
+  if (typeof viewerLimit !== "undefined") {
+    updateDoc["viewerLimit"] = viewerLimit;
+  }
+
+  if (Object.keys(updateDoc).length !== 0) {
+    await db.user.update(id, updateDoc);
   }
 
   res.status(204).end();

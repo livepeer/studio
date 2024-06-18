@@ -1287,6 +1287,10 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
+        viewerLimit:
+          type: number
+          example: 10
+          description: Maximum number of viewers allowed for the user
     signing-key:
       table: signing_key
       properties:
