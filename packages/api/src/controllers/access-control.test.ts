@@ -114,6 +114,38 @@ describe("controllers/access-control", () => {
       await hookSem.wait(3000);
     });
 
+    it("should include viewer limit per user", async () => {
+      client.jwtAuth = adminToken;
+      const userId = gatedAsset.userId;
+      await db.user.update(userId, { viewerLimit: 10 });
+
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: "foo",
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        user_id: userId,
+        viewer_limit_per_user: 10,
+      });
+    });
+
+    it("should not include viewer limit per user if viewerLimit is 0", async () => {
+      client.jwtAuth = adminToken;
+      const userId = gatedAsset.userId;
+      await db.user.update(userId, { viewerLimit: 10 });
+      await db.user.update(userId, { viewerLimit: 0 });
+
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: "foo",
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({});
+    });
+
     it("should deny for non 2xx", async () => {
       webhookStatusCode = 403;
       client.jwtAuth = adminToken;
