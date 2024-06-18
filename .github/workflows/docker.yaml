@@ -79,7 +79,7 @@ jobs:
             type=raw,value=stable,enable=${{ startsWith(github.event.ref, 'refs/tags/v') }}
 
       - name: Build and push livepeer docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           build-args: |
             VERSION=${{ (github.ref_type == 'tag' && github.ref_name) || (github.event.pull_request.head.sha || github.sha) }}
