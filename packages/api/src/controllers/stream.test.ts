@@ -17,11 +17,10 @@ import {
   AuxTestServer,
   TestClient,
   clearDatabase,
+  createApiToken,
+  createProject,
   setupUsers,
   startAuxTestServer,
-  createProject,
-  createApiToken,
-  useApiTokenWithProject,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
@@ -1266,6 +1265,35 @@ describe("controllers/stream", () => {
         expect(json.errors[0]).toContain("additionalProperties");
       });
 
+      it("should disallow adding recordingSpec without record=true", async () => {
+        const res = await client.patch(patchPath, {
+          recordingSpec: { profiles: [{ bitrate: 1600000 }] },
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          "recordingSpec is only supported with record=true",
+        );
+      });
+
+      it("should allow patching recordingSpec with record=true", async () => {
+        const res = await client.patch(patchPath, {
+          record: true,
+          recordingSpec: { profiles: [{ bitrate: 3000000 }] },
+        });
+        expect(res.status).toBe(204);
+      });
+
+      it("should remove null recordingSpec.profiles", async () => {
+        const res = await client.patch(patchPath, {
+          record: true,
+          recordingSpec: { profiles: null },
+        });
+        expect(res.status).toBe(204);
+        const updated = await db.stream.get(stream.id);
+        expect(updated.recordingSpec).toEqual({});
+      });
+
       it("should validate field types", async () => {
         const testTypeErr = async (payload: any) => {
           let res = await client.patch(patchPath, payload);
@@ -1425,12 +1453,36 @@ describe("controllers/stream", () => {
     });
 
     it("should not accept additional properties for creating a stream", async () => {
-      const postMockLivepeerStream = JSON.parse(JSON.stringify(postMockStream));
-      postMockLivepeerStream.livepeer = "livepeer";
-      const res = await client.post("/stream", { ...postMockLivepeerStream });
+      const res = await client.post("/stream", {
+        ...postMockStream,
+        livepeer: "livepeer",
+      });
       expect(res.status).toBe(422);
       const stream = await res.json();
       expect(stream.id).toBeUndefined();
+    });
+
+    it("should not accept recordingSpec without record", async () => {
+      const res = await client.post("/stream", {
+        ...postMockStream,
+        recordingSpec: { profiles: [{ bitrate: 1600000 }] },
+      });
+      expect(res.status).toBe(400);
+      const json = await res.json();
+      expect(json.errors[0]).toContain(
+        "recordingSpec is only supported with record=true",
+      );
+    });
+
+    it("should remove null profiles from recordingSpec", async () => {
+      const res = await client.post("/stream", {
+        ...postMockStream,
+        record: true,
+        recordingSpec: { profiles: null },
+      });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      expect(stream.recordingSpec).toEqual({});
     });
   });
 

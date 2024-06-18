@@ -604,6 +604,10 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
+          description: |
+            Profiles to transcode the stream into. If not specified, a default
+            set of profiles will be used with 240p, 360p, 480p and 720p
+            resolutions. Keep in mind that the source rendition is always kept.
           default:
             - name: 240p0
               fps: 0
@@ -647,11 +651,11 @@ components:
             profiles:
               type: array
               items:
-                $ref: "#/components/schemas/ffmpeg-profile"
+                $ref: "#/components/schemas/transcode-profile"
               description: |
-                Profiles to record the stream in. If not specified, the stream
-                will be recorded in the same profiles as the stream itself. Keep
-                in mind that the source rendition will always be recorded.
+                Profiles to process the recording of this stream into. If not
+                specified, default profiles will be derived based on the stream
+                input. Keep in mind that the source rendition is always kept.
         multistream:
           type: object
           additionalProperties: false
@@ -697,16 +701,35 @@ components:
           $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        # Same as profiles in stream, but allowing null as well. This is mostly a compatibility workaround for Go SDKs
+        # to be able to send empty arrays in the request body (can't use omitempty).
         profiles:
           type:
             - array
             - "null"
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+          default:
+            $ref: "#/components/schemas/stream/properties/profiles/default"
+          description:
+            $ref: "#/components/schemas/stream/properties/profiles/description"
         record:
           $ref: "#/components/schemas/stream/properties/record"
+        # Same as recordingSpec but allowing null for the profiles field (same reason as above).
         recordingSpec:
-          $ref: "#/components/schemas/stream/properties/recordingSpec"
+          type: object
+          description:
+            $ref: "#/components/schemas/stream/properties/recordingSpec/description"
+          additionalProperties: false
+          properties:
+            profiles:
+              type:
+                - array
+                - "null"
+              items:
+                $ref: "#/components/schemas/transcode-profile"
+              description:
+                $ref: "#/components/schemas/stream/properties/recordingSpec/properties/profiles/description"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
         userTags:
@@ -738,11 +761,9 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          type:
-            - array
-            - "null"
-          items:
-            $ref: "#/components/schemas/ffmpeg-profile"
+          $ref: "#/components/schemas/new-stream-payload/properties/profiles"
+        recordingSpec:
+          $ref: "#/components/schemas/new-stream-payload/properties/recordingSpec"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
@@ -937,9 +958,7 @@ components:
             The playback ID to use with the Playback Info endpoint to retrieve
             playback URLs.
         profiles:
-          type: array
-          items:
-            $ref: "#/components/schemas/ffmpeg-profile"
+          $ref: "#/components/schemas/stream/properties/profiles"
         recordingSpec:
           $ref: "#/components/schemas/stream/properties/recordingSpec"
     error:
@@ -1115,12 +1134,13 @@ components:
         profiles:
           type: array
           description: |
-            Requested profiles for the asset to be transcoded into. Currently
-            only supported for livestream recording assets, configured through
-            the `stream.recordingSpec` field. If this is not present it means
-            that default profiles were derived from the input metadata.
+            Requested profiles for the asset to be transcoded into. Configured
+            on the upload APIs payload or through the `stream.recordingSpec`
+            field for recordings. If not specified, default profiles are derived
+            based on the source input. If this is a recording, the source will
+            not be present in this list but will be available for playback.
           items:
-            $ref: "#/components/schemas/ffmpeg-profile"
+            $ref: "#/components/schemas/transcode-profile"
         storage:
           additionalProperties: false
           properties:
@@ -1397,12 +1417,15 @@ components:
         c2pa:
           type: boolean
           description: Decides if the output video should include C2PA signature
+        # Compatibility workaround for the Go SDK similar to `new-stream-payload.profiles`
         profiles:
           type:
             - array
             - "null"
           items:
             $ref: "#/components/schemas/transcode-profile"
+          description:
+            $ref: "#/components/schemas/asset/properties/profiles/description"
         targetSegmentSizeSecs:
           type: number
           description:
