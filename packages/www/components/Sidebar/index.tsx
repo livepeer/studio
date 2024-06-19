@@ -672,6 +672,10 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 };
 
 const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
+  const { logout } = useApi();
+
+  const { clearProjectId } = useProjectContext();
+
   const { appendProjectId } = useProjectContext();
   const goBack = () => {
     Router.push(appendProjectId("/"));
