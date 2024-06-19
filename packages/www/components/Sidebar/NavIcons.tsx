@@ -23,10 +23,10 @@ export const HomeIcon = ({ active = false }) => (
   </Box>
 );
 
-export const StreamIcon = ({ active = false }) => (
+export const StreamIcon = ({ active = false, size = "16" }) => (
   <svg
-    width="16"
-    height="18"
+    width={size}
+    height={size}
     viewBox="0 0 16 18"
     fill="none"
     xmlns="http://www.w3.org/2000/svg">
@@ -50,11 +50,11 @@ export const StreamIcon = ({ active = false }) => (
   </svg>
 );
 
-export const TerminalIcon = ({ active = false }) => (
+export const TerminalIcon = ({ active = false, size = "16" }) => (
   <svg
-    height="16"
+    height={size}
     viewBox="0 0 16 16"
-    width="16"
+    width={size}
     xmlns="http://www.w3.org/2000/svg">
     <Box
       as="path"
@@ -86,24 +86,24 @@ export const BillingIcon = ({ active = false }) => (
   </svg>
 );
 
-export const UsageIcon = ({ active = false }) => (
+export const UsageIcon = ({ active = false, size = "16" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    height="16"
+    height={size}
     viewBox="0 -960 960 960"
-    width="16"
+    width={size}
     fill="#4F566B">
     <path d="M63-537 0-600q93-95 218-147.5T480-800q24 0 54 1.5t62 5.5l-42 86q-18-2-36-2.5t-38-.5q-119 0-225.5 46T63-537Zm123 118-63-63q69-67 165.5-102T508-611l-39 81q-77-2-154.5 29T186-419Zm258 255q-27-11-39.5-41t1.5-59l237-490q3-7 10.5-10t15.5-1q8 2 13 9t3 15L547-206q-8 32-41 42.5t-62-.5Zm330-255q-16-17-44.5-37T681-485l21-86q35 12 73 38.5t62 50.5l-63 63Zm123-118q-39-38-85-69t-88-50l22-90q65 27 116 63.5t98 82.5l-63 63Z" />
   </svg>
 );
 
-export const AssetsIcon = ({ active = false }) => (
+export const AssetsIcon = ({ active = false, size = "16" }) => (
   <Box
     as="svg"
     xmlns="http://www.w3.org/2000/svg"
-    height="16"
+    height={size}
     viewBox="0 0 24 24"
-    width="16"
+    width={size}
     fill="#4F566B">
     <path d="M2 6H0v5h.01L0 20c0 1.1.9 2 2 2h18v-2H2V6zm20-2h-8l-2-2H6c-1.1 0-1.99.9-1.99 2L4 16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM7 15l4.5-6 3.5 4.51 2.5-3.01L21 15H7z" />
   </Box>
@@ -147,7 +147,7 @@ export const SettingsIcon = ({ active = false }) => (
   </svg>
 );
 
-export const WorkspaceIcon = ({ active = false }) => (
+export const ProjectsIcon = ({ active = false }) => (
   <svg
     width="16"
     height="16"

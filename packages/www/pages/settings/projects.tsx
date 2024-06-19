@@ -56,14 +56,13 @@ const WorkspaceProjects = () => {
             p: "$6",
           },
         }}>
-        <Box css={{ mb: "$7" }}>
+        <Box css={{ mb: "$6" }}>
           <Flex
             justify={"between"}
             css={{
               borderBottom: "1px solid",
               borderColor: "$neutral6",
               pb: "$5",
-              mb: "$5",
               width: "100%",
             }}>
             <Flex direction={"column"}>
@@ -101,6 +100,13 @@ const WorkspaceProjects = () => {
           {data?.map((project, i) => (
             <Link
               onClick={() => setProjectId(project.id)}
+              css={{
+                textDecoration: "none",
+
+                "&:hover": {
+                  textDecoration: "none",
+                },
+              }}
               href={`/dashboard/projects/${project.id}/`}>
               <ProjectTile
                 key={`project-tile-${i}`}

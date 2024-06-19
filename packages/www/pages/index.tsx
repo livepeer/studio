@@ -19,15 +19,7 @@ export default function Dashboard() {
   useLoggedIn();
 
   useEffect(() => {
-    if (projectId) {
-      push(`/projects/${projectId}`);
-    } else if (projects && projects.length > 0) {
-      const project = projects.find((project) => project.name !== "");
-      if (project) {
-        setProjectId(project.id);
-        push(`/projects/${project.id}`);
-      }
-    }
-  }, [projectId, projects]);
+    push(`/settings/projects`);
+  }, []);
   return <div />;
 }

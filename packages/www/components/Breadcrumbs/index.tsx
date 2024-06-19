@@ -66,20 +66,7 @@ const Breadcrumbs = ({ children }) => {
       </Box>
     ));
 
-  if (isSettingsPage) {
-    allItems.unshift(
-      <Box
-        as="li"
-        css={{
-          m: 0,
-          fontSize: "$3",
-          lineHeight: 1.5,
-        }}
-        key="project">
-        <Box css={{ display: "inline-flex" }}>Settings</Box>
-      </Box>
-    );
-  } else {
+  if (!isSettingsPage) {
     if (projectId) {
       const project = data?.find((project) => project.id === projectId);
       allItems.unshift(

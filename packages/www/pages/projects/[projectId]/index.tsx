@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   return (
     <Box css={{ p: "$6" }}>
-      {!emailValid && (
+      {/* {!emailValid && (
         <Banner
           title="Verify your email"
           description="Verify your account with a link via email."
@@ -64,7 +64,7 @@ const Dashboard = () => {
           }
           css={{ mb: "$3" }}
         />
-      )}
+      )} */}
       {showPromo && (
         <Banner
           title="Upgrade"
@@ -83,22 +83,10 @@ const Dashboard = () => {
           css={{ mb: "$7" }}
         />
       )}
-      <Box css={{ mb: "$9" }}>
+      <Box css={{ mb: "$6" }}>
         <GettingStarted firstName={user?.firstName} />
       </Box>
-      <Box css={{ mb: "100px" }}>
-        <UsageSummary />
-      </Box>
-      <Box css={{ mb: "$8" }}>
-        <StreamsTable
-          title="Streams"
-          hideFilters={true}
-          userId={user.id}
-          pageSize={5}
-          tableId="dashboardStreamsTable"
-          viewAll="/dashboard/streams"
-        />
-      </Box>
+
       <FeaturesModel />
     </Box>
   );

@@ -9,11 +9,9 @@ import {
   Button,
 } from "@livepeer/design-system";
 import { DashboardSettingsGeneral as Content } from "content";
-import React, { useCallback, useRef, useState } from "react";
-import Image from "next/image";
+import React, { useCallback, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { useProjectContext } from "context/ProjectContext";
-import { useRouter } from "next/router";
 import DeleteProjectDialog from "components/Project/deleteProjectDialog";
 import { Project } from "@livepeer.studio/api";
 

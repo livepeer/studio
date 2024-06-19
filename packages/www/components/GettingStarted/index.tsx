@@ -9,22 +9,86 @@ import {
   Box,
   Flex,
   Link as A,
+  Paragraph,
+  Card,
+  Promo,
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon, ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { useProjectContext } from "context/ProjectContext";
-
-import { getBrandName } from "lib/utils";
+import { useQuery } from "react-query";
+import { useApi } from "hooks";
+import Image from "next/image";
+import {
+  AssetsIcon,
+  StreamIcon,
+  TerminalIcon,
+  UsageIcon,
+} from "components/Sidebar/NavIcons";
 
 const GettingStarted = ({ firstName = "" }) => {
-  const { appendProjectId } = useProjectContext();
+  const { appendProjectId, projectId } = useProjectContext();
+  const { getProject } = useApi();
+
+  const { data } = useQuery([projectId], () => getProject(projectId));
+
+  const SDKs = [
+    {
+      name: "React.js Components",
+      description:
+        "Integrate Livepeer Studio into your React application using our Livepeer Studio React SDK.",
+      link: "/docs/sdk/react",
+      image:
+        "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+    },
+    {
+      name: "JavaScript SDK",
+      description:
+        "Integrate Livepeer Studio into your JavaScript application using our Livepeer Studio JavaScript SDK.",
+      link: "/docs/sdk/javascript",
+      image:
+        "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+    },
+    {
+      name: "Python SDK",
+      description:
+        "Integrate Livepeer Studio into your Python application using our Livepeer Studio Python SDK.",
+      link: "/docs/sdk/python",
+      image:
+        "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+    },
+
+    {
+      name: "Ruby SDK",
+      description:
+        "Integrate Livepeer Studio into your Ruby application using our Livepeer Studio Ruby SDK.",
+      link: "/docs/sdk/ruby",
+      image:
+        "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ruby/ruby-original.svg",
+    },
+  ];
+
   return (
     <>
-      <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
-        Welcome to {getBrandName()}
-        {firstName && `, ${firstName}`}
-      </Heading>
-      <Box css={{ bc: "$panel" }}>
+      <Flex
+        justify={"between"}
+        align={"center"}
+        css={{
+          mb: "$4",
+        }}>
+        <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600 }}>
+          {data?.name}
+        </Heading>
+        <Link href={appendProjectId("/settings")} passHref legacyBehavior>
+          <Button as="a" size="2">
+            Edit Project
+          </Button>
+        </Link>
+      </Flex>
+      <Box
+        css={{
+          bc: "$panel",
+        }}>
         <Accordion
           placeholder="Getting Started"
           type="single"
@@ -189,6 +253,61 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionItem>
         </Accordion>
       </Box>
+
+      <>
+        <Box
+          css={{
+            mt: "$6",
+            mb: "$3",
+          }}>
+          <Heading>Get started with Livepeer Studio</Heading>
+        </Box>
+        <Flex
+          justify={"between"}
+          wrap={"wrap"}
+          css={{
+            gap: "$4",
+          }}>
+          {SDKs.map((sdk) => (
+            <Promo
+              css={{
+                width: "22%",
+              }}>
+              <Image
+                style={{
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}
+                src={sdk.image}
+                alt={sdk.name}
+                width={26}
+                height={26}
+              />
+              <Text size={"4"} css={{ fontWeight: 500 }}>
+                {sdk.name}
+              </Text>
+              <Text
+                variant="neutral"
+                size="2"
+                css={{
+                  mt: "$1",
+                  mb: "$1",
+                }}>
+                {sdk.description}
+              </Text>
+              <Button
+                css={{
+                  mt: "$2",
+                  display: "flex",
+                  width: "fit-content",
+                  alignItems: "center",
+                }}>
+                See documentation <ArrowRightIcon />
+              </Button>
+            </Promo>
+          ))}
+        </Flex>
+      </>
     </>
   );
 };

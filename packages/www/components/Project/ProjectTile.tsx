@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   Button,
+  Avatar,
 } from "@livepeer/design-system";
 import React from "react";
 import { HiDotsHorizontal } from "react-icons/hi";
@@ -15,6 +16,87 @@ import Link from "next/link";
 
 export default function ProjectTile({ name, id }) {
   const { setProjectId } = useProjectContext();
+
+  const getEmojiIcon = (name = "") => {
+    const stagingKeywords = [
+      "staging",
+      "dev",
+      "qa",
+      "demo",
+      "preview",
+      "sandbox",
+      "playground",
+      "beta",
+    ];
+
+    const productionKeywords = [
+      "prod",
+      "production",
+      "live",
+      "master",
+      "main",
+      "release",
+      "deploy",
+      "ship",
+      "go",
+    ];
+
+    const otherDevKeywords = [
+      "build",
+      "compile",
+      "run",
+      "execute",
+      "debug",
+      "test",
+    ];
+
+    const randomEmojis = [
+      "✨",
+      "🌟",
+      "🎯",
+      "🏅",
+      "💡",
+      "📚",
+      "🛠️",
+      "🔒",
+      "🔍",
+      "💼",
+      "🧩",
+      "📝",
+      "🌐",
+      "🏆",
+      "🎉",
+    ];
+
+    const containsKeyword = (keywords) => {
+      return keywords.some((keyword) => name.toLowerCase().includes(keyword));
+    };
+
+    const hashString = (str) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+    };
+
+    const getRandomEmoji = (str) => {
+      const hash = hashString(str);
+      return randomEmojis[Math.abs(hash) % randomEmojis.length];
+    };
+
+    if (name.toLowerCase().includes("default")) {
+      return "⭐";
+    } else if (containsKeyword(stagingKeywords)) {
+      return "🔧";
+    } else if (containsKeyword(productionKeywords)) {
+      return "🚀";
+    } else if (containsKeyword(otherDevKeywords)) {
+      return "🧪";
+    } else {
+      return getRandomEmoji(name);
+    }
+  };
 
   return (
     <Box
@@ -34,14 +116,18 @@ export default function ProjectTile({ name, id }) {
           borderColor: "$neutral9",
         },
       }}>
-      <Flex direction={"column"}>
+      <Box>
         <Flex align={"center"} justify={"between"}>
-          <Text
-            css={{
-              fontWeight: 500,
-            }}>
-            {name}
-          </Text>
+          <Flex align={"center"}>
+            <Avatar fallback={getEmojiIcon(name)} size={"3"} />
+            <Text
+              css={{
+                fontWeight: 500,
+                ml: "$2",
+              }}>
+              {name}
+            </Text>
+          </Flex>
           <DropdownMenu>
             <Box
               as={DropdownMenuTrigger}
@@ -90,10 +176,12 @@ export default function ProjectTile({ name, id }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </Flex>
+      </Box>
+      <Flex justify={"end"}>
+        <Button css={{ mt: 40 }} size={1}>
+          Open Project
+        </Button>
       </Flex>
-      <Button css={{ mt: 40 }} size={1}>
-        Open Project
-      </Button>
     </Box>
   );
 }

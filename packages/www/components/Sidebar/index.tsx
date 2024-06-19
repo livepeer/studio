@@ -22,7 +22,9 @@ import {
   AssetsIcon,
   TopBottomChevron,
   SettingsIcon,
-  WorkspaceIcon,
+  ProjectsIcon,
+  UsageIcon,
+  BillingIcon,
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
@@ -137,30 +139,28 @@ export const generalSidebarItems = [
 
 const settingsSidebarItems = [
   {
-    title: "Workspace",
-    path: "#",
-    icon: <WorkspaceIcon />,
-    id: "settings/workspace",
+    title: "Projects",
+    path: "/settings/projects",
+    id: "settings/projects",
+    icon: <ProjectsIcon />,
+  },
+
+  {
+    title: "Usage",
+    path: "/settings/usage",
+    id: "settings/usage",
+    icon: <UsageIcon />,
+  },
+  {
+    title: "Billing",
+    path: "/settings/billing",
+    id: "settings/billing",
+    icon: <BillingIcon />,
     children: [
-      {
-        title: "Projects",
-        path: "/settings/projects",
-        id: "settings/projects",
-      },
       {
         title: "Plans",
         path: "/settings/billing/plans",
         id: "settings/plans",
-      },
-      {
-        title: "Usage",
-        path: "/settings/usage",
-        id: "settings/usage",
-      },
-      {
-        title: "Billing",
-        path: "/settings/billing",
-        id: "settings/billing",
       },
     ],
   },
@@ -677,26 +677,158 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
     Router.push(appendProjectId("/"));
   };
 
+  const isActive = (item: any) => {
+    if (id === item.id) {
+      return true;
+    }
+    return false;
+  };
+
+  const isParentActive = (item: any) => {
+    if (id === item.id) {
+      return true;
+    }
+    if (item.children) {
+      return item.children.some((child: any) => id === child.id);
+    }
+    return false;
+  };
+
   return (
     <>
-      <Flex align="center" justify="between" css={{ p: "$3", mb: "$1" }}>
-        <Button
-          onClick={goBack}
-          size={4}
-          css={{
-            ml: "-$2",
-            gap: "$3",
-            backgroundColor: "transparent",
-            color: "$neutral12",
-            fontWeight: 500,
-            "&:hover": {
-              backgroundColor: "transparent",
-            },
-          }}>
-          <FiChevronLeft size={21} />
-          Settings
-        </Button>
+      <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
+        <DropdownMenu>
+          <Flex
+            as={DropdownMenuTrigger}
+            align="center"
+            css={{
+              border: 0,
+              background: "transparent",
+              p: 6,
+              "&:hover": {
+                backgroundColor: "$neutral4",
+                borderRadius: "$3",
+              },
+            }}>
+            <Avatar
+              placeholder={user?.firstName || user?.email.charAt(0)}
+              css={{
+                width: 55,
+                height: 55,
+              }}
+              alt={user?.firstName}
+              fallback={
+                user?.firstName
+                  ? user?.firstName?.charAt(0)
+                  : user?.email.charAt(0)
+              }
+            />
+            <Text
+              size="3"
+              css={{ ml: "$2", fontSize: "$3", mr: "$1", color: "$neutral11" }}>
+              My Account
+            </Text>
+          </Flex>
+          <DropdownMenuContent
+            placeholder="Account"
+            css={{
+              border: "1px solid $colors$neutral6",
+              width: "12rem",
+              ml: "$4",
+            }}>
+            <DropdownMenuGroup
+              css={{
+                display: "flex",
+                flexDirection: "column",
+                mx: "$1",
+              }}>
+              <DropdownMenuItem
+                css={{
+                  py: 3,
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="billing-dropdown-item"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  Router.push("/settings/projects");
+                }}>
+                <Text size="2">Projects</Text>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                css={{
+                  py: 3,
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="billing-dropdown-item"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  Router.push("/settings/billing/plans");
+                }}>
+                <Text size="2">Plans</Text>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                css={{
+                  py: 3,
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="billing-dropdown-item"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  Router.push("/settings/billing");
+                }}>
+                <Text size="2">Billing</Text>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                css={{
+                  py: 3,
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="billing-dropdown-item"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  Router.push("/settings/usage");
+                }}>
+                <Text size="2">Usage</Text>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                css={{
+                  py: 3,
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="logout-dropdown-item"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  logout();
+                  clearProjectId();
+                }}>
+                <Text size="2">Log out</Text>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <ThemeSwitch />
       </Flex>
+
       <Flex
         css={{ px: "$4", height: "calc(100vh - 100px)" }}
         direction="column"
@@ -709,15 +841,14 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             },
           }}>
           {settingsSidebarItems.map((item, i) => (
-            <Box key={`settings-sidebar-${i}`}>
+            <Box key={item.id}>
               <Link href={item.path} passHref legacyBehavior>
-                <NavLink active={id === item.id}>
+                <NavLink active={isActive(item)}>
                   {item.icon}
                   {item.title}
                 </NavLink>
               </Link>
-
-              {item.children && (
+              {item.children && isParentActive(item) && (
                 <Box
                   css={{
                     a: {
@@ -726,8 +857,12 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
                     },
                   }}>
                   {item.children.map((child) => (
-                    <Link href={child.path} passHref legacyBehavior>
-                      <NavLink active={id === child.id}>{child.title}</NavLink>
+                    <Link
+                      href={child.path}
+                      key={child.id}
+                      passHref
+                      legacyBehavior>
+                      <NavLink active={isActive(child)}>{child.title}</NavLink>
                     </Link>
                   ))}
                 </Box>
@@ -735,6 +870,84 @@ const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
             </Box>
           ))}
         </Grid>
+
+        <Flex direction="column" gap={1}>
+          <NavLink
+            href="https://status.livepeer.studio/"
+            target="_blank"
+            css={{
+              color: "$neutral10",
+              transition: "color .3s",
+              textDecoration: "none",
+              "&:hover": {
+                color: "$neutral11",
+                transition: "color .3s",
+              },
+            }}>
+            <LoopIcon />
+            <Text
+              css={{
+                display: "flex",
+                backgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+                fontSize: "$1",
+              }}>
+              Status
+            </Text>
+          </NavLink>
+
+          <NavLink
+            href="https://livepeer.canny.io/changelog?labels=studio"
+            target="_blank"
+            css={{
+              color: "$neutral10",
+              transition: "color .3s",
+              textDecoration: "none",
+              "&:hover": {
+                color: "$neutral11",
+                transition: "color .3s",
+              },
+            }}>
+            <RocketIcon />
+            <Text
+              css={{
+                display: "flex",
+                backgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+                fontSize: "$1",
+              }}>
+              Changelog
+            </Text>
+          </NavLink>
+
+          <NavLink
+            href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
+            target="_blank"
+            css={{
+              color: "$neutral10",
+              transition: "color .3s",
+              textDecoration: "none",
+              "&:hover": {
+                color: "$neutral11",
+                transition: "color .3s",
+              },
+            }}>
+            <ChatBubbleIcon />
+            <Text
+              css={{
+                display: "flex",
+                backgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+                fontSize: "$1",
+              }}>
+              Feature Requests
+            </Text>
+          </NavLink>
+          <Contact />
+        </Flex>
       </Flex>
     </>
   );
