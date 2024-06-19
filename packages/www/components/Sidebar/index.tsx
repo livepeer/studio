@@ -167,55 +167,17 @@ const settingsSidebarItems = [
 ];
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
-  const { user, logout } = useApi();
-  const router = useRouter();
-
-  const June = useJune();
-
-  useEffect(() => {
-    const handleRouteChange = (url, { shallow }) => {
-      if (June) June.page(url);
-    };
-
-    router.events.on("routeChangeStart", handleRouteChange);
-
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-    };
-  }, [June]);
-
+  const { setProjectId, projectId, appendProjectId } = useProjectContext();
+  const { createProject, getProjects, logout, user } = useApi();
+  const queryClient = useQueryClient();
   const { pathname } = useRouter();
 
-  return (
-    <Box
-      css={{
-        backgroundColor: "$panel",
-        borderRight: "1px solid",
-        borderColor: "$neutral6",
-        maxWidth: 270,
-        width: 270,
-        top: 0,
-        position: "fixed",
-        justifyContent: "flex-end",
-        bottom: 0,
-      }}>
-      {pathname.includes("settings/") ? (
-        <SettingsSidebar id={id} user={user} />
-      ) : (
-        <GeneralSidebar id={id} user={user} />
-      )}
-    </Box>
-  );
-};
-
-const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
-  const { createProject, getProjects, logout } = useApi();
-
-  const router = useRouter();
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
-  const { setProjectId, projectId, appendProjectId, clearProjectId } =
-    useProjectContext();
-  const queryClient = useQueryClient();
+
+  const { data } = useQuery("projects", getProjects);
+  const activeProject = data?.find((project) => project.id === projectId);
+
+  const isSettingsPage = pathname.includes("/settings/");
 
   const onCreateClick = async (projectName: string) => {
     const project = await createProject({
@@ -227,10 +189,6 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
 
     queryClient.invalidateQueries("projects");
   };
-
-  const { data } = useQuery("projects", getProjects);
-
-  const activeProject = data?.find((project) => project.id === projectId);
 
   const isResourcePage = () => {
     const path = window.location.pathname;
@@ -270,689 +228,430 @@ const GeneralSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
         onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
         isOpen={showCreateProjectAlert}
       />
-
-      <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
-        <DropdownMenu>
-          <Flex
-            as={DropdownMenuTrigger}
-            align="center"
-            css={{
-              border: 0,
-              background: "transparent",
-              p: 6,
-              "&:hover": {
-                backgroundColor: "$neutral4",
-                borderRadius: "$3",
-              },
-            }}>
-            <Avatar
-              placeholder={user?.firstName || user?.email.charAt(0)}
+      <Box
+        css={{
+          backgroundColor: "$panel",
+          borderRight: "1px solid",
+          borderColor: "$neutral6",
+          maxWidth: 270,
+          width: 270,
+          top: 0,
+          position: "fixed",
+          justifyContent: "flex-end",
+          bottom: 0,
+        }}>
+        <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
+          <DropdownMenu>
+            <Flex
+              as={DropdownMenuTrigger}
+              align="center"
               css={{
-                width: 55,
-                height: 55,
-              }}
-              alt={user?.firstName}
-              fallback={
-                user?.firstName
-                  ? user?.firstName?.charAt(0)
-                  : user?.email.charAt(0)
-              }
-            />
-            <Text
-              size="3"
-              css={{ ml: "$2", fontSize: "$3", mr: "$1", color: "$neutral11" }}>
-              My Account
-            </Text>
-          </Flex>
-          <DropdownMenuContent
-            placeholder="Account"
-            css={{
-              border: "1px solid $colors$neutral6",
-              width: "12rem",
-              ml: "$4",
-            }}>
-            <DropdownMenuGroup
-              css={{
-                display: "flex",
-                flexDirection: "column",
-                mx: "$1",
+                border: 0,
+                background: "transparent",
+                p: 6,
+                "&:hover": {
+                  backgroundColor: "$neutral4",
+                  borderRadius: "$3",
+                },
               }}>
-              <DropdownMenuItem
+              <Avatar
+                placeholder={user?.firstName || user?.email.charAt(0)}
                 css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
+                  width: 55,
+                  height: 55,
                 }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/projects");
-                }}>
-                <Text size="2">Projects</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
+                alt={user?.firstName}
+                fallback={
+                  user?.firstName
+                    ? user?.firstName?.charAt(0)
+                    : user?.email.charAt(0)
+                }
+              />
+              <Text
+                size="3"
                 css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/billing/plans");
+                  ml: "$2",
+                  fontSize: "$3",
+                  mr: "$1",
+                  color: "$neutral11",
                 }}>
-                <Text size="2">Plans</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
+                My Account
+              </Text>
+            </Flex>
+            <DropdownMenuContent
+              placeholder="Account"
+              css={{
+                border: "1px solid $colors$neutral6",
+                width: "12rem",
+                ml: "$4",
+              }}>
+              <DropdownMenuGroup
                 css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/billing");
+                  display: "flex",
+                  flexDirection: "column",
+                  mx: "$1",
                 }}>
-                <Text size="2">Billing</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/usage");
-                }}>
-                <Text size="2">Usage</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="logout-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  logout();
-                  clearProjectId();
-                }}>
-                <Text size="2">Log out</Text>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <ThemeSwitch />
-      </Flex>
-
-      <DropdownMenu>
-        <Flex
-          align={"center"}
-          as={DropdownMenuTrigger}
-          css={{
-            py: "$1",
-            px: "$2",
-            gap: "$2",
-            mb: "$2",
-            mt: "-$1",
-            ml: "$4",
-            border: 0,
-            backgroundColor: "transparent",
-            "&:focus": {
-              outline: "none",
-            },
-            "&:hover": {
-              backgroundColor: "$neutral4",
-              borderRadius: "$3",
-            },
-          }}>
-          <Text
-            css={{
-              color: "$neutral11",
-            }}>
-            {activeProject?.name.toLowerCase().includes("my default project")
-              ? "Default Project"
-              : activeProject?.name}
-          </Text>
-          <TopBottomChevron />
+                <DropdownMenuItem
+                  css={{
+                    py: 3,
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    Router.push("/settings/projects");
+                  }}>
+                  <Text size="2">Projects</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: 3,
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    Router.push("/settings/billing/plans");
+                  }}>
+                  <Text size="2">Plans</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: 3,
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    Router.push("/settings/billing");
+                  }}>
+                  <Text size="2">Billing</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: 3,
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    Router.push("/settings/usage");
+                  }}>
+                  <Text size="2">Usage</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: 3,
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="logout-dropdown-item"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    logout();
+                  }}>
+                  <Text size="2">Log out</Text>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ThemeSwitch />
         </Flex>
-        <DropdownMenuContent
-          placeholder={"Projects"}
-          css={{
-            border: "1px solid $colors$neutral6",
-            p: "$3",
-            width: "14rem",
-            ml: "$5",
-          }}>
-          <Text size={2} variant={"neutral"} css={{ ml: "$1", mb: "$1" }}>
-            Projects
-          </Text>
-          <Box
-            css={{
-              borderBottom: "1px solid",
-              borderColor: "$neutral6",
-              pb: "$2",
-            }}>
-            {data?.map((project) => (
-              <DropdownMenuItem
-                key={project.id}
+
+        {!isSettingsPage && (
+          <DropdownMenu>
+            <Flex
+              align={"center"}
+              as={DropdownMenuTrigger}
+              css={{
+                py: "$1",
+                px: "$2",
+                gap: "$2",
+                mb: "$2",
+                mt: "-$1",
+                ml: "$4",
+                border: 0,
+                backgroundColor: "transparent",
+                "&:focus": {
+                  outline: "none",
+                },
+                "&:hover": {
+                  backgroundColor: "$neutral4",
+                  borderRadius: "$3",
+                },
+              }}>
+              <Text
                 css={{
-                  py: "$1",
-                  px: "$2",
-                  cursor: "default",
-                  "&:hover": {
-                    backgroundColor: "$neutral4",
-                    borderRadius: "$3",
+                  color: "$neutral11",
+                }}>
+                {activeProject?.name
+                  .toLowerCase()
+                  .includes("my default project")
+                  ? "Default Project"
+                  : activeProject?.name}
+              </Text>
+              <TopBottomChevron />
+            </Flex>
+            <DropdownMenuContent
+              placeholder={"Projects"}
+              css={{
+                border: "1px solid $colors$neutral6",
+                p: "$3",
+                width: "14rem",
+                ml: "$5",
+              }}>
+              <Text size={2} variant={"neutral"} css={{ ml: "$1", mb: "$1" }}>
+                Projects
+              </Text>
+              <Box
+                css={{
+                  borderBottom: "1px solid",
+                  borderColor: "$neutral6",
+                  pb: "$2",
+                }}>
+                {data?.map((project) => (
+                  <DropdownMenuItem
+                    key={project.id}
+                    css={{
+                      py: "$1",
+                      px: "$2",
+                      cursor: "default",
+                      "&:hover": {
+                        backgroundColor: "$neutral4",
+                        borderRadius: "$3",
+                      },
+                    }}>
+                    <Flex
+                      onClick={() => {
+                        setProjectId(project.id);
+                        if (isResourcePage()) {
+                          const path = isResourcePage() as string;
+                          const newUrl = `/dashboard/projects/${project.id}${path}`;
+                          window.location.assign(newUrl);
+                        }
+                      }}
+                      css={{ width: "100%" }}
+                      key={project.id}
+                      align={"center"}
+                      justify={"between"}>
+                      <Text size={2}>
+                        {project?.name
+                          ?.toLowerCase()
+                          ?.includes("my default project")
+                          ? "Default Project"
+                          : project?.name}
+                      </Text>
+                      {projectId === project.id && <FiCheck />}
+                    </Flex>
+                  </DropdownMenuItem>
+                ))}
+              </Box>
+              <Box
+                css={{
+                  py: "$2",
+                  pb: 0,
+                  fontSize: 14,
+                  color: "$primary11",
+                  a: {
+                    textDecoration: "none",
+                    color: "$neutral12",
                   },
                 }}>
                 <Flex
-                  onClick={() => {
-                    setProjectId(project.id);
-                    if (isResourcePage()) {
-                      const path = isResourcePage() as string;
-                      const newUrl = `/dashboard/projects/${project.id}${path}`;
-                      window.location.assign(newUrl);
-                    }
-                  }}
-                  css={{ width: "100%" }}
-                  key={project.id}
-                  align={"center"}
-                  justify={"between"}>
-                  <Text size={2}>
-                    {project?.name
-                      ?.toLowerCase()
-                      ?.includes("my default project")
-                      ? "Default Project"
-                      : project?.name}
-                  </Text>
-                  {projectId === project.id && <FiCheck />}
+                  direction={"column"}
+                  css={{
+                    width: "100%",
+                  }}>
+                  <DropdownMenuItem
+                    css={{
+                      color: "$neutral12",
+                      cursor: "default",
+                      borderRadius: "$3",
+                      mb: "$1",
+                      py: "$1",
+                      px: "$2",
+                      "&:hover": {
+                        backgroundColor: "$neutral4",
+                      },
+                    }}>
+                    <Flex
+                      onClick={() => setShowCreateProjectAlert(true)}
+                      align={"center"}>
+                      <Text size={2}>Create new project</Text>
+                    </Flex>
+                  </DropdownMenuItem>
+                  <Flex
+                    onClick={() => Router.push("/settings/projects")}
+                    align={"center"}
+                    css={{
+                      color: "$neutral12",
+                      cursor: "default",
+                      borderRadius: "$3",
+                      px: "$2",
+                      py: "$1",
+                      "&:hover": {
+                        backgroundColor: "$neutral4",
+                      },
+                    }}>
+                    <Text size={2}>View all projects</Text>
+                  </Flex>
                 </Flex>
-              </DropdownMenuItem>
-            ))}
-          </Box>
-          <Box
+              </Box>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        <Flex
+          css={{ px: "$4", height: "calc(100vh - 100px)" }}
+          direction="column"
+          justify="between">
+          <Grid
+            gap={1}
             css={{
-              py: "$2",
-              pb: 0,
-              fontSize: 14,
-              color: "$primary11",
               a: {
                 textDecoration: "none",
-                color: "$neutral12",
               },
             }}>
-            <Flex
-              direction={"column"}
-              css={{
-                width: "100%",
-              }}>
-              <DropdownMenuItem
-                css={{
-                  color: "$neutral12",
-                  cursor: "default",
-                  borderRadius: "$3",
-                  mb: "$1",
-                  py: "$1",
-                  px: "$2",
-                  "&:hover": {
-                    backgroundColor: "$neutral4",
-                  },
-                }}>
-                <Flex
-                  onClick={() => setShowCreateProjectAlert(true)}
-                  align={"center"}>
-                  <Text size={2}>Create new project</Text>
-                </Flex>
-              </DropdownMenuItem>
-              <Flex
-                onClick={() => Router.push("/settings/projects")}
-                align={"center"}
-                css={{
-                  color: "$neutral12",
-                  cursor: "default",
-                  borderRadius: "$3",
-                  px: "$2",
-                  py: "$1",
-                  "&:hover": {
-                    backgroundColor: "$neutral4",
-                  },
-                }}>
-                <Text size={2}>View all projects</Text>
-              </Flex>
-            </Flex>
-          </Box>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <Flex
-        css={{ px: "$4", height: "calc(100vh - 100px)" }}
-        direction="column"
-        justify="between">
-        <Grid
-          gap={1}
-          css={{
-            a: {
-              textDecoration: "none",
-            },
-          }}>
-          {generalSidebarItems.map((item) => (
-            <Box key={item.id}>
-              <Link href={appendProjectId(item.path)} passHref legacyBehavior>
-                <NavLink active={isActive(item)}>
-                  {item.icon}
-                  {item.title}
-                </NavLink>
-              </Link>
-              {item.children && isParentActive(item) && (
-                <Box
-                  css={{
-                    a: {
-                      pl: 35,
-                      mt: "$1",
-                    },
-                  }}>
-                  {item.children.map((child) => (
-                    <Link
-                      href={appendProjectId(child.path)}
-                      key={child.id}
-                      passHref
-                      legacyBehavior>
-                      <NavLink active={isActive(child)}>{child.title}</NavLink>
-                    </Link>
-                  ))}
+            {(isSettingsPage ? settingsSidebarItems : generalSidebarItems).map(
+              (item) => (
+                <Box key={item.id}>
+                  <Link
+                    href={appendProjectId(item.path)}
+                    passHref
+                    legacyBehavior>
+                    <NavLink active={isActive(item)}>
+                      {item.icon}
+                      {item.title}
+                    </NavLink>
+                  </Link>
+                  {item.children && isParentActive(item) && (
+                    <Box
+                      css={{
+                        a: {
+                          pl: 35,
+                          mt: "$1",
+                        },
+                      }}>
+                      {item.children.map((child) => (
+                        <Link
+                          href={appendProjectId(child.path)}
+                          key={child.id}
+                          passHref
+                          legacyBehavior>
+                          <NavLink active={isActive(child)}>
+                            {child.title}
+                          </NavLink>
+                        </Link>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
-          ))}
-        </Grid>
-        <Flex
-          direction="column"
-          gap={1}
-          css={{
-            mb: "$7",
-          }}>
-          <NavLink
-            href="https://status.livepeer.studio/"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <LoopIcon />
-            <Text
-              css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
-              }}>
-              Status
-            </Text>
-          </NavLink>
-
-          <NavLink
-            href="https://livepeer.canny.io/changelog?labels=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <RocketIcon />
-            <Text
-              css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
-              }}>
-              Changelog
-            </Text>
-          </NavLink>
-
-          <NavLink
-            href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <ChatBubbleIcon />
-            <Text
-              css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
-              }}>
-              Feature Requests
-            </Text>
-          </NavLink>
-          <Contact />
-        </Flex>
-      </Flex>
-    </>
-  );
-};
-
-const SettingsSidebar = ({ id, user }: { id: SidebarId; user: User }) => {
-  const { logout } = useApi();
-
-  const { clearProjectId } = useProjectContext();
-
-  const { appendProjectId } = useProjectContext();
-  const goBack = () => {
-    Router.push(appendProjectId("/"));
-  };
-
-  const isActive = (item: any) => {
-    if (id === item.id) {
-      return true;
-    }
-    return false;
-  };
-
-  const isParentActive = (item: any) => {
-    if (id === item.id) {
-      return true;
-    }
-    if (item.children) {
-      return item.children.some((child: any) => id === child.id);
-    }
-    return false;
-  };
-
-  return (
-    <>
-      <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
-        <DropdownMenu>
+              )
+            )}
+          </Grid>
           <Flex
-            as={DropdownMenuTrigger}
-            align="center"
+            direction="column"
+            gap={1}
             css={{
-              border: 0,
-              background: "transparent",
-              p: 6,
-              "&:hover": {
-                backgroundColor: "$neutral4",
-                borderRadius: "$3",
-              },
+              mb: "$7",
             }}>
-            <Avatar
-              placeholder={user?.firstName || user?.email.charAt(0)}
+            <NavLink
+              href="https://status.livepeer.studio/"
+              target="_blank"
               css={{
-                width: 55,
-                height: 55,
-              }}
-              alt={user?.firstName}
-              fallback={
-                user?.firstName
-                  ? user?.firstName?.charAt(0)
-                  : user?.email.charAt(0)
-              }
-            />
-            <Text
-              size="3"
-              css={{ ml: "$2", fontSize: "$3", mr: "$1", color: "$neutral11" }}>
-              My Account
-            </Text>
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
+              }}>
+              <LoopIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Status
+              </Text>
+            </NavLink>
+
+            <NavLink
+              href="https://livepeer.canny.io/changelog?labels=studio"
+              target="_blank"
+              css={{
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
+              }}>
+              <RocketIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Changelog
+              </Text>
+            </NavLink>
+
+            <NavLink
+              href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
+              target="_blank"
+              css={{
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
+              }}>
+              <ChatBubbleIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Feature Requests
+              </Text>
+            </NavLink>
+            <Contact />
           </Flex>
-          <DropdownMenuContent
-            placeholder="Account"
-            css={{
-              border: "1px solid $colors$neutral6",
-              width: "12rem",
-              ml: "$4",
-            }}>
-            <DropdownMenuGroup
-              css={{
-                display: "flex",
-                flexDirection: "column",
-                mx: "$1",
-              }}>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/projects");
-                }}>
-                <Text size="2">Projects</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/billing/plans");
-                }}>
-                <Text size="2">Plans</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/billing");
-                }}>
-                <Text size="2">Billing</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/settings/usage");
-                }}>
-                <Text size="2">Usage</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: 3,
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="logout-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  logout();
-                  clearProjectId();
-                }}>
-                <Text size="2">Log out</Text>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <ThemeSwitch />
-      </Flex>
-
-      <Flex
-        css={{ px: "$4", height: "calc(100vh - 100px)" }}
-        direction="column"
-        justify="between">
-        <Grid
-          gap={1}
-          css={{
-            a: {
-              textDecoration: "none",
-            },
-          }}>
-          {settingsSidebarItems.map((item, i) => (
-            <Box key={item.id}>
-              <Link href={item.path} passHref legacyBehavior>
-                <NavLink active={isActive(item)}>
-                  {item.icon}
-                  {item.title}
-                </NavLink>
-              </Link>
-              {item.children && isParentActive(item) && (
-                <Box
-                  css={{
-                    a: {
-                      pl: 35,
-                      mt: "$1",
-                    },
-                  }}>
-                  {item.children.map((child) => (
-                    <Link
-                      href={child.path}
-                      key={child.id}
-                      passHref
-                      legacyBehavior>
-                      <NavLink active={isActive(child)}>{child.title}</NavLink>
-                    </Link>
-                  ))}
-                </Box>
-              )}
-            </Box>
-          ))}
-        </Grid>
-
-        <Flex direction="column" gap={1}>
-          <NavLink
-            href="https://status.livepeer.studio/"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <LoopIcon />
-            <Text
-              css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
-              }}>
-              Status
-            </Text>
-          </NavLink>
-
-          <NavLink
-            href="https://livepeer.canny.io/changelog?labels=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <RocketIcon />
-            <Text
-              css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
-              }}>
-              Changelog
-            </Text>
-          </NavLink>
-
-          <NavLink
-            href="https://livepeer.canny.io/feature-requests?category=studio&selectedCategory=studio"
-            target="_blank"
-            css={{
-              color: "$neutral10",
-              transition: "color .3s",
-              textDecoration: "none",
-              "&:hover": {
-                color: "$neutral11",
-                transition: "color .3s",
-              },
-            }}>
-            <ChatBubbleIcon />
-            <Text
-              css={{
-                display: "flex",
-                backgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-                fontSize: "$1",
-              }}>
-              Feature Requests
-            </Text>
-          </NavLink>
-          <Contact />
         </Flex>
-      </Flex>
+      </Box>
     </>
   );
 };
