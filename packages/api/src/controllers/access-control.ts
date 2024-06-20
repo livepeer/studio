@@ -36,7 +36,7 @@ const app = Router();
 type GateConfig = {
   refresh_interval: number;
   rate_limit: number;
-  viewer_limit_per_user: number;
+  user_viewer_limit: number;
   user_id: string;
 };
 
@@ -226,7 +226,7 @@ app.post(
     let config: Partial<GateConfig> = {};
 
     if (user.viewerLimit) {
-      config.viewer_limit_per_user = user.viewerLimit;
+      config.user_viewer_limit = user.viewerLimit;
       config.user_id = user.id;
     }
 
