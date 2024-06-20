@@ -23,6 +23,7 @@ import {
   SuspendUserPayload,
   UpdateSubscription,
   User,
+  Project,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -190,6 +191,15 @@ async function createSubscription(
       ...payAsYouGoItems,
     ],
     expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+async function createDefaultProject(userId: string): Promise<WithID<Project>> {
+  return await db.project.create({
+    id: uuid(),
+    name: "Default Project",
+    userId: userId,
+    createdAt: Date.now(),
   });
 }
 
@@ -397,12 +407,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     };
   }
 
-  let project = await db.project.create({
-    id: uuid(),
-    name: "My default project",
-    userId: id,
-    createdAt: Date.now(),
-  });
+  let project = await createDefaultProject(id);
 
   await db.user.create({
     kind: "user",
@@ -796,16 +801,10 @@ app.post("/token", validatePost("user"), async (req, res) => {
   }
 
   if (!user.defaultProjectId) {
-    const id = uuid();
-    await db.project.create({
-      id: id,
-      name: "My default project",
-      userId: user.id,
-      createdAt: Date.now(),
-    });
+    const project = await createDefaultProject(user.id);
 
     await db.user.update(user.id, {
-      defaultProjectId: id,
+      defaultProjectId: project.id,
     });
   }
 
@@ -1521,13 +1520,7 @@ app.post(
     const results = [];
 
     for (const user of users) {
-      const project = await db.project.create({
-        id: uuid(),
-        name: "My default project",
-        userId: user.id,
-        createdAt: Date.now(),
-      });
-
+      const project = await createDefaultProject(user.id);
       const defaultProjectId = project.id;
       await db.user.update(user.id, {
         defaultProjectId,
