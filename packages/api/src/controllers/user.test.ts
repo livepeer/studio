@@ -86,6 +86,17 @@ describe("controllers/user", () => {
       expect(users.length).toEqual(6);
     });
 
+    it("should update user with viewerLimit", async () => {
+      const res = await client.patch(`/user/${nonAdminUser.id}`, {
+        viewerLimit: 10,
+      });
+      expect(res.status).toBe(204);
+
+      const updatedUser = await db.user.get(nonAdminUser.id);
+      expect(updatedUser.id).toBe(nonAdminUser.id);
+      expect(updatedUser.viewerLimit).toBe(10);
+    });
+
     it("should get some of the users & get a working next Link", async () => {
       for (let i = 0; i < 13; i += 1) {
         const u = await db.user.create({
