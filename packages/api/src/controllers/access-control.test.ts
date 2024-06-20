@@ -114,7 +114,7 @@ describe("controllers/access-control", () => {
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({
         user_id: gatedAsset.userId,
-        viewer_limit_per_user: 10,
+        user_viewer_limit: 10,
       });
 
       await db.user.update(gatedAsset.userId, { viewerLimit: 0 });
