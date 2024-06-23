@@ -46,6 +46,9 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
   }, [projectId]);
 
   const appendProjectId = (path: string) => {
+    if (!projectId) {
+      return "";
+    }
     return `/projects/${projectId}${path}`;
   };
 

@@ -84,7 +84,7 @@ const Dashboard = () => {
         />
       )}
       <Box css={{ mb: "$6" }}>
-        <GettingStarted firstName={user?.firstName} />
+        <GettingStarted />
       </Box>
 
       <FeaturesModel />
