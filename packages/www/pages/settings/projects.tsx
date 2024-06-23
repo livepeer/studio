@@ -8,7 +8,6 @@ import {
   Grid,
   Button,
   Flex,
-  Link,
 } from "@livepeer/design-system";
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery, useQueryClient } from "react-query";
@@ -16,6 +15,7 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { useProjectContext } from "context/ProjectContext";
+import Link from "next/link";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
@@ -99,14 +99,11 @@ const WorkspaceProjects = () => {
           }}>
           {data?.map((project, i) => (
             <Link
-              onClick={() => setProjectId(project.id)}
-              css={{
+              style={{
                 textDecoration: "none",
-                "&:hover": {
-                  textDecoration: "none",
-                },
               }}
-              href={`/dashboard/projects/${project.id}/`}>
+              passHref
+              href={`/projects/${project.id}/`}>
               <ProjectTile
                 key={`project-tile-${i}`}
                 id={project.id}
@@ -116,6 +113,7 @@ const WorkspaceProjects = () => {
           ))}
         </Grid>
       </Box>
+
       <CreateProjectDialog
         onCreate={onCreateClick}
         onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}

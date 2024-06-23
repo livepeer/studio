@@ -401,11 +401,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 css={{
                   color: "$neutral11",
                 }}>
-                {activeProject?.name
-                  .toLowerCase()
-                  .includes("my default project")
-                  ? "Default Project"
-                  : activeProject?.name}
+                {activeProject?.name}
               </Text>
               <TopBottomChevron />
             </Flex>
@@ -437,27 +433,21 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                         backgroundColor: "$neutral4",
                         borderRadius: "$3",
                       },
+                    }}
+                    onClick={() => {
+                      setProjectId(project.id);
+                      if (isResourcePage()) {
+                        const path = isResourcePage() as string;
+                        const newUrl = `/dashboard/projects/${project.id}${path}`;
+                        window.location.assign(newUrl);
+                      }
                     }}>
                     <Flex
-                      onClick={() => {
-                        setProjectId(project.id);
-                        if (isResourcePage()) {
-                          const path = isResourcePage() as string;
-                          const newUrl = `/dashboard/projects/${project.id}${path}`;
-                          window.location.assign(newUrl);
-                        }
-                      }}
                       css={{ width: "100%" }}
                       key={project.id}
                       align={"center"}
                       justify={"between"}>
-                      <Text size={2}>
-                        {project?.name
-                          ?.toLowerCase()
-                          ?.includes("my default project")
-                          ? "Default Project"
-                          : project?.name}
-                      </Text>
+                      <Text size={2}>{project?.name}</Text>
                       {projectId === project.id && <FiCheck />}
                     </Flex>
                   </DropdownMenuItem>

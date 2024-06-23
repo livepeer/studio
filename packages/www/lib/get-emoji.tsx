@@ -2,7 +2,11 @@
  * This function returns an emoji icon based on the name of the project.
  */
 
-const getEmojiIcon = (name = "") => {
+const getEmojiIcon = (name) => {
+  if (!name) {
+    return "";
+  }
+
   const stagingKeywords = [
     "staging",
     "dev",

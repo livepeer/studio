@@ -109,7 +109,7 @@ const GettingStarted = () => {
         css={{
           mb: "$5",
         }}>
-        <Flex>
+        <Flex align={"center"}>
           <Avatar
             fallback={getEmojiIcon(data?.name)}
             style={{

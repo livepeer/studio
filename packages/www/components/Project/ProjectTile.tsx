@@ -86,7 +86,8 @@ function ProjectTile({ name, id }) {
                   }}>
                   {generalSidebarItems.map((item) => (
                     <Link
-                      onClick={() => setProjectId(id)}
+                      passHref
+                      legacyBehavior
                       href={`/projects/${id}/${item.path}`}>
                       <NavLink key={item.title}>{item.title}</NavLink>
                     </Link>
