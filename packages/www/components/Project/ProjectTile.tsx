@@ -14,7 +14,7 @@ import { NavLink, generalSidebarItems } from "components/Sidebar";
 import { useProjectContext } from "context/ProjectContext";
 import Link from "next/link";
 
-export default function ProjectTile({ name, id }) {
+function ProjectTile({ name, id }) {
   const { setProjectId } = useProjectContext();
 
   const getEmojiIcon = (name = "") => {
@@ -185,3 +185,5 @@ export default function ProjectTile({ name, id }) {
     </Box>
   );
 }
+
+export default ProjectTile;

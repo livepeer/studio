@@ -102,7 +102,6 @@ const WorkspaceProjects = () => {
               onClick={() => setProjectId(project.id)}
               css={{
                 textDecoration: "none",
-
                 "&:hover": {
                   textDecoration: "none",
                 },
@@ -111,17 +110,12 @@ const WorkspaceProjects = () => {
               <ProjectTile
                 key={`project-tile-${i}`}
                 id={project.id}
-                name={
-                  project?.name?.toLowerCase().includes("my default project")
-                    ? "Default Project"
-                    : project?.name
-                }
+                name={project?.name}
               />
             </Link>
           ))}
         </Grid>
       </Box>
-
       <CreateProjectDialog
         onCreate={onCreateClick}
         onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}

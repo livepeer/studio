@@ -30,12 +30,10 @@ import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
 import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
 import Contact from "../Contact";
-import { useJune } from "hooks/use-june";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import CreateProjectDialog from "components/Project/createProjectDialog";
-import { User } from "@livepeer.studio/api";
-import { FiCheck, FiChevronLeft } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
 import { useProjectContext } from "context/ProjectContext";
 
 export const NavLink = styled(A, {
@@ -535,7 +533,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               (item) => (
                 <Box key={item.id}>
                   <Link
-                    href={appendProjectId(item.path)}
+                    href={
+                      isSettingsPage ? item.path : appendProjectId(item.path)
+                    }
                     passHref
                     legacyBehavior>
                     <NavLink active={isActive(item)}>
@@ -553,7 +553,11 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       }}>
                       {item.children.map((child) => (
                         <Link
-                          href={appendProjectId(child.path)}
+                          href={
+                            isSettingsPage
+                              ? child.path
+                              : appendProjectId(child.path)
+                          }
                           key={child.id}
                           passHref
                           legacyBehavior>
@@ -572,7 +576,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             direction="column"
             gap={1}
             css={{
-              mb: "$7",
+              mb: !isSettingsPage ? "$6" : "$0",
             }}>
             <NavLink
               href="https://status.livepeer.studio/"

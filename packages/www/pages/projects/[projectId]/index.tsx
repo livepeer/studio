@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   return (
     <Box css={{ p: "$6" }}>
-      {/* {!emailValid && (
+      {!emailValid && (
         <Banner
           title="Verify your email"
           description="Verify your account with a link via email."
@@ -64,7 +64,7 @@ const Dashboard = () => {
           }
           css={{ mb: "$3" }}
         />
-      )} */}
+      )}
       {showPromo && (
         <Banner
           title="Upgrade"
