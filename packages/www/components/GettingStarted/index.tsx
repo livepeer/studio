@@ -9,10 +9,14 @@ import {
   Promo,
   Code,
   Grid,
+  useSnackbar,
   Avatar,
+  HoverCardRoot,
+  HoverCardContent,
+  HoverCardTrigger,
 } from "@livepeer/design-system";
 import Link from "next/link";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
 import { useProjectContext } from "context/ProjectContext";
 import { useQuery } from "react-query";
 import { useApi } from "hooks";
@@ -25,6 +29,7 @@ import {
 } from "components/Sidebar/NavIcons";
 import { getEmojiIcon } from "lib/get-emoji";
 import { useTheme } from "next-themes";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const GettingStarted = () => {
   const { appendProjectId, projectId } = useProjectContext();
@@ -32,6 +37,8 @@ const GettingStarted = () => {
   const { resolvedTheme } = useTheme();
 
   const { data } = useQuery([projectId], () => getProject(projectId));
+
+  const [openSnackbar] = useSnackbar();
 
   const GettingStartedCard = [
     {
@@ -100,6 +107,16 @@ const GettingStarted = () => {
       action: "Visit Documentation",
     },
   ];
+
+  const codeExample = `
+curl --request POST \
+  --url https://livepeer.studio/api/stream \
+  --header 'Authorization: Bearer <API_KEY>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "name": "my first stream"
+}'
+  `;
 
   return (
     <>
@@ -170,18 +187,44 @@ const GettingStarted = () => {
               }}>
               Get your API key and start coding your next video application.
             </Text>
-            <img
-              src={
-                resolvedTheme === "light"
-                  ? "/dashboard/code-example-light.png"
-                  : "/dashboard/code-example-dark.png"
-              }
-              alt="Code example"
-              style={{
-                marginBottom: 10,
-                marginTop: 7,
-              }}
-            />
+            <HoverCardRoot openDelay={200}>
+              <HoverCardTrigger>
+                <Flex>
+                  <CopyToClipboard
+                    text={codeExample}
+                    onCopy={() => openSnackbar("Copied to clipboard")}>
+                    <img
+                      src={
+                        resolvedTheme === "light"
+                          ? "/dashboard/code-example-light.png"
+                          : "/dashboard/code-example-dark.png"
+                      }
+                      alt="Code example"
+                      style={{
+                        marginBottom: 10,
+                        marginTop: 7,
+                        width: "100%",
+                      }}
+                    />
+                  </CopyToClipboard>
+                </Flex>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <Text
+                  variant="neutral"
+                  css={{
+                    backgroundColor: "$panel",
+                    borderRadius: 6,
+                    px: "$3",
+                    py: "$1",
+                    fontSize: "$1",
+                    display: "flex",
+                    ai: "center",
+                  }}>
+                  <CopyIcon /> <Box css={{ ml: "$2" }}>Click to copy</Box>
+                </Text>
+              </HoverCardContent>
+            </HoverCardRoot>
             <Link
               style={{
                 textDecoration: "none",
