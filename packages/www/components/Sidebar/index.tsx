@@ -221,11 +221,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
   return (
     <>
-      <CreateProjectDialog
-        onCreate={onCreateClick}
-        onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
-        isOpen={showCreateProjectAlert}
-      />
       <Box
         css={{
           backgroundColor: "$panel",
@@ -237,6 +232,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           position: "fixed",
           justifyContent: "flex-end",
           bottom: 0,
+          zIndex: 0,
         }}>
         <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
           <DropdownMenu>
@@ -470,6 +466,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     width: "100%",
                   }}>
                   <DropdownMenuItem
+                    onClick={() => setShowCreateProjectAlert(true)}
                     css={{
                       color: "$neutral12",
                       cursor: "default",
@@ -481,27 +478,27 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                         backgroundColor: "$neutral4",
                       },
                     }}>
-                    <Flex
-                      onClick={() => setShowCreateProjectAlert(true)}
-                      align={"center"}>
+                    <Flex align={"center"}>
                       <Text size={2}>Create new project</Text>
                     </Flex>
                   </DropdownMenuItem>
-                  <Flex
+                  <DropdownMenuItem
                     onClick={() => Router.push("/settings/projects")}
-                    align={"center"}
                     css={{
                       color: "$neutral12",
                       cursor: "default",
                       borderRadius: "$3",
-                      px: "$2",
+                      mb: "$1",
                       py: "$1",
+                      px: "$2",
                       "&:hover": {
                         backgroundColor: "$neutral4",
                       },
                     }}>
-                    <Text size={2}>View all projects</Text>
-                  </Flex>
+                    <Flex align={"center"}>
+                      <Text size={2}>View all projects</Text>
+                    </Flex>
+                  </DropdownMenuItem>
                 </Flex>
               </Box>
             </DropdownMenuContent>
@@ -646,6 +643,12 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           </Flex>
         </Flex>
       </Box>
+
+      <CreateProjectDialog
+        onCreate={onCreateClick}
+        onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
+        isOpen={showCreateProjectAlert}
+      />
     </>
   );
 };
