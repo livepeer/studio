@@ -173,58 +173,63 @@ curl --request POST \
             css={{
               width: "100%",
               height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
             }}>
-            <TerminalIcon size={"24"} />
-            <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
-              Integrate with your app
-            </Text>
-            <Text
-              variant="neutral"
-              size="2"
-              css={{
-                mt: "$1",
-                mb: "$1",
-              }}>
-              Get your API key and start coding your next video application.
-            </Text>
-            <HoverCardRoot openDelay={200}>
-              <HoverCardTrigger>
-                <Flex>
-                  <CopyToClipboard
-                    text={codeExample}
-                    onCopy={() => openSnackbar("Copied to clipboard")}>
-                    <img
-                      src={
-                        resolvedTheme === "light"
-                          ? "/dashboard/code-example-light.png"
-                          : "/dashboard/code-example-dark.png"
-                      }
-                      alt="Code example"
-                      style={{
-                        marginBottom: 10,
-                        marginTop: 7,
-                        width: "100%",
-                      }}
-                    />
-                  </CopyToClipboard>
-                </Flex>
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <Text
-                  variant="neutral"
-                  css={{
-                    backgroundColor: "$panel",
-                    borderRadius: 6,
-                    px: "$3",
-                    py: "$1",
-                    fontSize: "$1",
-                    display: "flex",
-                    ai: "center",
-                  }}>
-                  <CopyIcon /> <Box css={{ ml: "$2" }}>Click to copy</Box>
-                </Text>
-              </HoverCardContent>
-            </HoverCardRoot>
+            <Box>
+              <TerminalIcon size={"24"} />
+              <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
+                Integrate with your app
+              </Text>
+              <Text
+                variant="neutral"
+                size="2"
+                css={{
+                  mt: "$1",
+                  mb: "$1",
+                }}>
+                Get your API key and start coding your next video application.
+              </Text>
+              <HoverCardRoot openDelay={200}>
+                <HoverCardTrigger>
+                  <Flex>
+                    <CopyToClipboard
+                      text={codeExample}
+                      onCopy={() => openSnackbar("Copied to clipboard")}>
+                      <img
+                        src={
+                          resolvedTheme === "light"
+                            ? "/dashboard/code-example-light.png"
+                            : "/dashboard/code-example-dark.png"
+                        }
+                        alt="Code example"
+                        style={{
+                          marginBottom: 10,
+                          marginTop: 7,
+                          width: "100%",
+                        }}
+                      />
+                    </CopyToClipboard>
+                  </Flex>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  <Text
+                    variant="neutral"
+                    css={{
+                      backgroundColor: "$panel",
+                      borderRadius: 6,
+                      px: "$3",
+                      py: "$1",
+                      fontSize: "$1",
+                      display: "flex",
+                      ai: "center",
+                    }}>
+                    <CopyIcon /> <Box css={{ ml: "$2" }}>Click to copy</Box>
+                  </Text>
+                </HoverCardContent>
+              </HoverCardRoot>
+            </Box>
             <Link
               style={{
                 textDecoration: "none",
@@ -284,32 +289,37 @@ const Card = ({
         width: "100%",
         height: "100%",
         boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
       }}>
-      {icon ? (
-        <Box>{icon}</Box>
-      ) : (
-        <Image
-          style={{
-            borderRadius: 5,
-          }}
-          src={image}
-          alt={name}
-          width={26}
-          height={26}
-        />
-      )}
-      <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
-        {name}
-      </Text>
-      <Text
-        variant="neutral"
-        size="2"
-        css={{
-          mt: "$1",
-          mb: "$1",
-        }}>
-        {description}
-      </Text>
+      <Box>
+        {icon ? (
+          <Box>{icon}</Box>
+        ) : (
+          <Image
+            style={{
+              borderRadius: 5,
+            }}
+            src={image}
+            alt={name}
+            width={26}
+            height={26}
+          />
+        )}
+        <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
+          {name}
+        </Text>
+        <Text
+          variant="neutral"
+          size="2"
+          css={{
+            mt: "$1",
+            mb: "$1",
+          }}>
+          {description}
+        </Text>
+      </Box>
       <Link
         href={link}
         style={{
