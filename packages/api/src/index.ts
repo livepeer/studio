@@ -83,7 +83,6 @@ export default async function makeApp(params: CliArgs) {
   const unhandledRejection = (err) => {
     logger.error("fatal, unhandled promise rejection: ", err);
     err.stack && logger.error(err.stack);
-    sigterm();
   };
   process.on("unhandledRejection", unhandledRejection);
 
