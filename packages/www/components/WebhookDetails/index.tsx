@@ -336,17 +336,16 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
             px: "$3",
             py: "$2",
             height: "100%",
-            border: activeFilter === filter ? "2px solid" : "1px solid",
-            borderColor: activeFilter === filter ? "$blue11" : "$neutral8",
-            width: "20%",
+            border: "1px solid",
+            borderColor: activeFilter === filter ? "$primary8" : "$neutral8",
+            width: "20em",
             borderRadius: "$3",
           }}>
           <Text
             css={{
               fontSize: "$3",
-              fontWeight: activeFilter === filter ? 500 : 400,
               mb: "$1",
-              color: activeFilter === filter ? "$blue11" : "$neutral9",
+              color: activeFilter === filter ? "$primary8" : "$neutral8",
               textTransform: "capitalize",
             }}>
             {filter}
@@ -355,7 +354,7 @@ const Filters = ({ filters, activeFilter, handleFilterClick, logs }) => {
             css={{
               fontWeight: 500,
               fontSize: "$3",
-              color: activeFilter === filter && "$blue11",
+              color: activeFilter === filter ? "$primary8" : "$primary12",
             }}>
             {filter === "all"
               ? totalWebhookLogs

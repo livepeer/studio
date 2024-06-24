@@ -191,7 +191,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
   const isResourcePage = () => {
     const path = window.location.pathname;
 
-    const resourceKeywords = ["/streams/", "/assets/", "/webhooks/"];
+    const resourceKeywords = ["/streams/", "/assets/", "/developers/webhooks/"];
 
     for (const keyword of resourceKeywords) {
       if (path.includes(keyword)) {
