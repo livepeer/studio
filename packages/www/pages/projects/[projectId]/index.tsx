@@ -86,8 +86,6 @@ const Dashboard = () => {
       <Box css={{ mb: "$6" }}>
         <GettingStarted />
       </Box>
-
-      <FeaturesModel />
     </Box>
   );
 };

@@ -16,6 +16,7 @@ import { useState } from "react";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { useProjectContext } from "context/ProjectContext";
 import Link from "next/link";
+import FeaturesModel from "components/FeaturesModel";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
@@ -119,6 +120,8 @@ const WorkspaceProjects = () => {
         onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
         isOpen={showCreateProjectAlert}
       />
+
+      <FeaturesModel />
     </Layout>
   );
 };
