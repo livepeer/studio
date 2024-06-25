@@ -521,7 +521,7 @@ app.get("/", authorizer({}), async (req, res) => {
   }
   if (userId) {
     query.push(sql`stream.data->>'userId' = ${userId}`);
-    if(req.user.id === userId) {
+    if (req.user.id === userId) {
       query.push(
         sql`coalesce(stream.data->>'projectId', ${
           req.user.defaultProjectId || ""
