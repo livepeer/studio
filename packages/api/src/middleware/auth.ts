@@ -83,9 +83,9 @@ export function hasAccessToResource(
   return (
     isAdmin ||
     (!resource.deleted &&
-      resource.userId === user.id &&
-      (resource.projectId ?? user.defaultProjectId ?? "") ===
-        (project?.id ?? ""))
+      resource.userId === user.id) // &&
+     // (resource.projectId ?? user.defaultProjectId ?? "") ===
+     // (project?.id ?? ""))
   );
 }
 

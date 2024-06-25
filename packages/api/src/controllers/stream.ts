@@ -501,12 +501,8 @@ app.get("/", authorizer({}), async (req, res) => {
 
   if (!req.user.admin) {
     userId = req.user.id;
-    query.push(
-      sql`coalesce(stream.data->>'projectId', ${
-        req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`,
-    );
   }
+
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`stream.data->>'deleted' IS NULL`);
   }
@@ -525,6 +521,13 @@ app.get("/", authorizer({}), async (req, res) => {
   }
   if (userId) {
     query.push(sql`stream.data->>'userId' = ${userId}`);
+    if(req.user.id === userId) {
+      query.push(
+        sql`coalesce(stream.data->>'projectId', ${
+          req.user.defaultProjectId || ""
+        }) = ${req.project?.id || ""}`,
+      );
+    }
   }
 
   if (!order) {

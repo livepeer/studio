@@ -718,14 +718,6 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  if (!req.user.admin) {
-    query.push(
-      sql`coalesce(asset.data->>'projectId', ${
-        req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`,
-    );
-  }
-
   if (req.user.admin && deleting === "true") {
     const deletionThreshold = new Date(
       Date.now() - DELETE_ASSET_DELAY,
@@ -764,6 +756,11 @@ app.get("/", authorizer({}), async (req, res) => {
     });
   } else {
     query.push(sql`asset.data->>'userId' = ${req.user.id}`);
+    query.push(
+      sql`coalesce(asset.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`,
+    );
 
     let fields = " asset.id as id, asset.data as data";
     if (count) {
