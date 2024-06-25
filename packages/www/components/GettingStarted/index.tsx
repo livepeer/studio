@@ -57,7 +57,7 @@ const GettingStarted = () => {
       action: "Create Stream",
     },
     {
-      name: "Get started with data",
+      name: "Understand your usage",
       description: "Browse through your account usage and billing data.",
       link: "/settings/usage",
       icon: <UsageIcon size={"24"} />,
