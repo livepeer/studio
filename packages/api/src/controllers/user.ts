@@ -1516,8 +1516,9 @@ app.post(
   "/migrate/userDefaultProject",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    // parse limit from querystring
+    // parse limit and actually_migrate from querystring
     const limit = parseInt(req.query.limit?.toString() || "100");
+    const actuallyMigrate = req.query.actually_migrate === "true";
 
     const [users] = await db.user.find(
       [
@@ -1536,7 +1537,9 @@ app.post(
 
     for (const user of users) {
       if (isFakeEmail(user.email)) {
-        await db.user.update(user.id, { toBeDeleted: true });
+        if (actuallyMigrate) {
+          await db.user.update(user.id, { toBeDeleted: true });
+        }
         results.flagged.push({ id: user.id, email: user.email });
         continue;
       }
@@ -1553,7 +1556,9 @@ app.post(
           tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
 
         if (allTokensOld) {
-          await db.user.update(user.id, { toBeDeleted: true });
+          if (actuallyMigrate) {
+            await db.user.update(user.id, { toBeDeleted: true });
+          }
           results.flagged.push({ id: user.id, email: user.email });
           continue;
         }
@@ -1561,7 +1566,9 @@ app.post(
 
       const project = await createDefaultProject(user.id);
       const defaultProjectId = project.id;
-      await db.user.update(user.id, { defaultProjectId });
+      if (actuallyMigrate) {
+        await db.user.update(user.id, { defaultProjectId });
+      }
 
       results.migrated.push({
         id: user.id,
@@ -1571,6 +1578,7 @@ app.post(
     }
 
     res.status(200).json({
+      dry_run: !actuallyMigrate,
       totalMigrated: results.migrated.length,
       totalFlagged: results.flagged.length,
       total: users.length,
