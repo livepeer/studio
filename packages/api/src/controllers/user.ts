@@ -1509,6 +1509,8 @@ app.post(
   },
 );
 
+const OLD_USER_CUTOFF = 1687730400000; // 26 June 2023
+
 // Utility to migrate users to defaultProjects
 // This is also flagging users to be deleted for cleanup
 // To call once and then we can remove it
@@ -1533,35 +1535,27 @@ app.post(
       flagged: [],
     };
 
-    const OLD_USER_CUTOFF = Date.now() - ms("12 months");
-
     for (const user of users) {
-      if (isFakeEmail(user.email) && !user.admin) {
-        if (actuallyMigrate) {
-          await db.user.update(user.id, { toBeDeleted: true });
-        }
-        results.flagged.push({ id: user.id, email: user.email });
-        continue;
-      }
-
       const isOldUser = user.createdAt < OLD_USER_CUTOFF && !user.admin;
       const isInactive =
         user.lastSeen < OLD_USER_CUTOFF &&
         user.lastStreamedAt < OLD_USER_CUTOFF;
 
-      if (isOldUser && isInactive) {
-        const [tokens] = await db.apiToken.find({ userId: user.id });
-        const allTokensOld =
-          tokens.length === 0 ||
-          tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
+      const [tokens] = await db.apiToken.find({ userId: user.id });
+      const allTokensOld =
+        tokens.length === 0 ||
+        tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
 
-        if (allTokensOld) {
-          if (actuallyMigrate) {
-            await db.user.update(user.id, { toBeDeleted: true });
-          }
-          results.flagged.push({ id: user.id, email: user.email });
-          continue;
+      const shouldDeleteUser =
+        !user.admin &&
+        (isFakeEmail(user.email) || (isOldUser && isInactive && allTokensOld));
+
+      if (shouldDeleteUser) {
+        if (actuallyMigrate) {
+          await db.user.update(user.id, { toBeDeleted: true });
         }
+        results.flagged.push({ id: user.id, email: user.email });
+        continue;
       }
 
       const project = await createDefaultProject(user.id);
