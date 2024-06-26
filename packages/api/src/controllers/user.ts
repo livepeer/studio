@@ -1536,7 +1536,7 @@ app.post(
     const OLD_USER_CUTOFF = Date.now() - ms("12 months");
 
     for (const user of users) {
-      if (isFakeEmail(user.email)) {
+      if (isFakeEmail(user.email) && !user.admin) {
         if (actuallyMigrate) {
           await db.user.update(user.id, { toBeDeleted: true });
         }
