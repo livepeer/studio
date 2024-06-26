@@ -39,6 +39,7 @@ import {
   toStringValues,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
+import { isFakeEmail } from "fakefilter";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt", "viewerLimit"];
 
@@ -1509,6 +1510,7 @@ app.post(
 );
 
 // Utility to migrate users to defaultProjects
+// This is also flagging users to be deleted for cleanup
 // To call once and then we can remove it
 app.post(
   "/migrate/userDefaultProject",
@@ -1525,28 +1527,55 @@ app.post(
       { limit },
     );
 
-    const results = [];
+    const results = {
+      migrated: [],
+      flagged: [],
+    };
+
+    const OLD_USER_CUTOFF = Date.now() - ms("12 months");
 
     for (const user of users) {
+      if (isFakeEmail(user.email)) {
+        await db.user.update(user.id, { toBeDeleted: true });
+        results.flagged.push({ id: user.id, email: user.email });
+        continue;
+      }
+
+      const isOldUser = user.createdAt < OLD_USER_CUTOFF && !user.admin;
+      const isInactive =
+        user.lastSeen < OLD_USER_CUTOFF &&
+        user.lastStreamedAt < OLD_USER_CUTOFF;
+
+      if (isOldUser && isInactive) {
+        const [tokens] = await db.apiToken.find({ userId: user.id });
+        const allTokensOld =
+          tokens.length === 0 ||
+          tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
+
+        if (allTokensOld) {
+          await db.user.update(user.id, { toBeDeleted: true });
+          results.flagged.push({ id: user.id, email: user.email });
+          continue;
+        }
+      }
+
       const project = await createDefaultProject(user.id);
       const defaultProjectId = project.id;
-      await db.user.update(user.id, {
-        defaultProjectId,
-      });
+      await db.user.update(user.id, { defaultProjectId });
 
-      results.push({
+      results.migrated.push({
         id: user.id,
+        email: user.email,
         defaultProjectId,
       });
     }
 
     res.status(200).json({
-      migrated: results.length,
+      totalMigrated: results.migrated.length,
+      totalFlagged: results.flagged.length,
       total: users.length,
-      users: results.map(({ id, defaultProjectId }) => ({
-        id,
-        defaultProjectId,
-      })),
+      migrated: results.migrated,
+      flagged: results.flagged,
     });
   },
 );

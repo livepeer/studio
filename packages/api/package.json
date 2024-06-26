@@ -76,6 +76,7 @@
     "express-async-errors": "^3.1.1",
     "express-mung": "^0.5.1",
     "express-prom-bundle": "^6.4.1",
+    "fakefilter": "^0.1.880",
     "fast-stable-stringify": "^1.0.0",
     "fs-extra": "^7.0.1",
     "google-auth-library": "^5.2.2",
