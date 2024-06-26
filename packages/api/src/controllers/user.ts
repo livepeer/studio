@@ -36,6 +36,7 @@ import {
   recaptchaVerify,
   sendgridEmail,
   sendgridValidateEmail,
+  sendgridValidateEmailAsync,
   toStringValues,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
@@ -1536,6 +1537,16 @@ app.post(
     };
 
     for (const user of users) {
+      const isFake = isFakeEmail(user.email);
+      const verdict = await sendgridValidateEmailAsync(
+        user.email,
+        req.config.sendgridValidationApiKey,
+      );
+      let isValid = true;
+      if (verdict !== "Valid") {
+        isValid = false;
+      }
+
       const isOldUser = user.createdAt < OLD_USER_CUTOFF && !user.admin;
       const isInactive =
         user.lastSeen < OLD_USER_CUTOFF &&
@@ -1547,14 +1558,21 @@ app.post(
         tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
 
       const shouldDeleteUser =
-        !user.admin &&
-        (isFakeEmail(user.email) || (isOldUser && isInactive && allTokensOld));
+        !user.admin && (isFake || (isOldUser && isInactive && allTokensOld));
 
       if (shouldDeleteUser) {
         if (actuallyMigrate) {
-          await db.user.update(user.id, { toBeDeleted: true });
+          await db.user.update(user.id, {
+            toBeDeleted: true,
+            flaggedEmail: isFake && !isValid,
+          });
         }
-        results.flagged.push({ id: user.id, email: user.email });
+        results.flagged.push({
+          id: user.id,
+          email: user.email,
+          isFake,
+          isValid,
+        });
         continue;
       }
 

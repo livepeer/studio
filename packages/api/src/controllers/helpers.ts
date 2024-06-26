@@ -420,7 +420,7 @@ export function sendgridValidateEmail(email: string, validationApiKey: string) {
   });
 }
 
-async function sendgridValidateEmailAsync(
+export async function sendgridValidateEmailAsync(
   email: string,
   validationApiKey: string,
 ) {
@@ -439,6 +439,7 @@ async function sendgridValidateEmailAsync(
     `Email address validation result ` +
       `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`,
   );
+  return verdict;
 }
 
 export type FieldsMap = {
