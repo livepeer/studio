@@ -1510,7 +1510,7 @@ app.post(
   },
 );
 
-const OLD_USER_CUTOFF = 1687730400000; // 26 June 2023
+const OLD_USER_CUTOFF = 1656312726000; // 27 June 2022
 
 // Utility to migrate users to defaultProjects
 // This is also flagging users to be deleted for cleanup
