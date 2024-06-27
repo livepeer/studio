@@ -671,7 +671,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
 
   const stream = await db.stream.get(parentId);
-  req.checkResourceAccess(stream, true);
+  req.checkResourceAccess(stream, false);
 
   let filterOut;
   const query = [];
@@ -748,7 +748,7 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
   const stream = await db.stream.get(parentId);
-  req.checkResourceAccess(stream, true);
+  req.checkResourceAccess(stream, false);
 
   const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
     kind: "stream",
