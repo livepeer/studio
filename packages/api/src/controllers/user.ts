@@ -36,9 +36,11 @@ import {
   recaptchaVerify,
   sendgridEmail,
   sendgridValidateEmail,
+  sendgridValidateEmailAsync,
   toStringValues,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
+import { isFakeEmail } from "fakefilter";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt", "viewerLimit"];
 
@@ -1508,14 +1510,18 @@ app.post(
   },
 );
 
+const OLD_USER_CUTOFF = 1656312726000; // 27 June 2022
+
 // Utility to migrate users to defaultProjects
+// This is also flagging users to be deleted for cleanup
 // To call once and then we can remove it
 app.post(
   "/migrate/userDefaultProject",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    // parse limit from querystring
+    // parse limit and actually_migrate from querystring
     const limit = parseInt(req.query.limit?.toString() || "100");
+    const actuallyMigrate = req.query.actually_migrate === "true";
 
     const [users] = await db.user.find(
       [
@@ -1525,28 +1531,71 @@ app.post(
       { limit },
     );
 
-    const results = [];
+    const results = {
+      migrated: [],
+      flagged: [],
+    };
 
     for (const user of users) {
+      const isFake = isFakeEmail(user.email);
+      const verdict = await sendgridValidateEmailAsync(
+        user.email,
+        req.config.sendgridValidationApiKey,
+      );
+      let isValid = true;
+      if (verdict !== "Valid") {
+        isValid = false;
+      }
+
+      const isOldUser = user.createdAt < OLD_USER_CUTOFF && !user.admin;
+      const isInactive =
+        user.lastSeen < OLD_USER_CUTOFF &&
+        user.lastStreamedAt < OLD_USER_CUTOFF;
+
+      const [tokens] = await db.apiToken.find({ userId: user.id });
+      const allTokensOld =
+        tokens.length === 0 ||
+        tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
+
+      const shouldDeleteUser =
+        !user.admin && (isFake || (isOldUser && isInactive && allTokensOld));
+
+      if (shouldDeleteUser) {
+        if (actuallyMigrate) {
+          await db.user.update(user.id, {
+            toBeDeleted: true,
+            flaggedEmail: isFake && !isValid,
+          });
+        }
+        results.flagged.push({
+          id: user.id,
+          email: user.email,
+          isFake,
+          isValid,
+        });
+        continue;
+      }
+
       const project = await createDefaultProject(user.id);
       const defaultProjectId = project.id;
-      await db.user.update(user.id, {
-        defaultProjectId,
-      });
+      if (actuallyMigrate) {
+        await db.user.update(user.id, { defaultProjectId });
+      }
 
-      results.push({
+      results.migrated.push({
         id: user.id,
+        email: user.email,
         defaultProjectId,
       });
     }
 
     res.status(200).json({
-      migrated: results.length,
+      dry_run: !actuallyMigrate,
+      totalMigrated: results.migrated.length,
+      totalFlagged: results.flagged.length,
       total: users.length,
-      users: results.map(({ id, defaultProjectId }) => ({
-        id,
-        defaultProjectId,
-      })),
+      migrated: results.migrated,
+      flagged: results.flagged,
     });
   },
 );

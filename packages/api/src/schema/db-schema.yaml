@@ -1201,6 +1201,15 @@ components:
         defaultProjectId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        toBeDeleted:
+          type: boolean
+          default: false
+          description: Flag to be deleted
+        flaggedEmail:
+          type: boolean
+          default: false
+          description:
+            Whether the user's email is a temporary email or flagged by sendgrid
         kind:
           type: string
           readOnly: true
