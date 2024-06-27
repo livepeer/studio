@@ -1526,7 +1526,7 @@ app.post(
     const [users] = await db.user.find(
       [
         sql`(users.data->>'defaultProjectId' = '' OR users.data->>'defaultProjectId' IS NULL)`,
-        sql`(users.data->>'admin' = 'false' OR users.data->>'admin' IS NULL)`,
+        sql`(users.data->>'toBeDeleted' = 'false' OR users.data->>'toBeDeleted' IS NULL)`,
       ],
       { limit },
     );
@@ -1538,14 +1538,6 @@ app.post(
 
     for (const user of users) {
       const isFake = isFakeEmail(user.email);
-      const verdict = await sendgridValidateEmailAsync(
-        user.email,
-        req.config.sendgridValidationApiKey,
-      );
-      let isValid = true;
-      if (verdict !== "Valid") {
-        isValid = false;
-      }
 
       const isOldUser = user.createdAt < OLD_USER_CUTOFF && !user.admin;
       const isInactive =
@@ -1557,28 +1549,28 @@ app.post(
         tokens.length === 0 ||
         tokens.every((token) => token.lastSeen < OLD_USER_CUTOFF);
 
-      const shouldDeleteUser =
-        !user.admin && (isFake || (isOldUser && isInactive && allTokensOld));
+      const isOldAndInactiveUser = isOldUser && isInactive && allTokensOld;
+      const shouldDeleteUser = !user.admin && (isFake || isOldAndInactiveUser);
 
       if (shouldDeleteUser) {
         if (actuallyMigrate) {
           await db.user.update(user.id, {
             toBeDeleted: true,
-            flaggedEmail: isFake && !isValid,
+            flaggedEmail: typeof isFake == "string",
           });
         }
         results.flagged.push({
           id: user.id,
           email: user.email,
           isFake,
-          isValid,
+          isOldAndInactiveUser,
         });
         continue;
       }
-
-      const project = await createDefaultProject(user.id);
-      const defaultProjectId = project.id;
+      let defaultProjectId = "not_created_in_dry_runs";
       if (actuallyMigrate) {
+        const project = await createDefaultProject(user.id);
+        defaultProjectId = project.id;
         await db.user.update(user.id, { defaultProjectId });
       }
 
