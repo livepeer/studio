@@ -73,15 +73,17 @@ app.get("/", authorizer({}), async (req, res, next) => {
 
   if (!req.user.admin) {
     userId = req.user.id;
-    query.push(
-      sql`coalesce(session.data->>'projectId', '') = ${req.project?.id || ""}`,
-    );
   }
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`(session.data->>'deleted')::boolean IS false`);
   }
   if (userId) {
     query.push(sql`session.data->>'userId' = ${userId}`);
+    query.push(
+      sql`coalesce(session.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`,
+    );
   }
   if (parentId) {
     query.push(sql`session.data->>'parentId' = ${parentId}`);
