@@ -61,9 +61,10 @@ function isAuthorized(
 }
 
 export async function getProject(req: Request, projectId: string) {
-  const project = projectId
-    ? await db.project.get(projectId, { useCache: true })
-    : { id: "", name: "default", userId: req.user.id };
+  const project = await db.project.get(projectId, { useCache: true });
+  if (!project) {
+    throw new NotFoundError(`project not found`);
+  }
   if (!req.user.admin && req.user.id !== project.userId) {
     throw new ForbiddenError(`invalid user`);
   }
