@@ -271,13 +271,12 @@ export const getClips = async (
   let output: WithID<Asset>[];
   let newCursor: string;
 
-  if (!req.user.admin) {
-    query.push(
-      sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`,
-    );
-  }
-
   query.push(sql`asset.data->>'userId' = ${req.user.id}`);
+  query.push(
+    sql`coalesce(asset.data->>'projectId', ${
+      req.user.defaultProjectId || ""
+    }) = ${req.project?.id || ""}`,
+  );
 
   if (!content) {
     throw new NotFoundError("Content not found");
