@@ -72,7 +72,7 @@ app.all(
     res.header("x-livepeer-project-id", req.project?.id || "");
     res.header(
       "x-livepeer-is-project-default",
-      (req.project?.id == req.user?.defaultProjectId).toString(),
+      req.project?.id == req.user?.defaultProjectId ? "true" : "false",
     );
 
     res.status(204).end();
