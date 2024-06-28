@@ -884,7 +884,7 @@ app.post(
     );
     const dupAsset = await db.asset.findDuplicateUrlUpload(
       url,
-      req.user.id,
+      req.user,
       req.project?.id,
     );
     if (dupAsset) {
