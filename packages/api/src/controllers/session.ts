@@ -79,11 +79,13 @@ app.get("/", authorizer({}), async (req, res, next) => {
   }
   if (userId) {
     query.push(sql`session.data->>'userId' = ${userId}`);
-    query.push(
-      sql`coalesce(session.data->>'projectId', ${
-        req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`,
-    );
+    if (userId === req.user.id) {
+      query.push(
+        sql`coalesce(session.data->>'projectId', ${
+          req.user.defaultProjectId || ""
+        }) = ${req.project?.id || ""}`,
+      );
+    }
   }
   if (parentId) {
     query.push(sql`session.data->>'parentId' = ${parentId}`);
