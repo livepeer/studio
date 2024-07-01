@@ -772,9 +772,9 @@ export async function addDefaultProjectId(
   };
 
   const enrichResponseWithUserProjectId = async (document) => {
-    if ("id" in document && "userId" in document && "user" in document) {
-      if (!document.projectId || document.projectId === "") {
-        if (document.user?.defaultProjectId) {
+    if ("id" in document && "userId" in document) {
+      if (!document.projectId) {
+        if (document.user) {
           document.projectId = document.user.defaultProjectId;
         } else {
           let user = await db.user.get(document.userId, { useCache: true });
