@@ -771,45 +771,49 @@ export async function addDefaultProjectId(
     }
   };
 
-  const enrichResponseWithUserProjectId = (document) => {
+  const enrichResponseWithUserProjectId = async (document) => {
     if ("id" in document && "userId" in document && "user" in document) {
-      if (
-        (!document.projectId || document.projectId === "") &&
-        document.user?.defaultProjectId
-      ) {
-        document.projectId = document.user.defaultProjectId;
+      if (!document.projectId || document.projectId === "") {
+        if (document.user?.defaultProjectId) {
+          document.projectId = document.user.defaultProjectId;
+        } else {
+          let user = await db.user.get(document.userId, { useCache: true });
+          if (user.defaultProjectId) {
+            document.projectId = user.defaultProjectId;
+          }
+        }
       }
     }
   };
 
   const clonedBody = deepClone(body);
 
-  const processItem = (item) => {
+  const processItem = async (item) => {
     if (typeof item === "object" && item !== null) {
       if (req.user.admin) {
-        enrichResponseWithUserProjectId(item);
+        await enrichResponseWithUserProjectId(item);
       } else {
         enrichResponse(item);
       }
 
-      Object.values(item).forEach((subItem) => {
-        if (typeof subItem === "object" && subItem !== null) {
-          if (req.user.admin) {
-            enrichResponseWithUserProjectId(subItem);
-          } else {
-            enrichResponse(subItem);
+      await Promise.all(
+        Object.values(item).map(async (subItem) => {
+          if (typeof subItem === "object" && subItem !== null) {
+            if (req.user.admin) {
+              await enrichResponseWithUserProjectId(subItem);
+            } else {
+              enrichResponse(subItem);
+            }
           }
-        }
-      });
+        }),
+      );
     }
   };
 
   if (Array.isArray(clonedBody)) {
-    clonedBody.forEach((item) => {
-      processItem(item);
-    });
+    await Promise.all(clonedBody.map(processItem));
   } else if (typeof clonedBody === "object" && clonedBody !== null) {
-    processItem(clonedBody);
+    await processItem(clonedBody);
   }
 
   return clonedBody;
