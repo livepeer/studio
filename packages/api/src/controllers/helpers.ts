@@ -777,7 +777,10 @@ export async function addDefaultProjectId(
         if (document.user) {
           document.projectId = document.user.defaultProjectId;
         } else {
-          let user = await db.user.get(document.userId, { useCache: true });
+          let user =
+            document.userId === req.user.id
+              ? req.user
+              : await db.user.get(document.userId, { useCache: true });
           if (user.defaultProjectId) {
             document.projectId = user.defaultProjectId;
           }
