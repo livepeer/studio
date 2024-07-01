@@ -255,6 +255,11 @@ describe("convert w3 storage to object store URL", () => {
         defaultProjectId: "defaultProject1",
       },
     };
+    const mockAsset3 = {
+      id: "asset3",
+      userId: "test",
+      projectId: undefined,
+    };
 
     const assetList = [mockAsset, mockAsset2];
 
@@ -281,6 +286,9 @@ describe("convert w3 storage to object store URL", () => {
     // nonAdmin + multipleAssets
     result = await addDefaultProjectId(assetList, mockReq, mockRes);
     expect(result[0].projectId).toBe("defaultProject1");
+    // nonAdmin + missing user subitem
+    result = await addDefaultProjectId(mockAsset3, mockReq, mockRes);
+    expect(result.projectId).toBe("defaultProject1");
     mockReq.user.admin = true;
     mockReq.user.defaultProjectId = "adminProjectId";
     // admin + singleAsset
