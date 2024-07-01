@@ -53,7 +53,7 @@ const Billing = () => {
   );
   const June = useJune();
 
-  const standardProducts = ["Hacker", "Growth", "Scale"];
+  const standardProducts = ["Sandbox", "Growth"];
 
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
