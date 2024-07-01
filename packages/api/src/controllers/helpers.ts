@@ -814,7 +814,7 @@ export async function addDefaultProjectId(
   };
 
   if (Array.isArray(clonedBody)) {
-    await Promise.all(clonedBody.map(processItem));
+    await Promise.all(clonedBody.map((item) => processItem(item)));
   } else if (typeof clonedBody === "object" && clonedBody !== null) {
     await processItem(clonedBody);
   }
