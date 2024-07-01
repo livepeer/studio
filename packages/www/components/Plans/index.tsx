@@ -229,7 +229,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <Tooltip
                     multiline
-                    content="Deliver high-quality playback with any viewer device and network bandwidth.">
+                    content="Max amount of concurrent viewers.">
                     <Text
                       size="3"
                       css={{
@@ -250,9 +250,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item
                 displayCheck={false}
                 title={
-                  <Tooltip
-                    multiline
-                    content="Deliver high-quality playback with any viewer device and network bandwidth.">
+                  <Tooltip multiline content="Minimum monthly spend.">
                     <Text
                       size="3"
                       css={{
