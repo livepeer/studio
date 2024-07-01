@@ -81,9 +81,11 @@ export function hasAccessToResource(
   }
   const isAdmin = uiAdminOnly ? isUIAdmin : user.admin;
   return (
-    isAdmin || (!resource.deleted && resource.userId === user.id) // &&
-    // (resource.projectId ?? user.defaultProjectId ?? "") ===
-    // (project?.id ?? ""))
+    isAdmin ||
+    (!resource.deleted &&
+      resource.userId === user.id &&
+      (resource.projectId ?? user.defaultProjectId ?? "") ===
+        (project?.id ?? ""))
   );
 }
 
