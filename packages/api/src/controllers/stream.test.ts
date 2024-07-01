@@ -131,7 +131,8 @@ describe("controllers/stream", () => {
     } = await setupUsers(server, mockAdminUser, mockNonAdminUser));
     client.jwtAuth = adminToken;
 
-    projectId = await createProject(client);
+    let project = await createProject(client);
+    projectId = project.id;
     expect(projectId).toBeDefined();
   });
 
