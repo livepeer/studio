@@ -69,7 +69,7 @@ export const products = {
   },
   hacker_1: {
     order: 3,
-    name: "Hacker",
+    name: "Sandbox",
     lookupKeys: ["hacker_1"],
     price: 0,
     usage: [
@@ -197,7 +197,7 @@ export const products = {
   },
   prod_O9XuIjn7EqYRVW: {
     order: 8,
-    name: "Hacker",
+    name: "Sandbox",
     lookupKeys: ["hacker_1"],
     usage: [
       {
@@ -210,13 +210,13 @@ export const products = {
         name: "Delivery",
         description: "Delivery (minutes)",
         price: 0.0005,
-        limit: 10_000,
+        limit: 5_000,
       },
       {
         name: "Storage",
         description: "Storage (minutes)",
         price: 0.0035,
-        limit: 1_000,
+        limit: 60,
       },
     ],
     monthlyPrice: 0,
@@ -230,22 +230,23 @@ export const products = {
         name: "Transcoding",
         description: "Transcoding (minutes)",
         price: 0.0055,
-        limit: 3_000,
+        limit: 0,
       },
       {
         name: "Delivery",
         description: "Delivery (minutes)",
         price: 0.0005,
-        limit: 100_000,
+        limit: 0,
       },
       {
         name: "Storage",
         description: "Storage (minutes)",
         price: 0.0035,
-        limit: 10_000,
+        limit: 0,
       },
     ],
     monthlyPrice: 100,
+    concurrent_viewers: 50_000,
     payAsYouGo: true,
   },
   prod_O9XtcfOSMjSD5L: {
