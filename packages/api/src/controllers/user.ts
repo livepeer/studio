@@ -1083,6 +1083,13 @@ app.post(
       return res.json({ errors: [`user email ${email} not found`] });
     }
 
+    if (!user.emailValid) {
+      res.status(403);
+      return res.json({
+        errors: ["email not verified, please verify your email first"],
+      });
+    }
+
     const id = uuid();
     let resetToken = uuid();
     await db.passwordResetToken.create({
