@@ -67,7 +67,7 @@ const Delete = ({ stream, invalidate, ...props }) => {
                     e.preventDefault();
                     setSaving(true);
                     await deleteStream(stream.id);
-                    Router.replace("/dashboard");
+                    Router.replace("/");
                     await invalidate();
                     setSaving(false);
                     setOpen(false);
