@@ -363,7 +363,12 @@ describe("controllers/user", () => {
       let req = await client.post(`/user/password/reset-token`, {
         email: user.email,
       });
-      expect(req.status).toBe(201);
+
+      if (user.emailValid) {
+        expect(req.status).toBe(201);
+      } else {
+        expect(req.status).toBe(403);
+      }
 
       const tokens = await db.passwordResetToken.find([
         sql`password_reset_token.data->>'userId' = ${userRes.id}`,
