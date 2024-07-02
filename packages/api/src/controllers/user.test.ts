@@ -364,55 +364,56 @@ describe("controllers/user", () => {
         email: user.email,
       });
 
+      // should return 201 when user email is valid
       if (user.emailValid) {
         expect(req.status).toBe(201);
+        const tokens = await db.passwordResetToken.find([
+          sql`password_reset_token.data->>'userId' = ${userRes.id}`,
+        ]);
+        const token = tokens[0][0];
+        expect(token.resetToken).toBeDefined();
+
+        // should return 404 when user email not found
+        req = await client.post(`/user/password/reset-token`, {
+          email: "noemail@gmail.com",
+        });
+        expect(req.status).toBe(404);
+        let resp = await req.json();
+        expect(resp.errors[0]).toBe("user not found");
+
+        // should return 422 when extra property added to request
+        req = await client.post(`/user/password/reset-token`, {
+          email: "noemail@gmail.com",
+          password: "a".repeat(64),
+        });
+        expect(req.status).toBe(422);
+
+        // should reset user password
+        req = await client.post(`/user/password/reset`, {
+          email: user.email,
+          password: "a".repeat(64),
+          resetToken: token.resetToken,
+        });
+
+        expect(req.status).toBe(200);
+        user = await db.user.get(userRes.id);
+        expect(user.id).toEqual(userRes.id);
+        expect(user.emailValid).toEqual(true);
+
+        // should return 403 when password reset token not found
+        req = await client.post(`/user/password/reset`, {
+          email: user.email,
+          password: "a".repeat(64),
+          resetToken: uuid(),
+        });
+        expect(req.status).toBe(404);
+
+        resp = await req.json();
+        expect(resp.errors[0]).toBe("Password reset token not found");
       } else {
+        // should return 403 when user email not verified
         expect(req.status).toBe(403);
       }
-
-      const tokens = await db.passwordResetToken.find([
-        sql`password_reset_token.data->>'userId' = ${userRes.id}`,
-      ]);
-      const token = tokens[0][0];
-      expect(token.resetToken).toBeDefined();
-
-      // should return 404 when user email not found
-      req = await client.post(`/user/password/reset-token`, {
-        email: "noemail@gmail.com",
-      });
-      expect(req.status).toBe(404);
-      let resp = await req.json();
-      expect(resp.errors[0]).toBe("user not found");
-
-      // should return 422 when extra property added to request
-      req = await client.post(`/user/password/reset-token`, {
-        email: "noemail@gmail.com",
-        password: "a".repeat(64),
-      });
-      expect(req.status).toBe(422);
-
-      // should reset user password
-      req = await client.post(`/user/password/reset`, {
-        email: user.email,
-        password: "a".repeat(64),
-        resetToken: token.resetToken,
-      });
-
-      expect(req.status).toBe(200);
-      user = await db.user.get(userRes.id);
-      expect(user.id).toEqual(userRes.id);
-      expect(user.emailValid).toEqual(true);
-
-      // should return 403 when password reset token not found
-      req = await client.post(`/user/password/reset`, {
-        email: user.email,
-        password: "a".repeat(64),
-        resetToken: uuid(),
-      });
-      expect(req.status).toBe(404);
-
-      resp = await req.json();
-      expect(resp.errors[0]).toBe("Password reset token not found");
     });
   });
 
