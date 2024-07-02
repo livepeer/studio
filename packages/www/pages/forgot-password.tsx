@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
 import { ForgotPassword as Content } from "content";
+import { canSendEmail } from "lib/utils/can-send-email";
 
 const ForgotPasswordPage = () => {
   useLoggedIn(false);
@@ -22,6 +23,14 @@ const ForgotPasswordPage = () => {
   const onSubmit = async ({ email }) => {
     setLoading(true);
     setErrors([]);
+    const response = canSendEmail("resetPassword");
+    if (!response.canSend) {
+      setLoading(false);
+      setErrors([
+        `Please wait ${response.waitTime} seconds before sending another email.`,
+      ]);
+      return;
+    }
     const res = await makePasswordResetToken(email);
     if (res.errors) {
       setLoading(false);
