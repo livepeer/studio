@@ -35,6 +35,8 @@ import {
   TerminalIcon,
   UsageIcon,
 } from "./NavIcons";
+import { toast } from "sonner";
+import { canSendEmail } from "lib/utils/can-send-email";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -76,7 +78,7 @@ export type SidebarId =
   | "billing/plans";
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
-  const { user, logout } = useApi();
+  const { user, logout, makePasswordResetToken } = useApi();
   const router = useRouter();
 
   const June = useJune();
@@ -92,6 +94,25 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
   }, [June]);
+
+  const changePassword = async (e) => {
+    e.preventDefault();
+    const response = canSendEmail("resetPassword");
+    if (!response.canSend) {
+      toast(
+        `Please wait ${response.waitTime} seconds before sending another email.`
+      );
+      return;
+    }
+    const res = await makePasswordResetToken(user.email);
+    if (res.errors) {
+      res.errors.forEach((error) => {
+        toast(error);
+      });
+    } else {
+      toast("Password reset link sent to your email.");
+    }
+  };
 
   return (
     <Box
@@ -150,12 +171,17 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem
+                key="change-password-dropdown-item"
+                onSelect={changePassword}>
+                Change Password
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 key="logout-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
                   logout();
                 }}>
-                Logout
+                Log out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
