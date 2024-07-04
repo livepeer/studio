@@ -2391,10 +2391,42 @@ components:
           type: number
           description: Total minutes of storage usage.
           example: 100
+    realtime-viewership-metric:
+      type: object
+      description: |
+        An individual metric about realtime viewership of a stream/asset.
+      required:
+        - viewCount
+        - errorRate
+      properties:
+        playbackId:
+          type: string
+          description: The playback ID associated with the metric.
+          example: 1bde4o2i6xycudoy
+        device:
+          type: string
+          description: The device used by the viewer.
+          example: iPhone
+        browser:
+          type: string
+          description: The browser used by the viewer.
+          example: Safari
+        country:
+          type: string
+          description: The country where the viewer is located.
+          example: United States
+        viewCount:
+          type: integer
+          description: The number of views for the stream/asset.
+          example: 100
+        errorRate:
+          type: number
+          description: The error rate for the stream/asset.
+          example: 0.1
     viewership-metric:
       type: object
       description: |
-        An individual metric about viewership of an asset. Necessarily, at least
+        An individual metric about viewership of a stream/asset. Necessarily, at least
         1 of playbackId and dStorageUrl will be present, depending on the query.
       required:
         - viewCount
@@ -2472,11 +2504,11 @@ components:
           example: 123
         viewCount:
           type: integer
-          description: The number of views for the asset.
+          description: The number of views for the stream/asset.
           example: 100
         playtimeMins:
           type: number
-          description: The total playtime in minutes for the asset.
+          description: The total playtime in minutes for the stream/asset.
           example: 10
         ttffMs:
           type: number
@@ -2488,7 +2520,7 @@ components:
           example: 0.1
         errorRate:
           type: number
-          description: The error rate for the asset.
+          description: The error rate for the stream/asset.
           example: 0.1
         exitsBeforeStart:
           type: number
@@ -4108,6 +4140,59 @@ paths:
       responses:
         "204":
           description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /data/views/now:
+    get:
+      operationId: getRealtimeViewershipNow
+      x-speakeasy-name-override: getRealtimeViewership
+      summary: Query realtime viewership
+      tags:
+        - metrics
+      description: |
+        Requires a private (non-CORS) API key to be used.
+      parameters:
+        - name: playbackId
+          in: query
+          description: |
+            The playback ID to filter the query results. This can be a canonical
+            playback ID from Livepeer assets or streams, or dStorage identifiers
+            for assets
+          schema:
+            type: string
+        - name: creatorId
+          in: query
+          description: The creator ID to filter the query results
+          schema:
+            type: string
+        - name: "breakdownBy[]"
+          in: query
+          description: |
+            The list of fields to break down the query results. Specify this
+            query-string multiple times to break down by multiple fields.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - playbackId
+                - device
+                - browser
+                - country
+      responses:
+        "200":
+          description: A list of Metric objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/realtime-viewership-metric"
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:
