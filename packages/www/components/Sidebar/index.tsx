@@ -104,13 +104,12 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
       );
       return;
     }
+    toast("Password reset link sent to your email.");
     const res = await makePasswordResetToken(user.email);
     if (res.errors) {
       res.errors.forEach((error) => {
         toast(error);
       });
-    } else {
-      toast("Password reset link sent to your email.");
     }
   };
 
