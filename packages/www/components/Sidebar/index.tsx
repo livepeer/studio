@@ -100,7 +100,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
       toast(
-        `Please wait ${response.waitTime} seconds before sending another email.`
+        `Please wait ${response.waitTime} seconds before sending another email.`,
       );
       return;
     }
