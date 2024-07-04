@@ -134,7 +134,7 @@ describe("controllers/user", () => {
       let resTwoJson = await resTwo.json();
       expect(resTwo.status).toBe(409);
       expect(resTwoJson.errors[0]).toBe(
-        "email already registered - please sign in instead or check your verification email",
+        "email already registered - please sign in instead or check your verification email"
       );
 
       // Registering a user with the same uppercased email should fail
@@ -145,7 +145,7 @@ describe("controllers/user", () => {
       let resThreeJson = await resThree.json();
       expect(resThree.status).toBe(409);
       expect(resThreeJson.errors[0]).toBe(
-        "email already registered - please sign in instead or check your verification email",
+        "email already registered - please sign in instead or check your verification email"
       );
     });
 
@@ -263,7 +263,7 @@ describe("controllers/user", () => {
 
       let adminChange = await resAdminChange.json();
       expect(adminChange.errors[0]).toBe(
-        `user does not have admin priviledges`,
+        `user does not have admin priviledges`
       );
     });
 
@@ -365,55 +365,50 @@ describe("controllers/user", () => {
       });
 
       // should return 201 when user email is valid
-      if (user.emailValid) {
-        expect(req.status).toBe(201);
-        const tokens = await db.passwordResetToken.find([
-          sql`password_reset_token.data->>'userId' = ${userRes.id}`,
-        ]);
-        const token = tokens[0][0];
-        expect(token.resetToken).toBeDefined();
+      expect(req.status).toBe(201);
+      const tokens = await db.passwordResetToken.find([
+        sql`password_reset_token.data->>'userId' = ${userRes.id}`,
+      ]);
+      const token = tokens[0][0];
+      expect(token.resetToken).toBeDefined();
 
-        // should return 404 when user email not found
-        req = await client.post(`/user/password/reset-token`, {
-          email: "noemail@gmail.com",
-        });
-        expect(req.status).toBe(404);
-        let resp = await req.json();
-        expect(resp.errors[0]).toBe("user not found");
+      // should return 404 when user email not found
+      req = await client.post(`/user/password/reset-token`, {
+        email: "noemail@gmail.com",
+      });
+      expect(req.status).toBe(404);
+      let resp = await req.json();
+      expect(resp.errors[0]).toBe("user not found");
 
-        // should return 422 when extra property added to request
-        req = await client.post(`/user/password/reset-token`, {
-          email: "noemail@gmail.com",
-          password: "a".repeat(64),
-        });
-        expect(req.status).toBe(422);
+      // should return 422 when extra property added to request
+      req = await client.post(`/user/password/reset-token`, {
+        email: "noemail@gmail.com",
+        password: "a".repeat(64),
+      });
+      expect(req.status).toBe(422);
 
-        // should reset user password
-        req = await client.post(`/user/password/reset`, {
-          email: user.email,
-          password: "a".repeat(64),
-          resetToken: token.resetToken,
-        });
+      // should reset user password
+      req = await client.post(`/user/password/reset`, {
+        email: user.email,
+        password: "a".repeat(64),
+        resetToken: token.resetToken,
+      });
 
-        expect(req.status).toBe(200);
-        user = await db.user.get(userRes.id);
-        expect(user.id).toEqual(userRes.id);
-        expect(user.emailValid).toEqual(true);
+      expect(req.status).toBe(200);
+      user = await db.user.get(userRes.id);
+      expect(user.id).toEqual(userRes.id);
+      expect(user.emailValid).toEqual(true);
 
-        // should return 403 when password reset token not found
-        req = await client.post(`/user/password/reset`, {
-          email: user.email,
-          password: "a".repeat(64),
-          resetToken: uuid(),
-        });
-        expect(req.status).toBe(404);
+      // should return 403 when password reset token not found
+      req = await client.post(`/user/password/reset`, {
+        email: user.email,
+        password: "a".repeat(64),
+        resetToken: uuid(),
+      });
+      expect(req.status).toBe(404);
 
-        resp = await req.json();
-        expect(resp.errors[0]).toBe("Password reset token not found");
-      } else {
-        // should return 403 when user email not verified
-        expect(req.status).toBe(403);
-      }
+      resp = await req.json();
+      expect(resp.errors[0]).toBe("Password reset token not found");
     });
   });
 
@@ -458,7 +453,7 @@ describe("controllers/user", () => {
       expect(refreshToken.revoked).toBeFalsy();
       expect(refreshToken.createdAt).toBeLessThanOrEqual(Date.now());
       expect(refreshToken.expiresAt).toBeGreaterThan(
-        Date.now() + REFRESH_TOKEN_TTL - 60000,
+        Date.now() + REFRESH_TOKEN_TTL - 60000
       );
     };
 
@@ -519,14 +514,14 @@ describe("controllers/user", () => {
         expect(res.status).toBe(201);
 
         mockTimeDelay(
-          ACCESS_TOKEN_TTL * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO - 60 * 1000,
+          ACCESS_TOKEN_TTL * REFRESH_TOKEN_MIN_REUSE_DELAY_RATIO - 60 * 1000
         );
 
         res = await client.post("/user/token/refresh", { refreshToken });
         expect(res.status).toBe(401);
         const { errors } = await res.json();
         expect(errors[0]).toBe(
-          "refresh token has already been used too recently",
+          "refresh token has already been used too recently"
         );
 
         const refreshTokenObj = await db.jwtRefreshToken.get(refreshToken);
@@ -558,7 +553,7 @@ describe("controllers/user", () => {
 
       it("should generate a new refresh token when close to expiration", async () => {
         mockTimeDelay(
-          REFRESH_TOKEN_TTL * (1 - REFRESH_TOKEN_REFRESH_THRESHOLD) + 60 * 1000,
+          REFRESH_TOKEN_TTL * (1 - REFRESH_TOKEN_REFRESH_THRESHOLD) + 60 * 1000
         );
 
         const res = await client.post("/user/token/refresh", {
@@ -601,7 +596,7 @@ describe("controllers/user", () => {
           {
             algorithm: "HS256",
             jwtid: uuid(),
-          },
+          }
         );
 
         mockTime(NEVER_EXPIRING_JWT_CUTOFF_DATE - 24 * 60 * 60 * 1000);
@@ -619,7 +614,7 @@ describe("controllers/user", () => {
         expect(res.status).toBe(401);
         const { errors } = await res.json();
         expect(errors[0]).toBe(
-          "legacy access token detected. please log in again",
+          "legacy access token detected. please log in again"
         );
       });
 
@@ -676,7 +671,7 @@ describe("controllers/user", () => {
       let resJson = await res.json();
       expect(res.status).toBe(403);
       expect(resJson.errors[0]).toBe(
-        `user ${nonAdminUser.email} has not been verified. please check your inbox for verification email.`,
+        `user ${nonAdminUser.email} has not been verified. please check your inbox for verification email.`
       );
 
       client.apiKey = adminApiKey;
@@ -684,7 +679,7 @@ describe("controllers/user", () => {
       resJson = await res.json();
       expect(res.status).toBe(403);
       expect(resJson.errors[0]).toBe(
-        `user ${adminUser.email} has not been verified. please check your inbox for verification email.`,
+        `user ${adminUser.email} has not been verified. please check your inbox for verification email.`
       );
 
       // adding emailValid true to user
