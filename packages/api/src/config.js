@@ -48,7 +48,7 @@ export const products = {
       {
         name: "Storage",
         description: "Storage (minutes)",
-        price: 0.0035,
+        price: 0.0015,
         limit: 10_000,
       },
     ],
@@ -90,7 +90,7 @@ export const products = {
       {
         name: "Storage",
         description: "Storage (minutes)",
-        price: 0.0035,
+        price: 0.0015,
         limit: 1_000,
       },
     ],
@@ -117,11 +117,13 @@ export const products = {
       {
         name: "Storage",
         description: "Storage (minutes)",
-        price: 0.0035,
+        price: 0.0015,
         limit: 10_000,
       },
     ],
-    monthlyPrice: 100,
+    monthlyPrice: 1, // test value for staging
+    minimumSpend: true,
+    concurrent_viewers: 50_000,
     payAsYouGo: true,
     viewerLimit: 50_000,
   },
@@ -247,12 +249,13 @@ export const products = {
       {
         name: "Storage",
         description: "Storage (minutes)",
-        price: 0.0035,
+        price: 0.0015,
         limit: 0,
       },
     ],
     monthlyPrice: 100,
     concurrent_viewers: 50_000,
+    minimumSpend: true,
     payAsYouGo: true,
     viewerLimit: 50_000,
   },
@@ -276,7 +279,7 @@ export const products = {
       {
         name: "Storage",
         description: "Storage (minutes)",
-        price: 0.0035,
+        price: 0.0015,
         limit: 50_000,
       },
     ],
@@ -302,7 +305,7 @@ export const products = {
       {
         name: "Storage",
         description: "Storage (minutes)",
-        price: 0.0035,
+        price: 0.0015,
       },
     ],
     monthlyPrice: 0,

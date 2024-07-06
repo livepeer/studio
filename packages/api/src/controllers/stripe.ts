@@ -132,13 +132,24 @@ async function reportUsageForUser(
     subscription: user.stripeCustomerSubscriptionId,
   });
 
-  const usageNotifications = await getUsageNotifications(
-    usageData.usagePercentages,
-    user,
-  );
+  const product = products[user.stripeProductId];
+  let usageToReport = usageData.overUsage;
 
-  if (usageNotifications.length > 0) {
-    await notifyUser(usageNotifications, user, { headers: {}, config });
+  if (!product.minumumSpend) {
+    const usageNotifications = await getUsageNotifications(
+      usageData.usagePercentages,
+      user,
+    );
+
+    if (usageNotifications.length > 0) {
+      await notifyUser(usageNotifications, user, { headers: {}, config });
+    }
+  } else {
+    const overage = await calculateOverageOnMinimumSpend(
+      product,
+      usageData.billingUsage,
+    );
+    usageToReport = overage;
   }
 
   if (actuallyReport) {
@@ -212,6 +223,70 @@ const sendUsageRecordToStripe = async (
       }
     }),
   );
+};
+
+const calculateOverageOnMinimumSpend = async (product, billingUsage) => {
+  const mimimumSpend = product.monthlyPrice;
+
+  let storageUsage = billingUsage.storageUsage;
+  let deliveryUsage = billingUsage.deliveryUsage;
+  let totalUsage = billingUsage.totalUsage;
+
+  let prices: any = {};
+
+  if (product?.usage) {
+    product.usage.forEach((item) => {
+      if (item.name.toLowerCase() === "transcoding")
+        prices.transcoding = item.price;
+      if (item.name.toLowerCase() === "delivery") prices.streaming = item.price;
+      if (item.name.toLowerCase() === "storage") prices.storage = item.price;
+    });
+  }
+
+  let totalSpent =
+    prices.storage * storageUsage +
+    prices.streaming * deliveryUsage +
+    prices.transcoding * totalUsage;
+  if (totalSpent > mimimumSpend) {
+    let remainingOverage = totalSpent - mimimumSpend;
+    let overageUsage = {
+      StorageUsageMins: 0,
+      DeliveryUsageMins: 0,
+      TotalUsageMins: 0,
+    };
+
+    if (remainingOverage > 0) {
+      const totalSpentInCategories = {
+        storage: prices.storage * storageUsage,
+        delivery: prices.streaming * deliveryUsage,
+        transcoding: prices.transcoding * totalUsage,
+      };
+
+      const totalSpent =
+        totalSpentInCategories.storage +
+        totalSpentInCategories.delivery +
+        totalSpentInCategories.transcoding;
+
+      if (totalSpent > 0) {
+        const overageRatio = remainingOverage / totalSpent;
+
+        overageUsage.StorageUsageMins =
+          (totalSpentInCategories.storage * overageRatio) / prices.storage;
+        overageUsage.DeliveryUsageMins =
+          (totalSpentInCategories.delivery * overageRatio) / prices.streaming;
+        overageUsage.TotalUsageMins =
+          (totalSpentInCategories.transcoding * overageRatio) /
+          prices.transcoding;
+      }
+    }
+
+    return overageUsage;
+  }
+  return {
+    StorageUsageMins: 0,
+    DeliveryUsageMins: 0,
+    TotalUsageMins: 0,
+  };
 };
 
 // Webhook handler for asynchronous events called by stripe on invoice generation
