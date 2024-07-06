@@ -225,8 +225,8 @@ const sendUsageRecordToStripe = async (
   );
 };
 
-const calculateOverageOnMinimumSpend = async (product, billingUsage) => {
-  const mimimumSpend = product.monthlyPrice;
+export const calculateOverageOnMinimumSpend = async (product, billingUsage) => {
+  const minimumSpend = product.monthlyPrice;
 
   let storageUsage = billingUsage.storageUsage;
   let deliveryUsage = billingUsage.deliveryUsage;
@@ -247,8 +247,8 @@ const calculateOverageOnMinimumSpend = async (product, billingUsage) => {
     prices.storage * storageUsage +
     prices.streaming * deliveryUsage +
     prices.transcoding * totalUsage;
-  if (totalSpent > mimimumSpend) {
-    let remainingOverage = totalSpent - mimimumSpend;
+  if (totalSpent > minimumSpend) {
+    let remainingOverage = totalSpent - minimumSpend;
     let overageUsage = {
       StorageUsageMins: 0,
       DeliveryUsageMins: 0,
