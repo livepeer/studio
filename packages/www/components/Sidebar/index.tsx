@@ -313,10 +313,11 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   key="billing-dropdown-item"
                   onSelect={(e) => {
                     e.preventDefault();
-                    Router.push("/settings/billing/plans");
+                    Router.push("/settings/usage");
                   }}>
-                  <Text size="2">Plans</Text>
+                  <Text size="2">Usage</Text>
                 </DropdownMenuItem>
+
                 <DropdownMenuItem
                   css={{
                     py: 3,
@@ -333,6 +334,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   }}>
                   <Text size="2">Billing</Text>
                 </DropdownMenuItem>
+
                 <DropdownMenuItem
                   css={{
                     py: 3,
@@ -345,9 +347,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   key="billing-dropdown-item"
                   onSelect={(e) => {
                     e.preventDefault();
-                    Router.push("/settings/usage");
+                    Router.push("/settings/billing/plans");
                   }}>
-                  <Text size="2">Usage</Text>
+                  <Text size="2">Plans</Text>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   css={{
@@ -405,9 +407,10 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               placeholder={"Projects"}
               css={{
                 border: "1px solid $colors$neutral6",
-                p: "$3",
                 width: "14rem",
                 ml: "$5",
+                py: "$2",
+                px: "$3",
               }}>
               <Text size={2} variant={"neutral"} css={{ ml: "$1", mb: "$1" }}>
                 Projects
@@ -471,7 +474,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       color: "$neutral12",
                       cursor: "default",
                       borderRadius: "$3",
-                      mb: "$1",
                       py: "$1",
                       px: "$2",
                       "&:hover": {
@@ -488,7 +490,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       color: "$neutral12",
                       cursor: "default",
                       borderRadius: "$3",
-                      mb: "$1",
                       py: "$1",
                       px: "$2",
                       "&:hover": {
