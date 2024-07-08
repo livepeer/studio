@@ -1,6 +1,6 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import { authorizer } from "../middleware";
-import { db } from "../store";
+import { db, jobsDb } from "../store";
 import { v4 as uuid } from "uuid";
 import {
   makeNextHREF,
@@ -11,7 +11,11 @@ import {
 import { NotFoundError, ForbiddenError } from "../store/errors";
 import sql from "sql-template-strings";
 import { WithID } from "../store/types";
-import { Project } from "../schema/types";
+import { Asset, Project } from "../schema/types";
+import { CliArgs } from "../parse-cli";
+import Queue from "../store/queue";
+import logger from "../logger";
+import { DB } from "../store/db";
 
 const app = Router();
 
@@ -176,5 +180,116 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+app.post(
+  "/job/projects-cleanup",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    // import the job dynamically to avoid circular dependencies
+    const { default: projectsCleanup } = await import(
+      "../jobs/projects-cleanup"
+    );
+
+    const limit = parseInt(req.query.limit?.toString()) || 1000;
+
+    const { cleanedUp } = await projectsCleanup(
+      {
+        ...req.config,
+        projectsCleanupLimit: limit,
+      },
+      req,
+      { jobsDb },
+    );
+
+    res.status(200);
+    res.json({ cleanedUp });
+  },
+);
+
+export function triggerCleanUpProjectsJob(
+  projects: Project[],
+  req: Request,
+): [Project[], Promise<void>] {
+  if (!projects.length) {
+    return [projects, Promise.resolve()];
+  }
+
+  const jobPromise = Promise.resolve().then(async () => {
+    try {
+      await Promise.all(projects.map((s) => cleanUpProject(jobsDb, s, req)));
+    } catch (err) {
+      const ids = projects.map((s) => s.id);
+      logger.error(`Error cleaning up projectId=${ids} err=`, err);
+    }
+  });
+
+  return [projects, jobPromise];
+}
+
+async function cleanUpProject(db: DB, project: Project, req: Request) {
+  let [assets] = await db.asset.find({
+    filters: {
+      projectId: project.id,
+      deleted: false,
+    },
+  });
+
+  let [streams] = await db.stream.find({
+    filters: {
+      projectId: project.id,
+      deleted: false,
+    },
+  });
+
+  let [signingKeys] = await db.signingKey.find({
+    filters: {
+      projectId: project.id,
+      deleted: false,
+    },
+  });
+
+  let [webhooks] = await db.webhook.find({
+    filters: {
+      projectId: project.id,
+      deleted: false,
+    },
+  });
+
+  let [sessions] = await db.session.find({
+    filters: {
+      projectId: project.id,
+      deleted: false,
+    },
+  });
+
+  for (const asset of assets) {
+    await req.taskScheduler.deleteAsset(asset.id);
+  }
+
+  for (const stream of streams) {
+    await db.stream.update(stream.id, {
+      deleted: true,
+    });
+  }
+
+  for (const signingKey of signingKeys) {
+    await db.signingKey.update(signingKey.id, {
+      deleted: true,
+      disabled: true,
+    });
+  }
+
+  for (const webhook of webhooks) {
+    await db.webhook.update(webhook.id, {
+      deleted: true,
+    });
+  }
+
+  for (const session of sessions) {
+    await db.session.update(session.id, {
+      deleted: true,
+    });
+  }
+}
 
 export default app;
