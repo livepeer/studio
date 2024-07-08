@@ -1,6 +1,6 @@
 import serverPromise, { TestServer } from "../test-server";
 import { clearDatabase } from "../test-helpers";
-import { calculateOverageOnMinimumSpend, reportUsageForUser } from "./stripe";
+import { calculateOverageOnMinimumSpend } from "./stripe";
 import { calculateOverUsage } from "./usage";
 
 let server: TestServer;
