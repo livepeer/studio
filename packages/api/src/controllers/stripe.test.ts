@@ -1,6 +1,7 @@
 import serverPromise, { TestServer } from "../test-server";
 import { clearDatabase } from "../test-helpers";
-import { calculateOverageOnMinimumSpend } from "./stripe";
+import { calculateOverageOnMinimumSpend, reportUsageForUser } from "./stripe";
+import { calculateOverUsage } from "./usage";
 
 let server: TestServer;
 
@@ -149,6 +150,60 @@ describe("controllers/stripe", () => {
       expect(overage.StorageUsageMins * product.usage[2].price).toEqual(0);
       expect(overage.DeliveryUsageMins * product.usage[1].price).toEqual(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toEqual(450);
+    });
+
+    it("should report correctly the usage for products without minimum spend", async () => {
+      const product = {
+        minimumSpend: false,
+        monthlyPrice: 100,
+        usage: [
+          {
+            name: "Transcoding",
+            description: "Transcoding (minutes)",
+            price: 0.0055,
+            limit: 3_000,
+          },
+          {
+            name: "Delivery",
+            description: "Delivery (minutes)",
+            price: 0.0005,
+            limit: 100_000,
+          },
+          {
+            name: "Storage",
+            description: "Storage (minutes)",
+            price: 0.0015,
+            limit: 10_000,
+          },
+        ],
+      };
+      // No overage
+      let billingUsage = {
+        TotalUsageMins: 3_000,
+        DeliveryUsageMins: 100_000,
+        StorageUsageMins: 10_000,
+      };
+      let overusage = await calculateOverUsage(product, billingUsage);
+      expect(overusage.TotalUsageMins * product.usage[0].price).toEqual(0);
+      expect(overusage.DeliveryUsageMins * product.usage[1].price).toEqual(0);
+      expect(overusage.StorageUsageMins * product.usage[2].price).toEqual(0);
+
+      // 1 minute overage for each item
+      billingUsage = {
+        TotalUsageMins: 3_001,
+        DeliveryUsageMins: 100_001,
+        StorageUsageMins: 10_001,
+      };
+      overusage = await calculateOverUsage(product, billingUsage);
+      expect(overusage.TotalUsageMins * product.usage[0].price).toEqual(
+        product.usage[0].price,
+      );
+      expect(overusage.DeliveryUsageMins * product.usage[1].price).toEqual(
+        product.usage[1].price,
+      );
+      expect(overusage.StorageUsageMins * product.usage[2].price).toEqual(
+        product.usage[2].price,
+      );
     });
   });
 });
