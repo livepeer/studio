@@ -216,6 +216,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://{{ip}}:8935",
       },
+      "ai-gateway-url": {
+        describe:
+          "base URL of the AI Gateway to call for generative AI requests",
+        type: "string",
+      },
       "ipfs-gateway-url": {
         describe:
           "base URL to use for the IPFS content gateway returned on assets.",

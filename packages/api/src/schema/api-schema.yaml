@@ -2854,7 +2854,42 @@ components:
         targetSegmentSizeSecs:
           $ref: >-
             #/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs
-
+    # AI Generate payloads. Keep in mind that these use snake_case instead of camelCase since
+    # they implement the same interface as the AI Gateway Livepeer node.
+    text-to-image-payload:
+      type: object
+      required:
+        - prompt
+      properties:
+        prompt:
+          type: string
+        model_id:
+          type: string
+          default: SG161222/RealVisXL_V4.0_Lightning
+          enum:
+            - SG161222/RealVisXL_V4.0_Lightning
+            - ByteDance/SDXL-Lightning
+        height:
+          type: integer
+        width:
+          type: integer
+        guidance_scale:
+          type: number
+          default: 7.5
+        negative_prompt:
+          type: string
+          default: ""
+        safety_check:
+          type: boolean
+          default: true
+        seed:
+          type: integer
+        num_inference_steps:
+          type: integer
+          default: 50
+        num_images_per_prompt:
+          type: integer
+          default: 1
 paths:
   /stream:
     post:

@@ -11,6 +11,7 @@ import orchestrator from "./orchestrator";
 import stream from "./stream";
 import user from "./user";
 import geolocate from "./geolocate";
+import generate from "./generate";
 import webhook from "./webhook";
 import asset from "./asset";
 import task from "./task";
@@ -38,6 +39,7 @@ export default {
   stream,
   user,
   geolocate,
+  generate,
   ingest,
   webhook,
   asset,
