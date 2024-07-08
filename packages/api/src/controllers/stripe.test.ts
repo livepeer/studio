@@ -1,16 +1,5 @@
 import serverPromise, { TestServer } from "../test-server";
 import { clearDatabase } from "../test-helpers";
-import { ObjectStore, User } from "../schema/types";
-import { db } from "../store";
-import { v4 as uuid } from "uuid";
-import {
-  addDefaultProjectId,
-  deleteCredentials,
-  getS3PresignedUrl,
-  toObjectStoreUrl,
-  toWeb3StorageUrl,
-} from "./helpers";
-import { Request, Response } from "express";
 import { calculateOverageOnMinimumSpend } from "./stripe";
 
 let server: TestServer;
@@ -53,6 +42,7 @@ describe("controllers/stripe", () => {
         ],
       };
 
+      // Test 75$ spend with overage reported as 0, corresponding to 100$ invoice
       let billingUsage = {
         totalUsage: 3000, // 3000 * 0.0055 = 16.5
         deliveryUsage: 100000, // 100,000 * 0.0005 = 50
@@ -63,6 +53,7 @@ describe("controllers/stripe", () => {
       expect(overage.DeliveryUsageMins * product.usage[1].price).toEqual(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toEqual(0);
 
+      // Test 98$ spend with overage reported as 0, corresponding to 100$ invoice
       billingUsage = {
         totalUsage: 6000, // 6000 * 0.0055 = 33
         deliveryUsage: 100000, // 100,000 * 0.0005 = 50
@@ -73,6 +64,7 @@ describe("controllers/stripe", () => {
       expect(overage.DeliveryUsageMins * product.usage[1].price).toEqual(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toEqual(0);
 
+      // Test 103$ spend with overage reported as 3$, corresponding to 103$ invoice distributed across 1 product items
       billingUsage = {
         totalUsage: 0, // 0 * 0.0055 = 0
         deliveryUsage: 206000, // 100,000 * 0.0005 = 103
@@ -82,6 +74,8 @@ describe("controllers/stripe", () => {
       expect(overage.StorageUsageMins * product.usage[2].price).toEqual(0);
       expect(overage.DeliveryUsageMins * product.usage[1].price).toEqual(3);
       expect(overage.TotalUsageMins * product.usage[0].price).toEqual(0);
+
+      // Test 131$ spend with overage reported as 31$, corresponding to 131$ invoice distributed across 3 product items
       billingUsage = {
         totalUsage: 12000, // 12000 * 0.0055 = 66
         deliveryUsage: 100000, // 100,000 * 0.0005 = 50
@@ -103,6 +97,7 @@ describe("controllers/stripe", () => {
           overage.StorageUsageMins * product.usage[2].price,
       ).toEqual(31);
 
+      // Test 30$ spend with overage reported as 0, corresponding to 100$ invoice
       billingUsage = {
         totalUsage: 0, // 0 * 0.0055 = 0
         deliveryUsage: 0, // 0 * 0.0005 = 0
@@ -113,6 +108,7 @@ describe("controllers/stripe", () => {
       expect(overage.DeliveryUsageMins * product.usage[1].price).toEqual(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toEqual(0);
 
+      // Test 60$ spend with overage reported as 0, corresponding to 100$ invoice
       billingUsage = {
         totalUsage: 5000, // 5000 * 0.0055 = 27.5
         deliveryUsage: 50000, // 50,000 * 0.0005 = 25
@@ -123,10 +119,11 @@ describe("controllers/stripe", () => {
       expect(overage.DeliveryUsageMins * product.usage[1].price).toEqual(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toEqual(0);
 
+      // Test 147.5$ spend with overage reported as 47.5$, corresponding to 147.5$ invoice distributed across 2 product items
       billingUsage = {
-        totalUsage: 10000, // 10000 * 0.0055 = 55
-        deliveryUsage: 150000, // 150,000 * 0.0005 = 75
-        storageUsage: 15000, // 15,000 * 0.0015 = 22.5 - total = 152.5
+        totalUsage: 0,
+        deliveryUsage: 250000,
+        storageUsage: 15000, // total = 147.5
       };
       overage = await calculateOverageOnMinimumSpend(product, billingUsage);
       expect(overage.StorageUsageMins * product.usage[2].price).toBeGreaterThan(
@@ -135,15 +132,14 @@ describe("controllers/stripe", () => {
       expect(
         overage.DeliveryUsageMins * product.usage[1].price,
       ).toBeGreaterThan(0);
-      expect(overage.TotalUsageMins * product.usage[0].price).toBeGreaterThan(
-        0,
-      );
+      expect(overage.TotalUsageMins * product.usage[0].price).toBe(0);
       expect(
         overage.TotalUsageMins * product.usage[0].price +
           overage.DeliveryUsageMins * product.usage[1].price +
           overage.StorageUsageMins * product.usage[2].price,
-      ).toEqual(52.5);
+      ).toEqual(47.5);
 
+      // Test 550$ spend with overage reported as 450, corresponding to 550$ invoice
       billingUsage = {
         totalUsage: 100000, // 550
         deliveryUsage: 0,
