@@ -517,7 +517,7 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
 
   for (const filter of json) {
     const fv = fieldsMap[filter.id];
-    if (!filter.value) {
+    if (!("value" in filter)) {
       throw new Error(`missing filter value for id "${filter.id}"`);
     }
 
