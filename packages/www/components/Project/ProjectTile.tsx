@@ -11,13 +11,10 @@ import {
 import React from "react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { NavLink, generalSidebarItems } from "components/Sidebar";
-import { useProjectContext } from "context/ProjectContext";
 import Link from "next/link";
 import { getEmojiIcon } from "lib/get-emoji";
 
-function ProjectTile({ name, id }) {
-  const { setProjectId } = useProjectContext();
-
+function ProjectTile({ name, id, invalidateQuery }) {
   return (
     <Box
       css={{

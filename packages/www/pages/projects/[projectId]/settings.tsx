@@ -20,7 +20,11 @@ const Settings = () => {
   const { projectId } = useProjectContext();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data } = useQuery([projectId], () => getProject(projectId));
+  const { data } = useQuery([projectId], () => getProject(projectId), {
+    onSuccess(data) {
+      setProjectName(data.name);
+    },
+  });
 
   const [projectName, setProjectName] = useState<string | null>();
   const queryClient = useQueryClient();

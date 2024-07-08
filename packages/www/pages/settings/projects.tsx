@@ -12,7 +12,7 @@ import {
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery, useQueryClient } from "react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { useProjectContext } from "context/ProjectContext";
 import Link from "next/link";
@@ -34,8 +34,13 @@ const WorkspaceProjects = () => {
     setProjectId(project.id);
     setShowCreateProjectAlert(false);
 
-    queryClient.invalidateQueries("projects");
+    invalidateQuery();
   };
+
+  const invalidateQuery = useCallback(() => {
+    queryClient.invalidateQueries("projects");
+    return true;
+  }, [queryClient]);
 
   const { data } = useQuery("projects", getProjects);
 
@@ -107,6 +112,7 @@ const WorkspaceProjects = () => {
               href={`/projects/${project.id}/`}>
               <ProjectTile
                 key={`project-tile-${i}`}
+                invalidateQuery={invalidateQuery}
                 id={project.id}
                 name={project?.name}
               />
