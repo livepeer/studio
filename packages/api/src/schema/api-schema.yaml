@@ -2890,6 +2890,98 @@ components:
         num_images_per_prompt:
           type: integer
           default: 1
+    image-to-image-payload:
+      type: object
+      required:
+        - prompt
+        - image
+      properties:
+        prompt:
+          type: string
+        image:
+          type: string
+          format: binary
+        model_id:
+          type: string
+          default: timbrooks/instruct-pix2pix
+          enum:
+            - timbrooks/instruct-pix2pix
+            - ByteDance/SDXL-Lightning
+            - SG161222/RealVisXL_V4.0_Lightning
+        strength:
+          type: number
+          default: 0.8
+        guidance_scale:
+          type: number
+          default: 7.5
+        image_guidance_scale:
+          type: number
+          default: 1.5
+        negative_prompt:
+          type: string
+          default: ""
+        safety_check:
+          type: boolean
+          default: true
+        seed:
+          type: integer
+        num_images_per_prompt:
+          type: integer
+          default: 1
+    image-to-video-payload:
+      type: object
+      required:
+        - image
+      properties:
+        image:
+          type: string
+          format: binary
+        model_id:
+          type: string
+          default: stabilityai/stable-video-diffusion-img2vid-xt-1-1
+          enum:
+            - stabilityai/stable-video-diffusion-img2vid-xt-1-1
+        height:
+          type: integer
+          default: 576
+        width:
+          type: integer
+          default: 1024
+        fps:
+          type: integer
+          default: 6
+        motion_bucket_id:
+          type: integer
+          default: 127
+        noise_aug_strength:
+          type: number
+          default: 0.02
+        seed:
+          type: integer
+        safety_check:
+          type: boolean
+          default: true
+    upscale-payload:
+      type: object
+      required:
+        - prompt
+        - image
+      properties:
+        prompt:
+          type: string
+        image:
+          type: string
+          format: binary
+        model_id:
+          type: string
+          default: stabilityai/stable-diffusion-x4-upscaler
+          enum:
+            - stabilityai/stable-diffusion-x4-upscaler
+        safety_check:
+          type: boolean
+          default: true
+        seed:
+          type: integer
 paths:
   /stream:
     post:
