@@ -4,11 +4,9 @@
  * If user has a default project, redirect to that project, else redirect to the first project (default project)
  */
 
-import { useApi, useLoggedIn } from "hooks";
+import { useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { useQuery } from "react-query";
-import { useProjectContext } from "context/ProjectContext";
 
 export default function Dashboard() {
   const { push } = useRouter();

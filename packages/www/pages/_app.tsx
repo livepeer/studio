@@ -120,19 +120,24 @@ const App = ({ Component, pageProps }) => {
             dark: "dark-theme-green",
             light: "light-theme-green",
           }}>
-          <SnackbarProvider>
+          <ProjectProvider>
             <SyncProjectId />
-            <QueryClientProvider client={queryClient}>
-              <ApiProvider>
-                <AnalyzerProvider>
-                  <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
-                    <DefaultSeo {...SEO} />
-                    <Component {...pageProps} />
-                  </LivepeerConfig>
-                </AnalyzerProvider>
-              </ApiProvider>
-            </QueryClientProvider>
-          </SnackbarProvider>
+
+            <SnackbarProvider>
+              <QueryClientProvider client={queryClient}>
+                <ApiProvider>
+                  <AnalyzerProvider>
+                    <LivepeerConfig
+                      theme={livepeerTheme}
+                      client={livepeerClient}>
+                      <DefaultSeo {...SEO} />
+                      <Component {...pageProps} />
+                    </LivepeerConfig>
+                  </AnalyzerProvider>
+                </ApiProvider>
+              </QueryClientProvider>
+            </SnackbarProvider>
+          </ProjectProvider>
         </ThemeProvider>
       </DesignSystemProvider>
     </>

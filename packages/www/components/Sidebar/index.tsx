@@ -1,33 +1,21 @@
 import {
+  styled,
+  Box,
+  Flex,
+  Text,
   Link as A,
   Avatar,
-  Box,
+  Grid,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuTrigger,
   DropdownMenuItem,
   Button,
 } from "@livepeer/design-system";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import {
-  BookmarkFilledIcon,
-  BookmarkIcon,
-  ChatBubbleIcon,
-  ChevronDownIcon,
-  LoopIcon,
-  RocketIcon,
-} from "@radix-ui/react-icons";
-import { useJune } from "hooks/use-june";
-import { isExport } from "lib/utils";
-import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import { useEffect } from "react";
-import { useApi } from "../../hooks";
-import ThemeSwitch from "../ThemeSwitch";
-import {
-  AssetsIcon,
-  BillingIcon,
   HomeIcon,
   StreamIcon,
   TerminalIcon,
@@ -40,7 +28,12 @@ import {
 } from "./NavIcons";
 import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
-import { RocketIcon, ChatBubbleIcon, LoopIcon } from "@radix-ui/react-icons";
+import {
+  RocketIcon,
+  ChatBubbleIcon,
+  LoopIcon,
+  BookmarkIcon,
+} from "@radix-ui/react-icons";
 import Contact from "../Contact";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
@@ -437,7 +430,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   <DropdownMenuItem
                     key={project.id}
                     css={{
-                      py: "$1",
+                      py: "$3",
                       px: "$2",
                       cursor: "default",
                       "&:hover": {
@@ -486,7 +479,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       color: "$neutral12",
                       cursor: "default",
                       borderRadius: "$3",
-                      py: "$1",
+                      py: "$3",
                       px: "$2",
                       "&:hover": {
                         backgroundColor: "$neutral4",
@@ -502,7 +495,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       color: "$neutral12",
                       cursor: "default",
                       borderRadius: "$3",
-                      py: "$1",
+                      py: "$3",
                       px: "$2",
                       "&:hover": {
                         backgroundColor: "$neutral4",
