@@ -31,7 +31,7 @@ import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-const DEFAULT_MAX_CONCURRENT_VIEWERS = 50_000;
+export const DEFAULT_MAX_CONCURRENT_VIEWERS = 50_000;
 const app = Router();
 
 type GateConfig = {
@@ -225,18 +225,20 @@ app.post(
 
     let config: Partial<GateConfig> = {};
 
-    let concurrentViewers = DEFAULT_MAX_CONCURRENT_VIEWERS;
-    let userProduct = products[user.stripeProductId];
+    let viewerLimit = DEFAULT_MAX_CONCURRENT_VIEWERS;
 
-    if (userProduct.concurrentViewers) {
-      concurrentViewers = userProduct.concurrentViewers;
+    if (user.stripeProductId) {
+      let userProduct = products[user.stripeProductId];
+      if (userProduct?.viewerLimit) {
+        viewerLimit = userProduct.viewerLimit;
+      }
     }
 
-    if (user.viewerLimit) {
-      concurrentViewers = user.viewerLimit;
+    if (user.viewerLimit || user.viewerLimit === 0) {
+      viewerLimit = user.viewerLimit;
     }
 
-    config.user_viewer_limit = concurrentViewers;
+    config.user_viewer_limit = viewerLimit;
     config.user_id = user.id;
 
     if (content.playbackPolicy?.refreshInterval) {
