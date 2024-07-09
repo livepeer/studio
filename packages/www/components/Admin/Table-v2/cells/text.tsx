@@ -18,7 +18,9 @@ const TextCell = <D extends TableData>({
   return (
     <div>
       {cell.value.tooltipChildren ? <Tooltip id={pid} /> : null}
-      <div data-tooltip-id={pid} content={`${cell?.value?.tooltipChildren}`}>
+      <div
+        data-tooltip-id={pid}
+        data-tooltip-content={`${cell?.value?.tooltipChildren}`}>
         {cell.value.href ? (
           <Link href={cell.value.href}>{cell.value.children}</Link>
         ) : (
