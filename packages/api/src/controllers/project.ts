@@ -3,6 +3,7 @@ import { authorizer } from "../middleware";
 import { db, jobsDb } from "../store";
 import { v4 as uuid } from "uuid";
 import {
+  deleteAllOwnedObjects,
   makeNextHREF,
   parseFilters,
   parseOrder,
@@ -216,7 +217,7 @@ export function triggerCleanUpProjectsJob(
 
   const jobPromise = Promise.resolve().then(async () => {
     try {
-      await Promise.all(projects.map((s) => cleanUpProject(jobsDb, s, req)));
+      await Promise.all(projects.map((s) => cleanUpProject(s, req)));
     } catch (err) {
       const ids = projects.map((s) => s.id);
       logger.error(`Error cleaning up projectId=${ids} err=`, err);
@@ -226,70 +227,8 @@ export function triggerCleanUpProjectsJob(
   return [projects, jobPromise];
 }
 
-async function cleanUpProject(db: DB, project: Project, req: Request) {
-  let [assets] = await db.asset.find({
-    filters: {
-      projectId: project.id,
-      deleted: false,
-    },
-  });
-
-  let [streams] = await db.stream.find({
-    filters: {
-      projectId: project.id,
-      deleted: false,
-    },
-  });
-
-  let [signingKeys] = await db.signingKey.find({
-    filters: {
-      projectId: project.id,
-      deleted: false,
-    },
-  });
-
-  let [webhooks] = await db.webhook.find({
-    filters: {
-      projectId: project.id,
-      deleted: false,
-    },
-  });
-
-  let [sessions] = await db.session.find({
-    filters: {
-      projectId: project.id,
-      deleted: false,
-    },
-  });
-
-  for (const asset of assets) {
-    await req.taskScheduler.deleteAsset(asset.id);
-  }
-
-  for (const stream of streams) {
-    await db.stream.update(stream.id, {
-      deleted: true,
-    });
-  }
-
-  for (const signingKey of signingKeys) {
-    await db.signingKey.update(signingKey.id, {
-      deleted: true,
-      disabled: true,
-    });
-  }
-
-  for (const webhook of webhooks) {
-    await db.webhook.update(webhook.id, {
-      deleted: true,
-    });
-  }
-
-  for (const session of sessions) {
-    await db.session.update(session.id, {
-      deleted: true,
-    });
-  }
+async function cleanUpProject(project: Project, req: Request) {
+  await deleteAllOwnedObjects(req, { projectId: project.id, deleted: false });
 }
 
 export default app;
