@@ -8,6 +8,7 @@ import { HttpError } from "../../../lib/utils";
 import { ApiState, StreamInfo } from "../types";
 import { getCursor } from "../helpers";
 import { SetStateAction } from "react";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -28,7 +29,9 @@ export const getStreamInfo = async (
 };
 
 export const getStream = async (streamId): Promise<Stream> => {
-  const [res, stream] = await context.fetch(`/stream/${streamId}`);
+  const url = `/stream/${streamId}?projectId=${projectId}`;
+
+  const [res, stream] = await context.fetch(url);
   if (res.status !== 200) {
     throw stream && typeof stream === "object"
       ? { ...stream, status: res.status }
@@ -60,6 +63,7 @@ export const getStreams = async (
       cursor: opts?.cursor,
       count: opts?.count,
       streamsonly: 1,
+      projectId,
     })}`,
   );
 
@@ -71,6 +75,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
+      projectId,
     })}`,
   );
   const [activeStreamRes] = await context.fetch(
@@ -81,6 +86,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
+      projectId,
     })}`,
   );
 
@@ -93,6 +99,7 @@ export const getStreams = async (
       limit: opts?.limit,
       count: true,
       streamsonly: 1,
+      projectId,
     })}`,
   );
 
@@ -168,7 +175,7 @@ export const generateJwt = async (playbackId: string): Promise<string> => {
 };
 
 export const createStream = async (params): Promise<Stream> => {
-  const [res, stream] = await context.fetch(`/stream`, {
+  const [res, stream] = await context.fetch(`/stream?projectId=${projectId}`, {
     method: "POST",
     body: JSON.stringify(params),
     headers: {
@@ -183,7 +190,8 @@ export const createStream = async (params): Promise<Stream> => {
 };
 
 export const terminateStream = async (id: string): Promise<boolean> => {
-  const [res, body] = await context.fetch(`/stream/${id}/terminate`, {
+  const url = `/stream/${id}/terminate?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
   });
   if (!res.ok) {
@@ -196,7 +204,8 @@ export const terminateStream = async (id: string): Promise<boolean> => {
 };
 
 export const deleteStream = async (id: string): Promise<void> => {
-  const [res, body] = await context.fetch(`/stream/${id}`, {
+  const url = `/stream/${id}?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
   });
   if (res.status !== 204) {
@@ -205,7 +214,8 @@ export const deleteStream = async (id: string): Promise<void> => {
 };
 
 export const deleteStreams = async (ids: Array<string>): Promise<void> => {
-  const [res, body] = await context.fetch(`/stream`, {
+  const url = `/stream?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
     body: JSON.stringify({ ids }),
     headers: {
@@ -221,7 +231,8 @@ export const patchStream = async (
   streamId: string,
   patch: StreamPatchPayload,
 ): Promise<void> => {
-  const [res, body] = await context.fetch(`/stream/${streamId}`, {
+  const url = `/stream/${streamId}?projectId=${projectId}`;
+  const [res, body] = await context.fetch(url, {
     method: "PATCH",
     body: JSON.stringify(patch),
     headers: {

@@ -47,6 +47,7 @@ export const makeColumns = () => [
 export const rowsPageFromState = async (
   state,
   getWebhooks: Function,
+  appendProjectId: Function,
 ): Promise<RowsPageFromStateResult<WebhooksTableData>> => {
   const [webhooks, nextCursor, _res, count] = await getWebhooks(
     false,
@@ -66,7 +67,7 @@ export const rowsPageFromState = async (
         id: webhook.id,
         name: {
           children: webhook.name,
-          href: `/developers/webhooks/${webhook.id}`,
+          href: appendProjectId(`/developers/webhooks/${webhook.id}`),
           css: {
             overflow: "hidden",
             "text-overflow": "ellipsis",
@@ -88,7 +89,7 @@ export const rowsPageFromState = async (
               {webhook.url}
             </Link>
           ),
-          href: `/developers/webhooks/${webhook.id}`,
+          href: appendProjectId(`/developers/webhooks/${webhook.id}`),
           css: {},
         },
         events: {
@@ -107,20 +108,20 @@ export const rowsPageFromState = async (
               </Button>
             </Tooltip>
           ),
-          href: `/developers/webhooks/${webhook.id}`,
+          href: appendProjectId(`/developers/webhooks/${webhook.id}`),
           css: {},
         },
 
         lastFailure: {
           date: new Date(webhook?.status?.lastFailure?.timestamp),
           fallback: <p>-</p>,
-          href: `/developers/webhooks/${webhook.id}`,
+          href: appendProjectId(`/developers/webhooks/${webhook.id}`),
           css: {},
         },
         lastTriggeredAt: {
           date: new Date(webhook?.status?.lastTriggeredAt),
           fallback: <p>-</p>,
-          href: `/developers/webhooks/${webhook.id}`,
+          href: appendProjectId(`/developers/webhooks/${webhook.id}`),
           css: {},
         },
       };

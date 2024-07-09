@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "hooks";
 import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
@@ -95,17 +95,10 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
       {detailsTooltip ? (
         <Flex sx={{ alignItems: "center" }}>
           <Flex>
-            <ReactTooltip
-              id={`tooltip-details-${stream.id}`}
-              className="tooltip"
-              place="top"
-              type="dark"
-              effect="solid">
-              {detailsTooltip}
-            </ReactTooltip>
+            <Tooltip id={`tooltip-details-${stream.id}`} />
             <Help
-              data-tip
-              data-for={`tooltip-details-${stream.id}`}
+              data-tooltip-id={`tooltip-details-${stream.id}`}
+              data-tooltip-content={`${detailsTooltip}`}
               sx={{
                 color: "muted",
                 cursor: "pointer",

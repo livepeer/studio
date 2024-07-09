@@ -7,6 +7,7 @@ import TableEmptyState from "../Table/components/TableEmptyState";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+import { useProjectContext } from "context/ProjectContext";
 
 export type StreamsTableData = {
   id: string;
@@ -64,6 +65,7 @@ export const rowsPageFromState = async (
   state: State<StreamsTableData>,
   userId: string,
   getStreams: Function,
+  appendProjectId: Function,
 ): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
   let isHealthy: boolean;
@@ -92,22 +94,27 @@ export const rowsPageFromState = async (
       id: stream.id,
       value: stream.name,
       children: <Text size={2}>{stream.name}</Text>,
-      href: `/streams/${stream.id}`,
+      tooltipChildren: stream.createdByTokenName ? (
+        <>
+          Created by token <b>{stream.createdByTokenName}</b>
+        </>
+      ) : null,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
     details: { stream },
     createdAt: {
       date: new Date(stream.createdAt),
       fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
-      href: `/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
     lastSeen: {
       date: stream.lastSeen ? new Date(stream.lastSeen) : null,
       fallback: <Box css={{ color: "$neutral8" }}>—</Box>,
-      href: `/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
     status: {
       children: stream.isActive ? "Active" : "Idle",
-      href: `/streams/${stream.id}`,
+      href: appendProjectId(`/streams/${stream.id}`),
     },
   }));
   return { rows, nextCursor, count, allStreamCount, activeStreamCount };

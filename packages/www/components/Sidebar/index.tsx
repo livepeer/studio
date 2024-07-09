@@ -1,40 +1,44 @@
 import {
+  styled,
+  Box,
+  Flex,
+  Text,
   Link as A,
   Avatar,
-  Box,
+  Grid,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuTrigger,
-  Flex,
-  Grid,
-  Text,
-  styled,
+  DropdownMenuItem,
+  Button,
 } from "@livepeer/design-system";
-import {
-  BookmarkFilledIcon,
-  BookmarkIcon,
-  ChatBubbleIcon,
-  ChevronDownIcon,
-  LoopIcon,
-  RocketIcon,
-} from "@radix-ui/react-icons";
-import { useJune } from "hooks/use-june";
-import { isExport } from "lib/utils";
-import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import { useEffect } from "react";
-import { useApi } from "../../hooks";
 import ThemeSwitch from "../ThemeSwitch";
+import Link from "next/link";
 import {
-  AssetsIcon,
-  BillingIcon,
   HomeIcon,
   StreamIcon,
   TerminalIcon,
+  AssetsIcon,
+  TopBottomChevron,
+  SettingsIcon,
+  ProjectsIcon,
   UsageIcon,
+  BillingIcon,
 } from "./NavIcons";
+import { useApi } from "../../hooks";
+import Router, { useRouter } from "next/router";
+import {
+  RocketIcon,
+  ChatBubbleIcon,
+  LoopIcon,
+  BookmarkIcon,
+} from "@radix-ui/react-icons";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "react-query";
+import CreateProjectDialog from "components/Project/createProjectDialog";
+import { FiCheck } from "react-icons/fi";
+import { useProjectContext } from "context/ProjectContext";
 
 export const NavLink = styled(A, {
   fontSize: 14,
@@ -42,7 +46,7 @@ export const NavLink = styled(A, {
   alignItems: "center",
   color: "$primary12",
   px: "$2",
-  py: 6,
+  py: 7,
   borderRadius: "$2",
   cursor: "default",
   lineHeight: 1.2,
@@ -71,215 +75,502 @@ export type SidebarId =
   | "developers"
   | "developers/signing-keys"
   | "developers/webhooks"
-  | "usage"
-  | "billing"
-  | "billing/plans";
+  | "settings"
+  | "settings/general"
+  | "settings/projects"
+  | "settings/usage"
+  | "settings/billing"
+  | "settings/plans";
+
+export const generalSidebarItems = [
+  {
+    title: "Home",
+    path: "/",
+    icon: <HomeIcon />,
+    id: "home",
+  },
+  {
+    title: "Streams",
+    path: "/streams",
+    icon: <StreamIcon />,
+    id: "streams",
+    children: [
+      {
+        title: "Sessions",
+        path: "/sessions",
+        id: "streams/sessions",
+      },
+    ],
+  },
+  {
+    title: "Assets",
+    path: "/assets",
+    icon: <AssetsIcon />,
+    id: "assets",
+  },
+  {
+    title: "Developers",
+    path: "/developers/api-keys",
+    icon: <TerminalIcon />,
+    id: "developers",
+    children: [
+      {
+        title: "API Keys",
+        path: "/developers/api-keys",
+        id: "developers",
+      },
+      {
+        title: "Signing Keys",
+        path: "/developers/signing-keys",
+        id: "developers/signing-keys",
+      },
+      {
+        title: "Webhooks",
+        path: "/developers/webhooks",
+        id: "developers/webhooks",
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    path: "/settings",
+    icon: <SettingsIcon />,
+    id: "settings",
+  },
+];
+
+const settingsSidebarItems = [
+  {
+    title: "Projects",
+    path: "/settings/projects",
+    id: "settings/projects",
+    icon: <ProjectsIcon />,
+  },
+
+  {
+    title: "Usage",
+    path: "/settings/usage",
+    id: "settings/usage",
+    icon: <UsageIcon />,
+  },
+  {
+    title: "Billing",
+    path: "/settings/billing",
+    id: "settings/billing",
+    icon: <BillingIcon />,
+    children: [
+      {
+        title: "Plans",
+        path: "/settings/billing/plans",
+        id: "settings/plans",
+      },
+    ],
+  },
+];
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
-  const { user, logout } = useApi();
-  const router = useRouter();
+  const { setProjectId, projectId, appendProjectId } = useProjectContext();
+  const { createProject, getProjects, logout, user } = useApi();
+  const queryClient = useQueryClient();
+  const { pathname } = useRouter();
 
-  const June = useJune();
+  const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
 
-  useEffect(() => {
-    const handleRouteChange = (url, { shallow }) => {
-      if (June) June.page(url);
-    };
+  const { data } = useQuery("projects", getProjects);
+  const activeProject = data?.find((project) => project.id === projectId);
 
-    router.events.on("routeChangeStart", handleRouteChange);
+  const isSettingsPage = pathname.includes("/settings/");
 
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-    };
-  }, [June]);
+  const onCreateClick = async (projectName: string) => {
+    const project = await createProject({
+      name: projectName,
+    });
+
+    setProjectId(project.id);
+    setShowCreateProjectAlert(false);
+
+    queryClient.invalidateQueries("projects");
+  };
+
+  const isResourcePage = () => {
+    const path = window.location.pathname;
+
+    const resourceKeywords = ["/streams/", "/assets/", "/developers/webhooks/"];
+
+    for (const keyword of resourceKeywords) {
+      if (path.includes(keyword)) {
+        return keyword;
+      }
+    }
+
+    return false;
+  };
+
+  const isActive = (item: any) => {
+    if (id === item.id) {
+      return true;
+    }
+    return false;
+  };
+
+  const isParentActive = (item: any) => {
+    if (id === item.id) {
+      return true;
+    }
+    if (item.children) {
+      return item.children.some((child: any) => id === child.id);
+    }
+    return false;
+  };
 
   return (
-    <Box
-      css={{
-        backgroundColor: "$panel",
-        borderRight: "1px solid",
-        borderColor: "$neutral6",
-        maxWidth: 270,
-        width: 270,
-        top: 0,
-        position: "fixed",
-        justifyContent: "flex-end",
-        bottom: 0,
-      }}>
-      <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
-        <DropdownMenu>
-          <Flex
-            as={DropdownMenuTrigger}
-            align="center"
-            css={{
-              border: 0,
-              background: "transparent",
-              p: 0,
-            }}>
-            <Avatar
-              placeholder="user"
-              size="3"
-              alt={user?.firstName}
-              fallback={
-                user?.firstName
-                  ? user?.firstName?.charAt(0)
-                  : user?.email.charAt(0)
-              }
-            />
-            <Text
-              size="3"
-              css={{ ml: "$2", fontSize: "$3", mr: "$1" }}
-              title={user?.email}>
-              {user?.firstName}
-            </Text>
-            <Box
-              as={ChevronDownIcon}
-              css={{ width: 20, height: 20, color: "$hiContrast" }}
-            />
-          </Flex>
-          <DropdownMenuContent
-            placeholder="dropdown-menu-content"
-            css={{ border: "1px solid $colors$neutral6" }}>
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                key="billing-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  Router.push("/billing");
-                }}>
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="logout-dropdown-item"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  logout();
-                }}>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <ThemeSwitch />
-      </Flex>
-      <Flex
-        css={{ px: "$4", height: "calc(100vh - 100px)" }}
-        direction="column"
-        justify="between">
-        <Grid
-          gap={1}
-          css={{
-            a: {
-              textDecoration: "none",
-            },
-          }}>
-          <Link href="/" passHref legacyBehavior>
-            <NavLink active={id === "home"}>
-              <HomeIcon active={id === "home"} />
-              Home
-            </NavLink>
-          </Link>
-          <Box>
-            <Link href="/streams" passHref legacyBehavior>
-              <NavLink active={id === "streams"}>
-                <StreamIcon active={id === "streams"} />
-                Streams
-              </NavLink>
-            </Link>
-
-            {id?.split("/")[0] === "streams" && (
-              <Box
+    <>
+      <Box
+        css={{
+          backgroundColor: "$panel",
+          borderRight: "1px solid",
+          borderColor: "$neutral6",
+          maxWidth: 270,
+          width: 270,
+          top: 0,
+          position: "fixed",
+          justifyContent: "flex-end",
+          bottom: 0,
+          zIndex: 0,
+        }}>
+        <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
+          <DropdownMenu>
+            <Flex
+              as={DropdownMenuTrigger}
+              align="center"
+              css={{
+                border: 0,
+                background: "transparent",
+                p: 6,
+                "&:hover": {
+                  backgroundColor: "$neutral4",
+                  borderRadius: "$3",
+                },
+              }}>
+              <Avatar
+                placeholder={user?.firstName || user?.email.charAt(0)}
                 css={{
-                  a: { pl: 35 },
-                  "> :first-child": {
-                    mt: "$1",
-                  },
-                }}>
-                <Link href="/sessions" passHref legacyBehavior>
-                  <NavLink active={id === "streams/sessions"}>Sessions</NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
-          <Link href="/assets" passHref legacyBehavior>
-            <NavLink active={id === "assets"}>
-              <AssetsIcon active={id === "assets"} />
-              Assets
-            </NavLink>
-          </Link>
-          <Box>
-            <Link href="/developers/api-keys" passHref legacyBehavior>
-              <NavLink>
-                <TerminalIcon active={id?.split("/")[0] === "developers"} />
-                Developers
-              </NavLink>
-            </Link>
-
-            {id?.split("/")[0] === "developers" && (
-              <Box
+                  width: 55,
+                  height: 55,
+                }}
+                alt={user?.firstName}
+                fallback={
+                  user?.firstName
+                    ? user?.firstName?.charAt(0)
+                    : user?.email.charAt(0)
+                }
+              />
+              <Text
+                size="3"
                 css={{
-                  a: {
-                    pl: 35,
-                    mt: "$1",
-                  },
+                  ml: "$2",
+                  fontSize: "$3",
+                  mr: "$1",
+                  color: "$neutral11",
                 }}>
-                <Link href="/developers/api-keys" passHref legacyBehavior>
-                  <NavLink active={id === "developers"}>API Keys</NavLink>
-                </Link>
-                <Link href="/developers/signing-keys" passHref legacyBehavior>
-                  <NavLink active={id === "developers/signing-keys"}>
-                    Signing Keys
-                  </NavLink>
-                </Link>
-                <Link href="/developers/webhooks" passHref legacyBehavior>
-                  <NavLink active={id === "developers/webhooks"}>
-                    Webhooks
-                  </NavLink>
-                </Link>
-              </Box>
-            )}
-          </Box>
-
-          {!isExport() && (
-            <Box>
-              <Link href="/usage" passHref legacyBehavior>
-                <NavLink active={id === "usage"}>
-                  <UsageIcon active={id === "usage"} />
-                  Usage
-                </NavLink>
-              </Link>
-            </Box>
-          )}
-
-          {!isExport() && (
-            <Box>
-              <Link href="/billing" passHref legacyBehavior>
-                <NavLink active={id === "billing"}>
-                  <BillingIcon active={id === "billing"} />
-                  Billing
-                </NavLink>
-              </Link>
-
-              {id?.split("/")[0] === "billing" && (
-                <Box
+                My Account
+              </Text>
+            </Flex>
+            <DropdownMenuContent
+              placeholder="Account"
+              css={{
+                border: "1px solid $colors$neutral6",
+                width: "12rem",
+                ml: "$4",
+                mt: "$1",
+              }}>
+              <DropdownMenuGroup
+                css={{
+                  display: "flex",
+                  flexDirection: "column",
+                  mx: "$1",
+                }}>
+                <DropdownMenuItem
                   css={{
-                    a: {
-                      pl: 35,
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
                     },
-                    "> :first-child": {
-                      mt: "$1",
-                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onClick={(e) => {
+                    Router.push("/settings/projects");
                   }}>
-                  <Link href="/billing/plans" passHref legacyBehavior>
-                    <NavLink active={id === "billing/plans"}>Plans</NavLink>
+                  <Text size="2">Projects</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onClick={() => {
+                    Router.push("/settings/usage");
+                  }}>
+                  <Text size="2">Usage</Text>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onClick={() => {
+                    Router.push("/settings/billing");
+                  }}>
+                  <Text size="2">Billing</Text>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onClick={() => {
+                    Router.push("/settings/billing/plans");
+                  }}>
+                  <Text size="2">Plans</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="logout-dropdown-item"
+                  onClick={() => {
+                    logout();
+                  }}>
+                  <Text size="2">Log out</Text>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ThemeSwitch />
+        </Flex>
+
+        {!isSettingsPage && (
+          <DropdownMenu>
+            <Flex
+              align={"center"}
+              as={DropdownMenuTrigger}
+              css={{
+                py: "$1",
+                px: "$2",
+                gap: "$2",
+                mb: "$2",
+                mt: "-$1",
+                ml: "$4",
+                border: 0,
+                backgroundColor: "transparent",
+                "&:focus": {
+                  outline: "none",
+                },
+                "&:hover": {
+                  backgroundColor: "$neutral4",
+                  borderRadius: "$3",
+                },
+              }}>
+              <Text
+                css={{
+                  color: "$neutral11",
+                }}>
+                {activeProject?.name}
+              </Text>
+              <TopBottomChevron />
+            </Flex>
+            <DropdownMenuContent
+              placeholder={"Projects"}
+              css={{
+                border: "1px solid $colors$neutral6",
+                width: "14rem",
+                ml: "$5",
+                py: "$2",
+                px: "$3",
+              }}>
+              <Text size={2} variant={"neutral"} css={{ ml: "$1", mb: "$1" }}>
+                Projects
+              </Text>
+              <Box
+                css={{
+                  borderBottom: "1px solid",
+                  borderColor: "$neutral6",
+                  pb: "$2",
+                }}>
+                {data?.map((project) => (
+                  <DropdownMenuItem
+                    key={project.id}
+                    css={{
+                      py: "$3",
+                      px: "$2",
+                      cursor: "default",
+                      "&:hover": {
+                        backgroundColor: "$neutral4",
+                        borderRadius: "$3",
+                      },
+                    }}
+                    onClick={() => {
+                      setProjectId(project.id);
+                      if (isResourcePage()) {
+                        const path = isResourcePage() as string;
+                        const newUrl = `/dashboard/projects/${project.id}${path}`;
+                        window.location.assign(newUrl);
+                      }
+                    }}>
+                    <Flex
+                      css={{ width: "100%" }}
+                      key={project.id}
+                      align={"center"}
+                      justify={"between"}>
+                      <Text size={2}>{project?.name}</Text>
+                      {projectId === project.id && <FiCheck />}
+                    </Flex>
+                  </DropdownMenuItem>
+                ))}
+              </Box>
+              <Box
+                css={{
+                  py: "$2",
+                  pb: 0,
+                  fontSize: 14,
+                  color: "$primary11",
+                  a: {
+                    textDecoration: "none",
+                    color: "$neutral12",
+                  },
+                }}>
+                <Flex
+                  direction={"column"}
+                  css={{
+                    width: "100%",
+                  }}>
+                  <DropdownMenuItem
+                    onClick={() => setShowCreateProjectAlert(true)}
+                    css={{
+                      color: "$neutral12",
+                      cursor: "default",
+                      borderRadius: "$3",
+                      py: "$3",
+                      px: "$2",
+                      "&:hover": {
+                        backgroundColor: "$neutral4",
+                      },
+                    }}>
+                    <Flex align={"center"}>
+                      <Text size={2}>Create new project</Text>
+                    </Flex>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => Router.push("/settings/projects")}
+                    css={{
+                      color: "$neutral12",
+                      cursor: "default",
+                      borderRadius: "$3",
+                      py: "$3",
+                      px: "$2",
+                      "&:hover": {
+                        backgroundColor: "$neutral4",
+                      },
+                    }}>
+                    <Flex align={"center"}>
+                      <Text size={2}>View all projects</Text>
+                    </Flex>
+                  </DropdownMenuItem>
+                </Flex>
+              </Box>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        <Flex
+          css={{ px: "$4", height: "calc(100vh - 100px)" }}
+          direction="column"
+          justify="between">
+          <Grid
+            gap={1}
+            css={{
+              a: {
+                textDecoration: "none",
+              },
+            }}>
+            {(isSettingsPage ? settingsSidebarItems : generalSidebarItems).map(
+              (item) => (
+                <Box key={item.id}>
+                  <Link
+                    href={
+                      isSettingsPage ? item.path : appendProjectId(item.path)
+                    }
+                    passHref
+                    legacyBehavior>
+                    <NavLink active={isActive(item)}>
+                      {item.icon}
+                      {item.title}
+                    </NavLink>
                   </Link>
+                  {item.children && isParentActive(item) && (
+                    <Box
+                      css={{
+                        a: {
+                          pl: 35,
+                          mt: "$1",
+                        },
+                      }}>
+                      {item.children.map((child) => (
+                        <Link
+                          href={
+                            isSettingsPage
+                              ? child.path
+                              : appendProjectId(child.path)
+                          }
+                          key={child.id}
+                          passHref
+                          legacyBehavior>
+                          <NavLink active={isActive(child)}>
+                            {child.title}
+                          </NavLink>
+                        </Link>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
-          )}
-        </Grid>
-        {!isExport() && (
-          <Flex direction="column" gap={1}>
+              ),
+            )}
+          </Grid>
+          <Flex
+            direction="column"
+            gap={1}
+            css={{
+              mb: !isSettingsPage ? "$6" : "$0",
+            }}>
             <NavLink
               href="https://docs.livepeer.org"
               target="_blank"
@@ -380,9 +671,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               </Text>
             </NavLink>
           </Flex>
-        )}
-      </Flex>
-    </Box>
+        </Flex>
+      </Box>
+
+      <CreateProjectDialog
+        onCreate={onCreateClick}
+        onOpenChange={(isOpen) => setShowCreateProjectAlert(isOpen)}
+        isOpen={showCreateProjectAlert}
+      />
+    </>
   );
 };
 

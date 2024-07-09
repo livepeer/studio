@@ -23,6 +23,8 @@ import "../css/recaptcha.css";
 import "../css/tailwind.css";
 import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
+import { ProjectProvider } from "context/ProjectContext";
+import useSyncProjectId from "hooks/use-project";
 
 const queryClient = new QueryClient();
 
@@ -94,6 +96,11 @@ const livepeerTheme: ThemeConfig = {
   },
 };
 
+const SyncProjectId = () => {
+  useSyncProjectId();
+  return null;
+};
+
 const App = ({ Component, pageProps }) => {
   globalStyles();
   return (
@@ -113,18 +120,24 @@ const App = ({ Component, pageProps }) => {
             dark: "dark-theme-green",
             light: "light-theme-green",
           }}>
-          <SnackbarProvider>
-            <QueryClientProvider client={queryClient}>
-              <ApiProvider>
-                <AnalyzerProvider>
-                  <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
-                    <DefaultSeo {...SEO} />
-                    <Component {...pageProps} />
-                  </LivepeerConfig>
-                </AnalyzerProvider>
-              </ApiProvider>
-            </QueryClientProvider>
-          </SnackbarProvider>
+          <ProjectProvider>
+            <SyncProjectId />
+
+            <SnackbarProvider>
+              <QueryClientProvider client={queryClient}>
+                <ApiProvider>
+                  <AnalyzerProvider>
+                    <LivepeerConfig
+                      theme={livepeerTheme}
+                      client={livepeerClient}>
+                      <DefaultSeo {...SEO} />
+                      <Component {...pageProps} />
+                    </LivepeerConfig>
+                  </AnalyzerProvider>
+                </ApiProvider>
+              </QueryClientProvider>
+            </SnackbarProvider>
+          </ProjectProvider>
         </ThemeProvider>
       </DesignSystemProvider>
     </>

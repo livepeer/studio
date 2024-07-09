@@ -6,6 +6,7 @@ import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/StreamDetails/StreamOverviewTab";
+import { useProjectContext } from "context/ProjectContext";
 
 const refetchInterval = 5 * 1000;
 
@@ -14,6 +15,7 @@ const StreamDetails = () => {
   const queryClient = useQueryClient();
   const { getStream } = useApi();
   const { getHealth } = useAnalyzer();
+  const { appendProjectId } = useProjectContext();
   const [currentTab, setCurrentTab] = useState<"Overview" | "Health">(
     "Overview",
   );
@@ -51,7 +53,7 @@ const StreamDetails = () => {
       invalidateStream={invalidateStream}
       setSwitchTab={setCurrentTab}
       breadcrumbs={[
-        { title: "Streams", href: "/streams" },
+        { title: "Streams", href: appendProjectId("/streams") },
         { title: stream?.name },
       ]}
       embedVideoDialogOpen={embedVideoDialogOpen}

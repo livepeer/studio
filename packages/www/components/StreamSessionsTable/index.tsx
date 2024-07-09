@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useApi } from "../../hooks";
 import Table, {
   DefaultSortBy,
@@ -14,6 +14,7 @@ import {
   rowsPageFromState,
   StreamSessionsTableData,
 } from "./helpers";
+import { useProjectContext } from "context/ProjectContext";
 
 const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId } = useApi();
@@ -23,6 +24,7 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   });
   const [openSnackbar] = useSnackbar();
   const columns = useMemo(makeColumns, []);
+  const { appendProjectId, projectId } = useProjectContext();
 
   const fetcher: Fetcher<StreamSessionsTableData> = useCallback(
     async (state) =>
@@ -31,9 +33,14 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         user.id,
         getStreamSessionsByUserId,
         openSnackbar,
+        appendProjectId,
       ),
     [getStreamSessionsByUserId, user.id],
   );
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <Table

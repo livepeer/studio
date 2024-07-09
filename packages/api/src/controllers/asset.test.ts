@@ -908,6 +908,8 @@ describe("controllers/asset", () => {
       const { size } = await fs.stat(filePath);
       let uploadPercentage = await new Promise<number>(
         async (resolve, reject) => {
+          // @ts-ignore
+          // TUS types doesn't work well with node and typescript out of the box: https://github.com/tus/tus-js-client/issues/289#issuecomment-1997073291
           const upload = new tus.Upload(file, {
             endpoint: tusEndpoint,
             urlStorage: new (tus as any).FileUrlStorage(

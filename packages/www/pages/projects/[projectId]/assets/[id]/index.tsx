@@ -6,6 +6,7 @@ import AssetDetail from "layouts/assetDetail";
 import AssetOverviewTab from "components/AssetDetails/AssetOverviewTab";
 import AssetEventLogTab from "components/AssetDetails/AssetEventLogTab";
 import { Asset } from "@livepeer.studio/api";
+import { useProjectContext } from "context/ProjectContext";
 
 const refetchInterval = 5 * 1000;
 
@@ -17,6 +18,7 @@ const AssetDetails = () => {
   );
   const [editAssetDialogOpen, setEditAssetDialogOpen] = useState(false);
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
+  const { appendProjectId } = useProjectContext();
 
   const { query } = router;
   const id = query.id as string;
@@ -51,7 +53,7 @@ const AssetDetails = () => {
       setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}
       refetchAsset={() => refetchAsset()}
       breadcrumbs={[
-        { title: "Assets", href: "/assets" },
+        { title: "Assets", href: appendProjectId("/assets") },
         { title: asset?.name },
       ]}>
       {currentTab === "Overview" ? (

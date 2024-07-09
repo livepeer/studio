@@ -109,7 +109,7 @@ const Billing = () => {
         setOverUsageBill(oBill);
         let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
         setUpcomingInvoice(uInvoice?.invoices);
-        setUpcomingInvoiceTotal((uInvoice?.invoices.total / 100) | 0);
+        setUpcomingInvoiceTotal((uInvoice?.invoices?.total / 100) | 0);
       }
     };
 
@@ -190,7 +190,7 @@ const Billing = () => {
   }
   return (
     <Layout
-      id="billing"
+      id="settings/billing"
       breadcrumbs={[{ title: "Billing" }]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
@@ -280,7 +280,7 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
-            <Link href="/billing/plans" passHref legacyBehavior>
+            <Link href="/settings/billing/plans" passHref legacyBehavior>
               <A
                 variant="primary"
                 css={{ display: "flex", alignItems: "center" }}>
@@ -354,7 +354,7 @@ const Billing = () => {
               </Flex>
             </Heading>
           </Flex>
-          <Link href="/usage" passHref legacyBehavior>
+          <Link href="/settings/usage" passHref legacyBehavior>
             <A
               variant="primary"
               css={{ display: "flex", alignItems: "center" }}

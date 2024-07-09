@@ -11,6 +11,7 @@ import {
 } from "@livepeer/design-system";
 import router from "next/router";
 import Spinner from "../Spinner";
+import { useProjectContext } from "context/ProjectContext";
 
 const DeleteDialog = ({
   deleteDialogOpen,
@@ -27,13 +28,15 @@ const DeleteDialog = ({
   deleteWebhook(): Promise<void>;
   invalidateQuery(): Promise<void>;
 }) => {
+  const { appendProjectId } = useProjectContext();
+
   const onDeleteClick = async () => {
     setDeleting(true);
     await deleteWebhook();
     await invalidateQuery();
     setDeleting(false);
     setDeleteDialogOpen(false);
-    router.push("/developers/webhooks");
+    router.push(appendProjectId("/developers/webhooks"));
   };
 
   return (

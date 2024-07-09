@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useApi } from "../../hooks";
 import Table, {
   DefaultSortBy,
@@ -16,6 +16,7 @@ import {
 import CreateDialog from "./CreateDialog";
 import { makeSelectAction, makeCreateAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import { useProjectContext } from "context/ProjectContext";
 
 const SigningKeysTable = ({
   title = "Signing Keys",
@@ -34,6 +35,7 @@ const SigningKeysTable = ({
   });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
+  const { projectId } = useProjectContext();
 
   const columns = useMemo(makeColumns, []);
 
@@ -41,6 +43,10 @@ const SigningKeysTable = ({
     async (state) => rowsPageFromState(state, getSigningKeys),
     [],
   );
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <>

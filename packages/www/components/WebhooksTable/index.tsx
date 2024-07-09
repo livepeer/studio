@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useApi } from "../../hooks";
 import Table, {
   DefaultSortBy,
@@ -20,6 +20,7 @@ import {
 } from "./helpers";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
+import { useProjectContext } from "context/ProjectContext";
 
 const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
   const router = useRouter();
@@ -27,15 +28,17 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
     useApi();
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
+  const { projectId } = useProjectContext();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
     tableId: "webhooksTable",
     initialOrder: sortByToString(DefaultSortBy),
   });
 
   const columns = useMemo(makeColumns, []);
+  const { appendProjectId } = useProjectContext();
 
   const fetcher: Fetcher<WebhooksTableData> = useCallback(
-    async (state) => rowsPageFromState(state, getWebhooks),
+    async (state) => rowsPageFromState(state, getWebhooks, appendProjectId),
     [getWebhooks, user.id],
   );
 
@@ -49,10 +52,14 @@ const WebhooksTable = ({ title = "Endpoints" }: { title?: string }) => {
     await state.invalidate();
     const query = router.query.admin === "true" ? { admin: true } : {};
     await router.push({
-      pathname: `/developers/webhooks/${newWebhook.id}`,
+      pathname: appendProjectId(`/developers/webhooks/${newWebhook.id}`),
       query,
     });
   };
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <Box css={{ p: "$6", mb: "$8" }}>
