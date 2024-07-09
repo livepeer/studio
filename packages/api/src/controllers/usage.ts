@@ -17,7 +17,7 @@ export const getBillingUsage = async (
   fromTime: number,
   toTime: number,
   baseUrl: string,
-  adminToken: string
+  adminToken: string,
 ) => {
   // Fetch usage data from /data/usage endpoint
   const usage = await fetch(
@@ -30,7 +30,7 @@ export const getBillingUsage = async (
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
-    }
+    },
   ).then((res) => res.json());
 
   return usage;
@@ -40,7 +40,7 @@ export const getRecentlyActiveUsers = async (
   fromTime: number,
   toTime: number,
   baseUrl: string,
-  adminToken: string
+  adminToken: string,
 ) => {
   // Fetch usage data from /data/usage endpoint
   const users = await fetch(
@@ -52,7 +52,7 @@ export const getRecentlyActiveUsers = async (
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
-    }
+    },
   ).then((res) => res.json());
 
   return users;
@@ -63,7 +63,7 @@ export const getViewers = async (
   fromTime: number,
   toTime: number,
   baseUrl: string,
-  adminToken: string
+  adminToken: string,
 ) => {
   try {
     // Fetch viewership data from /data/views endpoint
@@ -77,7 +77,7 @@ export const getViewers = async (
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
-      }
+      },
     ).then((res) => res.json());
 
     let viewers = 0;
@@ -112,15 +112,15 @@ export const calculateOverUsage = async (product, usage) => {
   const overUsage = {
     TotalUsageMins: Math.max(
       usage?.TotalUsageMins - (limits.transcoding || 0),
-      0
+      0,
     ),
     DeliveryUsageMins: Math.max(
       usage?.DeliveryUsageMins - (limits.streaming || 0),
-      0
+      0,
     ),
     StorageUsageMins: Math.max(
       usage?.StorageUsageMins - (limits.storage || 0),
-      0
+      0,
     ),
   };
 
@@ -161,7 +161,7 @@ export const getUsagePercentageOfLimit = async (product, usage) => {
 
 export async function getRecentlyActiveHackers(
   ingests: Ingest[],
-  adminToken: string
+  adminToken: string,
 ) {
   // Current date in milliseconds
   const currentDateMillis = new Date().getTime();
@@ -174,7 +174,7 @@ export async function getRecentlyActiveHackers(
     cutOffDate,
     currentDateMillis,
     ingests[0].origin,
-    adminToken
+    adminToken,
   );
 
   let activeHackers = [];
@@ -199,24 +199,24 @@ export async function getUsageData(
   billingCycleStart: number,
   billingCycleEnd: number,
   ingests: Ingest[],
-  adminToken: string
+  adminToken: string,
 ) {
   const billingUsage = await getBillingUsage(
     user.id,
     billingCycleStart,
     billingCycleEnd,
     ingests[0].origin,
-    adminToken
+    adminToken,
   );
 
   const overUsage = await calculateOverUsage(
     products[user.stripeProductId],
-    billingUsage
+    billingUsage,
   );
 
   const usagePercentages = await getUsagePercentageOfLimit(
     products[user.stripeProductId],
-    billingUsage
+    billingUsage,
   );
 
   return {
@@ -240,7 +240,7 @@ app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
     toTime,
     {
       useReplica: true,
-    }
+    },
   );
 
   res.status(200);
@@ -254,12 +254,12 @@ app.get(
     const ingests = await req.getIngest();
     const recentlyActiveHackers = await getRecentlyActiveHackers(
       ingests,
-      req.token.id
+      req.token.id,
     );
 
     res.status(200);
     res.json(recentlyActiveHackers);
-  }
+  },
 );
 
 app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -284,7 +284,7 @@ app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     ingests[0].origin,
-    req.token.id
+    req.token.id,
   );
 
   res.status(200);
@@ -319,17 +319,17 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     ingests[0].origin,
-    req.token.id
+    req.token.id,
   );
 
   const overage = await calculateOverUsage(
     products[user.stripeProductId],
-    usage
+    usage,
   );
 
   const usagePercentages = await getUsagePercentageOfLimit(
     products[user.stripeProductId],
-    usage
+    usage,
   );
 
   res.status(200);
@@ -350,7 +350,7 @@ app.post("/update", authorizer({ anyAdmin: true }), async (req, res) => {
       updateUsageTo: toTime,
       updateUsageApiToken: req.token.id,
     },
-    { jobsDb, stripe: req.stripe }
+    { jobsDb, stripe: req.stripe },
   );
 
   res.status(200);

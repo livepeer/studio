@@ -43,7 +43,7 @@ type GateConfig = {
 async function fireGateWebhook(
   webhook: DBWebhook,
   content: DBStream | WithID<Asset>,
-  payload: AccessControlGatePayload
+  payload: AccessControlGatePayload,
 ) {
   let timestamp = Date.now();
   let jsonPayload = {
@@ -76,7 +76,7 @@ async function fireGateWebhook(
   const sigHeaders = signatureHeaders(
     params.body,
     webhook.sharedSecret,
-    timestamp
+    timestamp,
   );
   params.headers = { ...params.headers, ...sigHeaders };
 
@@ -114,7 +114,7 @@ async function fireGateWebhook(
       timestamp,
       statusCode,
       errorMessage,
-      undefined
+      undefined,
     );
   }
   if ("pull" in content && content.pull) {
@@ -130,26 +130,26 @@ async function fireGateWebhook(
         `access-control: gate: webhook=${
           webhook.id
         } statusCode=${statusCode} respSpanId=${resp?.headers.get(
-          "X-Tlive-Spanid"
+          "X-Tlive-Spanid",
         )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
           process.hrtime(startTime)[1] / 1e6
         }ms accessKey=${payload.accessKey} playbackId=${
           content.playbackId
         } webhook=${
           webhook.id
-        } referer=${referer} origin=${origin} playURL=${playURL} playDomain=${playDomain}`
+        } referer=${referer} origin=${origin} playURL=${playURL} playDomain=${playDomain}`,
       );
     } catch (e) {
       console.log(
         `access-control: gate: webhook=${
           webhook.id
         } statusCode=${statusCode} respSpanId=${resp?.headers.get(
-          "X-Tlive-Spanid"
+          "X-Tlive-Spanid",
         )} respBody=${Buffer.from(respBody).toString("base64")} duration=${
           process.hrtime(startTime)[1] / 1e6
         }ms accessKey=${payload.accessKey} playbackId=${
           content.playbackId
-        } webhook=${webhook.id}`
+        } webhook=${webhook.id}`,
       );
     }
   } else {
@@ -158,7 +158,7 @@ async function fireGateWebhook(
         webhook.id
       } statusCode=${statusCode} duration=${
         process.hrtime(startTime)[1] / 1e6
-      }ms`
+      }ms`,
     );
   }
   return statusCode;
@@ -173,7 +173,7 @@ function checkRespBody(resp: string): number | null {
     return body.ret;
   } catch (e) {
     console.log(
-      `access-control: error checking response body for status code: ${e}`
+      `access-control: error checking response body for status code: ${e}`,
     );
   }
 }
@@ -193,7 +193,7 @@ app.post(
           (await db.stream.getByPlaybackId(playbackId)) ||
           (await db.asset.getByPlaybackId(playbackId))
         );
-      }
+      },
     );
 
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
@@ -257,7 +257,7 @@ app.post(
       if (origin === "null" || origin === "") {
         origin = referer;
         console.log(
-          `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`
+          `access-control: gate: origin is null, using referer=${origin} for playbackId=${playbackId}`,
         );
       }
 
@@ -275,7 +275,7 @@ app.post(
               access-control: gate: content with playbackId=${playbackId} is gated but origin=${origin} not in allowed origins=${allowedOrigins}, disallowing playback
             `);
             throw new ForbiddenError(
-              `Content is gated and origin not in allowed origins`
+              `Content is gated and origin not in allowed origins`,
             );
           }
         }
@@ -292,7 +292,7 @@ app.post(
             access-control: gate: no pub provided for playbackId=${playbackId}, disallowing playback
           `);
           throw new ForbiddenError(
-            "Content is gated and requires a public key"
+            "Content is gated and requires a public key",
           );
         }
 
@@ -303,7 +303,7 @@ app.post(
               sql`signing_key.data->>'publicKey' = ${req.body.pub}`,
             ];
             return db.signingKey.find(query, { limit: 2 });
-          }
+          },
         );
 
         if (signingKeyOutput.length == 0) {
@@ -311,7 +311,7 @@ app.post(
             access-control: gate: content with playbackId=${playbackId} is gated but corresponding public key not found for key=${req.body.pub}, disallowing playback
           `);
           throw new ForbiddenError(
-            "Content is gated and corresponding public key not found"
+            "Content is gated and corresponding public key not found",
           );
         }
 
@@ -321,7 +321,7 @@ app.post(
             access-control: gate: content contentId=${content.id} with playbackId=${playbackId} is gated but multiple (${signingKeyOutput.length}) public keys found for key=${req.body.pub}, disallowing playback, colliding keys=${collisionKeys}
           `);
           throw new BadRequestError(
-            "Multiple signing keys found for the same public key."
+            "Multiple signing keys found for the same public key.",
           );
         }
 
@@ -348,7 +348,7 @@ app.post(
       case "webhook":
         if (!req.body.accessKey || req.body.type !== "accessKey") {
           throw new ForbiddenError(
-            "Content is gated and requires an access key"
+            "Content is gated and requires an access key",
           );
         }
         const webhook = await db.webhook.get(content.playbackPolicy.webhookId, {
@@ -359,7 +359,7 @@ app.post(
             access-control: gate: content with playbackId=${playbackId} is gated but corresponding webhook not found for webhookId=${content.playbackPolicy.webhookId}, disallowing playback
           `);
           throw new InternalServerError(
-            "Content is gated and corresponding webhook not found"
+            "Content is gated and corresponding webhook not found",
           );
         }
 
@@ -375,22 +375,22 @@ app.post(
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} failed, disallowing playback
           `);
           throw new BadGatewayError(
-            "Content is gated and corresponding webhook failed"
+            "Content is gated and corresponding webhook failed",
           );
         } else {
           console.log(`
             access-control: gate: content with playbackId=${playbackId} is gated but webhook=${webhook.id} returned status code ${statusCode}, disallowing playback
           `);
           throw new ForbiddenError(
-            "Content is gated and corresponding webhook failed"
+            "Content is gated and corresponding webhook failed",
           );
         }
       default:
         throw new BadRequestError(
-          `unknown playbackPolicy type: ${playbackPolicyType}`
+          `unknown playbackPolicy type: ${playbackPolicyType}`,
         );
     }
-  }
+  },
 );
 
 app.get("/public-key", async (req, res) => {
@@ -410,7 +410,7 @@ app.get("/public-key", async (req, res) => {
         return response.json();
       } else {
         throw new Error(
-          `access-control: error retrieving public key from catalyst statusCode=${response.status} catalystUrl=${url}`
+          `access-control: error retrieving public key from catalyst statusCode=${response.status} catalystUrl=${url}`,
         );
       }
     })

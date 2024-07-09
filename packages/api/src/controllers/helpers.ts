@@ -48,7 +48,7 @@ export async function hash(password: string, salt: string) {
     passphraseKey,
     { name: "PBKDF2" },
     false,
-    ["deriveBits", "deriveKey"]
+    ["deriveBits", "deriveKey"],
   );
   const webKey = await crypto.subtle.deriveKey(
     {
@@ -71,7 +71,7 @@ export async function hash(password: string, salt: string) {
     true,
 
     // this web crypto object will only be allowed for these functions
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
   const buffer = await crypto.subtle.exportKey("raw", webKey);
 
@@ -137,7 +137,7 @@ function bytesToHexString(bytes: Uint8Array, separate = false) {
 
 export function makeNextHREF(req: express.Request, nextCursor: string) {
   let baseUrl = new URL(
-    `${req.protocol}://${req.get("host")}${req.originalUrl}`
+    `${req.protocol}://${req.get("host")}${req.originalUrl}`,
   );
   let next = baseUrl;
   next.searchParams.set("cursor", nextCursor);
@@ -210,7 +210,7 @@ export type OSS3Config = S3ClientConfig & {
 };
 
 export async function getObjectStoreS3Config(
-  os: ObjectStore
+  os: ObjectStore,
 ): Promise<OSS3Config> {
   const url = new URL(os.url);
   let protocol = url.protocol;
@@ -398,8 +398,8 @@ export async function sendgridEmailPaymentFailed({
 
   console.log(`
     sending payment failed email to=${email} for user=${
-    user.id
-  } message=${JSON.stringify(msg)}
+      user.id
+    } message=${JSON.stringify(msg)}
   `);
 
   SendgridMail.setApiKey(sendgridApiKey);
@@ -415,14 +415,14 @@ export function sendgridValidateEmail(email: string, validationApiKey: string) {
   sendgridValidateEmailAsync(email, validationApiKey).catch((error) => {
     console.error(
       `Email address validation error email="${email}" error=`,
-      error
+      error,
     );
   });
 }
 
 export async function sendgridValidateEmailAsync(
   email: string,
-  validationApiKey: string
+  validationApiKey: string,
 ) {
   SendgridClient.setApiKey(validationApiKey);
   const [response, body] = await SendgridClient.request({
@@ -437,7 +437,7 @@ export async function sendgridValidateEmailAsync(
   const rawBody = JSON.stringify(JSON.stringify(body));
   console.log(
     `Email address validation result ` +
-      `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`
+      `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`,
   );
   return verdict;
 }
@@ -488,7 +488,7 @@ export function parseOrder(fieldsMap: FieldsMap, val: string) {
 
 export function parseFilters(
   fieldsMap: FieldsMap,
-  val: string
+  val: string,
 ): SQLStatement[] {
   try {
     return parseFiltersRaw(fieldsMap, val);
@@ -530,19 +530,21 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
             throw new Error(
               `expected boolean value for field "${
                 filter.id
-              }", got: ${JSON.stringify(filter.value)}`
+              }", got: ${JSON.stringify(filter.value)}`,
             );
           }
           q.push(
             sql``.append(
               `coalesce((${fv.val})::boolean, FALSE) IS ${
                 filter.value ? "TRUE" : "FALSE"
-              } `
-            )
+              } `,
+            ),
           );
         } else if (fv.type === "full-text") {
           q.push(
-            sql``.append(fv.val).append(sql` ILIKE ${"%" + filter.value + "%"}`)
+            sql``
+              .append(fv.val)
+              .append(sql` ILIKE ${"%" + filter.value + "%"}`),
           );
         } else if (isObject(filter.value)) {
           // if value is a dictionary
@@ -570,7 +572,7 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
               sql``
                 .append(fv.val)
                 .append(comparison)
-                .append(sql` ${filter.value[key]}`)
+                .append(sql` ${filter.value[key]}`),
             );
           });
         } else {
@@ -663,7 +665,7 @@ export const triggerCatalystPullStart =
           url.searchParams.set("lon", lon.toString());
           playbackUrl = url.toString();
           console.log(
-            `triggering catalyst pull start for streamId=${stream.id} playbackId=${stream.playbackId} lat=${lat} lon=${lon} pullRegion=${stream.pullRegion}, playbackUrl=${playbackUrl}`
+            `triggering catalyst pull start for streamId=${stream.id} playbackId=${stream.playbackId} lat=${lat} lon=${lon} pullRegion=${stream.pullRegion}, playbackUrl=${playbackUrl}`,
           );
         }
 
@@ -689,7 +691,7 @@ export const triggerCatalystPullStart =
               stream.id
             } playbackUrl=${playbackUrl} status=${
               res.status
-            } error=${JSON.stringify(body)}`
+            } error=${JSON.stringify(body)}`,
           );
           await sleep(250);
         }
@@ -699,12 +701,12 @@ export const triggerCatalystPullStart =
 
 export const triggerCatalystStreamStopSessions = (
   req: Request,
-  playback_id: string
+  playback_id: string,
 ) => triggerCatalystEvent(req, { resource: "stopSessions", playback_id });
 
 export const triggerCatalystStreamUpdated = (
   req: Request,
-  playback_id: string
+  playback_id: string,
 ) => triggerCatalystEvent(req, { resource: "stream", playback_id });
 
 async function triggerCatalystEvent(
@@ -712,7 +714,7 @@ async function triggerCatalystEvent(
   payload: {
     resource: "stream" | "nuke" | "stopSessions";
     playback_id: string;
-  }
+  },
 ) {
   const { catalystBaseUrl } = req.config;
 
@@ -730,7 +732,7 @@ async function triggerCatalystEvent(
     throw new Error(
       `error dispatching event to catalyst url=${url} payload=${payload} status=${
         res.status
-      } error=${await res.text()}`
+      } error=${await res.text()}`,
     );
   }
 }
@@ -752,7 +754,7 @@ export function getProjectId(req: Request): string {
 export async function addDefaultProjectId(
   body: any,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   const deepClone = (obj) => {
     return JSON.parse(JSON.stringify(obj));
@@ -806,7 +808,7 @@ export async function addDefaultProjectId(
               enrichResponse(subItem);
             }
           }
-        })
+        }),
       );
     }
   };

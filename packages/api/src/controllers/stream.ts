@@ -126,18 +126,18 @@ app.use(mung.jsonAsync(addDefaultProjectId));
 async function validateMultistreamTarget(
   userId: string,
   profileNames: Set<string>,
-  target: MultistreamTargetRef
+  target: MultistreamTargetRef,
 ): Promise<Omit<MultistreamTargetRef, "spec">> {
   const { profile, id, spec } = target;
   if (!profileNames.has(profile)) {
     const available = JSON.stringify([...profileNames]);
     throw new BadRequestError(
-      `multistream target profile not found: "${profile}". available: ${available}`
+      `multistream target profile not found: "${profile}". available: ${available}`,
     );
   }
   if (!!spec === !!id) {
     throw new BadRequestError(
-      `multistream target must have either an "id" or a "spec"`
+      `multistream target must have either an "id" or a "spec"`,
     );
   }
   if (id) {
@@ -174,7 +174,7 @@ function toProfileNames(profiles: Profile[]): Set<string> {
 async function validateMultistreamOpts(
   userId: string,
   profiles: Profile[],
-  multistream: MultistreamOptions
+  multistream: MultistreamOptions,
 ): Promise<MultistreamOptions> {
   const profileNames = toProfileNames(profiles);
   if (!multistream?.targets) {
@@ -182,8 +182,8 @@ async function validateMultistreamOpts(
   }
   const targets = await Promise.all(
     multistream.targets.map((t) =>
-      validateMultistreamTarget(userId, profileNames, t)
-    )
+      validateMultistreamTarget(userId, profileNames, t),
+    ),
   );
   const uniqueIds = new Set(targets.map((t) => `${t.profile} -> ${t.id}`));
   if (uniqueIds.size !== targets.length) {
@@ -194,7 +194,7 @@ async function validateMultistreamOpts(
 
 async function validateStreamPlaybackPolicy(
   playbackPolicy: DBStream["playbackPolicy"],
-  req: Request
+  req: Request,
 ) {
   if (
     playbackPolicy?.type === "lit_signing_condition" ||
@@ -202,19 +202,19 @@ async function validateStreamPlaybackPolicy(
     playbackPolicy?.unifiedAccessControlConditions
   ) {
     throw new BadRequestError(
-      `playbackPolicy type "lit_signing_condition" with a resourceId or unifiedAccessControlConditions is not supported for streams`
+      `playbackPolicy type "lit_signing_condition" with a resourceId or unifiedAccessControlConditions is not supported for streams`,
     );
   }
   if (playbackPolicy?.type == "webhook") {
     let webhook = await db.webhook.get(playbackPolicy.webhookId);
     if (!webhook || webhook.deleted) {
       throw new BadRequestError(
-        `webhook ${playbackPolicy.webhookId} not found`
+        `webhook ${playbackPolicy.webhookId} not found`,
       );
     }
     if (!hasAccessToResource(req, webhook)) {
       throw new BadRequestError(
-        `webhook ${playbackPolicy.webhookId} not found`
+        `webhook ${playbackPolicy.webhookId} not found`,
       );
     }
     const allowedOrigins = playbackPolicy?.allowedOrigins;
@@ -237,7 +237,7 @@ async function validateStreamPlaybackPolicy(
             const allowedOriginsValid = allowedOrigins.every(isValidOrigin);
             if (!allowedOriginsValid) {
               throw new BadRequestError(
-                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>"
+                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>",
               );
             }
           }
@@ -253,7 +253,7 @@ async function validateTags(userTags: object) {
   let stringifiedTags = JSON.stringify(userTags);
   if (stringifiedTags.length > 2048) {
     throw new BadRequestError(
-      `userTags object is too large. Max size is 2048 characters`
+      `userTags object is too large. Max size is 2048 characters`,
     );
   }
 }
@@ -272,7 +272,7 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
         projectId: stream.projectId,
         userId: user.id,
       });
-    })
+    }),
   );
 }
 
@@ -280,7 +280,7 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
 // 1. if the same pull request is created within 1 min (this prevents race condition between different nodes executing /lockPull)
 // 2. if the same stream was stopped within 10 min (this prevents Mist delays in stopping/starting the stream)
 export function resolvePullUrlFromExistingStreams(
-  existingStreams: DBStream[]
+  existingStreams: DBStream[],
 ): { pullUrl: string; pullRegion: string } {
   if (existingStreams.length !== 1) {
     return null;
@@ -295,7 +295,7 @@ export function resolvePullUrlFromExistingStreams(
     stream.lastSeen > Date.now() - PULL_REUSE_SAME_NODE_TIMEOUT;
   if (hasPullInfo && (pullLockedRecently || stoppedRecently)) {
     logger.info(
-      `pull request created with the same request within 10 min, reusing existing ingest node ${stream.pullLockedBy}`
+      `pull request created with the same request within 10 min, reusing existing ingest node ${stream.pullLockedBy}`,
     );
     return {
       pullUrl: "https://" + stream.pullLockedBy + ":443/hls/video+",
@@ -308,13 +308,13 @@ export function resolvePullUrlFromExistingStreams(
 async function resolvePullUrlAndRegion(
   stream: NewStreamPayload,
   ingest: string,
-  playbackId: string
+  playbackId: string,
 ): Promise<{ pullUrl: string; pullRegion: string }> {
   if (process.env.NODE_ENV === "test") {
     return { pullUrl: null, pullRegion: null };
   }
   const url = new URL(
-    pathJoin(ingest, `hls`, `ingest-${playbackId}`, `index.m3u8`)
+    pathJoin(ingest, `hls`, `ingest-${playbackId}`, `index.m3u8`),
   );
   const { lat, lon } = stream.pull?.location ?? {};
   if (lat && lon) {
@@ -337,10 +337,10 @@ async function resolvePullUrlAndRegion(
 // Extracts Mist URL from redirected node URL, e.g. "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
 export function extractUrlFrom(
   playbackUrl: string,
-  playbackId: string
+  playbackId: string,
 ): string {
   const hostRegex = new RegExp(
-    `(https?:\/\/.+-\\w+-catalyst.+\/hls\/.+)ingest-${playbackId}\/index.m3u8`
+    `(https?:\/\/.+-\\w+-catalyst.+\/hls\/.+)ingest-${playbackId}\/index.m3u8`,
   );
   const matches = playbackUrl.match(hostRegex);
   return matches ? matches[1] : null;
@@ -349,10 +349,10 @@ export function extractUrlFrom(
 // Extracts region from redirected node URL, e.g. "sto" from "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+foo/index.m3u8"
 export function extractRegionFrom(
   playbackUrl: string,
-  playbackId: string
+  playbackId: string,
 ): string {
   const regionRegex = new RegExp(
-    `https?:\/\/(.+)-\\w+-catalyst.+ingest-${playbackId}\/index.m3u8`
+    `https?:\/\/(.+)-\\w+-catalyst.+ingest-${playbackId}\/index.m3u8`,
   );
   const matches = playbackUrl.match(regionRegex);
   return matches ? matches[1] : null;
@@ -384,7 +384,7 @@ export function triggerCleanUpIsActiveJob(
   config: CliArgs,
   streams: DBStream[],
   queue: Queue,
-  ingest: string
+  ingest: string,
 ): [DBStream[], Promise<void>] {
   streams = streams.filter(shouldCleanUpIsActive);
   if (!streams.length) {
@@ -409,15 +409,15 @@ export function triggerCleanUpIsActiveJob(
             { isActive: false },
             queue,
             ingest,
-            true
-          )
-        )
+            true,
+          ),
+        ),
       );
     } catch (err) {
       const ids = parentStreams.map((s) => s.id);
       logger.error(
         `Error sending /setactive hooks for streamIds=${ids} err=`,
-        err
+        err,
       );
     }
 
@@ -428,13 +428,13 @@ export function triggerCleanUpIsActiveJob(
         childStreams,
         queue,
         ingest,
-        true
+        true,
       );
     } catch (err) {
       const ids = childStreams.map((s) => s.id);
       logger.error(
         `Error sending recording.waiting hooks for streamIds=${ids} err=`,
-        err
+        err,
       );
     }
   });
@@ -525,7 +525,7 @@ app.get("/", authorizer({}), async (req, res) => {
       query.push(
         sql`coalesce(stream.data->>'projectId', ${
           req.user.defaultProjectId || ""
-        }) = ${req.project?.id || ""}`
+        }) = ${req.project?.id || ""}`,
       );
     }
   }
@@ -569,14 +569,14 @@ app.get("/", authorizer({}), async (req, res) => {
   }
 
   output = db.stream.addDefaultFieldsMany(
-    db.stream.removePrivateFieldsMany(output, req.user.admin)
+    db.stream.removePrivateFieldsMany(output, req.user.admin),
   );
   res.status(200).json(output);
 });
 
 export async function getRecordingPlaybackUrl(
   stream: DBStream,
-  objectStoreId: string
+  objectStoreId: string,
 ) {
   let url: string;
 
@@ -603,7 +603,7 @@ export async function getRecordingFields(
   config: CliArgs,
   ingest: string,
   session: DBSession,
-  forceUrl: boolean
+  forceUrl: boolean,
 ): Promise<Pick<DBSession, "recordingStatus" | "recordingUrl" | "mp4Url">> {
   if (!session.record) {
     return {};
@@ -622,8 +622,8 @@ export async function getRecordingFields(
         assetPhase == "ready"
           ? "ready"
           : assetPhase == "failed"
-          ? "failed"
-          : "waiting",
+            ? "failed"
+            : "waiting",
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
     };
@@ -638,7 +638,7 @@ export async function getRecordingFields(
   const base = pathJoin(
     ingest,
     `recordings`,
-    session.lastSessionId ?? session.id
+    session.lastSessionId ?? session.id,
   );
   return {
     recordingStatus: recordingStatus,
@@ -655,7 +655,7 @@ export async function withRecordingFields(
   config: CliArgs,
   ingest: string,
   session: DBSession,
-  forceUrl: boolean
+  forceUrl: boolean,
 ) {
   return {
     ...session,
@@ -710,7 +710,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
         req.config,
         ingest,
         session,
-        !!forceUrl
+        !!forceUrl,
       );
       if (!raw) {
         if (session.previousSessions && session.previousSessions.length) {
@@ -719,7 +719,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
         }
         const combinedStats = getCombinedStats(
           session,
-          session.previousStats || {}
+          session.previousStats || {},
         );
         return {
           ...session,
@@ -728,7 +728,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
         };
       }
       return session;
-    })
+    }),
   );
 
   if (filterOut) {
@@ -762,8 +762,8 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   }
   res.json(
     db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(data, req.user.admin)
-    )
+      db.stream.removePrivateFieldsMany(data, req.user.admin),
+    ),
   );
 });
 
@@ -785,7 +785,7 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
     query.push(
       sql`coalesce(data->>'projectId', ${req.user.defaultProjectId || ""}) = ${
         req.project?.id || ""
-      }`
+      }`,
     );
   }
   if (streamsonly) {
@@ -808,8 +808,8 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   }
   res.json(
     db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(streams, req.user.admin)
-    )
+      db.stream.removePrivateFieldsMany(streams, req.user.admin),
+    ),
   );
 });
 
@@ -830,7 +830,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     // is a sum of all sessions
     const combinedStats = getCombinedStats(
       lastSession,
-      lastSession.previousStats || {}
+      lastSession.previousStats || {},
     );
     stream = {
       ...lastSession,
@@ -858,15 +858,15 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
 
       return stream;
     },
-    5
+    5,
   );
 
   req.checkResourceAccess(stream);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
-      db.stream.removePrivateFields(stream, req.user.admin)
-    )
+      db.stream.removePrivateFields(stream, req.user.admin),
+    ),
   );
 });
 
@@ -875,14 +875,14 @@ app.get("/key/:streamKey", authorizer({}), async (req, res) => {
   const useReplica = req.query.main !== "true";
   const [docs] = await db.stream.find(
     { streamKey: req.params.streamKey },
-    { useReplica }
+    { useReplica },
   );
   req.checkResourceAccess(docs[0]);
   res.status(200);
   res.json(
     db.stream.addDefaultFields(
-      db.stream.removePrivateFields(docs[0], req.user.admin)
-    )
+      db.stream.removePrivateFields(docs[0], req.user.admin),
+    ),
   );
 });
 
@@ -890,7 +890,7 @@ app.get("/key/:streamKey", authorizer({}), async (req, res) => {
 app.get(
   "/:streamId/broadcaster",
   geolocateMiddleware({}),
-  getBroadcasterHandler
+  getBroadcasterHandler,
 );
 
 app.post(
@@ -917,7 +917,7 @@ app.post(
       const playbackId = req.body.name.split("+")[1];
       const [docs] = await db.stream.find(
         { playbackId },
-        { useReplica: false }
+        { useReplica: false },
       );
       if (docs.length) {
         stream = docs[0];
@@ -948,7 +948,7 @@ app.post(
     } = stream;
     const profiles = hackMistSettings(
       req,
-      useParentProfiles ? stream.profiles : req.body.profiles
+      useParentProfiles ? stream.profiles : req.body.profiles,
     );
     const childStream: DBStream = wowzaHydrate({
       ...req.body,
@@ -973,7 +973,7 @@ app.post(
     const existingSession = await db.session.get(sessionId);
     if (existingSession) {
       logger.info(
-        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId} stream.projectId=${stream.projectId}`
+        `user session re-used for session.id=${sessionId} session.parentId=${existingSession.parentId} session.name=${existingSession.name} session.playbackId=${existingSession.playbackId} session.userId=${existingSession.userId} stream.id=${stream.id} stream.name='${stream.name}' stream.playbackId=${stream.playbackId} stream.userId=${stream.userId} stream.projectId=${stream.projectId}`,
       );
     } else {
       const session: DBSession = {
@@ -1009,7 +1009,7 @@ app.post(
           req.config,
           session,
           req.queue,
-          ingest
+          ingest,
         ).catch((err) => {
           logger.error("Error sending recording.started hook err=", err);
         });
@@ -1025,9 +1025,9 @@ app.post(
         stream.name
       }' playbackid=${stream.playbackId} session_id=${id} projectid=${
         stream.projectId
-      } elapsed=${Date.now() - start}ms`
+      } elapsed=${Date.now() - start}ms`,
     );
-  }
+  },
 );
 
 app.post(
@@ -1076,7 +1076,7 @@ app.post(
         await db.session.replace({ ...session, ...patch });
       } else {
         logger.warn(
-          `stream-health-payload: session not found for stream_id=${stream.id} session_id=${payload.session_id}`
+          `stream-health-payload: session not found for stream_id=${stream.id} session_id=${payload.session_id}`,
         );
       }
     }
@@ -1090,11 +1090,11 @@ app.post(
         `is_active=${payload.is_active} is_healthy=${payload.is_healthy} ` +
         `issues=${payload.issues} human_issues=${payload.human_issues} ` +
         `extra=${JSON.stringify(payload.extra)} ` +
-        `tracks=${JSON.stringify(payload.tracks)}`
+        `tracks=${JSON.stringify(payload.tracks)}`,
     );
 
     res.status(204).end();
-  }
+  },
 );
 
 const pullStreamKeyAccessors: Record<string, string[]> = {
@@ -1155,7 +1155,7 @@ app.put(
     };
     logger.info(
       `pull request received userId=${req.user.id} ` +
-        `payload=${JSON.stringify(JSON.stringify(payloadLog))}` // double stringify to escape string for logfmt
+        `payload=${JSON.stringify(JSON.stringify(payloadLog))}`, // double stringify to escape string for logfmt
     );
 
     const keyValue = _.get(payload, pullStreamKeyAccessors[key]);
@@ -1163,13 +1163,13 @@ app.put(
       return res.status(400).json({
         errors: [
           `key must be one of ${Object.keys(
-            pullStreamKeyAccessors
+            pullStreamKeyAccessors,
           )} and must be present in the payload`,
         ],
       });
     }
     const filtersStr = encodeURIComponent(
-      JSON.stringify([{ id: key, value: keyValue }])
+      JSON.stringify([{ id: key, value: keyValue }]),
     );
     const filters = parseFilters(fieldsMap, filtersStr);
 
@@ -1182,7 +1182,7 @@ app.put(
         }) = ${req.project?.id || ""}`,
         ...filters,
       ],
-      { useReplica: false }
+      { useReplica: false },
     );
     if (streams.length > 1) {
       return res.status(400).json({
@@ -1199,13 +1199,13 @@ app.put(
     let stream: DBStream;
     if (!streamExisted) {
       logger.info(
-        `pull request creating a new stream with name=${rawPayload.name}`
+        `pull request creating a new stream with name=${rawPayload.name}`,
       );
       stream = await handleCreateStream(req, payload);
       const { pullUrl, pullRegion } = await resolvePullUrlAndRegion(
         rawPayload,
         ingest,
-        stream.playbackId
+        stream.playbackId,
       );
       streamPullUrl = pullUrl;
       stream.pullRegion = pullRegion;
@@ -1217,16 +1217,16 @@ app.put(
         (await resolvePullUrlAndRegion(
           rawPayload,
           ingest,
-          oldStream.playbackId
+          oldStream.playbackId,
         ));
       streamPullUrl = pullUrl;
       logger.info(
-        `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`
+        `pull reusing existing old stream with id=${oldStream.id} name=${oldStream.name}`,
       );
       const sleepFor = terminateDelay(oldStream);
       if (sleepFor > 0) {
         console.log(
-          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`
+          `stream pull delaying because of recent terminate streamId=${oldStream.id} lastTerminatedAt=${oldStream.lastTerminatedAt} sleepFor=${sleepFor}`,
         );
         await sleep(sleepFor);
       }
@@ -1261,10 +1261,10 @@ app.put(
     res.status(streamExisted ? 200 : 201);
     res.json(
       db.stream.addDefaultFields(
-        db.stream.removePrivateFields(stream, req.user.admin)
-      )
+        db.stream.removePrivateFields(stream, req.user.admin),
+      ),
     );
-  }
+  },
 );
 
 app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -1290,7 +1290,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     req.config,
     [stream],
     req.queue,
-    await getIngestBase(req)
+    await getIngestBase(req),
   );
   const doingActiveCleanup = cleanedUpStreams.length > 0;
 
@@ -1305,7 +1305,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
         : sql`(data->>'pullLockedBy' = ${host} OR (COALESCE((data->>'pullLockedAt')::bigint,0) < ${leaseDeadline} AND COALESCE((data->>'isActive')::boolean,FALSE) = FALSE))`,
     ],
     { pullLockedAt: Date.now(), pullLockedBy: host },
-    { throwIfEmpty: false }
+    { throwIfEmpty: false },
   );
 
   if (updateRes.rowCount > 0) {
@@ -1313,7 +1313,7 @@ app.post("/:id/lockPull", authorizer({ anyAdmin: true }), async (req, res) => {
     return;
   }
   logger.info(
-    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, lastSeen=${stream.lastSeen}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`
+    `/lockPull failed for stream=${id}, isActive=${stream.isActive}, lastSeen=${stream.lastSeen}, pullLockedBy=${stream.pullLockedBy}, pullLockedAt=${stream.pullLockedAt}`,
   );
   res.status(423).end();
 });
@@ -1355,7 +1355,7 @@ app.post(
             req.user.defaultProjectId || ""
           }) = ${req.project?.id || ""}`,
         ],
-        { useReplica: false }
+        { useReplica: false },
       );
 
       if (streams.length === 1) {
@@ -1363,15 +1363,15 @@ app.post(
         const ingest = await getIngestBase(req);
         await triggerCatalystPullStart(
           stream,
-          getHLSPlaybackUrl(ingest, stream)
+          getHLSPlaybackUrl(ingest, stream),
         );
 
         return res
           .status(200)
           .json(
             db.stream.addDefaultFields(
-              db.stream.removePrivateFields(stream, req.user.admin)
-            )
+              db.stream.removePrivateFields(stream, req.user.admin),
+            ),
           );
       } else if (streams.length > 1) {
         return res.status(400).json({
@@ -1392,10 +1392,10 @@ app.post(
     res.status(201);
     res.json(
       db.stream.addDefaultFields(
-        db.stream.removePrivateFields(stream, req.user.admin)
-      )
+        db.stream.removePrivateFields(stream, req.user.admin),
+      ),
     );
-  }
+  },
 );
 
 async function handleCreateStream(req: Request, payload: NewStreamPayload) {
@@ -1413,7 +1413,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
     const store = await db.objectStore.get(objectStoreId);
     if (!store || store.deleted || store.disabled) {
       throw new BadRequestError(
-        `object store ${objectStoreId} not found or disabled`
+        `object store ${objectStoreId} not found or disabled`,
       );
     }
   }
@@ -1421,7 +1421,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   if (recordingSpec) {
     if (!payload.record) {
       throw new BadRequestError(
-        `recordingSpec is only supported with record=true`
+        `recordingSpec is only supported with record=true`,
       );
     }
     if (!recordingSpec.profiles) {
@@ -1458,7 +1458,7 @@ async function handleCreateStream(req: Request, payload: NewStreamPayload) {
   doc.multistream = await validateMultistreamOpts(
     req.user.id,
     doc.profiles,
-    doc.multistream
+    doc.multistream,
   );
 
   if (doc.userTags) {
@@ -1490,7 +1490,7 @@ app.put(
     const { id } = req.params;
     const { active, startedAt, hostName } = req.body as StreamSetActivePayload;
     logger.info(
-      `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`
+      `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`,
     );
 
     const stream = await db.stream.get(id, { useReplica: false });
@@ -1523,7 +1523,7 @@ app.put(
       // key. We only support 1 conc. session so keep the last to have started.
       logger.info(
         `Ignoring /setactive false since another session had already started. ` +
-          `stream=${id} currMist="${stream.region}-${stream.mistHost}" oldMist="${req.config.ownRegion}-${hostName}"`
+          `stream=${id} currMist="${stream.region}-${stream.mistHost}" oldMist="${req.config.ownRegion}-${hostName}"`,
       );
       return res.status(204).end();
     }
@@ -1543,7 +1543,7 @@ app.put(
       stream,
       patch,
       req.queue,
-      ingest
+      ingest,
     );
 
     // update the other auxiliary info in the database in background.
@@ -1564,13 +1564,13 @@ app.put(
       } catch (err) {
         logger.error(
           "Error updating aux info from /setactive in database err=",
-          err
+          err,
         );
       }
     });
 
     res.status(204).end();
-  }
+  },
 );
 
 /**
@@ -1588,11 +1588,11 @@ async function setStreamActiveWithHooks(
   patch: Partial<DBStream> & { isActive: boolean },
   queue: Queue,
   ingest: string,
-  isCleanup?: boolean
+  isCleanup?: boolean,
 ) {
   if (stream.parentId) {
     throw new Error(
-      "must only set stream active synchronously for parent streams"
+      "must only set stream active synchronously for parent streams",
     );
   }
 
@@ -1619,7 +1619,7 @@ async function setStreamActiveWithHooks(
       .catch((err) => {
         logger.error(
           `Error sending /setactive hooks stream_id=${stream.id} event=${event} err=`,
-          err
+          err,
         );
       });
   }
@@ -1633,13 +1633,13 @@ async function setStreamActiveWithHooks(
         childStreams,
         queue,
         ingest,
-        isCleanup
+        isCleanup,
       ).catch((err) => {
         logger.error(
           `Error triggering session recording hooks stream_id=${stream.id} err=`,
-          err
+          err,
         );
-      })
+      }),
     );
   }
 }
@@ -1655,14 +1655,14 @@ async function triggerSessionRecordingProcessing(
   childStreams: DBStream[],
   queue: Queue,
   ingest: string,
-  isCleanup?: boolean
+  isCleanup?: boolean,
 ) {
   const streamsBySessionId: Record<string, DBStream[]> = {};
   for (const stream of childStreams) {
     if (!stream.parentId) {
       logger.error(
         `triggerSessionRecordingProcessing: ignoring parent streamId=${stream.id} stream=`,
-        stream
+        stream,
       );
       continue;
     } else if (isCleanup && !shouldCleanUpIsActive(stream)) {
@@ -1684,7 +1684,7 @@ async function triggerSessionRecordingProcessing(
         if (!sessionId) {
           // child streams didn't have a sessionId before recordings v2 upgrade. they're all stale now so just clear on DB.
           logger.info(
-            `triggerSessionRecordingProcessing: Clearing isActive for recording v1 child streams sessionId=${sessionId} childStreamsIds=${streamsIds}`
+            `triggerSessionRecordingProcessing: Clearing isActive for recording v1 child streams sessionId=${sessionId} childStreamsIds=${streamsIds}`,
           );
           await clearIsActiveMany(db, streamsFromSession);
           return;
@@ -1695,7 +1695,7 @@ async function triggerSessionRecordingProcessing(
           // if we have an asset, then the recording has already been processed and we don't need to send a
           // recording.waiting hook. also clear the isActive field from child streams.
           logger.info(
-            `triggerSessionRecordingProcessing: Clearing isActive for already processed session sessionId=${sessionId} assetId=${asset.id}`
+            `triggerSessionRecordingProcessing: Clearing isActive for already processed session sessionId=${sessionId} assetId=${asset.id}`,
           );
           await clearIsActiveMany(db, streamsFromSession);
           return;
@@ -1711,11 +1711,11 @@ async function triggerSessionRecordingProcessing(
         if (!session.record || isStale) {
           if (isStale) {
             logger.info(
-              `triggerSessionRecordingProcessing: Skipping recording for stale session sessionId=${session.id} lastSeen=${session.lastSeen} childStreamsIds=${streamsIds}`
+              `triggerSessionRecordingProcessing: Skipping recording for stale session sessionId=${session.id} lastSeen=${session.lastSeen} childStreamsIds=${streamsIds}`,
             );
           } else {
             logger.info(
-              `triggerSessionRecordingProcessing: Clearing isActive for session without recording enabled sessionId=${session.id} childStreamsIds=${streamsIds}`
+              `triggerSessionRecordingProcessing: Clearing isActive for session without recording enabled sessionId=${session.id} childStreamsIds=${streamsIds}`,
             );
           }
           // clean-up isActive field synchronously on child streams from stale sessions. no isActive left behind!
@@ -1724,28 +1724,28 @@ async function triggerSessionRecordingProcessing(
         }
 
         logger.info(
-          `triggerSessionRecordingProcessing: Triggering recording.waiting hook sessionId=${sessionId} childStreamsIds=${streamsIds}`
+          `triggerSessionRecordingProcessing: Triggering recording.waiting hook sessionId=${sessionId} childStreamsIds=${streamsIds}`,
         );
         await publishDelayedRecordingWaitingHook(
           config,
           session,
           queue,
-          ingest
+          ingest,
         );
       } catch (err) {
         const ids = streamsFromSession?.map((s) => s?.id);
         logger.error(
           `Error handling session recording hooks sessionId=${sessionId} childStreamsIds=${ids} err=`,
-          err
+          err,
         );
       }
-    })
+    }),
   );
 }
 
 async function clearIsActiveMany(db: DB, streams: DBStream[]) {
   await Promise.all(
-    streams.map((s) => db.stream.update(s.id, { isActive: false }))
+    streams.map((s) => db.stream.update(s.id, { isActive: false })),
   );
 }
 
@@ -1753,7 +1753,7 @@ async function publishRecordingStartedHook(
   config: CliArgs,
   session: DBSession,
   queue: Queue,
-  ingest: string
+  ingest: string,
 ) {
   return queue.publishWebhook("events.recording.started", {
     type: "webhook_event",
@@ -1774,7 +1774,7 @@ async function publishDelayedRecordingWaitingHook(
   config: CliArgs,
   session: DBSession,
   queue: Queue,
-  ingest: string
+  ingest: string,
 ) {
   return await queue.delayedPublishWebhook(
     "events.recording.waiting",
@@ -1796,7 +1796,7 @@ async function publishDelayedRecordingWaitingHook(
       },
     },
     USER_SESSION_TIMEOUT + 10_000,
-    "recording_waiting_delayed_events"
+    "recording_waiting_delayed_events",
   );
 }
 
@@ -1831,19 +1831,19 @@ app.patch(
 
       if (upRes.rowCount) {
         console.log(
-          `set isActive=false for ids=${req.body.ids} rowCount=${upRes.rowCount}`
+          `set isActive=false for ids=${req.body.ids} rowCount=${upRes.rowCount}`,
         );
       }
     } catch (e) {
       console.error(
-        `error setting stream active to false ids=${req.body.ids} err=${e}`
+        `error setting stream active to false ids=${req.body.ids} err=${e}`,
       );
       upRes = { rowCount: 0 } as QueryResult;
     }
 
     res.status(200);
     return res.json({ rowCount: upRes?.rowCount ?? 0 });
-  }
+  },
 );
 
 app.post(
@@ -1865,7 +1865,7 @@ app.post(
     const newTarget = await validateMultistreamTarget(
       req.user.id,
       toProfileNames(stream.profiles),
-      payload
+      payload,
     );
 
     let multistream: DBStream["multistream"] = {
@@ -1875,7 +1875,7 @@ app.post(
     multistream = await validateMultistreamOpts(
       req.user.id,
       stream.profiles,
-      multistream
+      multistream,
     );
 
     let patch: StreamPatchPayload & Partial<DBStream> = {
@@ -1888,7 +1888,7 @@ app.post(
 
     res.status(200);
     res.json(db.multistreamTarget.cleanWriteOnlyResponse(updatedTarget));
-  }
+  },
 );
 
 app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
@@ -1906,7 +1906,7 @@ app.delete("/:id/multistream/:targetId", authorizer({}), async (req, res) => {
   multistream = await validateMultistreamOpts(
     req.user.id,
     stream.profiles,
-    multistream
+    multistream,
   );
 
   let patch: StreamPatchPayload & Partial<DBStream> = {
@@ -1976,7 +1976,7 @@ app.patch(
       const { record } = typeof payload.record === "boolean" ? payload : stream;
       if (!record) {
         throw new BadRequestError(
-          `recordingSpec is only supported with record=true`
+          `recordingSpec is only supported with record=true`,
         );
       }
       if (!recordingSpec.profiles) {
@@ -1992,7 +1992,7 @@ app.patch(
       multistream = await validateMultistreamOpts(
         req.user.id,
         stream.profiles,
-        multistream
+        multistream,
       );
       patch = { ...patch, multistream };
     }
@@ -2023,7 +2023,7 @@ app.patch(
 
     res.status(204);
     res.end();
-  }
+  },
 );
 
 app.patch("/:id/record", authorizer({}), async (req, res) => {
@@ -2124,7 +2124,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
   const user = await db.user.get(stream.userId);
   const resp = {
     stream: db.stream.addDefaultFields(
-      db.stream.removePrivateFields(stream, req.user.admin)
+      db.stream.removePrivateFields(stream, req.user.admin),
     ),
     session,
     isPlaybackid,
@@ -2202,7 +2202,7 @@ app.post(
     await triggerCatalystPullStart(stream, getHLSPlaybackUrl(ingest, stream));
 
     res.status(204).end();
-  }
+  },
 );
 
 app.delete("/:id/terminate", authorizer({}), async (req, res) => {
@@ -2254,12 +2254,12 @@ app.post(
         ...req.config,
         activeCleanupLimit: limit,
       },
-      { jobsDb, queue: req.queue }
+      { jobsDb, queue: req.queue },
     );
 
     res.status(200);
     res.json({ cleanedUp });
-  }
+  },
 );
 
 // Hooks
@@ -2406,14 +2406,14 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
 
   const { data: webhooks } = await db.webhook.listSubscribed(
     user.id,
-    "stream.detection"
+    "stream.detection",
   );
   let detection = undefined;
   if (webhooks.length > 0 || stream.detection) {
     console.warn(
       `Ignoring configured detection webhooks="${webhooks.map(
-        (w) => w.id
-      )}" for manifestId=${manifestID}`
+        (w) => w.id,
+      )}" for manifestId=${manifestID}`,
     );
     // TODO: Validate if these are the best default configs
     // detection = {
@@ -2429,8 +2429,8 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
 
   console.log(
     `StreamHookResponse id=${manifestID} profiles=${JSON.stringify(
-      stream.profiles
-    )}`
+      stream.profiles,
+    )}`,
   );
 
   // Inject H264ConstrainedHigh profile for no B-Frames in livestreams unless the user has set it manually
@@ -2485,7 +2485,7 @@ app.post(
 
     await req.queue.publishWebhook("events.stream.detection", msg);
     return res.status(204).end();
-  }
+  },
 );
 
 const statsFields: (keyof StreamStats)[] = [

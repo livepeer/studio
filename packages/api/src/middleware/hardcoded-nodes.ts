@@ -31,7 +31,7 @@ export default function hardcodedNodes({
     }
     if (orchestrators?.length) {
       req.orchestratorsGetters.push(
-        async () => orchestrators as OrchestratorNodeAddress[]
+        async () => orchestrators as OrchestratorNodeAddress[],
       );
     }
     if (!req.getIngest) {
