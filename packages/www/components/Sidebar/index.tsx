@@ -34,7 +34,6 @@ import {
   LoopIcon,
   BookmarkIcon,
 } from "@radix-ui/react-icons";
-import Contact from "../Contact";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import CreateProjectDialog from "components/Project/createProjectDialog";
@@ -283,6 +282,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 border: "1px solid $colors$neutral6",
                 width: "12rem",
                 ml: "$4",
+                mt: "$1",
               }}>
               <DropdownMenuGroup
                 css={{
@@ -292,7 +292,8 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 }}>
                 <DropdownMenuItem
                   css={{
-                    py: 3,
+                    py: "$3",
+                    px: "$2",
                     borderRadius: "$1",
                     "&:hover": {
                       transition: ".2s",
@@ -300,15 +301,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     },
                   }}
                   key="billing-dropdown-item"
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onClick={(e) => {
                     Router.push("/settings/projects");
                   }}>
                   <Text size="2">Projects</Text>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   css={{
-                    py: 3,
+                    py: "$3",
+                    px: "$2",
                     borderRadius: "$1",
                     "&:hover": {
                       transition: ".2s",
@@ -316,8 +317,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     },
                   }}
                   key="billing-dropdown-item"
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     Router.push("/settings/usage");
                   }}>
                   <Text size="2">Usage</Text>
@@ -325,7 +325,8 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
                 <DropdownMenuItem
                   css={{
-                    py: 3,
+                    py: "$3",
+                    px: "$2",
                     borderRadius: "$1",
                     "&:hover": {
                       transition: ".2s",
@@ -333,8 +334,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     },
                   }}
                   key="billing-dropdown-item"
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     Router.push("/settings/billing");
                   }}>
                   <Text size="2">Billing</Text>
@@ -342,7 +342,8 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
                 <DropdownMenuItem
                   css={{
-                    py: 3,
+                    py: "$3",
+                    px: "$2",
                     borderRadius: "$1",
                     "&:hover": {
                       transition: ".2s",
@@ -350,15 +351,15 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     },
                   }}
                   key="billing-dropdown-item"
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     Router.push("/settings/billing/plans");
                   }}>
                   <Text size="2">Plans</Text>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   css={{
-                    py: 3,
+                    py: "$3",
+                    px: "$2",
                     borderRadius: "$1",
                     "&:hover": {
                       transition: ".2s",
@@ -366,8 +367,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     },
                   }}
                   key="logout-dropdown-item"
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     logout();
                   }}>
                   <Text size="2">Log out</Text>
@@ -562,7 +562,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     </Box>
                   )}
                 </Box>
-              )
+              ),
             )}
           </Grid>
           <Flex
