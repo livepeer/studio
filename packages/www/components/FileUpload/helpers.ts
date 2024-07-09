@@ -9,7 +9,7 @@ export type FileUploadFilteredItem = {
 
 export const filteredItemsToShow = (
   fileUploads: FileUpload[],
-  assets: Asset[]
+  assets: Asset[],
 ): FileUploadFilteredItem[] => {
   const assetNamesUninque = new Set();
   const assetsFiltered = assets
@@ -17,7 +17,7 @@ export const filteredItemsToShow = (
     .filter((asset) => {
       // Filter outfailed assets that are currently not file uploads
       const fileUpload = fileUploads.find(
-        (fileUpload) => fileUpload.file.name === asset.name
+        (fileUpload) => fileUpload.file.name === asset.name,
       );
       const doesAssetNameMatchesFile = fileUpload !== undefined;
       if (!doesAssetNameMatchesFile) return false;
@@ -35,10 +35,10 @@ export const filteredItemsToShow = (
 
   const items = [
     ...assetsFiltered.map(
-      (asset): FileUploadFilteredItem => ({ type: "asset", asset })
+      (asset): FileUploadFilteredItem => ({ type: "asset", asset }),
     ),
     ...fileUploads.map(
-      (file): FileUploadFilteredItem => ({ type: "file", file })
+      (file): FileUploadFilteredItem => ({ type: "file", file }),
     ),
   ];
   return items;

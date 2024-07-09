@@ -35,7 +35,7 @@ export default function FeaturesModel() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const hasShownFeature = localStorage.getItem(
-        `hasShownFeature-${feature.id}`
+        `hasShownFeature-${feature.id}`,
       );
       if (!hasShownFeature) {
         setShouldShowFeature(true);
