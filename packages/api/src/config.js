@@ -25,6 +25,7 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
+    viewerLimit: 30,
   },
   prod_1: {
     deprecated: true,
@@ -52,6 +53,7 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
+    viewerLimit: 50_000,
   },
   prod_2: {
     deprecated: true,
@@ -93,6 +95,7 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
+    viewerLimit: 30,
   },
   growth_1: {
     order: 4,
@@ -120,6 +123,7 @@ export const products = {
     ],
     monthlyPrice: 100,
     payAsYouGo: true,
+    viewerLimit: 50_000,
   },
   scale_1: {
     order: 5,
@@ -147,6 +151,7 @@ export const products = {
     ],
     monthlyPrice: 500,
     payAsYouGo: true,
+    viewerLimit: 50_000,
   },
   pay_as_you_go_1: {
     order: 6,
@@ -220,6 +225,7 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
+    viewerLimit: 30,
   },
   prod_O9XtHhI6rbTT1B: {
     order: 9,
@@ -247,6 +253,7 @@ export const products = {
     ],
     monthlyPrice: 100,
     payAsYouGo: true,
+    viewerLimit: 50_000,
   },
   prod_O9XtcfOSMjSD5L: {
     order: 10,
@@ -274,6 +281,7 @@ export const products = {
     ],
     monthlyPrice: 500,
     payAsYouGo: true,
+    viewerLimit: 50_000,
   },
   prod_O9XuWMU1Up6QKf: {
     order: 11,
@@ -343,5 +351,6 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
+    viewerLimit: 50_000,
   },
 };

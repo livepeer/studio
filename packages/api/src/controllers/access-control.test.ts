@@ -14,6 +14,7 @@ import { db } from "../store";
 import { generateUniquePlaybackId } from "./generate-keys";
 import { json as bodyParserJson } from "body-parser";
 import { semaphore } from "../util";
+import { DEFAULT_MAX_CONCURRENT_VIEWERS } from "./access-control";
 
 // includes auth file tests
 
@@ -102,10 +103,10 @@ describe("controllers/access-control", () => {
       webhookResponseBody = "";
     });
 
-    it("should allow playback on gated asset and include viewer limit info", async () => {
+    it("should allow playback on gated asset and include viewer limit info for all plans", async () => {
       client.jwtAuth = adminToken;
 
-      await db.user.update(gatedAsset.userId, { viewerLimit: 10 });
+      await db.user.update(gatedAsset.userId, { viewerLimit: 10 }); // Specific viewer limit for user
       const res = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "accessKey",
@@ -117,14 +118,58 @@ describe("controllers/access-control", () => {
         user_viewer_limit: 10,
       });
 
-      await db.user.update(gatedAsset.userId, { viewerLimit: 0 });
+      await db.user.update(gatedAsset.userId, { viewerLimit: 0 }); // Specific viewer limit for user
       const res2 = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "accessKey",
         accessKey: "foo",
       });
       expect(res2.status).toBe(200);
-      expect(await res2.json()).toEqual({});
+      expect(await res2.json()).toEqual({
+        user_id: gatedAsset.userId,
+        user_viewer_limit: 0,
+      });
+
+      await db.user.update(gatedAsset.userId, {
+        stripeProductId: "prod_O9XuIjn7EqYRVW",
+        viewerLimit: null,
+      }); // Free tier
+      const res3 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: "foo",
+      });
+      expect(res3.status).toBe(200);
+      expect(await res3.json()).toEqual({
+        user_id: gatedAsset.userId,
+        user_viewer_limit: 30,
+      });
+
+      await db.user.update(gatedAsset.userId, {
+        stripeProductId: "prod_O9XtHhI6rbTT1B",
+      }); // Growth
+      const res4 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: "foo",
+      });
+      expect(res4.status).toBe(200);
+      expect(await res4.json()).toEqual({
+        user_id: gatedAsset.userId,
+        user_viewer_limit: 50_000,
+      });
+
+      await db.user.update(gatedAsset.userId, { stripeProductId: null }); // Default for untracked plans
+      const res5 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: "foo",
+      });
+      expect(res5.status).toBe(200);
+      expect(await res5.json()).toEqual({
+        user_id: gatedAsset.userId,
+        user_viewer_limit: 50_000,
+      });
 
       await hookSem.wait(3000);
     });
