@@ -1,20 +1,19 @@
 import {
   AlertDialog,
-  AlertDialogContent,
-  Flex,
-  Box,
-  Badge,
-  AlertDialogTitle,
-  Button,
   AlertDialogCancel,
-  Text,
+  AlertDialogContent,
+  AlertDialogTitle,
+  Badge,
+  Box,
+  Button,
+  Flex,
   Heading,
   Link,
+  Text,
 } from "@livepeer/design-system";
 import { featuresList } from "content/ftux-model";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineSparkles } from "react-icons/hi";
 
 export default function FeaturesModel() {
@@ -47,14 +46,8 @@ export default function FeaturesModel() {
   return (
     <AlertDialog open={shouldShowFeature}>
       <AlertDialogContent css={{ p: "0", borderRadius: 0 }}>
-        <Flex css={{ fd: "row", gap: "$3" }}>
-          <Box
-            css={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              p: "$5",
-            }}>
+        <Flex className="flex flex-row gap-3">
+          <Box className="flex flex-col flex-1 justify-center p-5">
             <Badge
               variant="green"
               size={"2"}
@@ -79,7 +72,7 @@ export default function FeaturesModel() {
                 {renderDescriptionWithLineBreaks(feature.description)}
               </Text>
             </Box>
-            <Flex css={{ gap: "$3", mt: "$2" }}>
+            <Flex className="flex flex-row gap-3 mt-2">
               <AlertDialogCancel asChild>
                 <Button
                   onClick={() => {
@@ -103,13 +96,14 @@ export default function FeaturesModel() {
               </Button>
             </Flex>
           </Box>
-          <Image
-            width={500}
-            height={500}
-            objectFit="contain"
-            src={feature.imageUrl}
-            alt="Projects"
-          />
+          <Box className="flex flex-col flex-1 relative">
+            <Image
+              fill
+              src={feature.imageUrl}
+              alt="Projects"
+              className="object-cover"
+            />
+          </Box>
         </Flex>
       </AlertDialogContent>
     </AlertDialog>
