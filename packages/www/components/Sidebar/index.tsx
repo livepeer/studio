@@ -82,16 +82,21 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
   const June = useJune();
 
   useEffect(() => {
-    const handleRouteChange = (url, { shallow }) => {
-      if (June) June.page(url);
-    };
+    if (typeof June !== "undefined") {
+      const handleRouteChange = (url, { shallow }) => {
+        console.log("Tracking URL:", url);
+        June.track(url);
+      };
 
-    router.events.on("routeChangeStart", handleRouteChange);
+      console.log("Adding event listener");
+      router.events.on("routeChangeStart", handleRouteChange);
 
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-    };
-  }, [June]);
+      return () => {
+        console.log("Removing event listener");
+        router.events.off("routeChangeStart", handleRouteChange);
+      };
+    }
+  }, [June, router.events]);
 
   return (
     <Box

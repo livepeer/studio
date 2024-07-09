@@ -26,7 +26,6 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
     { name: 0, "Session bitrate": 0 },
   ]);
 
-  const June = useJune();
   const [multiDataChart, setMultiDataChart] = useState<MultistreamChartType[]>(
     [],
   );
@@ -34,8 +33,6 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
   const startTime = useMemo(() => Date.now(), []);
 
   const [info, setInfo] = useState<StreamInfo | null>(null);
-
-  June?.track(events.stream.health);
 
   const { getStreamInfo } = useApi();
 

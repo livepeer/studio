@@ -92,6 +92,7 @@
     "@types/eventsource": "^1.1.7",
     "@types/numeral": "^2.0.2",
     "@types/react-table": "^7.0.5",
+    "@types/react-tooltip": "^4.2.4",
     "@types/segment-analytics": "^0.0.32",
     "@types/theme-ui": "0.3.1",
     "autoprefixer": "^10.4.19",
