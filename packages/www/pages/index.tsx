@@ -12,9 +12,6 @@ import { useProjectContext } from "context/ProjectContext";
 
 export default function Dashboard() {
   const { push } = useRouter();
-  const { getProjects } = useApi();
-  const { setProjectId, projectId } = useProjectContext();
-  const { data: projects } = useQuery("projects", getProjects);
 
   useLoggedIn();
 

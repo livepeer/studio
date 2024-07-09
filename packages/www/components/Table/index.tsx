@@ -197,6 +197,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           // Let's make a column for selection
           {
             id: "selection",
+            width: 30,
             // The header can use the table's getToggleAllRowsSelectedProps method
             // to render a checkbox
             Header: ({
@@ -210,7 +211,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               return (
                 <Checkbox
                   placeholder="Select all rows"
-                  css={{ display: "flex" }}
+                  className="flex"
                   onClick={props.onChange}
                   value="toggle-all"
                   checked={isAllRowsSelected ? true : false}
@@ -223,7 +224,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               return (
                 <Checkbox
                   placeholder="Select row"
-                  css={{ display: "flex" }}
+                  className="flex"
                   // @ts-ignore
                   value={row.isSelected}
                   // @ts-ignore
@@ -293,8 +294,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   };
 
   const headerCssWidth = (column, index, rowSelection): string => {
-    const isSelectColumn = index === 0 && rowSelection === "all";
-    return isSelectColumn ? "$4" : column.width || "auto";
+    return column.width || "auto";
   };
 
   const headerComponent = header ? (

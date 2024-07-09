@@ -6,40 +6,43 @@ import qs from "qs";
 import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
+import sql from "sql-template-strings";
 import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
 import { authorizer, validatePost } from "../middleware";
+import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
+import { CliArgs } from "../parse-cli";
 import {
   CreateCustomer,
   CreateSubscription,
-  PasswordResetTokenRequest,
+  DisableUserPayload,
   PasswordResetConfirm,
+  PasswordResetTokenRequest,
+  RefreshTokenPayload,
+  SuspendUserPayload,
   UpdateSubscription,
   User,
-  SuspendUserPayload,
-  DisableUserPayload,
-  RefreshTokenPayload,
+  Project,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import {
+  FieldsMap,
   makeNextHREF,
-  sendgridEmail,
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridEmail,
   sendgridValidateEmail,
+  sendgridValidateEmailAsync,
   toStringValues,
-  FieldsMap,
   triggerCatalystStreamStopSessions,
 } from "./helpers";
-import { EMAIL_VERIFICATION_CUTOFF_DATE } from "../middleware/auth";
-import sql from "sql-template-strings";
-import { CliArgs } from "../parse-cli";
+import { isFakeEmail } from "fakefilter";
 
-const adminOnlyFields = ["verifiedAt", "planChangedAt"];
+const adminOnlyFields = ["verifiedAt", "planChangedAt", "viewerLimit"];
 
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
@@ -115,11 +118,12 @@ export const frontendUrl = (
   {
     headers: { "x-forwarded-proto": proto },
     config: { frontendDomain },
-  }: Request,
+  }: Pick<Request, "headers" | "config">,
   path: string
 ) => `${proto || "https"}://${frontendDomain}${path}`;
 
-export const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
+export const unsubscribeUrl = (req: Pick<Request, "headers" | "config">) =>
+  frontendUrl(req, "/contact");
 
 export async function terminateUserStreams(
   req: Request,
@@ -189,6 +193,15 @@ async function createSubscription(
       ...payAsYouGoItems,
     ],
     expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+async function createDefaultProject(userId: string): Promise<WithID<Project>> {
+  return await db.project.create({
+    id: uuid(),
+    name: "Default Project",
+    userId: userId,
+    createdAt: Date.now(),
   });
 }
 
@@ -396,6 +409,8 @@ app.post("/", validatePost("user"), async (req, res) => {
     };
   }
 
+  let project = await createDefaultProject(id);
+
   await db.user.create({
     kind: "user",
     id: id,
@@ -410,6 +425,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     lastName,
     organization,
     phone,
+    defaultProjectId: project.id,
     ...stripeFields,
   });
 
@@ -733,10 +749,18 @@ app.patch(
 
 app.patch("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
-  const { directPlayback } = req.body;
+  const { directPlayback, viewerLimit } = req.body;
 
+  const updateDoc = {};
   if (typeof directPlayback !== "undefined") {
-    await db.user.update(id, { directPlayback });
+    updateDoc["directPlayback"] = directPlayback;
+  }
+  if (typeof viewerLimit !== "undefined") {
+    updateDoc["viewerLimit"] = viewerLimit;
+  }
+
+  if (Object.keys(updateDoc).length !== 0) {
+    await db.user.update(id, updateDoc);
   }
 
   res.status(204).end();
@@ -785,6 +809,15 @@ app.post("/token", validatePost("user"), async (req, res) => {
       ],
     });
   }
+
+  if (!user.defaultProjectId) {
+    const project = await createDefaultProject(user.id);
+
+    await db.user.update(user.id, {
+      defaultProjectId: project.id,
+    });
+  }
+
   res.status(201);
   res.json({ id: user.id, email: user.email, token, refreshToken });
 });

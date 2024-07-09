@@ -197,11 +197,6 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         name: {
           id: stream.id,
           children: stream.name,
-          tooltipChildren: stream.createdByTokenName ? (
-            <>
-              Created by token <b>{stream.createdByTokenName}</b>
-            </>
-          ) : null,
           href: `/app/stream/${stream.id}`,
         },
         details: { stream },

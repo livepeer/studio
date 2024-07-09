@@ -1,7 +1,7 @@
 import { URL } from "url";
 import basicAuth from "basic-auth";
 import corsLib, { CorsOptions } from "cors";
-import { Request, RequestHandler, Response } from "express";
+import { Request, RequestHandler } from "express";
 import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
 import { ApiToken, User, Project } from "../schema/types";
@@ -10,8 +10,9 @@ import {
   ForbiddenError,
   BadRequestError,
   UnauthorizedError,
+  NotFoundError,
 } from "../store/errors";
-import { WithID } from "../store/types";
+import { DBOwnedResource, WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
 
@@ -61,13 +62,31 @@ function isAuthorized(
 
 export async function getProject(req: Request, projectId: string) {
   const project = projectId
-    ? await db.project.get(projectId)
+    ? await db.project.get(projectId, { useCache: true })
     : { id: "", name: "default", userId: req.user.id };
   if (!req.user.admin && req.user.id !== project.userId) {
     throw new ForbiddenError(`invalid user`);
   }
 
   return project;
+}
+
+export function hasAccessToResource(
+  { isUIAdmin, user, project }: Pick<Request, "isUIAdmin" | "user" | "project">,
+  resource?: DBOwnedResource,
+  uiAdminOnly = false
+) {
+  if (!resource || !user) {
+    return false;
+  }
+  const isAdmin = uiAdminOnly ? isUIAdmin : user.admin;
+  return (
+    isAdmin ||
+    (!resource.deleted &&
+      resource.userId === user.id &&
+      (resource.projectId ?? user.defaultProjectId ?? "") ===
+        (project?.id ?? ""))
+  );
 }
 
 /**
@@ -171,6 +190,10 @@ function authenticator(): RequestHandler {
     req.token = tokenObject;
     req.user = user;
 
+    if (!projectId) {
+      projectId = req.user.defaultProjectId;
+    }
+
     if (projectId) {
       project = await getProject(req, projectId);
       req.project = project;
@@ -178,6 +201,15 @@ function authenticator(): RequestHandler {
 
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
+
+    req.checkResourceAccess = (
+      resource?: DBOwnedResource,
+      uiAdminOnly = false
+    ) => {
+      if (!hasAccessToResource(req, resource, uiAdminOnly)) {
+        throw new NotFoundError("not found");
+      }
+    };
 
     return next();
   };

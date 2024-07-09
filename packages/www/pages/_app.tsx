@@ -12,16 +12,15 @@ import {
 } from "@livepeer/react";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { ApiProvider, getEndpoint } from "hooks/use-api";
-import { getBrandName, isDevelopment, isExport, isStaging } from "lib/utils";
-import { MetaMaskProvider } from "metamask-react";
+import { getBrandName } from "lib/utils";
 import { DefaultSeo } from "next-seo";
 import { ThemeProvider } from "next-themes";
 import Head from "next/head";
-import Script from "next/script";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "../css/hubspot.scss";
 import "../css/markdown.css";
 import "../css/recaptcha.css";
+import "../css/tailwind.css";
 import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
 import { ProjectProvider } from "context/ProjectContext";
@@ -121,26 +120,19 @@ const App = ({ Component, pageProps }) => {
             dark: "dark-theme-green",
             light: "light-theme-green",
           }}>
-          <ProjectProvider>
+          <SnackbarProvider>
             <SyncProjectId />
-
-            <SnackbarProvider>
-              <QueryClientProvider client={queryClient}>
-                <MetaMaskProvider>
-                  <ApiProvider>
-                    <AnalyzerProvider>
-                      <LivepeerConfig
-                        theme={livepeerTheme}
-                        client={livepeerClient}>
-                        <DefaultSeo {...SEO} />
-                        <Component {...pageProps} />
-                      </LivepeerConfig>
-                    </AnalyzerProvider>
-                  </ApiProvider>
-                </MetaMaskProvider>
-              </QueryClientProvider>
-            </SnackbarProvider>
-          </ProjectProvider>
+            <QueryClientProvider client={queryClient}>
+              <ApiProvider>
+                <AnalyzerProvider>
+                  <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
+                    <DefaultSeo {...SEO} />
+                    <Component {...pageProps} />
+                  </LivepeerConfig>
+                </AnalyzerProvider>
+              </ApiProvider>
+            </QueryClientProvider>
+          </SnackbarProvider>
         </ThemeProvider>
       </DesignSystemProvider>
     </>

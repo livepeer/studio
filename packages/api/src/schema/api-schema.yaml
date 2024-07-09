@@ -185,6 +185,10 @@ components:
           type: string
           readOnly: true
           deprecated: true
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         createdAt:
           type: number
           readOnly: true
@@ -600,6 +604,10 @@ components:
           $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
+          description: |
+            Profiles to transcode the stream into. If not specified, a default
+            set of profiles will be used with 240p, 360p, 480p and 720p
+            resolutions. Keep in mind that the source rendition is always kept.
           default:
             - name: 240p0
               fps: 0
@@ -623,12 +631,31 @@ components:
               height: 720
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         record:
           description: |
             Should this stream be recorded? Uses default settings. For more
             customization, create and configure an object store.
           type: boolean
           example: false
+        recordingSpec:
+          type: object
+          description: |
+            Configuration for recording the stream. This can only be set if
+            `record` is true.
+          additionalProperties: false
+          properties:
+            profiles:
+              type: array
+              items:
+                $ref: "#/components/schemas/transcode-profile"
+              description: |
+                Profiles to process the recording of this stream into. If not
+                specified, default profiles will be derived based on the stream
+                input. Keep in mind that the source rendition is always kept.
         multistream:
           type: object
           additionalProperties: false
@@ -674,14 +701,35 @@ components:
           $ref: "#/components/schemas/input-creator-id"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
+        # Same as profiles in stream, but allowing null as well. This is mostly a compatibility workaround for Go SDKs
+        # to be able to send empty arrays in the request body (can't use omitempty).
         profiles:
           type:
             - array
             - "null"
           items:
             $ref: "#/components/schemas/ffmpeg-profile"
+          default:
+            $ref: "#/components/schemas/stream/properties/profiles/default"
+          description:
+            $ref: "#/components/schemas/stream/properties/profiles/description"
         record:
           $ref: "#/components/schemas/stream/properties/record"
+        # Same as recordingSpec but allowing null for the profiles field (same reason as above).
+        recordingSpec:
+          type: object
+          description:
+            $ref: "#/components/schemas/stream/properties/recordingSpec/description"
+          additionalProperties: false
+          properties:
+            profiles:
+              type:
+                - array
+                - "null"
+              items:
+                $ref: "#/components/schemas/transcode-profile"
+              description:
+                $ref: "#/components/schemas/stream/properties/recordingSpec/properties/profiles/description"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
         userTags:
@@ -713,11 +761,9 @@ components:
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         profiles:
-          type:
-            - array
-            - "null"
-          items:
-            $ref: "#/components/schemas/ffmpeg-profile"
+          $ref: "#/components/schemas/new-stream-payload/properties/profiles"
+        recordingSpec:
+          $ref: "#/components/schemas/new-stream-payload/properties/recordingSpec"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
     target-add-payload:
@@ -876,6 +922,10 @@ components:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb6-d1f0985eb0a9
         record:
           description: >
             Whether the stream should be recorded. Uses default settings. For
@@ -908,9 +958,9 @@ components:
             The playback ID to use with the Playback Info endpoint to retrieve
             playback URLs.
         profiles:
-          type: array
-          items:
-            $ref: "#/components/schemas/ffmpeg-profile"
+          $ref: "#/components/schemas/stream/properties/profiles"
+        recordingSpec:
+          $ref: "#/components/schemas/stream/properties/recordingSpec"
     error:
       type: object
       properties:
@@ -1081,6 +1131,16 @@ components:
                     ID of the asset from which this asset was created.
         creatorId:
           $ref: "#/components/schemas/creator-id"
+        profiles:
+          type: array
+          description: |
+            Requested profiles for the asset to be transcoded into. Configured
+            on the upload APIs payload or through the `stream.recordingSpec`
+            field for recordings. If not specified, default profiles are derived
+            based on the source input. If this is a recording, the source will
+            not be present in this list but will be available for playback.
+          items:
+            $ref: "#/components/schemas/transcode-profile"
         storage:
           additionalProperties: false
           properties:
@@ -1177,7 +1237,9 @@ components:
           description: Size of the asset in bytes
           example: 84934509
         hash:
-          type: array
+          type:
+            - array
+            - "null"
           description: Hash of the asset
           items:
             type: object
@@ -1293,6 +1355,15 @@ components:
           readOnly: true
           type: string
           description: URL to access file via HTTP through an IPFS gateway
+    new-signing-key-payload:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Name of the signing key
+        projectId:
+          type: string
+          description: Project ID to which this signing key belongs
     new-asset-payload:
       additionalProperties: false
       required:
@@ -1346,12 +1417,15 @@ components:
         c2pa:
           type: boolean
           description: Decides if the output video should include C2PA signature
+        # Compatibility workaround for the Go SDK similar to `new-stream-payload.profiles`
         profiles:
           type:
             - array
             - "null"
           items:
             $ref: "#/components/schemas/transcode-profile"
+          description:
+            $ref: "#/components/schemas/asset/properties/profiles/description"
         targetSegmentSizeSecs:
           type: number
           description:
@@ -2141,6 +2215,10 @@ components:
           type: boolean
           description: Disable the signing key to allow rotation safely
           example: false
+        projectId:
+          type: string
+          description: The ID of the project
+          example: aac12556-4d65-4d34-9fb
     user:
       type: object
       required:
@@ -2313,10 +2391,42 @@ components:
           type: number
           description: Total minutes of storage usage.
           example: 100
+    realtime-viewership-metric:
+      type: object
+      description: |
+        An individual metric about realtime viewership of a stream/asset.
+      required:
+        - viewCount
+        - errorRate
+      properties:
+        playbackId:
+          type: string
+          description: The playback ID associated with the metric.
+          example: 1bde4o2i6xycudoy
+        device:
+          type: string
+          description: The device used by the viewer.
+          example: iPhone
+        browser:
+          type: string
+          description: The browser used by the viewer.
+          example: Safari
+        country:
+          type: string
+          description: The country where the viewer is located.
+          example: United States
+        viewCount:
+          type: integer
+          description: The number of views for the stream/asset.
+          example: 100
+        errorRate:
+          type: number
+          description: The error rate for the stream/asset.
+          example: 0.1
     viewership-metric:
       type: object
       description: |
-        An individual metric about viewership of an asset. Necessarily, at least
+        An individual metric about viewership of a stream/asset. Necessarily, at least
         1 of playbackId and dStorageUrl will be present, depending on the query.
       required:
         - viewCount
@@ -2394,11 +2504,11 @@ components:
           example: 123
         viewCount:
           type: integer
-          description: The number of views for the asset.
+          description: The number of views for the stream/asset.
           example: 100
         playtimeMins:
           type: number
-          description: The total playtime in minutes for the asset.
+          description: The total playtime in minutes for the stream/asset.
           example: 10
         ttffMs:
           type: number
@@ -2410,7 +2520,7 @@ components:
           example: 0.1
         errorRate:
           type: number
-          description: The error rate for the asset.
+          description: The error rate for the stream/asset.
           example: 0.1
         exitsBeforeStart:
           type: number
@@ -4030,6 +4140,59 @@ paths:
       responses:
         "204":
           description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /data/views/now:
+    get:
+      operationId: getRealtimeViewershipNow
+      x-speakeasy-name-override: getRealtimeViewership
+      summary: Query realtime viewership
+      tags:
+        - metrics
+      description: |
+        Requires a private (non-CORS) API key to be used.
+      parameters:
+        - name: playbackId
+          in: query
+          description: |
+            The playback ID to filter the query results. This can be a canonical
+            playback ID from Livepeer assets or streams, or dStorage identifiers
+            for assets
+          schema:
+            type: string
+        - name: creatorId
+          in: query
+          description: The creator ID to filter the query results
+          schema:
+            type: string
+        - name: "breakdownBy[]"
+          in: query
+          description: |
+            The list of fields to break down the query results. Specify this
+            query-string multiple times to break down by multiple fields.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - playbackId
+                - device
+                - browser
+                - country
+      responses:
+        "200":
+          description: A list of Metric objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/realtime-viewership-metric"
+                x-speakeasy-name-override: data
         default:
           description: Error
           content:

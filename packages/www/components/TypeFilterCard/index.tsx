@@ -18,7 +18,6 @@ export default function TypeFilterCard({
     paddingTop: "$2",
     paddingBottom: "$2",
     width: "20em",
-    maxHeight: "3.5em",
     border: "1px solid",
     borderColor: isActive ? "$primary8" : "$neutral8",
     borderRadius: "$3",
@@ -45,7 +44,6 @@ export default function TypeFilterCard({
         css={{
           fontSize: "$3",
           fontWeight: isActive ? 500 : 400,
-          mb: "-$2",
           color: "inherit",
         }}>
         {name}

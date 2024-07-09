@@ -4,7 +4,7 @@ import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
-import express, { Request } from "express";
+import express, { Request, Response } from "express";
 import sql, { SQLStatement } from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
@@ -16,6 +16,8 @@ import * as nativeCrypto from "crypto";
 import { DBStream } from "../store/stream-table";
 import { fetchWithTimeoutAndRedirects, sleep } from "../util";
 import logger from "../logger";
+import { db } from "../store";
+import { v4 as uuid } from "uuid";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
@@ -418,7 +420,7 @@ export function sendgridValidateEmail(email: string, validationApiKey: string) {
   });
 }
 
-async function sendgridValidateEmailAsync(
+export async function sendgridValidateEmailAsync(
   email: string,
   validationApiKey: string
 ) {
@@ -437,6 +439,7 @@ async function sendgridValidateEmailAsync(
     `Email address validation result ` +
       `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`
   );
+  return verdict;
 }
 
 export type FieldsMap = {
@@ -514,7 +517,7 @@ function parseFiltersRaw(fieldsMap: FieldsMap, val: string): SQLStatement[] {
 
   for (const filter of json) {
     const fv = fieldsMap[filter.id];
-    if (!filter.value) {
+    if (!("value" in filter)) {
       throw new Error(`missing filter value for id "${filter.id}"`);
     }
 
@@ -706,7 +709,10 @@ export const triggerCatalystStreamUpdated = (
 
 async function triggerCatalystEvent(
   req: Request,
-  payload: { resource: "stream" | "nuke" | "stopSessions"; playback_id: string }
+  payload: {
+    resource: "stream" | "nuke" | "stopSessions";
+    playback_id: string;
+  }
 ) {
   const { catalystBaseUrl } = req.config;
 
@@ -733,4 +739,83 @@ export function mapInputCreatorId(inputId: InputCreatorId): CreatorId {
   return typeof inputId === "string"
     ? { type: "unverified", value: inputId }
     : inputId;
+}
+
+export function getProjectId(req: Request): string {
+  let projectId = req.user.defaultProjectId ?? "";
+  if (req.project?.id) {
+    projectId = req.project.id;
+  }
+  return projectId;
+}
+
+export async function addDefaultProjectId(
+  body: any,
+  req: Request,
+  res: Response
+) {
+  const deepClone = (obj) => {
+    return JSON.parse(JSON.stringify(obj));
+  };
+
+  const enrichResponse = (document) => {
+    if ("id" in document && "userId" in document) {
+      if (
+        (!document.projectId || document.projectId === "") &&
+        req.user?.defaultProjectId
+      ) {
+        document.projectId = req.user.defaultProjectId;
+      }
+    }
+  };
+
+  const enrichResponseWithUserProjectId = async (document) => {
+    if ("id" in document && "userId" in document) {
+      if (!document.projectId) {
+        if (document.user) {
+          document.projectId = document.user.defaultProjectId;
+        } else {
+          let user =
+            document.userId === req.user.id
+              ? req.user
+              : await db.user.get(document.userId, { useCache: true });
+          if (user.defaultProjectId) {
+            document.projectId = user.defaultProjectId;
+          }
+        }
+      }
+    }
+  };
+
+  const clonedBody = deepClone(body);
+
+  const processItem = async (item) => {
+    if (typeof item === "object" && item !== null) {
+      if (req.user.admin) {
+        await enrichResponseWithUserProjectId(item);
+      } else {
+        enrichResponse(item);
+      }
+
+      await Promise.all(
+        Object.values(item).map(async (subItem) => {
+          if (typeof subItem === "object" && subItem !== null) {
+            if (req.user.admin) {
+              await enrichResponseWithUserProjectId(subItem);
+            } else {
+              enrichResponse(subItem);
+            }
+          }
+        })
+      );
+    }
+  };
+
+  if (Array.isArray(clonedBody)) {
+    await Promise.all(clonedBody.map((item) => processItem(item)));
+  } else if (typeof clonedBody === "object" && clonedBody !== null) {
+    await processItem(clonedBody);
+  }
+
+  return clonedBody;
 }

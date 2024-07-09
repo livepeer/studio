@@ -564,8 +564,10 @@ export default class WebhookCannon {
           id,
           playbackId,
           userId: session.userId,
+          projectId: session.projectId,
           createdAt: session.createdAt,
           source: { type: "recording", sessionId: session.id },
+          profiles: session.recordingSpec?.profiles,
           status: { phase: "waiting", updatedAt: Date.now() },
           name: `live-${startedAt}`,
           objectStoreId:
@@ -585,6 +587,7 @@ export default class WebhookCannon {
         {
           upload: {
             url: url,
+            profiles: session.recordingSpec?.profiles,
             thumbnails: !(await isExperimentSubject(
               "vod-thumbs-off",
               session.userId

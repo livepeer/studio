@@ -177,6 +177,7 @@ app.post(
         user: owner,
         token: req.token,
         config: req.config,
+        project: req.project,
       },
       id,
       uPlaybackId,
@@ -224,6 +225,7 @@ const fieldsMap = {
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
+  projectId: `asset.data->>'projectId'`,
   playbackId: `asset.data->>'playbackId'`,
   sourceType: `asset.data->'source'->>'type'`,
   sourceSessionId: `asset.data->'source'->>'sessionId'`,
@@ -270,6 +272,11 @@ export const getClips = async (
   let newCursor: string;
 
   query.push(sql`asset.data->>'userId' = ${req.user.id}`);
+  query.push(
+    sql`coalesce(asset.data->>'projectId', ${
+      req.user.defaultProjectId || ""
+    }) = ${req.project?.id || ""}`
+  );
 
   if (!content) {
     throw new NotFoundError("Content not found");

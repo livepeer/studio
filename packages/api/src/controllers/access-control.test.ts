@@ -102,15 +102,30 @@ describe("controllers/access-control", () => {
       webhookResponseBody = "";
     });
 
-    it("should allow playback on gated asset", async () => {
+    it("should allow playback on gated asset and include viewer limit info", async () => {
       client.jwtAuth = adminToken;
+
+      await db.user.update(gatedAsset.userId, { viewerLimit: 10 });
       const res = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
         type: "accessKey",
         accessKey: "foo",
       });
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({});
+      expect(await res.json()).toEqual({
+        user_id: gatedAsset.userId,
+        user_viewer_limit: 10,
+      });
+
+      await db.user.update(gatedAsset.userId, { viewerLimit: 0 });
+      const res2 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "accessKey",
+        accessKey: "foo",
+      });
+      expect(res2.status).toBe(200);
+      expect(await res2.json()).toEqual({});
+
       await hookSem.wait(3000);
     });
 

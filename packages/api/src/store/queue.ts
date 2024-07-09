@@ -1,5 +1,5 @@
 import * as amqp from "amqp-connection-manager";
-import { ChannelWrapper, AmqpConnectionManager } from "amqp-connection-manager";
+import { AmqpConnectionManager, ChannelWrapper } from "amqp-connection-manager";
 import { Channel, ConsumeMessage } from "amqplib";
 import messages from "./messages";
 import { EventKey } from "./webhook-table";
@@ -92,10 +92,11 @@ export class RabbitQueue implements Queue {
 
   public static async connect(
     url: string,
+    appName: string = "api",
     tasksExchange = defaultTaskExchange
   ): Promise<RabbitQueue> {
     const queue = new RabbitQueue(tasksExchange);
-    await queue.init(url);
+    await queue.init(url, appName);
     return queue;
   }
 
@@ -104,9 +105,13 @@ export class RabbitQueue implements Queue {
     this.exchanges = getExchanges(tasksExchange);
   }
 
-  private async init(url: string): Promise<void> {
+  private async init(url: string, appName: string): Promise<void> {
     // Create a new connection manager
-    this.connection = amqp.connect([url]);
+    this.connection = amqp.connect([url], {
+      connectionOptions: {
+        clientProperties: { connection_name: appName },
+      },
+    });
     this.channel = this.connection.createChannel({
       json: true,
       publishTimeout: 60_000, // 60s

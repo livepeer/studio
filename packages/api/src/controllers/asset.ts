@@ -1,41 +1,20 @@
-import { authorizer } from "../middleware";
-import { validatePost } from "../middleware";
-import { Request, RequestHandler, Router, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { v4 as uuid } from "uuid";
+import { FileStore as TusFileStore } from "@tus/file-store";
+import { S3Store as TusS3Store } from "@tus/s3-store";
 import {
-  Server as TusServer,
   EVENTS as TUS_EVENTS,
+  Server as TusServer,
   Upload as TusUpload,
 } from "@tus/server";
-import { S3Store as TusS3Store } from "@tus/s3-store";
-import { FileStore as TusFileStore } from "@tus/file-store";
-import _ from "lodash";
-import {
-  makeNextHREF,
-  parseFilters,
-  parseOrder,
-  getS3PresignedUrl,
-  toStringValues,
-  pathJoin,
-  getObjectStoreS3Config,
-  reqUseReplica,
-  isValidBase64,
-  mapInputCreatorId,
-} from "./helpers";
-import { db } from "../store";
-import sql from "sql-template-strings";
-import {
-  ForbiddenError,
-  UnprocessableEntityError,
-  NotFoundError,
-  BadRequestError,
-  InternalServerError,
-  UnauthorizedError,
-  NotImplementedError,
-} from "../store/errors";
+import { Request, Response, Router } from "express";
+import mung from "express-mung";
 import httpProxy from "http-proxy";
-import { generateUniquePlaybackId } from "./generate-keys";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import _ from "lodash";
+import os from "os";
+import sql from "sql-template-strings";
+import { v4 as uuid } from "uuid";
+import { authorizer, validatePost } from "../middleware";
+import { CliArgs } from "../parse-cli";
 import {
   Asset,
   AssetPatchPayload,
@@ -45,20 +24,40 @@ import {
   NewAssetPayload,
   ObjectStore,
   PlaybackPolicy,
-  Project,
   Task,
 } from "../schema/types";
-import { WithID } from "../store/types";
-import Queue from "../store/queue";
-import { taskScheduler, ensureQueueCapacity } from "../task/scheduler";
-import os from "os";
+import { db } from "../store";
+import {
+  BadRequestError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  NotImplementedError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "../store/errors";
 import {
   ensureExperimentSubject,
   isExperimentSubject,
 } from "../store/experiment-table";
-import { CliArgs } from "../parse-cli";
-import mung from "express-mung";
+import Queue from "../store/queue";
+import { WithID } from "../store/types";
+import { ensureQueueCapacity, taskScheduler } from "../task/scheduler";
 import { getClips } from "./clip";
+import { generateUniquePlaybackId } from "./generate-keys";
+import {
+  addDefaultProjectId,
+  getObjectStoreS3Config,
+  getS3PresignedUrl,
+  isValidBase64,
+  makeNextHREF,
+  mapInputCreatorId,
+  parseFilters,
+  parseOrder,
+  pathJoin,
+  reqUseReplica,
+  toStringValues,
+} from "./helpers";
 
 // 7 Days
 const DELETE_ASSET_DELAY = 7 * 24 * 60 * 60 * 1000;
@@ -196,13 +195,20 @@ export async function validateAssetPayload(
   const userId = req.user.id;
   const payload = req.body as NewAssetPayload;
 
-  if (payload.objectStoreId) {
-    const os = await getActiveObjectStore(payload.objectStoreId);
+  const { name, profiles, staticMp4, creatorId, objectStoreId, storage } =
+    payload;
+
+  if (objectStoreId) {
+    const os = await getActiveObjectStore(objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
         `the provided object store is not owned by user`
       );
     }
+  }
+
+  if (profiles && !profiles.length) {
+    throw new BadRequestError("assets must have at least one profile");
   }
 
   // Validate playbackPolicy on creation to generate resourceId & check if unifiedAccessControlConditions is present when using lit_signing_condition
@@ -236,14 +242,15 @@ export async function validateAssetPayload(
       phase: source.type === "directUpload" ? "uploading" : "waiting",
       updatedAt: createdAt,
     },
-    name: payload.name,
+    name,
     source,
-    staticMp4: payload.staticMp4,
-    projectId: req.project?.id ?? "",
-    creatorId: mapInputCreatorId(payload.creatorId),
+    ...(profiles ? { profiles } : null), // avoid serializing null profiles on the asset,
+    staticMp4,
+    projectId: req.project?.id,
+    creatorId: mapInputCreatorId(creatorId),
     playbackPolicy,
-    objectStoreId: payload.objectStoreId || (await defaultObjectStoreId(req)),
-    storage: storageInputToState(payload.storage),
+    objectStoreId: objectStoreId || (await defaultObjectStoreId(req)),
+    storage: storageInputToState(storage),
   };
 }
 
@@ -495,6 +502,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
     timestamp: asset.createdAt,
     event: "asset.created",
     userId: asset.userId,
+    projectId: asset.projectId,
     payload: {
       asset: {
         id: asset.id,
@@ -613,14 +621,24 @@ export async function toExternalAsset(
   return a;
 }
 
+app.use(mung.jsonAsync(addDefaultProjectId));
+
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
     const { details } = toStringValues(req.query);
-    const toExternalAssetFunc = (a: Asset) =>
-      toExternalAsset(a, req.config, !!details, req.user.admin);
+    const toExternalAssetFunc = async (a: Asset) => {
+      const modifiedAsset = await toExternalAsset(
+        a,
+        req.config,
+        !!details,
+        req.user.admin
+      );
+
+      return modifiedAsset;
+    };
 
     if (Array.isArray(data)) {
       return Promise.all(data.map(toExternalAssetFunc));
@@ -700,9 +718,6 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
-  query.push(
-    sql`coalesce(asset.data->>'projectId', '') = ${req.project?.id || ""}`
-  );
   if (req.user.admin && deleting === "true") {
     const deletionThreshold = new Date(
       Date.now() - DELETE_ASSET_DELAY
@@ -741,6 +756,11 @@ app.get("/", authorizer({}), async (req, res) => {
     });
   } else {
     query.push(sql`asset.data->>'userId' = ${req.user.id}`);
+    query.push(
+      sql`coalesce(asset.data->>'projectId', ${
+        req.user.defaultProjectId || ""
+      }) = ${req.project?.id || ""}`
+    );
 
     let fields = " asset.id as id, asset.data as data";
     if (count) {
@@ -775,13 +795,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   if (!asset || asset.deleted) {
     throw new NotFoundError(`Asset not found`);
   }
-
-  if (req.user.admin !== true && req.user.id !== asset.userId) {
-    throw new ForbiddenError(
-      "user can only request information on their own assets"
-    );
-  }
-
+  req.checkResourceAccess(asset);
   res.json(asset);
 });
 
@@ -870,7 +884,7 @@ app.post(
     );
     const dupAsset = await db.asset.findDuplicateUrlUpload(
       url,
-      req.user.id,
+      req.user,
       req.project?.id
     );
     if (dupAsset) {
@@ -969,6 +983,10 @@ app.post(
           url: downloadUrl,
           catalystPipelineStrategy: catalystPipelineStrategy(req),
           encryption,
+          thumbnails: !(await isExperimentSubject(
+            "vod-thumbs-off",
+            req.user?.id
+          )),
           c2pa,
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },

@@ -1,11 +1,11 @@
 import { Router, Request } from "express";
 import sql from "sql-template-strings";
 
-import { authorizer } from "../middleware";
-import { User } from "../schema/types";
+import { authorizer, hasAccessToResource } from "../middleware";
+import { User, Project } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
-import { pathJoin } from "../controllers/helpers";
+import { addDefaultProjectId, pathJoin } from "../controllers/helpers";
 import { fetchWithTimeout } from "../util";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
@@ -25,6 +25,7 @@ import {
 import { LVPR_SDK_EMAILS, getClips } from "./clip";
 import { NotFoundError } from "../store/errors";
 import { cache } from "../store/cache";
+import mung from "express-mung";
 
 const app = Router();
 
@@ -36,6 +37,7 @@ const fieldsMap: FieldsMap = {
   userId: `session.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `session.data->>'parentId'`,
+  projectId: `session.data->>'projectId'`,
   record: { val: `session.data->'record'`, type: "boolean" },
   sourceSegments: `session.data->'sourceSegments'`,
   transcodedSegments: {
@@ -57,6 +59,8 @@ const fieldsMap: FieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
+app.use(mung.jsonAsync(addDefaultProjectId));
+
 app.get("/", authorizer({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId, count } =
     toStringValues(req.query);
@@ -65,15 +69,23 @@ app.get("/", authorizer({}), async (req, res, next) => {
     limit = undefined;
   }
 
+  const query = parseFilters(fieldsMap, filters);
+
   if (!req.user.admin) {
     userId = req.user.id;
   }
-  const query = parseFilters(fieldsMap, filters);
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`(session.data->>'deleted')::boolean IS false`);
   }
   if (userId) {
     query.push(sql`session.data->>'userId' = ${userId}`);
+    if (userId === req.user.id) {
+      query.push(
+        sql`coalesce(session.data->>'projectId', ${
+          req.user.defaultProjectId || ""
+        }) = ${req.project?.id || ""}`
+      );
+    }
   }
   if (parentId) {
     query.push(sql`session.data->>'parentId' = ${parentId}`);
@@ -146,8 +158,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
-    ((session.userId !== req.user.id || session.deleted) &&
-      !req.user.admin &&
+    (!hasAccessToResource(req, session) &&
       !LVPR_SDK_EMAILS.includes(req.user.email))
   ) {
     // do not reveal that session exists

@@ -17,6 +17,8 @@ import {
   AuxTestServer,
   TestClient,
   clearDatabase,
+  createApiToken,
+  createProject,
   setupUsers,
   startAuxTestServer,
 } from "../test-helpers";
@@ -113,6 +115,7 @@ describe("controllers/stream", () => {
   let nonAdminUser: User;
   let nonAdminToken: string;
   let nonAdminApiKey: string;
+  let projectId: string;
 
   beforeEach(async () => {
     await server.store.create(mockStore);
@@ -127,6 +130,10 @@ describe("controllers/stream", () => {
       nonAdminApiKey,
     } = await setupUsers(server, mockAdminUser, mockNonAdminUser));
     client.jwtAuth = adminToken;
+
+    let project = await createProject(client);
+    projectId = project.id;
+    expect(projectId).toBeDefined();
   });
 
   describe("basic CRUD with JWT authorization", () => {
@@ -136,6 +143,7 @@ describe("controllers/stream", () => {
         const document = {
           id: uuid(),
           kind: "stream",
+          projectId: i > 7 ? projectId : undefined,
         };
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -151,6 +159,31 @@ describe("controllers/stream", () => {
           id: uuid(),
           kind: "stream",
           deleted: i > 3 ? true : undefined,
+          projectId: i > 2 ? projectId : undefined,
+        } as DBStream;
+        await server.store.create(document);
+        const res = await client.get(`/stream/${document.id}`);
+        const stream = await res.json();
+        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
+      }
+
+      const res = await client.get("/stream");
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(streams.length).toEqual(4);
+      const resAll = await client.get("/stream?all=1");
+      expect(resAll.status).toBe(200);
+      const streamsAll = await resAll.json();
+      expect(streamsAll.length).toEqual(5);
+    });
+
+    it("should get all streams with admin authorization and specific projectId in query param", async () => {
+      for (let i = 0; i < 5; i += 1) {
+        const document = {
+          id: uuid(),
+          kind: "stream",
+          deleted: i > 3 ? true : undefined,
+          projectId: i > 2 ? projectId : undefined,
         } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
@@ -1183,6 +1216,7 @@ describe("controllers/stream", () => {
 
       it("should disallow patching other users streams", async () => {
         client.jwtAuth = nonAdminToken;
+        client.apiKey = "";
         const res = await client.patch(patchPath, {});
         expect(res.status).toBe(404);
       });
@@ -1230,6 +1264,35 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(422);
         const json = await res.json();
         expect(json.errors[0]).toContain("additionalProperties");
+      });
+
+      it("should disallow adding recordingSpec without record=true", async () => {
+        const res = await client.patch(patchPath, {
+          recordingSpec: { profiles: [{ bitrate: 1600000 }] },
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          "recordingSpec is only supported with record=true"
+        );
+      });
+
+      it("should allow patching recordingSpec with record=true", async () => {
+        const res = await client.patch(patchPath, {
+          record: true,
+          recordingSpec: { profiles: [{ bitrate: 3000000 }] },
+        });
+        expect(res.status).toBe(204);
+      });
+
+      it("should remove null recordingSpec.profiles", async () => {
+        const res = await client.patch(patchPath, {
+          record: true,
+          recordingSpec: { profiles: null },
+        });
+        expect(res.status).toBe(204);
+        const updated = await db.stream.get(stream.id);
+        expect(updated.recordingSpec).toEqual({});
       });
 
       it("should validate field types", async () => {
@@ -1350,7 +1413,7 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
-      expect(streams[0]).toEqual(source[3]);
+      expect(streams[0].id).toEqual(source[3].id);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
       expect(res.headers.raw().link).toBeDefined();
       expect(res.headers.raw().link.length).toBe(1);
@@ -1360,7 +1423,7 @@ describe("controllers/stream", () => {
       expect(nextRes.status).toBe(200);
       const nextStreams = await nextRes.json();
       expect(nextStreams.length).toEqual(1);
-      expect(nextStreams[0]).toEqual(source[6]);
+      expect(nextStreams[0].id).toEqual(source[6].id);
       expect(nextStreams[0].userId).toEqual(nonAdminUser.id);
     });
 
@@ -1391,17 +1454,43 @@ describe("controllers/stream", () => {
     });
 
     it("should not accept additional properties for creating a stream", async () => {
-      const postMockLivepeerStream = JSON.parse(JSON.stringify(postMockStream));
-      postMockLivepeerStream.livepeer = "livepeer";
-      const res = await client.post("/stream", { ...postMockLivepeerStream });
+      const res = await client.post("/stream", {
+        ...postMockStream,
+        livepeer: "livepeer",
+      });
       expect(res.status).toBe(422);
       const stream = await res.json();
       expect(stream.id).toBeUndefined();
     });
+
+    it("should not accept recordingSpec without record", async () => {
+      const res = await client.post("/stream", {
+        ...postMockStream,
+        recordingSpec: { profiles: [{ bitrate: 1600000 }] },
+      });
+      expect(res.status).toBe(400);
+      const json = await res.json();
+      expect(json.errors[0]).toContain(
+        "recordingSpec is only supported with record=true"
+      );
+    });
+
+    it("should remove null profiles from recordingSpec", async () => {
+      const res = await client.post("/stream", {
+        ...postMockStream,
+        record: true,
+        recordingSpec: { profiles: null },
+      });
+      expect(res.status).toBe(201);
+      const stream = await res.json();
+      expect(stream.recordingSpec).toEqual({});
+    });
   });
 
   describe("stream endpoint with api key", () => {
+    let newApiKey;
     beforeEach(async () => {
+      // create streams without a projectId
       for (let i = 0; i < 5; i += 1) {
         const document = {
           id: uuid(),
@@ -1412,7 +1501,45 @@ describe("controllers/stream", () => {
         const res = await client.get(`/stream/${document.id}`);
         expect(res.status).toBe(200);
       }
+
+      // create a new project
+      client.jwtAuth = nonAdminToken;
+      let project = await createProject(client);
+      expect(project).toBeDefined();
+
+      // then create a new api-key under that project
+      newApiKey = await createApiToken({
+        client: client,
+        projectId: project.id,
+        jwtAuthToken: nonAdminToken,
+      });
+      expect(newApiKey).toMatchObject({
+        id: expect.any(String),
+        projectId: project.id,
+      });
+
       client.jwtAuth = "";
+      client.apiKey = newApiKey.id;
+
+      // create streams with a projectId
+      for (let i = 0; i < 5; i += 1) {
+        const document = {
+          id: uuid(),
+          kind: "stream",
+          userId: nonAdminUser.id,
+          projectId: project.id,
+        };
+        const resCreate = await client.post("/stream", {
+          ...postMockStream,
+          name: "videorec+samplePlaybackId",
+        });
+        expect(resCreate.status).toBe(201);
+        const createdStream = await resCreate.json();
+        const res = await client.get(`/stream/${createdStream.id}`);
+        expect(res.status).toBe(200);
+        let stream = await res.json();
+        expect(stream.projectId).toEqual(project.id);
+      }
     });
 
     it("should get own streams", async () => {
@@ -1421,6 +1548,22 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(3);
+      expect(streams[0].userId).toEqual(nonAdminUser.id);
+
+      client.apiKey = newApiKey.id;
+      let res2 = await client.get(`/stream/user/${nonAdminUser.id}`);
+      expect(res2.status).toBe(200);
+      const streams2 = await res2.json();
+      expect(streams2.length).toEqual(5);
+      expect(streams2[0].userId).toEqual(nonAdminUser.id);
+    });
+
+    it("should get streams owned by project when using api-key for project", async () => {
+      client.apiKey = newApiKey.id;
+      let res = await client.get(`/stream/`);
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(streams.length).toEqual(5);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
     });
 
@@ -1810,7 +1953,11 @@ describe("controllers/stream", () => {
             id: expect.stringMatching(uuidRegex),
             webhookId: webhookObj.id,
             event: "stream.detection",
-            stream: { ...stream, streamKey: undefined },
+            stream: {
+              ...stream,
+              streamKey: undefined,
+              projectId: expect.any(String),
+            },
             payload: { sceneClassification, seqNo: 1 },
           });
         });
@@ -2261,6 +2408,48 @@ describe("controllers/stream", () => {
       expect(sessions[0].mp4Url).toEqual(
         "http://example-public/playback_id/output.mp4"
       );
+    });
+
+    it("should propagate stream configs to child stream and session", async () => {
+      // create parent stream
+      const configs = {
+        record: true,
+        recordingSpec: {
+          profiles: [
+            {
+              name: "720p",
+              bitrate: 2000000,
+              fps: 30,
+              width: 1280,
+              height: 720,
+            },
+          ],
+        },
+      };
+      let res = await client.post(`/stream`, {
+        ...smallStream,
+        ...configs,
+      });
+      expect(res.status).toBe(201);
+      const parent = await res.json();
+      expect(parent).toMatchObject(configs);
+
+      // call transcoding hook
+      const sessionId = uuid();
+      res = await client.post(
+        `/stream/${parent.id}/stream?sessionId=${sessionId}`,
+        {
+          name: "session1",
+        }
+      );
+      expect(res.status).toBe(201);
+      const childStream = await res.json();
+      expect(childStream.parentId).toEqual(parent.id);
+      expect(childStream.sessionId).toEqual(sessionId);
+      expect(childStream).toMatchObject(configs);
+
+      const session = await db.session.get(sessionId);
+      expect(session).toMatchObject(configs);
     });
   });
 });

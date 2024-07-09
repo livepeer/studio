@@ -591,6 +591,10 @@ components:
       properties:
         userId:
           index: true
+        projectId:
+          type: string
+          index: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         events:
           index: true
           indexType: gin
@@ -1014,6 +1018,10 @@ components:
           description:
             Timestamp (in milliseconds) at which the asset was deleted
           example: 1587667174725
+        status:
+          properties:
+            phase:
+              index: true
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
@@ -1035,12 +1043,6 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
-    new-signing-key-payload:
-      additionalProperties: false
-      properties:
-        name:
-          type: string
-          description: Name of the signing key
     signing-key-response-payload:
       type: object
       required:
@@ -1196,6 +1198,18 @@ components:
         directPlayback:
           type: boolean
           default: false
+        defaultProjectId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        toBeDeleted:
+          type: boolean
+          default: false
+          description: Flag to be deleted
+        flaggedEmail:
+          type: boolean
+          default: false
+          description:
+            Whether the user's email is a temporary email or flagged by sendgrid
         kind:
           type: string
           readOnly: true
@@ -1282,6 +1296,10 @@ components:
           example: false
           description:
             User creates test streams and playbackIds should be flagged as such
+        viewerLimit:
+          type: number
+          example: 10
+          description: Maximum number of viewers allowed for the user
     signing-key:
       table: signing_key
       properties:
@@ -1292,6 +1310,10 @@ components:
         deleted:
           type: boolean
           default: false
+        projectId:
+          type: string
+          index: true
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
     usage:
       table: usage
       properties:

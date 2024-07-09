@@ -329,7 +329,7 @@ const Billing = () => {
                 <PaymentMethod data={data} />
               </>
             ) : (
-              "No payment method on file."
+              <Text variant="neutral">No payment method on file.</Text>
             )}
           </Flex>
         </Box>

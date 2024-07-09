@@ -1,21 +1,33 @@
 import {
-  styled,
-  Box,
-  Flex,
-  Text,
   Link as A,
   Avatar,
-  Grid,
+  Box,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuTrigger,
   DropdownMenuItem,
   Button,
 } from "@livepeer/design-system";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import {
+  BookmarkFilledIcon,
+  BookmarkIcon,
+  ChatBubbleIcon,
+  ChevronDownIcon,
+  LoopIcon,
+  RocketIcon,
+} from "@radix-ui/react-icons";
+import { useJune } from "hooks/use-june";
+import { isExport } from "lib/utils";
+import Link from "next/link";
+import Router, { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useApi } from "../../hooks";
+import ThemeSwitch from "../ThemeSwitch";
+import {
+  AssetsIcon,
+  BillingIcon,
   HomeIcon,
   StreamIcon,
   TerminalIcon,
@@ -567,6 +579,31 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               mb: !isSettingsPage ? "$6" : "$0",
             }}>
             <NavLink
+              href="https://docs.livepeer.org"
+              target="_blank"
+              css={{
+                color: "$neutral10",
+                transition: "color .3s",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "$neutral11",
+                  transition: "color .3s",
+                },
+              }}>
+              <BookmarkIcon />
+              <Text
+                css={{
+                  display: "flex",
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                  fontSize: "$1",
+                }}>
+                Documentation
+              </Text>
+            </NavLink>
+
+            <NavLink
               href="https://status.livepeer.studio/"
               target="_blank"
               css={{
@@ -640,7 +677,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                 Feature Requests
               </Text>
             </NavLink>
-            <Contact />
           </Flex>
         </Flex>
       </Box>

@@ -19,6 +19,7 @@ describe("assets table", () => {
       "asset_sourceAssetId",
       "asset_source_sessionId",
       "asset_source_url",
+      "asset_status_phase",
       "asset_storage_ipfs_cid",
       "asset_storage_ipfs_nftMetadata_cid",
       "asset_userId",
