@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
   Button,
+  useSnackbar,
 } from "@livepeer/design-system";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
@@ -26,7 +27,6 @@ import {
   UsageIcon,
   BillingIcon,
 } from "./NavIcons";
-import { toast } from "sonner";
 import { canSendEmail } from "lib/utils/can-send-email";
 import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
@@ -176,6 +176,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     useApi();
   const queryClient = useQueryClient();
   const { pathname } = useRouter();
+  const [openSnackbar] = useSnackbar();
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
 
@@ -230,16 +231,16 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     e.preventDefault();
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
-      toast(
-        `Please wait ${response.waitTime} seconds before sending another email.`,
+      openSnackbar(
+        `Please wait ${response.waitTime} seconds before sending another email.`
       );
       return;
     }
-    toast("Password reset link sent to your email.");
+    openSnackbar("Password reset link sent to your email.");
     const res = await makePasswordResetToken(user.email);
     if (res.errors) {
       res.errors.forEach((error) => {
-        toast(error);
+        openSnackbar(error);
       });
     }
   };
@@ -376,6 +377,22 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     Router.push("/settings/billing/plans");
                   }}>
                   <Text size="2">Plans</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="changepassword-dropdown-item"
+                  onClick={(e) => {
+                    changePassword(e);
+                  }}>
+                  <Text size="2">Change Password</Text>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   css={{
@@ -583,7 +600,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     </Box>
                   )}
                 </Box>
-              ),
+              )
             )}
           </Grid>
           <Flex

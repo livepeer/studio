@@ -23,7 +23,6 @@ import "../css/recaptcha.css";
 import "../css/tailwind.css";
 import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
-import { Toaster } from "sonner";
 import { ProjectProvider } from "context/ProjectContext";
 import useSyncProjectId from "hooks/use-project";
 
@@ -64,7 +63,7 @@ const globalStyles = globalCss({
 const themes: any = getThemes();
 const themeMap = {};
 Object.keys(themes).map(
-  (key, _index) => (themeMap[themes[key].className] = themes[key].className),
+  (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
 const livepeerClient = createReactClient({
@@ -132,7 +131,6 @@ const App = ({ Component, pageProps }) => {
                       client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
-                      <Toaster />
                     </LivepeerConfig>
                   </AnalyzerProvider>
                 </ApiProvider>
