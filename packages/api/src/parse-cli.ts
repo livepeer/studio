@@ -87,7 +87,7 @@ function coerceJsonValue<T>(flagName: string) {
 function coerceJsonProfileArr(flagName: string) {
   return (str: string): FfmpegProfile[] => {
     let profiles;
-    const validator = profileValidator as ValidateFunction;
+    const validator = profileValidator as any as ValidateFunction;
     try {
       profiles = JSON.parse(str);
     } catch (e) {

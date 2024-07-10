@@ -63,7 +63,7 @@ components:
         height:
           type: integer
           minimum: 128
-          expample: 720
+          example: 720
         bitrate:
           type: integer
           minimum: 400
@@ -120,7 +120,7 @@ components:
         height:
           type: integer
           minimum: 128
-          expample: 720
+          example: 720
         bitrate:
           type: integer
           minimum: 400
@@ -1142,6 +1142,7 @@ components:
           items:
             $ref: "#/components/schemas/transcode-profile"
         storage:
+          type: object
           additionalProperties: false
           properties:
             ipfs:
@@ -1384,6 +1385,7 @@ components:
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         storage:
+          type: object
           additionalProperties: false
           properties:
             ipfs:
