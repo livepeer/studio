@@ -65,7 +65,7 @@ export const rowsPageFromState = async (
   state: State<StreamsTableData>,
   userId: string,
   getStreams: Function,
-  appendProjectId: Function,
+  appendProjectId: Function
 ): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
   let isHealthy: boolean;
@@ -94,11 +94,9 @@ export const rowsPageFromState = async (
       id: stream.id,
       value: stream.name,
       children: <Text size={2}>{stream.name}</Text>,
-      tooltipChildren: stream.createdByTokenName ? (
-        <>
-          Created by token <b>{stream.createdByTokenName}</b>
-        </>
-      ) : null,
+      tooltipChildren: stream.createdByTokenName
+        ? `Created by token ${stream.createdByTokenName}`
+        : null,
       href: appendProjectId(`/streams/${stream.id}`),
     },
     details: { stream },

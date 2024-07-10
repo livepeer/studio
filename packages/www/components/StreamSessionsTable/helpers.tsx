@@ -59,7 +59,7 @@ export const makeColumns = () => [
     sortType: (...params: SortTypeArgs) =>
       numberSort(
         "original.sourceSegmentsDuration.sourceSegmentsDuration",
-        ...params,
+        ...params
       ),
   },
   {
@@ -75,7 +75,7 @@ export const rowsPageFromState = async (
   userId: string,
   getStreamSessionsByUserId: Function,
   openSnackbar: Function,
-  appendProjectId: Function,
+  appendProjectId: Function
 ): Promise<RowsPageFromStateResult<StreamSessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessionsByUserId(
     userId,
@@ -85,7 +85,7 @@ export const rowsPageFromState = async (
     formatFiltersForApiRequest(state.filters, {
       parseNumber: (n) => n * 60,
     }),
-    true,
+    true
   );
 
   return {
@@ -98,11 +98,9 @@ export const rowsPageFromState = async (
           id: stream.parentId,
           name: stream.parentStream.name,
           children: <Box>{stream.parentStream.name}</Box>,
-          tooltipChildren: stream.createdByTokenName ? (
-            <>
-              Created by stream <b>{stream.parentStream.name}</b>
-            </>
-          ) : null,
+          tooltipChildren: stream.createdByTokenName
+            ? `Created by stream ${stream.parentStream.name}`
+            : null,
           href: appendProjectId(`/streams/${stream.parentId}`),
         },
         recordingUrl: {
