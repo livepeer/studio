@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useApi } from "hooks";
 import Table, {
   useTableState,
@@ -17,6 +17,7 @@ import {
   rowsPageFromState,
 } from "./helpers";
 import { makeCreateAction } from "../Table/helpers";
+import { useProjectContext } from "context/ProjectContext";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -36,6 +37,7 @@ const AssetsTable = ({
   const { getAssets, uploadAssets, deleteAsset, getTasks, getFileUploads } =
     useApi();
   const [openSnackbar] = useSnackbar();
+  const { appendProjectId, projectId } = useProjectContext();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
     pageSize,
@@ -71,9 +73,20 @@ const AssetsTable = ({
 
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) =>
-      rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
-    [userId],
+      rowsPageFromState(
+        state,
+        userId,
+        getAssets,
+        getTasks,
+        onDeleteAsset,
+        appendProjectId,
+      ),
+    [userId, appendProjectId],
   );
+
+  useEffect(() => {
+    stateSetter.setProjectId(projectId);
+  }, [projectId]);
 
   return (
     <>

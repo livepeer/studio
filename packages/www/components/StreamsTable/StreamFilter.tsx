@@ -27,8 +27,9 @@ const DateInput = styled("input", {
   borderColor: "$neutral7",
   color: "$neutral9",
   outline: "none",
-  width: "94%",
+  width: "100%",
   borderRadius: "$1",
+  fontSize: "$2",
   p: "4px",
 });
 

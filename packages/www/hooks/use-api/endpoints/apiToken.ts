@@ -4,6 +4,7 @@ import { SetStateAction } from "react";
 import { ApiToken, Error as ApiError } from "@livepeer.studio/api";
 import { getCursor } from "../helpers";
 import { trackPageView } from "../tracking";
+import { projectId } from "hooks/use-project";
 
 let context: any;
 let setState: (value: SetStateAction<ApiState>) => void;
@@ -35,6 +36,7 @@ export const getApiTokens = async (
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
+      projectId,
     })}`,
   );
   const nextCursor = getCursor(res.headers.get("link"));
@@ -44,13 +46,16 @@ export const getApiTokens = async (
 
 export const createApiToken = async (params): Promise<ApiToken> => {
   trackPageView(params.email, "/create-api-token");
-  const [res, token] = await context.fetch(`/api-token`, {
-    method: "POST",
-    body: JSON.stringify(params),
-    headers: {
-      "content-type": "application/json",
+  const [res, token] = await context.fetch(
+    `/api-token?projectId=${projectId}`,
+    {
+      method: "POST",
+      body: JSON.stringify(params),
+      headers: {
+        "content-type": "application/json",
+      },
     },
-  });
+  );
   if (res.status !== 201) {
     throw new Error(JSON.stringify(res.errors));
   }
@@ -58,7 +63,9 @@ export const createApiToken = async (params): Promise<ApiToken> => {
 };
 
 export const deleteApiToken = async (id: string): Promise<void> => {
-  const [res, body] = await context.fetch(`/api-token/${id}`, {
+  const url = `/api-token/${id}?projectId=${projectId}`;
+
+  const [res, body] = await context.fetch(url, {
     method: "DELETE",
   });
   if (res.status !== 204) {

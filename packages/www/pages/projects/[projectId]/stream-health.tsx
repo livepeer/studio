@@ -7,7 +7,7 @@ import {
   TextField,
   Label,
 } from "@livepeer/design-system";
-import Layout from "../layouts/dashboard";
+import Layout from "../../../layouts/dashboard";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api/types";

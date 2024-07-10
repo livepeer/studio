@@ -75,6 +75,7 @@ export const rowsPageFromState = async (
   userId: string,
   getStreamSessionsByUserId: Function,
   openSnackbar: Function,
+  appendProjectId: Function,
 ): Promise<RowsPageFromStateResult<StreamSessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessionsByUserId(
     userId,
@@ -97,7 +98,12 @@ export const rowsPageFromState = async (
           id: stream.parentId,
           name: stream.parentStream.name,
           children: <Box>{stream.parentStream.name}</Box>,
-          href: `/streams/${stream.parentId}`,
+          tooltipChildren: stream.createdByTokenName ? (
+            <>
+              Created by stream <b>{stream.parentStream.name}</b>
+            </>
+          ) : null,
+          href: appendProjectId(`/streams/${stream.parentId}`),
         },
         recordingUrl: {
           id: stream.id,

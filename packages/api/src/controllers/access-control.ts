@@ -4,6 +4,7 @@ import { Request, Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import sql from "sql-template-strings";
+import { products } from "../config";
 import {
   NotFoundError,
   ForbiddenError,
@@ -30,12 +31,11 @@ import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-const MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE = 5;
+export const DEFAULT_MAX_CONCURRENT_VIEWERS = 50_000;
 const app = Router();
 
 type GateConfig = {
   refresh_interval: number;
-  rate_limit: number;
   user_viewer_limit: number;
   user_id: string;
 };
@@ -225,16 +225,21 @@ app.post(
 
     let config: Partial<GateConfig> = {};
 
-    if (user.viewerLimit) {
-      config.user_viewer_limit = user.viewerLimit;
-      config.user_id = user.id;
-    }
+    let viewerLimit = DEFAULT_MAX_CONCURRENT_VIEWERS;
 
-    if (user.createdAt > HACKER_DISABLE_CUTOFF_DATE) {
-      if (isFreeTierUser(user)) {
-        config.rate_limit = MAX_ALLOWED_VIEWERS_FOR_HACKER_TIER_PER_NODE;
+    if (user.stripeProductId) {
+      let userProduct = products[user.stripeProductId];
+      if (userProduct?.viewerLimit) {
+        viewerLimit = userProduct.viewerLimit;
       }
     }
+
+    if (user.viewerLimit || user.viewerLimit === 0) {
+      viewerLimit = user.viewerLimit;
+    }
+
+    config.user_viewer_limit = viewerLimit;
+    config.user_id = user.id;
 
     if (content.playbackPolicy?.refreshInterval) {
       config.refresh_interval = content.playbackPolicy.refreshInterval;

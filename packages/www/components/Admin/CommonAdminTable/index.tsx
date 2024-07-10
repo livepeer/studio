@@ -13,7 +13,7 @@ import {
   useRowSelect,
 } from "react-table";
 import Help from "../../../public/img/help.svg";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { User, Stream } from "@livepeer.studio/api";
 import "regenerator-runtime/runtime";
 
@@ -44,20 +44,12 @@ export const StreamName = ({
   admin?: boolean;
 }) => {
   const pid = `stream-name-${stream.id}-${name}`;
+  const tooltipContent = `Created by token ${stream?.createdByTokenName}`;
   const query = admin ? { admin: true } : {};
   return (
     <Box>
-      {stream.createdByTokenName ? (
-        <ReactTooltip
-          id={pid}
-          className="tooltip"
-          place="top"
-          type="dark"
-          effect="solid">
-          Created by token <b>{stream.createdByTokenName}</b>
-        </ReactTooltip>
-      ) : null}
-      <Box data-tip data-for={pid}>
+      {stream.createdByTokenName ? <Tooltip id={pid} /> : null}
+      <Box data-tooltip-id={pid} data-tooltip-content={tooltipContent}>
         <Link
           href={{ pathname: "/app/stream/[id]", query }}
           as={`/app/stream/${stream.id}`}>
@@ -93,15 +85,10 @@ export const RelativeTime = ({
     <Box id={idpref} key={idpref}>
       {tm ? (
         <>
-          <ReactTooltip
-            id={`tooltip-${idpref}`}
-            className="tooltip"
-            place="top"
-            type="dark"
-            effect="solid">
-            {toolTip}
-          </ReactTooltip>
-          <span data-tip data-for={`tooltip-${idpref}`}>
+          <Tooltip id={`tooltip-${idpref}`} />
+          <span
+            data-tooltip-id={`tooltip-${idpref}`}
+            data-tooltip-content={toolTip}>
             {main}
           </span>
         </>
@@ -114,27 +101,23 @@ export const RelativeTime = ({
 
 export const UserName = ({ user }: { user: User }) => {
   const tid = `tooltip-name-${user.id}`;
+  const tcontent = `
+    ${user.id}
+    ${user.firstName}
+    ${user.lastName}
+  `;
   return (
     <Box
       sx={{
         overflow: "hidden",
         textOverflow: "ellipsis",
       }}>
-      <ReactTooltip
-        id={tid}
-        className="tooltip"
-        place="top"
-        type="dark"
-        effect="solid">
-        <span>{user.id}</span>
-        <span>{user.firstName}</span>
-        <span>{user.lastName}</span>
-      </ReactTooltip>
-      <span data-tip data-for={tid}>
+      <span data-tooltip-id={tid} data-tooltip-content={tcontent}>
         {user.email.includes("@")
           ? user.email.split("@").join("@\u{200B}")
           : user.email}
       </span>
+      <Tooltip id={tid} />
     </Box>
   );
 };
@@ -311,7 +294,7 @@ const CommonAdminTable = ({
                 </Button>
                 <Button
                   variant="secondarySmall"
-                  disabled={rows.length < rowsPerPage || nextCursor === ""}
+                  disabled={rows.length < +rowsPerPage || nextCursor === ""}
                   sx={{ margin: 0, ml: 2, padding: "2px", px: "4px" }}
                   onClick={() => {
                     prevCursor.push(cursor);
@@ -458,18 +441,10 @@ const CommonAdminTable = ({
                         <Flex
                           sx={{ alignItems: "center", ml: "auto", mr: "1em" }}>
                           <Flex>
-                            <ReactTooltip
-                              id={`tooltip-multiorder`}
-                              className="tooltip"
-                              place="top"
-                              type="dark"
-                              effect="solid">
-                              To multi-sort (sort by two column simultaneously)
-                              hold shift while clicking on second column name.
-                            </ReactTooltip>
+                            <Tooltip id={`tooltip-multiorder`} />
                             <Help
-                              data-tip
-                              data-for={`tooltip-multiorder`}
+                              data-tooltip-id={`tooltip-multiorder`}
+                              data-tooltip-content="To multi-sort (sort by two column simultaneously) hold shift while clicking on second column name."
                               sx={{
                                 cursor: "pointer",
                                 ml: 1,

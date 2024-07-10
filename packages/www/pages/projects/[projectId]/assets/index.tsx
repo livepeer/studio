@@ -1,4 +1,4 @@
-import Layout from "../../layouts/dashboard";
+import Layout from "../../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import AssetsTable from "components/AssetsTable";
@@ -11,6 +11,10 @@ const Assets = () => {
   if (!user) {
     return <Layout />;
   }
+
+  const data = {
+    disableSizeLimit: true,
+  };
   return (
     <Layout
       id="assets"

@@ -145,7 +145,7 @@ const UsageSummary = () => {
         setOverUsageBill(oBill);
         let [res, uInvoice] = await getUpcomingInvoice(user.stripeCustomerId);
         setUpcomingInvoice(uInvoice?.invoices);
-        setUpcomingInvoiceTotal((uInvoice?.invoices.total / 100) | 0);
+        setUpcomingInvoiceTotal((uInvoice?.invoices?.total / 100) | 0);
       }
     };
 
@@ -304,7 +304,7 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/billing" passHref legacyBehavior>
+        <Link href="/settings/billing" passHref legacyBehavior>
           <A
             variant="primary"
             css={{ display: "flex", alignItems: "center" }}

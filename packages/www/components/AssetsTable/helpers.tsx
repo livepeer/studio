@@ -101,6 +101,7 @@ export const rowsPageFromState = async (
   getAssets: ApiClient["getAssets"],
   getTasks: ApiClient["getTasks"],
   onDeleteAsset: Function,
+  appendProjectId: Function,
 ): Promise<RowsPageFromStateResult<AssetsTableData>> => {
   const assetsPromise = getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
@@ -137,7 +138,7 @@ export const rowsPageFromState = async (
         id: asset.id,
         name: {
           id: asset.id,
-          href: `/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
           name: asset.name,
           isStatusFailed,
           errorMessage,
@@ -149,18 +150,18 @@ export const rowsPageFromState = async (
             </Box>
           ),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
         },
         sessionId: {
           children: <Box>{sessionId}</Box>,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/sessions?sessionId=${sessionId}`,
+          href: appendProjectId(`/sessions?sessionId=${sessionId}`),
         },
         createdAt: {
           id: asset.id,
           date: new Date(asset.createdAt),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
           asset: asset as Asset, // CreatedAt cell expect SDK asset instead of API
         },
         updatedAt: {
@@ -169,7 +170,7 @@ export const rowsPageFromState = async (
               ? new Date(asset.status.updatedAt)
               : null,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          href: `/assets/${asset.id}`,
+          href: appendProjectId(`/assets/${asset.id}`),
         },
         action: {
           id: asset.id,

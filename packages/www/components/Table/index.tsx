@@ -60,6 +60,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setFilters: Dispatch<SetStateAction<TFilter[]>>;
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
   setDataCount: Dispatch<SetStateAction<number | number[]>>;
+  setProjectId: Dispatch<SetStateAction<string>>;
 };
 
 export type State<T extends Record<string, unknown>> = {
@@ -73,6 +74,7 @@ export type State<T extends Record<string, unknown>> = {
   selectedRows: Row<T>[];
   pageSize: number;
   dataCount: number | number[];
+  projectId: string;
   invalidate: () => Promise<void>;
 };
 
@@ -566,6 +568,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [prevCursors, setPrevCursors] = useState<string[]>([]);
   const [nextCursor, setNextCursor] = useState("default");
   const [filters, setFilters] = useState<TFilter[]>([]);
+  const [projectId, setProjectId] = useState<string>("");
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
   const [dataCount, setDataCount] = useState<number | number[]>(0);
   const queryClient = useQueryClient();
@@ -584,6 +587,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       setFilters,
       setSelectedRows,
       setDataCount,
+      setProjectId,
     }),
     [],
   );
@@ -600,6 +604,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       selectedRows,
       pageSize,
       dataCount,
+      projectId,
       invalidate: () => queryClient.invalidateQueries(tableId),
     }),
     [
@@ -614,6 +619,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       dataCount,
       queryClient,
       tableId,
+      projectId,
     ],
   );
 
@@ -627,6 +633,7 @@ const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
     state.cursor,
     state.order,
     state.stringifiedFilters,
+    state.projectId,
   ];
   const tableData: UseQueryResult<FetchResult<T>> = useQuery(
     queryKey,

@@ -248,9 +248,9 @@ export class DB {
       throw e;
     }
     logger.debug(
-      `runQuery phase=success elapsed=${Date.now() - start}ms rows=${
-        result?.rowCount
-      } query=${queryLog}`,
+      `runQuery phase=success elapsed=${
+        Date.now() - start
+      }ms rows=${result?.rowCount} query=${queryLog}`,
     );
     return result;
   }
