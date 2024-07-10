@@ -172,7 +172,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               <DropdownMenuItem
                 key="change-password-dropdown-item"
                 onSelect={changePassword}>
-                Change Password
+                Change password
               </DropdownMenuItem>
               <DropdownMenuItem
                 key="logout-dropdown-item"
