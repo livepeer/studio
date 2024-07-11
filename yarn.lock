@@ -3699,10 +3699,12 @@
   dependencies:
     glob "7.1.7"
 
-"@next/mdx@^9.5.2":
-  version "9.5.5"
-  resolved "https://registry.npmjs.org/@next/mdx/-/mdx-9.5.5.tgz"
-  integrity sha512-IdwwXrxqNhZuEeyVdCKtv1R2CqIsAZm/rtCUbE5WImFW3VK8nrSFDFi+JkoWoDcHgGgaJYgfoYAoieHV5POGJg==
+"@next/mdx@^14.2.5":
+  version "14.2.5"
+  resolved "https://registry.yarnpkg.com/@next/mdx/-/mdx-14.2.5.tgz#22bda994aaf027651886e060ea1c8e95b28f015f"
+  integrity sha512-AROhSdXQg0/jt55iqxVSJqp9oaCyXwRe44/I17c77gDshZ6ex7VKBZDH0GljaxZ0Y4mScYUbFJJEh42Xw4X4Dg==
+  dependencies:
+    source-map "^0.7.0"
 
 "@next/swc-darwin-arm64@14.2.4":
   version "14.2.4"
@@ -22242,7 +22244,7 @@ source-map@^0.5.0, source-map@^0.5.6, source-map@^0.5.7:
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.5.7.tgz"
   integrity sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==
 
-source-map@^0.7.3:
+source-map@^0.7.0, source-map@^0.7.3:
   version "0.7.4"
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.7.4.tgz"
   integrity sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==
