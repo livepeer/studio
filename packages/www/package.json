@@ -48,6 +48,7 @@
     "filenamify": "^4.3.0",
     "lazysizes": "^5.2.0",
     "lodash.omit": "^4.5.0",
+    "lucide-react": "^0.407.0",
     "moment": "^2.24.0",
     "mux-embed": "^4.15.0",
     "next": "^14.2.4",
@@ -80,7 +81,8 @@
     "remark-emoji": "^2.1.0",
     "sass": "^1.77.6",
     "styled-components": "^6.1.11",
-    "tailwind-merge": "^2.3.0",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "theme-ui": "0.3.1",
     "tus-js-client": "^3.0.1",
     "uuid": "^8.3.2"
