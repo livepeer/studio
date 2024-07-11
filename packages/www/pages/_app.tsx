@@ -122,7 +122,6 @@ const App = ({ Component, pageProps }) => {
           }}>
           <ProjectProvider>
             <SyncProjectId />
-
             <SnackbarProvider>
               <QueryClientProvider client={queryClient}>
                 <ApiProvider>

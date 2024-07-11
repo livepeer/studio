@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Flex,
   Box,
@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogContent,
   AlertDialogCancel,
+  Alert,
 } from "@livepeer/design-system";
 import Spinner from "components/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -22,6 +23,7 @@ import { useTheme } from "next-themes";
 const PaymentMethodDialog = ({ invalidateQuery }) => {
   const { user, updateCustomerPaymentMethod } = useApi();
   const [status, setStatus] = useState("initial");
+  const [errorMessage, setErrorMessage] = useState("");
   const stripe = useStripe();
   const { register, handleSubmit } = useForm();
   const elements = useElements();
@@ -47,6 +49,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
         const paymentMethod = result.paymentMethod;
         if (result.error) {
           setStatus("error");
+          setErrorMessage(result.error.message);
         } else {
           updateCustomerPaymentMethod({
             stripeCustomerId,
@@ -54,7 +57,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           })
             // If the card is declined, display an error to the user.
             .then((result: any) => {
-              if (result.error) {
+              if (result.errors) {
+                setErrorMessage(result.errors?.[0]?.split("\n")[0]);
                 setStatus("error");
                 // The card had an error when trying to attach it to a customer.
                 throw result;
@@ -64,6 +68,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
             .then(onPaymentChangeComplete)
             .catch((error) => {
               console.log(error);
+
               setStatus("error");
             });
         }
@@ -103,6 +108,10 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
     });
   };
 
+  useEffect(() => {
+    setErrorMessage("");
+  }, [open]);
+
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       <Flex css={{ ai: "center" }}>
@@ -131,7 +140,18 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
             </Heading>
           </AlertDialogTitle>
 
-          <Box css={{ mt: "$4" }}>
+          {errorMessage && (
+            <Alert
+              css={{
+                my: "$3",
+                color: "$red11",
+              }}
+              variant={"red"}>
+              {errorMessage}
+            </Alert>
+          )}
+
+          <Box css={{ mt: "$2" }}>
             <Box css={{ color: "$hiContrast" }}>
               <Box>
                 <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
