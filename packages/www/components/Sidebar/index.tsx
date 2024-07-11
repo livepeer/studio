@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
   Button,
+  useSnackbar,
 } from "@livepeer/design-system";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
@@ -26,6 +27,7 @@ import {
   UsageIcon,
   BillingIcon,
 } from "./NavIcons";
+import { canSendEmail } from "lib/utils/can-send-email";
 import { useApi } from "../../hooks";
 import Router, { useRouter } from "next/router";
 import {
@@ -170,9 +172,11 @@ const settingsSidebarItems = [
 
 const Sidebar = ({ id }: { id: SidebarId }) => {
   const { setProjectId, projectId, appendProjectId } = useProjectContext();
-  const { createProject, getProjects, logout, user } = useApi();
+  const { createProject, getProjects, logout, user, makePasswordResetToken } =
+    useApi();
   const queryClient = useQueryClient();
   const { pathname } = useRouter();
+  const [openSnackbar] = useSnackbar();
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
 
@@ -221,6 +225,22 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
       return item.children.some((child: any) => id === child.id);
     }
     return false;
+  };
+
+  const changePassword = async (e) => {
+    e.preventDefault();
+    const response = canSendEmail("resetPassword");
+    if (!response.canSend) {
+      openSnackbar(
+        `Please wait ${response.waitTime} seconds before sending another email.`,
+      );
+      return;
+    }
+    openSnackbar("Password reset link sent to your email.");
+    const res = await makePasswordResetToken(user.email);
+    if (res.errors) {
+      openSnackbar(res?.errors?.[0]);
+    }
   };
 
   return (
@@ -355,6 +375,22 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     Router.push("/settings/billing/plans");
                   }}>
                   <Text size="2">Plans</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="changepassword-dropdown-item"
+                  onClick={(e) => {
+                    changePassword(e);
+                  }}>
+                  <Text size="2">Change Password</Text>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   css={{
