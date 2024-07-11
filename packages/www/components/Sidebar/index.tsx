@@ -239,9 +239,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     openSnackbar("Password reset link sent to your email.");
     const res = await makePasswordResetToken(user.email);
     if (res.errors) {
-      res.errors.forEach((error) => {
-        openSnackbar(error);
-      });
+      openSnackbar(res?.errors?.[0]);
     }
   };
 
