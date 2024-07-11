@@ -5,7 +5,7 @@ import "react-credit-cards/es/styles-compiled.css";
 const PaymentMethod = ({ data }) => {
   return (
     <Flex>
-      {data && (
+      {data?.card && (
         <Cards
           issuer={data.card.brand}
           expiry={
