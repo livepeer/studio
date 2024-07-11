@@ -175,7 +175,7 @@ app.post("/", validatePost("api-token"), async (req, res) => {
     access: req.body.access,
     createdAt: Date.now(),
   });
-  const apiToken = await req.store.get(`api-token/${id}`);
+  const apiToken = await db.apiToken.get(id, { useReplica: false });
 
   if (apiToken) {
     res.status(201);

@@ -98,11 +98,9 @@ export const rowsPageFromState = async (
           id: stream.parentId,
           name: stream.parentStream.name,
           children: <Box>{stream.parentStream.name}</Box>,
-          tooltipChildren: stream.createdByTokenName ? (
-            <>
-              Created by stream <b>{stream.parentStream.name}</b>
-            </>
-          ) : null,
+          tooltipChildren: stream.createdByTokenName
+            ? `Created by stream ${stream.parentStream.name}`
+            : null,
           href: appendProjectId(`/streams/${stream.parentId}`),
         },
         recordingUrl: {

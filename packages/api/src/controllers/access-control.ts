@@ -31,7 +31,6 @@ import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
-export const DEFAULT_MAX_CONCURRENT_VIEWERS = 50_000;
 const app = Router();
 
 type GateConfig = {
@@ -225,7 +224,7 @@ app.post(
 
     let config: Partial<GateConfig> = {};
 
-    let viewerLimit = DEFAULT_MAX_CONCURRENT_VIEWERS;
+    let viewerLimit = req.config.accessControlDefaultMaxConcurrentViewers;
 
     if (user.stripeProductId) {
       let userProduct = products[user.stripeProductId];

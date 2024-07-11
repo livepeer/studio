@@ -461,6 +461,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "Access Control Admin signing private key",
         type: "string",
       },
+      "access-control-default-max-concurrent-viewers": {
+        describe: "Access Control Max Concurrent viewers",
+        type: "number",
+        default: 50_000,
+      },
       "verification-frequency": {
         describe: "verificationFreq field to return from stream/hook",
         default: 0,
