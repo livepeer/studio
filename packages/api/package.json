@@ -131,7 +131,7 @@
     "@types/pg": "^7.14.4",
     "@types/uuid": "^9.0.0",
     "ajv-pack": "^0.3.1",
-    "cloudflare": "^2.7.0",
+    "cloudflare": "^3.4.0",
     "esbuild": "^0.18.17",
     "esm": "^3.2.22",
     "istanbul-api": "^2.1.6",
