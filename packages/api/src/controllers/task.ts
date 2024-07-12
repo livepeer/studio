@@ -291,7 +291,7 @@ app.post("/:id/retry", authorizer({}), async (req, res) => {
 
   const user = await db.user.get(task.userId);
   if (!user) {
-    return res.status(500).json({ errors: ["user not found"] });
+    return res.status(500).json({ errors: ["Account not found"] });
   }
 
   if (!req.user.admin && req.user.id !== task.userId) {
@@ -320,7 +320,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
 
   const user = await db.user.get(task.userId);
   if (!user) {
-    return res.status(500).json({ errors: ["task user not found"] });
+    return res.status(500).json({ errors: ["task Account not found"] });
   } else if (user.suspended || user.disabled) {
     return res.status(403).json({
       errors: [`task user is ${user.suspended ? "suspended" : "disabled"}`],

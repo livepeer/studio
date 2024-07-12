@@ -276,7 +276,7 @@ describe("controllers/user", () => {
       });
       expect(res.status).toBe(404);
       let tokenRes = await res.json();
-      expect(tokenRes.errors[0]).toBe(`user not found`);
+      expect(tokenRes.errors[0]).toBe(`Account not found`);
 
       // create user
       res = await client.post("/user", {
@@ -378,7 +378,7 @@ describe("controllers/user", () => {
       });
       expect(req.status).toBe(404);
       let resp = await req.json();
-      expect(resp.errors[0]).toBe("user not found");
+      expect(resp.errors[0]).toBe("Account not found");
 
       // should return 422 when extra property added to request
       req = await client.post(`/user/password/reset-token`, {

@@ -92,8 +92,8 @@ const StreamDetail = ({
     return !healthValid
       ? StatusVariant.Pending
       : healthyCond.status
-        ? StatusVariant.Healthy
-        : StatusVariant.Unhealthy;
+      ? StatusVariant.Healthy
+      : StatusVariant.Unhealthy;
   }, [stream?.isActive, streamHealth]);
 
   if (!user) {

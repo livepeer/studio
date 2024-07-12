@@ -243,7 +243,7 @@ app.post("/webhook", async (req, res) => {
 
     if (users.length < 1) {
       res.status(404);
-      return res.json({ errors: ["user not found"] });
+      return res.json({ errors: ["Account not found"] });
     }
 
     const user = users[0];
@@ -290,7 +290,7 @@ app.post("/webhook", async (req, res) => {
 
     if (users.length < 1) {
       res.status(404);
-      return res.json({ errors: ["user not found"] });
+      return res.json({ errors: ["Account not found"] });
     }
 
     const user = users[0];
@@ -411,7 +411,7 @@ app.patch(
 
     if (!user) {
       res.status(404);
-      return res.json({ errors: ["user not found"] });
+      return res.json({ errors: ["Account not found"] });
     }
 
     if (stripeCustomerSubscriptionId) {

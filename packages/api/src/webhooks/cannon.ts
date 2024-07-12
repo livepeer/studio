@@ -166,7 +166,7 @@ export default class WebhookCannon {
     let user = await db.user.get(userId);
     if (!user) {
       throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: User not found userId=${userId}`,
+        `webhook Cannon: onTrigger: Account not found userId=${userId}`,
       );
     } else if (user.suspended) {
       throw new UnprocessableEntityError(

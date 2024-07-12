@@ -622,8 +622,8 @@ export async function getRecordingFields(
         assetPhase == "ready"
           ? "ready"
           : assetPhase == "failed"
-            ? "failed"
-            : "waiting",
+          ? "failed"
+          : "waiting",
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
     };

@@ -971,7 +971,7 @@ components:
             type: string
             example:
               - id not provided
-              - user not found
+              - Account not found
     multistream-target:
       type: object
       required:

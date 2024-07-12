@@ -54,7 +54,7 @@ describe("controllers/region", () => {
 
       const user = await server.store.get(`user/${adminUser.id}`, false);
       if (!user) {
-        throw new Error("user not found");
+        throw new Error("Account not found");
       }
       adminUser = { ...user, admin: true, emailValid: true };
       await server.store.replace(adminUser);

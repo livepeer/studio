@@ -26,7 +26,7 @@ async function toUserId(emailOrId: string) {
     user = users?.[0];
   }
   if (!user) {
-    throw new NotFoundError(`user not found: ${emailOrId}`);
+    throw new NotFoundError(`Account not found: ${emailOrId}`);
   }
   return user.id;
 }
@@ -62,7 +62,7 @@ app.get("/check/:experiment", authorizer({}), async (req, res) => {
     if (userId) {
       user = await db.user.get(userId);
       if (!user) {
-        throw new NotFoundError("user not found");
+        throw new NotFoundError("Account not found");
       }
     }
   }

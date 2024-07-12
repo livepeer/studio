@@ -1240,7 +1240,7 @@ app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
   const user = await db.user.get(userId);
 
   if (!user) {
-    throw new NotFoundError(`user not found`);
+    throw new NotFoundError(`Account not found`);
   }
 
   const limit = parseInt(req.query.limit?.toString() || "100");

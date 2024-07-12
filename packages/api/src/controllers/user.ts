@@ -91,7 +91,7 @@ async function findUserByEmail(email: string, useReplica = true) {
   // Look for user by original email
   const [users] = await db.user.find({ email }, { useReplica });
   if (!users?.length) {
-    throw new NotFoundError("user not found");
+    throw new NotFoundError("Account not found");
   } else if (users.length > 1) {
     throw new InternalServerError("multiple users found with same email");
   }
@@ -294,7 +294,7 @@ app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const user = await db.user.get(id);
   if (!user) {
     res.status(404);
-    return res.json({ errors: ["user not found"] });
+    return res.json({ errors: ["Account not found"] });
   }
   await db.user.delete(id);
 
@@ -542,7 +542,7 @@ app.patch("/:id/email", authorizer({}), async (req, res) => {
     }
 
     if (!user) {
-      return res.status(404).json({ errors: ["User not found"] });
+      return res.status(404).json({ errors: ["Account not found"] });
     }
 
     await db.user.update(req.params.id, {
@@ -771,7 +771,7 @@ app.post("/token", validatePost("user"), async (req, res) => {
   const [hashedPassword] = await hash(req.body.password, user.salt);
   if (hashedPassword !== user.password) {
     res.status(403);
-    res.json({ errors: ["incorrect password"] });
+    res.json({ errors: ["Password incorrect"] });
     return;
   }
 
@@ -977,7 +977,7 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
 
   if (!user) {
     res.status(404);
-    return res.json({ errors: ["user not found"] });
+    return res.json({ errors: ["Account not found"] });
   }
 
   const emailSent = await sendVerificationEmail(req, user, selectedPlan);
@@ -1189,7 +1189,7 @@ app.post(
     );
     if (users.length < 1 || users[0].id !== req.user.id) {
       res.status(404);
-      return res.json({ errors: ["user not found"] });
+      return res.json({ errors: ["Account not found"] });
     }
     let user = users[0];
 
@@ -1232,7 +1232,7 @@ app.post(
     );
     if (users.length < 1) {
       res.status(404);
-      return res.json({ errors: ["user not found"] });
+      return res.json({ errors: ["Account not found"] });
     }
     let user = users[0];
     if (user.stripeCustomerSubscriptionId) {
@@ -1313,7 +1313,7 @@ app.post(
       users[0].stripeCustomerId !== payload.stripeCustomerId
     ) {
       res.status(404);
-      return res.json({ errors: ["user not found"] });
+      return res.json({ errors: ["Account not found"] });
     }
     let user = users[0];
 

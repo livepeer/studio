@@ -309,7 +309,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
   const user = await db.user.get(req.query.userId);
 
   if (!user) {
-    throw new NotFoundError(`user not found: ${req.query.userId}`);
+    throw new NotFoundError(`Account not found: ${req.query.userId}`);
   }
 
   const ingests = await req.getIngest();
