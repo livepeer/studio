@@ -43,7 +43,7 @@ const FileUpload = () => {
 
   return (
     <Box
-    className="bg-background border"
+      className="bg-background border"
       css={{
         position: "fixed",
         bottom: "$4",

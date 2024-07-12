@@ -127,7 +127,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
         </Button>
       </Flex>
 
-      <AlertDialogContent className="bg-surface" css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent
+        className="bg-surface"
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <Box
           as="form"
           onSubmit={handleSubmit(onSubmit)}

@@ -40,7 +40,9 @@ const DeleteProjectDialog = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange} {...props}>
-      <AlertDialogContent className="bg-surface" css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent
+        className="bg-surface"
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Delete Project </Heading>
         </AlertDialogTitle>

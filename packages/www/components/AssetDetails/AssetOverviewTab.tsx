@@ -135,8 +135,9 @@ const AssetOverviewTab = ({
           </Text>
         </Box>
         <div
-        className="bg-background text-foreground p-4 rounded-lg border" 
-        size="2" css={{ borderRadius: "$2" }}>
+          className="bg-background text-foreground p-4 rounded-lg border"
+          size="2"
+          css={{ borderRadius: "$2" }}>
           <Flex css={{ justifyContent: "space-between" }}>
             <Flex align="center">
               <StyledIpfsIcon />

@@ -17,7 +17,7 @@ import { getEmojiIcon } from "lib/get-emoji";
 function ProjectTile({ name, id, invalidateQuery }) {
   return (
     <Box
-    className="bg-background border"
+      className="bg-background border"
       css={{
         p: "$4",
         width: "100%",
@@ -34,9 +34,11 @@ function ProjectTile({ name, id, invalidateQuery }) {
       <Box>
         <Flex align={"center"} justify={"between"}>
           <Flex align={"center"}>
-            <Avatar 
-            className="bg-accent pt-1"
-            fallback={getEmojiIcon(name)} size={"3"} />
+            <Avatar
+              className="bg-accent pt-1"
+              fallback={getEmojiIcon(name)}
+              size={"3"}
+            />
             <Text
               css={{
                 fontWeight: 500,
@@ -86,9 +88,9 @@ function ProjectTile({ name, id, invalidateQuery }) {
                       passHref
                       legacyBehavior
                       href={`/projects/${id}/${item.path}`}>
-                      <NavLink
-                      className="hover:bg-accent"
-                      key={item.title}>{item.title}</NavLink>
+                      <NavLink className="hover:bg-accent" key={item.title}>
+                        {item.title}
+                      </NavLink>
                     </Link>
                   ))}
                 </Flex>
@@ -98,9 +100,7 @@ function ProjectTile({ name, id, invalidateQuery }) {
         </Flex>
       </Box>
       <Flex justify={"end"}>
-        <Button 
-        className="bg-accent"
-        css={{ mt: 40 }} size={1}>
+        <Button className="bg-accent" css={{ mt: 40 }} size={1}>
           Open Project
         </Button>
       </Flex>

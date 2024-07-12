@@ -64,9 +64,10 @@ const AssetChildrenHeadingBox = ({
           </Box>
         </Box>
         <Box css={{ position: "relative", top: "-8px" }}>
-          <Button 
-          className="bg-accent text-foreground"
-          size="2" onClick={() => setEditAssetDialogOpen(true)}>
+          <Button
+            className="bg-accent text-foreground"
+            size="2"
+            onClick={() => setEditAssetDialogOpen(true)}>
             <Box
               as={Pencil1Icon}
               css={{

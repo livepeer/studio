@@ -29,8 +29,8 @@ const CreateProjectDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent
-      className="bg-surface"
-      css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        className="bg-surface"
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Create Project</Heading>
         </AlertDialogTitle>

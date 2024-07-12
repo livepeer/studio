@@ -95,7 +95,7 @@ const CreateEditDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
       <AlertDialogContent
-      className="bg-surface"
+        className="bg-surface"
         css={{ width: 450, maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">

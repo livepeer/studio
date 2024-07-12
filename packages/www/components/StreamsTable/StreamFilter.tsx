@@ -286,7 +286,7 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                     : value)}
             </Flex>
             <DropdownMenuContent
-            className="bg-background border"
+              className="bg-background border"
               placeholder={"more options"}
               css={{
                 p: "$2",
@@ -308,7 +308,7 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                     mt: "$2",
                   }}>
                   <Button
-                  className="bg-accent"
+                    className="bg-accent"
                     type="submit"
                     css={{
                       fontWeight: 500,

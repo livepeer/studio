@@ -372,7 +372,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               )}
               {createAction && (
                 <Button
-                className="bg-accent"
+                  className="bg-accent"
                   variant="neutral"
                   size="2"
                   // @ts-ignore

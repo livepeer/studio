@@ -129,7 +129,7 @@ curl --request POST \
         <Flex align={"center"}>
           <Avatar
             fallback={getEmojiIcon(data?.name)}
-               className="bg-accent pt-1"
+            className="bg-accent pt-1"
             style={{
               borderRadius: 10,
               marginRight: 10,
@@ -141,10 +141,7 @@ curl --request POST \
           </Heading>
         </Flex>
         <Link href={appendProjectId("/settings")} passHref legacyBehavior>
-          <Button 
-        className="bg-accent"
-        
-          as="a" size="2">
+          <Button className="bg-accent" as="a" size="2">
             Edit Project
           </Button>
         </Link>
@@ -174,7 +171,7 @@ curl --request POST \
             gridTemplateColumns: "repeat(auto-fill, minmax(46%, 1fr))",
           }}>
           <div
-          className="bg-background border p-4 rounded-xl"
+            className="bg-background border p-4 rounded-xl"
             css={{
               width: "100%",
               height: "100%",
@@ -243,7 +240,7 @@ curl --request POST \
                 "https://docs.livepeer.org/api-reference/overview/introduction"
               }>
               <Button
-              className="bg-accent"
+                className="bg-accent"
                 css={{
                   mt: "$2",
                   display: "flex",
@@ -332,7 +329,7 @@ const Card = ({
           textDecoration: "none",
         }}>
         <Button
-        className="bg-accent"
+          className="bg-accent"
           css={{
             mt: "$2",
             display: "flex",
