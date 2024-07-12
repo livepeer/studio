@@ -2903,6 +2903,7 @@ components:
         image:
           type: string
           format: binary
+          maxLength: 10485760 # 10MiB
         model_id:
           type: string
           default: timbrooks/instruct-pix2pix
@@ -2938,6 +2939,7 @@ components:
         image:
           type: string
           format: binary
+          maxLength: 10485760 # 10MiB
         model_id:
           type: string
           default: stabilityai/stable-video-diffusion-img2vid-xt-1-1
@@ -2974,6 +2976,7 @@ components:
         image:
           type: string
           format: binary
+          maxLength: 10485760 # 10MiB
         model_id:
           type: string
           default: stabilityai/stable-diffusion-x4-upscaler
