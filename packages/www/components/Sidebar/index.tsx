@@ -56,14 +56,14 @@ export const NavLink = styled(A, {
   gap: "$2",
   textDecoration: "none",
   "&:hover": {
-    bc: "$neutral4",
+    bc: "hsl(var(--accent))",
     textDecoration: "none",
   },
   "&:focus": {
     outline: "none",
   },
   variants: {
-    active: { true: { bc: "$neutral4" } },
+    active: { true: { bc: "hsl(var(--accent))" } },
   },
 });
 
@@ -232,7 +232,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
       openSnackbar(
-        `Please wait ${response.waitTime} seconds before sending another email.`,
+        `Please wait ${response.waitTime} seconds before sending another email.`
       );
       return;
     }
@@ -245,30 +245,18 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
   return (
     <>
-      <Box
-        css={{
-          backgroundColor: "$panel",
-          borderRight: "1px solid",
-          borderColor: "$neutral6",
-          maxWidth: 270,
-          width: 270,
-          top: 0,
-          position: "fixed",
-          justifyContent: "flex-end",
-          bottom: 0,
-          zIndex: 0,
-        }}>
+      <Box className="bg-background w-[17rem] fixed justify-end  bottom-0 top-0 z-0">
         <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
           <DropdownMenu>
             <Flex
               as={DropdownMenuTrigger}
+              className="hover:bg-accent"
               align="center"
               css={{
                 border: 0,
                 background: "transparent",
                 p: 6,
                 "&:hover": {
-                  backgroundColor: "$neutral4",
                   borderRadius: "$3",
                 },
               }}>
@@ -297,9 +285,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               </Text>
             </Flex>
             <DropdownMenuContent
+              className="bg-surface border"
               placeholder="Account"
               css={{
-                border: "1px solid $colors$neutral6",
                 width: "12rem",
                 ml: "$4",
                 mt: "$1",
@@ -418,6 +406,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           <DropdownMenu>
             <Flex
               align={"center"}
+              className="hover:bg-accent"
               as={DropdownMenuTrigger}
               css={{
                 py: "$1",
@@ -432,7 +421,6 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   outline: "none",
                 },
                 "&:hover": {
-                  backgroundColor: "$neutral4",
                   borderRadius: "$3",
                 },
               }}>
@@ -445,13 +433,13 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
               <TopBottomChevron />
             </Flex>
             <DropdownMenuContent
+              className="bg-surface border"
               placeholder={"Projects"}
               css={{
-                border: "1px solid $colors$neutral6",
-                width: "14rem",
-                ml: "$5",
+                width: "13rem",
+                ml: "$4",
                 py: "$2",
-                px: "$3",
+                px: "$2",
               }}>
               <Text size={2} variant={"neutral"} css={{ ml: "$1", mb: "$1" }}>
                 Projects
@@ -598,7 +586,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     </Box>
                   )}
                 </Box>
-              ),
+              )
             )}
           </Grid>
           <Flex

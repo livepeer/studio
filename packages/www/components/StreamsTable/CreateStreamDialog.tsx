@@ -28,8 +28,12 @@ const CreateStreamDialog = ({
   const [streamName, setStreamName] = useState("");
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+    <AlertDialog
+    
+    open={isOpen} onOpenChange={onOpenChange}>
+      <AlertDialogContent 
+      className="bg-surface"
+      css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Create a new livestream</Heading>
         </AlertDialogTitle>
@@ -85,6 +89,7 @@ const CreateStreamDialog = ({
             <Button
               css={{ display: "flex", ai: "center" }}
               type="submit"
+              className="bg-accent text-foreground"
               size="2"
               disabled={creating}
               variant="primary">

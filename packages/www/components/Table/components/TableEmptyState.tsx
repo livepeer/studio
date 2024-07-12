@@ -46,6 +46,7 @@ const TableEmptyState = ({
     {actionToggleState && (
       <Flex align="center">
         <Button
+        className="bg-accent text-foreground"
           onClick={actionToggleState.onOn}
           css={{ alignSelf: "flex-start", mr: "$2" }}
           size="2"

@@ -119,12 +119,11 @@ const Settings = () => {
           <Button
             onClick={handleSubmit}
             disabled={isLoading || !projectName}
+            className="bg-accent text-foreground"
             css={{
               p: "$4",
               fontSize: "$2",
               mt: "$3",
-              backgroundColor: "$hiContrast",
-              color: "$loContrast",
             }}>
             {isLoading && (
               <Spinner

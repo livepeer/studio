@@ -237,11 +237,11 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                 fontSize: "$2",
                 borderRadius: "20px",
                 backgroundColor: "transparent",
-                borderColor: isActive ? "$primary8" : "$neutral9",
-                color: isActive ? "$primary9" : "$neutral9",
+                borderColor: isActive ? "$white" : "$neutral9",
+                color: isActive ? "$white" : "$neutral9",
                 "&:hover": {
-                  borderColor: "$primary8",
-                  color: "$primary9",
+                  borderColor: "$white",
+                  color: "$white",
                   transition: "0.3s",
                 },
                 "&:focus": {
@@ -286,9 +286,9 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                     : value)}
             </Flex>
             <DropdownMenuContent
+            className="bg-background border"
               placeholder={"more options"}
               css={{
-                border: "1px solid $colors$neutral6",
                 p: "$2",
                 width: "15rem",
                 mt: "$2",
@@ -308,6 +308,7 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                     mt: "$2",
                   }}>
                   <Button
+                  className="bg-accent"
                     type="submit"
                     css={{
                       fontWeight: 500,

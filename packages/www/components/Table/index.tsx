@@ -311,8 +311,6 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
         justify="between"
         css={{
           mb: "$3",
-          borderBottom: "1px solid",
-          borderColor: border ? "$neutral5" : "transparent",
           pb: border ? "$2" : 0,
         }}>
         {/* Header title */}
@@ -374,6 +372,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               )}
               {createAction && (
                 <Button
+                className="bg-accent"
                   variant="neutral"
                   size="2"
                   // @ts-ignore

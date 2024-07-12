@@ -45,7 +45,7 @@ export default function FeaturesModel() {
 
   return (
     <AlertDialog open={shouldShowFeature}>
-      <AlertDialogContent css={{ p: "0", borderRadius: 0 }}>
+      <AlertDialogContent className="bg-surface" css={{ p: "0", borderRadius: 0 }}>
         <Flex className="flex flex-row gap-3">
           <Box className="flex flex-col flex-1 justify-center p-5">
             <Badge

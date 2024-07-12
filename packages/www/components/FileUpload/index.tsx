@@ -43,6 +43,7 @@ const FileUpload = () => {
 
   return (
     <Box
+    className="bg-background border"
       css={{
         position: "fixed",
         bottom: "$4",
@@ -52,10 +53,8 @@ const FileUpload = () => {
         minWidth: 420,
         maxHeight: "90%",
         overflowY: "scroll",
-        border: "1px solid $neutral6",
         borderRadius: "$3",
         zIndex: 2,
-        backgroundColor: "$panel",
       }}>
       <Flex direction="column" justify="center">
         {!hasPendingFileUploads && (

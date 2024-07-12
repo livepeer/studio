@@ -19,21 +19,21 @@ export default function TypeFilterCard({
     paddingBottom: "$2",
     width: "20em",
     border: "1px solid",
-    borderColor: isActive ? "$primary8" : "$neutral8",
+    borderColor: isActive ? "$white" : "$neutral8",
     borderRadius: "$3",
-    color: isActive ? "$primary8" : "$neutral8",
+    color: isActive ? "$white" : "$neutral8",
     cursor: "default",
     "&:hover": {
       border: "1px solid",
-      borderColor: "$primary8",
-      color: "$primary8",
+      borderColor: "$white",
+      color: "$white",
       transition: "0.3s",
     },
     "& h4": {
-      color: isActive ? "$primary8" : "$primary12",
+      color: isActive ? "$white" : "$primary12",
     },
     "&:hover h4": {
-      color: "$primary8",
+      color: "$white",
       transition: "0.3s",
     },
   });

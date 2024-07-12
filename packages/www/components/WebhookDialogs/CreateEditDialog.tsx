@@ -95,6 +95,7 @@ const CreateEditDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
       <AlertDialogContent
+      className="bg-surface"
         css={{ width: 450, maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">
@@ -222,6 +223,7 @@ const CreateEditDialog = ({
 
             <Flex
               align="center"
+              className="bg-surface"
               direction="column"
               justify={events.length > 0 ? "start" : "center"}
               css={{
@@ -232,7 +234,6 @@ const CreateEditDialog = ({
                 overflowX: "hidden",
                 overflowY: "auto",
                 border: "1px solid $colors$neutral7",
-                backgroundColor: "$neutral2",
                 zIndex: 1,
               }}>
               {events.length > 0 ? (
@@ -280,6 +281,7 @@ const CreateEditDialog = ({
                 css={{ display: "flex", ai: "center" }}
                 type="submit"
                 size="2"
+                className="bg-accent text-foreground"
                 disabled={saving}
                 variant="primary">
                 {saving && (

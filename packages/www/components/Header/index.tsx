@@ -93,7 +93,6 @@ const Header = ({ breadcrumbs = [] }) => {
           height: 60,
           width: "100%",
           margin: "0 auto",
-          maxWidth: "1520px",
         }}>
         <Breadcrumbs aria-label="breadcrumb">
           {breadcrumbs.map((breadcrumb, i) => {

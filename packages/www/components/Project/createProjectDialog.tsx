@@ -28,7 +28,9 @@ const CreateProjectDialog = ({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent
+      className="bg-surface"
+      css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Create Project</Heading>
         </AlertDialogTitle>
@@ -82,6 +84,7 @@ const CreateProjectDialog = ({
               type="submit"
               size="2"
               disabled={creating}
+              className="bg-accent text-foreground"
               variant="primary">
               {creating && (
                 <Spinner

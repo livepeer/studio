@@ -60,7 +60,7 @@ const CreateDialog = ({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent className="bg-surface" css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         {!newKey && (
           <>
             <AlertDialogTitle asChild>
@@ -98,6 +98,7 @@ const CreateDialog = ({
                   size="2"
                   disabled={isLoading}
                   type="submit"
+                  className="bg-accent text-foreground" 
                   variant="primary">
                   {isLoading && (
                     <Spinner
