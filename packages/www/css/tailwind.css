@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --color-border: 240 5% 80%;
+    --color-background: 0 0% 98%;
+    --color-foreground: 0 0% 10%;
+    --color-muted: 249 4% 44%;
+    --color-surface: 240 4% 95%;
+    --color-accent: 240 4% 30%;
+  }
+
+  /* 
+  The class name here is temporory. Since old class names are still in use. We can replace this with .dark once we are ready to switch to the new class names.
+  */
+  .dark-theme-green {
+    --color-border: 240 5% 16%;
+    --color-background: 0 0% 9%;
+    --color-foreground: 0 0% 100%;
+    --color-muted: 249 4 64;
+    --color-surface: 240 4% 9%;
+    --color-accent: 240 4% 14;
+  }
+}
