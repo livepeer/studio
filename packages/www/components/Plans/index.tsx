@@ -224,6 +224,50 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   fontSize: "$3",
                 }}
               />
+              <Item
+                displayCheck={false}
+                title={
+                  <Tooltip
+                    multiline
+                    content="Max amount of concurrent viewers.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Concurrent Viewers
+                    </Text>
+                  </Tooltip>
+                }
+                css={{
+                  borderBottom: 0,
+                  fontSize: "$3",
+                }}
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Tooltip multiline content="Minimum monthly spend.">
+                    <Text
+                      size="3"
+                      css={{
+                        fontWeight: 600,
+                        mb: "$1",
+                        textDecoration: "underline dotted rgb(67, 76, 88)",
+                        cursor: "default",
+                      }}>
+                      Minimum Spend
+                    </Text>
+                  </Tooltip>
+                }
+                css={{
+                  borderBottom: 0,
+                  fontSize: "$3",
+                }}
+              />
               <Item displayCheck={false} css={{ borderBottom: 0 }} title={""} />
             </List>
           </Box>
@@ -277,7 +321,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 displayCheck={false}
                 title={
                   <Flex css={{ justifyContent: "center", width: "100%" }}>
-                    <span>1,000 minutes</span>
+                    <span>1,000 minutes / month</span>
                   </Flex>
                 }
               />
@@ -285,7 +329,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 displayCheck={false}
                 title={
                   <Flex css={{ justifyContent: "center", width: "100%" }}>
-                    <span>1,000 minutes</span>
+                    <span>60 minutes / month</span>
                   </Flex>
                 }
                 displayX={false}
@@ -294,7 +338,25 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 displayCheck={false}
                 title={
                   <Flex css={{ justifyContent: "center", width: "100%" }}>
-                    <span>10,000 minutes</span>
+                    <span>5,000 minutes / month</span>
+                  </Flex>
+                }
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Up to 30</span>
+                  </Flex>
+                }
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>None</span>
                   </Flex>
                 }
                 css={{ borderBottom: 0 }}
@@ -325,7 +387,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["prod_O9XtHhI6rbTT1B"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>$100 per month*</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
               <PlanForm
                 text={
                   dashboard
@@ -366,26 +428,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                       justifyContent: "center",
                       alignItems: "center",
                     }}>
-                    <span>3,000 minutes</span>
-                    <Tooltip
-                      multiline
-                      content="Then $5.50 for every additional 1,000 minutes">
-                      <Flex
-                        css={{
-                          borderRadius: 1000,
-                          bc: "$sage12",
-                          color: "$loContrast",
-                          width: 18,
-                          height: 18,
-                          fontSize: "$1",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "default",
-                          ml: "$2",
-                        }}>
-                        $
-                      </Flex>
-                    </Tooltip>
+                    <span>$0.33 / 60 minutes</span>
                   </Flex>
                 }
               />
@@ -399,26 +442,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                       justifyContent: "center",
                       alignItems: "center",
                     }}>
-                    <span>10,000 minutes</span>
-                    <Tooltip
-                      multiline
-                      content="Then $3.50 for every additional 1,000 minutes">
-                      <Flex
-                        css={{
-                          borderRadius: 1000,
-                          bc: "$sage12",
-                          color: "$loContrast",
-                          width: 18,
-                          height: 18,
-                          fontSize: "$1",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "default",
-                          ml: "$2",
-                        }}>
-                        $
-                      </Flex>
-                    </Tooltip>
+                    <span>$0.09 / 60 minutes</span>
                   </Flex>
                 }
               />
@@ -432,195 +456,46 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                       justifyContent: "center",
                       alignItems: "center",
                     }}>
-                    <span>100,000 minutes</span>
-                    <Tooltip
-                      multiline
-                      css={{ float: "right" }}
-                      content="Then $0.50 for every additional 1,000 minutes">
-                      <Flex
-                        css={{
-                          borderRadius: 1000,
-                          bc: "$sage12",
-                          color: "$loContrast",
-                          width: 18,
-                          height: 18,
-                          fontSize: "$1",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "default",
-                          ml: "$2",
-                        }}>
-                        $
-                      </Flex>
-                    </Tooltip>
+                    <span>$0.03 / 60 minutes</span>
                   </Flex>
                 }
               />
               <Item
-                css={{ borderBottom: 0, fontSize: "11px" }}
                 displayCheck={false}
-                title={"* Pay as you go past allotted minutes"}
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
+                    <span>Up to 50,000</span>
+                  </Flex>
+                }
               />
-            </List>
-          </Box>
-
-          <Box
-            className="upgrade-card"
-            css={{
-              width: "12%",
-              color: "$hiContrast",
-              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
-              borderRadius: "16px",
-              background: "$green6",
-              p: "$4",
-              mr: "$2",
-              minWidth: 230,
-            }}>
-            <Flex
-              css={{
-                mb: "$4",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: 116,
-                textAlign: "center",
-              }}>
-              <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
-                {products["prod_O9XtcfOSMjSD5L"].name}
-              </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>$500 per month*</Box>
-              <PlanForm
-                text={
-                  dashboard
-                    ? stripeProductId === "prod_O9XtcfOSMjSD5L"
-                      ? "Current plan"
-                      : stripeProductId === "prod_O9XtcfOSMjSD5L"
-                        ? "Select"
-                        : "Select"
-                    : "Sign up"
+              <Item
+                displayCheck={false}
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
+                title={
+                  <Flex
+                    css={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
+                    <span>$100 minimum spend * </span>
+                  </Flex>
                 }
-                disabled={
-                  dashboard && stripeProductId === "prod_O9XtcfOSMjSD5L"
-                    ? true
-                    : false
-                }
-                variant="primary"
-                bc="$sage12"
-                color="$loContrast"
-                stripeProductId="prod_O9XtcfOSMjSD5L"
-                onClick={() => {
-                  if (dashboard) {
-                    setIsTourOpen(false);
-                  } else {
-                    router.push("/register?selectedPlan=2");
-                  }
+              />
+              <Item
+                css={{
+                  borderBottom: 0,
+                  fontSize: "11px",
+                  justifyContent: "center",
                 }}
-              />
-            </Flex>
-
-            <List>
-              <Item
                 displayCheck={false}
-                css={{ borderColor: "$neutral5" }}
-                title={
-                  <Flex
-                    css={{
-                      width: "100%",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}>
-                    <span>20,000 minutes</span>
-                    <Tooltip
-                      multiline
-                      content="Then $5.50 for every additional 1,000 minutes">
-                      <Flex
-                        css={{
-                          borderRadius: 1000,
-                          bc: "$sage12",
-                          color: "$loContrast",
-                          width: 18,
-                          height: 18,
-                          fontSize: "$1",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "default",
-                          ml: "$2",
-                        }}>
-                        $
-                      </Flex>
-                    </Tooltip>
-                  </Flex>
-                }
-              />
-              <Item
-                displayCheck={false}
-                css={{ borderColor: "$neutral5" }}
-                title={
-                  <Flex
-                    css={{
-                      width: "100%",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}>
-                    <span>50,000 minutes</span>
-                    <Tooltip
-                      multiline
-                      content="Then $3.50 for every additional 1,000 minutes">
-                      <Flex
-                        css={{
-                          borderRadius: 1000,
-                          bc: "$sage12",
-                          color: "$loContrast",
-                          width: 18,
-                          height: 18,
-                          fontSize: "$1",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "default",
-                          ml: "$2",
-                        }}>
-                        $
-                      </Flex>
-                    </Tooltip>
-                  </Flex>
-                }
-              />
-              <Item
-                displayCheck={false}
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={
-                  <Flex
-                    css={{
-                      width: "100%",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}>
-                    <span>500,000 minutes</span>
-                    <Tooltip
-                      multiline
-                      content="Then $0.50 for every additional 1,000 minutes">
-                      <Flex
-                        css={{
-                          borderRadius: 1000,
-                          bc: "$sage12",
-                          color: "$loContrast",
-                          width: 18,
-                          height: 18,
-                          fontSize: "$1",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "default",
-                          ml: "$2",
-                        }}>
-                        $
-                      </Flex>
-                    </Tooltip>
-                  </Flex>
-                }
-              />
-              <Item
-                css={{ borderBottom: 0, fontSize: "11px" }}
-                displayCheck={false}
-                title={"* Pay as you go past allotted minutes"}
+                title={"* (we round up if below $100)"}
               />
             </List>
           </Box>
@@ -645,7 +520,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Heading as="h3" size="3" css={{ mb: "$3", fontWeight: 600 }}>
                 {products["prod_4"].name}
               </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
+              <Box css={{ mb: "$4", fontSize: "$2" }}>Volume Discounts</Box>
               <Button
                 as="a"
                 size="3"
@@ -672,7 +547,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 displayCheck={false}
                 title={
                   <Flex css={{ justifyContent: "center", width: "100%" }}>
-                    <span>Custom pricing</span>
+                    <span>Custom quote</span>
                   </Flex>
                 }
               />
@@ -680,7 +555,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 displayCheck={false}
                 title={
                   <Flex css={{ justifyContent: "center", width: "100%" }}>
-                    <span>Custom pricing</span>
+                    <span>Custom quote</span>
                   </Flex>
                 }
               />
@@ -688,12 +563,38 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 displayCheck={false}
                 title={
                   <Flex css={{ justifyContent: "center", width: "100%" }}>
-                    <span>Custom pricing</span>
+                    <span>Custom quote</span>
                   </Flex>
                 }
                 css={{ borderBottom: 0 }}
               />
-              <Item css={{ borderBottom: 0 }} displayCheck={false} title={""} />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>Unlimited</span>
+                  </Flex>
+                }
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title={
+                  <Flex css={{ justifyContent: "center", width: "100%" }}>
+                    <span>$2.5k minimum spend</span>
+                  </Flex>
+                }
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                css={{
+                  borderBottom: 0,
+                  fontSize: "11px",
+                  justifyContent: "center",
+                }}
+                displayCheck={false}
+                title={"* with annual commit"}
+              />
             </List>
           </Box>
         </Flex>

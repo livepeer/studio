@@ -132,13 +132,24 @@ async function reportUsageForUser(
     subscription: user.stripeCustomerSubscriptionId,
   });
 
-  const usageNotifications = await getUsageNotifications(
-    usageData.usagePercentages,
-    user,
-  );
+  const product = products[user.stripeProductId];
+  let usageToReport = usageData.overUsage;
 
-  if (usageNotifications.length > 0) {
-    await notifyUser(usageNotifications, user, { headers: {}, config });
+  if (!product.minumumSpend) {
+    const usageNotifications = await getUsageNotifications(
+      usageData.usagePercentages,
+      user,
+    );
+
+    if (usageNotifications.length > 0) {
+      await notifyUser(usageNotifications, user, { headers: {}, config });
+    }
+  } else {
+    const overage = await calculateOverageOnMinimumSpend(
+      product,
+      usageData.billingUsage,
+    );
+    usageToReport = overage;
   }
 
   if (actuallyReport) {
@@ -212,6 +223,89 @@ const sendUsageRecordToStripe = async (
       }
     }),
   );
+};
+
+export const calculateOverageOnMinimumSpend = async (product, billingUsage) => {
+  const minimumSpend = product.monthlyPrice;
+
+  let { storageUsage, deliveryUsage, totalUsage } = billingUsage;
+
+  let prices: any = {};
+
+  if (product?.usage) {
+    product.usage.forEach((item) => {
+      if (item.name.toLowerCase() === "transcoding") {
+        prices.transcoding = item.price;
+      } else if (item.name.toLowerCase() === "delivery") {
+        prices.streaming = item.price;
+      } else if (item.name.toLowerCase() === "storage") {
+        prices.storage = item.price;
+      }
+    });
+  }
+
+  let totalSpent =
+    prices.storage * storageUsage +
+    prices.streaming * deliveryUsage +
+    prices.transcoding * totalUsage;
+
+  // If the total spent is less than the minimum spend, return 0 for all usage
+  // No usage is getting reported to Stripe, which, at the end of the billing cyle
+  // will result in a (monthlyPrice)$ invoice + 0$ usage
+  if (totalSpent <= minimumSpend) {
+    return {
+      StorageUsageMins: 0,
+      DeliveryUsageMins: 0,
+      TotalUsageMins: 0,
+    };
+  }
+
+  // Calculate the X amount in $ that is over the minimum spend
+  // Based on the current user usage
+  let remainingOverage = totalSpent - minimumSpend;
+
+  let overageUsage = {
+    StorageUsageMins: 0,
+    DeliveryUsageMins: 0,
+    TotalUsageMins: 0,
+  };
+
+  const totalSpentInCategories = {
+    storage: prices.storage * storageUsage,
+    delivery: prices.streaming * deliveryUsage,
+    transcoding: prices.transcoding * totalUsage,
+  };
+
+  let totalSpentOverage =
+    totalSpentInCategories.storage +
+    totalSpentInCategories.delivery +
+    totalSpentInCategories.transcoding;
+
+  // If the remaining overage is less than or equal to 0, return 0 for all usage
+  // No usage is getting reported to Stripe, which, at the end of the billing cyle
+  // will result in a (monthlyPrice)$ invoice + 0$ usage
+  if (remainingOverage <= 0 || totalSpentOverage <= 0) {
+    return {
+      StorageUsageMins: 0,
+      DeliveryUsageMins: 0,
+      TotalUsageMins: 0,
+    };
+  }
+
+  // If the usage is greater than 0, calculate the ratio of the remaining overage to the total spent
+  // This ratio will be used to calculate the amount of usage to report to Stripe
+  // distributed across the 3 product items with > $0 spend
+  // The resulting invoice will be (monthlyPrice)$ + transcodingOverage*price + streamingOverage*price + storageOverage*price
+  const overageRatio = remainingOverage / totalSpent;
+
+  overageUsage.StorageUsageMins =
+    (totalSpentInCategories.storage * overageRatio) / prices.storage;
+  overageUsage.DeliveryUsageMins =
+    (totalSpentInCategories.delivery * overageRatio) / prices.streaming;
+  overageUsage.TotalUsageMins =
+    (totalSpentInCategories.transcoding * overageRatio) / prices.transcoding;
+
+  return overageUsage;
 };
 
 // Webhook handler for asynchronous events called by stripe on invoice generation
