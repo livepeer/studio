@@ -26,6 +26,12 @@ export const validateFormData = (name: string): RequestHandler => {
   }
 
   return (req, res, next) => {
+    if (!req.is("multipart/form-data")) {
+      return res.status(422).json({
+        errors: ["Expected multipart/form-data content-type"],
+      });
+    }
+
     const { body, files } = req;
     const allFields = {};
     for (const [key, value] of Object.entries(body)) {

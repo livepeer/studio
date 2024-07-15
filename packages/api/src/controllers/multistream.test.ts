@@ -286,7 +286,7 @@ describe("controllers/multistream-target", () => {
         });
         expect(res.status).toBe(422);
         const body = await res.json();
-        expect(body.errors[0]).toContain("Bad URL");
+        expect(body.errors[0]).toContain(`must match format "uri"`);
       });
     });
 
