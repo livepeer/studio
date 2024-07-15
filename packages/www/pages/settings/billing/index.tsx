@@ -115,19 +115,55 @@ const Billing = () => {
 
     const calculateOverUsage = async (u) => {
       const product = getUserProduct(user);
-      const limits = {
-        transcoding: product?.usage[0].limit,
-        streaming: product?.usage[1].limit,
-        storage: product?.usage[2].limit,
-      };
 
-      const overUsage = {
-        TotalUsageMins: Math.max(u?.TotalUsageMins - limits.transcoding, 0),
-        DeliveryUsageMins: Math.max(u?.DeliveryUsageMins - limits.streaming, 0),
-        StorageUsageMins: Math.max(u?.StorageUsageMins - limits.storage, 0),
-      };
+      if (product?.name === "Growth") {
+        const minimumSpend = product.monthlyPrice;
+        const prices = {
+          transcoding: product.usage[0].price,
+          streaming: product.usage[1].price,
+          storage: product.usage[2].price,
+        };
 
-      return overUsage;
+        const totalSpent =
+          prices.transcoding * u?.TotalUsageMins +
+          prices.streaming * u?.DeliveryUsageMins +
+          prices.storage * u?.StorageUsageMins;
+
+        if (totalSpent <= minimumSpend) {
+          return {
+            TotalUsageMins: 0,
+            DeliveryUsageMins: 0,
+            StorageUsageMins: 0,
+          };
+        }
+
+        const remainingOverage = totalSpent - minimumSpend;
+        const overageRatio = remainingOverage / totalSpent;
+
+        return {
+          TotalUsageMins:
+            (u?.TotalUsageMins * overageRatio) / prices.transcoding,
+          DeliveryUsageMins:
+            (u?.DeliveryUsageMins * overageRatio) / prices.streaming,
+          StorageUsageMins:
+            (u?.StorageUsageMins * overageRatio) / prices.storage,
+        };
+      } else {
+        const limits = {
+          transcoding: product?.usage[0].limit,
+          streaming: product?.usage[1].limit,
+          storage: product?.usage[2].limit,
+        };
+
+        return {
+          TotalUsageMins: Math.max(u?.TotalUsageMins - limits.transcoding, 0),
+          DeliveryUsageMins: Math.max(
+            u?.DeliveryUsageMins - limits.streaming,
+            0,
+          ),
+          StorageUsageMins: Math.max(u?.StorageUsageMins - limits.storage, 0),
+        };
+      }
     };
 
     const calculateOverUsageBill = async (overusage) => {
