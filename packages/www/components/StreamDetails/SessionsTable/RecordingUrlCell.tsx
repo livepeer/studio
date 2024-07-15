@@ -29,7 +29,7 @@ const RecordingUrlCell = <D extends TableData>({
   const id = cell.value.id;
 
   return (
-    <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>
+    <Box id={`mp4-link-dropdown-${id}`}>
       {cell.value.mp4Url ? (
         <Flex css={{ justifyContent: "space-between", ai: "center" }}>
           {truncate(cell.value.children, 20)}
