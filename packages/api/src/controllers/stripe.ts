@@ -212,8 +212,12 @@ const sendUsageRecordToStripe = async (
           }
         );
       } else if (product.name === "Storage") {
+        let storageLookupKey = "tstorage_usage";
+        if (user.stripeProductId === "prod_O9XtHhI6rbTT1B") {
+          storageLookupKey = "tstorage_usage2";
+        }
         await stripe.subscriptionItems.createUsageRecord(
-          subscriptionItemsByLookupKey["tstorage_usage"],
+          subscriptionItemsByLookupKey[storageLookupKey],
           {
             quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
