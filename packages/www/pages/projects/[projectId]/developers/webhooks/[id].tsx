@@ -23,7 +23,7 @@ const WebhookDetail = () => {
     () => getWebhook(id),
     {
       enabled: !!id,
-    },
+    }
   );
 
   const { data: logs, refetch: refetchLogs } = useQuery(
@@ -32,7 +32,7 @@ const WebhookDetail = () => {
     {
       enabled: !!id,
       initialData: [],
-    },
+    }
   );
 
   const handleLogFilters = async (filters) => {

@@ -80,7 +80,7 @@ export async function initDb(params: CliArgs, serviceName = "api") {
       ...pgBaseParams,
       poolMaxSize: pgJobsPoolSize,
       appName: `${appName}-jobs`,
-    },
+    }
   );
   return { db, jobsDb, store };
 }
@@ -111,7 +111,7 @@ export async function initClients(params: CliArgs, serviceName = "api") {
 
   if (!stripeSecretKey) {
     console.warn(
-      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file.",
+      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
     );
   }
   const stripe = stripeSecretKey
@@ -155,7 +155,7 @@ export default async function appRouter(params: CliArgs) {
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
     if (!(supportAddr && sendgridTemplateId && sendgridApiKey)) {
       throw new Error(
-        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`,
+        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
       );
     }
   }
@@ -220,7 +220,7 @@ export default async function appRouter(params: CliArgs) {
           exposedHeaders: ["*"],
         },
       },
-    }),
+    })
   );
 
   // stripe webhook requires raw body
@@ -241,7 +241,7 @@ export default async function appRouter(params: CliArgs) {
   if (returnRegionInOrchestrator) {
     app.use((req, res, next) => {
       req.orchestratorsGetters.push(() =>
-        regionsGetter(halfRegionOrchestratorsUntrusted),
+        regionsGetter(halfRegionOrchestratorsUntrusted)
       );
       return next();
     });
@@ -251,7 +251,7 @@ export default async function appRouter(params: CliArgs) {
     app.use(
       subgraph({
         subgraphUrl,
-      }),
+      })
     );
   }
 
@@ -261,7 +261,7 @@ export default async function appRouter(params: CliArgs) {
   prefixRouter.get(
     "/stream/:streamId/broadcaster",
     geolocateMiddleware({}),
-    getBroadcasterHandler,
+    getBroadcasterHandler
   );
   for (const [name, controller] of Object.entries(controllers)) {
     // if we're operating in api-region mode, only handle geolocation traffic, forward the rest on

@@ -31,7 +31,7 @@ type Filter<T extends Record<string, unknown>> = { id: keyof T; value: any };
 export type FetchDataF<T extends Record<string, unknown>> = (
   filters: Filter<T>[],
   sortBy: Sort<T>[],
-  lastRow: Row<T> | null,
+  lastRow: Row<T> | null
 ) => void;
 
 type Props<T extends Record<string, unknown>> = {
@@ -147,7 +147,7 @@ const Table = <T extends Record<string, unknown>>({
           ...columns,
         ]);
       }
-    },
+    }
   );
 
   useEffect(() => {
@@ -234,7 +234,7 @@ const Table = <T extends Record<string, unknown>>({
                         scope="col"
                         {...column.getHeaderProps(
                           // @ts-ignore
-                          column.getSortByToggleProps(),
+                          column.getSortByToggleProps()
                         )}
                         sx={{
                           textTransform: "uppercase",

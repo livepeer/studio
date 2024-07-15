@@ -79,9 +79,9 @@ const AssetsTable = ({
         getAssets,
         getTasks,
         onDeleteAsset,
-        appendProjectId,
+        appendProjectId
       ),
-    [userId, appendProjectId],
+    [userId, appendProjectId]
   );
 
   useEffect(() => {

@@ -68,7 +68,7 @@ const StreamOverviewBox = ({
               url={globalPlaybackUrl}
               shortendUrl={globalPlaybackUrl.replace(
                 globalPlaybackUrl.slice(29, 45),
-                "…",
+                "…"
               )}
               anchor={false}
             />

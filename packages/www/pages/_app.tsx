@@ -63,7 +63,7 @@ const globalStyles = globalCss({
 const themes: any = getThemes();
 const themeMap = {};
 Object.keys(themes).map(
-  (key, _index) => (themeMap[themes[key].className] = themes[key].className),
+  (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
 const livepeerClient = createReactClient({

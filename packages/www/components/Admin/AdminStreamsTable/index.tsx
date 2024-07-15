@@ -69,7 +69,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         },
       },
     ],
-    [nextCursor, lastFilters],
+    [nextCursor, lastFilters]
   );
 
   const filtersDesc = useMemo(
@@ -77,7 +77,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
       { id: "id", placeholder: "Filter by ID" },
       { id: "user.email", placeholder: "Filter by email" },
     ],
-    [],
+    []
   );
 
   const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
@@ -117,7 +117,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
   const refecth = () => {
     fetchData(
       { order: lastOrder, cursor: lastCursor, filters: lastFilters },
-      true,
+      true
     );
   };
 

@@ -17,7 +17,7 @@ type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 async function checkUserOwned(
   req: Request,
   headerName: string,
-  getter: (id: string) => Promise<UserOwnedObj>,
+  getter: (id: string) => Promise<UserOwnedObj>
 ) {
   if (!(headerName in req.headers)) {
     return;
@@ -41,7 +41,7 @@ function playbackIdGetter(req: Request) {
   return async (id: string): Promise<UserOwnedObj> => {
     const { asset, stream, session } = await getResourceByPlaybackId(
       id,
-      req.user,
+      req.user
     );
     return asset || stream || session;
   };
@@ -72,7 +72,7 @@ app.all(
     res.header("x-livepeer-project-id", req.project?.id || "");
 
     res.status(204).end();
-  },
+  }
 );
 
 export default app;

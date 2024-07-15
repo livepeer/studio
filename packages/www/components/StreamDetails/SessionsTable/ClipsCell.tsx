@@ -35,7 +35,7 @@ const ClipsCell = <D extends TableData>({
         <Box css={{ pr: "$1" }}>
           <Link
             href={appendProjectId(
-              "/assets?sourceSessionId=" + cell.value.sessionId,
+              "/assets?sourceSessionId=" + cell.value.sessionId
             )}>
             <Badge size="1" variant="neutral" css={{}}>
               {cell.value.clipsCounts}

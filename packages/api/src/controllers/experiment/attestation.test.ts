@@ -70,7 +70,7 @@ beforeEach(async () => {
     {
       email: "user_non_admin@gmail.com",
       password: "y".repeat(64),
-    },
+    }
   ));
   client.apiKey = adminApiKey;
 
@@ -292,7 +292,7 @@ describe("Attestation API", () => {
 
     it("should return a list of attestation metadata entries from the given creator", async () => {
       const res = await client.get(
-        `/experiment/-/attestation?creator=${CREATOR_PUBLIC_KEY}`,
+        `/experiment/-/attestation?creator=${CREATOR_PUBLIC_KEY}`
       );
 
       expect(res.status).toEqual(200);

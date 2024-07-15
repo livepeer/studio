@@ -7,7 +7,7 @@ import { DB } from "../store/db";
 
 export default async function updateUsage(
   config: CliArgs,
-  clients?: { jobsDb: DB; stripe: Stripe },
+  clients?: { jobsDb: DB; stripe: Stripe }
 ) {
   const { jobsDb, stripe } =
     clients ?? (await initClients(config, "update-usage-job"));
@@ -23,7 +23,7 @@ export default async function updateUsage(
     let rows = (
       await jobsDb.usage.find(
         {},
-        { limit: 1, order: "data->>'date' DESC", useReplica: true },
+        { limit: 1, order: "data->>'date' DESC", useReplica: true }
       )
     )[0];
 
@@ -43,8 +43,8 @@ export default async function updateUsage(
   });
   logger.info(
     `Updating usage from=${fromTime} to=${toTime} usageHistory=${JSON.stringify(
-      usageHistory,
-    )}`,
+      usageHistory
+    )}`
   );
 
   // store each day of usage

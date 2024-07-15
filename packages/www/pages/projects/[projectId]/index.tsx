@@ -31,7 +31,7 @@ const Dashboard = () => {
       openSnackbar(`Errors: ${res.errors.join(", ")}`);
     } else {
       openSnackbar(
-        `We've sent you a link to verify your email. Please check your inbox at ${user.email}`,
+        `We've sent you a link to verify your email. Please check your inbox at ${user.email}`
       );
     }
   };

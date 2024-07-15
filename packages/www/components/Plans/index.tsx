@@ -394,8 +394,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     ? stripeProductId === "prod_O9XtHhI6rbTT1B"
                       ? "Current plan"
                       : stripeProductId === "prod_O9XtcfOSMjSD5L"
-                        ? "Select"
-                        : "Select"
+                      ? "Select"
+                      : "Select"
                     : "Sign up"
                 }
                 disabled={

@@ -48,8 +48,8 @@ const LogsContainer = ({
     filter === "all"
       ? logs
       : filter === "succeeded"
-        ? succeededLogs
-        : failedLogs;
+      ? succeededLogs
+      : failedLogs;
 
   const customTheme = {
     key: "color:#606060;line-height:1.8;font-size:14px;",
@@ -224,7 +224,7 @@ const LogsContainer = ({
                     JSON.parse(selected?.request?.body)?.payload ||
                       JSON.parse(selected?.request?.body)?.stream ||
                       JSON.parse(selected?.request?.body)?.asset ||
-                      JSON.parse(selected?.request?.body)?.task,
+                      JSON.parse(selected?.request?.body)?.task
                   )}
                 />
               )}

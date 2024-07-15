@@ -27,20 +27,20 @@ const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
         const events: AssetEvent[] = tasks
           ?.filter(
             (task) =>
-              task.outputAssetId === asset.id || task.inputAssetId === asset.id,
+              task.outputAssetId === asset.id || task.inputAssetId === asset.id
           )
           ?.map((task) => ({
             type: ["upload", "import"].includes(task?.type)
               ? asset.source?.type == "url"
                 ? "url-import"
                 : asset.source?.type == "directUpload"
-                  ? "file-import"
-                  : asset.source?.type == "recording"
-                    ? "recorded-session"
-                    : "other"
+                ? "file-import"
+                : asset.source?.type == "recording"
+                ? "recorded-session"
+                : "other"
               : task?.params?.export?.["ipfs"]
-                ? "ipfs-upload"
-                : "other",
+              ? "ipfs-upload"
+              : "other",
             timestamp: task?.createdAt ?? Date.now(),
           }));
 
@@ -79,12 +79,12 @@ const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
                   {event.type === "file-import"
                     ? "Asset created from file upload"
                     : event.type === "url-import"
-                      ? "Asset created from URL import"
-                      : event.type === "recorded-session"
-                        ? "Asset created from recorded stream"
-                        : event.type === "ipfs-upload"
-                          ? "Uploaded to IPFS"
-                          : "N/A"}
+                    ? "Asset created from URL import"
+                    : event.type === "recorded-session"
+                    ? "Asset created from recorded stream"
+                    : event.type === "ipfs-upload"
+                    ? "Uploaded to IPFS"
+                    : "N/A"}
                 </Text>
                 <Text variant="neutral" size="3">
                   {moment.unix(event.timestamp / 1000).format("lll")}

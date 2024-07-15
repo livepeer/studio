@@ -13,7 +13,7 @@ export default class CloudflareStore {
   constructor({ cloudflareNamespace, cloudflareAccount, cloudflareAuth }) {
     if (!cloudflareNamespace || !cloudflareAccount || !cloudflareAuth) {
       throw new Error(
-        "no cloudflare namespace, account id, or authorization key provided",
+        "no cloudflare namespace, account id, or authorization key provided"
       );
     }
     namespace = cloudflareNamespace;
@@ -94,7 +94,7 @@ export default class CloudflareStore {
 
 async function cloudflareFetch(
   reqUrl,
-  { method = "GET", retries = 0, data = null } = {},
+  { method = "GET", retries = 0, data = null } = {}
 ) {
   const req = {
     method: method,

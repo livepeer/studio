@@ -61,7 +61,7 @@ const parseUrlSafe = (str: string) => {
 
 const addQuery = (
   url: url.UrlWithParsedQuery,
-  query: querystring.ParsedUrlQuery,
+  query: querystring.ParsedUrlQuery
 ) => {
   url.query = { ...url.query, ...query };
   url.search = `?${querystring.stringify(url.query)}`;
@@ -95,7 +95,7 @@ const createTarget = (
   api: Api,
   stream: Stream,
   state: State,
-  parsedUrl: url.Url,
+  parsedUrl: url.Url
 ) => {
   const targets: MultistreamTargetRef[] = [
     ...(stream.multistream?.targets ?? []),
@@ -117,7 +117,7 @@ const updateTarget = async (
   targetId: string,
   state: State,
   parsedUrl: url.Url,
-  initState: State,
+  initState: State
 ) => {
   const patch = {
     name: state.name !== initState.name ? state.name : undefined,
@@ -138,7 +138,7 @@ const updateTarget = async (
               ...t,
               profile: state.profile,
               videoOnly: state.videoOnly,
-            },
+            }
     );
     await api.patchStream(stream.id, { multistream: { targets } });
   }
@@ -173,7 +173,7 @@ const SaveTargetDialog = ({
       profile: action === Action.Create ? "source" : targetRef?.profile,
       videoOnly: targetRef?.videoOnly ?? false,
     }),
-    [action, target?.name, targetRef?.profile, targetRef?.videoOnly],
+    [action, target?.name, targetRef?.profile, targetRef?.videoOnly]
   );
   const [state, setState] = useState(initState);
   useEffect(() => setState(initState), [isOpen]);
@@ -184,7 +184,7 @@ const SaveTargetDialog = ({
 
   const parsedUrl = useMemo(
     () => composeIngestUrl(state.ingestUrl, state.streamKey),
-    [state.ingestUrl, state.streamKey],
+    [state.ingestUrl, state.streamKey]
   );
 
   const saveMultistreamTarget = async () => {
@@ -202,7 +202,7 @@ const SaveTargetDialog = ({
       openSnackbar(
         `Successfully ${
           action === Action.Create ? "created" : "updated"
-        } multistream target ${name}`,
+        } multistream target ${name}`
       );
     } catch (error) {
       console.error(error);
@@ -219,7 +219,7 @@ const SaveTargetDialog = ({
     };
     const fromStream = stream.profiles
       ?.sort(
-        (p1, p2) => p1.height - p2.height || p1.name.localeCompare(p2.name),
+        (p1, p2) => p1.height - p2.height || p1.name.localeCompare(p2.name)
       )
       .reverse()
       .map(({ name, width, height, fps }) => ({

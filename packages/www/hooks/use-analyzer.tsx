@@ -237,7 +237,7 @@ class AnalyzerClient {
   fetchJson = async <T,>(
     region: string,
     path: string,
-    opts: RequestInit = {},
+    opts: RequestInit = {}
   ) => {
     const url = makeUrl(region, path);
     const headers = new Headers(opts.headers || {});
@@ -269,7 +269,7 @@ class AnalyzerClient {
     region: string,
     streamId: string,
     handler: (data: events.Any) => void,
-    from?: number,
+    from?: number
   ) => {
     const path = `/stream/${streamId}/events`;
     const qs = !from ? "" : "?from=" + from;

@@ -76,7 +76,7 @@ export default class StreamTable extends Table<DBStream> {
   async cachedUsageHistory(
     fromTime: number,
     toTime: number,
-    opts?: QueryOptions,
+    opts?: QueryOptions
   ): Promise<UsageData[]> {
     let usage = [];
     const q1 = sql`SELECT
@@ -206,7 +206,7 @@ export default class StreamTable extends Table<DBStream> {
     userId: string,
     fromTime: number | string,
     toTime: number | string,
-    opts?: QueryOptions,
+    opts?: QueryOptions
   ): Promise<UsageData> {
     const q1 = sql`SELECT
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
@@ -276,26 +276,26 @@ export default class StreamTable extends Table<DBStream> {
 
   async getByStreamKey(
     streamKey: string,
-    opts?: QueryOptions,
+    opts?: QueryOptions
   ): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'streamKey'=${streamKey}`.setName(
-        `${this.name}_by_streamKey`,
+        `${this.name}_by_streamKey`
       ),
-      opts,
+      opts
     );
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
   async getByPlaybackId(
     playbackId: string,
-    opts?: QueryOptions,
+    opts?: QueryOptions
   ): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'playbackId'=${playbackId}`.setName(
-        `${this.name}_by_playbackid`,
+        `${this.name}_by_playbackid`
       ),
-      opts,
+      opts
     );
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
@@ -303,22 +303,22 @@ export default class StreamTable extends Table<DBStream> {
   async getLastSession(id: string, opts?: QueryOptions): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->>'createdAt' DESC LIMIT 1`.setName(
-        `${this.name}_by_parentid_last_session`,
+        `${this.name}_by_parentid_last_session`
       ),
-      opts,
+      opts
     );
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
   async getActiveSessions(
     id: string,
-    opts?: QueryOptions,
+    opts?: QueryOptions
   ): Promise<DBStream[]> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream WHERE data->>'parentId'=${id} AND (data->>'isActive')::boolean = TRUE`.setName(
-        `${this.name}_by_parentid_active_sessions`,
+        `${this.name}_by_parentid_active_sessions`
       ),
-      opts,
+      opts
     );
     return res.rowCount < 1 ? [] : res.rows.map((row) => row.data as DBStream);
   }
@@ -336,18 +336,18 @@ export default class StreamTable extends Table<DBStream> {
           sql`(data->>'lastSeen')::bigint = ${stream.lastSeen}`,
         ],
         { isActive: false },
-        { throwIfEmpty: false },
+        { throwIfEmpty: false }
       );
       if (upRes.rowCount) {
         console.log(
           `cleaned timed out stream id=${stream.id} lastSeen=${new Date(
-            stream.lastSeen,
-          )} name=${stream.name}`,
+            stream.lastSeen
+          )} name=${stream.name}`
         );
       }
     } catch (e) {
       console.error(
-        `error setting stream active to false id=${stream.id} name=${stream.name} err=${e}`,
+        `error setting stream active to false id=${stream.id} name=${stream.name} err=${e}`
       );
       upRes = { rowCount: 0 };
     }
@@ -361,7 +361,7 @@ export default class StreamTable extends Table<DBStream> {
       } SET data = jsonb_set(data, '{isActive}', 'false'::jsonb) WHERE id IN (${ids
         .map((_, i) => "$" + (i + 1))
         .join(",")})`,
-      ids,
+      ids
     );
     return res;
   }
@@ -402,7 +402,7 @@ export default class StreamTable extends Table<DBStream> {
 
   removePrivateFieldsMany(
     objs: Array<DBStream>,
-    isAdmin: boolean = false,
+    isAdmin: boolean = false
   ): Array<DBStream> {
     return objs.map((o) => this.removePrivateFields(o, isAdmin));
   }

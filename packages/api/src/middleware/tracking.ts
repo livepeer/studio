@@ -28,7 +28,7 @@ class Tracker {
 
   private recordLastSeen(
     table: Table<{ id: string; lastSeen?: number }>,
-    id: string,
+    id: string
   ) {
     const key = `${table.name}-${id}`;
     const alreadyScheduled = this.pendingUpdates.has(key);
@@ -50,12 +50,12 @@ class Tracker {
           sql`id = ${id}`,
           sql`coalesce((data->'lastSeen')::bigint, 0) < ${lastSeen}`,
         ],
-        { lastSeen },
+        { lastSeen }
       );
     } catch (err) {
       console.log(
         `error saving last seen: table=${table?.name} id=${id} err=`,
-        err,
+        err
       );
     }
   }

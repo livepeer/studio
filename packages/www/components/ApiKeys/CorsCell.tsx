@@ -19,7 +19,7 @@ const CorsCell = (params: { cors: ApiToken["access"]["cors"] }) => {
         cors.allowedOrigins.includes("*")
           ? `${accessLevel} access allowed from any origin`
           : `${accessLevel} access allowed from: ${cors.allowedOrigins.join(
-              ", ",
+              ", "
             )}`
       }
       multiline>

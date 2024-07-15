@@ -39,7 +39,7 @@ const ApiKeysTable = ({
 
   const fetcher: Fetcher<ApiKeysTableData> = useCallback(
     async () => rowsPageFromState(userId, getApiTokens),
-    [userId],
+    [userId]
   );
 
   const trackEvent = useCallback(() => {
