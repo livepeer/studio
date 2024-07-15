@@ -48,13 +48,13 @@ const StreamPlayerBox = ({
   setIsBroadcastLive,
 }: StreamPlayerBoxProps) => {
   const [activeTab, setSwitchTab] = useState<"Browser" | "Streaming Software">(
-    "Browser",
+    "Browser"
   );
   const June = useJune();
 
   const isStreamActiveFromExternal = useMemo(
     () => !isBroadcastLive && stream.isActive,
-    [isBroadcastLive, stream.isActive],
+    [isBroadcastLive, stream.isActive]
   );
 
   useEffect(() => {

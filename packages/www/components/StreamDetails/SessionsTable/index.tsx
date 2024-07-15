@@ -42,9 +42,9 @@ const SessionsTable = ({
         streamId,
         getStreamSessions,
         getClipsBySessionId,
-        openSnackbar,
+        openSnackbar
       ),
-    [getStreamSessions, user.id],
+    [getStreamSessions, user.id]
   );
 
   return (

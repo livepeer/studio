@@ -21,7 +21,7 @@ export type AssetDetailsBoxProps = {
 const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
   const videoTrack = useMemo(
     () => asset?.videoSpec?.tracks?.find((t) => t?.type === "video"),
-    [asset?.videoSpec],
+    [asset?.videoSpec]
   );
 
   const isClip = asset?.source?.type ? asset?.source.type === "clip" : false;
@@ -79,7 +79,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
                   url={asset.playbackUrl}
                   shortendUrl={asset.playbackUrl.replace(
                     asset.playbackUrl.slice(29, 70),
-                    "…",
+                    "…"
                   )}
                   anchor={false}
                 />

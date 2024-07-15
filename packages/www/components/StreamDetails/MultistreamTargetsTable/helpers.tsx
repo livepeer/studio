@@ -52,7 +52,7 @@ export const makeTableData = (
   targets,
   targetRefs,
   invalidateStream: (optm?: Stream) => Promise<void>,
-  invalidateTargetId,
+  invalidateTargetId
 ): TableData<TargetsTableData> => {
   return {
     isLoading: false,
@@ -62,7 +62,7 @@ export const makeTableData = (
       rows: targets.map((target, idx) => {
         const ref = targetRefs[idx];
         const status = streamHealth?.multistream?.find(
-          (m) => m.target.id === ref.id && m.target.profile === ref.profile,
+          (m) => m.target.id === ref.id && m.target.profile === ref.profile
         );
         return {
           id: ref.id,

@@ -62,7 +62,7 @@ const AssetDetail = ({
         await refetchAsset();
       }
     },
-    [asset, patchAsset, refetchAsset],
+    [asset, patchAsset, refetchAsset]
   );
 
   useEffect(() => {

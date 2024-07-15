@@ -12,7 +12,7 @@ import Queue from "../store/queue";
 // clean up logic for them.
 export default async function activeCleanup(
   config: CliArgs,
-  clients?: { jobsDb: DB; queue: Queue },
+  clients?: { jobsDb: DB; queue: Queue }
 ) {
   if (!config.ingest?.length) {
     throw new Error("ingest not configured");
@@ -30,14 +30,14 @@ export default async function activeCleanup(
     {
       limit,
       order: "data->>'lastSeen' DESC",
-    },
+    }
   );
 
   const [cleanedUp, jobPromise] = triggerCleanUpIsActiveJob(
     config,
     streams,
     queue,
-    ingest[0].base,
+    ingest[0].base
   );
   await jobPromise;
 

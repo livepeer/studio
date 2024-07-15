@@ -18,7 +18,7 @@ import { CliArgs } from "../../parse-cli";
 export function signGoogleCDNCookie(
   config: CliArgs,
   urlPrefix: string,
-  expirationMs: number,
+  expirationMs: number
 ): [string, string] {
   const {
     googleCloudUrlSigningKeyName: keyName,
@@ -49,13 +49,13 @@ function setGoogleCloudCookie(res: Response, asset: WithID<Asset>) {
   const urlPrefix = getPlaybackFolderPrefix(asset.playbackUrl);
   const ttl = Math.max(
     60 * 60 * 1000,
-    2 * Math.round(asset.videoSpec.duration * 1000),
+    2 * Math.round(asset.videoSpec.duration * 1000)
   );
   const expiration = Date.now() + ttl;
   const [name, value] = signGoogleCDNCookie(
     res.req.config,
     urlPrefix.toString(),
-    expiration,
+    expiration
   );
   res.cookie(name, value, {
     httpOnly: true,

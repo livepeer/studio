@@ -98,7 +98,7 @@ const Usage = () => {
     const doGetBillingUsage = async (
       fromTime: any,
       toTime: any,
-      status: any,
+      status: any
     ) => {
       fromTime = fromTime * 1000;
       toTime = toTime * 1000;
@@ -127,7 +127,7 @@ const Usage = () => {
         fromTime,
         toTime,
         null,
-        timestep,
+        timestep
       );
       if (res2.status == 200 && Array.isArray(usageByDay)) {
         setUsageData(usageByDay);
@@ -142,12 +142,12 @@ const Usage = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        user.id,
+        user.id
       );
       doGetBillingUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        subscription?.status,
+        subscription?.status
       );
     };
 
@@ -193,14 +193,14 @@ const Usage = () => {
               {subscription && (
                 <Flex>
                   {new Date(
-                    subscription.current_period_start * 1000,
+                    subscription.current_period_start * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}{" "}
                   to{" "}
                   {new Date(
-                    subscription.current_period_end * 1000,
+                    subscription.current_period_end * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",

@@ -36,7 +36,7 @@ export default class FirestoreStore {
     if (parts[0] && parts[0].includes("+")) {
       if (!parts[1]) {
         throw new Error(
-          `I'm confused, what do I convert this key into for firestore? ${key}`,
+          `I'm confused, what do I convert this key into for firestore? ${key}`
         );
       }
       parts[1] = `${parts[0]}_${parts[1]}`;

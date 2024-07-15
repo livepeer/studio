@@ -19,7 +19,7 @@ const newLog = (
   evt: events.Any,
   level: "info" | "error",
   text: string,
-  keySuffix?: string,
+  keySuffix?: string
 ): LogData => ({
   key: keySuffix ? `${evt.id}-${keySuffix}` : evt.id,
   timestamp: evt.timestamp,
@@ -102,8 +102,8 @@ function createEventHandler() {
               infoLog(
                 evt,
                 `Stream is being transcoded on orchestrator ${orchestrator}`,
-                "transcoding-orchestrator",
-              ),
+                "transcoding-orchestrator"
+              )
             );
           }
 
@@ -112,8 +112,8 @@ function createEventHandler() {
               infoLog(
                 evt,
                 `Segment ${seqNo} successfully transcoded on ${orchestrator}`,
-                "segment-success",
-              ),
+                "segment-success"
+              )
             );
             failedSegments.current.delete(seqNo);
           }
@@ -131,13 +131,13 @@ function createEventHandler() {
             newLog(
               evt,
               level,
-              `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`,
+              `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`
             ),
           ];
       }
       return [];
     },
-    [lastOrchestrator, failedSegments],
+    [lastOrchestrator, failedSegments]
   );
 }
 

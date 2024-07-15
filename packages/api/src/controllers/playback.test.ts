@@ -8,7 +8,7 @@ import { DBSession } from "../store/session-table";
 import { cache } from "../store/cache";
 
 const EXPECTED_CROSS_USER_ASSETS_CUTOFF_DATE = Date.parse(
-  "2023-06-06T00:00:00.000Z",
+  "2023-06-06T00:00:00.000Z"
 );
 
 let server: TestServer;
@@ -79,7 +79,7 @@ describe("controllers/playback", () => {
       ({ client, adminToken, nonAdminToken } = await setupUsers(
         server,
         mockAdminUserInput,
-        mockNonAdminUserInput,
+        mockNonAdminUserInput
       ));
 
       client.jwtAuth = nonAdminToken;
@@ -87,7 +87,7 @@ describe("controllers/playback", () => {
       ({ client: client2, nonAdminToken: otherUserToken } = await setupUsers(
         server,
         mockAdminUserInput2,
-        mockNonAdminUserInput2,
+        mockNonAdminUserInput2
       ));
       client2.jwtAuth = otherUserToken;
 
@@ -115,7 +115,7 @@ describe("controllers/playback", () => {
         `/stream/${stream.id}/stream?sessionId=${sessionId}`,
         {
           name: "test-recording",
-        },
+        }
       );
       expect(res.status).toBe(201);
       childStream = await res.json();

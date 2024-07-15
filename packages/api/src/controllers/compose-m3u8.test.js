@@ -9,7 +9,7 @@ describe("compose-m3u8", () => {
     }
     setMock(
       "test://404.m3u8",
-      () => new Response("not found", { status: 404 }),
+      () => new Response("not found", { status: 404 })
     );
   });
 
@@ -91,7 +91,7 @@ describe("compose-m3u8", () => {
         "test://longPlaylistStore/stream/playlist.m3u8",
         "test://longPlaylistBroadcaster/stream/playlist.m3u8",
       ],
-      { limit: 10 },
+      { limit: 10 }
     );
     expect(combined).toEqual(testData.longPlaylistCombinedTen);
     const allCombined = await composeM3U8(
@@ -99,7 +99,7 @@ describe("compose-m3u8", () => {
         "test://longPlaylistStore/stream/playlist.m3u8",
         "test://longPlaylistBroadcaster/stream/playlist.m3u8",
       ],
-      { limit: 99999999 },
+      { limit: 99999999 }
     );
     expect(allCombined).toEqual(testData.longPlaylistCombined);
   });
@@ -115,7 +115,7 @@ describe("compose-m3u8", () => {
           from: "test://longPlaylistBroadcaster/stream",
           to: "https://example.com/store",
         },
-      },
+      }
     );
     expect(combined).toEqual(testData.longPlaylistCombinedRewritten);
   });

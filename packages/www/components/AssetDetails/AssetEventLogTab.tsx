@@ -27,7 +27,7 @@ const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
         const events: AssetEvent[] = tasks
           ?.filter(
             (task) =>
-              task.outputAssetId === asset.id || task.inputAssetId === asset.id,
+              task.outputAssetId === asset.id || task.inputAssetId === asset.id
           )
           ?.map((task) => ({
             type: ["upload", "import"].includes(task?.type)

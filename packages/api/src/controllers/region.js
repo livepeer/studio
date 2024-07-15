@@ -14,7 +14,7 @@ function flatRegions(regions = [], halfRegionOrchestratorsUntrusted = false) {
         halfRegionOrchestratorsUntrusted && count++ % 2 == 0 ? 0 : defaultScore,
       region: reg.region,
       ...orch,
-    })),
+    }))
   );
 }
 
@@ -31,7 +31,7 @@ app.get("/", async (req, res, next) => {
   }
 
   return res.json(
-    flatRegions(regions, req.config.halfRegionOrchestratorsUntrusted),
+    flatRegions(regions, req.config.halfRegionOrchestratorsUntrusted)
   );
 });
 
@@ -69,7 +69,7 @@ app.put(
     }
 
     return res.json(region);
-  },
+  }
 );
 
 app.delete(
@@ -78,7 +78,7 @@ app.delete(
   async (req, res, next) => {
     await db.region.delete(req.params.region);
     return res.status(204);
-  },
+  }
 );
 
 export default app;

@@ -10,7 +10,7 @@ const computeStatus = (
   target: MultistreamTarget,
   status: MultistreamStatus,
   streamActiveSince: number | undefined,
-  metrics: Metrics,
+  metrics: Metrics
 ): Status => {
   if (
     status?.connected.lastProbeTime < streamActiveSince ||
@@ -22,7 +22,7 @@ const computeStatus = (
   const currentTimestamp = moment().unix() * 1000;
 
   const lastActive = metrics?.MultistreamActiveSec?.find(
-    (m) => m?.dimensions?.targetId === target?.id,
+    (m) => m?.dimensions?.targetId === target?.id
   )?.last[0];
 
   const difference = (currentTimestamp - lastActive) / 1000;
@@ -58,7 +58,7 @@ const TargetStatusBadge = ({
 }) => {
   const status = useMemo(
     () => computeStatus(stream, target, msStatus, streamActiveSince, metrics),
-    [stream, target, msStatus, streamActiveSince],
+    [stream, target, msStatus, streamActiveSince]
   );
   const timestamp = msStatus?.connected.lastProbeTime;
   return <StatusBadge variant={status} timestamp={timestamp} />;

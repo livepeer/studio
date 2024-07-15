@@ -62,16 +62,13 @@ export const shuffle = <T>(arr: T[]) => {
 
 export const fetchWithTimeout = (
   url: string,
-  options: RequestInitWithTimeout,
+  options: RequestInitWithTimeout
 ) =>
   new Promise<Response>((resolve, reject) => {
-    let timeout = setTimeout(
-      () => {
-        timeout = null;
-        reject("timeout");
-      },
-      options.timeout || 10 * 1000,
-    );
+    let timeout = setTimeout(() => {
+      timeout = null;
+      reject("timeout");
+    }, options.timeout || 10 * 1000);
     return fetch(url, options).then(
       (response) => {
         if (timeout === null) {
@@ -88,13 +85,13 @@ export const fetchWithTimeout = (
         }
         clearTimeout(timeout);
         return reject(rejectReason);
-      },
+      }
     );
   });
 
 export const fetchWithTimeoutAndRedirects = async (
   url: string,
-  options: RequestInitWithRedirects,
+  options: RequestInitWithRedirects
 ): Promise<Response> => {
   const { maxRedirects = 5 } = options;
 

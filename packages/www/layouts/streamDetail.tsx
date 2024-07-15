@@ -82,7 +82,7 @@ const StreamDetail = ({
     if (!stream?.isActive) return null;
 
     const activeCond = streamHealth?.conditions.find(
-      (c) => c.type === "Active",
+      (c) => c.type === "Active"
     );
     const healthyCond = streamHealth?.healthy;
     const healthValid =

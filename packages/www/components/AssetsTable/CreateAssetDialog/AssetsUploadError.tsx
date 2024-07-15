@@ -53,7 +53,7 @@ const AssetsUploadError = ({
                 errorMessage={e.message}
               />
             );
-          }),
+          })
         )}
       </ul>
     </Box>

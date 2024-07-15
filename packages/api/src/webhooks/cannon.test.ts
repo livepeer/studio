@@ -56,7 +56,7 @@ describe("webhook cannon", () => {
 
     const nonAdminUserRes = await server.store.get(
       `user/${nonAdminUser.id}`,
-      false,
+      false
     );
     nonAdminUser = { ...nonAdminUserRes, emailValid: true };
     await server.store.replace(nonAdminUser);
@@ -181,7 +181,7 @@ describe("webhook cannon", () => {
           const signatureHeader = String(req.headers["livepeer-signature"]);
           const signature: string = signatureHeader.split(",")[1].split("=")[1];
           expect(signature).toEqual(
-            sign(JSON.stringify(req.body), mockWebhook.sharedSecret),
+            sign(JSON.stringify(req.body), mockWebhook.sharedSecret)
           );
         }
         next();
@@ -446,7 +446,7 @@ describe("webhook cannon", () => {
           `/stream/${parentStream.id}/stream?sessionId=${sessionId}`,
           {
             name: "session1",
-          },
+          }
         );
         expect(res.status).toBe(201);
         childStream = await res.json();
@@ -567,7 +567,7 @@ describe("webhook cannon", () => {
     const expectIsLocal = async (
       url: string,
       isLocal: boolean,
-      ips?: string[],
+      ips?: string[]
     ) => {
       expect(await server.webhook.checkIsLocalIp(url, false)).toMatchObject({
         isLocal,
@@ -623,10 +623,10 @@ describe("webhook cannon", () => {
 
       it("should not flag domains that resolve to public IPs", async () => {
         resolverMock.resolve4.mockReturnValueOnce(
-          Promise.resolve(["172.67.149.35"]),
+          Promise.resolve(["172.67.149.35"])
         );
         resolverMock.resolve6.mockReturnValueOnce(
-          Promise.resolve(["2606:4700:3037::ac43:9523"]),
+          Promise.resolve(["2606:4700:3037::ac43:9523"])
         );
 
         await expectIsLocal("http://livepeer.studio/mock", false, [
@@ -635,11 +635,11 @@ describe("webhook cannon", () => {
         ]);
         expect(resolverMock.resolve4.mock.calls).toHaveLength(1);
         expect(resolverMock.resolve4.mock.calls[0][0]).toEqual(
-          "livepeer.studio",
+          "livepeer.studio"
         );
         expect(resolverMock.resolve6.mock.calls).toHaveLength(1);
         expect(resolverMock.resolve6.mock.calls[0][0]).toEqual(
-          "livepeer.studio",
+          "livepeer.studio"
         );
       });
 
@@ -665,11 +665,11 @@ describe("webhook cannon", () => {
           ]);
           expect(resolverMock.resolve4.mock.calls).toHaveLength(1);
           expect(resolverMock.resolve4.mock.calls[0][0]).toEqual(
-            "local.mydomain.com",
+            "local.mydomain.com"
           );
           expect(resolverMock.resolve6.mock.calls).toHaveLength(1);
           expect(resolverMock.resolve6.mock.calls[0][0]).toEqual(
-            "local.mydomain.com",
+            "local.mydomain.com"
           );
         });
       }

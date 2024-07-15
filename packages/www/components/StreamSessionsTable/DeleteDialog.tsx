@@ -77,7 +77,7 @@ const DeleteDialog = ({ total, onUnselect, onDelete }) => {
                   setSaving(true);
                   await onDelete();
                   openSnackbar(
-                    `${total} session${total > 1 ? "s" : ""} deleted.`,
+                    `${total} session${total > 1 ? "s" : ""} deleted.`
                   );
                   setSaving(false);
                   setOpen(false);
