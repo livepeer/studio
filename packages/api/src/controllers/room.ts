@@ -33,7 +33,7 @@ app.post("/", authorizer({}), async (req, res) => {
   const svc = new RoomServiceClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
-    req.config.livekitSecret
+    req.config.livekitSecret,
   );
   await svc.createRoom({
     name: id,
@@ -99,7 +99,7 @@ app.delete("/:roomId", authorizer({}), async (req, res) => {
   const svc = new RoomServiceClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
-    req.config.livekitSecret
+    req.config.livekitSecret,
   );
   try {
     await svc.deleteRoom(req.params.roomId);
@@ -126,7 +126,7 @@ app.post(
     const egressClient = new EgressClient(
       req.config.livekitHost,
       req.config.livekitApiKey,
-      req.config.livekitSecret
+      req.config.livekitSecret,
     );
     const currentEgress = await egressClient.listEgress({
       roomName: req.params.roomId,
@@ -140,7 +140,7 @@ app.post(
     const svc = new RoomServiceClient(
       req.config.livekitHost,
       req.config.livekitApiKey,
-      req.config.livekitSecret
+      req.config.livekitSecret,
     );
     const rooms = await svc.listRooms([req.params.roomId]);
     if (rooms.length < 1) {
@@ -170,10 +170,10 @@ app.post(
       },
     });
     console.log(
-      `egress started. userId=${req.user.id} roomId=${req.params.roomId} streamId=${req.body.streamId}`
+      `egress started. userId=${req.user.id} roomId=${req.params.roomId} streamId=${req.body.streamId}`,
     );
     res.status(204).end();
-  }
+  },
 );
 
 app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
@@ -183,7 +183,7 @@ app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
   const egressClient = new EgressClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
-    req.config.livekitSecret
+    req.config.livekitSecret,
   );
   const currentEgress = await egressClient.listEgress({
     roomName: req.params.roomId,
@@ -195,7 +195,7 @@ app.delete("/:roomId/egress", authorizer({}), async (req, res) => {
       found = true;
       await egressClient.stopEgress(egress.egressId);
       console.log(
-        `egress stopped. userId=${req.user.id} roomId=${req.params.roomId}`
+        `egress stopped. userId=${req.user.id} roomId=${req.params.roomId}`,
       );
     }
   }
@@ -230,7 +230,7 @@ app.post(
         identity: id,
         ttl: 5 * 60,
         metadata: req.body.metadata,
-      }
+      },
     );
     at.addGrant({
       roomJoin: true,
@@ -251,7 +251,7 @@ app.post(
         token,
       token: token,
     });
-  }
+  },
 );
 
 app.delete("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
@@ -260,7 +260,7 @@ app.delete("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
   const svc = new RoomServiceClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
-    req.config.livekitSecret
+    req.config.livekitSecret,
   );
   try {
     await svc.removeParticipant(req.params.roomId, req.params.participantId);
@@ -280,11 +280,11 @@ app.get("/:roomId/user/:participantId", authorizer({}), async (req, res) => {
   const svc = new RoomServiceClient(
     req.config.livekitHost,
     req.config.livekitApiKey,
-    req.config.livekitSecret
+    req.config.livekitSecret,
   );
   const participant = await svc.getParticipant(
     req.params.roomId,
-    req.params.participantId
+    req.params.participantId,
   );
 
   res.status(200);
@@ -312,7 +312,7 @@ app.put(
     const svc = new RoomServiceClient(
       req.config.livekitHost,
       req.config.livekitApiKey,
-      req.config.livekitSecret
+      req.config.livekitSecret,
     );
 
     const permissions: Partial<ParticipantPermission> = {
@@ -324,17 +324,17 @@ app.put(
       req.params.roomId,
       req.params.participantId,
       req.body.metadata,
-      permissions as ParticipantPermission
+      permissions as ParticipantPermission,
     );
     res.status(204).end();
-  }
+  },
 );
 
 // Implement a webhook handler to receive webhooks from Livekit to update our state with room and participant details.
 app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
   const receiver = new WebhookReceiver(
     req.config.livekitApiKey,
-    req.config.livekitSecret
+    req.config.livekitSecret,
   );
 
   // event is a WebhookEvent object
@@ -343,7 +343,7 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
     event = receiver.receive(req.body, req.get("Authorization"));
   } catch (e) {
     console.log(
-      `failed to receive room webhook. auth=${req.get("Authorization")}`
+      `failed to receive room webhook. auth=${req.get("Authorization")}`,
     );
     throw e;
   }
@@ -368,7 +368,7 @@ app.post("/webhook", express.raw({ type: "*/*" }), async (req, res) => {
       const svc = new RoomServiceClient(
         req.config.livekitHost,
         req.config.livekitApiKey,
-        req.config.livekitSecret
+        req.config.livekitSecret,
       );
       const participants = await svc.listParticipants(roomId);
 

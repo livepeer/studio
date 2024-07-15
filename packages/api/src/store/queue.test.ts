@@ -86,7 +86,7 @@ describe("Queue", () => {
         event: "recording.ready",
         userId: "fdsa",
       },
-      2000
+      2000,
     );
     await sem.wait(4000);
     let duration = consumedAt - emittedAt;
@@ -120,7 +120,7 @@ describe("Queue", () => {
         event: "recording.ready",
         userId: "fdsa",
       },
-      1000
+      1000,
     );
     await sem.wait(3000);
     let duration = consumedAt - emittedAt;
@@ -164,7 +164,7 @@ describe("Queue", () => {
         event: "recording.ready",
         userId: "fdsa",
       },
-      1000
+      1000,
     );
     await queue.delayedPublishWebhook(
       "events.recording.ready",
@@ -176,7 +176,7 @@ describe("Queue", () => {
         event: "recording.ready",
         userId: "fdsa",
       },
-      200
+      200,
     );
     await sem2.wait(3000);
     let duration = consumedAt2 - emittedAt;
@@ -217,7 +217,7 @@ describe("Queue", () => {
         event: "recording.ready",
         userId: "fdsa",
       },
-      200
+      200,
     );
     await queue.delayedPublishWebhook(
       "webhooks.recording.ready",
@@ -229,7 +229,7 @@ describe("Queue", () => {
         event: "recording.ready",
         userId: "fdsa",
       },
-      200
+      200,
     );
     await sem1.wait(3000);
     await sem2.wait(3000);

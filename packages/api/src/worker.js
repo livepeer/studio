@@ -130,7 +130,7 @@ const amalgamate = async (req) => {
       const serverRes = await fetch(newReq);
       const data = await serverRes.json();
       return data;
-    })
+    }),
   );
   let output;
   if (responses.length === 0) {
@@ -167,7 +167,7 @@ const amalgamateM3U8 = async (req) => {
       newUrl.hostname = server;
       newUrl.port = newUrl.protocol === "https:" ? 443 : 80;
       return newUrl.toString();
-    })
+    }),
   );
   if (composed === null) {
     return new Response("not found", { status: 404 });
@@ -248,7 +248,7 @@ class ExpressResponse {
           .map(function (rel) {
             return "<" + links[rel] + '>; rel="' + rel + '"';
           })
-          .join(", ")
+          .join(", "),
     );
   }
 
@@ -294,7 +294,7 @@ async function expressRequest(cfReq, router) {
           new Response(text, {
             status: status,
             headers: res.headers,
-          })
+          }),
         );
       },
       json: (jsonObj) => {
@@ -369,7 +369,7 @@ async function handleEvent(event) {
   if (url.pathname === "/test.mp4") {
     return Response.redirect(
       "https://storage.googleapis.com/lp_testharness_assets/official_test_source_2s_keys_24pfs.mp4",
-      302
+      302,
     );
   }
   if (url.pathname.startsWith("/api/broadcaster/status")) {

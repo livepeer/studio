@@ -6,7 +6,7 @@ import { QueryOptions, WithID } from "./types";
 const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
 
 export const taskOutputToIpfsStorage = (
-  out: Task["output"]["export"]["ipfs"]
+  out: Task["output"]["export"]["ipfs"],
 ): Omit<Asset["storage"]["ipfs"], "spec"> =>
   !out
     ? null
@@ -26,7 +26,7 @@ export const taskOutputToIpfsStorage = (
 export default class AssetTable extends Table<WithID<Asset>> {
   async getByPlaybackId(
     playbackId: string,
-    opts?: QueryOptions
+    opts?: QueryOptions,
   ): Promise<WithID<Asset>> {
     const query = [
       sql`asset.data->>'playbackId' = ${playbackId}`,
@@ -45,19 +45,19 @@ export default class AssetTable extends Table<WithID<Asset>> {
   async getByIpfsCid(
     cid: string,
     user?: User,
-    crossUserCutoffDate?: number
+    crossUserCutoffDate?: number,
   ): Promise<WithID<Asset>> {
     return this.findFirstReady(
       [sql`asset.data->'storage'->'ipfs'->>'cid' = ${cid}`],
       user,
-      crossUserCutoffDate
+      crossUserCutoffDate,
     );
   }
 
   async getBySourceURL(
     url: string,
     user?: User,
-    crossUserCutoffDate?: number
+    crossUserCutoffDate?: number,
   ): Promise<WithID<Asset>> {
     return this.findFirstReady(
       [
@@ -66,14 +66,14 @@ export default class AssetTable extends Table<WithID<Asset>> {
         sql`asset.data->'source'->>'encryption' IS NULL`,
       ],
       user,
-      crossUserCutoffDate
+      crossUserCutoffDate,
     );
   }
 
   private async findFirstReady(
     query: SQLStatement[],
     user?: User,
-    crossUserCutoffDate?: number
+    crossUserCutoffDate?: number,
   ): Promise<WithID<Asset>> {
     const findOnce = async (userQuery: SQLStatement[]) => {
       const [assets] = await this.find(
@@ -86,7 +86,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
         {
           limit: 1,
           order: "coalesce((asset.data->'createdAt')::bigint, 0) ASC",
-        }
+        },
       );
       return assets.length > 0 ? assets[0] : null;
     };
@@ -122,7 +122,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
   async findDuplicateUrlUpload(
     url: string,
     user: User,
-    projectId: string
+    projectId: string,
   ): Promise<WithID<Asset>> {
     const createdAfter = Date.now() - DUPLICATE_ASSETS_THRESHOLD;
     const query = [

@@ -55,7 +55,7 @@ export const makeColumns = () => [
     sortType: (...params: SortTypeArgs) =>
       numberSort(
         "original.sourceSegmentsDuration.sourceSegmentsDuration",
-        ...params
+        ...params,
       ),
   },
   {
@@ -78,7 +78,7 @@ export const rowsPageFromState = async (
   streamId: string,
   getStreamSessions: Function,
   getClipsBySessionId: Function,
-  openSnackbar: Function
+  openSnackbar: Function,
 ): Promise<RowsPageFromStateResult<SessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessions(
     streamId,
@@ -87,11 +87,11 @@ export const rowsPageFromState = async (
     formatFiltersForApiRequest(state.filters, {
       parseNumber: (n) => n * 60,
     }),
-    true
+    true,
   );
 
   const clipsPromises = streams.map((stream: any) =>
-    getClipsBySessionId(stream.id, null, 100, null, null, 1)
+    getClipsBySessionId(stream.id, null, 100, null, null, 1),
   );
 
   const clipsCounts = await Promise.all(clipsPromises);

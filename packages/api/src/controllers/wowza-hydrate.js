@@ -80,7 +80,7 @@ export default (stream) => {
   // Dedupe profiles
   profiles = [...new Set(profiles)];
   const enabledEncodeNames = new Set(
-    enabledEncodes.map((encode) => encode.name)
+    enabledEncodes.map((encode) => encode.name),
   );
   const streamNameGroups = transcoderConfig.streamNameGroups.map(
     (streamNameGroup) => {
@@ -89,7 +89,7 @@ export default (stream) => {
         .filter((name) => enabledEncodeNames.has(name))
         .map((encodeName) => encodeNameToRenditionName[encodeName]);
       return { name, renditions };
-    }
+    },
   );
   const presets = [];
   return {

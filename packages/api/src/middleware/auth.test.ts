@@ -48,13 +48,13 @@ beforeAll(async () => {
   app.use(authenticator());
 
   app.all("/admin/*", authorizer({ anyAdmin: true }), (_req, res) =>
-    res.status(202).end()
+    res.status(202).end(),
   );
 
   const router = Router();
   router.use(
     "/nested",
-    Router().all("/*", authorizer({}), (_req, res) => res.status(203).end())
+    Router().all("/*", authorizer({}), (_req, res) => res.status(203).end()),
   );
   router.all("/*", authorizer({}), (_req, res) => res.status(203).end());
   app.use("/router", router);
@@ -93,7 +93,7 @@ describe("auth middleware", () => {
       ({ nonAdminUser, nonAdminApiKey, nonAdminToken } = await setupUsers(
         server,
         mockAdminUserInput,
-        mockNonAdminUserInput
+        mockNonAdminUserInput,
       ));
       basicAuth = `${nonAdminUser.id}:${nonAdminApiKey}`;
       basicAuth64 = Buffer.from(basicAuth).toString("base64");
@@ -138,7 +138,7 @@ describe("auth middleware", () => {
 
     const setAccess = async (
       token: string,
-      rules?: ApiToken["access"]["rules"]
+      rules?: ApiToken["access"]["rules"],
     ) => db.apiToken.update(token, { access: { rules } });
 
     const fetchStatus = async (method: string, path: string) => {
@@ -191,7 +191,7 @@ describe("auth middleware", () => {
           { resources: ["foo"], methods: ["options"] },
           { resources: ["foo/bar"], methods: ["get", "patch"] },
           { resources: ["foo/bar/zaz"], methods: ["head", "post"] },
-        ])
+        ]),
       );
 
       it("should disallow other methods", async () => {
@@ -222,7 +222,7 @@ describe("auth middleware", () => {
         setAccess(nonAdminApiKey, [
           { resources: ["gus/:id"] },
           { resources: ["gus/fra/*"] },
-        ])
+        ]),
       );
 
       it("should disallow other paths", async () => {
@@ -445,11 +445,11 @@ describe("auth middleware", () => {
       if (method === "OPTIONS") {
         expect(res.status).toEqual(204);
         expect(res.headers.get("access-control-allow-methods")).toEqual(
-          "GET,HEAD,PUT,PATCH,POST,DELETE"
+          "GET,HEAD,PUT,PATCH,POST,DELETE",
         );
       }
       expect(res.headers.get("access-control-allow-credentials")).toEqual(
-        "true"
+        "true",
       );
       const corsAllowed =
         res.headers.get("access-control-allow-origin") === origin;
@@ -474,7 +474,7 @@ describe("auth middleware", () => {
         await expectAllowed(
           "OPTIONS",
           "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
-          origin
+          origin,
         ).toBe(true);
         await expectAllowed("OPTIONS", "/playback/1234", origin).toBe(true);
         await expectAllowed("OPTIONS", "/user", origin).toBe(true);
@@ -487,7 +487,7 @@ describe("auth middleware", () => {
           await expectAllowed(
             method,
             "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
-            origin
+            origin,
           ).toBe(true);
           await expectAllowed(method, "/playback/1234", origin).toBe(true);
         }
@@ -500,7 +500,7 @@ describe("auth middleware", () => {
           await expectAllowed(method, "/asset/upload/url", origin).toBe(false);
           await expectAllowed(method, "/asset/upload", origin).toBe(false);
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
-            false
+            false,
           );
           await expectAllowed(method, "/playback", origin).toBe(false);
           await expectAllowed(method, "/stream", origin).toBe(false);
@@ -514,15 +514,15 @@ describe("auth middleware", () => {
       client.jwtAuth = nonAdminToken;
       for (const method of testMethods) {
         await expectAllowed(method, "/stream", "https://livepeer.studio").toBe(
-          true
+          true,
         );
         await expectAllowed(method, "/asset", "https://livepeer.studio").toBe(
-          true
+          true,
         );
         await expectAllowed(
           method,
           "/api-token/1234",
-          "https://livepeer.studio"
+          "https://livepeer.studio",
         ).toBe(true);
       }
     });
@@ -550,10 +550,10 @@ describe("auth middleware", () => {
           const expected = allowedOrigins.includes(origin);
 
           await expectAllowed(method, "/asset/upload/url", origin).toBe(
-            expected
+            expected,
           );
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
-            expected
+            expected,
           );
           await expectAllowed(method, "/asset", origin).toBe(expected);
           await expectAllowed(method, "/asset/abcd", origin).toBe(expected);
@@ -577,13 +577,13 @@ describe("auth middleware", () => {
       client.apiKey = await createApiToken({ allowedOrigins });
       // control case
       await expect(
-        fetchCors("GET", "/stream/1234", allowedOrigins[0])
+        fetchCors("GET", "/stream/1234", allowedOrigins[0]),
       ).resolves.toMatchObject({
         corsAllowed: true,
         status: 404,
       });
       await expect(
-        fetchCors("GET", "/data/views/1234/total", allowedOrigins[0])
+        fetchCors("GET", "/data/views/1234/total", allowedOrigins[0]),
       ).resolves.toMatchObject({
         corsAllowed: true,
         status: 404,
@@ -591,7 +591,7 @@ describe("auth middleware", () => {
 
       for (const [method, path] of forbiddenApis) {
         await expect(
-          fetchCors(method, path, allowedOrigins[0])
+          fetchCors(method, path, allowedOrigins[0]),
         ).resolves.toMatchObject({
           corsAllowed: true,
           status: 403,
@@ -613,7 +613,7 @@ describe("auth middleware", () => {
         const { corsAllowed, status, body } = await fetchCors(
           method,
           path,
-          allowedOrigins[0]
+          allowedOrigins[0],
         );
         expect(corsAllowed).toBe(true);
         expect([200, 403, 404, 422]).toContain(status);
@@ -636,14 +636,14 @@ describe("auth middleware", () => {
       ];
       for (const [method, path] of apis) {
         await expect(
-          fetchCors(method, path, "https://not.allowed.com")
+          fetchCors(method, path, "https://not.allowed.com"),
         ).resolves.toMatchObject({
           corsAllowed: false,
           status: 403,
           body: {
             errors: [
               expect.stringMatching(
-                /credential disallows CORS access from origin .+/
+                /credential disallows CORS access from origin .+/,
               ),
             ],
           },

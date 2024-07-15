@@ -73,7 +73,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
         accessor: "createdAt",
       },
     ],
-    [nextCursor, lastFilters]
+    [nextCursor, lastFilters],
   );
 
   const filtersDesc = useMemo(
@@ -83,7 +83,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
       { id: "url", placeholder: "url" },
       { id: "publicUrl", placeholder: "public url" },
     ],
-    []
+    [],
   );
 
   const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
@@ -116,7 +116,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
   const refetch = () => {
     fetchData(
       { order: lastOrder, cursor: lastCursor, filters: lastFilters },
-      true
+      true,
     );
   };
 

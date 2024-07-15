@@ -36,7 +36,7 @@ describe("controllers/experiment", () => {
     ({ client, adminApiKey, nonAdminUser, nonAdminApiKey } = await setupUsers(
       server,
       mockAdminUserInput,
-      mockNonAdminUserInput
+      mockNonAdminUserInput,
     ));
     client.apiKey = adminApiKey;
 
@@ -54,7 +54,7 @@ describe("controllers/experiment", () => {
       expect(res.status).toBe(404);
 
       res = await client.post(
-        `/experiment/-/lit-signing-condition/verify-lit-jwt`
+        `/experiment/-/lit-signing-condition/verify-lit-jwt`,
       );
       expect(res.status).toBe(403);
       const { errors } = await res.json();
@@ -82,7 +82,7 @@ describe("controllers/experiment", () => {
         `/experiment/lit-signing-condition/audience`,
         {
           allowAll: true,
-        }
+        },
       );
       expect(resAudience.status).toBe(204);
 
@@ -92,7 +92,7 @@ describe("controllers/experiment", () => {
 
     it("allows admins to check for other users", async () => {
       const res = await client.get(
-        `/experiment/check/lit-signing-condition?userId=${nonAdminUser.id}`
+        `/experiment/check/lit-signing-condition?userId=${nonAdminUser.id}`,
       );
       expect(res.status).toBe(204);
     });
@@ -111,11 +111,11 @@ describe("controllers/experiment", () => {
       } as any);
 
       let res = await client.get(
-        `/experiment/check/lit-signing-condition?playbackId=${assetId}`
+        `/experiment/check/lit-signing-condition?playbackId=${assetId}`,
       );
       expect(res.status).toBe(204);
       res = await client.get(
-        `/experiment/check/lit-signing-condition?playbackId=${streamId}`
+        `/experiment/check/lit-signing-condition?playbackId=${streamId}`,
       );
       expect(res.status).toBe(204);
     });

@@ -224,7 +224,7 @@ const LogsContainer = ({
                     JSON.parse(selected?.request?.body)?.payload ||
                       JSON.parse(selected?.request?.body)?.stream ||
                       JSON.parse(selected?.request?.body)?.asset ||
-                      JSON.parse(selected?.request?.body)?.task
+                      JSON.parse(selected?.request?.body)?.task,
                   )}
                 />
               )}

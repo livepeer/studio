@@ -81,7 +81,7 @@ const Health = () => {
         setInfo(info);
       }
     },
-    [getStreamInfo]
+    [getStreamInfo],
   );
 
   const getIngestRate = useCallback(
@@ -104,7 +104,7 @@ const Health = () => {
         });
       }
     },
-    [getStreamInfo]
+    [getStreamInfo],
   );
 
   useEffect(() => {

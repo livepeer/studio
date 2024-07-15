@@ -35,7 +35,7 @@ export const makeColumns = () => [
 export const makeTableData = (
   conditionsMap: Record<string, Condition>,
   stream: Stream,
-  streamActiveSince: number
+  streamActiveSince: number,
 ): TableData<HealthChecksTableData> => ({
   isLoading: false,
   data: {

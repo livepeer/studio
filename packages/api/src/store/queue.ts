@@ -10,13 +10,13 @@ const getExchanges = (tasksExchange = defaultTaskExchange) =>
   ({
     webhooks: "webhook_default_exchange",
     task: tasksExchange,
-  } as const);
+  }) as const;
 const getQueues = (tasksExchange = defaultTaskExchange) =>
   ({
     events: "webhook_events_queue_v1",
     webhooks: "webhook_cannon_single_url_v1",
     task: `${tasksExchange}_results`,
-  } as const);
+  }) as const;
 const delayedWebhookQueue = (delayMs: number) => `delayed_webhook_${delayMs}ms`;
 
 type Queues = ReturnType<typeof getQueues>;
@@ -32,14 +32,14 @@ export default interface Queue {
   publish(
     exchange: ExchangeName,
     key: RoutingKey,
-    msg: messages.Any
+    msg: messages.Any,
   ): Promise<void>;
   publishWebhook(key: RoutingKey, msg: messages.Webhooks): Promise<void>;
   delayedPublishWebhook(
     key: RoutingKey,
     msg: messages.Any,
     delay: number,
-    delayedQueueName?: string
+    delayedQueueName?: string,
   ): Promise<void>;
 
   consume(name: QueueName, func: (msg: ConsumeMessage) => void): Promise<void>;
@@ -53,11 +53,11 @@ export class NoopQueue implements Queue {
   async publish(
     exchange: ExchangeName,
     key: RoutingKey,
-    msg: messages.Webhooks
+    msg: messages.Webhooks,
   ) {
     console.warn(
       `WARN: Publish to exchange=${exchange} on noop queue. key=${key} message=`,
-      msg
+      msg,
     );
   }
 
@@ -68,11 +68,11 @@ export class NoopQueue implements Queue {
   async delayedPublishWebhook(
     key: RoutingKey,
     msg: messages.Any,
-    delay: number
+    delay: number,
   ) {
     console.warn(
       `WARN: Delayed publish event to noop queue. key=${key} delay=${delay} message=`,
-      msg
+      msg,
     );
   }
 
@@ -93,7 +93,7 @@ export class RabbitQueue implements Queue {
   public static async connect(
     url: string,
     appName: string = "api",
-    tasksExchange = defaultTaskExchange
+    tasksExchange = defaultTaskExchange,
   ): Promise<RabbitQueue> {
     const queue = new RabbitQueue(tasksExchange);
     await queue.init(url, appName);
@@ -137,22 +137,22 @@ export class RabbitQueue implements Queue {
           channel.bindQueue(
             this.queues.events,
             this.exchanges.webhooks,
-            "events.#"
+            "events.#",
           ),
           channel.bindQueue(
             this.queues.webhooks,
             this.exchanges.webhooks,
-            "webhooks.#"
+            "webhooks.#",
           ),
           channel.bindQueue(
             this.queues.task,
             this.exchanges.task,
-            "task.result.#"
+            "task.result.#",
           ),
           channel.bindQueue(
             this.queues.task,
             this.exchanges.task,
-            "task.resultPartial.#"
+            "task.resultPartial.#",
           ),
         ]);
         await channel.prefetch(10);
@@ -171,13 +171,15 @@ export class RabbitQueue implements Queue {
       this.connection.on("connectFailed", (err: Error) => {
         console.log("AMQP Connect Failed.", err);
         resolveOnce(
-          new Error(`Error connecting to RabbitMQ. ${err.name}: ${err.message}`)
+          new Error(
+            `Error connecting to RabbitMQ. ${err.name}: ${err.message}`,
+          ),
         );
       });
       this.connection.on("disconnect", ({ err }: { err: Error }) => {
         console.log("AMQP Disconnected.", err);
         resolveOnce(
-          new Error(`RabbitMQ disconnected. ${err.name}: ${err.message}`)
+          new Error(`RabbitMQ disconnected. ${err.name}: ${err.message}`),
         );
       });
     });
@@ -199,7 +201,7 @@ export class RabbitQueue implements Queue {
 
   public async consume(
     queueName: QueueName,
-    func: (msg: ConsumeMessage) => void
+    func: (msg: ConsumeMessage) => void,
   ): Promise<void> {
     if (!func) {
       throw new Error("RabbitMQ | consume | func is undefined");
@@ -218,7 +220,7 @@ export class RabbitQueue implements Queue {
 
   public async publishWebhook(
     route: RoutingKey,
-    msg: messages.Any
+    msg: messages.Any,
   ): Promise<void> {
     await this.publish("webhooks", route, msg);
   }
@@ -226,12 +228,12 @@ export class RabbitQueue implements Queue {
   public async publish(
     exchangeName: ExchangeName,
     route: RoutingKey,
-    msg: messages.Any
+    msg: messages.Any,
   ): Promise<void> {
     console.log(
       `publishing message route=${route} exchange=${exchangeName} msg=${JSON.stringify(
-        msg
-      )}`
+        msg,
+      )}`,
     );
     await this._channelPublish(this.exchanges[exchangeName], route, msg, {
       persistent: true,
@@ -248,7 +250,7 @@ export class RabbitQueue implements Queue {
     routingKey: RoutingKey,
     msg: messages.Any,
     delay: number,
-    delayedQueueName?: string
+    delayedQueueName?: string,
   ): Promise<void> {
     delay = Math.round(delay);
     if (!delayedQueueName) {
@@ -276,18 +278,18 @@ export class RabbitQueue implements Queue {
         console.log(
           `emitting delayed message: delay=${
             delay / 1000
-          }s queue=${delayedQueueName} msg=${JSON.stringify(msg)}`
+          }s queue=${delayedQueueName} msg=${JSON.stringify(msg)}`,
         );
         return this._channelPublish(delayedQueueName, routingKey, msg, {
           persistent: true,
         });
-      }
+      },
     );
   }
 
   private async _withSetup<T>(
     setup: amqp.SetupFunc,
-    action: () => Promise<T>
+    action: () => Promise<T>,
   ): Promise<T> {
     await this.channel.addSetup(setup);
     try {
@@ -302,24 +304,24 @@ export class RabbitQueue implements Queue {
     exchange: string,
     routingKey: string,
     msg: any,
-    opts: amqp.Options.Publish
+    opts: amqp.Options.Publish,
   ) {
     try {
       const success = await this.channel.publish(
         exchange,
         routingKey,
         msg,
-        opts
+        opts,
       );
       if (!success) {
         throw new Error(
-          `Failed to publish message ${routingKey}: publish buffer full`
+          `Failed to publish message ${routingKey}: publish buffer full`,
         );
       }
     } catch (err) {
       console.error(
         `Error publishing message: exchange="${exchange}" routingKey="${routingKey}" err=`,
-        err
+        err,
       );
       if (err?.message?.includes("timeout")) {
         throw new Error(`Timeout publishing message ${routingKey} to queue`);
