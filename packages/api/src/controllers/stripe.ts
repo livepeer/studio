@@ -24,7 +24,7 @@ const HELP_EMAIL = "help@livepeer.org";
 export const reportUsage = async (
   stripe: Stripe,
   config: CliArgs,
-  adminToken: string
+  adminToken: string,
 ) => {
   const payAsYouGoUsers = await getPayAsYouGoUsers(config.ingest, adminToken);
 
@@ -43,12 +43,12 @@ export const reportUsage = async (
           stripe,
           config,
           user,
-          adminToken
+          adminToken,
         );
         updatedUsers.push(userUpdated);
       } catch (e) {
         logger.error(
-          `Failed to create usage record for user=${user.id} with error=${e.message}`
+          `Failed to create usage record for user=${user.id} with error=${e.message}`,
         );
         updatedUsers.push({
           id: user.id,
@@ -76,7 +76,7 @@ async function getPayAsYouGoUsers(ingests: Ingest[], adminToken: string) {
     {
       limit: 9999999999,
       useReplica: true,
-    }
+    },
   );
 
   const hackerUsers = await getRecentlyActiveHackers(ingests, adminToken);
@@ -93,7 +93,7 @@ async function reportUsageForUser(
   actuallyReport: boolean = true,
   forceReport: boolean = false,
   from?: number,
-  to?: number
+  to?: number,
 ) {
   // make sure this func takes at least 100ms to avoid incurring into stripe rate limits
   const sleepProm = sleep(100);
@@ -109,7 +109,7 @@ async function reportUsageForUser(
   }
 
   const userSubscription = await stripe.subscriptions.retrieve(
-    user.stripeCustomerSubscriptionId
+    user.stripeCustomerSubscriptionId,
   );
 
   let billingCycleStart = userSubscription.current_period_start * 1000; // 1685311200000 // Test date
@@ -125,20 +125,31 @@ async function reportUsageForUser(
     billingCycleStart,
     billingCycleEnd,
     config.ingest,
-    adminToken
+    adminToken,
   );
 
   const subscriptionItems = await stripe.subscriptionItems.list({
     subscription: user.stripeCustomerSubscriptionId,
   });
 
-  const usageNotifications = await getUsageNotifications(
-    usageData.usagePercentages,
-    user
-  );
+  const product = products[user.stripeProductId];
+  let usageToReport = usageData.overUsage;
 
-  if (usageNotifications.length > 0) {
-    await notifyUser(usageNotifications, user, { headers: {}, config });
+  if (!product.minumumSpend) {
+    const usageNotifications = await getUsageNotifications(
+      usageData.usagePercentages,
+      user,
+    );
+
+    if (usageNotifications.length > 0) {
+      await notifyUser(usageNotifications, user, { headers: {}, config });
+    }
+  } else {
+    const overage = await calculateOverageOnMinimumSpend(
+      product,
+      usageData.billingUsage,
+    );
+    usageToReport = overage;
   }
 
   if (actuallyReport) {
@@ -148,7 +159,7 @@ async function reportUsageForUser(
         acc[item.price.lookup_key] = item.id;
         return acc;
       },
-      {} as Record<string, string>
+      {} as Record<string, string>,
     );
     logger.info(`
       usage: reporting usage to stripe for user=${user.id} email=${user.email} from=${billingCycleStart} to=${billingCycleEnd}
@@ -157,7 +168,7 @@ async function reportUsageForUser(
       stripe,
       user,
       subscriptionItemsByLookupKey,
-      usageData.overUsage
+      usageData.overUsage,
     );
   }
 
@@ -177,7 +188,7 @@ const sendUsageRecordToStripe = async (
   stripe: Stripe,
   user: WithID<User>,
   subscriptionItemsByLookupKey,
-  overUsage
+  overUsage,
 ) => {
   // Invoice items based on overusage
   await Promise.all(
@@ -189,7 +200,7 @@ const sendUsageRecordToStripe = async (
             quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       } else if (product.name === "Delivery") {
         await stripe.subscriptionItems.createUsageRecord(
@@ -198,7 +209,7 @@ const sendUsageRecordToStripe = async (
             quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       } else if (product.name === "Storage") {
         await stripe.subscriptionItems.createUsageRecord(
@@ -207,11 +218,94 @@ const sendUsageRecordToStripe = async (
             quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
             timestamp: Math.floor(new Date().getTime() / 1000),
             action: "set",
-          }
+          },
         );
       }
-    })
+    }),
   );
+};
+
+export const calculateOverageOnMinimumSpend = async (product, billingUsage) => {
+  const minimumSpend = product.monthlyPrice;
+
+  let { storageUsage, deliveryUsage, totalUsage } = billingUsage;
+
+  let prices: any = {};
+
+  if (product?.usage) {
+    product.usage.forEach((item) => {
+      if (item.name.toLowerCase() === "transcoding") {
+        prices.transcoding = item.price;
+      } else if (item.name.toLowerCase() === "delivery") {
+        prices.streaming = item.price;
+      } else if (item.name.toLowerCase() === "storage") {
+        prices.storage = item.price;
+      }
+    });
+  }
+
+  let totalSpent =
+    prices.storage * storageUsage +
+    prices.streaming * deliveryUsage +
+    prices.transcoding * totalUsage;
+
+  // If the total spent is less than the minimum spend, return 0 for all usage
+  // No usage is getting reported to Stripe, which, at the end of the billing cyle
+  // will result in a (monthlyPrice)$ invoice + 0$ usage
+  if (totalSpent <= minimumSpend) {
+    return {
+      StorageUsageMins: 0,
+      DeliveryUsageMins: 0,
+      TotalUsageMins: 0,
+    };
+  }
+
+  // Calculate the X amount in $ that is over the minimum spend
+  // Based on the current user usage
+  let remainingOverage = totalSpent - minimumSpend;
+
+  let overageUsage = {
+    StorageUsageMins: 0,
+    DeliveryUsageMins: 0,
+    TotalUsageMins: 0,
+  };
+
+  const totalSpentInCategories = {
+    storage: prices.storage * storageUsage,
+    delivery: prices.streaming * deliveryUsage,
+    transcoding: prices.transcoding * totalUsage,
+  };
+
+  let totalSpentOverage =
+    totalSpentInCategories.storage +
+    totalSpentInCategories.delivery +
+    totalSpentInCategories.transcoding;
+
+  // If the remaining overage is less than or equal to 0, return 0 for all usage
+  // No usage is getting reported to Stripe, which, at the end of the billing cyle
+  // will result in a (monthlyPrice)$ invoice + 0$ usage
+  if (remainingOverage <= 0 || totalSpentOverage <= 0) {
+    return {
+      StorageUsageMins: 0,
+      DeliveryUsageMins: 0,
+      TotalUsageMins: 0,
+    };
+  }
+
+  // If the usage is greater than 0, calculate the ratio of the remaining overage to the total spent
+  // This ratio will be used to calculate the amount of usage to report to Stripe
+  // distributed across the 3 product items with > $0 spend
+  // The resulting invoice will be (monthlyPrice)$ + transcodingOverage*price + streamingOverage*price + storageOverage*price
+  const overageRatio = remainingOverage / totalSpent;
+
+  overageUsage.StorageUsageMins =
+    (totalSpentInCategories.storage * overageRatio) / prices.storage;
+  overageUsage.DeliveryUsageMins =
+    (totalSpentInCategories.delivery * overageRatio) / prices.streaming;
+  overageUsage.TotalUsageMins =
+    (totalSpentInCategories.transcoding * overageRatio) / prices.transcoding;
+
+  return overageUsage;
 };
 
 // Webhook handler for asynchronous events called by stripe on invoice generation
@@ -238,7 +332,7 @@ app.post("/webhook", async (req, res) => {
 
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
-      { useReplica: false }
+      { useReplica: false },
     );
 
     if (users.length < 1) {
@@ -256,7 +350,7 @@ app.post("/webhook", async (req, res) => {
         invoice.period_end,
         {
           useReplica: false,
-        }
+        },
       );
 
       // Invoice items based on usage
@@ -275,7 +369,7 @@ app.post("/webhook", async (req, res) => {
               subscription: user.stripeCustomerSubscriptionId,
             });
           }
-        })
+        }),
       );
     }
   } else if (event.type === "invoice.payment_failed") {
@@ -285,7 +379,7 @@ app.post("/webhook", async (req, res) => {
 
     const [users] = await db.user.find(
       { stripeCustomerId: invoice.customer },
-      { useReplica: false }
+      { useReplica: false },
     );
 
     if (users.length < 1) {
@@ -345,7 +439,7 @@ app.post("/webhook", async (req, res) => {
         });
 
         let paidInvoices = allCustomerInvoices.data.filter(
-          (invoice) => invoice.status === "paid" && invoice.amount_due > 0
+          (invoice) => invoice.status === "paid" && invoice.amount_due > 0,
         );
 
         if (paidInvoices.length === 0) {
@@ -416,7 +510,7 @@ app.patch(
 
     if (stripeCustomerSubscriptionId) {
       const subscription = await req.stripe.subscriptions.retrieve(
-        stripeCustomerSubscriptionId
+        stripeCustomerSubscriptionId,
       );
 
       if (!subscription) {
@@ -447,7 +541,7 @@ app.patch(
 
     res.status(200);
     return res.json({ result: "user subscription updated" });
-  }
+  },
 );
 
 app.post(
@@ -489,7 +583,7 @@ app.post(
 
       try {
         subscription = await req.stripe.subscriptions.retrieve(
-          user.stripeCustomerSubscriptionId
+          user.stripeCustomerSubscriptionId,
         );
       } catch (e) {
         logger.error(`
@@ -544,7 +638,7 @@ app.post(
               price: item.id,
             })),
           ],
-        }
+        },
       );
 
       await db.user.update(user.id, {
@@ -567,7 +661,7 @@ app.post(
     res.json({
       result: "Migrated user with email " + user.email + " to enterprise plan",
     });
-  }
+  },
 );
 
 export default app;
