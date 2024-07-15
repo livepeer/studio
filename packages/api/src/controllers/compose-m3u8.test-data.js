@@ -265,9 +265,9 @@ test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/sourc
 
 export const longPlaylistStoreRewritten = longPlaylistStore.replace(
   /test:\/\/longPlaylistBroadcaster\/stream/g,
-  "https://example.com/store",
+  "https://example.com/store"
 );
 export const longPlaylistCombinedRewritten = longPlaylistCombined.replace(
   /test:\/\/longPlaylistBroadcaster\/stream/g,
-  "https://example.com/store",
+  "https://example.com/store"
 );

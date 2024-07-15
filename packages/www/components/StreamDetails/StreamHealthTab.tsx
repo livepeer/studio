@@ -28,7 +28,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
 
   const June = useJune();
   const [multiDataChart, setMultiDataChart] = useState<MultistreamChartType[]>(
-    [],
+    []
   );
 
   const startTime = useMemo(() => Date.now(), []);
@@ -53,7 +53,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         setInfo(info);
       }
     },
-    [getStreamInfo],
+    [getStreamInfo]
   );
 
   const getIngestRate = useCallback(
@@ -70,13 +70,13 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
           {
             name: lastItem ? lastItem.name + ingestInterval / 1000 : 0,
             "Session bitrate": Math.round(
-              (newInfo.session.ingestRate / 1000) * 8,
+              (newInfo.session.ingestRate / 1000) * 8
             ), // kilobits rather than bytes here
           },
         ].slice(Math.max(prev.length - maxItems, 0));
       });
     },
-    [getStreamInfo],
+    [getStreamInfo]
   );
 
   useEffect(() => {

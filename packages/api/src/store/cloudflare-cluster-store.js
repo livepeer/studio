@@ -6,7 +6,7 @@ export default class CloudflareStore {
     this.KV = global[cloudflareNamespace];
     if (!this.KV) {
       throw new Error(
-        `couldn't find cloudflare kv namespace at global.${cloudflareNamespace}`,
+        `couldn't find cloudflare kv namespace at global.${cloudflareNamespace}`
       );
     }
   }

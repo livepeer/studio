@@ -87,7 +87,7 @@ const UsageSummary = () => {
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
-    null,
+    null
   );
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
@@ -134,7 +134,7 @@ const UsageSummary = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        subscription?.status,
+        subscription?.status
       );
     };
 
@@ -160,7 +160,7 @@ const UsageSummary = () => {
         TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
         DeliveryUsageMins: Math.max(
           usage?.DeliveryUsageMins - limits.streaming,
-          0,
+          0
         ),
         StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
       };
@@ -176,8 +176,8 @@ const UsageSummary = () => {
           units: overusage.TotalUsageMins,
           total: Number(
             (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
-              2,
-            ),
+              2
+            )
           ),
         },
         deliveryBill: {
@@ -185,7 +185,7 @@ const UsageSummary = () => {
           total: Number(
             (
               overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
         storageBill: {
@@ -193,7 +193,7 @@ const UsageSummary = () => {
           total: Number(
             (
               overusage.StorageUsageMins * payAsYouGoData.usage[2].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
       };
@@ -263,14 +263,14 @@ const UsageSummary = () => {
           {subscription && (
             <Flex>
               {new Date(
-                subscription.current_period_start * 1000,
+                subscription.current_period_start * 1000
               ).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               })}{" "}
               to{" "}
               {new Date(
-                subscription.current_period_end * 1000,
+                subscription.current_period_end * 1000
               ).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",

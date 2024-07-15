@@ -13,7 +13,7 @@ export const getUsageNotifications = async (
     DeliveryUsageMins: number;
     StorageUsageMins: number;
   },
-  user: WithID<User>,
+  user: WithID<User>
 ) => {
   let notifications = [];
   const { TotalUsageMins, DeliveryUsageMins, StorageUsageMins } =
@@ -21,7 +21,7 @@ export const getUsageNotifications = async (
 
   if (
     [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
-      (min) => min > 90,
+      (min) => min > 90
     )
   ) {
     notifications.push({
@@ -43,7 +43,7 @@ export const getUsageNotifications = async (
     }
   } else if (
     [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
-      (min) => min > 90,
+      (min) => min > 90
     )
   ) {
     notifications.push({
@@ -53,7 +53,7 @@ export const getUsageNotifications = async (
     });
   } else if (
     [TotalUsageMins, DeliveryUsageMins, StorageUsageMins].some(
-      (min) => min > 75,
+      (min) => min > 75
     )
   ) {
     notifications.push({
@@ -91,7 +91,7 @@ type Notification = {
 export const notifyUser = async (
   notifications: Notification[],
   user: User,
-  req: Pick<Request, "headers" | "config">,
+  req: Pick<Request, "headers" | "config">
 ) => {
   for (let notification of notifications) {
     if (user.notifications?.usage?.[notification.type]) {
@@ -124,7 +124,7 @@ export const notifyUser = async (
 
 export const notifyMissingPaymentMethod = async (
   user: WithID<User>,
-  req: Request,
+  req: Request
 ) => {
   console.log(`
     usage: user=${user.id} is in overusage but doesn't have a payment method, notifying support team

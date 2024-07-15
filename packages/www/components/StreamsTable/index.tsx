@@ -63,7 +63,7 @@ const StreamsTable = ({
   const fetcher: Fetcher<StreamsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, userId, getStreams, appendProjectId),
-    [userId],
+    [userId]
   );
 
   const onCreateClick = useCallback(
@@ -79,7 +79,7 @@ const StreamsTable = ({
         query,
       });
     },
-    [createStream, state.invalidate],
+    [createStream, state.invalidate]
   );
 
   const onSetFilters = (e) => {
@@ -101,7 +101,7 @@ const StreamsTable = ({
     if (type === "All") {
       console.log("All", currentFilters);
       const newFilters = currentFilters.filter(
-        (filter) => filter.id !== "isActive" && filter.id !== "isHealthy",
+        (filter) => filter.id !== "isActive" && filter.id !== "isHealthy"
       );
       stateSetter.setFilters([]);
     } else {
@@ -129,7 +129,7 @@ const StreamsTable = ({
     if (type !== "All") {
       searchParams.set(
         type === "Active" ? "isActive" : "isHealthy",
-        type === "Active" ? "true" : "false",
+        type === "Active" ? "true" : "false"
       );
     }
 
@@ -184,7 +184,7 @@ const StreamsTable = ({
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
           "Create livestream",
-          createDialogState.onOn,
+          createDialogState.onOn
         )}
         header={
           <>

@@ -9,7 +9,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void,
+  _setState: (value: SetStateAction<ApiState>) => void
 ) => {
   context = _context;
   setState = _setState;
@@ -24,7 +24,7 @@ export const getTasks = async (
     order?: string;
     active?: boolean;
     count?: boolean;
-  },
+  }
 ): Promise<[Array<Task>, string, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
 
@@ -36,7 +36,7 @@ export const getTasks = async (
       limit: opts?.limit,
       cursor: opts?.cursor,
       count: opts?.count,
-    })}`,
+    })}`
   );
 
   if (res.status !== 200) {

@@ -26,7 +26,7 @@ export const amalgamate = async (req, endpoint) => {
       });
       const data = await serverRes.json();
       return data;
-    }),
+    })
   );
   let output;
   if (responses.length === 0) {

@@ -8,7 +8,7 @@ describe("create-db-tables", () => {
     await createDbTables({ ...params, postgresCreateTables: false });
 
     const res = await db.query(
-      "SELECT indexname FROM pg_indexes WHERE indexname NOT LIKE '%_pkey'",
+      "SELECT indexname FROM pg_indexes WHERE indexname NOT LIKE '%_pkey'"
     );
     const indexes = res.rows?.map((r: any) => r.indexname).sort();
 

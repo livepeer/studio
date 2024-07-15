@@ -49,7 +49,7 @@ export default ({
       client.put(`${id}.m3u8/part/${hostname}`, manifestText),
       ...parser.manifest.playlists.map(async (playlist) => {
         const manifestRes = await fetch(
-          `${upstreamBroadcaster}/stream/${playlist.uri}`,
+          `${upstreamBroadcaster}/stream/${playlist.uri}`
         );
         const mediaManifest = await manifestRes.text();
         await client.put(`${playlist.uri}/part/${hostname}`, mediaManifest);

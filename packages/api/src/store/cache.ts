@@ -39,7 +39,7 @@ class Cache {
   async getOrSet<T>(
     cacheKey: string,
     getter: () => Promise<T>,
-    ttl?: string | number,
+    ttl?: string | number
   ) {
     let content = this.get<T>(cacheKey);
     if (!content) {

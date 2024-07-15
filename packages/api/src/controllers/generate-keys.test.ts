@@ -105,7 +105,7 @@ describe("controllers/generate-keys", () => {
     keysMock.__addResult(
       stream1.playbackId,
       stream2.playbackId,
-      mockPlaybackId,
+      mockPlaybackId
     );
     const pid = await generateUniquePlaybackId("");
     expect(pid).not.toEqual(stream1.playbackId);
@@ -129,7 +129,7 @@ describe("controllers/generate-keys", () => {
       stream2.playbackId,
       stream1.playbackId,
       stream2.streamKey,
-      mockPlaybackId,
+      mockPlaybackId
     );
     await expect(generateUniquePlaybackId("")).resolves.toEqual(mockPlaybackId);
   });

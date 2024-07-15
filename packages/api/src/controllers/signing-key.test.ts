@@ -76,7 +76,7 @@ describe("controllers/signing-key", () => {
       let otherSigningKey = await res.json();
       otherPublicKey = Buffer.from(
         otherSigningKey.publicKey,
-        "base64",
+        "base64"
       ).toString();
       // create a new project
       client.jwtAuth = nonAdminToken;
@@ -121,7 +121,7 @@ describe("controllers/signing-key", () => {
       client.jwtAuth = nonAdminToken;
       client.apiKey = null;
       let sigKeyWithoutProject = await client.post(
-        "/access-control/signing-key",
+        "/access-control/signing-key"
       );
       expect(sigKeyWithoutProject.status).toBe(201);
       client.jwtAuth = "";
@@ -157,7 +157,7 @@ describe("controllers/signing-key", () => {
 
       expect(() => jwt.verify(token, decodedPublicKey)).not.toThrow();
       expect(() => jwt.verify(token, otherPublicKey)).toThrow(
-        JsonWebTokenError,
+        JsonWebTokenError
       );
     });
 
@@ -172,7 +172,7 @@ describe("controllers/signing-key", () => {
         {
           disabled: true,
           name: "My test signing key 1",
-        },
+        }
       );
       expect(res.status).toBe(204);
       res = await client.get(`/access-control/signing-key/${signingKey.id}`);
@@ -197,7 +197,7 @@ describe("controllers/signing-key", () => {
       expect(sigkey.status).toBe(201);
       let signingKey = await sigkey.json();
       let res = await client.delete(
-        `/access-control/signing-key/${signingKey.id}`,
+        `/access-control/signing-key/${signingKey.id}`
       );
       expect(res.status).toBe(204);
       res = await client.get(`/access-control/signing-key/${signingKey.id}`);

@@ -101,7 +101,7 @@ export const rowsPageFromState = async (
   getAssets: ApiClient["getAssets"],
   getTasks: ApiClient["getTasks"],
   onDeleteAsset: Function,
-  appendProjectId: Function,
+  appendProjectId: Function
 ): Promise<RowsPageFromStateResult<AssetsTableData>> => {
   const assetsPromise = getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
@@ -178,17 +178,17 @@ export const rowsPageFromState = async (
           onDelete: () => onDeleteAsset(asset.id),
         },
       };
-    },
+    }
   );
   return { rows, nextCursor, count };
 };
 
 export const fileUploadProgressForAsset = (
   asset: Asset,
-  fileUploads: FileUpload[],
+  fileUploads: FileUpload[]
 ): number | undefined => {
   const fileUpload = fileUploads.find(
-    (upload) => upload.file.name === asset.name,
+    (upload) => upload.file.name === asset.name
   );
   return fileUpload && asset.status?.phase === "waiting"
     ? (fileUpload.completed ? 1 : 0.99) * fileUpload.progress

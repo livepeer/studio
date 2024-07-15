@@ -132,7 +132,7 @@ const DeleteDialog = ({
                 setSaving(true);
                 try {
                   const targets = stream.multistream.targets.filter(
-                    (t) => t.id !== targetId,
+                    (t) => t.id !== targetId
                   );
                   const patch = { multistream: { targets } };
                   await patchStream(stream.id, patch);
@@ -187,7 +187,7 @@ const Toolbox = ({
       await patchMultistreamTarget(target.id, { disabled });
       await invalidateTargetId(target?.id);
       openSnackbar(
-        `Target ${target.name} has been turned ${disabled ? "off" : "on"}.`,
+        `Target ${target.name} has been turned ${disabled ? "off" : "on"}.`
       );
     },
     [
@@ -197,7 +197,7 @@ const Toolbox = ({
       target?.id,
       target?.name,
       target?.disabled,
-    ],
+    ]
   );
   const invalidateAll = useCallback(async () => {
     await Promise.all([invalidateStream(), invalidateTargetId(target?.id)]);
@@ -254,7 +254,7 @@ const Toolbox = ({
       <DisableDialog
         onDialogAction={useCallback(
           () => setTargetDisabled(true),
-          [setTargetDisabled],
+          [setTargetDisabled]
         )}
         open={disableDialogOpen}
         setOpen={setDisableDialogOpen}

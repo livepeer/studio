@@ -253,7 +253,7 @@ const StreamFilter = ({ onDone, activeFilters }) => {
                   onClick={(e) => {
                     e.stopPropagation();
                     const newFilters = outputFilters.filter(
-                      (f) => f.id !== filter.id,
+                      (f) => f.id !== filter.id
                     );
                     setOutputFilters(newFilters);
                     onDone(newFilters);

@@ -67,7 +67,7 @@ describe("controllers/multistream-target", () => {
         expect(res.status).toBe(404);
       }
       const res = await client.get(
-        `/multistream/target?userId=${nonAdminUser.id}`,
+        `/multistream/target?userId=${nonAdminUser.id}`
       );
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual([{ ...userMsTarget, url: undefined }]);
@@ -135,13 +135,13 @@ describe("controllers/multistream-target", () => {
       let cursor = "";
       for (let page = 1; page <= 3; page++) {
         const res = await client.get(
-          `/multistream/target?userId=${nonAdminUser.id}&limit=5&cursor=${cursor}`,
+          `/multistream/target?userId=${nonAdminUser.id}&limit=5&cursor=${cursor}`
         );
         expect(res.status).toBe(200);
 
         const link = res.headers.get("link");
         expect(link).toEqual(
-          page < 3 ? expect.stringContaining("cursor=") : null,
+          page < 3 ? expect.stringContaining("cursor=") : null
         );
         cursor = getNextCursor(link);
 
@@ -191,7 +191,7 @@ describe("controllers/multistream-target", () => {
       });
       expect(res.status).toBe(204);
       const patched = db.multistreamTarget.cleanWriteOnlyResponse(
-        await db.multistreamTarget.get(created.id),
+        await db.multistreamTarget.get(created.id)
       );
       expect(patched).not.toEqual(created);
       expect(patched).toEqual({ ...created, disabled: true });
@@ -335,7 +335,7 @@ describe("controllers/multistream-target", () => {
     it("should get all multistream targets for another user with admin API key", async () => {
       client.apiKey = adminApiKey;
       let res = await client.get(
-        `/multistream/target?userId=${nonAdminUser.id}`,
+        `/multistream/target?userId=${nonAdminUser.id}`
       );
       expect(res.status).toBe(200);
 
@@ -346,7 +346,7 @@ describe("controllers/multistream-target", () => {
     it("should throw unauthorized error when using invalid API key", async () => {
       client.apiKey = "random_key";
       const res = await client.get(
-        `/multistream/target?userId=${nonAdminUser.id}`,
+        `/multistream/target?userId=${nonAdminUser.id}`
       );
       expect(res.status).toBe(401);
     });
@@ -362,12 +362,12 @@ describe("controllers/multistream-target", () => {
       client.apiKey = tokenId;
 
       const res = await client.get(
-        `/multistream/target?userId=${nonAdminUser.id}`,
+        `/multistream/target?userId=${nonAdminUser.id}`
       );
       expect(res.status).toBe(401);
       const errJson = await res.json();
       expect(errJson.errors[0]).toEqual(
-        `no user found from authorization header: Bearer ${tokenId}`,
+        `no user found from authorization header: Bearer ${tokenId}`
       );
     });
   });
