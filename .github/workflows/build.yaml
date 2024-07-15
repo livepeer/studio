@@ -58,7 +58,7 @@ jobs:
           tar -czvf "${RELEASE_PATH}/livepeer-api.tar.gz" livepeer-api
 
       - name: Upload artifacts for cutting release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
           path: releases/
