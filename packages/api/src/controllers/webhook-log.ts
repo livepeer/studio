@@ -55,7 +55,7 @@ app.get("/:requestId", authorizer({}), async (req, res) => {
 async function checkRequest(
   req: Request,
   webhook: DBWebhook,
-  webhookLog: WebhookLog
+  webhookLog: WebhookLog,
 ) {
   if (!webhook || webhook.deleted) {
     throw new NotFoundError(`webhook not found`);
@@ -76,7 +76,7 @@ async function checkRequest(
 
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
-    req.query
+    req.query,
   );
   if (isNaN(parseInt(limit))) {
     limit = undefined;

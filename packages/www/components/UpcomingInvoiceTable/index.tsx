@@ -43,7 +43,7 @@ const UpcomingInvoiceTable = ({
           <Th css={{ fontSize: "$2", fontWeight: 600 }}>Overage</Th>
           <Td></Td>
           <Td css={{ fontSize: "$2", fontWeight: 600 }}>Usage</Td>
-          <Td css={{ fontSize: "$2", fontWeight: 600 }}>Plan Usage Limit</Td>
+          <Td css={{ fontSize: "$2", fontWeight: 600 }}></Td>
           <Td></Td>
           <Td>
             {usage &&
@@ -60,7 +60,7 @@ const UpcomingInvoiceTable = ({
           <Td>
             {usage && parseInt(usage.TotalUsageMins).toLocaleString()} minutes
           </Td>
-          <Td>{product.usage[0].limit.toLocaleString()} minutes</Td>
+          <Td></Td>
           <Td>${product.usage[0].price} / min</Td>
 
           <Td>
@@ -75,7 +75,7 @@ const UpcomingInvoiceTable = ({
             {usage && parseInt(usage.DeliveryUsageMins).toLocaleString()}{" "}
             minutes
           </Td>
-          <Td>{product.usage[1].limit.toLocaleString()} minutes</Td>
+          <Td></Td>
           <Td>${product.usage[1].price} / min</Td>
 
           <Td>
@@ -88,7 +88,7 @@ const UpcomingInvoiceTable = ({
           <Td>
             {usage && parseInt(usage.StorageUsageMins).toLocaleString()} minutes
           </Td>
-          <Td>{product.usage[2].limit.toLocaleString()} minutes</Td>
+          <Td></Td>
           <Td>${product.usage[2].price} / min</Td>
 
           <Td>
@@ -107,7 +107,7 @@ const UpcomingInvoiceTable = ({
           <Td css={{ fontSize: "$2" }}>
             Due on{" "}
             {new Date(
-              subscription.current_period_end * 1000
+              subscription.current_period_end * 1000,
             ).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",

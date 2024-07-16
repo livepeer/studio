@@ -49,7 +49,7 @@ const Billing = () => {
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
-    null
+    null,
   );
   const June = useJune();
 
@@ -58,7 +58,7 @@ const Billing = () => {
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
       const [_res, paymentMethod] = await getPaymentMethod(
-        user.stripeCustomerPaymentMethodId
+        user.stripeCustomerPaymentMethodId,
       );
       return paymentMethod;
     }
@@ -115,19 +115,55 @@ const Billing = () => {
 
     const calculateOverUsage = async (u) => {
       const product = getUserProduct(user);
-      const limits = {
-        transcoding: product?.usage[0].limit,
-        streaming: product?.usage[1].limit,
-        storage: product?.usage[2].limit,
-      };
 
-      const overUsage = {
-        TotalUsageMins: Math.max(u?.TotalUsageMins - limits.transcoding, 0),
-        DeliveryUsageMins: Math.max(u?.DeliveryUsageMins - limits.streaming, 0),
-        StorageUsageMins: Math.max(u?.StorageUsageMins - limits.storage, 0),
-      };
+      if (product?.name === "Growth") {
+        const minimumSpend = product.monthlyPrice;
+        const prices = {
+          transcoding: product.usage[0].price,
+          streaming: product.usage[1].price,
+          storage: product.usage[2].price,
+        };
 
-      return overUsage;
+        const totalSpent =
+          prices.transcoding * u?.TotalUsageMins +
+          prices.streaming * u?.DeliveryUsageMins +
+          prices.storage * u?.StorageUsageMins;
+
+        if (totalSpent <= minimumSpend) {
+          return {
+            TotalUsageMins: 0,
+            DeliveryUsageMins: 0,
+            StorageUsageMins: 0,
+          };
+        }
+
+        const remainingOverage = totalSpent - minimumSpend;
+        const overageRatio = remainingOverage / totalSpent;
+
+        return {
+          TotalUsageMins:
+            (u?.TotalUsageMins * overageRatio) / prices.transcoding,
+          DeliveryUsageMins:
+            (u?.DeliveryUsageMins * overageRatio) / prices.streaming,
+          StorageUsageMins:
+            (u?.StorageUsageMins * overageRatio) / prices.storage,
+        };
+      } else {
+        const limits = {
+          transcoding: product?.usage[0].limit,
+          streaming: product?.usage[1].limit,
+          storage: product?.usage[2].limit,
+        };
+
+        return {
+          TotalUsageMins: Math.max(u?.TotalUsageMins - limits.transcoding, 0),
+          DeliveryUsageMins: Math.max(
+            u?.DeliveryUsageMins - limits.streaming,
+            0,
+          ),
+          StorageUsageMins: Math.max(u?.StorageUsageMins - limits.storage, 0),
+        };
+      }
     };
 
     const calculateOverUsageBill = async (overusage) => {
@@ -138,8 +174,8 @@ const Billing = () => {
           units: overusage.TotalUsageMins,
           total: Number(
             (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
-              2
-            )
+              2,
+            ),
           ),
         },
         deliveryBill: {
@@ -147,7 +183,7 @@ const Billing = () => {
           total: Number(
             (
               overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
-            ).toFixed(2)
+            ).toFixed(2),
           ),
         },
         storageBill: {
@@ -155,7 +191,7 @@ const Billing = () => {
           total: Number(
             (
               overusage.StorageUsageMins * payAsYouGoData.usage[2].price
-            ).toFixed(2)
+            ).toFixed(2),
           ),
         },
       };
@@ -171,7 +207,7 @@ const Billing = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        subscription?.status
+        subscription?.status,
       );
     };
 
@@ -222,14 +258,14 @@ const Billing = () => {
               {subscription && (
                 <Flex>
                   {new Date(
-                    subscription.current_period_start * 1000
+                    subscription.current_period_start * 1000,
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}{" "}
                   to{" "}
                   {new Date(
-                    subscription.current_period_end * 1000
+                    subscription.current_period_end * 1000,
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",

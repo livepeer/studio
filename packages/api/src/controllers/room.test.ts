@@ -112,7 +112,7 @@ describe("controllers/room", () => {
 
       const mockGetParticipant = jest.spyOn(
         roomServiceClient,
-        "getParticipant"
+        "getParticipant",
       );
       mockGetParticipant.mockReturnValueOnce(
         Promise.resolve({
@@ -121,7 +121,7 @@ describe("controllers/room", () => {
           someOtherProp: "foo",
           permission: {},
           joinedAt: 1,
-        })
+        }),
       );
       res = await client.get(`/room/${roomId}/user/${resp.id}`);
       expect(res.status).toBe(200);
@@ -140,7 +140,7 @@ describe("controllers/room", () => {
 
       const mockRemoveParticipant = jest.spyOn(
         roomServiceClient,
-        "removeParticipant"
+        "removeParticipant",
       );
       res = await client.delete(`/room/${roomId}/user/${resp.id}`);
       expect(res.status).toBe(204);
@@ -153,12 +153,12 @@ describe("controllers/room", () => {
 
       let mockStartEgress = jest.spyOn(
         egressClient,
-        "startRoomCompositeEgress"
+        "startRoomCompositeEgress",
       );
       mockStartEgress.mockReturnValueOnce(
         Promise.resolve({
           egressId: "egress-id",
-        })
+        }),
       );
       let mockStopEgress = jest.spyOn(egressClient, "stopEgress");
       mockStopEgress.mockReturnValueOnce(Promise.resolve(undefined));
@@ -185,7 +185,7 @@ describe("controllers/room", () => {
       mockListEgress.mockReturnValueOnce(
         Promise.resolve([
           { egressId: "egress-id", status: EgressStatus.EGRESS_ACTIVE },
-        ])
+        ]),
       );
       // already started so should 400
       res = await client.post(`/room/${roomId}/egress`, {
@@ -196,7 +196,7 @@ describe("controllers/room", () => {
       mockListEgress.mockReturnValueOnce(
         Promise.resolve([
           { egressId: "egress-id", status: EgressStatus.EGRESS_ACTIVE },
-        ])
+        ]),
       );
       res = await client.delete(`/room/${roomId}/egress`);
       expect(res.status).toBe(204);

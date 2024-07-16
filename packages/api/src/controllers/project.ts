@@ -24,7 +24,7 @@ const fieldsMap = {
 
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, order, all, filters, count, allUsers } = toStringValues(
-    req.query
+    req.query,
   );
 
   if (isNaN(parseInt(limit))) {
@@ -106,7 +106,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
   if (req.user.admin !== true && req.user.id !== project.userId) {
     throw new ForbiddenError(
-      "user can only request information on their own projects"
+      "user can only request information on their own projects",
     );
   }
 

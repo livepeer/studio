@@ -232,7 +232,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
       openSnackbar(
-        `Please wait ${response.waitTime} seconds before sending another email.`
+        `Please wait ${response.waitTime} seconds before sending another email.`,
       );
       return;
     }
@@ -598,7 +598,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     </Box>
                   )}
                 </Box>
-              )
+              ),
             )}
           </Grid>
           <Flex

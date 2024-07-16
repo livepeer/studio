@@ -323,7 +323,7 @@ describe("controllers/access-control", () => {
       expect(res3.status).toBe(403);
       let resJson = await res3.json();
       expect(resJson.errors[0]).toBe(
-        `Content is gated and origin not in allowed origins`
+        `Content is gated and origin not in allowed origins`,
       );
       const res4 = await client.post("/access-control/gate", {
         stream: `video+${gatedAsset.playbackId}`,
@@ -338,7 +338,7 @@ describe("controllers/access-control", () => {
       expect(res4.status).toBe(403);
       let resJson2 = await res4.json();
       expect(resJson2.errors[0]).toBe(
-        "Content is gated and corresponding public key not found"
+        "Content is gated and corresponding public key not found",
       );
     });
 

@@ -158,7 +158,7 @@ export const products = {
   pay_as_you_go_1: {
     order: 6,
     name: "Pay-As-You-Go",
-    lookupKeys: ["transcoding_usage", "tstreaming_usage", "tstorage_usage"],
+    lookupKeys: ["transcoding_usage", "tstreaming_usage", "tstorage_usage2"],
     usage: [
       {
         name: "Transcoding",
@@ -290,7 +290,7 @@ export const products = {
   prod_O9XuWMU1Up6QKf: {
     order: 11,
     name: "Pay-As-You-Go",
-    lookupKeys: ["transcoding_usage", "tstreaming_usage", "tstorage_usage"],
+    lookupKeys: ["transcoding_usage", "tstreaming_usage", "tstorage_usage2"],
     usage: [
       {
         name: "Transcoding",

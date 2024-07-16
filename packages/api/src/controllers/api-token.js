@@ -116,7 +116,7 @@ app.get("/", async (req, res) => {
     query.push(
       sql`coalesce(api_token.data->>'projectId', ${
         req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`
+      }) = ${req.project?.id || ""}`,
     );
   }
 

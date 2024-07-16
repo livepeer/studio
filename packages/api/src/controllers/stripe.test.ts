@@ -84,18 +84,18 @@ describe("controllers/stripe", () => {
       };
       overage = await calculateOverageOnMinimumSpend(product, billingUsage);
       expect(overage.StorageUsageMins * product.usage[2].price).toBeGreaterThan(
-        0
+        0,
       );
       expect(
-        overage.DeliveryUsageMins * product.usage[1].price
+        overage.DeliveryUsageMins * product.usage[1].price,
       ).toBeGreaterThan(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toBeGreaterThan(
-        0
+        0,
       );
       expect(
         overage.TotalUsageMins * product.usage[0].price +
           overage.DeliveryUsageMins * product.usage[1].price +
-          overage.StorageUsageMins * product.usage[2].price
+          overage.StorageUsageMins * product.usage[2].price,
       ).toEqual(31);
 
       // Test 30$ spend with overage reported as 0, corresponding to 100$ invoice
@@ -128,16 +128,16 @@ describe("controllers/stripe", () => {
       };
       overage = await calculateOverageOnMinimumSpend(product, billingUsage);
       expect(overage.StorageUsageMins * product.usage[2].price).toBeGreaterThan(
-        0
+        0,
       );
       expect(
-        overage.DeliveryUsageMins * product.usage[1].price
+        overage.DeliveryUsageMins * product.usage[1].price,
       ).toBeGreaterThan(0);
       expect(overage.TotalUsageMins * product.usage[0].price).toBe(0);
       expect(
         overage.TotalUsageMins * product.usage[0].price +
           overage.DeliveryUsageMins * product.usage[1].price +
-          overage.StorageUsageMins * product.usage[2].price
+          overage.StorageUsageMins * product.usage[2].price,
       ).toEqual(47.5);
 
       // Test 550$ spend with overage reported as 450, corresponding to 550$ invoice
@@ -196,13 +196,13 @@ describe("controllers/stripe", () => {
       };
       overusage = await calculateOverUsage(product, billingUsage);
       expect(overusage.TotalUsageMins * product.usage[0].price).toEqual(
-        product.usage[0].price
+        product.usage[0].price,
       );
       expect(overusage.DeliveryUsageMins * product.usage[1].price).toEqual(
-        product.usage[1].price
+        product.usage[1].price,
       );
       expect(overusage.StorageUsageMins * product.usage[2].price).toEqual(
-        product.usage[2].price
+        product.usage[2].price,
       );
     });
   });

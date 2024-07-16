@@ -25,7 +25,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -151,7 +151,7 @@ export const register = async ({
       headers: {
         "content-type": "application/json",
       },
-    }
+    },
   );
   if (res.status !== 201) {
     return body;
@@ -249,7 +249,7 @@ export const resetPassword = async (email, resetToken, password) => {
 
 export const getUser = async (
   userId,
-  opts = {}
+  opts = {},
 ): Promise<[Response, User | ApiError]> => {
   let [res, user] = await context.fetch(`/user/${userId}`, opts);
   if (isDevelopment() && hasStripe && !user.stripeProductId && user.email) {
@@ -275,7 +275,7 @@ export const getUsers = async (
   limit = 100,
   cursor?: string,
   order?: string,
-  filters?: Array<{ id: string; value: string }>
+  filters?: Array<{ id: string; value: string }>,
 ): Promise<[Array<User> | ApiError, string, Response]> => {
   const f = filters ? JSON.stringify(filters) : undefined;
   const uri = `/user?${qs.stringify({ limit, cursor, filters: f, order })}`;
@@ -288,11 +288,11 @@ export const getUsers = async (
 export const getUsage = async (
   fromTime: number,
   toTime: number,
-  userId?: number
+  userId?: number,
 ): Promise<[Response, UsageData | ApiError]> => {
   let [res, usage] = await context.fetch(
     `/user/usage?${qs.stringify({ fromTime, toTime, userId })}`,
-    {}
+    {},
   );
 
   return [res, usage as UsageData | ApiError];
@@ -302,7 +302,7 @@ export const getBillingUsage = async (
   fromTime: number,
   toTime: number,
   creatorId?: number,
-  timeStep?: string
+  timeStep?: string,
 ): Promise<[Response, BillingUsageData | ApiError]> => {
   let [res, usage] = await context.fetch(
     `/data/usage/query?${qs.stringify({
@@ -311,7 +311,7 @@ export const getBillingUsage = async (
       creatorId,
       timeStep,
     })}`,
-    {}
+    {},
   );
 
   if (!usage) {
@@ -329,7 +329,7 @@ export const getBillingUsage = async (
 };
 
 export const getUpcomingInvoice = async (
-  stripeCustomerId: string
+  stripeCustomerId: string,
 ): Promise<[Response, any | ApiError]> => {
   let [res, invoice] = await context.fetch(`/user/retrieve-upcoming-invoice`, {
     method: "POST",
@@ -344,7 +344,7 @@ export const getUpcomingInvoice = async (
 
 export const makeUserAdmin = async (
   email,
-  admin
+  admin,
 ): Promise<[Response, User | ApiError]> => {
   const [res, body] = await context.fetch("/user/make-admin", {
     method: "POST",
@@ -365,7 +365,7 @@ export const makeUserAdmin = async (
 
 export const setUserSuspended = async (
   userId: string,
-  payload: SuspendUserPayload
+  payload: SuspendUserPayload,
 ): Promise<[Response, ApiError]> => {
   const [res, body] = await context.fetch(`/user/${userId}/suspended`, {
     method: "PATCH",
@@ -388,7 +388,7 @@ export const setUserSuspended = async (
 };
 
 export const createCustomer = async (
-  email
+  email,
 ): Promise<{ id: string } | ApiError> => {
   if (!hasStripe) {
     return;
@@ -460,7 +460,7 @@ export const updateSubscription = async ({
 };
 
 export const getSubscription = async (
-  stripeCustomerSubscriptionId: string
+  stripeCustomerSubscriptionId: string,
 ): Promise<[Response, ApiError]> => {
   let [res, subscription] = await context.fetch(`/user/retrieve-subscription`, {
     method: "POST",
@@ -476,7 +476,7 @@ export const getSubscription = async (
 };
 
 export const getInvoices = async (
-  stripeCustomerId: string
+  stripeCustomerId: string,
 ): Promise<[Response, ApiError]> => {
   let [res, invoice] = await context.fetch(`/user/retrieve-invoices`, {
     method: "POST",
@@ -492,7 +492,7 @@ export const getInvoices = async (
 };
 
 export const getPaymentMethod = async (
-  stripePaymentMethodId: string
+  stripePaymentMethodId: string,
 ): Promise<[Response, PaymentMethodData | ApiError]> => {
   let [res, paymentMethod] = await context.fetch(
     `/user/retrieve-payment-method`,
@@ -504,7 +504,7 @@ export const getPaymentMethod = async (
       headers: {
         "content-type": "application/json",
       },
-    }
+    },
   );
   return [res, paymentMethod];
 };
@@ -524,7 +524,7 @@ export const updateCustomerPaymentMethod = async ({
       headers: {
         "content-type": "application/json",
       },
-    }
+    },
   );
 
   setState((state) => ({ ...state, userRefresh: Date.now() }));

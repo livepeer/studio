@@ -99,7 +99,7 @@ app.post(
     });
 
     res.status(204).end();
-  }
+  },
 );
 
 // Experiment CRUD
@@ -121,7 +121,7 @@ app.post(
       audienceUserIds,
     });
     res.status(201).json(experiment);
-  }
+  },
 );
 
 app.patch("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -154,7 +154,7 @@ app.get("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
       experiment.audienceUserIds?.map(async (userId) => {
         const user = await db.user.get(userId);
         return db.user.cleanWriteOnlyResponse(user);
-      }) ?? []
+      }) ?? [],
     ),
   };
 
@@ -171,7 +171,7 @@ const fieldsMap = {
 
 app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
   let { limit, cursor, order, filters, count, subject } = toStringValues(
-    req.query
+    req.query,
   );
   if (isNaN(parseInt(limit))) {
     limit = undefined;

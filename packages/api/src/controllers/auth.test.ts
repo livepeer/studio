@@ -101,7 +101,7 @@ describe("controller/auth", () => {
           { resources: ["foo"], methods: ["options"] },
           { resources: ["foo/bar"], methods: ["get", "patch"] },
           { resources: ["foo/bar/zaz"], methods: ["head", "post"] },
-        ])
+        ]),
       );
 
       it("should disallow other methods", async () => {
@@ -132,7 +132,7 @@ describe("controller/auth", () => {
         setAccess(nonAdminApiKey, [
           { resources: ["gus/:id"] },
           { resources: ["gus/fra/*"] },
-        ])
+        ]),
       );
 
       it("should disallow other paths", async () => {
@@ -263,11 +263,11 @@ describe("controller/auth", () => {
       if (method === "OPTIONS") {
         expect(res.status).toEqual(204);
         expect(res.headers.get("access-control-allow-methods")).toEqual(
-          "GET,HEAD,PUT,PATCH,POST,DELETE"
+          "GET,HEAD,PUT,PATCH,POST,DELETE",
         );
       }
       expect(res.headers.get("access-control-allow-credentials")).toEqual(
-        "true"
+        "true",
       );
       const corsAllowed =
         res.headers.get("access-control-allow-origin") === origin;
@@ -291,7 +291,7 @@ describe("controller/auth", () => {
         for (const origin of testOrigins) {
           await expectAllowed(method, "/asset/upload", origin).toBe(false);
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
-            false
+            false,
           );
           await expectAllowed(method, "/playback", origin).toBe(false);
           await expectAllowed(method, "/stream", origin).toBe(false);
@@ -305,15 +305,15 @@ describe("controller/auth", () => {
       client.jwtAuth = nonAdminToken;
       for (const method of testMethods) {
         await expectAllowed(method, "/stream", "https://livepeer.studio").toBe(
-          true
+          true,
         );
         await expectAllowed(method, "/asset", "https://livepeer.studio").toBe(
-          true
+          true,
         );
         await expectAllowed(
           method,
           "/api-token/1234",
-          "https://livepeer.studio"
+          "https://livepeer.studio",
         ).toBe(true);
       }
     });
@@ -341,7 +341,7 @@ describe("controller/auth", () => {
           const expected = allowedOrigins.includes(origin);
 
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
-            expected
+            expected,
           );
           await expectAllowed(method, "/asset", origin).toBe(expected);
           await expectAllowed(method, "/asset/abcd", origin).toBe(expected);
@@ -365,13 +365,13 @@ describe("controller/auth", () => {
       client.apiKey = await createApiToken({ allowedOrigins });
       // control case
       await expect(
-        fetchCors("GET", "/stream/1234", allowedOrigins[0])
+        fetchCors("GET", "/stream/1234", allowedOrigins[0]),
       ).resolves.toMatchObject({
         corsAllowed: true,
         status: 204,
       });
       await expect(
-        fetchCors("GET", "/data/views/1234/total", allowedOrigins[0])
+        fetchCors("GET", "/data/views/1234/total", allowedOrigins[0]),
       ).resolves.toMatchObject({
         corsAllowed: true,
         status: 204,
@@ -379,7 +379,7 @@ describe("controller/auth", () => {
 
       for (const [method, path] of forbiddenApis) {
         await expect(
-          fetchCors(method, path, allowedOrigins[0])
+          fetchCors(method, path, allowedOrigins[0]),
         ).resolves.toMatchObject({
           corsAllowed: true,
           status: 403,
@@ -401,7 +401,7 @@ describe("controller/auth", () => {
         const { corsAllowed, status, body } = await fetchCors(
           method,
           path,
-          allowedOrigins[0]
+          allowedOrigins[0],
         );
         expect(corsAllowed).toBe(true);
         expect(status).toBe(204);
@@ -424,14 +424,14 @@ describe("controller/auth", () => {
       ];
       for (const [method, path] of apis) {
         await expect(
-          fetchCors(method, path, "https://not.allowed.com")
+          fetchCors(method, path, "https://not.allowed.com"),
         ).resolves.toMatchObject({
           corsAllowed: false,
           status: 403,
           body: {
             errors: [
               expect.stringMatching(
-                /credential disallows CORS access from origin .+/
+                /credential disallows CORS access from origin .+/,
               ),
             ],
           },
@@ -516,15 +516,15 @@ describe("controller/auth", () => {
       await db.asset.markDeleted(nonAdminAsset.id);
 
       await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
-        404
+        404,
       );
       await expect(fetchAuth({ pid: nonAdminStream.playbackId })).resolves.toBe(
-        404
+        404,
       );
 
       await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(404);
       await expect(fetchAuth({ pid: nonAdminAsset.playbackId })).resolves.toBe(
-        404
+        404,
       );
     });
 
@@ -532,36 +532,36 @@ describe("controller/auth", () => {
       await expect(fetchAuth({ streamId: adminStream.id })).resolves.toBe(403);
       await expect(fetchAuth({ assetId: adminAsset.id })).resolves.toBe(403);
       await expect(fetchAuth({ pid: adminAsset.playbackId })).resolves.toBe(
-        403
+        403,
       );
     });
 
     it("should allow access to own resources", async () => {
       await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
-        204
+        204,
       );
       await expect(fetchAuth({ pid: nonAdminStream.playbackId })).resolves.toBe(
-        204
+        204,
       );
 
       await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
       await expect(fetchAuth({ pid: nonAdminAsset.playbackId })).resolves.toBe(
-        204
+        204,
       );
     });
 
     it("should allow admins to access to other users resources", async () => {
       client.apiKey = adminApiKey;
       await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
-        204
+        204,
       );
       await expect(fetchAuth({ pid: nonAdminStream.playbackId })).resolves.toBe(
-        204
+        204,
       );
 
       await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
       await expect(fetchAuth({ pid: nonAdminAsset.playbackId })).resolves.toBe(
-        204
+        204,
       );
     });
   });

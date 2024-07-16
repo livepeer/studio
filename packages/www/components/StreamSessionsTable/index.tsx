@@ -33,9 +33,9 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         user.id,
         getStreamSessionsByUserId,
         openSnackbar,
-        appendProjectId
+        appendProjectId,
       ),
-    [getStreamSessionsByUserId, user.id]
+    [getStreamSessionsByUserId, user.id],
   );
 
   useEffect(() => {
