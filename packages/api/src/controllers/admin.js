@@ -117,7 +117,7 @@ app.post(
       i++;
     }
     res.end(`cleaned routes for ${cleaned}/${toClean.length} streams\n`);
-  }
+  },
 );
 
 app.post("/active-clean", authorizer({ anyAdmin: true }), async (req, res) => {

@@ -63,7 +63,7 @@ describe("controllers/api-token", () => {
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
-        false
+        false,
       );
       nonAdminUser = { ...nonAdminUserRes, emailValid: true };
       await server.store.replace(nonAdminUser);

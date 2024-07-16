@@ -69,10 +69,10 @@ app.post(
       },
       null,
       null,
-      req.user.id
+      req.user.id,
     );
     res.json(task);
-  }
+  },
 );
 
 export default app;

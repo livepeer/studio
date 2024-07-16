@@ -47,7 +47,7 @@ export default class Table<T extends DBObject> {
   // get a single document by id
   async get(
     id: string,
-    { useReplica = true, useCache }: GetOptions = {}
+    { useReplica = true, useCache }: GetOptions = {},
   ): Promise<T> {
     if (!id) {
       throw new Error("missing id");
@@ -68,13 +68,13 @@ export default class Table<T extends DBObject> {
       res = await this.db.query(
         sql`SELECT data FROM `
           .append(this.name)
-          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
+          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
       );
     } else {
       res = await this.db.replicaQuery(
         sql`SELECT data FROM `
           .append(this.name)
-          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`))
+          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
       );
     }
 
@@ -91,7 +91,7 @@ export default class Table<T extends DBObject> {
 
   async getMany(
     ids: Array<string>,
-    opts: GetOptions = { useReplica: true }
+    opts: GetOptions = { useReplica: true },
   ): Promise<Array<T>> {
     if (!ids || !ids.length) {
       throw new Error("missing ids");
@@ -104,7 +104,7 @@ export default class Table<T extends DBObject> {
           .join(",")})`,
         values: ids,
       },
-      opts
+      opts,
     );
 
     if (res.rowCount < 1) {
@@ -116,7 +116,7 @@ export default class Table<T extends DBObject> {
   // returns [docs, cursor]
   async find<Q = T>(
     query: FindQuery | Array<SQLStatement> = {},
-    opts: FindOptions<Q> = {}
+    opts: FindOptions<Q> = {},
   ): Promise<[Array<Q>, string]> {
     const {
       cursor = "",
@@ -143,7 +143,7 @@ export default class Table<T extends DBObject> {
     }
     if (cursor && !cursor.includes("skip")) {
       filters.push(
-        sql``.append(this.name + ".").append(sql`data->>'id' > ${cursor}`)
+        sql``.append(this.name + ".").append(sql`data->>'id' > ${cursor}`),
       );
     }
     let first = true;
@@ -196,7 +196,7 @@ export default class Table<T extends DBObject> {
     try {
       await this.db.query(
         `INSERT INTO ${this.name} VALUES ($1, $2)`, //p
-        [doc.id, JSON.stringify(doc)] //p
+        [doc.id, JSON.stringify(doc)], //p
       );
     } catch (e) {
       if (e.message.includes("duplicate key value")) {
@@ -210,7 +210,7 @@ export default class Table<T extends DBObject> {
   async replace(doc: T) {
     const res = await this.db.query(
       `UPDATE ${this.name} SET data = $1 WHERE id = $2`,
-      [JSON.stringify(doc), doc.id]
+      [JSON.stringify(doc), doc.id],
     );
 
     if (res.rowCount < 1) {
@@ -223,7 +223,7 @@ export default class Table<T extends DBObject> {
   async update(
     query: string | Array<SQLStatement>,
     doc: Partial<T>,
-    opts: UpdateOptions = {}
+    opts: UpdateOptions = {},
   ) {
     const { throwIfEmpty = true } = opts;
     const q = sql`UPDATE `.append(this.name).append(sql`
@@ -292,7 +292,7 @@ export default class Table<T extends DBObject> {
   async markDeleted(id: string) {
     const res = await this.db.query(
       `UPDATE ${this.name} SET data = jsonb_set(data, '{deleted}', 'true'::jsonb) WHERE id = $1`,
-      [id]
+      [id],
     );
 
     if (res.rowCount < 1) {
@@ -307,7 +307,7 @@ export default class Table<T extends DBObject> {
       } SET data = jsonb_set(data, '{deleted}', 'true'::jsonb) WHERE id IN (${ids
         .map((_, i) => "$" + (i + 1))
         .join(",")})`,
-      ids
+      ids,
     );
 
     if (res.rowCount < 1) {
@@ -333,7 +333,7 @@ export default class Table<T extends DBObject> {
       } else if (fieldSpec.properties && res[fieldName]) {
         res[fieldName] = this.cleanWriteOnlyResponse(
           res[fieldName] as any,
-          fieldSpec
+          fieldSpec,
         );
       }
     }

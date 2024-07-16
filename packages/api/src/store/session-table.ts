@@ -11,9 +11,9 @@ export default class SessionTable extends Table<DBSession> {
   async getLastSession(parentId: string, opts?: QueryOptions) {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT * FROM session  WHERE data->>'parentId'=${parentId} ORDER BY data->>'createdAt' DESC LIMIT 1`.setName(
-        `${this.name}_last_by_parentid`
+        `${this.name}_last_by_parentid`,
       ),
-      opts
+      opts,
     );
     return res.rowCount < 1 ? null : (res.rows[0].data as DBSession);
   }

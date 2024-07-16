@@ -21,7 +21,7 @@ function makeMP4Url(
   hlsUrl: string,
   profileName: string,
   streamName: string,
-  createdAt: number
+  createdAt: number,
 ): string {
   const sanitizedName = filenamify
     .default(streamName, { replacement: "_" })
@@ -32,7 +32,7 @@ function makeMP4Url(
   const pp = hlsUrl.split("/");
   pp.pop();
   return `${pp.join(
-    "/"
+    "/",
   )}/${profileName}/${sanitizedName}-${timestamp}-${profileName}.mp4`;
 }
 
@@ -56,7 +56,7 @@ function getHighestMP4Url(hlsUrl: string, profiles: Array<Profile>): string {
       }
       return pv;
     },
-    ["", 0]
+    ["", 0],
   );
   return makeMP4Url(hlsUrl, profileName, "", 0);
 }
@@ -80,7 +80,7 @@ const RecordingUrlCell = <D extends TableData>({
                   cell.value.href,
                   "source",
                   cell.value.streamName,
-                  cell.value.createdAt
+                  cell.value.createdAt,
                 )}
                 sx={{ p: 1 }}>
                 Download&nbsp;mp4&nbsp;beta
@@ -163,7 +163,7 @@ const StreamSessionsTable = ({
         disableSortBy: true,
       },
     ],
-    []
+    [],
   );
 
   const data: SessionsTableData[] = useMemo(() => {

@@ -16,7 +16,7 @@ const getOrchestrators = async (req: Request, res, next) => {
     orchestrators.map(({ address, score = defaultScore }) => ({
       address,
       score,
-    }))
+    })),
   );
 };
 

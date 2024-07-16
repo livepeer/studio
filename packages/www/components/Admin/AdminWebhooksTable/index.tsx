@@ -99,7 +99,7 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
         },
       },
     ],
-    [nextCursor, lastFilters]
+    [nextCursor, lastFilters],
   );
 
   const filtersDesc = useMemo(
@@ -108,7 +108,7 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
       { id: "name", placeholder: "name" },
       { id: "url", placeholder: "url" },
     ],
-    []
+    [],
   );
 
   const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
@@ -141,7 +141,7 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
   const refecth = () => {
     fetchData(
       { order: lastOrder, cursor: lastCursor, filters: lastFilters },
-      true
+      true,
     );
   };
 

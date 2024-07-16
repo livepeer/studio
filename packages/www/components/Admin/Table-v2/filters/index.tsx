@@ -8,7 +8,7 @@ type AnyFilterValue = string;
 
 type BaseFilterProps<
   Table extends Record<string, unknown>,
-  Value extends AnyFilterValue = string
+  Value extends AnyFilterValue = string,
 > = {
   currentFilters: { id: keyof Table; value: Value }[] | undefined;
   setFilter: (columnId: keyof Table, newValue: Value) => void;
@@ -31,7 +31,7 @@ const TextFilter = <Table extends Record<string, unknown>>({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilter(columnId, e.target.value);
     },
-    [setFilter]
+    [setFilter],
   );
 
   return (

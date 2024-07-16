@@ -43,7 +43,7 @@ export const makeColumns = () => [
 
 export const rowsPageFromState = async (
   state: State<SigningKeysTableData>,
-  getSigningKeys: Function
+  getSigningKeys: Function,
 ): Promise<RowsPageFromStateResult<SigningKeysTableData>> => {
   const [signingKeys, nextCursor, _, count] = await getSigningKeys({
     filters: formatFiltersForApiRequest(state.filters),
@@ -70,7 +70,7 @@ export const rowsPageFromState = async (
         date: new Date(signingKey.createdAt),
         fallback: <Box css={{ color: "$primary8" }}>—</Box>,
       },
-    })
+    }),
   );
   return { rows, nextCursor, count };
 };

@@ -185,20 +185,20 @@ export class DB {
 
     if (createTablesOnDb) {
       const tables = Object.entries(schema.components.schemas).filter(
-        ([name, schema]) => "table" in schema && schema.table
+        ([name, schema]) => "table" in schema && schema.table,
       );
       await Promise.all(
         tables.map(([name, schema]) => {
           const camelName = kebabToCamel(name);
           return this[camelName].ensureTable();
-        })
+        }),
       );
     }
   }
 
   queryWithOpts<T, I extends any[] = any[]>(
     query: QueryConfig<I>,
-    opts: QueryOptions = { useReplica: true }
+    opts: QueryOptions = { useReplica: true },
   ): Promise<QueryResult<T>> {
     const { useReplica = true } = opts;
     if (useReplica && this.replicaPool) {
@@ -209,14 +209,14 @@ export class DB {
 
   query<T, I extends any[] = any[]>(
     query: string | QueryConfig<I>,
-    values?: I
+    values?: I,
   ): Promise<QueryResult<T>> {
     return this.runQuery(this.pool, query, values);
   }
 
   replicaQuery<T, I extends any[] = any[]>(
     query: string | QueryConfig<I>,
-    values?: I
+    values?: I,
   ): Promise<QueryResult<T>> {
     let pool = this.replicaPool ?? this.pool;
     return this.runQuery(pool, query, values);
@@ -226,7 +226,7 @@ export class DB {
   async runQuery<T, I extends any[] = any[]>(
     pool: Pool,
     query: string | QueryConfig<I>,
-    values?: I
+    values?: I,
   ): Promise<QueryResult<T>> {
     let queryLog: string;
     if (typeof query === "string") {
@@ -243,14 +243,14 @@ export class DB {
       logger.error(
         `runQuery phase=error elapsed=${Date.now() - start}ms error=${
           e.message
-        } query=${queryLog}`
+        } query=${queryLog}`,
       );
       throw e;
     }
     logger.debug(
       `runQuery phase=success elapsed=${Date.now() - start}ms rows=${
         result?.rowCount
-      } query=${queryLog}`
+      } query=${queryLog}`,
     );
     return result;
   }
