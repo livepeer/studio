@@ -81,6 +81,17 @@ describe("controllers/generate", () => {
     aiGatewayCalls = {};
   });
 
+  const buildMultipartBody = (textFields: Record<string, any>) => {
+    const form = new FormData();
+    for (const [k, v] of Object.entries(textFields)) {
+      form.append(k, v);
+    }
+    form.append("image", "dummy", {
+      contentType: "image/png",
+    });
+    return form;
+  };
+
   describe("API proxies", () => {
     it("should call the AI Gateway for generate API /text-to-image", async () => {
       const res = await client.post("/beta/generate/text-to-image", {
@@ -93,17 +104,6 @@ describe("controllers/generate", () => {
       });
       expect(aiGatewayCalls).toEqual({ "text-to-image": 1 });
     });
-
-    const buildMultipartBody = (textFields: Record<string, any>) => {
-      const form = new FormData();
-      for (const [k, v] of Object.entries(textFields)) {
-        form.append(k, v);
-      }
-      form.append("image", "dummy", {
-        contentType: "image/png",
-      });
-      return form;
-    };
 
     it("should call the AI Gateway for generate API /image-to-image", async () => {
       const res = await client.fetch("/beta/generate/image-to-image", {
@@ -147,20 +147,47 @@ describe("controllers/generate", () => {
     });
   });
 
-  it("should limit maximum payload size", async () => {
-    const form = new FormData();
+  describe("validates multipart schema", () => {
+    const hugeForm = new FormData();
     const file11mb = "a".repeat(11 * 1024 * 1024);
-    form.append("image", file11mb, {
+    hugeForm.append("image", file11mb, {
       contentType: "image/png",
     });
-    const res = await client.fetch("/beta/generate/image-to-video", {
-      method: "POST",
-      body: form,
-    });
-    expect(res.status).toBe(422);
-    expect(await res.json()).toEqual({
-      errors: ["Field value too long"],
-    });
-    expect(aiGatewayCalls).toEqual({});
+
+    const testCases = [
+      [
+        "should fail with a missing required field",
+        buildMultipartBody({}),
+        "must have required property 'prompt'",
+      ],
+      [
+        "should fail with bad type for a field",
+        buildMultipartBody({ prompt: "impromptu", seed: "NaN" }),
+        "must be integer",
+      ],
+      [
+        "should fail with an unknown field",
+        buildMultipartBody({
+          prompt: "impromptu",
+          extra_good_image: "yes pls",
+        }),
+        "must NOT have additional properties",
+      ],
+      ["should limit maximum payload size", hugeForm, "Field value too long"],
+    ] as const;
+
+    for (const [title, input, error] of testCases) {
+      it(title, async () => {
+        const res = await client.fetch("/beta/generate/image-to-image", {
+          method: "POST",
+          body: input,
+        });
+        expect(res.status).toBe(422);
+        expect(await res.json()).toEqual({
+          errors: [expect.stringContaining(error)],
+        });
+        expect(aiGatewayCalls).toEqual({});
+      });
+    }
   });
 });

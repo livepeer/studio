@@ -2862,6 +2862,7 @@ components:
       type: object
       required:
         - prompt
+      additionalProperties: false
       properties:
         prompt:
           type: string
@@ -2897,6 +2898,7 @@ components:
       required:
         - prompt
         - image
+      additionalProperties: false
       properties:
         prompt:
           type: string
@@ -2935,6 +2937,7 @@ components:
       type: object
       required:
         - image
+      additionalProperties: false
       properties:
         image:
           type: string
@@ -2970,6 +2973,7 @@ components:
       required:
         - prompt
         - image
+      additionalProperties: false
       properties:
         prompt:
           type: string
