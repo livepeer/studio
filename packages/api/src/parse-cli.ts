@@ -220,7 +220,6 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "base URL of the AI Gateway to call for generative AI requests",
         type: "string",
-        default: "http://staging-livepeer-ai-gateway/", // TODO: Remove this default, staging testing only
       },
       "ipfs-gateway-url": {
         describe:
