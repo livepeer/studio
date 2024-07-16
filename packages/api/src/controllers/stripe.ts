@@ -193,26 +193,26 @@ const sendUsageRecordToStripe = async (
   // Invoice items based on overusage
   await Promise.all(
     products[user.stripeProductId].usage.map(async (product) => {
-      if (product.name === "Transcoding") {
-        await stripe.subscriptionItems.createUsageRecord(
-          subscriptionItemsByLookupKey["transcoding_usage"],
-          {
-            quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
-            timestamp: Math.floor(new Date().getTime() / 1000),
-            action: "set",
-          },
-        );
-      } else if (product.name === "Delivery") {
-        await stripe.subscriptionItems.createUsageRecord(
-          subscriptionItemsByLookupKey["tstreaming_usage"],
-          {
-            quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
-            timestamp: Math.floor(new Date().getTime() / 1000),
-            action: "set",
-          },
-        );
-      } else if (product.name === "Storage") {
-        try {
+      try {
+        if (product.name === "Transcoding") {
+          await stripe.subscriptionItems.createUsageRecord(
+            subscriptionItemsByLookupKey["transcoding_usage"],
+            {
+              quantity: parseInt(overUsage.TotalUsageMins.toFixed(0)),
+              timestamp: Math.floor(new Date().getTime() / 1000),
+              action: "set",
+            },
+          );
+        } else if (product.name === "Delivery") {
+          await stripe.subscriptionItems.createUsageRecord(
+            subscriptionItemsByLookupKey["tstreaming_usage"],
+            {
+              quantity: parseInt(overUsage.DeliveryUsageMins.toFixed(0)),
+              timestamp: Math.floor(new Date().getTime() / 1000),
+              action: "set",
+            },
+          );
+        } else if (product.name === "Storage") {
           await stripe.subscriptionItems.createUsageRecord(
             subscriptionItemsByLookupKey["tstorage_usage2"],
             {
@@ -221,18 +221,11 @@ const sendUsageRecordToStripe = async (
               action: "set",
             },
           );
-        } catch (e) {
-          // Fallback to old storage lookup key if new one fails.
-          // To avoid breaking the usage reporting during migration
-          await stripe.subscriptionItems.createUsageRecord(
-            subscriptionItemsByLookupKey["tstorage_usage"],
-            {
-              quantity: parseInt(overUsage.StorageUsageMins.toFixed(0)),
-              timestamp: Math.floor(new Date().getTime() / 1000),
-              action: "set",
-            },
-          );
         }
+      } catch (e) {
+        logger.error(`
+          error- failed to create usage record for user=${user.id} product=${product.name} with error=${e.message}
+        `);
       }
     }),
   );
