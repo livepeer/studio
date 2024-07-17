@@ -38,6 +38,7 @@ params.trustedIpfsGateways = [
   "https://ipfs.example.com/ipfs/",
   /https:\/\/.+\.ipfs-provider.io\/ipfs\//,
 ];
+params.aiGatewayUrl = "http://localhost:30303/";
 params.ingest = [
   {
     ingest: "rtmp://test/live",

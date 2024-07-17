@@ -527,6 +527,7 @@ components:
           type: string
           description: Refresh token to be used to generate a new JWT
     transcode-asset-payload:
+      type: object
       additionalProperties: false
       required:
         - name

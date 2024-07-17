@@ -87,7 +87,7 @@ function coerceJsonValue<T>(flagName: string) {
 function coerceJsonProfileArr(flagName: string) {
   return (str: string): FfmpegProfile[] => {
     let profiles;
-    const validator = profileValidator as ValidateFunction;
+    const validator = profileValidator as any as ValidateFunction;
     try {
       profiles = JSON.parse(str);
     } catch (e) {
@@ -215,6 +215,11 @@ export default function parseCli(argv?: string | readonly string[]) {
           "template string of the form {{ip}} for the broadcaster webhook.",
         type: "string",
         default: "https://{{ip}}:8935",
+      },
+      "ai-gateway-url": {
+        describe:
+          "base URL of the AI Gateway to call for generative AI requests",
+        type: "string",
       },
       "ipfs-gateway-url": {
         describe:

@@ -1,8 +1,8 @@
-import serverPromise, { TestServer } from "../test-server";
-import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
 import { MultistreamTarget, User } from "../schema/types";
 import { db } from "../store";
+import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
 
 // includes auth file tests
 
@@ -286,7 +286,7 @@ describe("controllers/multistream-target", () => {
         });
         expect(res.status).toBe(422);
         const body = await res.json();
-        expect(body.errors[0]).toContain("Bad URL");
+        expect(body.errors[0]).toContain(`must match format \\"uri\\"`);
       });
     });
 

@@ -63,7 +63,7 @@ components:
         height:
           type: integer
           minimum: 128
-          expample: 720
+          example: 720
         bitrate:
           type: integer
           minimum: 400
@@ -120,7 +120,7 @@ components:
         height:
           type: integer
           minimum: 128
-          expample: 720
+          example: 720
         bitrate:
           type: integer
           minimum: 400
@@ -1142,6 +1142,7 @@ components:
           items:
             $ref: "#/components/schemas/transcode-profile"
         storage:
+          type: object
           additionalProperties: false
           properties:
             ipfs:
@@ -1384,6 +1385,7 @@ components:
         creatorId:
           $ref: "#/components/schemas/input-creator-id"
         storage:
+          type: object
           additionalProperties: false
           properties:
             ipfs:
@@ -2854,7 +2856,141 @@ components:
         targetSegmentSizeSecs:
           $ref: >-
             #/components/schemas/new-asset-payload/properties/targetSegmentSizeSecs
-
+    # AI Generate payloads. Keep in mind that these use snake_case instead of camelCase since
+    # they implement the same interface as the AI Gateway Livepeer node.
+    text-to-image-payload:
+      type: object
+      required:
+        - prompt
+      additionalProperties: false
+      properties:
+        prompt:
+          type: string
+        model_id:
+          type: string
+          default: SG161222/RealVisXL_V4.0_Lightning
+          enum:
+            - SG161222/RealVisXL_V4.0_Lightning
+            - ByteDance/SDXL-Lightning
+        height:
+          type: integer
+        width:
+          type: integer
+        guidance_scale:
+          type: number
+          default: 7.5
+        negative_prompt:
+          type: string
+          default: ""
+        safety_check:
+          type: boolean
+          default: true
+        seed:
+          type: integer
+        num_inference_steps:
+          type: integer
+          default: 50
+        num_images_per_prompt:
+          type: integer
+          default: 1
+    image-to-image-payload:
+      type: object
+      required:
+        - prompt
+        - image
+      additionalProperties: false
+      properties:
+        prompt:
+          type: string
+        image:
+          type: string
+          format: binary
+          maxLength: 10485760 # 10MiB
+        model_id:
+          type: string
+          default: timbrooks/instruct-pix2pix
+          enum:
+            - timbrooks/instruct-pix2pix
+            - ByteDance/SDXL-Lightning
+            - SG161222/RealVisXL_V4.0_Lightning
+        strength:
+          type: number
+          default: 0.8
+        guidance_scale:
+          type: number
+          default: 7.5
+        image_guidance_scale:
+          type: number
+          default: 1.5
+        negative_prompt:
+          type: string
+          default: ""
+        safety_check:
+          type: boolean
+          default: true
+        seed:
+          type: integer
+        num_images_per_prompt:
+          type: integer
+          default: 1
+    image-to-video-payload:
+      type: object
+      required:
+        - image
+      additionalProperties: false
+      properties:
+        image:
+          type: string
+          format: binary
+          maxLength: 10485760 # 10MiB
+        model_id:
+          type: string
+          default: stabilityai/stable-video-diffusion-img2vid-xt-1-1
+          enum:
+            - stabilityai/stable-video-diffusion-img2vid-xt-1-1
+        height:
+          type: integer
+          default: 576
+        width:
+          type: integer
+          default: 1024
+        fps:
+          type: integer
+          default: 6
+        motion_bucket_id:
+          type: integer
+          default: 127
+        noise_aug_strength:
+          type: number
+          default: 0.02
+        seed:
+          type: integer
+        safety_check:
+          type: boolean
+          default: true
+    upscale-payload:
+      type: object
+      required:
+        - prompt
+        - image
+      additionalProperties: false
+      properties:
+        prompt:
+          type: string
+        image:
+          type: string
+          format: binary
+          maxLength: 10485760 # 10MiB
+        model_id:
+          type: string
+          default: stabilityai/stable-diffusion-x4-upscaler
+          enum:
+            - stabilityai/stable-diffusion-x4-upscaler
+        safety_check:
+          type: boolean
+          default: true
+        seed:
+          type: integer
 paths:
   /stream:
     post:
