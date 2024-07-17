@@ -644,8 +644,6 @@ export class TaskScheduler {
         userId: asset.userId,
         projectId: asset.projectId,
         payload: {
-          id: asset.id,
-          snapshot,
           asset: {
             id: asset.id,
             snapshot,
