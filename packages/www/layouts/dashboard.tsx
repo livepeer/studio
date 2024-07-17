@@ -1,14 +1,15 @@
-import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
-import Sidebar, { SidebarId } from "components/Sidebar";
+import Sidebar, { type SidebarId } from "components/Sidebar";
 import Header from "components/Header";
 import FileUpload from "components/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
-import { getStripe, isExport } from "../lib/utils";
+import { cn, getStripe, isExport } from "../lib/utils";
 import Router from "next/router";
 import { useMemo } from "react";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
+import { Flex } from "components/ui/flex";
+import { Box } from "components/ui/box";
 
 // Track client-side page views with Segment & HubSpot
 if (!isExport() && process.env.NODE_ENV === "production") {
@@ -78,26 +79,30 @@ function DashboardLayout({
 
   return (
     <>
-      <Box className="dashboard">
-        <Elements stripe={stripePromise}>
-          <Head>
-            <meta name="viewport" content="width=1023" />
-          </Head>
-          {!isExport() && <NextSeo {...seo} />}
+      <Elements stripe={stripePromise}>
+        <Head>
+          <meta name="viewport" content="width=1023" />
+        </Head>
+        {!isExport() && <NextSeo {...seo} />}
+        <Flex
+          className={cn(
+            "relative flex-row overflow-hidden min-h-full items-stretch h-full w-full bg-background-light"
+          )}>
           <Sidebar id={id} />
-          <Box css={{ pl: 270, width: "100%" }}>
-            <Header breadcrumbs={breadcrumbs} />
+
+          <Box className="container h-full flex-1 min-w-0">
             <Box
-              css={{
-                margin: "0 auto",
-                maxWidth: "1520px",
-              }}>
+              className={cn(
+                "relative h-full w-full bg-background",
+                "rounded-2xl p-1 outline outline-1 outline-foreground/10"
+              )}>
+              <Header breadcrumbs={breadcrumbs} />
               {children}
             </Box>
           </Box>
-          <FileUpload />
-        </Elements>
-      </Box>
+        </Flex>
+        <FileUpload />
+      </Elements>
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useApi } from "hooks";
 import { StreamInfo } from "hooks/use-api/types";
 import Logger from "components/Logger";

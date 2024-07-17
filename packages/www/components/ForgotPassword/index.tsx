@@ -1,6 +1,6 @@
 import { TextField, Button, Box, Text } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useHubspotForm } from "hooks";
 
 // The frontend salts are all the same. This could be configurable someday.

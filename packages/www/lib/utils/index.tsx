@@ -1,10 +1,12 @@
 import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
 import getConfig from "next/config";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export const { publicRuntimeConfig } = getConfig();
-
-export const { basePath } = publicRuntimeConfig;
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export function pathJoin2(p1: string, p2: string): string {
   if (!p1) {
@@ -230,13 +232,7 @@ export function isExport(): boolean {
 }
 
 export function isStaging(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    (window.location.hostname.includes("livepeer.monster") ||
-      window.location.hostname.includes("livepeer.vercel.app") ||
-      window.location.hostname.includes("livepeerorg.vercel.app") ||
-      window.location.hostname.includes("livepeerorg.now.sh"))
-  );
+  return true;
 }
 
 export function isProduction(): boolean {
@@ -252,14 +248,4 @@ export function isDevelopment(): boolean {
 
 export function truncate(str, n) {
   return str.length > n ? str.substr(0, n - 1) + "…" : str;
-}
-
-export function getBrandName(): string {
-  if (process.env.NEXT_PUBLIC_BRAND_NAME) {
-    return process.env.NEXT_PUBLIC_BRAND_NAME;
-  }
-  if (isExport()) {
-    return "Livepeer Catalyst";
-  }
-  return "Livepeer Studio";
 }

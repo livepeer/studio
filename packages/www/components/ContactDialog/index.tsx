@@ -13,7 +13,7 @@ import {
   useSnackbar,
 } from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export const ContactDialog = ({ open, setOpen }) => {
   const router = useRouter();

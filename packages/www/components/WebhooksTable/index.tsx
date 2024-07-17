@@ -11,7 +11,7 @@ import { useToggleState } from "hooks/use-toggle-state";
 import CreateDialog, {
   Action,
 } from "components/WebhookDialogs/CreateEditDialog";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {
   makeColumns,
   makeEmptyState,

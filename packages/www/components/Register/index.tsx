@@ -1,7 +1,7 @@
 import { TextField, Button, Box, Text } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useMailChimp } from "react-use-mailchimp-signup";
 import { useHubspotForm } from "hooks";
 

@@ -1,20 +1,3 @@
-import {
-  styled,
-  Box,
-  Flex,
-  Text,
-  Link as A,
-  Avatar,
-  Grid,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  Button,
-  useSnackbar,
-} from "@livepeer/design-system";
-import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import {
   HomeIcon,
@@ -29,7 +12,7 @@ import {
 } from "./NavIcons";
 import { canSendEmail } from "lib/utils/can-send-email";
 import { useApi } from "../../hooks";
-import Router, { useRouter } from "next/router";
+import Router, { usePathname, useRouter } from "next/navigation";
 import {
   RocketIcon,
   ChatBubbleIcon,
@@ -41,31 +24,21 @@ import { useQuery, useQueryClient } from "react-query";
 import CreateProjectDialog from "components/Project/createProjectDialog";
 import { FiCheck } from "react-icons/fi";
 import { useProjectContext } from "context/ProjectContext";
-
-export const NavLink = styled(A, {
-  fontSize: 14,
-  display: "flex",
-  alignItems: "center",
-  color: "$primary12",
-  px: "$2",
-  py: 7,
-  borderRadius: "$2",
-  cursor: "default",
-  lineHeight: 1.2,
-  fontWeight: 500,
-  gap: "$2",
-  textDecoration: "none",
-  "&:hover": {
-    bc: "$neutral4",
-    textDecoration: "none",
-  },
-  "&:focus": {
-    outline: "none",
-  },
-  variants: {
-    active: { true: { bc: "$neutral4" } },
-  },
-});
+import { Box } from "components/ui/box";
+import { Text } from "components/ui/text";
+import { Flex } from "components/ui/flex";
+import { cn } from "lib/utils";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "components/ui/dropdown-menu";
+import { Grid } from "components/ui/grid";
+import { Avatar, AvatarFallback } from "components/ui/avatar";
+import { navigationOutlineVariants } from "components/ui/outline";
 
 export type SidebarId =
   | "home"
@@ -175,12 +148,11 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
   const { createProject, getProjects, logout, user, makePasswordResetToken } =
     useApi();
   const queryClient = useQueryClient();
-  const { pathname } = useRouter();
-  const [openSnackbar] = useSnackbar();
+  const pathname = usePathname();
 
   const [showCreateProjectAlert, setShowCreateProjectAlert] = useState(false);
 
-  const { data } = useQuery("projects", getProjects);
+  const { data } = useQuery({ queryKey: ["projects"], queryFn: getProjects });
   const activeProject = data?.find((project) => project.id === projectId);
 
   const isSettingsPage = pathname.includes("/settings/");
@@ -193,7 +165,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     setProjectId(project.id);
     setShowCreateProjectAlert(false);
 
-    queryClient.invalidateQueries("projects");
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
   };
 
   const isResourcePage = () => {
@@ -231,229 +203,140 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     e.preventDefault();
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
-      openSnackbar(
+      toast.warning(
         `Please wait ${response.waitTime} seconds before sending another email.`
       );
       return;
     }
-    openSnackbar("Password reset link sent to your email.");
+    toast("Password reset link sent to your email.");
     const res = await makePasswordResetToken(user.email);
     if (res.errors) {
-      openSnackbar(res?.errors?.[0]);
+      toast.error(res?.errors?.[0]);
     }
   };
 
   return (
     <>
-      <Box
-        css={{
-          backgroundColor: "$panel",
-          borderRight: "1px solid",
-          borderColor: "$neutral6",
-          maxWidth: 270,
-          width: 270,
-          top: 0,
-          position: "fixed",
-          justifyContent: "flex-end",
-          bottom: 0,
-          zIndex: 0,
-        }}>
-        <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
-          <DropdownMenu>
+      <Flex className="flex-col px-4 pt-2 pb-4 h-full lg:min-w-[250px]">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Flex
-              as={DropdownMenuTrigger}
-              align="center"
-              css={{
-                border: 0,
-                background: "transparent",
-                p: 6,
-                "&:hover": {
-                  backgroundColor: "$neutral4",
-                  borderRadius: "$3",
-                },
-              }}>
+              className={cn(
+                "items-center py-2 select-none cursor-pointer",
+                navigationOutlineVariants()
+              )}>
               <Avatar
-                placeholder={user?.firstName || user?.email.charAt(0)}
-                css={{
-                  width: 55,
-                  height: 55,
-                }}
-                alt={user?.firstName}
-                fallback={
-                  user?.firstName
+                className="w-10 h-10"
+                placeholder={user?.firstName || user?.email.charAt(0)}>
+                <AvatarFallback>
+                  {user?.firstName
                     ? user?.firstName?.charAt(0)
-                    : user?.email.charAt(0)
-                }
-              />
-              <Text
-                size="3"
-                css={{
-                  ml: "$2",
-                  fontSize: "$3",
-                  mr: "$1",
-                  color: "$neutral11",
-                }}>
-                My Account
-              </Text>
+                    : user?.email.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <Text className="ml-2 font-semibold mr-1">My Account</Text>
             </Flex>
-            <DropdownMenuContent
-              placeholder="Account"
-              css={{
-                border: "1px solid $colors$neutral6",
-                width: "12rem",
-                ml: "$4",
-                mt: "$1",
-              }}>
-              <DropdownMenuGroup
+          </DropdownMenuTrigger>
+          <DropdownMenuContent placeholder="Account">
+            <DropdownMenuGroup className="mx-1">
+              <Link href="/settings/projects">
+                <DropdownMenuItem>
+                  <Text>Projects</Text>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/settings/usage">
+                <DropdownMenuItem>
+                  <Text>Usage</Text>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/settings/billing">
+                <DropdownMenuItem>
+                  <Text>Billing</Text>
+                </DropdownMenuItem>
+              </Link>
+
+              <DropdownMenuItem
                 css={{
-                  display: "flex",
-                  flexDirection: "column",
-                  mx: "$1",
+                  py: "$3",
+                  px: "$2",
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="billing-dropdown-item"
+                onClick={() => {
+                  Router.push("/settings/billing/plans");
                 }}>
-                <DropdownMenuItem
-                  css={{
-                    py: "$3",
-                    px: "$2",
-                    borderRadius: "$1",
-                    "&:hover": {
-                      transition: ".2s",
-                      bc: "$neutral4",
-                    },
-                  }}
-                  key="billing-dropdown-item"
-                  onClick={(e) => {
-                    Router.push("/settings/projects");
-                  }}>
-                  <Text size="2">Projects</Text>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  css={{
-                    py: "$3",
-                    px: "$2",
-                    borderRadius: "$1",
-                    "&:hover": {
-                      transition: ".2s",
-                      bc: "$neutral4",
-                    },
-                  }}
-                  key="billing-dropdown-item"
-                  onClick={() => {
-                    Router.push("/settings/usage");
-                  }}>
-                  <Text size="2">Usage</Text>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  css={{
-                    py: "$3",
-                    px: "$2",
-                    borderRadius: "$1",
-                    "&:hover": {
-                      transition: ".2s",
-                      bc: "$neutral4",
-                    },
-                  }}
-                  key="billing-dropdown-item"
-                  onClick={() => {
-                    Router.push("/settings/billing");
-                  }}>
-                  <Text size="2">Billing</Text>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  css={{
-                    py: "$3",
-                    px: "$2",
-                    borderRadius: "$1",
-                    "&:hover": {
-                      transition: ".2s",
-                      bc: "$neutral4",
-                    },
-                  }}
-                  key="billing-dropdown-item"
-                  onClick={() => {
-                    Router.push("/settings/billing/plans");
-                  }}>
-                  <Text size="2">Plans</Text>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  css={{
-                    py: "$3",
-                    px: "$2",
-                    borderRadius: "$1",
-                    "&:hover": {
-                      transition: ".2s",
-                      bc: "$neutral4",
-                    },
-                  }}
-                  key="changepassword-dropdown-item"
-                  onClick={(e) => {
-                    changePassword(e);
-                  }}>
-                  <Text size="2">Change Password</Text>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  css={{
-                    py: "$3",
-                    px: "$2",
-                    borderRadius: "$1",
-                    "&:hover": {
-                      transition: ".2s",
-                      bc: "$neutral4",
-                    },
-                  }}
-                  key="logout-dropdown-item"
-                  onClick={() => {
-                    logout();
-                  }}>
-                  <Text size="2">Log out</Text>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <ThemeSwitch />
-        </Flex>
+                <Text>Plans</Text>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                css={{
+                  py: "$3",
+                  px: "$2",
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="changepassword-dropdown-item"
+                onClick={(e) => {
+                  changePassword(e);
+                }}>
+                <Text>Change Password</Text>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                css={{
+                  py: "$3",
+                  px: "$2",
+                  borderRadius: "$1",
+                  "&:hover": {
+                    transition: ".2s",
+                    bc: "$neutral4",
+                  },
+                }}
+                key="logout-dropdown-item"
+                onClick={() => {
+                  logout();
+                }}>
+                <Text>Log out</Text>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {!isSettingsPage && (
           <DropdownMenu>
-            <Flex
-              align={"center"}
-              as={DropdownMenuTrigger}
-              css={{
-                py: "$1",
-                px: "$2",
-                gap: "$2",
-                mb: "$2",
-                mt: "-$1",
-                ml: "$4",
-                border: 0,
-                backgroundColor: "transparent",
-                "&:focus": {
-                  outline: "none",
-                },
-                "&:hover": {
-                  backgroundColor: "$neutral4",
-                  borderRadius: "$3",
-                },
-              }}>
-              <Text
-                css={{
-                  color: "$neutral11",
-                }}>
-                {activeProject?.name}
-              </Text>
-              <TopBottomChevron />
-            </Flex>
-            <DropdownMenuContent
-              placeholder={"Projects"}
-              css={{
-                border: "1px solid $colors$neutral6",
-                width: "14rem",
-                ml: "$5",
-                py: "$2",
-                px: "$3",
-              }}>
-              <Text size={2} variant={"neutral"} css={{ ml: "$1", mb: "$1" }}>
+            <DropdownMenuTrigger asChild>
+              <Flex
+                className="items-center gap-2 mb-2 mt-[-1px] "
+                css={
+                  {
+                    // py: "$1",
+                    // px: "$2",
+                    // gap: "$2",
+                    // mb: "$2",
+                    // mt: "-$1",
+                    // ml: "$4",
+                    // border: 0,
+                    // backgroundColor: "transparent",
+                    // "&:focus": {
+                    //   outline: "none",
+                    // },
+                    // "&:hover": {
+                    //   backgroundColor: "$neutral4",
+                    //   borderRadius: "$3",
+                    // },
+                  }
+                }>
+                <Text variant="neutral">{activeProject?.name}</Text>
+                <TopBottomChevron />
+              </Flex>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent placeholder={"Projects"}>
+              <Text variant={"neutral"} className="ml-1 mb-1">
                 Projects
               </Text>
               <Box
@@ -483,62 +366,26 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       }
                     }}>
                     <Flex
-                      css={{ width: "100%" }}
-                      key={project.id}
-                      align={"center"}
-                      justify={"between"}>
-                      <Text size={2}>{project?.name}</Text>
+                      className="w-full justify-between items-center"
+                      key={project.id}>
+                      <Text>{project?.name}</Text>
                       {projectId === project.id && <FiCheck />}
                     </Flex>
                   </DropdownMenuItem>
                 ))}
               </Box>
-              <Box
-                css={{
-                  py: "$2",
-                  pb: 0,
-                  fontSize: 14,
-                  color: "$primary11",
-                  a: {
-                    textDecoration: "none",
-                    color: "$neutral12",
-                  },
-                }}>
-                <Flex
-                  direction={"column"}
-                  css={{
-                    width: "100%",
-                  }}>
+              <Box className="py-2">
+                <Flex className="flex-col w-full">
                   <DropdownMenuItem
-                    onClick={() => setShowCreateProjectAlert(true)}
-                    css={{
-                      color: "$neutral12",
-                      cursor: "default",
-                      borderRadius: "$3",
-                      py: "$3",
-                      px: "$2",
-                      "&:hover": {
-                        backgroundColor: "$neutral4",
-                      },
-                    }}>
-                    <Flex align={"center"}>
-                      <Text size={2}>Create new project</Text>
+                    onClick={() => setShowCreateProjectAlert(true)}>
+                    <Flex className="justify-center">
+                      <Text>Create new project</Text>
                     </Flex>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => Router.push("/settings/projects")}
-                    css={{
-                      color: "$neutral12",
-                      cursor: "default",
-                      borderRadius: "$3",
-                      py: "$3",
-                      px: "$2",
-                      "&:hover": {
-                        backgroundColor: "$neutral4",
-                      },
-                    }}>
-                    <Flex align={"center"}>
-                      <Text size={2}>View all projects</Text>
+                    onClick={() => Router.push("/settings/projects")}>
+                    <Flex className="items-center">
+                      <Text>View all projects</Text>
                     </Flex>
                   </DropdownMenuItem>
                 </Flex>
@@ -547,31 +394,20 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           </DropdownMenu>
         )}
 
-        <Flex
-          css={{ px: "$4", height: "calc(100vh - 100px)" }}
-          direction="column"
-          justify="between">
-          <Grid
-            gap={1}
-            css={{
-              a: {
-                textDecoration: "none",
-              },
-            }}>
+        <Flex className="flex-1 flex-col justify-between">
+          <Grid className="gap-1">
             {(isSettingsPage ? settingsSidebarItems : generalSidebarItems).map(
               (item) => (
                 <Box key={item.id}>
-                  <Link
+                  <NavLink
                     href={
                       isSettingsPage ? item.path : appendProjectId(item.path)
                     }
-                    passHref
-                    legacyBehavior>
-                    <NavLink active={isActive(item)}>
-                      {item.icon}
-                      {item.title}
-                    </NavLink>
-                  </Link>
+                    active={isActive(item)}>
+                    {item.icon}
+                    {item.title}
+                  </NavLink>
+
                   {item.children && isParentActive(item) && (
                     <Box
                       css={{
@@ -602,11 +438,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             )}
           </Grid>
           <Flex
-            direction="column"
-            gap={1}
-            css={{
-              mb: !isSettingsPage ? "$6" : "$0",
-            }}>
+            className={cn("flex-col gap-1 mb-6", !isSettingsPage && "mb-0")}>
             <NavLink
               href="https://docs.livepeer.org"
               target="_blank"
@@ -708,7 +540,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             </NavLink>
           </Flex>
         </Flex>
-      </Box>
+      </Flex>
 
       <CreateProjectDialog
         onCreate={onCreateClick}
@@ -716,6 +548,25 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         isOpen={showCreateProjectAlert}
       />
     </>
+  );
+};
+
+const NavLink = ({
+  href,
+  children,
+  active,
+}: {
+  href: string;
+  children: React.ReactNode;
+  active: boolean;
+}) => {
+  return (
+    <Link
+      className={cn("flex items-center gap-2", navigationOutlineVariants({}))}
+      aria-selected={active}
+      href={href}>
+      {children}
+    </Link>
   );
 };
 

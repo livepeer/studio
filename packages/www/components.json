@@ -8,10 +8,11 @@
     "css": "css/tailwind.css",
     "baseColor": "slate",
     "cssVariables": true,
-    "prefix": ""
+    "prefix": "",
+    "rsc": true
   },
   "aliases": {
     "components": "components",
-    "utils": "lib"
+    "utils": "lib/utils"
   }
 }

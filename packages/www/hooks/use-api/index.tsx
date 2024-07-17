@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useContext, createContext, useEffect } from "react";
 import jwt from "jsonwebtoken";
 import { User } from "@livepeer.studio/api";

@@ -1,5 +1,4 @@
 import { Flex, Button, Link as A } from "@livepeer/design-system";
-import { basePath } from "../../lib/utils";
 
 const Nav = () => {
   return (
@@ -7,7 +6,7 @@ const Nav = () => {
       align="center"
       justify="between"
       css={{
-        backgroundImage: `url(${basePath}/noise.png)`,
+        backgroundImage: "url(/noise.png)",
         backgroundRepeat: "repeat",
         bc: "#1C1C1C",
         height: 70,
@@ -27,7 +26,7 @@ const Nav = () => {
         },
       }}>
       <A href="/" css={{ display: "flex" }}>
-        <img src={`${basePath}/logo.svg`} />
+        <img src="/logo.svg" alt="Livepeer Studio" />
       </A>
       <Button
         as={A}

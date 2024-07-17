@@ -1,6 +1,4 @@
 import {
-  Heading,
-  Text,
   Button,
   Box,
   Flex,
@@ -30,6 +28,7 @@ import {
 import { getEmojiIcon } from "lib/get-emoji";
 import { useTheme } from "next-themes";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Text } from "components/ui/text";
 
 const GettingStarted = () => {
   const { appendProjectId, projectId } = useProjectContext();
@@ -135,9 +134,9 @@ curl --request POST \
             }}
             size={"3"}
           />
-          <Heading size="2" css={{ fontWeight: 600 }}>
+          <Text size="xl" weight="semibold">
             {data?.name}
-          </Heading>
+          </Text>
         </Flex>
         <Link href={appendProjectId("/settings")} passHref legacyBehavior>
           <Button as="a" size="2">
@@ -161,7 +160,7 @@ curl --request POST \
             mt: "$6",
             mb: "$3",
           }}>
-          <Heading>Get started with Livepeer Studio</Heading>
+          <Text size="xl">Get started with Livepeer Studio</Text>
         </Box>
         <Grid
           css={{
@@ -179,16 +178,10 @@ curl --request POST \
             }}>
             <Box>
               <TerminalIcon size={"24"} />
-              <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
+              <Text size="xl" weight="semibold" className="mt-2">
                 Integrate with your app
               </Text>
-              <Text
-                variant="neutral"
-                size="2"
-                css={{
-                  mt: "$1",
-                  mb: "$1",
-                }}>
+              <Text variant="neutral" size="sm" className="mt-1 mb-1">
                 Get your API key and start coding your next video application.
               </Text>
               <HoverCardRoot openDelay={200}>
@@ -307,16 +300,10 @@ const Card = ({
             height={26}
           />
         )}
-        <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
+        <Text size="lg" weight="semibold" className="mt-2">
           {name}
         </Text>
-        <Text
-          variant="neutral"
-          size="2"
-          css={{
-            mt: "$1",
-            mb: "$1",
-          }}>
+        <Text variant="neutral" size="sm" className="mt-1 mb-1">
           {description}
         </Text>
       </Box>

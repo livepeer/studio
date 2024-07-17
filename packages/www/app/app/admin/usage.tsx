@@ -1,0 +1,25 @@
+/** @jsxImportSource @emotion/react */
+import { jsx } from "theme-ui";
+import useApi from "../../../hooks/use-api";
+import Layout from "../../../layouts/admin";
+import useLoggedIn from "../../../hooks/use-logged-in";
+import TabbedLayout from "components/Admin/TabbedLayout";
+import AdminUsageTable from "components/Admin/AdminUsageTable";
+import { getTabs } from ".";
+
+const Usage = () => {
+  useLoggedIn();
+  const { user, logout } = useApi();
+  if (!user) {
+    return <Layout />;
+  }
+  const tabs = getTabs(5);
+
+  return (
+    <TabbedLayout tabs={tabs} logout={logout}>
+      <AdminUsageTable id="Admin API Usage Table" key="usage" />
+    </TabbedLayout>
+  );
+};
+
+export default Usage;

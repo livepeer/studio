@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
 import React, {
   createContext,
   useContext,
@@ -5,7 +8,6 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { useRouter } from "next/router";
 
 interface ProjectContextType {
   projectId: string;
@@ -17,7 +19,9 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
+
   const [projectId, setProjectId] = useState<string>(() => {
     // Get initial value from localStorage if it exists
     if (typeof window !== "undefined") {
@@ -27,23 +31,23 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    if (router.query.projectId) {
-      setProjectId(router.query.projectId as string);
+    if (searchParams.get("projectId")) {
+      setProjectId(searchParams.get("projectId") as string);
     }
-  }, [router.query.projectId]);
+  }, [searchParams]);
 
-  useEffect(() => {
-    if (projectId) {
-      // Save projectId to localStorage
-      localStorage.setItem("projectId", projectId);
-      router.replace({
-        query: {
-          ...router.query,
-          projectId,
-        },
-      });
-    }
-  }, [projectId]);
+  // useEffect(() => {
+  //   if (projectId) {
+  //     // Save projectId to localStorage
+  //     localStorage.setItem("projectId", projectId);
+  //     router.replace({
+  //       query: {
+  //         ...router.query,
+  //         projectId,
+  //       },
+  //     });
+  //   }
+  // }, [projectId]);
 
   const appendProjectId = (path: string) => {
     if (!projectId) {

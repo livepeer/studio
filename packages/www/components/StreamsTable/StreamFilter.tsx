@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { CrossCircledIcon, PlusCircledIcon } from "@radix-ui/react-icons";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 type SearchFilters = {
   name: string;

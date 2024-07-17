@@ -44,7 +44,7 @@ function insertSeparators(items) {
 const Breadcrumbs = ({ children }) => {
   const { projectId } = useProjectContext();
   const { getProjects } = useApi();
-  const { data } = useQuery("projects", getProjects);
+  const { data } = useQuery({ queryKey: ["projects"], queryFn: getProjects });
   const pathname = usePathname();
 
   const isSettingsPage = pathname?.includes("settings/");

@@ -1,3 +1,5 @@
+"use client";
+
 import EventSource from "eventsource";
 import { useApi } from "hooks";
 import { useContext, useMemo, createContext, ReactNode } from "react";

@@ -10,7 +10,7 @@ import {
 } from "./helpers";
 import FieldContent from "./fields";
 import { format, addDays, addMinutes } from "date-fns";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { makeQuery, QueryParams } from "lib/utils/router";
 
 export type Condition =

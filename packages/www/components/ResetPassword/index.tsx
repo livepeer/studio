@@ -8,7 +8,7 @@ import {
 } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useHubspotForm } from "hooks";
 import Link from "next/link";
 

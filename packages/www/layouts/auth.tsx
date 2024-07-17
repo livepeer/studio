@@ -2,7 +2,6 @@ import { Flex, Box } from "@livepeer/design-system";
 import Router from "next/router";
 import { NextSeo } from "next-seo";
 import Nav from "components/Nav";
-import { basePath } from "../lib/utils";
 
 // Track client-side page views with Segment & HubSpot
 if (process.env.NODE_ENV === "production") {
@@ -73,7 +72,7 @@ function Layout({
       <Flex
         className="main"
         css={{
-          backgroundImage: `url(${basePath}/noise.png)`,
+          backgroundImage: "url(/noise.png)",
           backgroundRepeat: "repeat",
           bc: "#1C1C1C",
           flexGrow: 1,

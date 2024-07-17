@@ -8,7 +8,7 @@ import StreamHealthWarningAlert from "components/StreamDetails/StreamHealthWarni
 import StreamPlayerBox from "components/StreamDetails/StreamPlayerBox/";
 import { useApi, useLoggedIn } from "hooks";
 import Layout from "layouts/dashboard";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 const StreamDetail = ({

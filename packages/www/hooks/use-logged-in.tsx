@@ -1,6 +1,6 @@
 import useApi from "./use-api";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useJune, events } from "hooks/use-june";
 
 const emailVerificationMode =
@@ -14,7 +14,8 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
   const { user, token } = useApi();
   const router = useRouter();
   const June = useJune();
-  const { next } = router.query;
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
 
   const trackEvent = useCallback(
     (user) => {

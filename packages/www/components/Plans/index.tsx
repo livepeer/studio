@@ -11,7 +11,7 @@ import {
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/PlanForm";
 import { products } from "@livepeer.studio/api/src/config";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -302,8 +302,6 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 }
                 disabled={
                   dashboard && stripeProductId === "prod_O9XuIjn7EqYRVW"
-                    ? true
-                    : false
                 }
                 variant="primary"
                 bc="$sage12"

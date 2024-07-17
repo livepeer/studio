@@ -8,7 +8,7 @@ import Table, {
 } from "components/Table";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import ActiveStreamsBadge from "components/ActiveStreamsBadge";
 import {
   defaultCreateProfiles,
