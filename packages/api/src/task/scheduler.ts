@@ -614,7 +614,7 @@ export class TaskScheduler {
     }
     asset = { ...asset, ...updates };
 
-    const snapshot = toExternalAsset(asset, this.config, true);
+    const snapshot = await toExternalAsset(asset, this.config, true);
     const timestamp = asset.status.updatedAt;
     const event = updates.deleted ? "asset.deleted" : "asset.updated";
     await this.queue.publishWebhook(`events.${event}`, {
