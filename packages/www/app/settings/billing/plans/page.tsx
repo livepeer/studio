@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Layout from "../../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer/design-system";

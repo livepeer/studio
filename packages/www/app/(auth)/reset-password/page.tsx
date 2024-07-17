@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Layout from "layouts/auth";
 import ResetPassword from "components/ResetPassword";

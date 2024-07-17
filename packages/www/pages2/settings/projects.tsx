@@ -1,5 +1,3 @@
-"use client";
-
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardProjects as Content } from "content";

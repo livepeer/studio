@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";

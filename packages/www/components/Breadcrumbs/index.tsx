@@ -31,7 +31,7 @@ function insertSeparators(items) {
         current,
         <BreadcrumbsSeparator aria-hidden key={`separator-${index}`}>
           /
-        </BreadcrumbsSeparator>
+        </BreadcrumbsSeparator>,
       );
     } else {
       acc.push(current);
@@ -44,7 +44,7 @@ function insertSeparators(items) {
 const Breadcrumbs = ({ children }) => {
   const { projectId } = useProjectContext();
   const { getProjects } = useApi();
-  const { data } = useQuery({ queryKey: ["projects"], queryFn: getProjects });
+  const { data } = useQuery("projects", getProjects);
   const pathname = usePathname();
 
   const isSettingsPage = pathname?.includes("settings/");
@@ -79,7 +79,7 @@ const Breadcrumbs = ({ children }) => {
           }}
           key="project">
           <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
-        </Box>
+        </Box>,
       );
     }
   }

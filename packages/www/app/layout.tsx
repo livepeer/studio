@@ -1,5 +1,10 @@
+import { DEFAULT_THEME } from "../lib/theme";
+
+import { TooltipProvider } from "components/ui/tooltip";
 import { DesignSystemProvider } from "context/DesignSystemContext";
+import { LivepeerConfigProvider } from "context/LivepeerConfig";
 import { ProjectProvider } from "context/ProjectContext";
+import ReactQueryProvider from "context/QueryContext";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { ApiProvider } from "hooks/use-api";
 import { fontSans } from "lib/fonts";
@@ -7,9 +12,12 @@ import { cn } from "lib/utils";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "../css/tailwind.css";
+import "../css/hubspot.scss";
+import "../css/markdown.css";
+import "../css/recaptcha.css";
+import "../css/tailwind.css";
 import { SyncProjectId } from "./sync-project-id";
-import ReactQueryProvider from "context/QueryContext";
-import { TooltipProvider } from "components/ui/tooltip";
+// import { getThemes } from "@livepeer/design-system";
 
 export const metadata: Metadata = {
   title: "Livepeer Studio",
@@ -39,6 +47,12 @@ export const metadata: Metadata = {
   },
 };
 
+// const themes: any = getThemes();
+// const themeMap = {};
+// Object.keys(themes).map(
+//   (key, _index) => (themeMap[themes[key].className] = themes[key].className),
+// );
+
 export default function RootLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
@@ -51,21 +65,30 @@ export default function RootLayout({
       <body
         className={cn(
           "h-screen overflow-hidden bg-background font-sans antialiased text-foreground",
-          fontSans.variable
+          fontSans.variable,
         )}>
         <DesignSystemProvider>
           <ThemeProvider
+            // forcedTheme={Component.theme || undefined}
+            disableTransitionOnChange
             attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange>
+            defaultTheme={DEFAULT_THEME}
+            value={{
+              // ...themeMap,
+              dark: "dark-theme-green",
+              light: "light-theme-green",
+            }}>
             <ProjectProvider>
               <SyncProjectId />
               {/* <SnackbarProvider> */}
               <ReactQueryProvider>
                 <ApiProvider>
                   <AnalyzerProvider>
-                    <TooltipProvider>{children}</TooltipProvider>
+                    <TooltipProvider>
+                      <LivepeerConfigProvider>
+                        {children}
+                      </LivepeerConfigProvider>
+                    </TooltipProvider>
                   </AnalyzerProvider>
                 </ApiProvider>
               </ReactQueryProvider>

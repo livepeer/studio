@@ -1,5 +1,5 @@
-import { cn } from 'lib/utils';
-import * as React from 'react';
+import { cn } from "lib/utils";
+import * as React from "react";
 
 const Box = React.forwardRef<
   HTMLDivElement,
@@ -7,6 +7,6 @@ const Box = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn(className)} {...props} />
 ));
-Box.displayName = 'Box';
+Box.displayName = "Box";
 
 export { Box };

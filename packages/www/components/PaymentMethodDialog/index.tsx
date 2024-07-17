@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
-import { Flex, Box, Grid, Button, Alert } from "@livepeer/design-system";
+import {
+  Flex,
+  Box,
+  Grid,
+  Heading,
+  Button,
+  TextField,
+  Label,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogCancel,
+  Alert,
+} from "@livepeer/design-system";
 import Spinner from "components/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
 import { useForm } from "react-hook-form";
 import { MdCreditCard } from "react-icons/md";
 import { useTheme } from "next-themes";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogTitle,
-} from "components/ui/alert-dialog";
-import { Input } from "components/ui/input";
-import { Text } from "components/ui/text";
-import { Label } from "components/ui/label";
 
 const PaymentMethodDialog = ({ invalidateQuery }) => {
   const { user, updateCustomerPaymentMethod } = useApi();
@@ -129,11 +133,11 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           onSubmit={handleSubmit(onSubmit)}
           id="billing-stripe-form">
           <AlertDialogTitle asChild>
-            <Text size="xl">
+            <Heading size="1">
               {!user.stripeCustomerPaymentMethodId
                 ? "Add payment method"
                 : "Change payment method"}
-            </Text>
+            </Heading>
           </AlertDialogTitle>
 
           {errorMessage && (
@@ -153,9 +157,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                 <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
                   Full name
                 </Label>
-                <Input
+                <TextField
                   size="2"
-                  ref={register("name")}
+                  ref={register({ required: true })}
                   placeholder="Jane Doe"
                   id="name"
                   name="name"
@@ -176,9 +180,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="email">
                     Email
                   </Label>
-                  <Input
+                  <TextField
                     size="2"
-                    ref={register("email")}
+                    ref={register({ required: true })}
                     placeholder="jane.doe@gmail.com"
                     id="email"
                     css={{ width: "100%" }}
@@ -191,9 +195,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="phone">
                     Phone
                   </Label>
-                  <Input
+                  <TextField
                     size="2"
-                    ref={register("phone")}
+                    ref={register({ required: true })}
                     placeholder="(941) 555-0123"
                     id="phone"
                     css={{ width: "100%" }}
@@ -207,9 +211,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                 <Label css={{ mb: "$1", display: "block" }} htmlFor="address">
                   Address
                 </Label>
-                <Input
+                <TextField
                   size="2"
-                  ref={register("address")}
+                  ref={register({ required: true })}
                   placeholder="185 Berry St"
                   id="address"
                   name="address"
@@ -230,9 +234,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="city">
                     City
                   </Label>
-                  <Input
+                  <TextField
                     size="2"
-                    ref={register("city")}
+                    ref={register({ required: true })}
                     placeholder="Brooklyn"
                     id="city"
                     css={{ width: "100%" }}
@@ -245,9 +249,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="State">
                     State
                   </Label>
-                  <Input
+                  <TextField
                     size="2"
-                    ref={register("state")}
+                    ref={register({ required: true })}
                     placeholder="NY"
                     id="name"
                     css={{ width: "100%" }}
@@ -262,9 +266,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                     htmlFor="postalCode">
                     ZIP
                   </Label>
-                  <Input
+                  <TextField
                     size="2"
-                    ref={register("postalCode")}
+                    ref={register({ required: true })}
                     placeholder="11211"
                     id="postalCode"
                     css={{ width: "100%" }}

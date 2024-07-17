@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { Flex, Box, Grid, Heading, useSnackbar } from "@livepeer/design-system";
 import {
+  Flex,
+  Box,
+  Grid,
+  Heading,
+  TextField,
+  Label,
+  Text,
+  Button,
   AlertDialog,
+  AlertDialogTitle,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogTitle,
   AlertDialogCancel,
-} from "components/ui/alert-dialog";
-import { Text } from "components/ui/text";
-import { Label } from "components/ui/label";
-import { Input } from "components/ui/input";
-import { Button } from "components/ui/button";
+  useSnackbar,
+} from "@livepeer/design-system";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
@@ -188,6 +192,7 @@ const PlanForm = ({
       <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
         <Flex css={{ ai: "center" }}>
           <Button
+            size="3"
             css={{
               width: "100%",
               background: bc,
@@ -201,6 +206,7 @@ const PlanForm = ({
               },
             }}
             disabled={disabled}
+            variant="primary"
             onClick={() => {
               onClick();
               setOpen(true);
@@ -222,11 +228,11 @@ const PlanForm = ({
             onSubmit={handleSubmit(onSubmit)}
             id="plan-stripe-form">
             <AlertDialogTitle asChild>
-              <Text size="xl">
+              <Heading size="1">
                 {!user.stripeCustomerPaymentMethodId
                   ? "Enter card details"
                   : "Change plan"}
-              </Text>
+              </Heading>
             </AlertDialogTitle>
 
             <AlertDialogDescription asChild>
@@ -239,8 +245,9 @@ const PlanForm = ({
                       htmlFor="name">
                       Full name
                     </Label>
-                    <Input
-                      ref={register("name")}
+                    <TextField
+                      size="2"
+                      ref={register({ required: true })}
                       placeholder="Jane Doe"
                       id="name"
                       name="name"
@@ -263,8 +270,9 @@ const PlanForm = ({
                         htmlFor="email">
                         Email
                       </Label>
-                      <Input
-                        ref={register("email")}
+                      <TextField
+                        size="2"
+                        ref={register({ required: true })}
                         placeholder="jane.doe@gmail.com"
                         id="email"
                         css={{ width: "100%" }}
@@ -279,8 +287,9 @@ const PlanForm = ({
                         htmlFor="phone">
                         Phone
                       </Label>
-                      <Input
-                        ref={register("phone")}
+                      <TextField
+                        size="2"
+                        ref={register({ required: true })}
                         placeholder="(941) 555-0123"
                         id="phone"
                         css={{ width: "100%" }}
@@ -296,8 +305,9 @@ const PlanForm = ({
                       htmlFor="address">
                       Address
                     </Label>
-                    <Input
-                      ref={register("address")}
+                    <TextField
+                      size="2"
+                      ref={register({ required: true })}
                       placeholder="185 Berry St"
                       id="address"
                       name="address"
@@ -320,8 +330,9 @@ const PlanForm = ({
                         htmlFor="city">
                         City
                       </Label>
-                      <Input
-                        ref={register("city")}
+                      <TextField
+                        size="2"
+                        ref={register({ required: true })}
                         placeholder="Brooklyn"
                         id="city"
                         css={{ width: "100%" }}
@@ -336,8 +347,9 @@ const PlanForm = ({
                         htmlFor="State">
                         State
                       </Label>
-                      <Input
-                        ref={register("state")}
+                      <TextField
+                        size="2"
+                        ref={register({ required: true })}
                         placeholder="NY"
                         id="name"
                         css={{ width: "100%" }}
@@ -352,8 +364,9 @@ const PlanForm = ({
                         htmlFor="postalCode">
                         ZIP
                       </Label>
-                      <Input
-                        ref={register("postalCode")}
+                      <TextField
+                        size="2"
+                        ref={register({ required: true })}
                         placeholder="11211"
                         id="postalCode"
                         css={{ width: "100%" }}
@@ -435,19 +448,22 @@ const PlanForm = ({
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
               <AlertDialogCancel asChild>
                 <Button
-                  variant="outline"
+                  size="2"
                   onClick={() => {
                     setOpen(false);
-                  }}>
+                  }}
+                  ghost>
                   Cancel
                 </Button>
               </AlertDialogCancel>
               <Button
+                size="2"
                 className="elements-style-background"
                 type="submit"
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
-                }>
+                }
+                variant="primary">
                 {status === "processing" && (
                   <Spinner
                     css={{
