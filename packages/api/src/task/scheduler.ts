@@ -383,18 +383,24 @@ export class TaskScheduler {
     userId?: string,
     requesterId?: string,
   ) {
+    const uId = inputAsset?.userId || outputAsset?.userId || userId;
+    const user = await db.user.get(uId, { useCache: true });
     const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
-      userId: inputAsset?.userId || outputAsset?.userId || userId,
+      userId: uId,
       params,
       status: {
         phase: "pending",
         updatedAt: Date.now(),
       },
+      projectId:
+        inputAsset?.projectId ||
+        outputAsset?.projectId ||
+        user.defaultProjectId,
       requesterId,
     });
     await this.queue.publishWebhook("events.task.spawned", {
