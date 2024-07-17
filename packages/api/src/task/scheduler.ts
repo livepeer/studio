@@ -646,6 +646,10 @@ export class TaskScheduler {
         payload: {
           id: asset.id,
           snapshot,
+          asset: {
+            id: asset.id,
+            snapshot,
+          },
         },
       });
     }
