@@ -1,23 +1,22 @@
 import { ConsumeMessage } from "amqplib";
-import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
-import messages from "../store/messages";
-import Queue from "../store/queue";
-import { Asset, Task } from "../schema/types";
-import { v4 as uuid } from "uuid";
-import { WithID } from "../store/types";
-import { taskOutputToIpfsStorage } from "../store/asset-table";
-import { RoutingKey } from "../store/queue";
-import { EventKey } from "../store/webhook-table";
-import { sleep } from "../util";
 import sql from "sql-template-strings";
-import { TooManyRequestsError } from "../store/errors";
-import { CliArgs } from "../parse-cli";
+import { v4 as uuid } from "uuid";
+import { toExternalAsset } from "../controllers/asset";
+import { toExternalSession } from "../controllers/session";
 import {
   taskParamsWithoutCredentials,
   toExternalTask,
 } from "../controllers/task";
-import { toExternalAsset } from "../controllers/asset";
-import { toExternalSession } from "../controllers/session";
+import { CliArgs } from "../parse-cli";
+import { Asset, Task } from "../schema/types";
+import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
+import { taskOutputToIpfsStorage } from "../store/asset-table";
+import { TooManyRequestsError } from "../store/errors";
+import messages from "../store/messages";
+import Queue, { RoutingKey } from "../store/queue";
+import { WithID } from "../store/types";
+import { EventKey } from "../store/webhook-table";
+import { sleep } from "../util";
 
 const taskInfo = (task: WithID<Task>, config: CliArgs): messages.TaskInfo => ({
   id: task.id,
@@ -615,7 +614,7 @@ export class TaskScheduler {
     }
     asset = { ...asset, ...updates };
 
-    const snapshot = toExternalAsset(asset, this.config, true);
+    const snapshot = await toExternalAsset(asset, this.config, true);
     const timestamp = asset.status.updatedAt;
     const event = updates.deleted ? "asset.deleted" : "asset.updated";
     await this.queue.publishWebhook(`events.${event}`, {
@@ -645,8 +644,10 @@ export class TaskScheduler {
         userId: asset.userId,
         projectId: asset.projectId,
         payload: {
-          id: asset.id,
-          snapshot,
+          asset: {
+            id: asset.id,
+            snapshot,
+          },
         },
       });
     }
