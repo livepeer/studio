@@ -66,7 +66,7 @@ const ID = () => {
       }
       setUserInfo(info as User);
     } catch (err) {
-      console.error(err); // todo: surface this
+      console.error(err);
     }
   }, [id]);
 
@@ -88,7 +88,7 @@ const ID = () => {
       fetchUser();
       close();
     } catch (err) {
-      console.error(err); // todo: surface this
+      console.error(err);
     }
   };
 
@@ -99,7 +99,7 @@ const ID = () => {
       await makeUserEnterprise(userInfo.id);
       fetchUser();
     } catch (err) {
-      console.error(err); // todo: surface this
+      console.error(err);
     }
     close();
   };
