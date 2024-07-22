@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import qs from "qs";
 import {
   Error as ApiError,
+  DisableUserPayload,
   SuspendUserPayload,
   User,
 } from "@livepeer.studio/api";
@@ -263,6 +264,37 @@ export const getUser = async (
   return [res, user as User | ApiError];
 };
 
+export const patchUser = async (userId, payload) => {
+  const [res, body] = await context.fetch(`/user/${userId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+  return [res, body];
+};
+
+export const makeUserEnterprise = async (
+  userId,
+): Promise<[Response, User | ApiError]> => {
+  const [res, body] = await context.fetch("/stripe/user/subscribe/enterprise", {
+    method: "POST",
+    body: JSON.stringify({ userId: userId, actually_migrate: true }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  setState((state) => ({ ...state, userRefresh: Date.now() }));
+
+  if (res.status !== 201) {
+    return body;
+  }
+
+  return res;
+};
+
 // Get current Stripe product, allowing for development users that don't have any
 export const getUserProduct = (user: User) => {
   if (hasStripe) {
@@ -368,6 +400,30 @@ export const setUserSuspended = async (
   payload: SuspendUserPayload,
 ): Promise<[Response, ApiError]> => {
   const [res, body] = await context.fetch(`/user/${userId}/suspended`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+
+  if (res.status !== 204) {
+    if (body && body.errors) {
+      return [res, body];
+    }
+    return [
+      res,
+      { errors: [res.body ? `${body}` : `http status ${res.status}`] },
+    ];
+  }
+  return [res, null];
+};
+
+export const setUserDisabled = async (
+  userId: string,
+  payload: DisableUserPayload,
+): Promise<[Response, ApiError]> => {
+  const [res, body] = await context.fetch(`/user/${userId}/disabled`, {
     method: "PATCH",
     body: JSON.stringify(payload),
     headers: {
