@@ -2950,9 +2950,13 @@ components:
         num_inference_steps:
           type: integer
           default: 50
+          minimum: 1
+          maximum: 200
         num_images_per_prompt:
           type: integer
           default: 1
+          minimum: 1
+          maximum: 20
     image-to-image-payload:
       type: object
       required:
@@ -2993,6 +2997,8 @@ components:
         num_images_per_prompt:
           type: integer
           default: 1
+          minimum: 1
+          maximum: 20
     image-to-video-payload:
       type: object
       required:
