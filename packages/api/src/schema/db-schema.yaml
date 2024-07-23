@@ -1400,3 +1400,10 @@ components:
           $ref: "#/components/schemas/webhook/properties/sharedSecret"
         streamId:
           $ref: "#/components/schemas/webhook/properties/streamId"
+    ai-generate-log:
+      table: ai_generate_log
+      properties:
+        userId:
+          index: true
+        projectId:
+          index: true
