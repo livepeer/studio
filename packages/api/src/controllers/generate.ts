@@ -1,9 +1,10 @@
-import { RequestHandler, Router } from "express";
+import { Request, RequestHandler, Router } from "express";
 import FormData from "form-data";
 import multer from "multer";
 import { BodyInit } from "node-fetch";
 import logger from "../logger";
 import { authorizer, validateFormData, validatePost } from "../middleware";
+import { BadRequestError } from "../store/errors";
 import { fetchWithTimeout } from "../util";
 import { experimentSubjectsOnly } from "./experiment";
 import { pathJoin2 } from "./helpers";
@@ -18,6 +19,38 @@ const multipart = multer({
 const app = Router();
 
 app.use(experimentSubjectsOnly("ai-generate"));
+
+function createPayload(
+  req: Request,
+  isJSONReq: boolean,
+  defaultModel: string,
+): BodyInit {
+  if (isJSONReq) {
+    return JSON.stringify({
+      model_id: defaultModel,
+      ...req.body,
+    });
+  }
+  if (!Array.isArray(req.files)) {
+    throw new BadRequestError("Expected an array of files");
+  }
+
+  const form = new FormData();
+  if (!("model_id" in req.body)) {
+    form.append("model_id", defaultModel);
+  }
+  for (const [key, value] of Object.entries(req.body)) {
+    form.append(key, value);
+  }
+  for (const file of req.files) {
+    form.append(file.fieldname, file.buffer, {
+      filename: file.originalname,
+      contentType: file.mimetype,
+      knownLength: file.size,
+    });
+  }
+  return form;
+}
 
 function registerGenerateHandler(
   name: string,
@@ -40,57 +73,27 @@ function registerGenerateHandler(
       }
 
       const apiUrl = pathJoin2(aiGatewayUrl, path);
-
-      let payload: BodyInit;
-      if (isJSONReq) {
-        payload = JSON.stringify({
-          model_id: defaultModel,
-          ...req.body,
-        });
-      } else {
-        const form = new FormData();
-        if (!("model_id" in req.body)) {
-          form.append("model_id", defaultModel);
-        }
-        for (const [key, value] of Object.entries(req.body)) {
-          form.append(key, value);
-        }
-
-        if (!Array.isArray(req.files)) {
-          return res.status(400).json({
-            errors: ["Expected an array of files"],
-          });
-        }
-        for (const file of req.files) {
-          form.append(file.fieldname, file.buffer, {
-            filename: file.originalname,
-            contentType: file.mimetype,
-            knownLength: file.size,
-          });
-        }
-        payload = form;
-      }
-
-      const response = await fetchWithTimeout(apiUrl, {
+      const request = createPayload(req, isJSONReq, defaultModel);
+      const gatewayRes = await fetchWithTimeout(apiUrl, {
         method: "POST",
-        body: payload,
+        body: request,
         timeout: AI_GATEWAY_TIMEOUT,
         headers: isJSONReq ? { "content-type": "application/json" } : {},
       });
 
-      const body = await response.json();
-      if (!response.ok) {
+      const response = await gatewayRes.json();
+      if (!gatewayRes.ok) {
         logger.error(
           `Error from generate API ${path} status=${
-            response.status
-          } body=${JSON.stringify(body)}`,
+            gatewayRes.status
+          } body=${JSON.stringify(response)}`,
         );
       }
-      if (response.status >= 500) {
+      if (gatewayRes.status >= 500) {
         return res.status(500).json({ errors: [`Failed to generate ${name}`] });
       }
 
-      res.status(response.status).json(body);
+      res.status(gatewayRes.status).json(response);
     },
   );
 }
