@@ -31,7 +31,7 @@ const BACKOFF_COEF = 2;
 const MAX_RETRIES = 33;
 const ASSET_HOOK_OLD_SCHEMA_THRESHOLD = 1722124800000; // 2024-07-28Z
 const oldHookCounter = new promclient.Counter({
-  name: "asset_webhook_old_schema_count",
+  name: "livepeer_api_asset_webhook_old_schema_count",
   help: "Count of webhooks fired with the old schema",
   labelNames: ["event"],
 });
