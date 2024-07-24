@@ -16,6 +16,8 @@ import { pathJoin2 } from "./helpers";
 
 const AI_GATEWAY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
+type AiGenerateType = AiGenerateLog["type"];
+
 const multipart = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10485760 }, // 10MiB
@@ -84,7 +86,7 @@ function createPayload(
 }
 
 function logAiGenerateRequest(
-  type: string,
+  type: AiGenerateType,
   startedAt: number,
   request: AiGenerateLog["request"],
   status?: number,
@@ -129,14 +131,14 @@ function logAiGenerateRequest(
 }
 
 function registerGenerateHandler(
-  name: string,
+  type: AiGenerateType,
   defaultModel: string,
   isJSONReq = false,
 ): RequestHandler {
-  const path = `/${name}`;
+  const path = `/${type}`;
   const middlewares = isJSONReq
-    ? [validatePost(`${name}-payload`)]
-    : [multipart.any(), validateFormData(`${name}-payload`)];
+    ? [validatePost(`${type}-payload`)]
+    : [multipart.any(), validateFormData(`${type}-payload`)];
   return app.post(
     path,
     authorizer({}),
@@ -165,7 +167,7 @@ function registerGenerateHandler(
         error = err;
       } finally {
         logAiGenerateRequest(
-          name,
+          type,
           startedAt,
           request,
           gatewayRes?.status,
@@ -176,7 +178,7 @@ function registerGenerateHandler(
 
       if (gatewayRes.status >= 500) {
         // Hide internal server error details from the user.
-        return res.status(500).json({ errors: [`Failed to generate ${name}`] });
+        return res.status(500).json({ errors: [`Failed to generate ${type}`] });
       }
 
       res.status(gatewayRes.status).json(response);
