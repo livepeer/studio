@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { Request, RequestHandler, Router } from "express";
 import FormData from "form-data";
 import multer from "multer";
-import { BodyInit } from "node-fetch";
+import { BodyInit, Response } from "node-fetch";
 import promclient from "prom-client";
 import { v4 as uuid } from "uuid";
 import logger from "../logger";
@@ -83,26 +83,38 @@ function createPayload(
   return [form, payload];
 }
 
-function logGenerationRequest(
+function logAiGenerateRequest(
   type: string,
   startedAt: number,
-  success: boolean,
   request: AiGenerateLog["request"],
-  response: any,
+  status?: number,
+  response?: any,
+  error?: any,
 ): void {
+  const success = !!status && status >= 200 && status < 300;
+  if (!success) {
+    logger.error(
+      `Error from generate API type=${type} status=${status} body=${JSON.stringify(
+        response,
+      )}`,
+    );
+  }
+
   setImmediate(async () => {
-    const log: AiGenerateLog = {
-      id: uuid(),
-      type,
-      startedAt,
-      duration: (Date.now() - startedAt) / 1000,
-      success,
-      request,
-      response,
-      error: success ? undefined : response?.details?.msg,
-    };
+    let log: AiGenerateLog;
     try {
-      await db.aiGenerateLog.create(log);
+      const errorStr = error ? String(error) : response?.details?.msg;
+      log = {
+        id: uuid(),
+        type,
+        startedAt,
+        duration: (Date.now() - startedAt) / 1000,
+        success,
+        request,
+        response,
+        error: success ? undefined : errorStr,
+      };
+      log = await db.aiGenerateLog.create(log);
 
       const complexity = aiGenerateMetricComplexity(request);
       aiGenerateDurationMetric.observe({ type, complexity }, log.duration);
@@ -139,26 +151,34 @@ function registerGenerateHandler(
       const startedAt = Date.now();
       const apiUrl = pathJoin2(aiGatewayUrl, path);
       const [body, request] = createPayload(req, isJSONReq, defaultModel);
-      const gatewayRes = await fetchWithTimeout(apiUrl, {
-        method: "POST",
-        body,
-        timeout: AI_GATEWAY_TIMEOUT,
-        headers: isJSONReq ? { "content-type": "application/json" } : {},
-      });
+      let gatewayRes: Response, response: any, error: any;
+      try {
+        gatewayRes = await fetchWithTimeout(apiUrl, {
+          method: "POST",
+          body,
+          timeout: AI_GATEWAY_TIMEOUT,
+          headers: isJSONReq ? { "content-type": "application/json" } : {},
+        });
 
-      const response = await gatewayRes.json();
-      if (!gatewayRes.ok) {
-        logger.error(
-          `Error from generate API ${path} status=${
-            gatewayRes.status
-          } body=${JSON.stringify(response)}`,
+        response = await gatewayRes.json();
+      } catch (err) {
+        error = err;
+      } finally {
+        logAiGenerateRequest(
+          name,
+          startedAt,
+          request,
+          gatewayRes?.status,
+          response,
+          error,
         );
       }
-      logGenerationRequest(name, startedAt, gatewayRes.ok, request, response);
 
       if (gatewayRes.status >= 500) {
+        // Hide internal server error details from the user.
         return res.status(500).json({ errors: [`Failed to generate ${name}`] });
       }
+
       res.status(gatewayRes.status).json(response);
     },
   );
