@@ -85,41 +85,58 @@ function createPayload(
   return [form, payload];
 }
 
+function parseOptionalJson(buf: Buffer): any {
+  const str = buf?.toString();
+  if (!str) {
+    return str;
+  }
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    return str;
+  }
+}
+
 function logAiGenerateRequest(
+  userId: string,
+  projectId: string,
   type: AiGenerateType,
   startedAt: number,
   request: AiGenerateLog["request"],
-  status?: number,
-  response?: any,
+  statusCode?: number,
+  responseBuf?: Buffer,
   error?: any,
 ): void {
-  const success = !!status && status >= 200 && status < 300;
+  const durationMs = Date.now() - startedAt;
+  const success = !error && statusCode && statusCode >= 200 && statusCode < 300;
   if (!success) {
     logger.error(
-      `Error from generate API type=${type} status=${status} body=${JSON.stringify(
-        response,
-      )}`,
+      `Error from generate API type=${type} status=${statusCode} body=${responseBuf} error=${error}`,
     );
   }
 
   setImmediate(async () => {
     let log: AiGenerateLog;
     try {
+      const response = parseOptionalJson(responseBuf);
       const errorStr = error ? String(error) : response?.details?.msg;
       log = {
         id: uuid(),
+        userId,
+        projectId,
         type,
         startedAt,
-        duration: (Date.now() - startedAt) / 1000,
+        durationMs,
         success,
         request,
+        statusCode,
         response,
         error: success ? undefined : errorStr,
       };
       log = await db.aiGenerateLog.create(log);
 
       const complexity = aiGenerateMetricComplexity(request);
-      aiGenerateDurationMetric.observe({ type, complexity }, log.duration);
+      aiGenerateDurationMetric.observe({ type, complexity }, durationMs);
     } catch (err) {
       logger.error(
         `Failed to save AI generation log type=${type} log=${JSON.stringify(
@@ -133,7 +150,7 @@ function logAiGenerateRequest(
 function registerGenerateHandler(
   type: AiGenerateType,
   defaultModel: string,
-  isJSONReq = false,
+  isJSONReq = false, // multipart by default
 ): RequestHandler {
   const path = `/${type}`;
   const middlewares = isJSONReq
@@ -153,7 +170,7 @@ function registerGenerateHandler(
       const startedAt = Date.now();
       const apiUrl = pathJoin2(aiGatewayUrl, path);
       const [body, request] = createPayload(req, isJSONReq, defaultModel);
-      let gatewayRes: Response, response: any, error: any;
+      let gatewayRes: Response, response: Buffer, error: any;
       try {
         gatewayRes = await fetchWithTimeout(apiUrl, {
           method: "POST",
@@ -162,11 +179,13 @@ function registerGenerateHandler(
           headers: isJSONReq ? { "content-type": "application/json" } : {},
         });
 
-        response = await gatewayRes.json();
+        response = await gatewayRes.buffer();
       } catch (err) {
         error = err;
       } finally {
         logAiGenerateRequest(
+          req.user.id,
+          req.project?.id,
           type,
           startedAt,
           request,
@@ -174,14 +193,23 @@ function registerGenerateHandler(
           response,
           error,
         );
+        if (error) {
+          throw error;
+        }
       }
 
       if (gatewayRes.status >= 500) {
-        // Hide internal server error details from the user.
+        // We hide internal server error details from the user.
         return res.status(500).json({ errors: [`Failed to generate ${type}`] });
       }
 
-      res.status(gatewayRes.status).json(response);
+      // forward content metadata headers
+      for (const [key, value] of gatewayRes.headers.entries()) {
+        if (key.toLowerCase().startsWith("content-")) {
+          res.set(key, value);
+        }
+      }
+      res.status(gatewayRes.status).send(response);
     },
   );
 }

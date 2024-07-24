@@ -2905,19 +2905,25 @@ components:
             - $ref: "#/components/schemas/image-to-image-payload"
             - $ref: "#/components/schemas/image-to-video-payload"
             - $ref: "#/components/schemas/upscale-payload"
+        statusCode:
+          type: integer
+          description: HTTP status code received from the AI gateway
+          example: 200
         response:
-          type: object
+          type:
+            - string
+            - object
           description: Response from the AI generate request, if successful
           additionalProperties: true
         error:
           type: string
           description: Error message if the AI generate request failed.
           example: Failed to load model
-        duration:
-          type: number
+        durationMs:
+          type: integer
           description:
-            The time taken (in seconds) to make the AI generate request
-          example: 0.5
+            The time taken (in milliseconds) to make the AI generate request
+          example: 500
     text-to-image-payload:
       type: object
       required:
