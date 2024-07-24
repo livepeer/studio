@@ -1427,6 +1427,7 @@ components:
           example: 5b9e63bb-6fd0-4bea-aff2-cc5d4eb9cad0
         startedAt:
           type: number
+          index: true
           readOnly: true
           description:
             Timestamp (in milliseconds) at which the AI generation started

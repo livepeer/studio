@@ -2,8 +2,9 @@ import crypto from "crypto";
 import { Request, RequestHandler, Router } from "express";
 import FormData from "form-data";
 import multer from "multer";
-import { BodyInit, Response } from "node-fetch";
+import { BodyInit, Response as FetchResponse } from "node-fetch";
 import promclient from "prom-client";
+import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
 import logger from "../logger";
 import { authorizer, validateFormData, validatePost } from "../middleware";
@@ -15,6 +16,7 @@ import { experimentSubjectsOnly } from "./experiment";
 import { pathJoin2 } from "./helpers";
 
 const AI_GATEWAY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+const MINUTE_MS = 60 * 1000;
 
 type AiGenerateType = AiGenerateLog["type"];
 
@@ -33,6 +35,33 @@ const aiGenerateDurationMetric = new promclient.Histogram({
 const app = Router();
 
 app.use(experimentSubjectsOnly("ai-generate"));
+
+const rateLimiter: RequestHandler = async (req, res, next) => {
+  const now = Date.now();
+  const [[{ numRecentReqs, minStartedAt }]] = await db.aiGenerateLog.find<{
+    numRecentReqs: number;
+    minStartedAt: number;
+  }>(
+    [
+      sql`data->>'userId' = ${req.user.id}`,
+      sql`data->>'startedAt' >= ${now - MINUTE_MS}`, // do not convert to bigint to use index
+    ],
+    {
+      order: null,
+      fields:
+        "COUNT(*) as numRecentReqs, MIN((data->>'startedAt')::bigint) as minStartedAt",
+      process: (row) => row, // avoid extracting `data` field from result rows
+    },
+  );
+
+  if (numRecentReqs >= req.config.aiMaxRequestsPerMinutePerUser) {
+    const retryAfter = (minStartedAt + MINUTE_MS - now) / 1000;
+    res.set("Retry-After", `${Math.min(Math.ceil(retryAfter), 1)}`);
+    return res.status(429).json({ errors: ["Too many AI requests"] });
+  }
+
+  next();
+};
 
 function createPayload(
   req: Request,
@@ -144,13 +173,14 @@ function registerGenerateHandler(
   isJSONReq = false, // multipart by default
 ): RequestHandler {
   const path = `/${type}`;
-  const middlewares = isJSONReq
+  const payloadParsers = isJSONReq
     ? [validatePost(`${type}-payload`)]
     : [multipart.any(), validateFormData(`${type}-payload`)];
   return app.post(
     path,
     authorizer({}),
-    ...middlewares,
+    ...payloadParsers,
+    rateLimiter,
     async function proxyGenerate(req, res) {
       const { aiGatewayUrl } = req.config;
       if (!aiGatewayUrl) {
@@ -161,7 +191,7 @@ function registerGenerateHandler(
       const startedAt = Date.now();
       const apiUrl = pathJoin2(aiGatewayUrl, path);
       const [body, request] = createPayload(req, isJSONReq, defaultModel);
-      let gatewayRes: Response, response: Buffer, error: any;
+      let gatewayRes: FetchResponse, response: Buffer, error: any;
       try {
         gatewayRes = await fetchWithTimeout(apiUrl, {
           method: "POST",

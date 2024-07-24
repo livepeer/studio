@@ -413,6 +413,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: 100,
         type: "number",
       },
+      aiMaxRequestsPerMinutePerUser: {
+        describe:
+          "maximum number of AI generate requests that can be made by a user per minute",
+        default: 20,
+        type: "number",
+      },
       "ingest-region": {
         describe:
           "list of ingest endpoints to use as servers to consult for /api/ingest",
