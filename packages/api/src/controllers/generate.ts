@@ -30,7 +30,7 @@ const aiGenerateDurationMetric = new promclient.Histogram({
   labelNames: ["type", "complexity"], // see aiGenerateMetricComplexity
 });
 
-// We divide obervations in "complexity" buckets. The complexity is only relevant on image generation pipelines that
+// We divide observations in "complexity" buckets. The complexity is only relevant on image generation pipelines that
 // have num images and/or inference steps params. The complexity is based on the product of them.
 function aiGenerateMetricComplexity(request: AiGenerateLog["request"]) {
   const numInferenceSteps =
