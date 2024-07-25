@@ -69,15 +69,9 @@ export default function RootLayout({
         )}>
         <DesignSystemProvider>
           <ThemeProvider
-            // forcedTheme={Component.theme || undefined}
             disableTransitionOnChange
             attribute="class"
-            defaultTheme={DEFAULT_THEME}
-            value={{
-              // ...themeMap,
-              dark: "dark-theme-green",
-              light: "light-theme-green",
-            }}>
+            defaultTheme={DEFAULT_THEME}>
             <ProjectProvider>
               <SyncProjectId />
               {/* <SnackbarProvider> */}

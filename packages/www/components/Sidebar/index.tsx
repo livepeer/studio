@@ -10,6 +10,7 @@ import {
   UsageIcon,
   BillingIcon,
 } from "./NavIcons";
+import ThemeSwitch from "../ThemeSwitch";
 import { canSendEmail } from "lib/utils/can-send-email";
 import { useApi } from "../../hooks";
 import Router, { usePathname, useRouter } from "next/navigation";
@@ -204,7 +205,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
       toast.warning(
-        `Please wait ${response.waitTime} seconds before sending another email.`
+        `Please wait ${response.waitTime} seconds before sending another email.`,
       );
       return;
     }
@@ -218,94 +219,97 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
   return (
     <>
       <Flex className="flex-col px-4 pt-2 pb-4 h-full lg:min-w-[250px]">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Flex
-              className={cn(
-                "items-center py-2 select-none cursor-pointer",
-                navigationOutlineVariants()
-              )}>
-              <Avatar
-                className="w-10 h-10"
-                placeholder={user?.firstName || user?.email.charAt(0)}>
-                <AvatarFallback>
-                  {user?.firstName
-                    ? user?.firstName?.charAt(0)
-                    : user?.email.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <Text className="ml-2 font-semibold mr-1">My Account</Text>
-            </Flex>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent placeholder="Account">
-            <DropdownMenuGroup className="mx-1">
-              <Link href="/settings/projects">
-                <DropdownMenuItem>
-                  <Text>Projects</Text>
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/settings/usage">
-                <DropdownMenuItem>
-                  <Text>Usage</Text>
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/settings/billing">
-                <DropdownMenuItem>
-                  <Text>Billing</Text>
-                </DropdownMenuItem>
-              </Link>
+        <Flex>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Flex
+                className={cn(
+                  "items-center py-2 select-none cursor-pointer",
+                  navigationOutlineVariants(),
+                )}>
+                <Avatar
+                  className="w-10 h-10"
+                  placeholder={user?.firstName || user?.email.charAt(0)}>
+                  <AvatarFallback>
+                    {user?.firstName
+                      ? user?.firstName?.charAt(0)
+                      : user?.email.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <Text className="ml-2 font-semibold mr-1">My Account</Text>
+              </Flex>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent placeholder="Account">
+              <DropdownMenuGroup className="mx-1">
+                <Link href="/settings/projects">
+                  <DropdownMenuItem>
+                    <Text>Projects</Text>
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/settings/usage">
+                  <DropdownMenuItem>
+                    <Text>Usage</Text>
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/settings/billing">
+                  <DropdownMenuItem>
+                    <Text>Billing</Text>
+                  </DropdownMenuItem>
+                </Link>
 
-              <DropdownMenuItem
-                css={{
-                  py: "$3",
-                  px: "$2",
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="billing-dropdown-item"
-                onClick={() => {
-                  Router.push("/settings/billing/plans");
-                }}>
-                <Text>Plans</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: "$3",
-                  px: "$2",
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="changepassword-dropdown-item"
-                onClick={(e) => {
-                  changePassword(e);
-                }}>
-                <Text>Change Password</Text>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                css={{
-                  py: "$3",
-                  px: "$2",
-                  borderRadius: "$1",
-                  "&:hover": {
-                    transition: ".2s",
-                    bc: "$neutral4",
-                  },
-                }}
-                key="logout-dropdown-item"
-                onClick={() => {
-                  logout();
-                }}>
-                <Text>Log out</Text>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="billing-dropdown-item"
+                  onClick={() => {
+                    Router.push("/settings/billing/plans");
+                  }}>
+                  <Text>Plans</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="changepassword-dropdown-item"
+                  onClick={(e) => {
+                    changePassword(e);
+                  }}>
+                  <Text>Change Password</Text>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  css={{
+                    py: "$3",
+                    px: "$2",
+                    borderRadius: "$1",
+                    "&:hover": {
+                      transition: ".2s",
+                      bc: "$neutral4",
+                    },
+                  }}
+                  key="logout-dropdown-item"
+                  onClick={() => {
+                    logout();
+                  }}>
+                  <Text>Log out</Text>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ThemeSwitch />
+        </Flex>
 
         {!isSettingsPage && (
           <DropdownMenu>
@@ -434,7 +438,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     </Box>
                   )}
                 </Box>
-              )
+              ),
             )}
           </Grid>
           <Flex
