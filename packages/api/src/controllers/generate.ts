@@ -38,25 +38,29 @@ app.use(experimentSubjectsOnly("ai-generate"));
 
 const rateLimiter: RequestHandler = async (req, res, next) => {
   const now = Date.now();
-  const [[{ numRecentReqs, minStartedAt }]] = await db.aiGenerateLog.find<{
-    numRecentReqs: number;
-    minStartedAt: number;
-  }>(
+  const [[{ count, min }]] = await db.aiGenerateLog.find(
     [
       sql`data->>'userId' = ${req.user.id}`,
       sql`data->>'startedAt' >= ${now - MINUTE_MS}`, // do not convert to bigint to use index
     ],
     {
       order: null,
-      fields:
-        "COUNT(*) as numRecentReqs, MIN((data->>'startedAt')::bigint) as minStartedAt",
+      fields: "COUNT(*) as count, MIN((data->>'startedAt')::bigint) as min",
       process: (row) => row, // avoid extracting `data` field from result rows
     },
   );
+  const numRecentReqs = parseInt(count);
+  const minStartedAt = parseInt(min);
 
   if (numRecentReqs >= req.config.aiMaxRequestsPerMinutePerUser) {
-    const retryAfter = (minStartedAt + MINUTE_MS - now) / 1000;
-    res.set("Retry-After", `${Math.min(Math.ceil(retryAfter), 1)}`);
+    let retryAfter = (minStartedAt + MINUTE_MS - now) / 1000;
+    retryAfter = Math.max(Math.ceil(retryAfter), 1);
+    logger.info(
+      `Rate-limiting too many AI requests from userId=${req.user.id} userEmail=${req.user.email} ` +
+        `numRecentReqs=${numRecentReqs} minStartedAt=${minStartedAt} now=${now} retryAfter=${retryAfter}`,
+    );
+
+    res.set("Retry-After", `${retryAfter}`);
     return res.status(429).json({ errors: ["Too many AI requests"] });
   }
 
