@@ -107,9 +107,11 @@ function newPlaybackInfo(
     }
   }
   if (thumbUrl) {
+    const thumbExtension = thumbUrl.split(".").pop().toLowerCase();
+    const isPng = thumbExtension === "png";
     playbackInfo.meta.source.push({
-      hrn: "Thumbnail (JPEG)",
-      type: "image/jpeg",
+      hrn: isPng ? "Thumbnail (PNG)" : "Thumbnail (JPEG)",
+      type: isPng ? "image/png" : "image/jpeg",
       url: thumbUrl,
     });
   }
