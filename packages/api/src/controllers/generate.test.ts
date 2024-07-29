@@ -1,11 +1,14 @@
 import FormData from "form-data";
 import { Headers, Response } from "node-fetch";
+import { v4 as uuid } from "uuid";
 import { AiGenerateLog, User } from "../schema/types";
 import { db } from "../store";
 import {
   AuxTestServer,
   TestClient,
   clearDatabase,
+  createApiTokenInNewProject,
+  createUser,
   setupUsers,
   startAuxTestServer,
 } from "../test-helpers";
@@ -41,6 +44,7 @@ const mockFetchHttpError = (
 let server: TestServer;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
+let mockOtherNonAdminUserInput: User;
 
 // jest.setTimeout(70000)
 
@@ -56,6 +60,11 @@ beforeAll(async () => {
     email: "user_non_admin@gmail.com",
     password: "y".repeat(64),
   };
+
+  mockOtherNonAdminUserInput = {
+    email: "other_user_non_admin@gmail.com",
+    password: "z".repeat(64),
+  };
 });
 
 afterEach(async () => {
@@ -68,6 +77,7 @@ describe("controllers/generate", () => {
   let adminApiKey: string;
   let nonAdminUser: User;
   let nonAdminToken: string;
+  let nonAdminApiKey: string;
 
   let aiGatewayServer: AuxTestServer;
   let aiGatewayCalls: Record<string, number>;
@@ -101,14 +111,18 @@ describe("controllers/generate", () => {
     mockedFetchWithTimeout.mockRestore();
     mockedFetchWithTimeout.mockImplementation(origFetchWithTimeout);
 
-    ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminToken } =
-      await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+    ({
+      client,
+      adminUser,
+      adminApiKey,
+      nonAdminUser,
+      nonAdminToken,
+      nonAdminApiKey,
+    } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
 
     client.apiKey = adminApiKey;
-    await client.post("/experiment", {
-      name: "ai-generate",
-      audienceUserIds: [adminUser.id, nonAdminUser.id],
-    });
+    await client.post("/experiment", { name: "ai-generate" });
+    await client.post("/experiment/ai-generate/audience", { allowAll: true });
     client.apiKey = null;
     client.jwtAuth = nonAdminToken;
 
@@ -331,6 +345,125 @@ describe("controllers/generate", () => {
         error: "Error: on your face",
       } as Partial<AiGenerateLog>);
       expect(log.statusCode).toBeUndefined();
+    });
+  });
+
+  describe.only("rate limiting", () => {
+    // test params is configured with 5 reqs/min
+
+    const pipelines = [
+      "text-to-image",
+      "image-to-image",
+      "image-to-video",
+      "upscale",
+    ] as const;
+
+    const makeAiGenReq = (pipeline: (typeof pipelines)[number]) =>
+      pipeline === "text-to-image"
+        ? client.post(`/beta/generate/${pipeline}`, {
+            prompt: "whatever you feel like",
+          })
+        : client.fetch(`/beta/generate/${pipeline}`, {
+            method: "POST",
+            body: buildMultipartBody(
+              pipeline === "image-to-video" ? {} : { prompt: "make magic" },
+            ),
+          });
+
+    it("should rate limit requests", async () => {
+      for (let i = 0; i < 5; i++) {
+        const res = await makeAiGenReq("text-to-image");
+        expect(res.status).toBe(200);
+      }
+
+      // sleep so the logs are written on db in background
+      await sleep(100);
+      const res = await makeAiGenReq("text-to-image");
+      expect(res.status).toBe(429);
+    });
+
+    it("should rate limit reqeusts across different pipelines", async () => {
+      for (let i = 0; i < 5; i++) {
+        const res = await makeAiGenReq(pipelines[i % pipelines.length]);
+        expect(res.status).toBe(200);
+      }
+
+      await sleep(100);
+      for (const pip of pipelines) {
+        const res = await makeAiGenReq(pip);
+        expect(res.status).toBe(429);
+      }
+    });
+
+    it("should not rate limit requests between different users", async () => {
+      const otherUser = await createUser(
+        server,
+        client,
+        mockOtherNonAdminUserInput,
+        false,
+        true,
+      );
+
+      // first user exhausts their reqs
+      for (let i = 0; i < 5; i++) {
+        const res = await makeAiGenReq("text-to-image");
+        expect(res.status).toBe(200);
+      }
+      await sleep(100);
+
+      // other user still has their quota to use
+      client.jwtAuth = otherUser.token;
+      for (let i = 0; i < 5; i++) {
+        const res = await makeAiGenReq("text-to-image");
+        expect(res.status).toBe(200);
+      }
+    });
+
+    it("should have the same limit between projects", async () => {
+      const { project, newApiKey } = await createApiTokenInNewProject(client);
+      expect(newApiKey.projectId).toEqual(project.id);
+      expect(newApiKey.projectId).not.toEqual(nonAdminUser.defaultProjectId);
+
+      // exhaust requests across all projects
+      client.jwtAuth = null;
+      const projectTokens = [nonAdminApiKey, newApiKey.id];
+      for (let i = 0; i < 5; i++) {
+        client.apiKey = projectTokens[i % projectTokens.length];
+        const res = await makeAiGenReq("text-to-image");
+        expect(res.status).toBe(200);
+      }
+      await sleep(100);
+
+      // 429 in all projects
+      for (const token of projectTokens) {
+        client.apiKey = token;
+        const res = await makeAiGenReq("text-to-image");
+        expect(res.status).toBe(429);
+      }
+    });
+
+    it("should allow new requests after a minute", async () => {
+      const firstReqStart = Date.now() - 58_000; // start 58s ago
+      // create fake logs from previous requests
+      for (let i = 0; i < 5; i++) {
+        await db.aiGenerateLog.create({
+          id: uuid(),
+          startedAt: firstReqStart + 5000 * i, // space previous requests 5s apart
+          userId: nonAdminUser.id,
+          projectId: nonAdminUser.defaultProjectId,
+        } as any); // we only need the above fields for rate-limiting
+      }
+
+      // doesn't allow a request immediately
+      let res = await makeAiGenReq("text-to-image");
+      expect(res.status).toBe(429);
+      const retryAfter = parseInt(res.headers.get("Retry-After") ?? "0");
+      expect(retryAfter).toBe(2); // in 2s the first req will be old enough
+
+      // callers should wait for the retry-after period and try again
+      await sleep(retryAfter * 1000);
+      res = await makeAiGenReq("text-to-image");
+      expect(res.status).toBe(200);
     });
   });
 });
