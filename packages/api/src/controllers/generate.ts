@@ -7,7 +7,7 @@ import promclient from "prom-client";
 import { v4 as uuid } from "uuid";
 import logger from "../logger";
 import { authorizer, validateFormData, validatePost } from "../middleware";
-import { AiGenerateLog, TextToImagePayload } from "../schema/types";
+import { AiGenerateLog } from "../schema/types";
 import { db } from "../store";
 import { BadRequestError } from "../store/errors";
 import { fetchWithTimeout } from "../util";
@@ -27,19 +27,8 @@ const aiGenerateDurationMetric = new promclient.Histogram({
   name: "livepeer_api_ai_generate_duration",
   buckets: [100, 500, 1000, 2500, 5000, 10000, 30000, 60000],
   help: "Duration in milliseconds of the AI generation request",
-  labelNames: ["type", "complexity"], // see aiGenerateMetricComplexity
+  labelNames: ["type", "status_code"],
 });
-
-// We divide observations in "complexity" buckets. The complexity is only relevant on image generation pipelines that
-// have num images and/or inference steps params. The complexity is based on the product of them.
-function aiGenerateMetricComplexity(request: AiGenerateLog["request"]) {
-  const numInferenceSteps =
-    (request as TextToImagePayload)?.num_inference_steps ?? 50;
-  const numImages = (request as TextToImagePayload)?.num_images_per_prompt ?? 1;
-  // We divide by 200 to reduce cardinality of the metric.
-  // The range goes from 0 to `200 * 20 / 200` = 20 maximum cardinality
-  return Math.round((numInferenceSteps * numImages) / 200);
-}
 
 const app = Router();
 
@@ -135,8 +124,10 @@ function logAiGenerateRequest(
       };
       log = await db.aiGenerateLog.create(log);
 
-      const complexity = aiGenerateMetricComplexity(request);
-      aiGenerateDurationMetric.observe({ type, complexity }, durationMs);
+      aiGenerateDurationMetric.observe(
+        { type, status_code: statusCode },
+        durationMs,
+      );
     } catch (err) {
       logger.error(
         `Failed to save AI generation log type=${type} log=${JSON.stringify(
