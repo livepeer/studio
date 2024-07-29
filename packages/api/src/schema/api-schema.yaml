@@ -2578,6 +2578,7 @@ components:
                       - WebRTC (H264)
                       - FLV (H264)
                       - Thumbnail (JPEG)
+                      - Thumbnail (PNG)
                       - Thumbnails
                   type:
                     type: string
@@ -2588,6 +2589,7 @@ components:
                       - html5/video/h264
                       - video/x-flv
                       - image/jpeg
+                      - image/png
                       - text/vtt
                   url:
                     type: string
