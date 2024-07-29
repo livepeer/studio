@@ -223,7 +223,7 @@ function registerGenerateHandler(
         }
       }
 
-      if (gatewayRes.status >= 500) {
+      if (!req.user.admin && gatewayRes.status >= 500) {
         // We hide internal server error details from the user.
         return res.status(500).json({ errors: [`Failed to generate ${type}`] });
       }
