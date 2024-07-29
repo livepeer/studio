@@ -16,7 +16,7 @@ import { experimentSubjectsOnly } from "./experiment";
 import { pathJoin2 } from "./helpers";
 
 const AI_GATEWAY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
-const MINUTE_MS = 60 * 1000;
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 
 type AiGenerateType = AiGenerateLog["type"];
 
@@ -41,7 +41,7 @@ const rateLimiter: RequestHandler = async (req, res, next) => {
   const [[{ count, min }]] = await db.aiGenerateLog.find(
     [
       sql`data->>'userId' = ${req.user.id}`,
-      sql`data->>'startedAt' >= ${now - MINUTE_MS}`, // do not convert to bigint to use index
+      sql`data->>'startedAt' >= ${now - RATE_LIMIT_WINDOW}`, // do not convert to bigint to use index
     ],
     {
       order: null,
@@ -53,7 +53,7 @@ const rateLimiter: RequestHandler = async (req, res, next) => {
   const minStartedAt = parseInt(min);
 
   if (numRecentReqs >= req.config.aiMaxRequestsPerMinutePerUser) {
-    let retryAfter = (minStartedAt + MINUTE_MS - now) / 1000;
+    let retryAfter = (minStartedAt + RATE_LIMIT_WINDOW - now) / 1000;
     retryAfter = Math.max(Math.ceil(retryAfter), 1);
     logger.info(
       `Rate-limiting too many AI requests from userId=${req.user.id} userEmail=${req.user.email} ` +
