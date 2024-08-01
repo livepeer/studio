@@ -1811,6 +1811,10 @@ components:
           type: string
           description: ID of the output asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        projectId:
+          type: string
+          description: ID of the project
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         requesterId:
           type: string
           description: ID of the requester hash(IP + SALT + PlaybackId)
