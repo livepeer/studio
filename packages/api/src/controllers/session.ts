@@ -307,7 +307,7 @@ async function buildSingleRecordingUrl(
     url: manifestUrl,
     session,
     objectStoreId,
-    thumbUrl: pathJoin(urlPrefix, "source", "latest.jpg"),
+    thumbUrl: pathJoin(urlPrefix, "source", "latest.png"),
   };
 }
 
