@@ -27,6 +27,7 @@ import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
 import { cache } from "../store/cache";
+import { fetchWithTimeout } from "../util";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -292,6 +293,18 @@ async function getPlaybackInfo(
     let thumbUrl: string;
     try {
       ({ url, thumbUrl } = await getRunningRecording(stream, req));
+      // TODO: remove this after the transtion
+      // This is to avoid to incur in 404 errors for not running livestream on png thumbs
+      try {
+        if (thumbUrl.split(".").pop().toLowerCase() === "png") {
+          const response = await fetchWithTimeout(thumbUrl, { method: "HEAD" });
+          if (response.status === 404) {
+            thumbUrl = thumbUrl.replace(/\.png$/, ".jpg");
+          }
+        }
+      } catch (error) {
+        console.error("Error checking thumbUrl:", error);
+      }
     } catch (e) {
       logger.error("Error while getting recording", e);
     }
