@@ -295,15 +295,19 @@ async function getPlaybackInfo(
       ({ url, thumbUrl } = await getRunningRecording(stream, req));
       // TODO: remove this after the transtion
       // This is to avoid to incur in 404 errors for not running livestream on png thumbs
-      try {
-        if (thumbUrl.split(".").pop().toLowerCase() === "png") {
-          const response = await fetchWithTimeout(thumbUrl, { method: "HEAD" });
-          if (response.status === 404) {
-            thumbUrl = thumbUrl.replace(/\.png$/, ".jpg");
+      if (thumbUrl) {
+        try {
+          if (thumbUrl.split(".").pop().toLowerCase() === "png") {
+            const response = await fetchWithTimeout(thumbUrl, {
+              method: "HEAD",
+            });
+            if (response.status === 404) {
+              thumbUrl = thumbUrl.replace(/\.png$/, ".jpg");
+            }
           }
+        } catch (error) {
+          console.error("Error checking thumbUrl:", error);
         }
-      } catch (error) {
-        console.error("Error checking thumbUrl:", error);
       }
     } catch (e) {
       logger.error("Error while getting recording", e);
