@@ -223,7 +223,7 @@ export const products = {
         name: "Storage",
         description: "Storage (minutes)",
         price: 0.0035,
-        limit: 1_000,
+        limit: 60,
       },
     ],
     monthlyPrice: 0,
