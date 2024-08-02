@@ -361,11 +361,15 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   );
   if (task.outputAssetId) {
     const asset = await db.asset.get(task.outputAssetId);
+    let phase: Asset["status"]["phase"] = "processing";
+    if (asset.status?.phase === "deleting") {
+      phase = "deleting";
+    }
     await req.taskScheduler.updateAsset(
       asset,
       {
         status: {
-          phase: "processing",
+          phase,
           updatedAt: Date.now(),
           progress: Math.max(doc.progress, asset.status.progress ?? 0),
         },

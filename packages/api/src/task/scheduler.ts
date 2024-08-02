@@ -140,6 +140,11 @@ export class TaskScheduler {
           await this.failTask(task, error, event.output);
           return true;
         }
+        let phase: Asset["status"]["phase"] = "ready";
+        const asset = await db.asset.get(task.outputAssetId);
+        if (asset.status?.phase === "deleting") {
+          phase = "deleting";
+        }
         await this.updateAsset(task.outputAssetId, {
           size: assetSpec.size,
           hash: assetSpec.hash,
@@ -156,7 +161,7 @@ export class TaskScheduler {
               },
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
-            phase: "ready",
+            phase,
             updatedAt: Date.now(),
           },
         });
@@ -234,7 +239,6 @@ export class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
-
     return true;
   }
 
@@ -539,23 +543,12 @@ export class TaskScheduler {
       if (typeof asset === "string") {
         asset = await db.asset.get(asset);
       }
-
-      let phase = asset.status?.phase;
-      // Prevent bump of updatedAt if phase isn't getting updated
-      let updatedAt = asset.status?.updatedAt;
-
-      if (phase === "ready") {
-        // If the asset is ready, we need to schedule deletion
-        phase = "deleting";
-        updatedAt = Date.now();
-      }
-
       await this.updateAsset(asset, {
         deleted: true,
         deletedAt: Date.now(),
         status: {
-          phase: phase,
-          updatedAt: updatedAt,
+          phase: "deleting",
+          updatedAt: Date.now(),
         },
       });
       return true;
@@ -608,29 +601,41 @@ export class TaskScheduler {
         ),
       );
     }
+    const event = updates.deleted ? "asset.deleted" : "asset.updated";
+    const publishWebhook = async (asset: Asset) => {
+      const snapshot = await toExternalAsset(asset, this.config, true);
+      const timestamp = Date.now();
+      await this.queue.publishWebhook(`events.${event}`, {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp,
+        event,
+        userId: asset.userId,
+        projectId: asset.projectId,
+        payload: {
+          asset: {
+            id: asset.id,
+            snapshot,
+          },
+        },
+      });
+    };
+
+    if (event === "asset.deleted") {
+      await publishWebhook(asset);
+    }
+
     const res = await db.asset.update(query, updates);
     if (!res?.rowCount) {
       return;
     }
     asset = { ...asset, ...updates };
 
-    const snapshot = await toExternalAsset(asset, this.config, true);
-    const timestamp = asset.status.updatedAt;
-    const event = updates.deleted ? "asset.deleted" : "asset.updated";
-    await this.queue.publishWebhook(`events.${event}`, {
-      type: "webhook_event",
-      id: uuid(),
-      timestamp,
-      event,
-      userId: asset.userId,
-      projectId: asset.projectId,
-      payload: {
-        asset: {
-          id: asset.id,
-          snapshot,
-        },
-      },
-    });
+    if (event === "asset.deleted") {
+      return;
+    }
+
+    await publishWebhook(asset);
 
     const newPhase = asset.status.phase;
     if (phaseChanged && (newPhase === "ready" || newPhase === "failed")) {
@@ -639,14 +644,14 @@ export class TaskScheduler {
       await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
         id: uuid(),
-        timestamp,
+        timestamp: asset.status.updatedAt,
         event: assetEvent,
         userId: asset.userId,
         projectId: asset.projectId,
         payload: {
           asset: {
             id: asset.id,
-            snapshot,
+            snapshot: await toExternalAsset(asset, this.config, true),
           },
         },
       });
