@@ -296,7 +296,11 @@ app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["Account not found"] });
   }
-  await db.user.delete(id);
+
+  await db.user.update(id, {
+    deleted: true,
+    deletedAt: Date.now(),
+  });
 
   // TODO: remove all streams owned by user
   // TODO: remove all assets owned by user
