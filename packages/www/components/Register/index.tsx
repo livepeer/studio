@@ -21,7 +21,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
 
   const { handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_LOGIN_FORM_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_REGISTER_FORM_ID,
   });
 
   const { subscribe } = useMailChimp({
