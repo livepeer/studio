@@ -91,12 +91,12 @@ const StreamPlayerBox = ({
           mb: "$5",
         }}>
         <Box
+          className="bg-accent"
           css={{
             width: "100%",
             minHeight: 220,
             borderRadius: "$2",
             position: "relative",
-            bc: "$panel",
             border: "1px solid $neutral6",
             overflow: "hidden",
           }}>
@@ -128,7 +128,7 @@ const StreamPlayerBox = ({
           <AssetSharePopup
             playbackId={stream.playbackId}
             triggerNode={
-              <Button size="2">
+              <Button className="bg-accent" size="2">
                 <Box
                   as={Share2Icon}
                   css={{
@@ -152,6 +152,7 @@ const StreamPlayerBox = ({
             }>
             <Button
               size="2"
+              className="bg-accent"
               css={{
                 flex: 2,
               }}
@@ -174,9 +175,9 @@ const StreamPlayerBox = ({
         </Flex>
       </Box>
       <Box
+        className="bg-accent"
         css={{
           display: "flex",
-          backgroundColor: "$neutral3",
           borderRadius: "$1",
           fontWeight: 600,
           fontSize: "$2",
@@ -198,8 +199,7 @@ const StreamPlayerBox = ({
             alignItems: "center",
             justifyContent: "center",
             color: activeTab === "Browser" ? "$neutral1" : "inherit",
-            backgroundColor:
-              activeTab === "Browser" ? "$neutral12" : "transparent",
+            backgroundColor: activeTab === "Browser" ? "white" : "transparent",
           }}>
           <FaVideo />
           Browser
@@ -220,7 +220,7 @@ const StreamPlayerBox = ({
             justifyContent: "center",
             color: activeTab === "Streaming Software" ? "$neutral1" : "inherit",
             backgroundColor:
-              activeTab === "Streaming Software" ? "$neutral12" : "transparent",
+              activeTab === "Streaming Software" ? "white" : "transparent",
           }}>
           <FaKey />
           Streaming Software

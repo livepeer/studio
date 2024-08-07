@@ -39,7 +39,9 @@ const DisableDialog = ({
   const [saving, setSaving] = useState(false);
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent
+        className="bg-surface"
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Disable multistream target?</Heading>
         </AlertDialogTitle>
@@ -104,7 +106,9 @@ const DeleteDialog = ({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent
+        className="bg-surface"
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Delete multistream target?</Heading>
         </AlertDialogTitle>

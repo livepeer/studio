@@ -79,12 +79,18 @@ const StreamChildrenHeadingBox = ({
       <Box css={{ position: "relative", top: "-8px" }}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="2" css={{ display: "flex", ai: "center", mr: "$1" }}>
+            <Button
+              className="bg-accent"
+              size="2"
+              css={{ display: "flex", ai: "center", mr: "$1" }}>
               Actions
               <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent placeholder="dropdown-menu-content" align="end">
+          <DropdownMenuContent
+            className="bg-accent mt-2"
+            placeholder="dropdown-menu-content"
+            align="end">
             <DropdownMenuGroup>
               <Record
                 stream={stream}

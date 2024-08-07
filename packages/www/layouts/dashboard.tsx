@@ -85,16 +85,15 @@ function DashboardLayout({
           </Head>
           {!isExport() && <NextSeo {...seo} />}
           <Sidebar id={id} />
-          <Box css={{ pl: 270, width: "100%" }}>
+          <div className="ml-[18rem] bg-surface rounded-md h-[96vh] m-6 border border-border">
             <Header breadcrumbs={breadcrumbs} />
             <Box
               css={{
                 margin: "0 auto",
-                maxWidth: "1520px",
               }}>
               {children}
             </Box>
-          </Box>
+          </div>
           <FileUpload />
         </Elements>
       </Box>

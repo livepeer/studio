@@ -4,23 +4,38 @@
 
 @layer base {
   :root {
-    --color-border: 240 5% 80%;
-    --color-background: 0 0% 98%;
-    --color-foreground: 0 0% 10%;
-    --color-muted: 249 4% 44%;
-    --color-surface: 240 4% 95%;
-    --color-accent: 240 4% 30%;
+    --border: 240 5% 90%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
+    --muted: 249 4% 44%;
+    --surface: 240 4% 97%;
+    --accent: 240 4% 94%;
   }
 
   /* 
   The class name here is temporory. Since old class names are still in use. We can replace this with .dark once we are ready to switch to the new class names.
   */
   .dark-theme-green {
-    --color-border: 240 5% 16%;
-    --color-background: 0 0% 9%;
-    --color-foreground: 0 0% 100%;
-    --color-muted: 249 4 64;
-    --color-surface: 240 4% 9%;
-    --color-accent: 240 4% 14;
+    --border: 240 5% 15%;
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
+    --muted: 249 4 64;
+    --surface: 240 4% 8%;
+    --accent: 240 4% 14;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border !important;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-background text-foreground !important;
+    /* font-feature-settings: "rlig" 1, "calt" 1; */
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
   }
 }

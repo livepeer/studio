@@ -182,10 +182,10 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
         </Heading>
       </Box>
       <Box
+        className="bg-accent"
         css={{
           overflow: "scroll",
           p: "$4",
-          bc: "$neutral3",
           height: 300,
           borderRadius: 6,
         }}>
