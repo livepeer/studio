@@ -99,12 +99,13 @@ export class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    const tasks = await db.task.find({ id: event.task.id });
-    if (!tasks?.length || !tasks[0].length) {
-      console.log(`task event process error: task ${event.task.id} not found`);
+    const task = await db.task.get(event.task.id, { useReplica: false });
+    if (!task || task?.deleted) {
+      console.log(
+        `task event process error: task ${event.task.id} ${task ? "is deleted" : "not found"} in process task event`,
+      );
       return true;
     }
-    const task = tasks[0][0];
 
     // TODO: bundle all db updates in a single transaction
     if (event.error) {
@@ -211,12 +212,13 @@ export class TaskScheduler {
   async processTaskResultPartial(
     event: messages.TaskResultPartial,
   ): Promise<boolean> {
-    const tasks = await db.task.find({ id: event.task.id });
-    if (!tasks?.length || !tasks[0].length) {
-      console.log(`task event process error: task ${event.task.id} not found`);
+    const task = await db.task.get(event.task.id, { useReplica: false });
+    if (!task || task?.deleted) {
+      console.log(
+        `task event process error: task ${event.task.id} ${task ? "is deleted" : "not found"} in process task result partial`,
+      );
       return true;
     }
-    const task = tasks[0][0];
 
     const asset = await db.asset.get(task.outputAssetId);
     await this.updateAsset(task.outputAssetId, {
