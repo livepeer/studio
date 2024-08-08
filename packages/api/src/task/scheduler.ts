@@ -99,19 +99,12 @@ export class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    let task = await db.task.get(event.task.id, { useReplica: false });
+    const task = await db.task.get(event.task.id, { useReplica: false });
     if (!task) {
       console.log(
-        `task event process error: task ${event.task.id} not found, retrying after 500ms`,
+        `task event process error: task ${event.task.id} not found in process task event`,
       );
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      task = await db.task.get(event.task.id);
-      if (!task) {
-        console.log(
-          `task event process error: task ${event.task.id} not found in process task event`,
-        );
-        return true;
-      }
+      return true;
     }
 
     // TODO: bundle all db updates in a single transaction
@@ -219,19 +212,12 @@ export class TaskScheduler {
   async processTaskResultPartial(
     event: messages.TaskResultPartial,
   ): Promise<boolean> {
-    let task = await db.task.get(event.task.id, { useReplica: false });
+    const task = await db.task.get(event.task.id, { useReplica: false });
     if (!task) {
       console.log(
-        `task event process error: task ${event.task.id} not found, retrying after 500ms`,
+        `task event process error: task ${event.task.id} not found in process task result partial`,
       );
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      task = await db.task.get(event.task.id);
-      if (!task) {
-        console.log(
-          `task event process error: task ${event.task.id} not found in process task result partial`,
-        );
-        return true;
-      }
+      return true;
     }
 
     const asset = await db.asset.get(task.outputAssetId);
