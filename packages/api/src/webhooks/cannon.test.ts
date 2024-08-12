@@ -30,7 +30,13 @@ describe("webhook cannon", () => {
   let postMockStream: Stream;
   let mockStore: WithID<ObjectStore>;
   let mockWebhook: Webhook;
-  let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
+  let client,
+    adminUser,
+    adminToken,
+    nonAdminUser,
+    nonAdminToken,
+    adminProject,
+    nonAdminProject;
 
   async function setupUsers(server) {
     const client = new TestClient({
@@ -43,10 +49,14 @@ describe("webhook cannon", () => {
     let tokenRes = await client.post(`/user/token`, { ...mockAdminUser });
     const adminToken = await tokenRes.json();
     client.jwtAuth = adminToken["token"];
-
     const user = await server.store.get(`user/${adminUser.id}`, false);
     adminUser = { ...user, admin: true, emailValid: true };
     await server.store.replace(adminUser);
+    adminProject = await db.project.create({
+      name: "test project",
+      id: uuid(),
+      userId: adminUser.id,
+    });
 
     const resNonAdmin = await client.post(`/user/`, { ...mockNonAdminUser });
     let nonAdminUser = await resNonAdmin.json();
@@ -60,6 +70,11 @@ describe("webhook cannon", () => {
     );
     nonAdminUser = { ...nonAdminUserRes, emailValid: true };
     await server.store.replace(nonAdminUser);
+    nonAdminProject = await db.project.create({
+      name: "test project",
+      id: uuid(),
+      userId: nonAdminUser.id,
+    });
     return { client, adminUser, adminToken, nonAdminUser, nonAdminToken };
   }
 
