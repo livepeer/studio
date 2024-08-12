@@ -214,3 +214,9 @@ export const deleteAsset = async (assetId): Promise<void> => {
     throw new Error(`Failed to delete asset with id: ${assetId}`);
   }
 };
+
+export const deleteAssets = async (ids: Array<string>): Promise<void> => {
+  for (const id of ids) {
+    await deleteAsset(id);
+  }
+};
