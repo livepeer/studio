@@ -123,7 +123,7 @@ export default class WebhookCannon {
   }
 
   async processWebhookEvent(msg: messages.WebhookEvent): Promise<boolean> {
-    const { event, streamId, sessionId, userId } = msg;
+    const { event, streamId, sessionId, userId, projectId } = msg;
 
     if (event === "playback.accessControl") {
       // Cannot fire this event as a webhook, this is specific to access control and fired there
@@ -142,7 +142,12 @@ export default class WebhookCannon {
       }
     }
 
-    const { data: webhooks } = await db.webhook.listSubscribed(userId, event);
+    const { data: webhooks } = await db.webhook.listSubscribed(
+      userId,
+      event,
+      null,
+      projectId,
+    );
 
     console.log(
       `fetched webhooks. userId=${userId} event=${event} webhooks=`,
