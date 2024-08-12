@@ -9,6 +9,7 @@ import Table, {
 import { useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
+import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 import {
   AssetsTableData,
   filterItems,
@@ -16,7 +17,7 @@ import {
   makeEmptyState,
   rowsPageFromState,
 } from "./helpers";
-import { makeCreateAction } from "../Table/helpers";
+import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import { useProjectContext } from "context/ProjectContext";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -34,11 +35,18 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const { getAssets, uploadAssets, deleteAsset, getTasks, getFileUploads } =
-    useApi();
+  const {
+    getAssets,
+    uploadAssets,
+    deleteAsset,
+    deleteAssets,
+    getTasks,
+    getFileUploads,
+  } = useApi();
   const [openSnackbar] = useSnackbar();
   const { appendProjectId, projectId } = useProjectContext();
   const createDialogState = useToggleState();
+  const deleteDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
     pageSize,
     tableId,
@@ -46,12 +54,19 @@ const AssetsTable = ({
   });
   const columns = useMemo(makeColumns, []);
 
-  const onDeleteAsset = (assetId: string) => {
-    (async () => {
-      await deleteAsset(assetId);
-      await state.invalidate();
-    })();
-  };
+  const onDeleteAsset = useCallback(
+    async (assetId: string) => {
+      try {
+        await deleteAsset(assetId);
+        await state.invalidate();
+        openSnackbar("Asset deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting asset:", error);
+        openSnackbar("Error deleting asset. Please try again.");
+      }
+    },
+    [deleteAsset, state, openSnackbar],
+  );
 
   const onUploadAssetSuccess = () => sleep(2000).then(() => state.invalidate());
 
@@ -102,12 +117,22 @@ const AssetsTable = ({
         initialSortBy={[DefaultSortBy]}
         emptyState={makeEmptyState(createDialogState)}
         createAction={makeCreateAction("Upload asset", createDialogState.onOn)}
+        rowSelection="all"
+        selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
       />
 
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
         onCreate={onCreate}
+      />
+
+      <TableStateDeleteDialog
+        entityName={{ singular: "asset", plural: "assets" }}
+        state={state}
+        dialogToggleState={deleteDialogState}
+        deleteFunction={deleteAsset}
+        deleteMultipleFunction={deleteAssets}
       />
     </>
   );
