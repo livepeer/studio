@@ -18,6 +18,8 @@ import {
   useEffect,
   useState,
 } from "react";
+import { Alert, AlertDescription, AlertTitle } from "components/ui/alert";
+import { Clock10, Terminal, TriangleAlert } from "lucide-react";
 
 export type AssetDetailProps = {
   asset?: Asset;
@@ -86,17 +88,44 @@ const AssetDetail = ({
         onEdit={onEditAsset}
         asset={asset}
       />
-
       <EmbedVideoDialog
         isOpen={embedVideoDialogOpen}
         onOpenChange={setEmbedVideoDialogOpen}
         playbackId={asset?.playbackId}
       />
-
       <Layout id="assets" breadcrumbs={breadcrumbs}>
-        <Box css={{ px: "$6", py: "$7" }}>
+        <Box css={{ px: "$6", py: "$4" }}>
+          {asset?.status?.phase === "failed" ? (
+            <Alert variant="destructive">
+              <TriangleAlert size={18} />
+              <AlertTitle>Internal error processing file</AlertTitle>
+              <AlertDescription>{asset.status.errorMessage}</AlertDescription>
+            </Alert>
+          ) : asset?.status?.phase === "processing" ||
+            asset?.status?.phase === "uploading" ? (
+            <Alert variant="warning">
+              <Clock10 size={18} />
+              <AlertTitle>
+                <span className="capitalize">{asset.status.phase}</span> the
+                asset
+                {asset.status.progress
+                  ? ` (${asset.status.progress * 100}%)`
+                  : ""}
+              </AlertTitle>
+              <AlertDescription>
+                Please wait while the asset is {asset.status.phase}. This might
+                take a while.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <></>
+          )}
+
           {asset != undefined ? (
-            <Flex>
+            <Flex
+              css={{
+                mt: "$4",
+              }}>
               <Box
                 css={{
                   minWidth: 424,
