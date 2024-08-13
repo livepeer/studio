@@ -125,7 +125,9 @@ const Login = ({ id, buttonText, onSubmit, loading, errors }) => {
           </Box>
 
           {errors.length > 0 && (
-            <Box css={{ mt: "$2" }}>{errors.join(", ")}&nbsp;</Box>
+            <Box className="text-red-500" css={{ mt: "$2" }}>
+              {errors.join(", ")}&nbsp;
+            </Box>
           )}
 
           <Button

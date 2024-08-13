@@ -129,6 +129,7 @@ curl --request POST \
         <Flex align={"center"}>
           <Avatar
             fallback={getEmojiIcon(data?.name)}
+            className="bg-accent pt-1"
             style={{
               borderRadius: 10,
               marginRight: 10,
@@ -140,7 +141,7 @@ curl --request POST \
           </Heading>
         </Flex>
         <Link href={appendProjectId("/settings")} passHref legacyBehavior>
-          <Button as="a" size="2">
+          <Button className="bg-accent" as="a" size="2">
             Edit Project
           </Button>
         </Link>
@@ -169,7 +170,8 @@ curl --request POST \
             gap: "$5",
             gridTemplateColumns: "repeat(auto-fill, minmax(46%, 1fr))",
           }}>
-          <Promo
+          <div
+            className="bg-background border p-4 rounded-xl"
             css={{
               width: "100%",
               height: "100%",
@@ -238,6 +240,7 @@ curl --request POST \
                 "https://docs.livepeer.org/api-reference/overview/introduction"
               }>
               <Button
+                className="bg-accent"
                 css={{
                   mt: "$2",
                   display: "flex",
@@ -247,7 +250,7 @@ curl --request POST \
                 Visit documentation <ArrowRightIcon />
               </Button>
             </Link>
-          </Promo>
+          </div>
           <Grid
             css={{
               display: "grid",
@@ -284,11 +287,11 @@ const Card = ({
   link: string;
 }) => {
   return (
-    <Promo
+    <div
+      className="bg-background border p-4 rounded-xl"
       css={{
         width: "100%",
         height: "100%",
-        boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -326,6 +329,7 @@ const Card = ({
           textDecoration: "none",
         }}>
         <Button
+          className="bg-accent"
           css={{
             mt: "$2",
             display: "flex",
@@ -340,7 +344,7 @@ const Card = ({
           />
         </Button>
       </Link>
-    </Promo>
+    </div>
   );
 };
 

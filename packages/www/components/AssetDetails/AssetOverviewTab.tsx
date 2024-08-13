@@ -134,7 +134,9 @@ const AssetOverviewTab = ({
             may also archive them using the following storage providers.
           </Text>
         </Box>
-        <Promo size="2" css={{ borderRadius: "$2" }}>
+        <div
+          className="bg-background text-foreground p-4 rounded-lg border"
+          css={{ borderRadius: "$2" }}>
           <Flex css={{ justifyContent: "space-between" }}>
             <Flex align="center">
               <StyledIpfsIcon />
@@ -158,6 +160,7 @@ const AssetOverviewTab = ({
                     display: "inline-flex",
                     ai: "center",
                   }}
+                  className="bg-accent text-foreground"
                   size="2"
                   disabled={
                     Boolean(asset?.status?.phase !== "ready") || isUploading
@@ -206,7 +209,7 @@ const AssetOverviewTab = ({
               </Flex>
             </Box>
           )}
-        </Promo>
+        </div>
       </Box>
     </>
   );

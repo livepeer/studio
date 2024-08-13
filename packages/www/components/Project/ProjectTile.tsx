@@ -17,10 +17,8 @@ import { getEmojiIcon } from "lib/get-emoji";
 function ProjectTile({ name, id, invalidateQuery }) {
   return (
     <Box
+      className="bg-background border"
       css={{
-        bc: "$neutral2",
-        border: "1px solid",
-        borderColor: "$neutral6",
         p: "$4",
         width: "100%",
         borderRadius: "11px",
@@ -36,7 +34,11 @@ function ProjectTile({ name, id, invalidateQuery }) {
       <Box>
         <Flex align={"center"} justify={"between"}>
           <Flex align={"center"}>
-            <Avatar fallback={getEmojiIcon(name)} size={"3"} />
+            <Avatar
+              className="bg-accent pt-1"
+              fallback={getEmojiIcon(name)}
+              size={"3"}
+            />
             <Text
               css={{
                 fontWeight: 500,
@@ -59,8 +61,8 @@ function ProjectTile({ name, id, invalidateQuery }) {
             </Box>
             <DropdownMenuContent
               placeholder="Settings"
+              className="border bg-background"
               css={{
-                border: "1px solid $colors$neutral6",
                 p: "$2",
                 width: "13rem",
                 mt: "$1",
@@ -86,7 +88,9 @@ function ProjectTile({ name, id, invalidateQuery }) {
                       passHref
                       legacyBehavior
                       href={`/projects/${id}/${item.path}`}>
-                      <NavLink key={item.title}>{item.title}</NavLink>
+                      <NavLink className="hover:bg-accent" key={item.title}>
+                        {item.title}
+                      </NavLink>
                     </Link>
                   ))}
                 </Flex>
@@ -96,7 +100,7 @@ function ProjectTile({ name, id, invalidateQuery }) {
         </Flex>
       </Box>
       <Flex justify={"end"}>
-        <Button css={{ mt: 40 }} size={1}>
+        <Button className="bg-accent" css={{ mt: 40 }} size={1}>
           Open Project
         </Button>
       </Flex>

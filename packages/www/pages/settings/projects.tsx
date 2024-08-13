@@ -86,6 +86,7 @@ const WorkspaceProjects = () => {
               </Text>
             </Flex>
             <Button
+              className="bg-accent"
               onClick={() => setShowCreateProjectAlert(true)}
               css={{
                 p: "$3",

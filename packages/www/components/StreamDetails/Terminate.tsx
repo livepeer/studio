@@ -37,7 +37,9 @@ const Terminate = ({ stream, invalidate, ...props }) => {
         Terminate
       </Box>
 
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+      <AlertDialogContent
+        className="bg-surface"
+        css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Terminate stream?</Heading>
         </AlertDialogTitle>

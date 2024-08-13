@@ -108,7 +108,10 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenu.Trigger asChild>
-        <Button css={{ display: "flex", ai: "center" }} size="2">
+        <Button
+          className="bg-accent text-foreground"
+          css={{ display: "flex", ai: "center" }}
+          size="2">
           <Flex css={{ mr: "$2" }}>
             <FilterIcon />
           </Flex>
@@ -129,35 +132,41 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
           )}
         </Button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content align="end" sideOffset={5}>
+      <DropdownMenu.Content className="bg-accent" align="end" sideOffset={5}>
         <Box
           css={{
-            backgroundColor: "$loContrast",
             width: "284px",
             maxWidth: "284px",
             display: "flex",
             flexDirection: "column",
-            border: "1px solid $colors$neutral5",
             marginRight: "6px",
             borderRadius: "4px",
             overflow: "hidden",
             boxShadow: "0px 5px 15px -5px hsl(206deg 22% 7% / 15%)",
           }}>
           <Flex
+            className="bg-accent border-b border-2 "
             css={{
               width: "100%",
               justifyContent: "space-between",
               alignItems: "center",
               padding: "6px 7px",
-              background: "$panel",
             }}>
-            <Button onClick={handleClear} size="1" variant="neutral">
+            <Button
+              className="bg-accent text-foreground"
+              onClick={handleClear}
+              size="1"
+              variant="neutral">
               Clear
             </Button>
             <Text size="2" css={{ margin: "0px" }}>
               Filters
             </Text>
-            <Button size="1" variant="primary" onClick={handleDone}>
+            <Button
+              className="bg-accent text-foreground"
+              size="1"
+              variant="primary"
+              onClick={handleDone}>
               Done
             </Button>
           </Flex>
