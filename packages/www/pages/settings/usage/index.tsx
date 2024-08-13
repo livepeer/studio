@@ -117,9 +117,9 @@ const Usage = () => {
     });
 
     return [
-      { name: "Total Usage Minutes", data: TotalUsageMins },
-      { name: "Delivery Usage Minutes", data: DeliveryUsageMins },
-      { name: "Storage Usage Minutes", data: StorageUsageMins },
+      { name: "Transcoding usage minutes", data: TotalUsageMins },
+      { name: "Delivery usage minutes", data: DeliveryUsageMins },
+      { name: "Storage usage minutes", data: StorageUsageMins },
     ];
   };
 
@@ -228,8 +228,16 @@ const Usage = () => {
           {usageData.map((usageType, index) => (
             <Card className={`w-full `} key={usageType.name}>
               <CardHeader>
-                <CardTitle>{usageType.name}</CardTitle>
-                <CardDescription>{`${usageType.name} Chart`}</CardDescription>
+                <CardTitle className="capitalize">{usageType.name}</CardTitle>
+                <CardDescription className="normal-case">{`${
+                  usageType.name
+                } ${new Date(from * 1000).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })} to ${new Date(to * 1000).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}`}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer
@@ -252,7 +260,7 @@ const Usage = () => {
                       cursor={false}
                       content={<ChartTooltipContent hideLabel />}
                     />
-                    <Bar dataKey="value" fill="#30a46c" radius={8} />
+                    <Bar dataKey="value" fill="#3B8F68" radius={8} />
                   </BarChart>
                 </ChartContainer>
               </CardContent>

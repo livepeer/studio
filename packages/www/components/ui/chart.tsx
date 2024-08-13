@@ -171,6 +171,16 @@ const ChartTooltipContent = React.forwardRef<
     }
 
     const nestLabel = payload.length === 1 && indicator !== "dot";
+    const formatValue = (value) => {
+      if (value >= 1000) {
+        let formattedValue = (value / 1000).toFixed(1);
+        if (formattedValue.endsWith(".0")) {
+          formattedValue = formattedValue.slice(0, -2);
+        }
+        return `${formattedValue}k minutes`;
+      }
+      return `${value} minutes`;
+    };
 
     return (
       <div
@@ -226,15 +236,9 @@ const ChartTooltipContent = React.forwardRef<
                         "flex flex-1 justify-between leading-none",
                         nestLabel ? "items-end" : "items-center"
                       )}>
-                      <div className="grid gap-1.5">
-                        {nestLabel ? tooltipLabel : null}
-                        <span className="text-muted-foreground">
-                          {itemConfig?.label || item.name}
-                        </span>
-                      </div>
                       {item.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
-                          {item.value.toLocaleString()}
+                          {formatValue(item.value)}
                         </span>
                       )}
                     </div>
