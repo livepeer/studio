@@ -2,6 +2,7 @@ import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "lib/cn";
+import { Payload } from "recharts/types/component/DefaultLegendContent";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -274,6 +275,8 @@ const ChartLegendContent = React.forwardRef<
       return null;
     }
 
+    type ExtendedPayload = Payload & { dataKey: string };
+
     return (
       <div
         ref={ref}
@@ -282,7 +285,7 @@ const ChartLegendContent = React.forwardRef<
           verticalAlign === "top" ? "pb-3" : "pt-3",
           className
         )}>
-        {payload.map((item) => {
+        {payload.map((item: ExtendedPayload) => {
           const key = `${nameKey || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
@@ -322,33 +325,39 @@ function getPayloadConfigFromPayload(
     return undefined;
   }
 
-  const payloadPayload =
-    "payload" in payload &&
-    typeof payload.payload === "object" &&
-    payload.payload !== null
-      ? payload.payload
-      : undefined;
-
-  let configLabelKey: string = key;
-
   if (
-    key in payload &&
-    typeof payload[key as keyof typeof payload] === "string"
+    typeof payload === "object" &&
+    payload !== null &&
+    "payload" in payload &&
+    typeof (payload as any).payload === "object" &&
+    (payload as any).payload !== null
   ) {
-    configLabelKey = payload[key as keyof typeof payload] as string;
-  } else if (
-    payloadPayload &&
-    key in payloadPayload &&
-    typeof payloadPayload[key as keyof typeof payloadPayload] === "string"
-  ) {
-    configLabelKey = payloadPayload[
-      key as keyof typeof payloadPayload
-    ] as string;
+    const payloadPayload = (payload as any).payload;
+    let configLabelKey: string = key;
+
+    if (
+      key in payload &&
+      typeof payload[key as keyof typeof payload] === "string"
+    ) {
+      configLabelKey =
+        typeof payload[key as keyof typeof payload] === "string"
+          ? (payload[key as keyof typeof payload] as string)
+          : key;
+    } else if (
+      key in payloadPayload &&
+      typeof payloadPayload[key as keyof typeof payloadPayload] === "string"
+    ) {
+      configLabelKey = payloadPayload[
+        key as keyof typeof payloadPayload
+      ] as string;
+    }
+
+    return configLabelKey in config
+      ? config[configLabelKey]
+      : config[key as keyof typeof config];
   }
 
-  return configLabelKey in config
-    ? config[configLabelKey]
-    : config[key as keyof typeof config];
+  return undefined;
 }
 
 export {

@@ -80,13 +80,16 @@ const Usage = () => {
       );
       if (res.status === 200 && subscription) {
         setSubscription(subscription);
-        const { current_period_start, current_period_end } = subscription;
-        setFrom(current_period_start);
-        setTo(current_period_end);
-        await updateBillingUsage(current_period_start, current_period_end);
+        const { current_period_start, current_period_end } = subscription ?? {};
+        setFrom((current_period_start as number) ?? 0);
+        setTo((current_period_end as number) ?? 0);
+        await updateBillingUsage(
+          (current_period_start as number) ?? 0,
+          (current_period_end as number) ?? 0
+        );
         await updateUsageData(
-          current_period_start,
-          current_period_end,
+          (current_period_start as number) ?? 0,
+          (current_period_end as number) ?? 0,
           timestep
         );
       }
