@@ -19,7 +19,10 @@ import {
   useState,
 } from "react";
 import { Alert, AlertDescription, AlertTitle } from "components/ui/alert";
-import { Clock10, Terminal, TriangleAlert } from "lucide-react";
+import { Clock10, TriangleAlert } from "lucide-react";
+import { useRouter } from "next/router";
+import { useSnackbar } from "@livepeer/design-system";
+import { useProjectContext } from "context/ProjectContext";
 
 export type AssetDetailProps = {
   asset?: Asset;
@@ -49,8 +52,11 @@ const AssetDetail = ({
   setEmbedVideoDialogOpen,
 }: AssetDetailProps) => {
   useLoggedIn();
-  const { user, patchAsset } = useApi();
+  const { user, patchAsset, deleteAsset } = useApi();
   const [isCopied, setCopied] = useState(0);
+  const router = useRouter();
+  const [openSnackbar] = useSnackbar();
+  const { appendProjectId } = useProjectContext();
 
   const onEditAsset = useCallback(
     async (v: EditAssetReturnValue) => {
@@ -66,6 +72,19 @@ const AssetDetail = ({
     },
     [asset, patchAsset, refetchAsset],
   );
+
+  const onDeleteAsset = useCallback(async () => {
+    if (!asset?.id) return;
+
+    try {
+      await deleteAsset(asset.id);
+      openSnackbar("Asset deleted successfully");
+      router.push(appendProjectId("/assets"));
+    } catch (error) {
+      console.error(error);
+      openSnackbar("Error deleting asset. Please try again.");
+    }
+  }, [asset?.id, deleteAsset, openSnackbar, router, appendProjectId]);
 
   useEffect(() => {
     if (isCopied) {
@@ -145,6 +164,7 @@ const AssetDetail = ({
                 activeTab={activeTab}
                 setSwitchTab={setSwitchTab}
                 setEditAssetDialogOpen={setEditAssetDialogOpen}
+                onDeleteAsset={onDeleteAsset}
               />
             </Flex>
           ) : (
