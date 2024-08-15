@@ -265,9 +265,25 @@ export async function buildRecordingUrl(
   recordCatalystObjectStoreId: string,
   secondaryRecordObjectStoreId: string,
 ) {
+  if (!secondaryRecordObjectStoreId) {
+    return await buildSingleRecordingUrl(
+      session,
+      recordCatalystObjectStoreId,
+      false,
+    );
+  }
+
   return (
-    (await buildSingleRecordingUrl(session, recordCatalystObjectStoreId)) ??
-    (await buildSingleRecordingUrl(session, secondaryRecordObjectStoreId)) ?? {
+    (await buildSingleRecordingUrl(
+      session,
+      recordCatalystObjectStoreId,
+      true,
+    )) ??
+    (await buildSingleRecordingUrl(
+      session,
+      secondaryRecordObjectStoreId,
+      true,
+    )) ?? {
       url: null,
       thumbUrl: null,
       session,
@@ -279,28 +295,31 @@ export async function buildRecordingUrl(
 async function buildSingleRecordingUrl(
   session: DBSession,
   objectStoreId: string,
+  checkExists: boolean,
 ) {
   const os = await db.objectStore.get(objectStoreId, { useCache: true });
 
   const urlPrefix = pathJoin(os.publicUrl, session.playbackId, session.id);
   const manifestUrl = pathJoin(urlPrefix, "output.m3u8");
 
-  const cacheKey = `manifest-check-${manifestUrl}`;
-  let exists = cache.get<boolean>(cacheKey);
-  if (typeof exists === "undefined") {
-    const resp = await fetchWithTimeout(manifestUrl, {
-      method: "HEAD",
-      timeout: 5 * 1000,
-    });
-    exists = resp.status === 200;
+  if (checkExists) {
+    const cacheKey = `manifest-check-${manifestUrl}`;
+    let exists = cache.get<boolean>(cacheKey);
+    if (typeof exists === "undefined") {
+      const resp = await fetchWithTimeout(manifestUrl, {
+        method: "HEAD",
+        timeout: 5 * 1000,
+      });
+      exists = resp.status === 200;
 
-    // cache only for 15 seconds if it doesn't exist, in case stream is starting
-    const ttl = exists ? 120 : 15;
-    cache.set(cacheKey, exists, ttl);
-  }
+      // cache only for 15 seconds if it doesn't exist, in case stream is starting
+      const ttl = exists ? 120 : 15;
+      cache.set(cacheKey, exists, ttl);
+    }
 
-  if (!exists) {
-    return null;
+    if (!exists) {
+      return null;
+    }
   }
 
   return {
