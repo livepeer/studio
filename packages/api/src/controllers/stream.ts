@@ -2407,6 +2407,8 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
   const { data: webhooks } = await db.webhook.listSubscribed(
     user.id,
     "stream.detection",
+    stream.projectId || user.defaultProjectId,
+    user.defaultProjectId,
   );
   let detection = undefined;
   if (webhooks.length > 0 || stream.detection) {

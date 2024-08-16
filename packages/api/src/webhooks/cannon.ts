@@ -142,11 +142,23 @@ export default class WebhookCannon {
       }
     }
 
+    let user = await db.user.get(userId);
+    if (!user) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: Account not found userId=${userId}`,
+      );
+    } else if (user.suspended) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: User suspended userId=${userId}`,
+      );
+    }
+
     const { data: webhooks } = await db.webhook.listSubscribed(
       userId,
       event,
       null,
       projectId,
+      user.defaultProjectId,
     );
 
     console.log(
@@ -173,17 +185,6 @@ export default class WebhookCannon {
         db.stream.removePrivateFields({ ...stream }),
       );
       delete stream.streamKey;
-    }
-
-    let user = await db.user.get(userId);
-    if (!user) {
-      throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: Account not found userId=${userId}`,
-      );
-    } else if (user.suspended) {
-      throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: User suspended userId=${userId}`,
-      );
     }
 
     try {

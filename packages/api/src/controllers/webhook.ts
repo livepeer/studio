@@ -154,15 +154,12 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
 
   let streamId = req.query.streamId;
 
-  const stream = await db.stream.get(streamId);
-  if (!stream) {
-    throw new NotFoundError(`stream not found`);
-  }
   const { data } = await db.webhook.listSubscribed(
     userId,
     event,
+    req.project?.id || req.user.defaultProjectId,
+    req.user.defaultProjectId,
     streamId,
-    stream.projectId || req.user.defaultProjectId,
   );
 
   res.status(200);
