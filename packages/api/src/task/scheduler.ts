@@ -592,7 +592,7 @@ export class TaskScheduler {
     filters?: { allowedPhases: Array<Asset["status"]["phase"]> },
   ) {
     if (typeof asset === "string") {
-      asset = await db.asset.get(asset);
+      asset = await db.asset.get(asset, { useReplica: false });
     }
     const phaseChanged =
       updates.status && asset.status.phase !== updates.status.phase;
