@@ -250,5 +250,6 @@ registerGenerateHandler(
   "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
 );
 registerGenerateHandler("upscale", "stabilityai/stable-diffusion-x4-upscaler");
+registerGenerateHandler("audio-to-text", "openai/whisper-large-v3");
 
 export default app;
