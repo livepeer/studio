@@ -370,7 +370,7 @@ describe("controllers/generate", () => {
     });
   });
 
-  describe.only("rate limiting", () => {
+  describe("rate limiting", () => {
     // test params is configured with 5 reqs/min
 
     const pipelines = [
