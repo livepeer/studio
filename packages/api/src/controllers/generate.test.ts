@@ -85,6 +85,7 @@ describe("controllers/generate", () => {
   beforeAll(async () => {
     aiGatewayServer = await startAuxTestServer(30303); // port configured in test-params.ts
     const apis = [
+      "audio-to-text",
       "text-to-image",
       "image-to-image",
       "image-to-video",
@@ -129,18 +130,39 @@ describe("controllers/generate", () => {
     aiGatewayCalls = {};
   });
 
-  const buildMultipartBody = (textFields: Record<string, any>) => {
+  const buildMultipartBody = (
+    textFields: Record<string, any>,
+    multipartField = { name: "image", contentType: "image/png" },
+  ) => {
     const form = new FormData();
     for (const [k, v] of Object.entries(textFields)) {
       form.append(k, v);
     }
-    form.append("image", "dummy", {
-      contentType: "image/png",
+    form.append(multipartField.name, "dummy", {
+      contentType: multipartField.contentType,
     });
     return form;
   };
 
   describe("API proxies", () => {
+    it("should call the AI Gateway for generate API /audio-to-text", async () => {
+      const res = await client.fetch("/beta/generate/audio-to-text", {
+        method: "POST",
+        body: buildMultipartBody(
+          {
+            audio: "dummy",
+          },
+          { name: "audio", contentType: "audio/wav" },
+        ),
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        message: "success",
+        reqContentType: "application/json",
+      });
+      expect(aiGatewayCalls).toEqual({ "audio-to-text": 1 });
+    });
+
     it("should call the AI Gateway for generate API /text-to-image", async () => {
       const res = await client.post("/beta/generate/text-to-image", {
         prompt: "a man in a suit and tie",
