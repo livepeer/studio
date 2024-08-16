@@ -162,7 +162,7 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
     userId,
     event,
     streamId,
-    stream.projectId || req.user.defaultProjectIds,
+    stream.projectId || req.user.defaultProjectId,
   );
 
   res.status(200);
