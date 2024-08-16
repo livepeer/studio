@@ -1441,6 +1441,7 @@ components:
           description: Type of the AI generate request
           example: text-to-image
           enum:
+            - audio-to-text
             - text-to-image
             - image-to-image
             - image-to-video
