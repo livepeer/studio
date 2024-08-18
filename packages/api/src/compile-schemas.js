@@ -1,11 +1,12 @@
 import Ajv from "ajv";
-import pack from "ajv-pack";
-import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
+import ajvFormats from "ajv-formats";
+import standaloneCode from "ajv/dist/standalone";
 import fs from "fs-extra";
+import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
+import $RefParser from "json-schema-ref-parser";
+import { compile as generateTypes } from "json-schema-to-typescript";
 import _ from "lodash";
 import path from "path";
-import { compile as generateTypes } from "json-schema-to-typescript";
-import $RefParser from "json-schema-ref-parser";
 
 // This takes schema.yaml as its input and produces a few outputs.
 // 1. types.d.ts, TypeScript definitions of the JSON-schema objects
@@ -52,7 +53,14 @@ const data = _.merge({}, apiData, dbData);
   write(path.resolve(schemaDir, "schema.json"), str);
   write(path.resolve(schemaDistDir, "schema.json"), str);
 
-  const ajv = new Ajv({ sourceCode: true });
+  let ajv = new Ajv({
+    keywords: [
+      ...["example", "minValue"], // OpenAPI keywords not supported by ajv
+      ...["table", "index", "indexType", "unique"], // our custom keywords
+    ],
+    code: { source: true },
+  });
+  ajv = ajvFormats(ajv, ["binary", "uri"]);
 
   const index = [];
   let types = [];
@@ -62,7 +70,7 @@ const data = _.merge({}, apiData, dbData);
     const type = await generateTypes(schema);
     types.push(type);
     var validate = ajv.compile(schema);
-    var moduleCode = pack(ajv, validate);
+    var moduleCode = standaloneCode(ajv, validate);
     const outPath = path.resolve(validatorDir, `${name}.js`);
     write(outPath, moduleCode);
     index.push(`'${name}':  require('./${name}.js'),`);

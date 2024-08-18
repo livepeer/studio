@@ -4,6 +4,7 @@ import isLocalIP from "is-local-ip";
 import _ from "lodash";
 import { isIP } from "net";
 import { Response } from "node-fetch";
+import promclient from "prom-client";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 import { createAsset, primaryStorageExperiment } from "../controllers/asset";
@@ -28,6 +29,12 @@ const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
 const BACKOFF_COEF = 2;
 const MAX_RETRIES = 33;
+const ASSET_HOOK_OLD_SCHEMA_THRESHOLD = 1722124800000; // 2024-07-28Z
+const oldHookCounter = new promclient.Counter({
+  name: "livepeer_api_asset_webhook_old_schema_count",
+  help: "Count of webhooks fired with the old schema",
+  labelNames: ["event"],
+});
 
 const SIGNATURE_HEADER = "Livepeer-Signature";
 
@@ -352,7 +359,21 @@ export default class WebhookCannon {
     } else {
       console.log("preparing to fire webhook ", webhook.url);
       const timestamp = Date.now();
-      // go ahead
+      let { payload } = event;
+      if (
+        ["asset.ready", "asset.failed"].includes(event.event) &&
+        webhook.createdAt <= ASSET_HOOK_OLD_SCHEMA_THRESHOLD
+      ) {
+        // When these webhooks were originally created, the payload didn't include a nested `asset` field to encapsulate
+        // the fields from the asset. We fixed the schema but we need to keep supporting the old schema for old webhooks.
+        // TODO: Remove this once the metric below is all zeroed out.
+        payload = {
+          ...payload.asset,
+          ...payload,
+        };
+        oldHookCounter.inc({ event: event.event });
+      }
+
       let params = {
         method: "POST",
         headers: {
@@ -367,7 +388,7 @@ export default class WebhookCannon {
           timestamp,
           event: event.event,
           stream,
-          payload: event.payload,
+          payload,
         }),
       };
 

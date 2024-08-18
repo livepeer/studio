@@ -34,7 +34,6 @@ export type AssetsTableData = {
   sessionId: TextCellProps;
   createdAt: CreatedAtCellProps;
   updatedAt: DateCellProps;
-  action: ActionCellProps;
 };
 
 export const makeColumns = () => [
@@ -70,13 +69,6 @@ export const makeColumns = () => [
     accessor: "sessionId",
     Cell: TextCell,
     disableSortBy: true,
-  },
-  {
-    Header: "",
-    accessor: "action",
-    Cell: ActionCell,
-    disableSortBy: true,
-    width: "$5",
   },
 ];
 
@@ -171,11 +163,6 @@ export const rowsPageFromState = async (
               : null,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: appendProjectId(`/assets/${asset.id}`),
-        },
-        action: {
-          id: asset.id,
-          isStatusFailed,
-          onDelete: () => onDeleteAsset(asset.id),
         },
       };
     },

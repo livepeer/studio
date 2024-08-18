@@ -718,7 +718,7 @@ describe("controllers/asset", () => {
       await testStoragePatch(
         { ipfs: { nftMetadata: { a: "b" } } } as any,
         null,
-        [expect.stringContaining("should NOT have additional properties")],
+        [expect.stringContaining("must NOT have additional properties")],
       );
       await testStoragePatch(
         { ipfs: {} },

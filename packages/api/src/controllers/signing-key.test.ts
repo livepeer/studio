@@ -1,21 +1,21 @@
-import serverPromise, { TestServer } from "../test-server";
-import {
-  TestClient,
-  clearDatabase,
-  createApiToken,
-  setupUsers,
-  verifyJwt,
-} from "../test-helpers";
+import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 import {
   ApiToken,
   SigningKey,
   SigningKeyResponsePayload,
   User,
 } from "../schema/types";
-import { WithID } from "../store/types";
-import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 import { db } from "../store";
-import { createProject } from "../test-helpers";
+import { WithID } from "../store/types";
+import {
+  TestClient,
+  clearDatabase,
+  createApiToken,
+  createProject,
+  setupUsers,
+  verifyJwt,
+} from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
 
 // includes auth file tests
 
@@ -86,13 +86,13 @@ describe("controllers/signing-key", () => {
       apiKeyWithProject = await createApiToken({
         client: client,
         projectId: project.id,
-        jwtAuthToken: nonAdminToken,
       });
       expect(apiKeyWithProject).toMatchObject({
         id: expect.any(String),
         projectId: projectId,
       });
-      projectId = project.id;
+      client.jwtAuth = null;
+      client.apiKey = apiKeyWithProject.id;
     });
 
     it("should create a signing key and display the private key only on creation", async () => {

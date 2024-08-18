@@ -1,23 +1,22 @@
 import { ConsumeMessage } from "amqplib";
-import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
-import messages from "../store/messages";
-import Queue from "../store/queue";
-import { Asset, Task } from "../schema/types";
-import { v4 as uuid } from "uuid";
-import { WithID } from "../store/types";
-import { taskOutputToIpfsStorage } from "../store/asset-table";
-import { RoutingKey } from "../store/queue";
-import { EventKey } from "../store/webhook-table";
-import { sleep } from "../util";
 import sql from "sql-template-strings";
-import { TooManyRequestsError } from "../store/errors";
-import { CliArgs } from "../parse-cli";
+import { v4 as uuid } from "uuid";
+import { toExternalAsset } from "../controllers/asset";
+import { toExternalSession } from "../controllers/session";
 import {
   taskParamsWithoutCredentials,
   toExternalTask,
 } from "../controllers/task";
-import { toExternalAsset } from "../controllers/asset";
-import { toExternalSession } from "../controllers/session";
+import { CliArgs } from "../parse-cli";
+import { Asset, Task } from "../schema/types";
+import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
+import { taskOutputToIpfsStorage } from "../store/asset-table";
+import { TooManyRequestsError } from "../store/errors";
+import messages from "../store/messages";
+import Queue, { RoutingKey } from "../store/queue";
+import { WithID } from "../store/types";
+import { EventKey } from "../store/webhook-table";
+import { sleep } from "../util";
 
 const taskInfo = (task: WithID<Task>, config: CliArgs): messages.TaskInfo => ({
   id: task.id,
@@ -100,12 +99,13 @@ export class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    const tasks = await db.task.find({ id: event.task.id });
-    if (!tasks?.length || !tasks[0].length) {
-      console.log(`task event process error: task ${event.task.id} not found`);
+    const task = await db.task.get(event.task.id, { useReplica: false });
+    if (!task || task?.deleted) {
+      console.log(
+        `task event process error: task ${event.task.id} ${task ? "is deleted" : "not found"} in process task event`,
+      );
       return true;
     }
-    const task = tasks[0][0];
 
     // TODO: bundle all db updates in a single transaction
     if (event.error) {
@@ -212,12 +212,13 @@ export class TaskScheduler {
   async processTaskResultPartial(
     event: messages.TaskResultPartial,
   ): Promise<boolean> {
-    const tasks = await db.task.find({ id: event.task.id });
-    if (!tasks?.length || !tasks[0].length) {
-      console.log(`task event process error: task ${event.task.id} not found`);
+    const task = await db.task.get(event.task.id, { useReplica: false });
+    if (!task || task?.deleted) {
+      console.log(
+        `task event process error: task ${event.task.id} ${task ? "is deleted" : "not found"} in process task result partial`,
+      );
       return true;
     }
-    const task = tasks[0][0];
 
     const asset = await db.asset.get(task.outputAssetId);
     await this.updateAsset(task.outputAssetId, {
@@ -591,7 +592,7 @@ export class TaskScheduler {
     filters?: { allowedPhases: Array<Asset["status"]["phase"]> },
   ) {
     if (typeof asset === "string") {
-      asset = await db.asset.get(asset);
+      asset = await db.asset.get(asset, { useReplica: false });
     }
     const phaseChanged =
       updates.status && asset.status.phase !== updates.status.phase;
@@ -615,7 +616,7 @@ export class TaskScheduler {
     }
     asset = { ...asset, ...updates };
 
-    const snapshot = toExternalAsset(asset, this.config, true);
+    const snapshot = await toExternalAsset(asset, this.config, true);
     const timestamp = asset.status.updatedAt;
     const event = updates.deleted ? "asset.deleted" : "asset.updated";
     await this.queue.publishWebhook(`events.${event}`, {
@@ -645,8 +646,10 @@ export class TaskScheduler {
         userId: asset.userId,
         projectId: asset.projectId,
         payload: {
-          id: asset.id,
-          snapshot,
+          asset: {
+            id: asset.id,
+            snapshot,
+          },
         },
       });
     }

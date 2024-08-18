@@ -5,6 +5,7 @@ import { parse as parseUrl, format as stringifyUrl } from "url";
 import logger from "../logger";
 import schema from "../schema/schema.json";
 import {
+  AiGenerateLog,
   ApiToken,
   JwtRefreshToken,
   ObjectStore,
@@ -55,6 +56,7 @@ export class DB {
   task: TaskTable;
   signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
+  aiGenerateLog: Table<AiGenerateLog>;
   jwtRefreshToken: Table<JwtRefreshToken>;
   user: Table<User>;
   experiment: ExperimentTable;
@@ -141,6 +143,10 @@ export class DB {
     this.apiToken = makeTable<ApiToken>({
       db: this,
       schema: schemas["api-token"],
+    });
+    this.aiGenerateLog = makeTable<AiGenerateLog>({
+      db: this,
+      schema: schemas["ai-generate-log"],
     });
     this.jwtRefreshToken = makeTable<JwtRefreshToken>({
       db: this,
