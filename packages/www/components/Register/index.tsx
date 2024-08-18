@@ -14,10 +14,14 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [utmCampaign, setUtmCampaign] = useState("");
+  const [utmContent, setUtmContent] = useState("");
+  const [utmMedium, setUtmMedium] = useState("");
+  const [utmSource, setUtmSource] = useState("");
 
   const { handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_LOGIN_FORM_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_REGISTER_FORM_ID,
   });
 
   const { subscribe } = useMailChimp({
@@ -29,6 +33,30 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
       setEmail(router.query.email as string);
     }
   }, [router?.query?.email]);
+
+  useEffect(() => {
+    if (router?.query?.utm_campaign) {
+      setUtmCampaign(router.query.utm_campaign as string);
+    }
+  }, [router?.query?.utm_campaign]);
+
+  useEffect(() => {
+    if (router?.query?.utm_content) {
+      setUtmContent(router.query.utm_content as string);
+    }
+  }, [router?.query?.utm_content]);
+
+  useEffect(() => {
+    if (router?.query?.utm_medium) {
+      setUtmMedium(router.query.utm_medium as string);
+    }
+  }, [router?.query?.utm_medium]);
+
+  useEffect(() => {
+    if (router?.query?.utm_source) {
+      setUtmSource(router.query.utm_source as string);
+    }
+  }, [router?.query?.utm_source]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -137,6 +165,34 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <input
+            id="utm_campaign"
+            name="utm_campaign"
+            type="hidden"
+            value={utmCampaign}
+          />
+
+          <input
+            id="utm_content"
+            name="utm_content"
+            type="hidden"
+            value={utmContent}
+          />
+
+          <input
+            id="utm_medium"
+            name="utm_medium"
+            type="hidden"
+            value={utmMedium}
+          />
+
+          <input
+            id="utm_source"
+            name="utm_source"
+            type="hidden"
+            value={utmSource}
           />
 
           {errors.length > 0 && (

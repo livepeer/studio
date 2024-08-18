@@ -1511,14 +1511,13 @@ describe("controllers/stream", () => {
       newApiKey = await createApiToken({
         client: client,
         projectId: project.id,
-        jwtAuthToken: nonAdminToken,
       });
       expect(newApiKey).toMatchObject({
         id: expect.any(String),
         projectId: project.id,
       });
 
-      client.jwtAuth = "";
+      client.jwtAuth = null;
       client.apiKey = newApiKey.id;
 
       // create streams with a projectId

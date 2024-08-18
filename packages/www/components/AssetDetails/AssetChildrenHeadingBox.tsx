@@ -1,5 +1,14 @@
-import { Box, Flex, Button } from "@livepeer/design-system";
-import { Pencil1Icon } from "@radix-ui/react-icons";
+import {
+  Box,
+  Flex,
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@livepeer/design-system";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { Dispatch, SetStateAction } from "react";
 
 export type AssetChildrenHeadingBoxProps = {
@@ -7,6 +16,7 @@ export type AssetChildrenHeadingBoxProps = {
   activeTab: "Overview" | "Event Logs";
   setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
   setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
+  onDeleteAsset: () => void;
 };
 
 const AssetChildrenHeadingBox = ({
@@ -14,6 +24,7 @@ const AssetChildrenHeadingBox = ({
   activeTab,
   setSwitchTab,
   setEditAssetDialogOpen,
+  onDeleteAsset,
 }: AssetChildrenHeadingBoxProps) => {
   return (
     <Box css={{ flexGrow: 1, ml: "$8" }}>
@@ -64,15 +75,28 @@ const AssetChildrenHeadingBox = ({
           </Box>
         </Box>
         <Box css={{ position: "relative", top: "-8px" }}>
-          <Button size="2" onClick={() => setEditAssetDialogOpen(true)}>
-            <Box
-              as={Pencil1Icon}
-              css={{
-                mr: "$1",
-              }}
-            />
-            Edit Asset
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="2"
+                css={{ display: "flex", ai: "center", mr: "$1" }}>
+                Actions
+                <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              placeholder="dropdown-menu-content"
+              align="end">
+              <DropdownMenuGroup>
+                <DropdownMenuItem onSelect={() => setEditAssetDialogOpen(true)}>
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={onDeleteAsset} color="red">
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </Box>
       </Flex>
       <Box css={{ py: "$2" }}>{children}</Box>

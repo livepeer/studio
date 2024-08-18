@@ -27,6 +27,7 @@ import { isExperimentSubject } from "../store/experiment-table";
 import logger from "../logger";
 import { getRunningRecording } from "./session";
 import { cache } from "../store/cache";
+import { fetchWithTimeout } from "../util";
 
 /**
  * CROSS_USER_ASSETS_CUTOFF_DATE represents the cut-off date for cross-account
@@ -107,9 +108,11 @@ function newPlaybackInfo(
     }
   }
   if (thumbUrl) {
+    const thumbExtension = thumbUrl.split(".").pop().toLowerCase();
+    const isPng = thumbExtension === "png";
     playbackInfo.meta.source.push({
-      hrn: "Thumbnail (JPEG)",
-      type: "image/jpeg",
+      hrn: isPng ? "Thumbnail (PNG)" : "Thumbnail (JPEG)",
+      type: isPng ? "image/png" : "image/jpeg",
       url: thumbUrl,
     });
   }
@@ -290,6 +293,22 @@ async function getPlaybackInfo(
     let thumbUrl: string;
     try {
       ({ url, thumbUrl } = await getRunningRecording(stream, req));
+      // TODO: remove this after the transtion
+      // This is to avoid to incur in 404 errors for not running livestream on png thumbs
+      if (thumbUrl) {
+        try {
+          if (thumbUrl.split(".").pop().toLowerCase() === "png") {
+            const response = await fetchWithTimeout(thumbUrl, {
+              method: "HEAD",
+            });
+            if (response.status === 404) {
+              thumbUrl = thumbUrl.replace(/\.png$/, ".jpg");
+            }
+          }
+        } catch (error) {
+          console.error("Error checking thumbUrl:", error);
+        }
+      }
     } catch (e) {
       logger.error("Error while getting recording", e);
     }

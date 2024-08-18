@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { useApi } from "hooks";
 import { Button, Flex, Container, Select } from "@theme-ui/components";
+import { useRouter } from "next/router"; // Import useRouter from next/router
 import Modal from "../Modal";
 import { products } from "@livepeer.studio/api/src/config";
 import CommonAdminTable from "components/Admin/CommonAdminTable";
@@ -29,6 +30,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [loadingError, setLoadingError] = useState("");
 
   const { getUsers, makeUserAdmin, setUserSuspended } = useApi();
+  const router = useRouter(); // Initialize useRouter
 
   const close = () => {
     setAdminModal(false);
@@ -45,10 +47,30 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       {
         Header: "ID",
         accessor: "id",
+        Cell: ({ value }) => (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              router.push(`/app/admin/user/${value}`);
+            }}>
+            {value}
+          </a>
+        ),
       },
       {
         Header: "Email",
         accessor: "email",
+        Cell: ({ value, row }) => (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              router.push(`/app/admin/user/${row.original.id}`);
+            }}>
+            {value}
+          </a>
+        ),
       },
       {
         Header: "EmailValid",
