@@ -15,14 +15,14 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void,
+  _setState: (value: SetStateAction<ApiState>) => void
 ) => {
   context = _context;
   setState = _setState;
 };
 
 export const getStreamInfo = async (
-  id: string,
+  id: string
 ): Promise<[Response, StreamInfo | ApiError]> => {
   let [res, info] = await context.fetch(`/stream/${id}/info`);
   return [res, info as StreamInfo | ApiError];
@@ -49,7 +49,7 @@ export const getStreams = async (
     order?: string;
     active?: boolean;
     count?: boolean;
-  },
+  }
 ): Promise<[Stream[], string, number, number, number, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
 
@@ -64,7 +64,7 @@ export const getStreams = async (
       count: opts?.count,
       streamsonly: 1,
       projectId,
-    })}`,
+    })}`
   );
 
   const [allStreamRes] = await context.fetch(
@@ -72,36 +72,43 @@ export const getStreams = async (
       userId,
       filters,
       active: undefined,
-      limit: opts?.limit,
+      limit: 1,
       count: true,
       streamsonly: 1,
       projectId,
-    })}`,
+    })}`
   );
   const [activeStreamRes] = await context.fetch(
     `/stream?${qs.stringify({
       userId,
       filters,
       active: true,
-      limit: opts?.limit,
+      limit: 1,
       count: true,
       streamsonly: 1,
       projectId,
-    })}`,
+    })}`
   );
+
+  const unHealthyFilters = opts?.filters?.find((f) => f.id === "isHealthy")
+    ? opts?.filters
+    : [...(opts?.filters || []), { id: "isHealthy", value: "false" }];
+
+  console.log("unHealthyFilters", unHealthyFilters);
 
   const [unHealtyStreamRes] = await context.fetch(
     `/stream?${qs.stringify({
       userId,
-      filters,
-      active: true,
-      isHealthy: false,
-      limit: opts?.limit,
+      filters: JSON.stringify(unHealthyFilters),
+      limit: opts.limit,
       count: true,
       streamsonly: 1,
       projectId,
-    })}`,
+    })}`
   );
+
+  console.log("unHealtyStreamRes 2", unHealtyStreamRes.headers);
+  console.log("unHealtyStreamRes 4", allStreamRes.headers);
 
   if (res.status !== 200) {
     throw new Error(streams);
@@ -110,14 +117,18 @@ export const getStreams = async (
   const count = res.headers.get("X-Total-Count");
   const allStreamCount = allStreamRes.headers.get("X-Total-Count");
   const activeStreamCount = activeStreamRes.headers.get("X-Total-Count");
-  const unHealtyStreamCount = unHealtyStreamRes.headers.get("X-Total-Count");
+  const unHealthyStreamCount = unHealtyStreamRes.headers.get("X-Total-Count");
+
+  console.log("unHealtyStreamCount", unHealthyStreamCount);
+  console.log("allStreamCount", allStreamCount);
+
   return [
     streams,
     nextCursor,
     count,
     allStreamCount,
     activeStreamCount,
-    unHealtyStreamCount,
+    unHealthyStreamCount,
   ];
 };
 
@@ -153,7 +164,7 @@ export const getAdminStreams = async ({
       nonLivepeerOnly,
       userId,
       sessionsonly,
-    })}`,
+    })}`
   );
   const nextCursor = getCursor(res.headers.get("link"));
   return [streams, nextCursor, res];
@@ -161,7 +172,7 @@ export const getAdminStreams = async ({
 
 export const generateJwt = async (playbackId: string): Promise<string> => {
   const [res] = await context.fetch(
-    `/access-control/signing-key/jwt/${playbackId}`,
+    `/access-control/signing-key/jwt/${playbackId}`
   );
   if (res.status !== 200) {
     throw new Error(JSON.stringify(res.body));
@@ -229,7 +240,7 @@ export const deleteStreams = async (ids: Array<string>): Promise<void> => {
 
 export const patchStream = async (
   streamId: string,
-  patch: StreamPatchPayload,
+  patch: StreamPatchPayload
 ): Promise<void> => {
   const url = `/stream/${streamId}?projectId=${projectId}`;
   const [res, body] = await context.fetch(url, {

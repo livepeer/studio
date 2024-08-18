@@ -65,7 +65,7 @@ export const rowsPageFromState = async (
   state: State<StreamsTableData>,
   userId: string,
   getStreams: Function,
-  appendProjectId: Function,
+  appendProjectId: Function
 ): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
   let isHealthy: boolean;
@@ -75,18 +75,31 @@ export const rowsPageFromState = async (
       return false;
     }
 
+    if (f.id && f.isOpen) {
+      return {
+        id: f.id,
+        value: f.condition.value,
+      };
+    }
     return true;
   });
-  const [streams, nextCursor, count, allStreamCount, activeStreamCount] =
-    await getStreams(userId, {
-      active,
-      isHealthy,
-      filters: formatFiltersForApiRequest(filteredFilters),
-      limit: state.pageSize.toString(),
-      cursor: state.cursor,
-      order: state.order,
-      count: true,
-    });
+
+  const [
+    streams,
+    nextCursor,
+    count,
+    allStreamCount,
+    activeStreamCount,
+    unHealthyStreamCount,
+  ] = await getStreams(userId, {
+    active,
+    isHealthy,
+    filters: formatFiltersForApiRequest(filteredFilters),
+    limit: state.pageSize.toString(),
+    cursor: state.cursor,
+    order: state.order,
+    count: true,
+  });
 
   const rows = streams.map((stream) => ({
     id: stream.id,
@@ -115,7 +128,14 @@ export const rowsPageFromState = async (
       href: appendProjectId(`/streams/${stream.id}`),
     },
   }));
-  return { rows, nextCursor, count, allStreamCount, activeStreamCount };
+  return {
+    rows,
+    nextCursor,
+    count,
+    allStreamCount,
+    activeStreamCount,
+    unHealthyStreamCount,
+  };
 };
 
 export const defaultCreateProfiles = [
