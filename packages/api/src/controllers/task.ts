@@ -2,7 +2,6 @@ import { Router } from "express";
 import mung from "express-mung";
 import _ from "lodash";
 import sql from "sql-template-strings";
-import { v4 as uuid } from "uuid";
 import { authorizer, validatePost } from "../middleware";
 import { CliArgs } from "../parse-cli";
 import { Asset, Task } from "../schema/types";
@@ -21,6 +20,7 @@ import {
   sqlQueryGroup,
   toStringValues,
 } from "./helpers";
+import { newId } from "./generate-keys";
 
 const app = Router();
 
@@ -28,7 +28,7 @@ function validateTaskPayload(
   id: string,
   userId: string,
   createdAt: number,
-  payload,
+  payload
 ) {
   return {
     id,
@@ -40,7 +40,7 @@ function validateTaskPayload(
 }
 
 const ipfsStorageToTaskOutput = (
-  ipfs: Omit<Asset["storage"]["ipfs"], "spec">,
+  ipfs: Omit<Asset["storage"]["ipfs"], "spec">
 ): Task["output"]["export"]["ipfs"] => ({
   videoFileCid: ipfs.cid,
   videoFileUrl: ipfs.url,
@@ -52,7 +52,7 @@ const ipfsStorageToTaskOutput = (
 
 function taskWithIpfsUrls(
   gatewayUrl: string,
-  task: WithID<Task>,
+  task: WithID<Task>
 ): WithID<Task> {
   if (task?.type !== "export" || !task?.output?.export?.ipfs) {
     return task;
@@ -72,16 +72,16 @@ function taskWithIpfsUrls(
 
 export function taskParamsWithoutCredentials(
   type: Task["type"],
-  params: Task["params"],
+  params: Task["params"]
 ): Task["params"] {
   const result = _.cloneDeep(params);
   switch (type) {
     case "transcode-file":
       result["transcode-file"].input.url = deleteCredentials(
-        params["transcode-file"].input.url,
+        params["transcode-file"].input.url
       );
       result["transcode-file"].storage.url = deleteCredentials(
-        params["transcode-file"].storage.url,
+        params["transcode-file"].storage.url
       );
       break;
     case "upload":
@@ -98,7 +98,7 @@ export async function getProcessingTasksByRequesterId(
   requesterId: string,
   ownerId: string,
   taskType?: string,
-  timeFrame?: number, // in minutes
+  timeFrame?: number // in minutes
 ): Promise<WithID<Task>[]> {
   if (!timeFrame) {
     timeFrame = 60;
@@ -132,7 +132,7 @@ const fieldsMap: FieldsMap = {
 export function toExternalTask(
   t: WithID<Task>,
   config: CliArgs,
-  isAdmin = false,
+  isAdmin = false
 ) {
   t = taskWithIpfsUrls(config.ipfsGatewayUrl, t);
   if (isAdmin) {
@@ -268,14 +268,14 @@ app.post(
   authorizer({ anyAdmin: true }),
   validatePost("task"),
   async (req, res) => {
-    const id = uuid();
+    const id = newId("task");
     const doc = validateTaskPayload(id, req.user.id, Date.now(), req.body);
 
     await db.task.create(doc);
 
     res.status(201);
     res.json(doc);
-  },
+  }
 );
 
 app.post("/:id/retry", authorizer({}), async (req, res) => {
@@ -334,7 +334,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     const numRunning = await db.task.countRunningTasks(req.user.id);
     if (numRunning >= req.config.vodMaxConcurrentTasksPerUser) {
       throw new TooManyRequestsError(
-        `too many tasks running for user ${user.id} (${numRunning})`,
+        `too many tasks running for user ${user.id} (${numRunning})`
       );
     }
   }
@@ -357,7 +357,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   await req.taskScheduler.updateTask(
     task,
     { status },
-    { allowedPhases: ["waiting", "running"] },
+    { allowedPhases: ["waiting", "running"] }
   );
   if (task.outputAssetId) {
     const asset = await db.asset.get(task.outputAssetId);
@@ -370,7 +370,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
           progress: Math.max(doc.progress, asset.status.progress ?? 0),
         },
       },
-      { allowedPhases: ["waiting", "processing"] },
+      { allowedPhases: ["waiting", "processing"] }
     );
   }
   if (task.inputAssetId) {
@@ -378,7 +378,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     if (task.id === asset?.storage?.status?.tasks.pending) {
       const progress = Math.max(
         doc.progress,
-        asset.storage.status.progress ?? 0,
+        asset.storage.status.progress ?? 0
       );
       await req.taskScheduler.updateAsset(asset, {
         storage: {

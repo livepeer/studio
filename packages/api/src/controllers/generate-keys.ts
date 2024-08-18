@@ -1,11 +1,32 @@
 import { randomBytes } from "crypto";
 import anyBase from "any-base";
 import { db } from "../store";
+import { customAlphabet } from "nanoid";
+
+export const nanoid = customAlphabet(
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+);
 
 const BASE_36 = "0123456789abcdefghijklmnopqrstuvwxyz";
 const SEGMENT_COUNT = 4;
 const SEGMENT_LENGTH = 4;
 const hexToBase36 = anyBase(anyBase.HEX, BASE_36);
+
+const prefixes = {
+  asset: "ast",
+  stream: "str",
+  playback: "pid",
+  key: "key",
+  webhook: "wbh",
+  project: "prj",
+  signingKey: "sk",
+  session: "ses",
+  task: "tsk",
+  clip: "cli",
+  experiment: "exp",
+  ai: "ai",
+  objectStore: "obj",
+} as const;
 
 function randomBytesAsync(size: number) {
   return new Promise<Buffer>((resolve, reject) => {
@@ -76,7 +97,7 @@ async function generateUniqueKey(shardBase: string, otherKeys: string[] = []) {
       return shardedKey;
     }
     console.warn(
-      `Generated conflicting database key. key=${shardedKey} otherKeys="${otherKeys}"`,
+      `Generated conflicting database key. key=${shardedKey} otherKeys="${otherKeys}"`
     );
   }
 }
@@ -85,5 +106,11 @@ export const generateUniqueStreamKey = generateUniqueKey;
 
 export const generateUniquePlaybackId = async (
   shardBase: string,
-  otherKeys: string[] = [],
+  otherKeys: string[] = []
 ) => formatPlaybackId(await generateUniqueKey(shardBase, otherKeys));
+
+export function newId(prefix: keyof typeof prefixes) {
+  const id = [prefixes[prefix], nanoid(16)].join("_");
+
+  return id;
+}

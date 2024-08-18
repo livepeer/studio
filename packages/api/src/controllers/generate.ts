@@ -14,6 +14,7 @@ import { BadRequestError } from "../store/errors";
 import { fetchWithTimeout } from "../util";
 import { experimentSubjectsOnly } from "./experiment";
 import { pathJoin2 } from "./helpers";
+import { newId } from "./generate-keys";
 
 const AI_GATEWAY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
@@ -47,7 +48,7 @@ const rateLimiter: RequestHandler = async (req, res, next) => {
       order: null,
       fields: "COUNT(*) as count, MIN((data->>'startedAt')::bigint) as min",
       process: (row) => row, // avoid extracting `data` field from result rows
-    },
+    }
   );
   const numRecentReqs = parseInt(count);
   const minStartedAt = parseInt(min);
@@ -57,7 +58,7 @@ const rateLimiter: RequestHandler = async (req, res, next) => {
     retryAfter = Math.max(Math.ceil(retryAfter), 1);
     logger.info(
       `Rate-limiting too many AI requests from userId=${req.user.id} userEmail=${req.user.email} ` +
-        `numRecentReqs=${numRecentReqs} minStartedAt=${minStartedAt} now=${now} retryAfter=${retryAfter}`,
+        `numRecentReqs=${numRecentReqs} minStartedAt=${minStartedAt} now=${now} retryAfter=${retryAfter}`
     );
 
     res.set("Retry-After", `${retryAfter}`);
@@ -70,7 +71,7 @@ const rateLimiter: RequestHandler = async (req, res, next) => {
 function createPayload(
   req: Request,
   isJSONReq: boolean,
-  defaultModel: string,
+  defaultModel: string
 ): [BodyInit, AiGenerateLog["request"]] {
   const payload = {
     model_id: defaultModel,
@@ -127,13 +128,13 @@ function logAiGenerateRequest(
   request: AiGenerateLog["request"],
   statusCode?: number,
   responseBuf?: Buffer,
-  error?: any,
+  error?: any
 ): void {
   const durationMs = Date.now() - startedAt;
   const success = !error && statusCode && statusCode >= 200 && statusCode < 300;
   if (!success) {
     logger.error(
-      `Error from generate API type=${type} status=${statusCode} body=${responseBuf} error=${error}`,
+      `Error from generate API type=${type} status=${statusCode} body=${responseBuf} error=${error}`
     );
   }
 
@@ -143,7 +144,7 @@ function logAiGenerateRequest(
       const response = parseOptionalJson(responseBuf);
       const errorStr = error ? String(error) : response?.details?.msg;
       log = {
-        id: uuid(),
+        id: newId("ai"),
         userId,
         projectId,
         type,
@@ -159,13 +160,13 @@ function logAiGenerateRequest(
 
       aiGenerateDurationMetric.observe(
         { type, status_code: statusCode },
-        durationMs,
+        durationMs
       );
     } catch (err) {
       logger.error(
         `Failed to save AI generation log type=${type} log=${JSON.stringify(
-          log,
-        )} err=${err}`,
+          log
+        )} err=${err}`
       );
     }
   });
@@ -174,7 +175,7 @@ function logAiGenerateRequest(
 function registerGenerateHandler(
   type: AiGenerateType,
   defaultModel: string,
-  isJSONReq = false, // multipart by default
+  isJSONReq = false // multipart by default
 ): RequestHandler {
   const path = `/${type}`;
   const payloadParsers = isJSONReq
@@ -216,7 +217,7 @@ function registerGenerateHandler(
           request,
           gatewayRes?.status,
           response,
-          error,
+          error
         );
         if (error) {
           throw error;
@@ -235,19 +236,19 @@ function registerGenerateHandler(
         }
       }
       res.status(gatewayRes.status).send(response);
-    },
+    }
   );
 }
 
 registerGenerateHandler(
   "text-to-image",
   "SG161222/RealVisXL_V4.0_Lightning",
-  true,
+  true
 );
 registerGenerateHandler("image-to-image", "timbrooks/instruct-pix2pix");
 registerGenerateHandler(
   "image-to-video",
-  "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
+  "stabilityai/stable-video-diffusion-img2vid-xt-1-1"
 );
 registerGenerateHandler("upscale", "stabilityai/stable-diffusion-x4-upscaler");
 

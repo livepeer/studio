@@ -3,7 +3,6 @@ import { authorizer, hasAccessToResource } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
-import { v4 as uuid } from "uuid";
 import {
   makeNextHREF,
   parseFilters,
@@ -17,6 +16,7 @@ import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
 import webhookLog from "./webhook-log";
 import mung from "express-mung";
+import { newId } from "./generate-keys";
 
 function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
   try {
@@ -28,7 +28,7 @@ function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
 
   if (!payload.events && !payload.event) {
     throw new UnprocessableEntityError(
-      `must provide "events" field with subscriptions`,
+      `must provide "events" field with subscriptions`
     );
   }
 
@@ -111,7 +111,7 @@ app.get("/", authorizer({}), async (req, res) => {
   query.push(
     sql`coalesce(webhook.data->>'projectId', ${
       req.user.defaultProjectId || ""
-    }) = ${req.project?.id || ""}`,
+    }) = ${req.project?.id || ""}`
   );
 
   if (!all || all === "false" || !req.user.admin) {
@@ -161,13 +161,13 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
 });
 
 app.post("/", authorizer({}), validatePost("webhook"), async (req, res) => {
-  const id = uuid();
+  const id = newId("webhook");
   const doc = validateWebhookPayload(
     id,
     req.user.id,
     req.project?.id,
     Date.now(),
-    req.body,
+    req.body
   );
   try {
     await req.store.create(doc);
@@ -201,7 +201,7 @@ app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
     userId,
     projectId,
     createdAt,
-    req.body,
+    req.body
   );
   try {
     await req.store.replace(doc);
@@ -245,7 +245,7 @@ app.patch(
     });
 
     res.status(204).end();
-  },
+  }
 );
 
 app.delete("/:id", authorizer({}), async (req, res) => {

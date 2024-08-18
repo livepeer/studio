@@ -1,5 +1,4 @@
 import Router from "express/lib/router";
-import { v4 as uuid } from "uuid";
 import sql from "sql-template-strings";
 
 import {
@@ -12,6 +11,7 @@ import { authorizer, validatePost } from "../middleware";
 import { AuthPolicy } from "../middleware/authPolicy";
 import { db } from "../store";
 import mung from "express-mung";
+import { newId } from "./generate-keys";
 
 const app = Router();
 
@@ -114,9 +114,8 @@ app.get("/", async (req, res) => {
   query.push(sql`api_token.data->>'userId' = ${userId}`);
   if (!req.user.admin) {
     query.push(
-      sql`coalesce(api_token.data->>'projectId', ${
-        req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`,
+      sql`coalesce(api_token.data->>'projectId', ${req.user.defaultProjectId || ""
+        }) = ${req.project?.id || ""}`,
     );
   }
 
@@ -148,7 +147,7 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/", validatePost("api-token"), async (req, res) => {
-  const id = uuid();
+  const id = newId("key")
   const userId =
     req.body.userId && req.user.admin ? req.body.userId : req.user.id;
 

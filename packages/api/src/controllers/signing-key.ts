@@ -11,7 +11,6 @@ import {
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { v4 as uuid } from "uuid";
 import { generateKeyPair, KeyPairSyncResult } from "crypto";
 import { ForbiddenError, NotFoundError } from "../store/errors";
 import {
@@ -22,6 +21,7 @@ import {
 import { WithID } from "../store/types";
 import { SignOptions, sign } from "jsonwebtoken";
 import mung from "express-mung";
+import { newId } from "./generate-keys";
 
 const fieldsMap: FieldsMap = {
   id: `signing_key.ID`,
@@ -49,9 +49,9 @@ async function generateSigningKeys() {
           },
         },
         (err, publicKey, privateKey) =>
-          err ? reject(err) : resolve({ publicKey, privateKey }),
+          err ? reject(err) : resolve({ publicKey, privateKey })
       );
-    },
+    }
   );
   return keypair;
 }
@@ -62,7 +62,7 @@ signingKeyApp.use(mung.jsonAsync(addDefaultProjectId));
 
 signingKeyApp.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
-    req.query,
+    req.query
   );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -115,7 +115,7 @@ signingKeyApp.get("/", authorizer({}), async (req, res) => {
   query.push(
     sql`coalesce(signing_key.data->>'projectId', ${
       req.user.defaultProjectId || ""
-    }) = ${req.project?.id || ""}`,
+    }) = ${req.project?.id || ""}`
   );
 
   let fields = " signing_key.id as id, signing_key.data as data";
@@ -179,7 +179,7 @@ signingKeyApp.post(
       });
     }
 
-    const id = uuid();
+    const id = newId("signingKey");
     const keypair = await generateSigningKeys();
 
     let b64PublicKey = Buffer.from(keypair.publicKey).toString("base64");
@@ -204,7 +204,7 @@ signingKeyApp.post(
 
     res.status(201);
     res.json(createdSigningKey);
-  },
+  }
 );
 
 signingKeyApp.delete("/:id", authorizer({}), async (req, res) => {
@@ -235,12 +235,12 @@ signingKeyApp.patch(
     const payload = req.body as SigningKeyPatchPayload;
     console.log(
       `patch signing key id=${id} payload=${JSON.stringify(
-        JSON.stringify(payload),
-      )}`,
+        JSON.stringify(payload)
+      )}`
     );
     await db.signingKey.update(id, payload);
     res.status(204).end();
-  },
+  }
 );
 
 signingKeyApp.get(
@@ -251,7 +251,7 @@ signingKeyApp.get(
 
     const adminKey = Buffer.from(
       req.config.accessControlAdminPrivkey,
-      "base64",
+      "base64"
     );
 
     const pubkey = req.config.accessControlAdminPubkey;
@@ -284,7 +284,7 @@ signingKeyApp.get(
     const token = sign(payload, adminKey, options);
 
     return res.send({ token });
-  },
+  }
 );
 
 export default signingKeyApp;

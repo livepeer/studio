@@ -44,7 +44,7 @@ import Queue from "../store/queue";
 import { WithID } from "../store/types";
 import { ensureQueueCapacity, taskScheduler } from "../task/scheduler";
 import { getClips } from "./clip";
-import { generateUniquePlaybackId } from "./generate-keys";
+import { generateUniquePlaybackId, newId } from "./generate-keys";
 import {
   addDefaultProjectId,
   getObjectStoreS3Config,
@@ -86,7 +86,7 @@ export const primaryStorageExperiment = "primary-vod-storage";
 
 export async function defaultObjectStoreId(
   { config, body, user }: Pick<Request, "config" | "body" | "user">,
-  isOldPipeline?: boolean,
+  isOldPipeline?: boolean
 ): Promise<string> {
   if (isOldPipeline) {
     return config.vodObjectStoreId;
@@ -94,7 +94,7 @@ export async function defaultObjectStoreId(
 
   const secondaryStorageEnabled = !(await isExperimentSubject(
     primaryStorageExperiment,
-    user?.id,
+    user?.id
   ));
 
   if (isPrivatePlaybackPolicy(body.playbackPolicy)) {
@@ -113,7 +113,7 @@ export async function defaultObjectStoreId(
 }
 
 export function assetEncryptionWithoutKey(
-  encryption: NewAssetPayload["encryption"],
+  encryption: NewAssetPayload["encryption"]
 ) {
   if (!encryption) {
     return encryption;
@@ -138,7 +138,7 @@ function cleanAssetTracks(asset: WithID<Asset>) {
 
 function anyMatchesRegexOrPrefix(
   arr: (string | RegExp)[],
-  value: string,
+  value: string
 ): boolean {
   for (const item of arr) {
     if (item instanceof RegExp && item.test(value)) {
@@ -153,7 +153,7 @@ function anyMatchesRegexOrPrefix(
 
 function parseUrlToDStorageUrl(
   url: string,
-  { trustedIpfsGateways, trustedArweaveGateways }: CliArgs,
+  { trustedIpfsGateways, trustedArweaveGateways }: CliArgs
 ): string {
   const urlObj = new URL(url);
   const path = urlObj.pathname;
@@ -190,7 +190,7 @@ export async function validateAssetPayload(
   id: string,
   playbackId: string,
   createdAt: number,
-  source: Asset["source"],
+  source: Asset["source"]
 ): Promise<WithID<Asset>> {
   const userId = req.user.id;
   const payload = req.body as NewAssetPayload;
@@ -202,7 +202,7 @@ export async function validateAssetPayload(
     const os = await getActiveObjectStore(objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
-        `the provided object store is not owned by user`,
+        `the provided object store is not owned by user`
       );
     }
   }
@@ -216,7 +216,7 @@ export async function validateAssetPayload(
     payload,
     playbackId,
     userId,
-    createdAt,
+    createdAt
   );
 
   // Transform IPFS and Arweave gateway URLs into native protocol URLs
@@ -258,7 +258,7 @@ async function validateAssetPlaybackPolicy(
   { playbackPolicy, objectStoreId, encryption }: Partial<NewAssetPayload>,
   playbackId: string,
   userId: string,
-  createdAt: number,
+  createdAt: number
 ) {
   if (isPrivatePlaybackPolicy(playbackPolicy) && objectStoreId) {
     throw new ForbiddenError(`private assets cannot use custom object store`);
@@ -269,7 +269,7 @@ async function validateAssetPlaybackPolicy(
 
     if (!playbackPolicy.unifiedAccessControlConditions) {
       throw new UnprocessableEntityError(
-        `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`,
+        `playbackPolicy.unifiedAccessControlConditions is required when using lit_signing_condition`
       );
     }
     if (!playbackPolicy?.resourceId) {
@@ -286,12 +286,12 @@ async function validateAssetPlaybackPolicy(
     let webhook = await db.webhook.get(playbackPolicy.webhookId);
     if (!webhook || webhook.deleted) {
       throw new BadRequestError(
-        `webhook ${playbackPolicy.webhookId} not found`,
+        `webhook ${playbackPolicy.webhookId} not found`
       );
     }
     if (webhook.userId !== userId) {
       throw new BadRequestError(
-        `webhook ${playbackPolicy.webhookId} not found`,
+        `webhook ${playbackPolicy.webhookId} not found`
       );
     }
     const allowedOrigins = playbackPolicy?.allowedOrigins;
@@ -314,7 +314,7 @@ async function validateAssetPlaybackPolicy(
             const allowedOriginsValid = allowedOrigins.every(isValidOrigin);
             if (!allowedOriginsValid) {
               throw new BadRequestError(
-                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>",
+                "allowedOrigins must be a list of valid origins <scheme>://<hostname>:<port>"
               );
             }
           }
@@ -327,7 +327,7 @@ async function validateAssetPlaybackPolicy(
   if (encryption?.encryptedKey) {
     if (!playbackPolicy) {
       throw new BadRequestError(
-        `a playbackPolicy is required when using encryption`,
+        `a playbackPolicy is required when using encryption`
       );
     }
   }
@@ -352,7 +352,7 @@ export type StaticPlaybackInfo = {
 
 export function getStaticPlaybackInfo(
   asset: WithID<Asset>,
-  os: ObjectStore,
+  os: ObjectStore
 ): StaticPlaybackInfo[] {
   return (asset.files ?? [])
     .filter((f) => f.type === "static_transcoded_mp4")
@@ -369,18 +369,18 @@ export function getStaticPlaybackInfo(
 export function getPlaybackUrl(
   ingest: string,
   asset: WithID<Asset>,
-  os: ObjectStore,
+  os: ObjectStore
 ): string {
   if (asset.playbackRecordingId) {
     return pathJoin(
       ingest,
       "recordings",
       asset.playbackRecordingId,
-      "index.m3u8",
+      "index.m3u8"
     );
   }
   const catalystManifest = asset.files?.find(
-    (f) => f.type === "catalyst_hls_manifest",
+    (f) => f.type === "catalyst_hls_manifest"
   );
   if (catalystManifest) {
     return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
@@ -400,7 +400,7 @@ function getDownloadUrl(
   { vodObjectStoreId }: Request["config"],
   ingest: string,
   asset: WithID<Asset>,
-  os: ObjectStore,
+  os: ObjectStore
 ): string {
   if (
     (asset.source?.type === "recording" || asset.source?.type === "clip") &&
@@ -426,7 +426,7 @@ export async function withPlaybackUrls(
   config: CliArgs,
   ingest: string,
   asset: WithID<Asset>,
-  os?: ObjectStore,
+  os?: ObjectStore
 ): Promise<WithID<Asset>> {
   if (asset.files?.length < 1) {
     // files is only set when playback is available
@@ -449,7 +449,7 @@ export async function withPlaybackUrls(
 
 export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(
   gatewayUrl: string,
-  ipfs: T,
+  ipfs: T
 ): T {
   if (!ipfs?.cid) {
     return ipfs;
@@ -463,7 +463,7 @@ export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(
 
 function assetWithIpfsUrls(
   gatewayUrl: string,
-  asset: WithID<Asset>,
+  asset: WithID<Asset>
 ): WithID<Asset> {
   if (!asset?.storage?.ipfs?.cid) {
     return asset;
@@ -479,7 +479,7 @@ function assetWithIpfsUrls(
 }
 
 function storageInputToState(
-  input: NewAssetPayload["storage"],
+  input: NewAssetPayload["storage"]
 ): Asset["storage"] {
   if (typeof input?.ipfs === "undefined") {
     return undefined;
@@ -498,7 +498,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
   asset = await db.asset.create(asset);
   await queue.publishWebhook("events.asset.created", {
     type: "webhook_event",
-    id: uuid(),
+    id: newId("webhook"),
     timestamp: asset.createdAt,
     event: "asset.created",
     userId: asset.userId,
@@ -517,12 +517,12 @@ async function reconcileAssetStorage(
   { taskScheduler, config }: Request,
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
-  task?: WithID<Task>,
+  task?: WithID<Task>
 ): Promise<Asset["storage"]> {
   let { storage } = asset;
   const ipfsParamsEq = _.isEqual(
     newStorage.ipfs?.spec,
-    storage?.ipfs?.spec ?? null,
+    storage?.ipfs?.spec ?? null
   );
   if ("ipfs" in newStorage && !ipfsParamsEq) {
     let newSpec = newStorage.ipfs?.spec;
@@ -535,7 +535,7 @@ async function reconcileAssetStorage(
       task = await taskScheduler.createAndScheduleTask(
         "export",
         { export: { ipfs: newSpec } },
-        asset,
+        asset
       );
     }
     storage = {
@@ -560,7 +560,7 @@ async function genUploadUrl(
   playbackId: string,
   objectStoreId: string,
   jwtSecret: string,
-  aud: string,
+  aud: string
 ) {
   const uploadedObjectKey = `directUpload/${playbackId}`;
   const os = await getActiveObjectStore(objectStoreId);
@@ -580,7 +580,7 @@ async function genUploadUrl(
 function parseUploadUrl(
   signedUploadUrl: string,
   jwtSecret: string,
-  audience: string,
+  audience: string
 ) {
   let urlJwt: JwtPayload;
   let uploadUrl: string;
@@ -600,7 +600,7 @@ export async function toExternalAsset(
   a: WithID<Asset>,
   config: CliArgs,
   details = false,
-  isAdmin = false,
+  isAdmin = false
 ) {
   const { ipfsGatewayUrl, ingest: ingestsConfig } = config;
   // Not sure why the ingests config was originally made an array and not a
@@ -626,7 +626,7 @@ app.use(mung.jsonAsync(addDefaultProjectId));
 app.use(
   mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
-    req,
+    req
   ) {
     const { details } = toStringValues(req.query);
     const toExternalAssetFunc = async (a: Asset) => {
@@ -634,7 +634,7 @@ app.use(
         a,
         req.config,
         !!details,
-        req.user.admin,
+        req.user.admin
       );
 
       return modifiedAsset;
@@ -653,7 +653,7 @@ app.use(
       };
     }
     return data;
-  }),
+  })
 );
 
 const fieldsMap = {
@@ -710,7 +710,7 @@ app.get("/", authorizer({}), async (req, res) => {
   if (cid) {
     const ipfsUrl = `ipfs://${cid}`;
     query.push(
-      sql`(asset.data->'storage'->'ipfs'->>'cid' = ${cid} OR asset.data->'source'->>'url' = ${ipfsUrl})`,
+      sql`(asset.data->'storage'->'ipfs'->>'cid' = ${cid} OR asset.data->'source'->>'url' = ${ipfsUrl})`
     );
   }
 
@@ -720,12 +720,12 @@ app.get("/", authorizer({}), async (req, res) => {
 
   if (req.user.admin && deleting === "true") {
     const deletionThreshold = new Date(
-      Date.now() - DELETE_ASSET_DELAY,
+      Date.now() - DELETE_ASSET_DELAY
     ).toISOString();
 
     query.push(sql`asset.data->'status'->>'phase' = 'deleting'`);
     query.push(
-      sql`asset.data->>'deletedAt' IS NOT NULL AND asset.data->>'deletedAt' < ${deletionThreshold}`,
+      sql`asset.data->>'deletedAt' IS NOT NULL AND asset.data->>'deletedAt' < ${deletionThreshold}`
     );
   }
 
@@ -759,7 +759,7 @@ app.get("/", authorizer({}), async (req, res) => {
     query.push(
       sql`coalesce(asset.data->>'projectId', ${
         req.user.defaultProjectId || ""
-      }) = ${req.project?.id || ""}`,
+      }) = ${req.project?.id || ""}`
     );
 
     let fields = " asset.id as id, asset.data as data";
@@ -824,27 +824,27 @@ app.post(
     const task = await req.taskScheduler.createAndScheduleTask(
       "export",
       { export: params },
-      asset,
+      asset
     );
 
     if ("ipfs" in params && !params.ipfs?.pinata) {
       // TODO: Make this unsupported. PATCH should be the only way to change asset storage.
       console.warn(
-        `Deprecated export to IPFS API used. userId=${req.user.id} assetId=${assetId}`,
+        `Deprecated export to IPFS API used. userId=${req.user.id} assetId=${assetId}`
       );
 
       const storage = await reconcileAssetStorage(
         req,
         asset,
         { ipfs: { spec: params.ipfs } },
-        task,
+        task
       );
       await req.taskScheduler.updateAsset(asset, { storage });
     }
 
     res.status(201);
     res.json({ task });
-  },
+  }
 );
 
 app.post(
@@ -869,8 +869,8 @@ app.post(
       }
     }
 
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(id);
+    const id = newId("asset");
+    const playbackId = newId("playback");
     const newAsset = await validateAssetPayload(
       req,
       id,
@@ -880,12 +880,12 @@ app.post(
         type: "url",
         url,
         encryption: assetEncryptionWithoutKey(encryption),
-      },
+      }
     );
     const dupAsset = await db.asset.findDuplicateUrlUpload(
       url,
       req.user,
-      req.project?.id,
+      req.project?.id
     );
     if (dupAsset) {
       const [task] = await db.task.find({ outputAssetId: dupAsset.id });
@@ -913,19 +913,19 @@ app.post(
           encryption,
           thumbnails: !(await isExperimentSubject(
             "vod-thumbs-off",
-            req.user?.id,
+            req.user?.id
           )),
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task,
           targetSegmentSizeSecs,
         },
       },
       undefined,
-      asset,
+      asset
     );
 
     res.status(201);
     res.json({ asset, task: { id: task.id } });
-  },
+  }
 );
 
 app.post(
@@ -933,8 +933,8 @@ app.post(
   authorizer({}),
   validatePost("new-asset-payload"),
   async (req, res) => {
-    const id = uuid();
-    let playbackId = await generateUniquePlaybackId(id);
+    const id = newId("asset");
+    let playbackId = newId("playback");
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     const { encryption, c2pa, profiles } = req.body as NewAssetPayload;
@@ -957,7 +957,7 @@ app.post(
       playbackId,
       vodObjectStoreId,
       jwtSecret,
-      jwtAudience,
+      jwtAudience
     );
 
     const ingests = await req.getIngest();
@@ -985,18 +985,18 @@ app.post(
           encryption,
           thumbnails: !(await isExperimentSubject(
             "vod-thumbs-off",
-            req.user?.id,
+            req.user?.id
           )),
           c2pa,
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
       },
       null,
-      asset,
+      asset
     );
 
     res.json({ url, tusEndpoint, asset, task: { id: task.id } });
-  },
+  }
 );
 
 let tusServer: TusServer;
@@ -1069,7 +1069,7 @@ const onUploadComplete = async (playbackId: string) => {
   } catch (err) {
     console.error(
       `error processing upload complete playbackId=${playbackId} err=`,
-      err,
+      err
     );
   }
 };
@@ -1086,7 +1086,7 @@ const getPendingAssetAndTask = async (playbackId: string) => {
 
   const tasks = await db.task.find(
     { outputAssetId: asset.id },
-    { useReplica: false },
+    { useReplica: false }
   );
   if (!tasks?.length || !tasks[0]?.length) {
     throw new NotFoundError(`task not found`);
@@ -1109,7 +1109,7 @@ app.post("/upload/tus", async (req, res) => {
   const uploadToken = req.query.token?.toString();
   if (!uploadToken) {
     throw new UnauthorizedError(
-      "Missing uploadToken metadata from /request-upload API",
+      "Missing uploadToken metadata from /request-upload API"
     );
   }
 
@@ -1133,7 +1133,7 @@ app.put("/upload/direct", async (req, res) => {
   const { uploadUrl, playbackId } = parseUploadUrl(
     token?.toString(),
     jwtSecret,
-    jwtAudience,
+    jwtAudience
   );
 
   // ensure upload exists and is pending
@@ -1146,7 +1146,7 @@ app.put("/upload/direct", async (req, res) => {
       await onUploadComplete(playbackId);
     } else {
       console.log(
-        `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`,
+        `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
       );
     }
   });
@@ -1249,7 +1249,7 @@ app.delete("/", authorizer({ anyAdmin: true }), async (req, res) => {
     [sql`data->>'userId' = ${userId}`, sql`data->>'deleted' IS NULL`],
     {
       limit,
-    },
+    }
   );
 
   let deletedCount = 0;
@@ -1301,11 +1301,11 @@ app.patch(
     ) {
       const sameResourceId = _.isEqual(
         playbackPolicy.resourceId,
-        asset.playbackPolicy.resourceId,
+        asset.playbackPolicy.resourceId
       );
       if (playbackPolicy.type !== "lit_signing_condition" || !sameResourceId) {
         throw new UnprocessableEntityError(
-          `cannot update playback policy from lit_signing_condition nor change the resource ID`,
+          `cannot update playback policy from lit_signing_condition nor change the resource ID`
         );
       }
     }
@@ -1316,7 +1316,7 @@ app.patch(
         isPrivatePlaybackPolicy(asset.playbackPolicy)
       ) {
         throw new UnprocessableEntityError(
-          `cannot update playback policy from private to public or vice versa`,
+          `cannot update playback policy from private to public or vice versa`
         );
       }
 
@@ -1324,7 +1324,7 @@ app.patch(
         { playbackPolicy },
         asset.playbackId,
         asset.userId,
-        asset.createdAt,
+        asset.createdAt
       );
     }
 
@@ -1336,7 +1336,7 @@ app.patch(
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
-  },
+  }
 );
 
 app.post("/:id/retry", authorizer({}), async (req, res) => {
@@ -1409,7 +1409,7 @@ app.post(
         sql`data->'source'->>'url' LIKE ${urlLike}`,
         ...(!from ? [] : [sql`data->'source'->>'url' > ${from}`]),
       ],
-      { limit, order: parseOrder(fieldsMap, "sourceUrl-false") },
+      { limit, order: parseOrder(fieldsMap, "sourceUrl-false") }
     );
 
     let tasks: Promise<WithID<Asset>>[] = [];
@@ -1434,7 +1434,7 @@ app.post(
         tasks.push(
           db.asset
             .update(asset.id, { source })
-            .then(() => db.asset.get(asset.id)),
+            .then(() => db.asset.get(asset.id))
         );
       }
 
@@ -1457,7 +1457,7 @@ app.post(
         source,
       })),
     });
-  },
+  }
 );
 
 export default app;

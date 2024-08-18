@@ -16,6 +16,7 @@ import { WithID } from "../store/types";
 
 import experimentApis from "./experiment/index";
 import { ensureExperimentSubject } from "../store/experiment-table";
+import { newId } from "./generate-keys";
 
 async function toUserId(emailOrId: string) {
   let user: User;
@@ -99,7 +100,7 @@ app.post(
     });
 
     res.status(204).end();
-  },
+  }
 );
 
 // Experiment CRUD
@@ -113,7 +114,7 @@ app.post(
     audienceUserIds = await toUserIds(audienceUserIds);
 
     const experiment = await db.experiment.create({
-      id: uuid(),
+      id: newId("experiment"),
       name,
       userId: req.user.id,
       createdAt: Date.now(),
@@ -121,7 +122,7 @@ app.post(
       audienceUserIds,
     });
     res.status(201).json(experiment);
-  },
+  }
 );
 
 app.patch("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
@@ -154,7 +155,7 @@ app.get("/:experiment", authorizer({ anyAdmin: true }), async (req, res) => {
       experiment.audienceUserIds?.map(async (userId) => {
         const user = await db.user.get(userId);
         return db.user.cleanWriteOnlyResponse(user);
-      }) ?? [],
+      }) ?? []
     ),
   };
 
@@ -171,7 +172,7 @@ const fieldsMap = {
 
 app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
   let { limit, cursor, order, filters, count, subject } = toStringValues(
-    req.query,
+    req.query
   );
   if (isNaN(parseInt(limit))) {
     limit = undefined;

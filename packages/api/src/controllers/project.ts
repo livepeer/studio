@@ -12,6 +12,7 @@ import { NotFoundError, ForbiddenError } from "../store/errors";
 import sql from "sql-template-strings";
 import { WithID } from "../store/types";
 import { Project } from "../schema/types";
+import { newId } from "./generate-keys";
 
 const app = Router();
 
@@ -24,7 +25,7 @@ const fieldsMap = {
 
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, order, all, filters, count, allUsers } = toStringValues(
-    req.query,
+    req.query
   );
 
   if (isNaN(parseInt(limit))) {
@@ -106,7 +107,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
   if (req.user.admin !== true && req.user.id !== project.userId) {
     throw new ForbiddenError(
-      "user can only request information on their own projects",
+      "user can only request information on their own projects"
     );
   }
 
@@ -116,7 +117,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 app.post("/", authorizer({}), async (req, res) => {
   const { name } = req.body;
 
-  const id = uuid();
+  const id = newId("project");
   await db.project.create({
     id: id,
     name: name,

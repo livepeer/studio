@@ -12,6 +12,7 @@ import { v4 as uuid } from "uuid";
 import sql from "sql-template-strings";
 import { db } from "../store";
 import { ObjectStorePatchPayload } from "../schema/types";
+import { newId } from "./generate-keys";
 
 const app = Router();
 
@@ -28,7 +29,7 @@ const fieldsMap: FieldsMap = {
 
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, all, cursor, userId, order, filters } = toStringValues(
-    req.query,
+    req.query
   );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -106,7 +107,7 @@ app.post(
   authorizer({}),
   validatePost("object-store"),
   async (req, res) => {
-    const id = uuid();
+    const id = newId("objectStore");
 
     await db.objectStore.create({
       id: id,
@@ -126,7 +127,7 @@ app.post(
       res.status(403);
       res.json({ errors: ["store not created"] });
     }
-  },
+  }
 );
 
 app.delete("/:id", authorizer({}), async (req, res) => {
@@ -162,12 +163,12 @@ app.patch(
     const payload = req.body as ObjectStorePatchPayload;
     console.log(
       `patch object store id=${id} payload=${JSON.stringify(
-        JSON.stringify(payload),
-      )}`,
+        JSON.stringify(payload)
+      )}`
     );
     await db.objectStore.update(id, payload);
     res.status(204).end();
-  },
+  }
 );
 
 export default app;
