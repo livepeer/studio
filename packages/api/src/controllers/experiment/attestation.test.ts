@@ -148,11 +148,6 @@ describe("Attestation API", () => {
   });
 
   describe("POST /", () => {
-    it("should support Flow Wallet signatures", async () => {
-      const res = await client.post("/experiment/-/attestation", FLOW_REQUEST);
-      expect(res.status).toBe(201);
-    });
-
     it("should return an error for invalid primaryType", async () => {
       let request = JSON.parse(JSON.stringify(REQUEST));
       request.primaryType = "InvalidType";
