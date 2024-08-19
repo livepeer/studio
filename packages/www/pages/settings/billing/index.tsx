@@ -137,17 +137,13 @@ const Billing = () => {
           };
         }
 
-        const remainingOverage = totalSpent - minimumSpend;
-        const overageRatio = remainingOverage / totalSpent;
-
-        return {
-          TotalUsageMins:
-            (u?.TotalUsageMins * overageRatio) / prices.transcoding,
-          DeliveryUsageMins:
-            (u?.DeliveryUsageMins * overageRatio) / prices.streaming,
-          StorageUsageMins:
-            (u?.StorageUsageMins * overageRatio) / prices.storage,
+        const overageRatio = (totalSpent - minimumSpend) / totalSpent;
+        let overage = {
+          TotalUsageMins: Math.round(u?.TotalUsageMins * overageRatio),
+          DeliveryUsageMins: Math.round(u?.DeliveryUsageMins * overageRatio),
+          StorageUsageMins: Math.round(u?.StorageUsageMins * overageRatio),
         };
+        return overage;
       } else {
         const limits = {
           transcoding: product?.usage[0].limit,
