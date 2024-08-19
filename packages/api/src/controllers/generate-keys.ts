@@ -110,7 +110,7 @@ export const generateUniquePlaybackId = async (
 ) => formatPlaybackId(await generateUniqueKey(shardBase, otherKeys));
 
 export function newId(prefix: keyof typeof prefixes) {
-  const id = [prefixes[prefix], nanoid(16)].join("_");
+  const id = [prefixes[prefix], nanoid(16)].join("-");
 
   return id;
 }
