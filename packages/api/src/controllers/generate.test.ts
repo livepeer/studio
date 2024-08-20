@@ -149,16 +149,14 @@ describe("controllers/generate", () => {
       const res = await client.fetch("/beta/generate/audio-to-text", {
         method: "POST",
         body: buildMultipartBody(
-          {
-            audio: "dummy",
-          },
+          {},
           { name: "audio", contentType: "audio/wav" },
         ),
       });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({
         message: "success",
-        reqContentType: "application/json",
+        reqContentType: expect.stringMatching("^multipart/form-data"),
       });
       expect(aiGatewayCalls).toEqual({ "audio-to-text": 1 });
     });
