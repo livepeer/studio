@@ -3018,6 +3018,86 @@ components:
           default: true
         seed:
           type: integer
+    ai-text-response:
+      type: object
+      required:
+        - text
+        - chunks
+      properties:
+        text:
+          type: string
+        chunks:
+          type: array
+          items:
+            type: object
+            required:
+              - timestamp
+              - text
+            properties:
+              timestamp:
+                type: array
+                items: {}
+              text:
+                type: string
+    ai-image-response:
+      type: object
+      required:
+        - images
+      properties:
+        images:
+          type: array
+          items:
+            type: object
+            required:
+              - url
+              - seed
+              - nsfw
+            properties:
+              url:
+                type: string
+                title: Url
+              seed:
+                type: integer
+                title: Seed
+              nsfw:
+                type: boolean
+                title: Nsfw
+    ai-error:
+      oneOf:
+        - $ref: "#/components/schemas/error"
+        - type: object
+          required:
+            - detail
+          properties:
+            detail:
+              type: object
+              required:
+                - msg
+              properties:
+                msg:
+                  type: string
+        - type: object
+          properties:
+            detail:
+              type: array
+              items:
+                type: object
+                required:
+                  - loc
+                  - msg
+                  - type
+                properties:
+                  msg:
+                    type: string
+                  type:
+                    type: string
+                    title: Error Type
+                  loc:
+                    type: array
+                    items:
+                      anyOf:
+                        - type: string
+                        - type: integer
 paths:
   /stream:
     post:
@@ -5119,3 +5199,145 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  # AI APIs section, imported from AI OpenAPI spec with some adjustments
+  "/beta/generate/audio-to-text":
+    post:
+      operationId: genAudioToText
+      summary: Audio To Text
+      x-speakeasy-name-override: audioToText
+      tags:
+        - generate
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/audio-to-text-payload"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-text-response"
+                x-speakeasy-name-override: data
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-error"
+  "/beta/generate/text-to-image":
+    post:
+      operationId: genTextToImage
+      summary: Text To Image
+      x-speakeasy-name-override: textToImage
+      tags:
+        - generate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/text-to-image-payload"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-image-response"
+                x-speakeasy-name-override: data
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-error"
+  "/beta/generate/image-to-image":
+    post:
+      operationId: genImageToImage
+      x-speakeasy-name-override: imageToImage
+      summary: Image To Image
+      tags:
+        - generate
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/image-to-image-payload"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-image-response"
+                x-speakeasy-name-override: data
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-error"
+  "/beta/generate/image-to-video":
+    post:
+      operationId: genImageToVideo
+      x-speakeasy-name-override: imageToVideo
+      summary: Image To Video
+      tags:
+        - generate
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/image-to-video-payload"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-image-response"
+                x-speakeasy-name-override: data
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-error"
+  "/beta/generate/upscale":
+    post:
+      operationId: genUpscale
+      x-speakeasy-name-override: upscale
+      summary: Upscale
+      tags:
+        - generate
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/upscale-payload"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-image-response"
+                x-speakeasy-name-override: data
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ai-error"
