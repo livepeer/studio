@@ -84,10 +84,7 @@ function createPayload(
   }
 
   const form = new FormData();
-  if (!("model_id" in req.body)) {
-    form.append("model_id", defaultModel);
-  }
-  for (const [key, value] of Object.entries(req.body)) {
+  for (const [key, value] of Object.entries(payload)) {
     form.append(key, value);
   }
   for (const file of req.files) {
@@ -250,5 +247,6 @@ registerGenerateHandler(
   "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
 );
 registerGenerateHandler("upscale", "stabilityai/stable-diffusion-x4-upscaler");
+registerGenerateHandler("audio-to-text", "openai/whisper-large-v3");
 
 export default app;
