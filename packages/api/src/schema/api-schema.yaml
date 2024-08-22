@@ -33,6 +33,8 @@ tags:
     description: Operations related to access control/signing keys api
   - name: task
     description: Operations related to tasks api
+  - name: generate
+    description: Operations related to AI generate api
 components:
   securitySchemes:
     apiKey:
