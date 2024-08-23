@@ -21,7 +21,7 @@ import { v4 as uuid } from "uuid";
 
 const ITERATIONS = 10000;
 const PAYMENT_FAILED_TIMEFRAME = 3 * 24 * 60 * 60 * 1000;
-const PULL_START_TIMEOUT = 60 * 1000;
+const PULL_START_TIMEOUT = 3 * 1000;
 
 const crypto = new Crypto();
 
@@ -669,34 +669,40 @@ export const triggerCatalystPullStart =
           );
         }
 
-        const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
+        const deadline = Date.now() + PULL_START_TIMEOUT;
         while (Date.now() < deadline) {
-          const res = await fetchWithTimeoutAndRedirects(playbackUrl, {
-            method: "GET",
-            timeout: PULL_START_TIMEOUT,
-            maxRedirects: 10,
-          });
-          const errHeader = res.headers.get("error");
-          const isHlsErr =
-            errHeader &&
-            errHeader != "" &&
-            !errHeader.includes("not allowed to view this stream");
-          if (res.ok && !isHlsErr) {
-            return;
-          }
+          try {
+            const res = await fetchWithTimeoutAndRedirects(playbackUrl, {
+              method: "GET",
+              timeout: PULL_START_TIMEOUT,
+              maxRedirects: 10,
+            });
+            const errHeader = res.headers.get("error");
+            const isHlsErr =
+              errHeader &&
+              errHeader != "" &&
+              !errHeader.includes("not allowed to view this stream");
+            if (res.ok && !isHlsErr) {
+              return;
+            }
 
-          const body = await res.text();
-          logger.warn(
-            `failed to trigger catalyst pull for stream=${
-              stream.id
-            } playbackUrl=${playbackUrl} status=${
-              res.status
-            } error=${JSON.stringify(body)}`,
-          );
+            const body = await res.text();
+            logger.warn(
+              `failed to trigger catalyst pull for stream=${
+                stream.id
+              } playbackUrl=${playbackUrl} status=${
+                res.status
+              } error=${JSON.stringify(body)}`,
+            );
+          } catch (e) {
+            logger.warn(
+              `error while trying to trigger catalyst pull for stream=${
+                stream.id
+              } playbackUrl=${playbackUrl} error=${e}`,
+            );
+          }
           await sleep(250);
         }
-
-        throw new Error(`failed to trigger catalyst pull`);
       };
 
 export const triggerCatalystStreamStopSessions = (
