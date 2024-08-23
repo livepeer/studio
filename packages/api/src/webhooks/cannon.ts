@@ -24,6 +24,7 @@ import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import { taskScheduler } from "../task/scheduler";
 import { RequestInitWithTimeout, fetchWithTimeout, sleep } from "../util";
+import tracking from "../middleware/tracking";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -761,7 +762,7 @@ export async function storeTriggerStatus(
         },
       };
     }
-    await db.webhook.updateStatus(webhook.id, status);
+    tracking.recordWebhookStatus(webhook.id, status);
   } catch (e) {
     console.log(
       `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`,
