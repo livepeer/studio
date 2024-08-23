@@ -56,14 +56,14 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<Filter[]>(
-    items.map((i) => ({ ...i, isOpen: false })),
+    items.map((i) => ({ ...i, isOpen: false }))
   );
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
   const [previousFilters, setPreviousFilters] = useState<Filter[]>([]);
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
-      p.map((f) => ({ ...f, isOpen: false, condition: undefined })),
+      p.map((f) => ({ ...f, isOpen: false, condition: undefined }))
     );
   }, []);
 
@@ -103,7 +103,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
         setFilters(previousFilters);
       }
     },
-    [filters, previousFilters],
+    [filters, previousFilters]
   );
 
   return (
@@ -152,7 +152,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
               padding: "6px 7px",
               background: "$panel",
             }}>
-            <Button onClick={handleClear} size="sm" variant="outline" >
+            <Button onClick={handleClear} size="sm" variant="outline">
               Clear
             </Button>
             <Text size="2" css={{ margin: "0px" }}>
@@ -267,7 +267,7 @@ type Parsers = {
 
 export const formatFiltersForApiRequest = (
   filters: Filter[],
-  parsers?: Partial<Parsers>,
+  parsers?: Partial<Parsers>
 ) => {
   const normalized: { id: string; value: any }[] = [];
   const typedParsers: Parsers = {
@@ -358,7 +358,7 @@ export const formatFiltersForQueryParam = (filters: Filter[]) => {
         normalized.push({
           id: filter.id,
           value: `${new Date(filter.condition.value[0]).getTime()},${new Date(
-            filter.condition.value[1],
+            filter.condition.value[1]
           ).getTime()}`,
         });
       case "numberEqual":
@@ -382,7 +382,7 @@ export const formatFiltersForQueryParam = (filters: Filter[]) => {
 
 export const formatFilterItemFromQueryParam = (
   filter: FilterItem,
-  queryParamValue: string,
+  queryParamValue: string
 ): Filter => {
   const decodedValue = decodeURIComponent(queryParamValue);
   switch (filter.type) {
@@ -415,12 +415,12 @@ export const formatFilterItemFromQueryParam = (
             ? (splitted.map((s) =>
                 format(
                   addMinutes(new Date(parseInt(s)), timezoneOffset),
-                  "yyyy-MM-dd",
-                ),
+                  "yyyy-MM-dd"
+                )
               ) as [string, string])
             : format(
                 addMinutes(new Date(parseInt(splitted[0])), timezoneOffset),
-                "yyyy-MM-dd",
+                "yyyy-MM-dd"
               ),
         },
       };

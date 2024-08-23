@@ -439,19 +439,16 @@ const PlanForm = ({
                   variant="outline"
                   onClick={() => {
                     setOpen(false);
-                  }}
->
+                  }}>
                   Cancel
                 </Button>
               </AlertDialogCancel>
               <Button
-
                 className="elements-style-background"
                 type="submit"
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
-                }
->
+                }>
                 {status === "processing" && (
                   <Spinner
                     css={{
