@@ -90,7 +90,7 @@ const CreateDialog = ({
         };
       });
     },
-    [setCors]
+    [setCors],
   );
 
   const isNewOriginValid = useMemo(() => {

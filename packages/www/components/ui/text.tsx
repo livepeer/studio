@@ -70,8 +70,8 @@ const Text = React.forwardRef<HTMLHeadingElement, TextProps>(
     const Comp = asChild
       ? Slot
       : variant === "link"
-      ? "span"
-      : sizeMap[size ?? "default"];
+        ? "span"
+        : sizeMap[size ?? "default"];
 
     return (
       <Comp
@@ -81,13 +81,13 @@ const Text = React.forwardRef<HTMLHeadingElement, TextProps>(
             variant,
             weight,
             className,
-          })
+          }),
         )}
         ref={ref}
         {...props}
       />
     );
-  }
+  },
 );
 Text.displayName = "Text";
 

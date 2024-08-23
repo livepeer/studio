@@ -12,7 +12,7 @@ const navigationOutlineVariants = cva(
     defaultVariants: {
       indicator: "none",
     },
-  }
+  },
 );
 
 export { navigationOutlineVariants };

@@ -136,7 +136,7 @@ export default class WebhookCannon {
       } catch (e) {
         console.log(
           `Error handling recording.waiting event sessionId=${sessionId} err=`,
-          e
+          e,
         );
         throw e;
       }
@@ -146,7 +146,7 @@ export default class WebhookCannon {
 
     console.log(
       `fetched webhooks. userId=${userId} event=${event} webhooks=`,
-      webhooks
+      webhooks,
     );
     if (webhooks.length === 0) {
       return true;
@@ -160,12 +160,12 @@ export default class WebhookCannon {
       if (!stream) {
         // if stream isn't found. don't fire the webhook, log an error
         throw new UnprocessableEntityError(
-          `webhook Cannon: onTrigger: Stream Not found , streamId: ${streamId}`
+          `webhook Cannon: onTrigger: Stream Not found , streamId: ${streamId}`,
         );
       }
       // basic sanitization.
       stream = db.stream.addDefaultFields(
-        db.stream.removePrivateFields({ ...stream })
+        db.stream.removePrivateFields({ ...stream }),
       );
       delete stream.streamKey;
     }
@@ -173,11 +173,11 @@ export default class WebhookCannon {
     let user = await db.user.get(userId);
     if (!user) {
       throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: Account not found userId=${userId}`
+        `webhook Cannon: onTrigger: Account not found userId=${userId}`,
       );
     } else if (user.suspended) {
       throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: User suspended userId=${userId}`
+        `webhook Cannon: onTrigger: User suspended userId=${userId}`,
       );
     }
 
@@ -196,8 +196,8 @@ export default class WebhookCannon {
             ...baseTrigger,
             id: uuid(),
             webhook,
-          })
-        )
+          }),
+        ),
       );
     } catch (error) {
       console.log("Error publish webhook trigger message: ", error);
@@ -246,17 +246,17 @@ export default class WebhookCannon {
   retry(
     trigger: messages.WebhookTrigger,
     webhookPayload?: RequestInitWithTimeout,
-    err?: Error
+    err?: Error,
   ) {
     if (trigger?.retries >= MAX_RETRIES) {
       console.log(
-        `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+        `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`,
       );
       try {
         trigger = webhookFailNotification(trigger, webhookPayload, err);
       } catch (err) {
         console.error(
-          `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+          `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`,
         );
       }
       return;
@@ -272,27 +272,27 @@ export default class WebhookCannon {
     return this.queue.delayedPublishWebhook(
       "webhooks.delayedEmits",
       trigger,
-      trigger.lastInterval
+      trigger.lastInterval,
     );
   }
 
   async notifyFailedWebhook(
     trigger: messages.WebhookTrigger,
     params?: RequestInitWithTimeout,
-    err?: any
+    err?: any,
   ) {
     if (!trigger.user.emailValid) {
       console.error(
-        `Webhook Cannon| User email is not valid, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+        `Webhook Cannon| User email is not valid, id: ${trigger.id}, streamId: ${trigger.stream?.id}`,
       );
       return;
     }
     if (!(this.supportAddr && this.sendgridTemplateId && this.sendgridApiKey)) {
       console.error(
-        `Webhook Cannon| Unable to send notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+        `Webhook Cannon| Unable to send notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`,
       );
       console.error(
-        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
+        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`,
       );
       return;
     }
@@ -328,7 +328,7 @@ export default class WebhookCannon {
     });
 
     console.log(
-      `Webhook Cannon| Email sent to user="${trigger.user.email}" id=${trigger.id} streamId=${trigger.stream?.id}`
+      `Webhook Cannon| Email sent to user="${trigger.user.email}" id=${trigger.id} streamId=${trigger.stream?.id}`,
     );
   }
 
@@ -337,7 +337,7 @@ export default class WebhookCannon {
     if (!event || !webhook || !user) {
       console.error(
         `invalid webhook trigger message received. type=${trigger.type} message=`,
-        trigger
+        trigger,
       );
       return;
     }
@@ -345,7 +345,7 @@ export default class WebhookCannon {
 
     const { ips, isLocal } = await this.checkIsLocalIp(
       webhook.url,
-      user.admin
+      user.admin,
     ).catch((e) => {
       console.error("error checking if is local IP: ", e);
       return { ips: [], isLocal: false };
@@ -354,7 +354,7 @@ export default class WebhookCannon {
     if (isLocal) {
       // don't fire this webhook.
       console.log(
-        `webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`
+        `webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`,
       );
     } else {
       console.log("preparing to fire webhook ", webhook.url);
@@ -395,7 +395,7 @@ export default class WebhookCannon {
       const sigHeaders = signatureHeaders(
         params.body,
         webhook.sharedSecret,
-        timestamp
+        timestamp,
       );
       params.headers = { ...params.headers, ...sigHeaders };
 
@@ -421,12 +421,12 @@ export default class WebhookCannon {
           await this.retry(
             trigger,
             params,
-            new Error("Status code: " + resp.status)
+            new Error("Status code: " + resp.status),
           );
         }
 
         console.error(
-          `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
+          `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`,
         );
         // we don't retry on non 400 responses. only on timeouts
         // this.retry(event);
@@ -444,11 +444,11 @@ export default class WebhookCannon {
             startTime,
             responseBody,
             webhook.sharedSecret,
-            params
+            params,
           );
         } catch (e) {
           console.log(
-            `Unable to store response of webhook ${webhook.id} url: ${webhook.url} error: ${e}`
+            `Unable to store response of webhook ${webhook.id} url: ${webhook.url} error: ${e}`,
           );
         }
         await this.storeTriggerStatus(
@@ -456,7 +456,7 @@ export default class WebhookCannon {
           triggerTime,
           statusCode,
           errorMessage,
-          responseBody
+          responseBody,
         );
         return;
       }
@@ -499,20 +499,20 @@ export default class WebhookCannon {
     triggerTime: number,
     statusCode: number,
     errorMessage: string,
-    responseBody: string
+    responseBody: string,
   ) {
     await storeTriggerStatus(
       webhook,
       triggerTime,
       statusCode,
       errorMessage,
-      responseBody
+      responseBody,
     );
   }
 
   async handleRecordingWaitingChecks(
     sessionId: string,
-    attempt = 1
+    attempt = 1,
   ): Promise<void> {
     const session = await db.session.get(sessionId, {
       useReplica: false,
@@ -546,12 +546,12 @@ export default class WebhookCannon {
     await Promise.all(
       childStreams.map((child) => {
         return db.stream.update(child.id, { isActive: false });
-      })
+      }),
     );
 
     if (!lastSeen && !hasSourceSegments) {
       logger.info(
-        `Skipping unused session sessionId=${session.id} childStreamCount=${childStreams.length}`
+        `Skipping unused session sessionId=${session.id} childStreamCount=${childStreams.length}`,
       );
       return;
     }
@@ -570,7 +570,7 @@ export default class WebhookCannon {
 
     const secondaryStorageEnabled = !(await isExperimentSubject(
       primaryStorageExperiment,
-      session.userId
+      session.userId,
     ));
     const secondaryObjectStoreId =
       secondaryStorageEnabled && this.secondaryVodObjectStoreId;
@@ -594,13 +594,13 @@ export default class WebhookCannon {
           objectStoreId:
             secondaryObjectStoreId || this.vodCatalystObjectStoreId,
         },
-        this.queue
+        this.queue,
       );
 
       const { url } = await buildRecordingUrl(
         session,
         this.recordCatalystObjectStoreId,
-        this.secondaryRecordObjectStoreId
+        this.secondaryRecordObjectStoreId,
       );
 
       await taskScheduler.createAndScheduleTask(
@@ -611,17 +611,17 @@ export default class WebhookCannon {
             profiles: session.recordingSpec?.profiles,
             thumbnails: !(await isExperimentSubject(
               "vod-thumbs-off",
-              session.userId
+              session.userId,
             )),
           },
         },
         undefined,
-        asset
+        asset,
       );
     } catch (e) {
       if (e instanceof BadRequestError) {
         throw new UnprocessableEntityError(
-          "Asset for the recording session already added"
+          "Asset for the recording session already added",
         );
       } else {
         throw e;
@@ -642,13 +642,13 @@ async function storeResponse(
   startTime: [number, number],
   responseBody: string,
   sharedSecret: string,
-  params
+  params,
 ): Promise<WebhookLog> {
   const hrDuration = process.hrtime(startTime);
   let encodedResponseBody = "";
   if (responseBody) {
     encodedResponseBody = Buffer.from(responseBody.substring(0, 1024)).toString(
-      "base64"
+      "base64",
     );
   }
 
@@ -681,7 +681,7 @@ async function storeResponse(
 
 export async function resendWebhook(
   webhook: DBWebhook,
-  webhookLog: WebhookLog
+  webhookLog: WebhookLog,
 ): Promise<WebhookLog> {
   const triggerTime = Date.now();
   const startTime = process.hrtime();
@@ -699,7 +699,7 @@ export async function resendWebhook(
     const sigHeaders = signatureHeaders(
       webhookLog.request.body,
       webhookLog.sharedSecret,
-      timestamp
+      timestamp,
     );
     webhookLog.request.headers = {
       ...webhookLog.request.headers,
@@ -723,7 +723,7 @@ export async function resendWebhook(
       triggerTime,
       statusCode,
       errorMessage,
-      responseBody
+      responseBody,
     );
     return await storeResponse(
       webhook,
@@ -733,7 +733,7 @@ export async function resendWebhook(
       startTime,
       responseBody,
       webhookLog.sharedSecret,
-      webhookLog.request
+      webhookLog.request,
     );
   }
 }
@@ -743,7 +743,7 @@ export async function storeTriggerStatus(
   triggerTime: number,
   statusCode?: number,
   errorMessage?: string,
-  responseBody?: string
+  responseBody?: string,
 ): Promise<void> {
   try {
     let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
@@ -764,7 +764,7 @@ export async function storeTriggerStatus(
     await db.webhook.updateStatus(webhook.id, status);
   } catch (e) {
     console.log(
-      `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
+      `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`,
     );
   }
 }
@@ -772,7 +772,7 @@ export async function storeTriggerStatus(
 export function webhookFailNotification(
   trigger: messages.WebhookTrigger,
   webhookPayload: RequestInitWithTimeout,
-  err: Error
+  err: Error,
 ): messages.WebhookTrigger {
   const lastFailureNotification = trigger?.lastFailureNotification;
   const currentTime = Date.now();
@@ -794,7 +794,7 @@ export function webhookFailNotification(
 export function signatureHeaders(
   payload: string,
   sharedSecret: string,
-  timestamp: number
+  timestamp: number,
 ): { [key: string]: string } | {} {
   if (!sharedSecret) return {};
   let signature = sign(payload, sharedSecret);

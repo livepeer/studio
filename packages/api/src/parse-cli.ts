@@ -105,7 +105,7 @@ function coerceJsonProfileArr(flagName: string) {
     }
     if (errors.length > 0) {
       throw new Error(
-        `--${flagName} validation error: ${JSON.stringify(errors)}`
+        `--${flagName} validation error: ${JSON.stringify(errors)}`,
       );
     }
     return profiles;
@@ -326,7 +326,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           const split = supportAddr.split("/");
           if (split.length !== 2) {
             throw new Error(
-              `supportAddr should be of the form name / email, got ${supportAddr} `
+              `supportAddr should be of the form name / email, got ${supportAddr} `,
             );
           }
           return split as [string, string];
@@ -635,14 +635,14 @@ export default function parseCli(argv?: string | readonly string[]) {
 
     --broadcaster and --orchestrator options should be of the form
     [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
-    `
+    `,
     )
     .strict(
-      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
+      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development",
     )
     .env("LP_API_")
     .strict(
-      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
+      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development",
     )
     .help()
     .parse(argv);

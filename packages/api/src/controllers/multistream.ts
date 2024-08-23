@@ -36,7 +36,7 @@ function adminListQuery(
   limit: number,
   cursor: string,
   orderStr: string,
-  filters: string
+  filters: string,
 ): [SQLStatement[], FindOptions<DBMultistreamTarget & { user: User }>] {
   type ResultRow = {
     id: string;
@@ -83,11 +83,11 @@ target.use(
     }
     if ("id" in data) {
       return db.multistreamTarget.cleanWriteOnlyResponse(
-        data as DBMultistreamTarget
+        data as DBMultistreamTarget,
       );
     }
     return data;
-  })
+  }),
 );
 
 target.get("/", authorizer({}), async (req, res) => {
@@ -126,7 +126,7 @@ target.get("/:id", authorizer({}), async (req, res) => {
   const data = await db.multistreamTarget.getAuthed(
     req.params.id,
     req.user.id,
-    isAdmin
+    isAdmin,
   );
   if (!data) {
     return notFound(res);
@@ -148,7 +148,7 @@ target.post(
     });
     res.status(201);
     res.json(data);
-  }
+  },
 );
 
 target.delete("/:id", authorizer({}), async (req, res) => {
@@ -191,18 +191,18 @@ target.patch(
     await triggerCatalystMultistreamUpdated(req, id);
     res.status(204);
     res.end();
-  }
+  },
 );
 
 async function triggerCatalystMultistreamUpdated(req: Request, id: string) {
   const query = [];
   query.push(
-    `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`
+    `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`,
   );
   const [streams] = await db.stream.find(query, {});
 
   await Promise.all(
-    streams.map((s) => triggerCatalystStreamUpdated(req, s.playbackId))
+    streams.map((s) => triggerCatalystStreamUpdated(req, s.playbackId)),
   );
 }
 

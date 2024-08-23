@@ -18,7 +18,7 @@ export default function TypeFilterCard({
     <Box
       className={cn(
         "px-3 py-2 border border-accent rounded-md hover:bg-accent-foreground/10",
-        isActive && "border-primary"
+        isActive && "border-primary",
       )}
       onClick={handleClick}>
       <Text

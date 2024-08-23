@@ -47,18 +47,18 @@ const MultistreamTargetsTable = ({
   const targetQueryKey = (id: string) => ["multistreamTarget", id];
   const invalidateTargetId = useCallback(
     (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
-    [queryClient]
+    [queryClient],
   );
   const targetRefs = stream.multistream?.targets ?? [];
   const targets = useQueries(
     targetRefs.map((ref) => ({
       queryKey: targetQueryKey(ref.id),
       queryFn: () => getMultistreamTarget(ref.id),
-    }))
+    })),
   ).map((res) => res.data as MultistreamTarget);
   const streamActiveSince = useMemo(() => {
     const activeCondition = streamHealth?.conditions.find(
-      (c) => c.type === "Active"
+      (c) => c.type === "Active",
     );
     return activeCondition?.status ? activeCondition.lastTransitionTime : null;
   }, [streamHealth?.conditions]);
@@ -72,9 +72,9 @@ const MultistreamTargetsTable = ({
         targets,
         targetRefs,
         invalidateStream,
-        invalidateTargetId
+        invalidateTargetId,
       ),
-    [state.tableId, stream, streamHealth, invalidateTargetId, targetRefs]
+    [state.tableId, stream, streamHealth, invalidateTargetId, targetRefs],
   );
 
   const trackEvent = useCallback(() => {

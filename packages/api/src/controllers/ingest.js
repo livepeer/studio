@@ -16,7 +16,7 @@ app.get(
       ingestPoints = await req.getIngest(req);
     }
     res.json(shuffle(ingestPoints));
-  }
+  },
 );
 
 export default app;

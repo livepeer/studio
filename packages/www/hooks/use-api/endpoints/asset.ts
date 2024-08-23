@@ -12,7 +12,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void
+  _setState: (value: SetStateAction<ApiState>) => void,
 ) => {
   context = _context;
   setState = _setState;
@@ -38,12 +38,12 @@ export const uploadAssets = async (
   files: File[],
   onSuccess?: (file: File) => void,
   onError?: (file: File, error: Error) => void,
-  onProgress?: (file: File, progress: number) => void
+  onProgress?: (file: File, progress: number) => void,
 ): Promise<void> => {
   const url = `/asset/request-upload?projectId=${projectId}`;
 
   const requestAssetUpload = async (
-    params
+    params,
   ): Promise<{ tusEndpoint: string }> => {
     const [res, assetUpload] = await context.fetch(url, {
       method: "POST",
@@ -64,7 +64,7 @@ export const uploadAssets = async (
     progress: number,
     completed: boolean,
     updatedAt: number,
-    error?: Error
+    error?: Error,
   ) => {
     setState((state) => ({
       ...state,
@@ -127,13 +127,13 @@ export const uploadAssets = async (
 
 export const getFileUploads = (): FileUpload[] => {
   return Object.keys(context.currentFileUploads ?? {}).map(
-    (key) => context.currentFileUploads?.[key]
+    (key) => context.currentFileUploads?.[key],
   );
 };
 
 export const getFilteredFileUploads = (): FileUpload[] => {
   return getFileUploads().filter(
-    (file) => file && !file.error && file.file.name
+    (file) => file && !file.error && file.file.name,
   );
 };
 
@@ -149,7 +149,7 @@ export const getAssets = async (
     cursor?: string;
     order?: string;
     count?: boolean;
-  }
+  },
 ): Promise<[Asset[], string, number]> => {
   const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
   const [res, assets] = await context.fetch(
@@ -162,7 +162,7 @@ export const getAssets = async (
       count: opts?.count,
       details: 1,
       projectId,
-    })}`
+    })}`,
   );
   if (res.status !== 200) {
     throw new Error(assets);
@@ -187,7 +187,7 @@ export const getAsset = async (assetId): Promise<Asset> => {
 
 export const patchAsset = async (
   assetId: string,
-  patch: AssetPatchPayload
+  patch: AssetPatchPayload,
 ): Promise<void> => {
   const url = `/asset/${assetId}?projectId=${projectId}`;
 

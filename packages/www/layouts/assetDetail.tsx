@@ -70,7 +70,7 @@ const AssetDetail = ({
         await refetchAsset();
       }
     },
-    [asset, patchAsset, refetchAsset]
+    [asset, patchAsset, refetchAsset],
   );
 
   const onDeleteAsset = useCallback(async () => {

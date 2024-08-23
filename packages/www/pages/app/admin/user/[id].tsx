@@ -51,7 +51,7 @@ const ID = () => {
   const [enableModal, setEnableModal] = useState(false);
   const [updateViewerLimitModal, setUpdateViewerLimitModal] = useState(false);
   const [newViewerLimit, setNewViewerLimit] = useState(
-    userInfo?.viewerLimit || 50000
+    userInfo?.viewerLimit || 50000,
   );
   const [notFound, setNotFound] = useState(false);
 

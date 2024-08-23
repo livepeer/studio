@@ -72,7 +72,7 @@ const CreateAssetDialog = ({
         ...prev,
         ...acceptedFiles.reduce(
           (prev, curr) => ({ ...prev, [curr.name]: curr }),
-          {}
+          {},
         ),
       };
       // Make sure there are never more than the max allowed files selected
@@ -101,7 +101,7 @@ const CreateAssetDialog = ({
       ...(isDragReject ? rejectStyle : {}),
       ...(isDragActive ? activeStyle : {}),
     }),
-    [isDragActive, isDragReject, isDragAccept]
+    [isDragActive, isDragReject, isDragAccept],
   );
 
   return (
@@ -123,7 +123,7 @@ const CreateAssetDialog = ({
             try {
               await onCreate({
                 videoFiles: Object.keys(videoFiles).map(
-                  (key) => videoFiles[key]
+                  (key) => videoFiles[key],
                 ),
               });
               setVideoFiles({});
