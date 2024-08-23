@@ -16,7 +16,7 @@ export default function errorHandler(): ErrorRequestHandler {
     }
 
     logger.error(
-      `Unhandled error in API path=${_req.path} errType=${err.name} err="${err.message}" stack=${err.stack}`,
+      `Unhandled error in API path=${_req.path} errType=${err.name} err="${err.message}" stack=${err.stack}`
     );
     return res
       .status(500)

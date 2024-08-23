@@ -17,7 +17,7 @@ function useDrag() {
         setDragging(false);
         setClicked(false);
       }),
-    [],
+    []
   );
 
   const dragMove = (ev: MouseEvent, cb: (posDif: number) => void) => {

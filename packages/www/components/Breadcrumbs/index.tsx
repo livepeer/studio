@@ -31,7 +31,7 @@ function insertSeparators(items) {
         current,
         <BreadcrumbsSeparator aria-hidden key={`separator-${index}`}>
           /
-        </BreadcrumbsSeparator>,
+        </BreadcrumbsSeparator>
       );
     } else {
       acc.push(current);
@@ -79,7 +79,7 @@ const Breadcrumbs = ({ children }) => {
           }}
           key="project">
           <Box css={{ display: "inline-flex" }}>{project?.name}</Box>
-        </Box>,
+        </Box>
       );
     }
   }

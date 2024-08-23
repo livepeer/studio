@@ -76,7 +76,7 @@ async function generateUniqueKey(shardBase: string, otherKeys: string[] = []) {
       return shardedKey;
     }
     console.warn(
-      `Generated conflicting database key. key=${shardedKey} otherKeys="${otherKeys}"`,
+      `Generated conflicting database key. key=${shardedKey} otherKeys="${otherKeys}"`
     );
   }
 }
@@ -85,5 +85,5 @@ export const generateUniqueStreamKey = generateUniqueKey;
 
 export const generateUniquePlaybackId = async (
   shardBase: string,
-  otherKeys: string[] = [],
+  otherKeys: string[] = []
 ) => formatPlaybackId(await generateUniqueKey(shardBase, otherKeys));

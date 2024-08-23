@@ -32,11 +32,11 @@ fs.ensureDirSync(schemaDistDir);
 
 const apiSchemaStr = fs.readFileSync(
   path.resolve(schemaDir, "api-schema.yaml"),
-  "utf8",
+  "utf8"
 );
 const dbSchemaStr = fs.readFileSync(
   path.resolve(schemaDir, "db-schema.yaml"),
-  "utf8",
+  "utf8"
 );
 const apiData = parseYaml(apiSchemaStr);
 const dbData = parseYaml(dbSchemaStr);

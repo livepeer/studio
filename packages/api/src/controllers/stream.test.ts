@@ -277,7 +277,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          "multistream target profile not found",
+          "multistream target profile not found"
         );
       });
 
@@ -304,7 +304,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `must have either an "id" or a "spec"`,
+          `must have either an "id" or a "spec"`
         );
       });
 
@@ -324,7 +324,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `must have either an "id" or a "spec"`,
+          `must have either an "id" or a "spec"`
         );
       });
 
@@ -347,7 +347,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `multistream target {id,profile} must be unique`,
+          `multistream target {id,profile} must be unique`
         );
 
         // Should allow same ID if using different profiles
@@ -627,7 +627,7 @@ describe("controllers/stream", () => {
           promises.push(
             client.post(`/stream/${stream.id}/lockPull`, {
               host: `host-${i}`,
-            }),
+            })
           );
         }
         const resPulls = await Promise.all(promises);
@@ -653,7 +653,7 @@ describe("controllers/stream", () => {
         // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
-          { leaseTimeout: 1 },
+          { leaseTimeout: 1 }
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -675,7 +675,7 @@ describe("controllers/stream", () => {
         // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
-          { host },
+          { host }
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -698,7 +698,7 @@ describe("controllers/stream", () => {
         // Request pull lock should succeed, because the lock lease has expired (so we assume the stream is not being pulled at the moment)
         const resLockPull2 = await client.post(
           `/stream/${stream.id}/lockPull`,
-          { host: "host-2" },
+          { host: "host-2" }
         );
         expect(resLockPull2.status).toBe(204);
       });
@@ -727,7 +727,7 @@ describe("controllers/stream", () => {
       it("should fail to dedup streams by a random key", async () => {
         let res = await client.put(
           "/stream/pull?key=invalid",
-          postMockPullStream,
+          postMockPullStream
         );
         expect(res.status).toBe(400);
         const errors = await res.json();
@@ -739,7 +739,7 @@ describe("controllers/stream", () => {
       it("should fail to dedup streams by creatorId if not provided", async () => {
         let res = await client.put(
           "/stream/pull?key=creatorId",
-          postMockPullStream,
+          postMockPullStream
         );
         expect(res.status).toBe(400);
         const errors = await res.json();
@@ -839,7 +839,7 @@ describe("controllers/stream", () => {
       it("should resolve pull url and region from existing stream", async () => {
         expect(resolvePullUrlFromExistingStreams([])).toStrictEqual(null);
         expect(
-          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }]),
+          resolvePullUrlFromExistingStreams([{ id: "id-1", name: "stream-1" }])
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -850,7 +850,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: 1714997385837,
             },
-          ]),
+          ])
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -861,7 +861,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: Date.now() - 2 * 60 * 1000,
             },
-          ]),
+          ])
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -872,7 +872,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: Date.now(),
             },
-          ]),
+          ])
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -883,7 +883,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "",
               pullLockedAt: Date.now(),
             },
-          ]),
+          ])
         ).toStrictEqual(null);
         expect(
           resolvePullUrlFromExistingStreams([
@@ -894,7 +894,7 @@ describe("controllers/stream", () => {
               pullLockedBy: "fra-prod-catalyst-1.lp-playback.studio",
               pullLockedAt: Date.now(),
             },
-          ]),
+          ])
         ).toStrictEqual({
           pullUrl:
             "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
@@ -910,7 +910,7 @@ describe("controllers/stream", () => {
               pullLockedAt: Date.now() - 2 * 60 * 1000,
               lastSeen: Date.now(),
             },
-          ]),
+          ])
         ).toStrictEqual({
           pullUrl:
             "https://fra-prod-catalyst-1.lp-playback.studio:443/hls/video+",
@@ -922,56 +922,56 @@ describe("controllers/stream", () => {
         expect(
           extractUrlFrom(
             "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe("https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+");
         expect(
           extractUrlFrom(
             "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe(
-          "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+",
+          "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+"
         );
         expect(
           extractUrlFrom(
             "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe(
-          "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+",
+          "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+"
         );
         expect(
           extractUrlFrom(
             "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe(null);
       });
       it("should extract region from redirected playback url", async () => {
         expect(
           extractRegionFrom(
             "https://sto-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe("sto");
         expect(
           extractRegionFrom(
             "https://mos2-prod-catalyst-0.lp-playback.studio:443/hls/video+ingest-12345-67890/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe("mos2");
         expect(
           extractRegionFrom(
             "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+ingest-12345-67890/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe("fra-staging");
         expect(
           extractRegionFrom(
             "https://fra-staging-staging-catalyst-0.livepeer.monster:443/hls/video+other-playback/index.m3u8",
-            "12345-67890",
-          ),
+            "12345-67890"
+          )
         ).toBe(null);
       });
     });
@@ -1019,7 +1019,7 @@ describe("controllers/stream", () => {
           profile: "source",
           videoOnly: false,
           spec: { name: "target-name", url: "rtmp://test/test" },
-        },
+        }
       );
       expect(res2.status).toBe(200);
       const body = await res2.json();
@@ -1029,7 +1029,7 @@ describe("controllers/stream", () => {
     describe("set active and heartbeat", () => {
       const callSetActive = async (
         streamId: string,
-        payload: StreamSetActivePayload,
+        payload: StreamSetActivePayload
       ) => {
         const res = await client.put(`/stream/${streamId}/setactive`, payload);
         expect(res.status).toBe(204);
@@ -1273,7 +1273,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          "recordingSpec is only supported with record=true",
+          "recordingSpec is only supported with record=true"
         );
       });
 
@@ -1471,7 +1471,7 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(400);
       const json = await res.json();
       expect(json.errors[0]).toContain(
-        "recordingSpec is only supported with record=true",
+        "recordingSpec is only supported with record=true"
       );
     });
 
@@ -1670,7 +1670,7 @@ describe("controllers/stream", () => {
         const testBasic = async (
           userPassword: string,
           statusCode: number,
-          error?: string,
+          error?: string
         ) => {
           client.jwtAuth = undefined;
           client.basicAuth = userPassword;
@@ -1694,7 +1694,7 @@ describe("controllers/stream", () => {
           await testBasic(
             `${nonAdminUser.id}:${adminApiKey}`,
             401,
-            expect.stringMatching(/no token .+ found/),
+            expect.stringMatching(/no token .+ found/)
           );
         });
 
@@ -1702,7 +1702,7 @@ describe("controllers/stream", () => {
           await testBasic(
             `${nonAdminUser.id}:${nonAdminApiKey}`,
             403,
-            expect.stringContaining("admin"),
+            expect.stringContaining("admin")
           );
         });
       });
@@ -1735,7 +1735,7 @@ describe("controllers/stream", () => {
         const res = await client.post("/stream/hook/health", payload);
         expect(res.status).toBe(204);
         const stream = await server.db.stream.getByPlaybackId(
-          payload.stream_name.split("+", 2)[1],
+          payload.stream_name.split("+", 2)[1]
         );
         return stream;
       };
@@ -1892,7 +1892,7 @@ describe("controllers/stream", () => {
               hookPayload = req.body;
               hookSem.release();
               res.status(204).end();
-            },
+            }
           );
           genMockWebhook = () => ({
             id: uuid(),
@@ -2065,7 +2065,7 @@ describe("controllers/stream", () => {
         `/stream/${stream.id}/stream?sessionId=${sessionId}`,
         {
           name: `video+${stream.playbackId}`,
-        },
+        }
       );
       expect(res.status).toBe(201);
       const child: Stream = await res.json();
@@ -2095,7 +2095,7 @@ describe("controllers/stream", () => {
         `/stream/${stream.id}/stream?sessionId=${sessionId}`,
         {
           name: `video+${stream.playbackId}`,
-        },
+        }
       );
       expect(res.status).toBe(201);
       const child: Stream = await res.json();
@@ -2226,7 +2226,7 @@ describe("controllers/stream", () => {
               profile: "H264ConstrainedHigh",
               ...profile,
             };
-          }),
+          })
         );
       }
     });
@@ -2275,7 +2275,7 @@ describe("controllers/stream", () => {
         {
           ...smallStream,
           name: "stream1",
-        },
+        }
       );
       expect(res.status).toBe(201);
       let stream1 = await res.json();
@@ -2335,7 +2335,7 @@ describe("controllers/stream", () => {
         {
           ...smallStream,
           name: "stream2",
-        },
+        }
       );
       expect(res.status).toBe(201);
       let stream2 = await res.json();
@@ -2402,10 +2402,10 @@ describe("controllers/stream", () => {
       expect(sessions).toHaveLength(1);
       expect(sessions[0].id).toEqual(sessionId);
       expect(sessions[0].recordingUrl).toEqual(
-        "http://example-public/playback_id/output.m3u8",
+        "http://example-public/playback_id/output.m3u8"
       );
       expect(sessions[0].mp4Url).toEqual(
-        "http://example-public/playback_id/output.mp4",
+        "http://example-public/playback_id/output.mp4"
       );
     });
 
@@ -2439,7 +2439,7 @@ describe("controllers/stream", () => {
         `/stream/${parent.id}/stream?sessionId=${sessionId}`,
         {
           name: "session1",
-        },
+        }
       );
       expect(res.status).toBe(201);
       const childStream = await res.json();

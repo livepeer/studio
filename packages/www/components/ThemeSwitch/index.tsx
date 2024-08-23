@@ -1,60 +1,11 @@
 import { useTheme } from "next-themes";
-import { styled } from "@livepeer/design-system";
-import * as Switch from "@radix-ui/react-switch";
-import Sun from "../../public/img/icons/sun.svg";
-import Moon from "../../public/img/icons/moon.svg";
 import { useEffect, useState } from "react";
-
-const StyledSwitch = styled(Switch.Root, {
-  appearance: "none",
-  border: "none",
-  padding: 0,
-  width: 25,
-  height: 12,
-  bc: "$neutral6",
-  borderRadius: 25,
-  position: "relative",
-  display: "flex",
-  alignItems: "center",
-  "&:focus": {
-    outline: "none",
-    boxShadow: "0 0 0 2px $green9",
-  },
-  '&[data-state="checked"]': {
-    background: "linear-gradient(to right, $green8, $green5)",
-  },
-});
-
-const StyledThumb = styled(Switch.Thumb, {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 20,
-  height: 20,
-  backgroundColor: "$loContrast",
-  borderRadius: "$round",
-  boxShadow: "rgba(0, 0, 0, 0.3) 0px 0px 2px",
-  transform: "translateX(-7px)",
-  willChange: "transform",
-  "> :nth-child(2)": {
-    display: "none",
-  },
-  '&[data-state="checked"]': {
-    bc: "$neutral6",
-    transform: "translateX(12px)",
-    "> :nth-child(1)": {
-      display: "none",
-    },
-    "> :nth-child(2)": {
-      display: "block",
-      fill: "$hiContrast",
-    },
-  },
-});
+import { Switch } from "../ui/switch";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 const ThemeSwitch = () => {
   const { resolvedTheme, setTheme } = useTheme();
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(resolvedTheme?.includes("dark"));
 
   useEffect(() => {
     if (resolvedTheme?.includes("dark")) {
@@ -70,12 +21,19 @@ const ThemeSwitch = () => {
   };
 
   return (
-    <StyledSwitch checked={checked} onCheckedChange={handleChange}>
-      <StyledThumb>
-        <Sun />
-        <Moon />
-      </StyledThumb>
-    </StyledSwitch>
+    <Switch
+      className="h-5 w-10"
+      thumbClassName="h-4 w-4"
+      checked={checked}
+      onCheckedChange={handleChange}
+      thumb={
+        checked ? (
+          <MoonIcon className="fill-primary h-2 w-2" />
+        ) : (
+          <SunIcon className="h-2 w-2" />
+        )
+      }
+    />
   );
 };
 

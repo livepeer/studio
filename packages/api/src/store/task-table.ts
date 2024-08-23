@@ -30,7 +30,7 @@ export default class TaskTable extends Table<WithID<Task>> {
 
   private async countPendingTasks(
     userId: string,
-    startedTasksOnly: boolean,
+    startedTasksOnly: boolean
   ): Promise<number> {
     const activeTaskThreshold = Date.now() - ACTIVE_TASK_TIMEOUT;
     // tasks that are on a retry backoff will be in the `waiting` phase with a `retries` field
@@ -49,7 +49,7 @@ export default class TaskTable extends Table<WithID<Task>> {
         sql`
           task.data->'status'->>'phase' = 'waiting'
           AND task.data->'status'->>'retries' IS NULL
-          AND coalesce( (task.data->'status'->>'updatedAt')::bigint, 0) > ${enqueuedTaskThreshold}`,
+          AND coalesce( (task.data->'status'->>'updatedAt')::bigint, 0) > ${enqueuedTaskThreshold}`
       );
     }
 

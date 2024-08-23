@@ -1,14 +1,10 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardProjects as Content } from "content";
-import {
-  Box,
-  Heading,
-  Text,
-  Grid,
-  Button,
-  Flex,
-} from "@livepeer/design-system";
+import { Box, Heading, Grid } from "@livepeer/design-system";
+import { Flex } from "components/ui/flex";
+import { Button } from "components/ui/button";
+import { Text } from "components/ui/text";
 import ProjectTile from "components/Project/ProjectTile";
 import { useQuery, useQueryClient } from "react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
@@ -63,15 +59,8 @@ const WorkspaceProjects = () => {
           },
         }}>
         <Box css={{ mb: "$6" }}>
-          <Flex
-            justify={"between"}
-            css={{
-              borderBottom: "1px solid",
-              borderColor: "$neutral6",
-              pb: "$5",
-              width: "100%",
-            }}>
-            <Flex direction={"column"}>
+          <Flex className="justify-between flex-col md:flex-row border-b border-accent pb-5 gap-4 w-full">
+            <Flex className="flex-col">
               <Heading
                 size="2"
                 css={{
@@ -81,28 +70,21 @@ const WorkspaceProjects = () => {
                 }}>
                 Projects
               </Heading>
-              <Text variant="neutral" size="3" css={{ mt: "$2" }}>
+              <Text variant="neutral" size="sm" className="mt-2">
                 Manage your projects
               </Text>
             </Flex>
             <Button
-              onClick={() => setShowCreateProjectAlert(true)}
-              css={{
-                p: "$3",
-                marginTop: "2rem",
-              }}>
+              variant="secondary"
+              onClick={() => setShowCreateProjectAlert(true)}>
               <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Create Project
-              </Box>
+              <Text size="sm" className="ml-2">
+                Create project
+              </Text>
             </Button>
           </Flex>
         </Box>
-        <Grid
-          css={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
-            gap: "$5",
-          }}>
+        <Grid className="grid-cols-1 md:grid-cols-2 gap-5">
           {data?.map((project, i) => (
             <Link
               style={{

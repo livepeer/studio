@@ -1,13 +1,9 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import {
-  Box,
-  Heading,
-  Badge,
-  Flex,
-  Text,
-  Link as A,
-} from "@livepeer/design-system";
+import { Box, Flex, Link as A } from "@livepeer/design-system";
+import { Text } from "components/ui/text";
+import { Badge } from "components/ui/badge";
+import { Button } from "components/ui/button";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { products } from "@livepeer.studio/api/src/config";
@@ -49,7 +45,7 @@ const Billing = () => {
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
-    null,
+    null
   );
   const June = useJune();
 
@@ -58,7 +54,7 @@ const Billing = () => {
   const fetcher = useCallback(async () => {
     if (user?.stripeCustomerPaymentMethodId) {
       const [_res, paymentMethod] = await getPaymentMethod(
-        user.stripeCustomerPaymentMethodId,
+        user.stripeCustomerPaymentMethodId
       );
       return paymentMethod;
     }
@@ -155,7 +151,7 @@ const Billing = () => {
           TotalUsageMins: Math.max(u?.TotalUsageMins - limits.transcoding, 0),
           DeliveryUsageMins: Math.max(
             u?.DeliveryUsageMins - limits.streaming,
-            0,
+            0
           ),
           StorageUsageMins: Math.max(u?.StorageUsageMins - limits.storage, 0),
         };
@@ -170,8 +166,8 @@ const Billing = () => {
           units: overusage.TotalUsageMins,
           total: Number(
             (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
-              2,
-            ),
+              2
+            )
           ),
         },
         deliveryBill: {
@@ -179,7 +175,7 @@ const Billing = () => {
           total: Number(
             (
               overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
         storageBill: {
@@ -187,7 +183,7 @@ const Billing = () => {
           total: Number(
             (
               overusage.StorageUsageMins * payAsYouGoData.usage[2].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
       };
@@ -203,7 +199,7 @@ const Billing = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        subscription?.status,
+        subscription?.status
       );
     };
 
@@ -228,6 +224,7 @@ const Billing = () => {
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
           <Flex
+            className="gap-2"
             justify="between"
             align="end"
             css={{
@@ -237,31 +234,22 @@ const Billing = () => {
               mb: "$5",
               width: "100%",
             }}>
-            <Heading size="2">
-              <Flex>
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Billing
-                </Box>
-              </Flex>
-            </Heading>
+            <Text weight="semibold" size="lg">
+              Billing
+            </Text>
             <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
               Current billing period (
               {subscription && (
                 <Flex>
                   {new Date(
-                    subscription.current_period_start * 1000,
+                    subscription.current_period_start * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}{" "}
                   to{" "}
                   {new Date(
-                    subscription.current_period_end * 1000,
+                    subscription.current_period_end * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -283,18 +271,9 @@ const Billing = () => {
               mb: "$4",
               width: "100%",
             }}>
-            <Heading size="1">
-              <Flex align="center">
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Current Plan
-                </Box>
-              </Flex>
-            </Heading>
+            <Text weight="semibold" size="lg">
+              Current Plan
+            </Text>
           </Flex>
           <Flex
             justify="between"
@@ -302,10 +281,7 @@ const Billing = () => {
             css={{ fontSize: "$3", color: "$hiContrast" }}>
             <Text variant="neutral">
               You are currently on the
-              <Badge
-                size="1"
-                variant="neutral"
-                css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
+              <Badge className="mx-1" variant="outline">
                 {user?.stripeProductId
                   ? products[user.stripeProductId]?.name
                   : products["prod_O9XuIjn7EqYRVW"]?.name}
@@ -313,11 +289,9 @@ const Billing = () => {
               plan.
             </Text>
             <Link href="/settings/billing/plans" passHref legacyBehavior>
-              <A
-                variant="primary"
-                css={{ display: "flex", alignItems: "center" }}>
+              <Button variant="outline">
                 View Plans & Upgrade <ArrowRightIcon />
-              </A>
+              </Button>
             </Link>
           </Flex>
         </Box>
@@ -332,18 +306,9 @@ const Billing = () => {
               mb: "$5",
               width: "100%",
             }}>
-            <Heading size="1">
-              <Flex align="center" justify="between">
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Payment Method
-                </Box>
-              </Flex>
-            </Heading>
+            <Text weight="semibold" size="lg">
+              Payment Method
+            </Text>
             <PaymentMethodDialog invalidateQuery={invalidateQuery} />
           </Flex>
           <Flex
@@ -373,26 +338,14 @@ const Billing = () => {
               mb: "$4",
               width: "100%",
             }}>
-            <Heading size="1">
-              <Flex align="center">
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Usage
-                </Box>
-              </Flex>
-            </Heading>
+            <Text weight="semibold" size="lg">
+              Usage
+            </Text>
           </Flex>
           <Link href="/settings/usage" passHref legacyBehavior>
-            <A
-              variant="primary"
-              css={{ display: "flex", alignItems: "center" }}
-              onClick={() => trackEvent()}>
+            <Button variant="outline" onClick={() => trackEvent()}>
               View Usage Details <ArrowRightIcon />
-            </A>
+            </Button>
           </Link>
         </Box>
         <Box css={{ mb: "$9" }}>
@@ -403,18 +356,9 @@ const Billing = () => {
               mb: "$4",
               width: "100%",
             }}>
-            <Heading size="1">
-              <Flex align="center">
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Upcoming Invoice
-                </Box>
-              </Flex>
-            </Heading>
+            <Text weight="semibold" size="lg">
+              Upcoming Invoice
+            </Text>
           </Flex>
           {!standardProducts.includes(products[user.stripeProductId]?.name) ? (
             <Text variant="neutral">
@@ -445,18 +389,9 @@ const Billing = () => {
                 mb: "$4",
                 width: "100%",
               }}>
-              <Heading size="1">
-                <Flex align="center">
-                  <Box
-                    css={{
-                      mr: "$3",
-                      fontWeight: 600,
-                      letterSpacing: "0",
-                    }}>
-                    Past Invoices
-                  </Box>
-                </Flex>
-              </Heading>
+              <Text weight="semibold" size="lg">
+                Past Invoices
+              </Text>
             </Flex>
             <PastInvoicesTable invoices={invoices} />
           </Box>

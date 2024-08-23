@@ -65,7 +65,7 @@ const AssetsTable = ({
         openSnackbar("Error deleting asset. Please try again.");
       }
     },
-    [deleteAsset, state, openSnackbar],
+    [deleteAsset, state, openSnackbar]
   );
 
   const onUploadAssetSuccess = () => sleep(2000).then(() => state.invalidate());
@@ -94,9 +94,9 @@ const AssetsTable = ({
         getAssets,
         getTasks,
         onDeleteAsset,
-        appendProjectId,
+        appendProjectId
       ),
-    [userId, appendProjectId],
+    [userId, appendProjectId]
   );
 
   useEffect(() => {

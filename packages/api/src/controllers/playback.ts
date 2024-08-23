@@ -51,7 +51,7 @@ function newPlaybackInfo(
   live?: PlaybackInfo["meta"]["live"],
   recordingUrl?: string,
   withRecordings?: boolean,
-  thumbUrl?: string,
+  thumbUrl?: string
 ): PlaybackInfo {
   let playbackInfo: PlaybackInfo = {
     type,
@@ -130,7 +130,7 @@ function newPlaybackInfo(
 const getAssetPlaybackInfo = async (
   config: CliArgs,
   ingest: string,
-  asset: WithID<Asset>,
+  asset: WithID<Asset>
 ) => {
   const os = await db.objectStore.get(asset.objectStoreId, { useCache: true });
   if (!os || os.deleted || os.disabled) {
@@ -150,7 +150,7 @@ const getAssetPlaybackInfo = async (
     null,
     asset.playbackPolicy || null,
     getStaticPlaybackInfo(asset, os),
-    getThumbsVTTUrl(asset, os),
+    getThumbsVTTUrl(asset, os)
   );
 };
 
@@ -163,7 +163,7 @@ type PlaybackResource = {
 export async function getResourceByPlaybackId(
   id: string,
   user?: User,
-  cutoffDate?: number,
+  cutoffDate?: number
 ): Promise<PlaybackResource> {
   let stream = await db.stream.getByPlaybackId(id);
   if (!stream) {
@@ -200,7 +200,7 @@ async function getAttestationPlaybackInfo(
   ingest: string,
   id: string,
   user?: User,
-  cutoffDate?: number,
+  cutoffDate?: number
 ): Promise<PlaybackInfo> {
   try {
     if (!isExperimentSubject("attestation", user?.id)) {
@@ -235,7 +235,7 @@ async function getPlaybackInfo(
   id: string,
   isCrossUserQuery: boolean,
   origin: string,
-  withRecordings?: boolean,
+  withRecordings?: boolean
 ): Promise<PlaybackInfo> {
   const cutoffDate = isCrossUserQuery ? null : CROSS_USER_ASSETS_CUTOFF_DATE;
   const cacheKey = `playbackInfo-${id}-user-${req.user?.id}-cutoff-${cutoffDate}`;
@@ -258,7 +258,7 @@ async function getPlaybackInfo(
       console.log(
         `Returning cross-user asset for playback. ` +
           `userId=${req.user?.id} userEmail=${req.user?.email} origin=${origin} ` +
-          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`,
+          `assetId=${asset.id} assetUserId=${asset.userId} playbackId=${asset.playbackId}`
       );
     }
 
@@ -278,13 +278,13 @@ async function getPlaybackInfo(
       const { user } = req;
       if (!user) {
         throw new UnauthorizedError(
-          `authentication is required to access recordings`,
+          `authentication is required to access recordings`
         );
       }
 
       if (stream.userId !== user.id) {
         throw new UnauthorizedError(
-          `user does not have access to recordings for this content`,
+          `user does not have access to recordings for this content`
         );
       }
     }
@@ -315,7 +315,7 @@ async function getPlaybackInfo(
 
     const flvOut = await isExperimentSubject(
       "stream-pull-source",
-      req.user?.id,
+      req.user?.id
     );
     return newPlaybackInfo(
       "live",
@@ -328,7 +328,7 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0,
       url,
       withRecordings,
-      thumbUrl,
+      thumbUrl
     );
   }
 
@@ -337,7 +337,7 @@ async function getPlaybackInfo(
       req.config,
       ingest,
       session,
-      false,
+      false
     );
     if (recordingUrl) {
       return newPlaybackInfo("recording", recordingUrl);
@@ -349,7 +349,7 @@ async function getPlaybackInfo(
     ingest,
     id,
     req.user,
-    cutoffDate,
+    cutoffDate
   );
 }
 
@@ -379,7 +379,7 @@ app.get("/:id", async (req, res) => {
     id,
     isEmbeddablePlayer,
     origin,
-    withRecordings,
+    withRecordings
   );
   if (!info) {
     throw new NotFoundError(`No playback URL found for ${id}`);

@@ -121,7 +121,7 @@ export default async function makeApp(params: CliArgs) {
         }
         return false;
       },
-    }),
+    })
   );
   app.use(router);
 
@@ -139,14 +139,14 @@ export default async function makeApp(params: CliArgs) {
         version: getGitHash(),
         app: "studio-api",
       },
-      1,
+      1
     );
     await new Promise<void>((resolve, reject) => {
       listener = app.listen(port, () => {
         const address = listener.address() as AddressInfo;
         listenPort = address.port;
         logger.info(
-          `API server listening on http://0.0.0.0:${listenPort}${httpPrefix}`,
+          `API server listening on http://0.0.0.0:${listenPort}${httpPrefix}`
         );
         resolve();
       });

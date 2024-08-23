@@ -82,7 +82,7 @@ const StreamDetail = ({
     if (!stream?.isActive) return null;
 
     const activeCond = streamHealth?.conditions.find(
-      (c) => c.type === "Active",
+      (c) => c.type === "Active"
     );
     const healthyCond = streamHealth?.healthy;
     const healthValid =
@@ -92,8 +92,8 @@ const StreamDetail = ({
     return !healthValid
       ? StatusVariant.Pending
       : healthyCond.status
-        ? StatusVariant.Healthy
-        : StatusVariant.Unhealthy;
+      ? StatusVariant.Healthy
+      : StatusVariant.Unhealthy;
   }, [stream?.isActive, streamHealth]);
 
   if (!user) {

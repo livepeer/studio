@@ -78,7 +78,7 @@ export default class Model implements IStore {
     const [table] = this.getTable(prefix);
     const [response, nextCursor] = await this.db[table].find(
       {},
-      { limit, cursor },
+      { limit, cursor }
     );
     const keys = response.map((x) => x.id);
     return [keys, nextCursor];

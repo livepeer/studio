@@ -107,7 +107,7 @@ const UpcomingInvoiceTable = ({
           <Td css={{ fontSize: "$2" }}>
             Due on{" "}
             {new Date(
-              subscription.current_period_end * 1000,
+              subscription.current_period_end * 1000
             ).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",

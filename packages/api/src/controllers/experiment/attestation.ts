@@ -41,7 +41,7 @@ app.post("/", validatePost("attestation"), async (req, res) => {
   const verfiedSignatureType = await verifySignature(
     message,
     signature,
-    signatureType,
+    signatureType
   );
   if (!verfiedSignatureType) {
     return res.status(400).json({ errors: ["invalid signature"] });
@@ -104,7 +104,7 @@ function toContent(attestation: Attestation) {
 async function verifySignature(
   message: any,
   signature: string,
-  signatureType?: Attestation["signatureType"],
+  signatureType?: Attestation["signatureType"]
 ): Promise<string> {
   const verifiedEIP712 =
     (signatureType === "eip712" || !signatureType) &&
@@ -122,7 +122,7 @@ function verifyEIP712Signature(message: any, signature: string): boolean {
       DOMAIN,
       TYPES,
       message,
-      signature,
+      signature
     );
 
     return verifiedSigner === message.signer;
@@ -133,7 +133,7 @@ function verifyEIP712Signature(message: any, signature: string): boolean {
 
 async function verifyFlowSignature(
   message: any,
-  signature: string,
+  signature: string
 ): Promise<boolean> {
   try {
     const compSig = [
@@ -148,7 +148,7 @@ async function verifyFlowSignature(
 
     return await fcl.AppUtils.verifyUserSignatures(
       Buffer.from(stringify(message)).toString("hex"),
-      compSig,
+      compSig
     );
   } catch (e) {
     return false;
@@ -176,7 +176,7 @@ app.get("/", async (req, res) => {
   const query = [];
   if (creator) {
     query.push(
-      `attestation.data->'message'->'attestations' @> '[{"role":"creator","address":"${creator}"}]'`,
+      `attestation.data->'message'->'attestations' @> '[{"role":"creator","address":"${creator}"}]'`
     );
   }
   const [output, newCursor] = await db.attestation.find(query, {

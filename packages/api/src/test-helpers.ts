@@ -25,14 +25,14 @@ export async function clearDatabase(server: TestServer) {
     .map((s) => ("table" in s ? s.table : null))
     .filter((t) => !!t);
   await Promise.all(
-    tables.map((t) => server?.db?.query(`TRUNCATE TABLE ${t}`)),
+    tables.map((t) => server?.db?.query(`TRUNCATE TABLE ${t}`))
   );
 }
 
 export function verifyJwt(
   token: string,
   publicKey: string,
-  verifyOptions?: VerifyOptions,
+  verifyOptions?: VerifyOptions
 ) {
   try {
     return jwt.verify(token, publicKey, verifyOptions);
@@ -138,7 +138,7 @@ export class TestClient {
       {
         ...args,
         headers,
-      },
+      }
     );
     return res;
   }
@@ -235,7 +235,7 @@ export async function createUser(
   client: TestClient,
   userData: User,
   admin: boolean,
-  emailValid: boolean,
+  emailValid: boolean
 ) {
   const userRes = await client.post(`/user`, userData);
   let user = await userRes.json();
@@ -261,7 +261,7 @@ export async function setupUsers(
   server: TestServer,
   admin: User,
   nonAdmin: User,
-  emailValid = true,
+  emailValid = true
 ) {
   const client = new TestClient({ server });
   const {

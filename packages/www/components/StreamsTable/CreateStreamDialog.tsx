@@ -1,19 +1,16 @@
-import {
-  Box,
-  Button,
-  Flex,
-  AlertDialog,
-  AlertDialogTitle,
-  AlertDialogContent,
-  AlertDialogCancel,
-  AlertDialogDescription,
-  TextField,
-  Heading,
-  Text,
-  Label,
-} from "@livepeer/design-system";
-import { useState } from "react";
+import { Box, Flex, Heading, Label, TextField } from "@livepeer/design-system";
 import Spinner from "components/Spinner";
+import { Button } from "components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "components/ui/dialog";
+import { Input } from "components/ui/input";
+import { Text } from "components/ui/text";
+import { useState } from "react";
 
 const CreateStreamDialog = ({
   isOpen,
@@ -28,11 +25,11 @@ const CreateStreamDialog = ({
   const [streamName, setStreamName] = useState("");
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle asChild>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <DialogTitle asChild>
           <Heading size="1">Create a new livestream</Heading>
-        </AlertDialogTitle>
+        </DialogTitle>
         <Box
           css={{ mt: "$3" }}
           as="form"
@@ -52,9 +49,8 @@ const CreateStreamDialog = ({
           }}>
           <Flex direction="column" gap="2">
             <Label htmlFor="firstName">Stream name</Label>
-            <TextField
+            <Input
               required
-              size="2"
               type="text"
               id="firstName"
               autoFocus={true}
@@ -66,28 +62,23 @@ const CreateStreamDialog = ({
               A-Z, a-z, 0-9, -, _, ~ only
             </Text> */}
           </Flex>
-          <AlertDialogDescription asChild>
-            <Text
-              size="3"
-              variant="neutral"
-              css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
+          <DialogDescription asChild>
+            <Text className="mt-2" variant="neutral">
               Newly created streams are assigned a special key and RTMP ingest
               URL to stream into.
             </Text>
-          </AlertDialogDescription>
+          </DialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-            <AlertDialogCancel asChild>
-              <Button disabled={creating} size="2" ghost>
+            <DialogClose asChild>
+              <Button disabled={creating} variant="outline">
                 Cancel
               </Button>
-            </AlertDialogCancel>
+            </DialogClose>
             <Button
               css={{ display: "flex", ai: "center" }}
               type="submit"
-              size="2"
-              disabled={creating}
-              variant="primary">
+              disabled={creating}>
               {creating && (
                 <Spinner
                   css={{
@@ -102,8 +93,8 @@ const CreateStreamDialog = ({
             </Button>
           </Flex>
         </Box>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

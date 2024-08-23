@@ -29,7 +29,7 @@ const origFetchWithTimeout = mockedFetchWithTimeout.getMockImplementation(); // 
 const mockFetchHttpError = (
   status: number,
   contentType: string,
-  body: string,
+  body: string
 ) => {
   mockedFetchWithTimeout.mockImplementation(async () => {
     // these are the only fields the API needs
@@ -132,7 +132,7 @@ describe("controllers/generate", () => {
 
   const buildMultipartBody = (
     textFields: Record<string, any>,
-    multipartField = { name: "image", contentType: "image/png" },
+    multipartField = { name: "image", contentType: "image/png" }
   ) => {
     const form = new FormData();
     for (const [k, v] of Object.entries(textFields)) {
@@ -150,7 +150,7 @@ describe("controllers/generate", () => {
         method: "POST",
         body: buildMultipartBody(
           {},
-          { name: "audio", contentType: "audio/wav" },
+          { name: "audio", contentType: "audio/wav" }
         ),
       });
       expect(res.status).toBe(200);
@@ -266,7 +266,7 @@ describe("controllers/generate", () => {
         {
           limit: 1,
           order: "coalesce((data->>'startedAt')::bigint, 0) desc",
-        },
+        }
       );
       expect(logs).toHaveLength(1);
       return logs[0];
@@ -308,7 +308,7 @@ describe("controllers/generate", () => {
       mockFetchHttpError(
         500,
         "application/json",
-        `{"details":{"msg":"sudden error"}}`,
+        `{"details":{"msg":"sudden error"}}`
       );
 
       const res = await client.post("/beta/generate/text-to-image", {
@@ -386,7 +386,7 @@ describe("controllers/generate", () => {
         : client.fetch(`/beta/generate/${pipeline}`, {
             method: "POST",
             body: buildMultipartBody(
-              pipeline === "image-to-video" ? {} : { prompt: "make magic" },
+              pipeline === "image-to-video" ? {} : { prompt: "make magic" }
             ),
           });
 
@@ -421,7 +421,7 @@ describe("controllers/generate", () => {
         client,
         mockOtherNonAdminUserInput,
         false,
-        true,
+        true
       );
 
       // first user exhausts their reqs

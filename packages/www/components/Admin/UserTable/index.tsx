@@ -101,7 +101,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
         },
       },
     ],
-    [nextCursor, lastFilters],
+    [nextCursor, lastFilters]
   );
 
   const filtersDesc = useMemo(
@@ -126,7 +126,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
         ),
       },
     ],
-    [],
+    []
   );
 
   const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
@@ -159,7 +159,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const refetch = () => {
     fetchData(
       { order: lastOrder, cursor: lastCursor, filters: lastFilters },
-      true,
+      true
     );
   };
 

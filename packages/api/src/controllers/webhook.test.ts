@@ -79,7 +79,7 @@ async function setupUsers(server) {
 
   const nonAdminUserRes = await server.store.get(
     `user/${nonAdminUser.id}`,
-    false,
+    false
   );
   nonAdminUser = { ...nonAdminUserRes, emailValid: true };
   await server.store.replace(nonAdminUser);
@@ -166,7 +166,7 @@ describe("controllers/webhook", () => {
       const resJson = await res.json();
       expect(res.status).toBe(200);
       expect(res.headers.get("link")).toEqual(
-        expect.stringContaining("cursor="),
+        expect.stringContaining("cursor=")
       );
       expect(resJson).toHaveLength(1);
       expect(resJson[0].userId).toEqual(generatedWebhook.userId);
@@ -353,13 +353,13 @@ describe("controllers/webhook", () => {
       expect(webhookRequest.response.body).toBeDefined();
 
       const getRes = await client.get(
-        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}`,
+        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}`
       );
       expect(getRes.status).toBe(200);
       const getJson = await getRes.json();
       expect(getJson.id).toEqual(webhookRequest.id);
       const resendRes = await client.post(
-        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`,
+        `/webhook/${generatedWebhook.id}/log/${webhookRequest.id}/resend`
       );
       expect(resendRes.status).toBe(200);
       const resent = await resendRes.json();
@@ -374,7 +374,7 @@ describe("controllers/webhook", () => {
 
       // try query filters
       logRes = await client.get(
-        `/webhook/${generatedWebhook.id}/log?filters=[{"id":"success","value":"false"}]`,
+        `/webhook/${generatedWebhook.id}/log?filters=[{"id":"success","value":"false"}]`
       );
       expect(logRes.status).toBe(200);
       logJson = await logRes.json();

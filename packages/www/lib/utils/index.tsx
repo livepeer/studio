@@ -2,6 +2,8 @@ import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
 import getConfig from "next/config";
 
+export { cn } from "../cn";
+
 export const { publicRuntimeConfig } = getConfig();
 
 export const { basePath } = publicRuntimeConfig;
@@ -45,7 +47,7 @@ function getLineHeight(el: HTMLElement) {
     "style",
     `margin:0; padding:0;font-family:${
       el.style.fontFamily || "inherit"
-    };font-size:${el.style.fontSize || "inherit"};`,
+    };font-size:${el.style.fontSize || "inherit"};`
   );
   temp.innerHTML = "A";
 
@@ -118,7 +120,7 @@ export const shouldStripe = () => {
 
 export function formatAmountForDisplay(
   amount: number,
-  currency: string,
+  currency: string
 ): string {
   let numberFormat = new Intl.NumberFormat(["en-US"], {
     style: "currency",
@@ -130,7 +132,7 @@ export function formatAmountForDisplay(
 
 export function formatAmountForStripe(
   amount: number,
-  currency: string,
+  currency: string
 ): number {
   let numberFormat = new Intl.NumberFormat(["en-US"], {
     style: "currency",
@@ -149,7 +151,7 @@ export function formatAmountForStripe(
 
 export function formatNumber(
   val: number,
-  maximumFractionDigits: number,
+  maximumFractionDigits: number
 ): string {
   let numberFormat = new Intl.NumberFormat(["en-US"], {
     maximumFractionDigits,
@@ -158,10 +160,7 @@ export function formatNumber(
 }
 
 export class HttpError extends Error {
-  constructor(
-    public status: number,
-    public body: any,
-  ) {
+  constructor(public status: number, public body: any) {
     super(HttpError.makeMessage(status, body));
   }
 
@@ -234,11 +233,12 @@ export function isExport(): boolean {
 
 export function isStaging(): boolean {
   return (
-    typeof window !== "undefined" &&
-    (window.location.hostname.includes("livepeer.monster") ||
-      window.location.hostname.includes("livepeer.vercel.app") ||
-      window.location.hostname.includes("livepeerorg.vercel.app") ||
-      window.location.hostname.includes("livepeerorg.now.sh"))
+    true ||
+    (typeof window !== "undefined" &&
+      (window.location.hostname.includes("livepeer.monster") ||
+        window.location.hostname.includes("livepeer.vercel.app") ||
+        window.location.hostname.includes("livepeerorg.vercel.app") ||
+        window.location.hostname.includes("livepeerorg.now.sh")))
   );
 }
 
