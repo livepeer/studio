@@ -122,7 +122,7 @@ const AssetDetail = ({
             </Alert>
           ) : asset?.status?.phase === "processing" ||
             asset?.status?.phase === "uploading" ? (
-            <Alert variant="warning">
+            <Alert variant="default">
               <Clock10 size={18} />
               <AlertTitle>
                 <span className="capitalize">{asset.status.phase}</span> the
@@ -140,7 +140,7 @@ const AssetDetail = ({
             <></>
           )}
 
-          {asset != undefined ? (
+          {asset !== undefined ? (
             <Flex
               css={{
                 mt: "$4",

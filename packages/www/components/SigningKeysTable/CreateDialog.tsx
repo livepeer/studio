@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-  DialogCancel,
   DialogClose,
 } from "components/ui/dialog";
 

@@ -436,22 +436,22 @@ const PlanForm = ({
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
               <AlertDialogCancel asChild>
                 <Button
-                  size="2"
+                  variant="outline"
                   onClick={() => {
                     setOpen(false);
                   }}
-                  ghost>
+>
                   Cancel
                 </Button>
               </AlertDialogCancel>
               <Button
-                size="2"
+
                 className="elements-style-background"
                 type="submit"
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
                 }
-                variant="primary">
+>
                 {status === "processing" && (
                   <Spinner
                     css={{
