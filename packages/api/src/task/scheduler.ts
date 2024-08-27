@@ -361,11 +361,11 @@ export class TaskScheduler {
     const task = await this.createTask(
       type,
       params,
+      projectId,
       inputAsset,
       outputAsset,
       userId,
       requesterId,
-      projectId,
     );
 
     if (user?.disabled) {
@@ -379,11 +379,11 @@ export class TaskScheduler {
   async createTask(
     type: Task["type"],
     params: Task["params"],
+    projectId: string,
     inputAsset?: Asset,
     outputAsset?: Asset,
     userId?: string,
     requesterId?: string,
-    projectId?: string,
   ) {
     const uId = inputAsset?.userId || outputAsset?.userId || userId;
     const user = await db.user.get(uId, { useCache: true });

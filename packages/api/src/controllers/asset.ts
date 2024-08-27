@@ -991,9 +991,9 @@ app.post(
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
       },
+      req.project?.id,
       null,
       asset,
-      req.project?.id,
     );
 
     res.json({ url, tusEndpoint, asset, task: { id: task.id } });
