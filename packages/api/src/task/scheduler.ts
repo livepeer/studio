@@ -8,7 +8,7 @@ import {
   toExternalTask,
 } from "../controllers/task";
 import { CliArgs } from "../parse-cli";
-import { Asset, Task } from "../schema/types";
+import { Asset, Task, User } from "../schema/types";
 import { jobsDb as db } from "../store"; // use only the jobs DB pool on queue logic
 import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { TooManyRequestsError } from "../store/errors";
@@ -352,6 +352,12 @@ export class TaskScheduler {
     userId?: string,
     requesterId?: string,
   ) {
+    let uId = inputAsset?.userId || outputAsset?.userId || userId;
+    let user: User;
+    if (uId) {
+      user = await db.user.get(uId);
+    }
+    const projectId = inputAsset?.projectId || user?.defaultProjectId;
     const task = await this.createTask(
       type,
       params,
@@ -359,16 +365,11 @@ export class TaskScheduler {
       outputAsset,
       userId,
       requesterId,
+      projectId,
     );
 
-    let uId = inputAsset?.userId || outputAsset?.userId || userId;
-
-    if (uId) {
-      const user = await db.user.get(uId);
-
-      if (user?.disabled) {
-        throw new Error("user is disabled");
-      }
+    if (user?.disabled) {
+      throw new Error("user is disabled");
     }
 
     await this.scheduleTask(task);
@@ -382,6 +383,7 @@ export class TaskScheduler {
     outputAsset?: Asset,
     userId?: string,
     requesterId?: string,
+    projectId?: string,
   ) {
     const uId = inputAsset?.userId || outputAsset?.userId || userId;
     const user = await db.user.get(uId, { useCache: true });
@@ -397,10 +399,7 @@ export class TaskScheduler {
         phase: "pending",
         updatedAt: Date.now(),
       },
-      projectId:
-        inputAsset?.projectId ||
-        outputAsset?.projectId ||
-        user.defaultProjectId,
+      projectId,
       requesterId,
     });
     await this.queue.publishWebhook("events.task.spawned", {

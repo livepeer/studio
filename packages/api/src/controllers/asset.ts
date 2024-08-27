@@ -993,6 +993,7 @@ app.post(
       },
       null,
       asset,
+      req.project?.id,
     );
 
     res.json({ url, tusEndpoint, asset, task: { id: task.id } });
