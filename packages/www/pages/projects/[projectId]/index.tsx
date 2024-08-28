@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Layout from "../../../layouts/dashboard";
 import { Box, Button, useSnackbar } from "@livepeer/design-system";
@@ -13,14 +13,27 @@ import { Dashboard as Content } from "content";
 import FeaturesModel from "components/FeaturesModel";
 
 const Dashboard = () => {
-  const { user, verifyEmail, getUserProduct } = useApi();
+  const { user, verifyEmail, getUserProduct, getUser } = useApi();
   const { emailValid } = user;
 
   const [loading, setLoading] = useState(false);
   const [shouldShowFeature, setShouldShowFeature] = useState(false);
+  const [showDisabledBanner, setShowDisabledBanner] = useState(false);
   const product = getUserProduct(user);
-  const showPromo = user.disabled;
   const [openSnackbar] = useSnackbar();
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const [res, updatedUser] = await getUser(user.id);
+        setShowDisabledBanner(updatedUser.disabled === true);
+      } catch (error) {
+        console.error("Error fetching user status:", error);
+      }
+    };
+
+    checkUserStatus();
+  }, [getUser]);
 
   const resendVerificationEmail = async () => {
     setLoading(true);
@@ -65,7 +78,7 @@ const Dashboard = () => {
           css={{ mb: "$3" }}
         />
       )}
-      {showPromo && (
+      {showDisabledBanner && (
         <Banner
           title="Upgrade"
           description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
