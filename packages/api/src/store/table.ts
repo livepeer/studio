@@ -371,15 +371,6 @@ export default class Table<T extends DBObject> {
 
   // on startup: auto-create indices if they don't exist
   async ensureIndex(propName: string, prop: FieldSpec, parents: string[] = []) {
-    if (
-      process.env.NODE_ENV !== "test" &&
-      ["stream", "session"].includes(this.name)
-    ) {
-      // avoid creating stream indexes in production right now. since the tables
-      // are large they can take 15+ minutes to index which hangs deployments.
-      // TODO: create an init container to create indexes before the server.
-      return;
-    }
     if (prop.oneOf?.length) {
       for (const oneSchema of prop.oneOf) {
         await this.ensureIndex(propName, oneSchema, parents);
