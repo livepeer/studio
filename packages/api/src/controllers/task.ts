@@ -127,6 +127,7 @@ const fieldsMap: FieldsMap = {
   type: `task.data->>'type'`,
   inputAssetId: `task.data->>'inputAssetId'`,
   outputAssetId: `task.data->>'outputAssetId'`,
+  projectId: `task.data->>'projectId'`,
 };
 
 export function toExternalTask(
@@ -209,6 +210,11 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`task.data->>'userId' = ${req.user.id}`);
+  query.push(
+    sql`coalesce(task.data->>'projectId', ${
+      req.user.defaultProjectId || ""
+    }) = ${req.project?.id || ""}`,
+  );
 
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`task.data->>'deleted' IS NULL`);

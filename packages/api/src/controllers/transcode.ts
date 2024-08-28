@@ -67,9 +67,7 @@ app.post(
           catalystPipelineStrategy,
         },
       },
-      null,
-      null,
-      req.user.id,
+      req.user,
     );
     res.json(task);
   },

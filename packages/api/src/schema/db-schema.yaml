@@ -1091,6 +1091,8 @@ components:
           index: true
         outputAssetId:
           index: true
+        projectId:
+          index: true
         requesterId:
           type: string
           description: ID of the requester hash(IP + SALT + PlaybackId)

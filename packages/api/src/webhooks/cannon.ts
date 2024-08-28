@@ -603,6 +603,8 @@ export default class WebhookCannon {
         this.secondaryRecordObjectStoreId,
       );
 
+      const user = await db.user.get(session.userId, { useCache: true });
+
       await taskScheduler.createAndScheduleTask(
         "upload",
         {
@@ -615,6 +617,7 @@ export default class WebhookCannon {
             )),
           },
         },
+        user,
         undefined,
         asset,
       );

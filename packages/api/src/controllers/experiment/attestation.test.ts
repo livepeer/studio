@@ -1,6 +1,7 @@
 import serverPromise, { TestServer } from "../../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../../test-helpers";
 import { v4 as uuid } from "uuid";
+import { db } from "../../store";
 
 const CREATOR_PUBLIC_KEY = "0xB7D5D7a6FcFE31611E4673AA3E61f21dC56723fC";
 const NOW = 1685527855812;
@@ -84,7 +85,6 @@ beforeEach(async () => {
   });
   expect(res.status).toBe(204);
 
-  client = new TestClient({ server });
   res = await client.post("/experiment/-/attestation", {
     primaryType: "VideoAttestation",
     domain: {
