@@ -355,6 +355,6 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
-    viewerLimit: 10_000,
+    viewerLimit: 20_000,
   },
 };
