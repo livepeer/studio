@@ -656,6 +656,20 @@ components:
                 Profiles to process the recording of this stream into. If not
                 specified, default profiles will be derived based on the stream
                 input. Keep in mind that the source rendition is always kept.
+        multistream:
+          type: object
+          additionalProperties: false
+          properties:
+            targets:
+              type: array
+              example:
+                - id: PUSH123
+                  profile: 720p
+              description: |
+                References to targets where this stream will be simultaneously
+                streamed to
+              items:
+                $ref: "#/components/schemas/target"
         suspended:
           type: boolean
           description: If currently suspended
