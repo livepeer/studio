@@ -377,14 +377,13 @@ export class TaskScheduler {
     outputAsset?: Asset,
     requesterId?: string,
   ) {
-    const uId = inputAsset?.userId || outputAsset?.userId || userId;
     const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
-      userId: uId,
+      userId,
       params,
       status: {
         phase: "pending",
