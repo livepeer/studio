@@ -247,6 +247,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminUser.defaultProjectId,
       });
 
       await sem.wait(3000);
@@ -287,6 +288,7 @@ describe("webhook cannon", () => {
           streamId: "streamid",
           event: "stream.started",
           userId: nonAdminUser.id,
+          projectId: nonAdminUser.defaultProjectId,
         });
 
         await sem.wait(3000);
@@ -325,6 +327,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminUser.defaultProjectId,
       });
 
       await Promise.all(sems.map((s) => s.wait(3000)));
@@ -355,6 +358,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminUser.defaultProjectId,
       });
 
       await sem.wait(3000);
@@ -369,6 +373,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.idle",
         userId: nonAdminUser.id,
+        projectId: nonAdminUser.defaultProjectId,
       });
 
       await sem.wait(3000);
@@ -384,6 +389,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.unknown" as any,
         userId: nonAdminUser.id,
+        projectId: nonAdminUser.defaultProjectId,
       });
 
       await sem.wait(1000);
@@ -424,6 +430,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminUser.defaultProjectId,
       });
 
       await Promise.all(sems.map((s) => s.wait(3000)));
@@ -512,6 +519,7 @@ describe("webhook cannon", () => {
           sessionId: session.id,
           event: "recording.waiting",
           userId: nonAdminUser.id,
+          projectId: nonAdminUser.defaultProjectId,
         });
 
         await sem.wait(3000);
@@ -556,6 +564,7 @@ describe("webhook cannon", () => {
           sessionId: session.id,
           event: "recording.waiting",
           userId: nonAdminUser.id,
+          projectId: nonAdminUser.defaultProjectId,
         });
 
         await sem.wait(3000);
