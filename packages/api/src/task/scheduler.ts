@@ -353,7 +353,7 @@ export class TaskScheduler {
     requesterId?: string,
   ) {
     const projectId =
-      inputAsset?.projectId || outputAsset.projectId || user?.defaultProjectId;
+      inputAsset?.projectId || outputAsset?.projectId || user?.defaultProjectId;
     const task = await this.createTask(
       type,
       params,
