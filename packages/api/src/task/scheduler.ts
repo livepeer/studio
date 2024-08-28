@@ -357,7 +357,7 @@ export class TaskScheduler {
     const task = await this.createTask(
       type,
       params,
-      user.id,
+      user,
       projectId,
       inputAsset,
       outputAsset,
@@ -371,7 +371,7 @@ export class TaskScheduler {
   async createTask(
     type: Task["type"],
     params: Task["params"],
-    userId: string,
+    user: User,
     projectId: string,
     inputAsset?: Asset,
     outputAsset?: Asset,
@@ -383,7 +383,7 @@ export class TaskScheduler {
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
-      userId,
+      userId: user.id,
       params,
       status: {
         phase: "pending",
@@ -401,6 +401,7 @@ export class TaskScheduler {
       payload: {
         task: taskInfo(task, this.config),
       },
+      projectId: task.projectId || user.defaultProjectId,
     });
     return task;
   }
@@ -498,6 +499,7 @@ export class TaskScheduler {
       payload: {
         task: taskInfo(task, this.config),
       },
+      projectId: task.projectId,
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
       let taskEvent: EventKey = `task.${task.status.phase}`;
@@ -512,6 +514,7 @@ export class TaskScheduler {
           success: task.status.phase === "completed",
           task: taskInfo(task, this.config),
         },
+        projectId: task.projectId,
       });
     }
     return task;
