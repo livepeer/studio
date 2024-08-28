@@ -350,14 +350,14 @@ export class TaskScheduler {
     user: User,
     inputAsset?: Asset,
     outputAsset?: Asset,
-    userId?: string,
     requesterId?: string,
   ) {
-    const projectId = inputAsset?.projectId || user?.defaultProjectId;
+    const projectId =
+      inputAsset?.projectId || outputAsset.projectId || user?.defaultProjectId;
     const task = await this.createTask(
       type,
       params,
-      userId,
+      user.id,
       projectId,
       inputAsset,
       outputAsset,
@@ -371,8 +371,8 @@ export class TaskScheduler {
   async createTask(
     type: Task["type"],
     params: Task["params"],
-    userId?: string,
-    projectId?: string,
+    userId: string,
+    projectId: string,
     inputAsset?: Asset,
     outputAsset?: Asset,
     requesterId?: string,

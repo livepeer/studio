@@ -207,10 +207,9 @@ app.post(
           sourceObjectStoreId: objectStoreId,
         },
       },
-      req.user,
+      owner,
       null,
       asset,
-      owner.id,
       requesterId,
     );
 

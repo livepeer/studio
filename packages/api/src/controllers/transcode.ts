@@ -68,9 +68,6 @@ app.post(
         },
       },
       req.user,
-      null,
-      null,
-      req.user.id,
     );
     res.json(task);
   },
