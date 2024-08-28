@@ -475,7 +475,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       "access-control-default-max-concurrent-viewers": {
         describe: "Access Control Max Concurrent viewers",
         type: "number",
-        default: 50_000,
+        default: 10_000,
       },
       "verification-frequency": {
         describe: "verificationFreq field to return from stream/hook",

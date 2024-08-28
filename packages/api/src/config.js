@@ -53,7 +53,7 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
-    viewerLimit: 50_000,
+    viewerLimit: 10_000,
   },
   prod_2: {
     deprecated: true,
@@ -123,9 +123,9 @@ export const products = {
     ],
     monthlyPrice: 1,
     minimumSpend: true,
-    concurrentViewers: 50_000,
+    concurrentViewers: 10_000,
     payAsYouGo: true,
-    viewerLimit: 50_000,
+    viewerLimit: 10_000,
   },
   scale_1: {
     order: 5,
@@ -153,7 +153,7 @@ export const products = {
     ],
     monthlyPrice: 500,
     payAsYouGo: true,
-    viewerLimit: 50_000,
+    viewerLimit: 10_000,
   },
   pay_as_you_go_1: {
     order: 6,
@@ -254,10 +254,10 @@ export const products = {
       },
     ],
     monthlyPrice: 100,
-    concurrentViewers: 50_000,
+    concurrentViewers: 10_000,
     minimumSpend: true,
     payAsYouGo: true,
-    viewerLimit: 50_000,
+    viewerLimit: 10_000,
   },
   prod_O9XtcfOSMjSD5L: {
     order: 10,
@@ -285,7 +285,7 @@ export const products = {
     ],
     monthlyPrice: 500,
     payAsYouGo: true,
-    viewerLimit: 50_000,
+    viewerLimit: 10_000,
   },
   prod_O9XuWMU1Up6QKf: {
     order: 11,
@@ -355,6 +355,6 @@ export const products = {
       },
     ],
     monthlyPrice: 0,
-    viewerLimit: 50_000,
+    viewerLimit: 10_000,
   },
 };
