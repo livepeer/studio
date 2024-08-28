@@ -73,7 +73,7 @@ class Tracker {
   }
 
   private async flushWebhookStatus(id: string) {
-    const status = this.pendingWebhookStatusUpdates.get(id) ?? {};
+    const status = this.pendingWebhookStatusUpdates.get(id);
     this.pendingWebhookStatusUpdates.delete(id);
     if (!status) {
       return;
