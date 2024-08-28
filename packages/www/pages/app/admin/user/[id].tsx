@@ -52,7 +52,7 @@ const ID = () => {
   const [updateViewerLimitModal, setUpdateViewerLimitModal] = useState(false);
   const [newViewerLimit, setNewViewerLimit] = useState(
     userInfo?.viewerLimit ||
-      (userInfo.stripeProductId === "prod_O9XuIjn7EqYRVW" ? 30 : 10_000),
+      (userInfo?.stripeProductId === "prod_O9XuIjn7EqYRVW" ? 30 : 10_000),
   );
   const [notFound, setNotFound] = useState(false);
 
@@ -196,7 +196,7 @@ const ID = () => {
                   <Box sx={{ m: "0.4em" }}>Viewer limit</Box>
                   <Box sx={{ m: "0.4em" }}>
                     {userInfo.viewerLimit ??
-                      (userInfo.stripeProductId === "prod_O9XuIjn7EqYRVW"
+                      (userInfo?.stripeProductId === "prod_O9XuIjn7EqYRVW"
                         ? 30
                         : 10_000)}
                   </Box>
