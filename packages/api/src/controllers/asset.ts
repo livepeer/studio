@@ -25,6 +25,7 @@ import {
   ObjectStore,
   PlaybackPolicy,
   Task,
+  User,
 } from "../schema/types";
 import { db } from "../store";
 import {
@@ -517,6 +518,7 @@ async function reconcileAssetStorage(
   { taskScheduler, config }: Request,
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
+  user: User,
   task?: WithID<Task>,
 ): Promise<Asset["storage"]> {
   let { storage } = asset;
@@ -535,6 +537,7 @@ async function reconcileAssetStorage(
       task = await taskScheduler.createAndScheduleTask(
         "export",
         { export: { ipfs: newSpec } },
+        user,
         asset,
       );
     }
@@ -824,6 +827,7 @@ app.post(
     const task = await req.taskScheduler.createAndScheduleTask(
       "export",
       { export: params },
+      req.user,
       asset,
     );
 
@@ -837,6 +841,7 @@ app.post(
         req,
         asset,
         { ipfs: { spec: params.ipfs } },
+        req.user,
         task,
       );
       await req.taskScheduler.updateAsset(asset, { storage });
@@ -919,6 +924,7 @@ app.post(
           targetSegmentSizeSecs,
         },
       },
+      req.user,
       undefined,
       asset,
     );
@@ -991,6 +997,7 @@ app.post(
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
       },
+      req.user.id,
       req.project?.id,
       null,
       asset,
@@ -1293,7 +1300,7 @@ app.patch(
 
     let storage = storageInputToState(storageInput);
     if (storage) {
-      storage = await reconcileAssetStorage(req, asset, storage);
+      storage = await reconcileAssetStorage(req, asset, storage, req.user);
     }
 
     if (

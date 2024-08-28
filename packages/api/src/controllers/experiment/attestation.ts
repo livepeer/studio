@@ -66,14 +66,18 @@ app.post("/", validatePost("attestation"), async (req, res) => {
     ...req.body,
   });
 
-  const task = await taskScheduler.createAndScheduleTask("export-data", {
-    exportData: {
-      ipfs: {},
-      type: "attestation",
-      id: attestationMetadata.id,
-      content: toContent(attestationMetadata),
+  const task = await taskScheduler.createAndScheduleTask(
+    "export-data",
+    {
+      exportData: {
+        ipfs: {},
+        type: "attestation",
+        id: attestationMetadata.id,
+        content: toContent(attestationMetadata),
+      },
     },
-  });
+    req.user,
+  );
 
   attestationMetadata.storage = {
     status: {

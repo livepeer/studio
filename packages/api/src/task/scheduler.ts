@@ -347,30 +347,22 @@ export class TaskScheduler {
   async createAndScheduleTask(
     type: Task["type"],
     params: Task["params"],
+    user: User,
     inputAsset?: Asset,
     outputAsset?: Asset,
     userId?: string,
     requesterId?: string,
   ) {
-    let uId = inputAsset?.userId || outputAsset?.userId || userId;
-    let user: User;
-    if (uId) {
-      user = await db.user.get(uId);
-    }
     const projectId = inputAsset?.projectId || user?.defaultProjectId;
     const task = await this.createTask(
       type,
       params,
+      userId,
       projectId,
       inputAsset,
       outputAsset,
-      userId,
       requesterId,
     );
-
-    if (user?.disabled) {
-      throw new Error("user is disabled");
-    }
 
     await this.scheduleTask(task);
     return task;
@@ -379,14 +371,13 @@ export class TaskScheduler {
   async createTask(
     type: Task["type"],
     params: Task["params"],
-    projectId: string,
+    userId?: string,
+    projectId?: string,
     inputAsset?: Asset,
     outputAsset?: Asset,
-    userId?: string,
     requesterId?: string,
   ) {
     const uId = inputAsset?.userId || outputAsset?.userId || userId;
-    const user = await db.user.get(uId, { useCache: true });
     const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
