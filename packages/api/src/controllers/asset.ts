@@ -997,7 +997,7 @@ app.post(
           ...(profiles ? { profiles } : null), // avoid serializing null profiles on the task
         },
       },
-      req.user.id,
+      req.user,
       req.project?.id,
       null,
       asset,
