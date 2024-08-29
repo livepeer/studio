@@ -437,6 +437,44 @@ describe("webhook cannon", () => {
       expect(calledFlags).toEqual([true, false]);
     });
 
+    it("should use the default projectId if not specified in the request, and receive events only related to the default projectId", async () => {
+      let res = await client.post(`/webhook`, {
+        ...mockWebhook,
+        name: "test-default-project",
+      });
+      expect(res.status).toBe(201);
+
+      res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
+        ...mockWebhook,
+        name: "test-non-default-project",
+      });
+      expect(res.status).toBe(201);
+
+      const sem = semaphore();
+      let calledFlags = [false, false];
+      webhookCallback = () => {
+        calledFlags[0] = true;
+        sem.release();
+      };
+      webhook2Callback = () => {
+        calledFlags[1] = true;
+        sem.release();
+      };
+
+      await server.queue.publishWebhook("events.stream.started", {
+        type: "webhook_event",
+        id: "webhook_test_12",
+        timestamp: Date.now(),
+        streamId: "streamid",
+        event: "stream.started",
+        userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
+      });
+
+      await sem.wait(3000);
+      expect(calledFlags).toEqual([true, false]);
+    });
+
     it("should send multiple events to same webhook", async () => {
       const res = await client.post(
         `/webhook?projectId=${nonAdminProject.id}`,
