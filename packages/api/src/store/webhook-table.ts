@@ -36,7 +36,9 @@ export default class WebhookTable extends Table<DBWebhook> {
     }
 
     query.push(
-      sql`coalesce(data->>'projectId', ${defaultProjectId}) = coalesce(${projectId}, ${defaultProjectId})`,
+      sql`coalesce(data->>'projectId', ${
+        defaultProjectId || ""
+      }) = ${projectId || defaultProjectId}`,
     );
 
     if (event) {
