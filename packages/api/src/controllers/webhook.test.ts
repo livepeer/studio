@@ -3,6 +3,7 @@ import { TestClient, clearDatabase } from "../test-helpers";
 import { sleep } from "../util";
 import { jobsDb } from "../store";
 import { Webhook } from "../schema/types";
+import tracking from "../middleware/tracking";
 
 let server;
 let mockAdminUser;
@@ -296,13 +297,14 @@ describe("controllers/webhook", () => {
       let hooksCalled = 0;
       for (let i = 0; i < 5 && hooksCalled < 2; i++) {
         await sleep(500);
+        await tracking.flushAll();
 
         hooksCalled = 0;
         for (const id of [webhookResJson.id, webhookResJson2.id]) {
           const res = await client.get(`/webhook/${id}`);
           expect(res.status).toBe(200);
           const { status } = (await res.json()) as Webhook;
-          if (status.lastTriggeredAt >= now) {
+          if (status && status.lastTriggeredAt >= now) {
             hooksCalled++;
           }
         }
