@@ -1,6 +1,6 @@
 import sql from "sql-template-strings";
 import { ApiToken } from "../schema/types";
-import { db } from "../store";
+import { jobsDb as db } from "../store";
 import Table from "../store/table";
 import { DBWebhook } from "../store/webhook-table";
 
