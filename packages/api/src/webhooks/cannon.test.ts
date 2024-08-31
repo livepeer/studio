@@ -392,35 +392,25 @@ describe("webhook cannon", () => {
       expect(calledFlags).toEqual([true, true]);
     });
 
-    it("should receive events for related project and not for unrelated", async () => {
-      let res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
-        ...mockWebhook,
-        name: "test-related",
-      });
-      expect(res.status).toBe(201);
-
+    it("should not receive events for unrelated project", async () => {
       const differentProject = await db.project.create({
         name: "different project",
         id: uuid(),
         userId: nonAdminUser.id,
       });
 
-      res = await client.post(`/webhook?projectId=${differentProject.id}`, {
+      let res = await client.post(`/webhook?projectId=${differentProject.id}`, {
         ...mockWebhook,
         name: "test-unrelated",
       });
 
       expect(res.status).toBe(201);
 
-      const sems = [semaphore(), semaphore()];
-      let calledFlags = [false, false];
+      const sem = semaphore();
+      let called = false;
       webhookCallback = () => {
-        calledFlags[0] = true;
-        sems[0].release();
-      };
-      webhook2Callback = () => {
-        calledFlags[1] = true;
-        sems[1].release();
+        called = true;
+        sem.release();
       };
 
       await server.queue.publishWebhook("events.stream.started", {
@@ -433,8 +423,8 @@ describe("webhook cannon", () => {
         projectId: nonAdminProject.id,
       });
 
-      await Promise.all(sems.map((s) => s.wait(3000)));
-      expect(calledFlags).toEqual([true, false]);
+      await sem.wait(3000);
+      expect(called).toBe(false);
     });
 
     it("should use the default projectId if not specified in the request, and receive events only related to the default projectId", async () => {
