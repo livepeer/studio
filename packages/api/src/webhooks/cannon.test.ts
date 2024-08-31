@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 
 import { sign } from "../controllers/helpers";
 import { USER_SESSION_TIMEOUT } from "../controllers/stream";
-import { ObjectStore, Stream, User, Webhook } from "../schema/types";
+import { ApiToken, ObjectStore, Stream, User, Webhook } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/session-table";
 import { DBStream } from "../store/stream-table";
@@ -30,7 +30,13 @@ describe("webhook cannon", () => {
   let postMockStream: Stream;
   let mockStore: WithID<ObjectStore>;
   let mockWebhook: Webhook;
-  let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
+  let client,
+    adminUser,
+    adminToken,
+    nonAdminUser,
+    nonAdminToken,
+    adminProject,
+    nonAdminProject;
 
   async function setupUsers(server) {
     const client = new TestClient({
@@ -43,10 +49,14 @@ describe("webhook cannon", () => {
     let tokenRes = await client.post(`/user/token`, { ...mockAdminUser });
     const adminToken = await tokenRes.json();
     client.jwtAuth = adminToken["token"];
-
     const user = await server.store.get(`user/${adminUser.id}`, false);
     adminUser = { ...user, admin: true, emailValid: true };
     await server.store.replace(adminUser);
+    const adminProject = await db.project.create({
+      name: "admin test project",
+      id: uuid(),
+      userId: adminUser.id,
+    });
 
     const resNonAdmin = await client.post(`/user/`, { ...mockNonAdminUser });
     let nonAdminUser = await resNonAdmin.json();
@@ -60,7 +70,20 @@ describe("webhook cannon", () => {
     );
     nonAdminUser = { ...nonAdminUserRes, emailValid: true };
     await server.store.replace(nonAdminUser);
-    return { client, adminUser, adminToken, nonAdminUser, nonAdminToken };
+    const nonAdminProject = await db.project.create({
+      name: "non-admin test project",
+      id: uuid(),
+      userId: nonAdminUser.id,
+    });
+    return {
+      client,
+      adminUser,
+      adminToken,
+      nonAdminUser,
+      nonAdminToken,
+      adminProject,
+      nonAdminProject,
+    };
   }
 
   beforeAll(async () => {
@@ -132,8 +155,15 @@ describe("webhook cannon", () => {
   });
 
   beforeEach(async () => {
-    ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
-      await setupUsers(server));
+    ({
+      client,
+      adminUser,
+      adminToken,
+      nonAdminUser,
+      nonAdminToken,
+      adminProject,
+      nonAdminProject,
+    } = await setupUsers(server));
 
     await db.objectStore.create(mockStore);
   });
@@ -209,14 +239,18 @@ describe("webhook cannon", () => {
     });
 
     it("should be able to receive the webhook event", async () => {
-      const res = await client.post("/webhook", {
-        ...mockWebhook,
-        name: "test non admin",
-      });
+      const res = await client.post(
+        "/webhook?projectId=" + nonAdminProject.id,
+        {
+          ...mockWebhook,
+          name: "test non admin",
+        },
+      );
       const resJson = await res.json();
       console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       expect(resJson.name).toBe("test non admin");
+      expect(resJson.projectId).toBe(nonAdminProject.id);
 
       const sem = semaphore();
       let called = false;
@@ -232,10 +266,50 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
       });
 
       await sem.wait(3000);
       expect(called).toBe(true);
+    });
+
+    it("should not receive webhook for different project", async () => {
+      const res = await client.post(
+        "/webhook?projectId=" + nonAdminProject.id,
+        {
+          ...mockWebhook,
+          name: "test non admin",
+        },
+      );
+      const resJson = await res.json();
+      console.log("webhook body: ", resJson);
+      expect(res.status).toBe(201);
+
+      const sem = semaphore();
+      let called = false;
+      webhookCallback = () => {
+        called = true;
+        sem.release();
+      };
+
+      const differentProject = await db.project.create({
+        name: "different project",
+        id: uuid(),
+        userId: nonAdminUser.id,
+      });
+
+      await server.queue.publishWebhook("events.stream.started", {
+        type: "webhook_event",
+        id: "webhook_test_12",
+        timestamp: Date.now(),
+        streamId: "streamid",
+        event: "stream.started",
+        userId: nonAdminUser.id,
+        projectId: differentProject.id,
+      });
+
+      await sem.wait(3000);
+      expect(called).toBe(false);
     });
 
     describe("local webhook", () => {
@@ -272,6 +346,7 @@ describe("webhook cannon", () => {
           streamId: "streamid",
           event: "stream.started",
           userId: nonAdminUser.id,
+          projectId: nonAdminProject.id,
         });
 
         await sem.wait(3000);
@@ -280,12 +355,12 @@ describe("webhook cannon", () => {
     });
 
     it("should call multiple webhooks", async () => {
-      let res = await client.post("/webhook", {
+      let res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
         ...mockWebhook,
         name: "test-1",
       });
       expect(res.status).toBe(201);
-      res = await client.post("/webhook", {
+      res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
         ...mockWebhook,
         url: mockWebhook.url + "2",
         name: "test-2",
@@ -310,18 +385,95 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
       });
 
       await Promise.all(sems.map((s) => s.wait(3000)));
       expect(calledFlags).toEqual([true, true]);
     });
 
-    it("should send multiple events to same webhook", async () => {
-      const res = await client.post("/webhook", {
-        ...mockWebhook,
-        name: "test-multi",
-        events: ["stream.started", "stream.idle"],
+    it("should not receive events for unrelated project", async () => {
+      const differentProject = await db.project.create({
+        name: "different project",
+        id: uuid(),
+        userId: nonAdminUser.id,
       });
+
+      let res = await client.post(`/webhook?projectId=${differentProject.id}`, {
+        ...mockWebhook,
+        name: "test-unrelated",
+      });
+
+      expect(res.status).toBe(201);
+
+      const sem = semaphore();
+      let called = false;
+      webhookCallback = () => {
+        called = true;
+        sem.release();
+      };
+
+      await server.queue.publishWebhook("events.stream.started", {
+        type: "webhook_event",
+        id: "webhook_test_12",
+        timestamp: Date.now(),
+        streamId: "streamid",
+        event: "stream.started",
+        userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
+      });
+
+      await sem.wait(3000);
+      expect(called).toBe(false);
+    });
+
+    it("should use the default projectId if not specified in the request, and receive events only related to the default projectId", async () => {
+      let res = await client.post(`/webhook`, {
+        ...mockWebhook,
+        name: "test-default-project",
+      });
+      expect(res.status).toBe(201);
+
+      res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
+        ...mockWebhook,
+        name: "test-non-default-project",
+      });
+      expect(res.status).toBe(201);
+
+      const sem = semaphore();
+      let calledFlags = [false, false];
+      webhookCallback = () => {
+        calledFlags[0] = true;
+        sem.release();
+      };
+      webhook2Callback = () => {
+        calledFlags[1] = true;
+        sem.release();
+      };
+
+      await server.queue.publishWebhook("events.stream.started", {
+        type: "webhook_event",
+        id: "webhook_test_12",
+        timestamp: Date.now(),
+        streamId: "streamid",
+        event: "stream.started",
+        userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
+      });
+
+      await sem.wait(3000);
+      expect(calledFlags).toEqual([true, false]);
+    });
+
+    it("should send multiple events to same webhook", async () => {
+      const res = await client.post(
+        `/webhook?projectId=${nonAdminProject.id}`,
+        {
+          ...mockWebhook,
+          name: "test-multi",
+          events: ["stream.started", "stream.idle"],
+        },
+      );
       expect(res.status).toBe(201);
 
       let callCount = 0;
@@ -340,6 +492,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
       });
 
       await sem.wait(3000);
@@ -354,6 +507,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.idle",
         userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
       });
 
       await sem.wait(3000);
@@ -369,6 +523,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.unknown" as any,
         userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
       });
 
       await sem.wait(1000);
@@ -376,12 +531,12 @@ describe("webhook cannon", () => {
     });
 
     it("should retry webhook deliveries (independently)", async () => {
-      let res = await client.post("/webhook", {
+      let res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
         ...mockWebhook,
         name: "test-retries-1",
       });
       expect(res.status).toBe(201);
-      res = await client.post("/webhook", {
+      res = await client.post(`/webhook?projectId=${nonAdminProject.id}`, {
         ...mockWebhook,
         url: mockWebhook.url + "2",
         name: "test-retries-2",
@@ -409,6 +564,7 @@ describe("webhook cannon", () => {
         streamId: "streamid",
         event: "stream.started",
         userId: nonAdminUser.id,
+        projectId: nonAdminProject.id,
       });
 
       await Promise.all(sems.map((s) => s.wait(3000)));
@@ -422,7 +578,7 @@ describe("webhook cannon", () => {
 
       beforeEach(async () => {
         // create parent stream
-        let res = await client.post(`/stream`, {
+        let res = await client.post(`/stream?projectId=${nonAdminProject.id}`, {
           ...postMockStream,
           record: true,
           recordingSpec: {
@@ -443,7 +599,7 @@ describe("webhook cannon", () => {
         // create child stream and session
         const sessionId = uuid();
         res = await client.post(
-          `/stream/${parentStream.id}/stream?sessionId=${sessionId}`,
+          `/stream/${parentStream.id}/stream?projectId=${nonAdminProject.id}&sessionId=${sessionId}`,
           {
             name: "session1",
           },
@@ -473,11 +629,14 @@ describe("webhook cannon", () => {
       });
 
       it("should create asset from recording.waiting event", async () => {
-        const res = await client.post("/webhook", {
-          ...mockWebhook,
-          name: "test-recording-waiting",
-          events: ["recording.waiting"],
-        });
+        const res = await client.post(
+          `/webhook?projectId=${nonAdminProject.id}`,
+          {
+            ...mockWebhook,
+            name: "test-recording-waiting",
+            events: ["recording.waiting"],
+          },
+        );
         expect(res.status).toBe(201);
         const webhook = await res.json();
         expect(webhook.userId).toEqual(nonAdminUser.id);
@@ -497,6 +656,7 @@ describe("webhook cannon", () => {
           sessionId: session.id,
           event: "recording.waiting",
           userId: nonAdminUser.id,
+          projectId: nonAdminProject.id,
         });
 
         await sem.wait(3000);
@@ -517,11 +677,14 @@ describe("webhook cannon", () => {
       });
 
       it("should propagate recording spec to upload task", async () => {
-        const res = await client.post("/webhook", {
-          ...mockWebhook,
-          name: "test-recording-waiting",
-          events: ["recording.waiting"],
-        });
+        const res = await client.post(
+          `/webhook?projectId=${nonAdminProject.id}`,
+          {
+            ...mockWebhook,
+            name: "test-recording-waiting",
+            events: ["recording.waiting"],
+          },
+        );
         expect(res.status).toBe(201);
         const webhook = await res.json();
         expect(webhook.userId).toEqual(nonAdminUser.id);
@@ -541,6 +704,7 @@ describe("webhook cannon", () => {
           sessionId: session.id,
           event: "recording.waiting",
           userId: nonAdminUser.id,
+          projectId: nonAdminProject.id,
         });
 
         await sem.wait(3000);

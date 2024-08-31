@@ -31,6 +31,7 @@ describe("Queue", () => {
       streamId: "asdf",
       event: "stream.started",
       userId: "fdsa",
+      projectId: "123",
     });
     await sleep(500);
     console.log("done");
@@ -56,6 +57,7 @@ describe("Queue", () => {
       streamId: "asdf",
       event: "stream.started",
       userId: "fdsa",
+      projectId: "123",
     });
     await sem.wait(2000);
     expect(resp.id).toBe("custom_msg");
@@ -85,6 +87,7 @@ describe("Queue", () => {
         streamId: "asdf",
         event: "recording.ready",
         userId: "fdsa",
+        projectId: "123",
       },
       2000,
     );
@@ -119,6 +122,7 @@ describe("Queue", () => {
         streamId: "asdf",
         event: "recording.ready",
         userId: "fdsa",
+        projectId: "123",
       },
       1000,
     );
@@ -163,6 +167,7 @@ describe("Queue", () => {
         streamId: "asdf",
         event: "recording.ready",
         userId: "fdsa",
+        projectId: "123",
       },
       1000,
     );
@@ -175,6 +180,7 @@ describe("Queue", () => {
         streamId: "asdf",
         event: "recording.ready",
         userId: "fdsa",
+        projectId: "123",
       },
       200,
     );
@@ -216,6 +222,7 @@ describe("Queue", () => {
         streamId: "asdf",
         event: "recording.ready",
         userId: "fdsa",
+        projectId: "123",
       },
       200,
     );
@@ -228,6 +235,7 @@ describe("Queue", () => {
         streamId: "asdf",
         event: "recording.ready",
         userId: "fdsa",
+        projectId: "123",
       },
       200,
     );
