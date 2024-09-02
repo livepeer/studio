@@ -1,6 +1,6 @@
 import sql from "sql-template-strings";
 import { ApiToken } from "../schema/types";
-import { db } from "../store";
+import { jobsDb as db } from "../store";
 import Table from "../store/table";
 import { DBWebhook } from "../store/webhook-table";
 
@@ -86,15 +86,19 @@ class Tracker {
   }
 
   async flushAll() {
+    const flushTasks = [];
     for (const key of this.pendingLastSeenUpdates.keys()) {
-      await this.flushLastSeen(key);
+      flushTasks.push(this.flushLastSeen(key));
     }
-    this.pendingLastSeenUpdates = new Map();
-
     for (const key of this.pendingWebhookStatusUpdates.keys()) {
-      await this.flushWebhookStatus(key);
+      flushTasks.push(this.flushWebhookStatus(key));
     }
+
+    // Only await after clearing the maps to avoid concurrent updates
+    this.pendingLastSeenUpdates = new Map();
     this.pendingWebhookStatusUpdates = new Map();
+
+    await Promise.all(flushTasks);
   }
 }
 
