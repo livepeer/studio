@@ -17,6 +17,7 @@ import CreateProjectDialog from "components/Project/createProjectDialog";
 import { useProjectContext } from "context/ProjectContext";
 import Link from "next/link";
 import FeaturesModel from "components/FeaturesModel";
+import Banner from "components/Banner";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
@@ -43,6 +44,7 @@ const WorkspaceProjects = () => {
   }, [queryClient]);
 
   const { data } = useQuery("projects", getProjects);
+  const showPromo = user?.disabled;
 
   if (!user) {
     return <Layout />;
@@ -63,6 +65,39 @@ const WorkspaceProjects = () => {
           },
         }}>
         <Box css={{ mb: "$6" }}>
+          {showPromo && (
+            <Banner
+              title="Upgrade"
+              titleCss={{
+                color: "$red11",
+                fontWeight: 600,
+                fontSize: "14px",
+              }}
+              descriptionCss={{
+                color: "$red11",
+                fontSize: "12px",
+              }}
+              css={{
+                background: "$red3",
+                mb: "$6",
+              }}
+              description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
+              button={
+                <Link href={"/settings/billing/plans"} passHref legacyBehavior>
+                  <Button
+                    variant="tomato"
+                    as="a"
+                    size="2"
+                    css={{
+                      cursor: "default",
+                      border: "1px solid $tomato7",
+                    }}>
+                    Upgrade
+                  </Button>
+                </Link>
+              }
+            />
+          )}
           <Flex
             justify={"between"}
             css={{
