@@ -1255,7 +1255,11 @@ app.put(
       ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      await triggerCatalystPullStart(stream, playbackUrl);
+      if (waitActive) {
+        await triggerCatalystPullStart(stream, playbackUrl);
+      } else {
+        triggerCatalystPullStart(stream, playbackUrl);
+      }
     }
 
     res.status(streamExisted ? 200 : 201);
