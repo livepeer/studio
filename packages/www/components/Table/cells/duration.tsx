@@ -10,10 +10,13 @@ export type DurationCellProps = {
 const DurationCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, DurationCellProps>) => {
-  if (cell.value.status === "waiting") {
-    return "In progress";
-  } else if (cell.value.status === "failed") {
-    return "Failed";
+  switch (cell.value.status) {
+    case "waiting":
+      return "In progress";
+    case "failed":
+      return "Failed";
+    case "deleted":
+      return "Deleted";
   }
   if (
     cell.value.sourceSegmentsDuration === 0 ||
@@ -21,6 +24,7 @@ const DurationCell = <D extends TableData>({
   ) {
     return "n/a";
   }
+
   try {
     const durationMins = Math.round(cell.value.sourceSegmentsDuration / 60);
     if (!durationMins) {

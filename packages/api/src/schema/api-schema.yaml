@@ -941,6 +941,7 @@ components:
             - waiting
             - ready
             - failed
+            - deleted
             - none
         recordingUrl:
           type: string

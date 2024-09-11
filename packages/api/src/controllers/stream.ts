@@ -619,11 +619,12 @@ export async function getRecordingFields(
     const assetPhase = assetWithPlayback.status?.phase;
     return {
       recordingStatus:
-        assetPhase == "ready"
-          ? "ready"
-          : assetPhase == "failed"
-            ? "failed"
-            : "waiting",
+        {
+          ready: "ready",
+          failed: "failed",
+          deleting: "deleted",
+          deleted: "deleted",
+        }[assetPhase] ?? "waiting",
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
     };
