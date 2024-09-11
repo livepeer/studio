@@ -429,7 +429,7 @@ export async function withPlaybackUrls(
   asset: WithID<Asset>,
   os?: ObjectStore,
 ): Promise<WithID<Asset>> {
-  if (asset.files?.length < 1) {
+  if (asset.files?.length < 1 || asset.deleted) {
     // files is only set when playback is available
     return asset;
   }
