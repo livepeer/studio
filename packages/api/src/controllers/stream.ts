@@ -1258,11 +1258,12 @@ app.put(
       ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      if (waitActive) {
-        await triggerCatalystPullStart(stream, playbackUrl);
-      } else {
-        triggerCatalystPullStart(stream, playbackUrl);
-      }
+      triggerCatalystPullStart(stream, playbackUrl);
+      const jsonUrl = new URL(playbackUrl);
+      jsonUrl.pathname = "/json_video+" + stream.playbackId + ".js";
+      console.log("calling json " + jsonUrl.toString());
+      await triggerCatalystPullStart(stream, jsonUrl.toString());
+      console.log("finished calling json " + jsonUrl.toString());
     }
 
     res.status(streamExisted ? 200 : 201);
