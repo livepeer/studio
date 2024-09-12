@@ -656,6 +656,7 @@ export const triggerCatalystPullStart =
   process.env.NODE_ENV === "test"
     ? async () => {} // noop in case of tests
     : async (stream: DBStream, playbackUrl: string) => {
+        console.log("pull start for " + playbackUrl);
         const { lat, lon } = stream.pull?.location ?? {};
         if (lat && lon) {
           // Set the lat/lon qs to override the observed "client location" and
@@ -682,6 +683,7 @@ export const triggerCatalystPullStart =
             errHeader != "" &&
             !errHeader.includes("not allowed to view this stream");
           if (res.ok && !isHlsErr) {
+            console.log("pull start finished for " + playbackUrl);
             return;
           }
 
@@ -690,6 +692,36 @@ export const triggerCatalystPullStart =
             `failed to trigger catalyst pull for stream=${
               stream.id
             } playbackUrl=${playbackUrl} status=${
+              res.status
+            } error=${JSON.stringify(body)}`,
+          );
+          await sleep(250);
+        }
+
+        throw new Error(`failed to trigger catalyst pull`);
+      };
+
+export const getCatalystStreamMetadata =
+  process.env.NODE_ENV === "test"
+    ? async () => {} // noop in case of tests
+    : async (url: string) => {
+        console.log("pull start for " + url);
+
+        const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
+        while (Date.now() < deadline) {
+          const res = await fetchWithTimeoutAndRedirects(url, {
+            method: "GET",
+            timeout: PULL_START_TIMEOUT,
+            maxRedirects: 10,
+          });
+          const body = await res.text();
+          if (res.ok && body.includes(`"meta":`)) {
+            console.log("pull start finished for " + url);
+            return;
+          }
+
+          logger.warn(
+            `getCatalystStreamMetadata failed for playbackUrl=${url} status=${
               res.status
             } error=${JSON.stringify(body)}`,
           );

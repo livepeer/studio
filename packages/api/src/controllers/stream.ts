@@ -59,6 +59,7 @@ import {
   triggerCatalystPullStart,
   triggerCatalystStreamStopSessions,
   triggerCatalystStreamUpdated,
+  getCatalystStreamMetadata,
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
@@ -1259,11 +1260,9 @@ app.put(
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
       triggerCatalystPullStart(stream, playbackUrl);
-      const jsonUrl = new URL(playbackUrl);
-      jsonUrl.pathname = "/json_video+" + stream.playbackId + ".js";
-      console.log("calling json " + jsonUrl.toString());
-      await triggerCatalystPullStart(stream, jsonUrl.toString());
-      console.log("finished calling json " + jsonUrl.toString());
+      const metadataUrl = new URL(playbackUrl);
+      metadataUrl.pathname = "/json_video+" + stream.playbackId + ".js";
+      await getCatalystStreamMetadata(metadataUrl.toString());
     }
 
     res.status(streamExisted ? 200 : 201);
