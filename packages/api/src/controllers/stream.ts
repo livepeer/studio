@@ -311,7 +311,6 @@ async function resolvePullUrlAndRegion(
   ingest: string,
   playbackId: string,
 ): Promise<{ pullUrl: string; pullRegion: string }> {
-  const start = new Date().getTime();
   if (process.env.NODE_ENV === "test") {
     return { pullUrl: null, pullRegion: null };
   }
@@ -330,8 +329,6 @@ async function resolvePullUrlAndRegion(
     // not a correct status code, so we can't determine the region/host
     return null;
   }
-  let elapsed = new Date().getTime() - start;
-  console.log("time taken resolvePullUrlAndRegion " + elapsed);
   return {
     pullUrl: extractUrlFrom(response.url, playbackId),
     pullRegion: extractRegionFrom(response.url, playbackId),
