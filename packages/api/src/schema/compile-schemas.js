@@ -24,7 +24,7 @@ const write = (dir, data) => {
   console.log(`wrote ${dir}`);
 };
 
-const schemaDir = path.resolve(__dirname, "schema");
+const schemaDir = path.resolve(__dirname, ".");
 const validatorDir = path.resolve(schemaDir, "validators");
 const schemaDistDir = path.resolve(__dirname, "..", "dist", "schema");
 fs.ensureDirSync(validatorDir);
