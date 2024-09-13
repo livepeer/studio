@@ -17,6 +17,19 @@ const schemaDir = path.resolve(__dirname, ".");
 const aiSchemaUrl =
   "https://raw.githubusercontent.com/livepeer/ai-worker/refs/heads/main/runner/gateway.openapi.yaml";
 
+const studioApiErrorSchema = {
+  type: "object",
+  properties: {
+    errors: {
+      type: "array",
+      minItems: 1,
+      items: {
+        type: "string",
+      },
+    },
+  },
+};
+
 const write = (dir, data) => {
   if (fs.existsSync(dir)) {
     const existing = fs.readFileSync(dir, "utf8");
@@ -44,14 +57,19 @@ const downloadAiSchema = async () => {
   delete schema.info;
   delete schema.servers;
 
+  // add studio-api-error schema
+  schema.components.schemas["studio-api-error"] = studioApiErrorSchema;
+
   // patches to the paths section
   schema.paths = mapObject(schema.paths, (path, value) => {
     // prefix paths with /api/beta/generate
     path = `/api/beta/generate${path}`;
     // remove security field
     delete value.security;
-    // add $ref: "#/components/schemas/error" as oneOf to all of the error responses
-    const apiError = () => ({ $ref: "#/components/schemas/error" });
+    // add Studio API error as oneOf to all of the error responses
+    const studioErrorRef = () => ({
+      $ref: "#/components/schemas/studio-api-error",
+    });
     value.post.responses = mapObject(
       value.post.responses,
       (statusCode, response) => {
@@ -62,7 +80,10 @@ const downloadAiSchema = async () => {
           return [statusCode, response];
         }
         response.content["application/json"].schema = {
-          oneOf: [response.content["application/json"].schema, apiError()],
+          oneOf: [
+            response.content["application/json"].schema,
+            studioErrorRef(),
+          ],
         };
         return [statusCode, response];
       },
@@ -71,7 +92,7 @@ const downloadAiSchema = async () => {
     if (!value.post.responses["default"]) {
       value.post.responses["default"] = {
         description: "Error",
-        content: { "application/json": { schema: apiError() } },
+        content: { "application/json": { schema: studioErrorRef() } },
       };
     }
     return [path, value];
