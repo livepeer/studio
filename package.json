@@ -26,6 +26,8 @@
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
     "test": "cd packages/api && yarn run test",
+    "compile-schemas": "cd packages/api && yarn run compile-schemas",
+    "pull-ai-schema": "cd packages/api && yarn run pull-ai-schema",
     "dev": "touch .env.local && cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
     "updated": "lerna updated --json",
     "prettier:base": "prettier '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'",
