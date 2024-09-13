@@ -157,7 +157,6 @@ export default class WebhookCannon {
     const { data: webhooks } = await db.webhook.listSubscribed(
       userId,
       event,
-      null,
       projectId,
       user.defaultProjectId,
     );
