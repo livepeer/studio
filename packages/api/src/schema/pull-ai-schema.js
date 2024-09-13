@@ -5,12 +5,13 @@ import path from "path";
 // This downloads the AI schema from the AI worker repo and saves in the local
 // ai-api-schema.yaml file, referenced by our main api-schema.yaml file.
 
-const defaultModels = {
+export const defaultModels = {
   "text-to-image": "SG161222/RealVisXL_V4.0_Lightning",
   "image-to-image": "timbrooks/instruct-pix2pix",
   "image-to-video": "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
   upscale: "stabilityai/stable-diffusion-x4-upscaler",
   "audio-to-text": "openai/whisper-large-v3",
+  "segment-anything-2": "facebook/sam2-hiera-large:",
 };
 const schemaDir = path.resolve(__dirname, ".");
 const aiSchemaUrl =
