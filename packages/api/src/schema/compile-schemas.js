@@ -25,6 +25,8 @@ const write = (dir, data) => {
 };
 
 const schemaDir = path.resolve(__dirname, ".");
+process.chdir(schemaDir);
+
 const validatorDir = path.resolve(schemaDir, "validators");
 const schemaDistDir = path.resolve(__dirname, "..", "dist", "schema");
 fs.ensureDirSync(validatorDir);

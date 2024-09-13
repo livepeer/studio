@@ -1,0 +1,866 @@
+openapi: 3.1.0
+paths:
+  /api/beta/generate/text-to-image:
+    post:
+      tags:
+        - generate
+      summary: Text To Image
+      description: Generate images from text prompts.
+      operationId: genTextToImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TextToImageParams"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageResponse"
+                x-speakeasy-name-override: data
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPValidationError"
+                  - $ref: "#/components/schemas/error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - HTTPBearer: []
+      x-speakeasy-name-override: textToImage
+  /api/beta/generate/image-to-image:
+    post:
+      tags:
+        - generate
+      summary: Image To Image
+      description: Apply image transformations to a provided image.
+      operationId: genImageToImage
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Body_genImageToImage"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageResponse"
+                x-speakeasy-name-override: data
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPValidationError"
+                  - $ref: "#/components/schemas/error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - HTTPBearer: []
+      x-speakeasy-name-override: imageToImage
+  /api/beta/generate/image-to-video:
+    post:
+      tags:
+        - generate
+      summary: Image To Video
+      description: Generate a video from a provided image.
+      operationId: genImageToVideo
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Body_genImageToVideo"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoResponse"
+                x-speakeasy-name-override: data
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPValidationError"
+                  - $ref: "#/components/schemas/error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - HTTPBearer: []
+      x-speakeasy-name-override: imageToVideo
+  /api/beta/generate/upscale:
+    post:
+      tags:
+        - generate
+      summary: Upscale
+      description: Upscale an image by increasing its resolution.
+      operationId: genUpscale
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Body_genUpscale"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageResponse"
+                x-speakeasy-name-override: data
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPValidationError"
+                  - $ref: "#/components/schemas/error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - HTTPBearer: []
+      x-speakeasy-name-override: upscale
+  /api/beta/generate/audio-to-text:
+    post:
+      tags:
+        - generate
+      summary: Audio To Text
+      description: Transcribe audio files to text.
+      operationId: genAudioToText
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Body_genAudioToText"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextResponse"
+                x-speakeasy-name-override: data
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "413":
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPValidationError"
+                  - $ref: "#/components/schemas/error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - HTTPBearer: []
+      x-speakeasy-name-override: audioToText
+  /api/beta/generate/segment-anything-2:
+    post:
+      tags:
+        - generate
+      summary: Segment Anything 2
+      description: Segment objects in an image.
+      operationId: genSegmentAnything2
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Body_genSegmentAnything2"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MasksResponse"
+                x-speakeasy-name-override: data
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPValidationError"
+                  - $ref: "#/components/schemas/error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/HTTPError"
+                  - $ref: "#/components/schemas/error"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - HTTPBearer: []
+      x-speakeasy-name-override: segmentAnything2
+components:
+  schemas:
+    APIError:
+      properties:
+        msg:
+          type: string
+          title: Msg
+          description: The error message.
+      type: object
+      required:
+        - msg
+      title: APIError
+      description: API error response model.
+    Body_genAudioToText:
+      properties:
+        audio:
+          type: string
+          format: binary
+          title: Audio
+          description: Uploaded audio file to be transcribed.
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for transcription.
+          default: openai/whisper-large-v3
+      type: object
+      required:
+        - audio
+        - model_id
+      title: Body_genAudioToText
+    Body_genImageToImage:
+      properties:
+        prompt:
+          type: string
+          title: Prompt
+          description: Text prompt(s) to guide image generation.
+        image:
+          type: string
+          format: binary
+          title: Image
+          description: Uploaded image to modify with the pipeline.
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for image generation.
+          default: timbrooks/instruct-pix2pix
+        strength:
+          type: number
+          title: Strength
+          description:
+            Degree of transformation applied to the reference image (0 to 1).
+          default: 0.8
+        guidance_scale:
+          type: number
+          title: Guidance Scale
+          description: >-
+            Encourages model to generate images closely linked to the text
+            prompt (higher values may reduce image quality).
+          default: 7.5
+        image_guidance_scale:
+          type: number
+          title: Image Guidance Scale
+          description: >-
+            Degree to which the generated image is pushed towards the initial
+            image.
+          default: 1.5
+        negative_prompt:
+          type: string
+          title: Negative Prompt
+          description: >-
+            Text prompt(s) to guide what to exclude from image generation.
+            Ignored if guidance_scale < 1.
+          default: ""
+        safety_check:
+          type: boolean
+          title: Safety Check
+          description: >-
+            Perform a safety check to estimate if generated images could be
+            offensive or harmful.
+          default: true
+        seed:
+          type: integer
+          title: Seed
+          description: Seed for random number generation.
+        num_inference_steps:
+          type: integer
+          title: Num Inference Steps
+          description: >-
+            Number of denoising steps. More steps usually lead to higher quality
+            images but slower inference. Modulated by strength.
+          default: 100
+        num_images_per_prompt:
+          type: integer
+          title: Num Images Per Prompt
+          description: Number of images to generate per prompt.
+          default: 1
+      type: object
+      required:
+        - prompt
+        - image
+        - model_id
+      title: Body_genImageToImage
+    Body_genImageToVideo:
+      properties:
+        image:
+          type: string
+          format: binary
+          title: Image
+          description: Uploaded image to generate a video from.
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for video generation.
+          default: stabilityai/stable-video-diffusion-img2vid-xt-1-1
+        height:
+          type: integer
+          title: Height
+          description: The height in pixels of the generated video.
+          default: 576
+        width:
+          type: integer
+          title: Width
+          description: The width in pixels of the generated video.
+          default: 1024
+        fps:
+          type: integer
+          title: Fps
+          description: The frames per second of the generated video.
+          default: 6
+        motion_bucket_id:
+          type: integer
+          title: Motion Bucket Id
+          description: >-
+            Used for conditioning the amount of motion for the generation. The
+            higher the number the more motion will be in the video.
+          default: 127
+        noise_aug_strength:
+          type: number
+          title: Noise Aug Strength
+          description: >-
+            Amount of noise added to the conditioning image. Higher values
+            reduce resemblance to the conditioning image and increase motion.
+          default: 0.02
+        safety_check:
+          type: boolean
+          title: Safety Check
+          description: >-
+            Perform a safety check to estimate if generated images could be
+            offensive or harmful.
+          default: true
+        seed:
+          type: integer
+          title: Seed
+          description: Seed for random number generation.
+        num_inference_steps:
+          type: integer
+          title: Num Inference Steps
+          description: >-
+            Number of denoising steps. More steps usually lead to higher quality
+            images but slower inference. Modulated by strength.
+          default: 25
+      type: object
+      required:
+        - image
+        - model_id
+      title: Body_genImageToVideo
+    Body_genSegmentAnything2:
+      properties:
+        image:
+          type: string
+          format: binary
+          title: Image
+          description: Image to segment.
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for image generation.
+          default: ""
+        point_coords:
+          type: string
+          title: Point Coords
+          description: >-
+            Nx2 array of point prompts to the model, where each point is in
+            (X,Y) in pixels.
+        point_labels:
+          type: string
+          title: Point Labels
+          description: >-
+            Labels for the point prompts, where 1 indicates a foreground point
+            and 0 indicates a background point.
+        box:
+          type: string
+          title: Box
+          description:
+            "A length 4 array given as a box prompt to the model, in XYXY
+            format."
+        mask_input:
+          type: string
+          title: Mask Input
+          description: >-
+            A low-resolution mask input to the model, typically from a previous
+            prediction iteration, with the form 1xHxW (H=W=256 for SAM).
+        multimask_output:
+          type: boolean
+          title: Multimask Output
+          description: >-
+            If true, the model will return three masks for ambiguous input
+            prompts, often producing better masks than a single prediction.
+          default: true
+        return_logits:
+          type: boolean
+          title: Return Logits
+          description: >-
+            If true, returns un-thresholded mask logits instead of a binary
+            mask.
+          default: true
+        normalize_coords:
+          type: boolean
+          title: Normalize Coords
+          description: >-
+            If true, the point coordinates will be normalized to the range
+            [0,1], with point_coords expected to be with respect to image
+            dimensions.
+          default: true
+      type: object
+      required:
+        - image
+        - model_id
+      title: Body_genSegmentAnything2
+    Body_genUpscale:
+      properties:
+        prompt:
+          type: string
+          title: Prompt
+          description: Text prompt(s) to guide upscaled image generation.
+        image:
+          type: string
+          format: binary
+          title: Image
+          description: Uploaded image to modify with the pipeline.
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for upscaled image generation.
+          default: stabilityai/stable-diffusion-x4-upscaler
+        safety_check:
+          type: boolean
+          title: Safety Check
+          description: >-
+            Perform a safety check to estimate if generated images could be
+            offensive or harmful.
+          default: true
+        seed:
+          type: integer
+          title: Seed
+          description: Seed for random number generation.
+        num_inference_steps:
+          type: integer
+          title: Num Inference Steps
+          description: >-
+            Number of denoising steps. More steps usually lead to higher quality
+            images but slower inference. Modulated by strength.
+          default: 75
+      type: object
+      required:
+        - prompt
+        - image
+        - model_id
+      title: Body_genUpscale
+    HTTPError:
+      properties:
+        detail:
+          allOf:
+            - $ref: "#/components/schemas/APIError"
+          description: Detailed error information.
+      type: object
+      required:
+        - detail
+      title: HTTPError
+      description: HTTP error response model.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: "#/components/schemas/ValidationError"
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ImageResponse:
+      properties:
+        images:
+          items:
+            $ref: "#/components/schemas/Media"
+          type: array
+          title: Images
+          description: The generated images.
+      type: object
+      required:
+        - images
+      title: ImageResponse
+      description: Response model for image generation.
+    MasksResponse:
+      properties:
+        masks:
+          type: string
+          title: Masks
+          description: The generated masks.
+        scores:
+          type: string
+          title: Scores
+          description: The model's confidence scores for each generated mask.
+        logits:
+          type: string
+          title: Logits
+          description:
+            "The raw, unnormalized predictions (logits) for the masks."
+      type: object
+      required:
+        - masks
+        - scores
+        - logits
+      title: MasksResponse
+      description: Response model for object segmentation.
+    Media:
+      properties:
+        url:
+          type: string
+          title: Url
+          description: The URL where the media can be accessed.
+        seed:
+          type: integer
+          title: Seed
+          description: The seed used to generate the media.
+        nsfw:
+          type: boolean
+          title: Nsfw
+          description: Whether the media was flagged as NSFW.
+      type: object
+      required:
+        - url
+        - seed
+        - nsfw
+      title: Media
+      description:
+        A media object containing information about the generated media.
+    TextResponse:
+      properties:
+        text:
+          type: string
+          title: Text
+          description: The generated text.
+        chunks:
+          items:
+            $ref: "#/components/schemas/chunk"
+          type: array
+          title: Chunks
+          description: The generated text chunks.
+      type: object
+      required:
+        - text
+        - chunks
+      title: TextResponse
+      description: Response model for text generation.
+    TextToImageParams:
+      properties:
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for image generation.
+          default: SG161222/RealVisXL_V4.0_Lightning
+        prompt:
+          type: string
+          title: Prompt
+          description: >-
+            Text prompt(s) to guide image generation. Separate multiple prompts
+            with '|' if supported by the model.
+        height:
+          type: integer
+          title: Height
+          description: The height in pixels of the generated image.
+          default: 576
+        width:
+          type: integer
+          title: Width
+          description: The width in pixels of the generated image.
+          default: 1024
+        guidance_scale:
+          type: number
+          title: Guidance Scale
+          description: >-
+            Encourages model to generate images closely linked to the text
+            prompt (higher values may reduce image quality).
+          default: 7.5
+        negative_prompt:
+          type: string
+          title: Negative Prompt
+          description: >-
+            Text prompt(s) to guide what to exclude from image generation.
+            Ignored if guidance_scale < 1.
+          default: ""
+        safety_check:
+          type: boolean
+          title: Safety Check
+          description: >-
+            Perform a safety check to estimate if generated images could be
+            offensive or harmful.
+          default: true
+        seed:
+          type: integer
+          title: Seed
+          description: Seed for random number generation.
+        num_inference_steps:
+          type: integer
+          title: Num Inference Steps
+          description: >-
+            Number of denoising steps. More steps usually lead to higher quality
+            images but slower inference. Modulated by strength.
+          default: 50
+        num_images_per_prompt:
+          type: integer
+          title: Num Images Per Prompt
+          description: Number of images to generate per prompt.
+          default: 1
+      type: object
+      required:
+        - prompt
+        - model_id
+      title: TextToImageParams
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+    VideoResponse:
+      properties:
+        images:
+          items:
+            $ref: "#/components/schemas/Media"
+          type: array
+          title: Images
+          description: The generated images.
+      type: object
+      required:
+        - images
+      title: VideoResponse
+      description: Response model for image generation.
+    chunk:
+      properties:
+        timestamp:
+          items: {}
+          type: array
+          title: Timestamp
+          description: The timestamp of the chunk.
+        text:
+          type: string
+          title: Text
+          description: The text of the chunk.
+      type: object
+      required:
+        - timestamp
+        - text
+      title: chunk
+      description: A chunk of text with a timestamp.
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

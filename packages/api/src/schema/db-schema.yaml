@@ -1455,10 +1455,10 @@ components:
             - upscale
         request:
           oneOf:
-            - $ref: "#/components/schemas/text-to-image-payload"
-            - $ref: "#/components/schemas/image-to-image-payload"
-            - $ref: "#/components/schemas/image-to-video-payload"
-            - $ref: "#/components/schemas/upscale-payload"
+            - $ref: "./ai-api-schema.yaml#/components/schemas/TextToImageParams"
+            - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genImageToImage"
+            - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genImageToVideo"
+            - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genUpscale"
         statusCode:
           type: integer
           description: HTTP status code received from the AI gateway
