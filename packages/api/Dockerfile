@@ -2,7 +2,7 @@ FROM node:18 as builder
 
 WORKDIR /app
 COPY . .
-RUN	yarn install --frozen-lockfile --ignore-scripts
+RUN	yarn install --immutable --ignore-scripts
 RUN yarn run prepare:lerna
 RUN cd packages/www && yarn run static
 RUN cd packages/api && yarn run esbuild
