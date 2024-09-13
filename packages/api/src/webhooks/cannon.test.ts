@@ -392,6 +392,26 @@ describe("webhook cannon", () => {
       expect(calledFlags).toEqual([true, true]);
     });
 
+    it("should fetch correct webhooks with listSubscribed", async () => {
+      const webhook1 = await client.post(`/webhook`, {
+        ...mockWebhook,
+        name: "test-1",
+      });
+      expect(webhook1.status).toBe(201);
+
+      const webhook2 = await client.post(`/webhook`, {
+        ...mockWebhook,
+        url: mockWebhook.url + "2",
+        name: "test-2",
+      });
+
+      expect(webhook2.status).toBe(201);
+
+      const subscribed = await client.get(`/webhook/subscribed/stream.started`);
+      const subscribedJson = await subscribed.json();
+      expect(subscribedJson.length).toBe(2);
+    });
+
     it("should not receive events for unrelated project", async () => {
       const differentProject = await db.project.create({
         name: "different project",
