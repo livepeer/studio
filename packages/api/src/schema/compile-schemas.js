@@ -24,6 +24,31 @@ const write = (dir, data) => {
   console.log(`wrote ${dir}`);
 };
 
+// Remove the title from the schema to avoid conflicts with the TypeScript type name
+function removeAllTitles(schema) {
+  if (schema.title) {
+    delete schema.title;
+  }
+
+  if (schema.properties) {
+    for (const key in schema.properties) {
+      if (schema.properties[key]) {
+        schema.properties[key] = removeAllTitles(schema.properties[key]);
+      }
+    }
+  }
+
+  if (schema.items) {
+    if (Array.isArray(schema.items)) {
+      schema.items = schema.items.map((item) => removeAllTitles(item));
+    } else {
+      schema.items = removeAllTitles(schema.items);
+    }
+  }
+
+  return schema;
+}
+
 const schemaDir = path.resolve(__dirname, ".");
 process.chdir(schemaDir);
 
@@ -64,7 +89,8 @@ const data = _.merge({}, ...subSchemas);
   const index = [];
   let types = [];
 
-  for (const [name, schema] of Object.entries(data.components.schemas)) {
+  for (let [name, schema] of Object.entries(data.components.schemas)) {
+    schema = removeAllTitles(schema);
     schema.title = name;
     const type = await generateTypes(schema);
     types.push(type);
