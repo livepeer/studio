@@ -32,17 +32,14 @@ const schemaDistDir = path.resolve(__dirname, "..", "dist", "schema");
 fs.ensureDirSync(validatorDir);
 fs.ensureDirSync(schemaDistDir);
 
-const apiSchemaStr = fs.readFileSync(
-  path.resolve(schemaDir, "api-schema.yaml"),
-  "utf8",
-);
-const dbSchemaStr = fs.readFileSync(
-  path.resolve(schemaDir, "db-schema.yaml"),
-  "utf8",
-);
-const apiData = parseYaml(apiSchemaStr);
-const dbData = parseYaml(dbSchemaStr);
-const data = _.merge({}, apiData, dbData);
+const schemaFiles = ["api-schema.yaml", "ai-api-schema.yaml", "db-schema.yaml"];
+const subSchemas = [];
+for (const file of schemaFiles) {
+  const schemaStr = fs.readFileSync(path.resolve(schemaDir, file), "utf8");
+  const data = parseYaml(schemaStr);
+  subSchemas.push(data);
+}
+const data = _.merge({}, ...subSchemas);
 
 (async () => {
   const yaml = serializeYaml(data);

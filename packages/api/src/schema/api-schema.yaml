@@ -35,7 +35,6 @@ tags:
     description: Operations related to tasks api
   - name: generate
     description: Operations related to AI generate api
-$ref: "./ai-api-schema.yaml"
 components:
   securitySchemes:
     apiKey:
