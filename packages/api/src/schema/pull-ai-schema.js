@@ -98,7 +98,9 @@ const downloadAiSchema = async () => {
     return [path, value];
   });
 
-  // Add default model_id to params objects
+  // Modify the pipeline input schemas to:
+  // - set default model_id values for each pipeline (and make them not requried)
+  // - disallow additionalProperties
   schema.components.schemas = mapObject(
     schema.components.schemas,
     (key, value) => {
@@ -110,14 +112,19 @@ const downloadAiSchema = async () => {
       } else {
         return [key, value];
       }
-      // turn CamelCase to kebab-case
+      // turn CamelCase3 to kebab-case-3
       pipelineName = pipelineName
-        .replace(/([a-z])([A-Z])/g, "$1-$2")
+        .replace(/([a-z])([A-Z0-9])/g, "$1-$2")
         .toLowerCase();
 
       if (pipelineName in defaultModels && value.properties.model_id) {
         value.properties.model_id.default = defaultModels[pipelineName];
+        if (value.required) {
+          value.required = value.required.filter((key) => key !== "model_id");
+        }
       }
+      value.additionalProperties = false;
+
       return [key, value];
     },
   );

@@ -408,8 +408,8 @@ components:
       type: object
       required:
         - audio
-        - model_id
       title: Body_genAudioToText
+      additionalProperties: false
     Body_genImageToImage:
       properties:
         prompt:
@@ -480,8 +480,8 @@ components:
       required:
         - prompt
         - image
-        - model_id
       title: Body_genImageToImage
+      additionalProperties: false
     Body_genImageToVideo:
       properties:
         image:
@@ -544,8 +544,8 @@ components:
       type: object
       required:
         - image
-        - model_id
       title: Body_genImageToVideo
+      additionalProperties: false
     Body_genSegmentAnything2:
       properties:
         image:
@@ -557,7 +557,7 @@ components:
           type: string
           title: Model Id
           description: Hugging Face model ID used for image generation.
-          default: ""
+          default: "facebook/sam2-hiera-large:"
         point_coords:
           type: string
           title: Point Coords
@@ -607,8 +607,8 @@ components:
       type: object
       required:
         - image
-        - model_id
       title: Body_genSegmentAnything2
+      additionalProperties: false
     Body_genUpscale:
       properties:
         prompt:
@@ -647,8 +647,8 @@ components:
       required:
         - prompt
         - image
-        - model_id
       title: Body_genUpscale
+      additionalProperties: false
     HTTPError:
       properties:
         detail:
@@ -807,8 +807,8 @@ components:
       type: object
       required:
         - prompt
-        - model_id
       title: TextToImageParams
+      additionalProperties: false
     ValidationError:
       properties:
         loc:
