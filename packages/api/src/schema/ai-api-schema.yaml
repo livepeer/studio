@@ -11,54 +11,54 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TextToImageParams"
+              $ref: '#/components/schemas/TextToImageParams'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ImageResponse"
+                $ref: '#/components/schemas/ImageResponse'
                 x-speakeasy-name-override: data
-        "400":
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "401":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "422":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPValidationError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "500":
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/studio-api-error"
+                $ref: '#/components/schemas/studio-api-error'
       security:
         - HTTPBearer: []
       x-speakeasy-name-override: textToImage
@@ -73,54 +73,54 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Body_genImageToImage"
+              $ref: '#/components/schemas/Body_genImageToImage'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ImageResponse"
+                $ref: '#/components/schemas/ImageResponse'
                 x-speakeasy-name-override: data
-        "400":
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "401":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "422":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPValidationError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "500":
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/studio-api-error"
+                $ref: '#/components/schemas/studio-api-error'
       security:
         - HTTPBearer: []
       x-speakeasy-name-override: imageToImage
@@ -135,54 +135,54 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Body_genImageToVideo"
+              $ref: '#/components/schemas/Body_genImageToVideo'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/VideoResponse"
+                $ref: '#/components/schemas/VideoResponse'
                 x-speakeasy-name-override: data
-        "400":
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "401":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "422":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPValidationError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "500":
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/studio-api-error"
+                $ref: '#/components/schemas/studio-api-error'
       security:
         - HTTPBearer: []
       x-speakeasy-name-override: imageToVideo
@@ -197,54 +197,54 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Body_genUpscale"
+              $ref: '#/components/schemas/Body_genUpscale'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ImageResponse"
+                $ref: '#/components/schemas/ImageResponse'
                 x-speakeasy-name-override: data
-        "400":
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "401":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "422":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPValidationError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "500":
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/studio-api-error"
+                $ref: '#/components/schemas/studio-api-error'
       security:
         - HTTPBearer: []
       x-speakeasy-name-override: upscale
@@ -259,62 +259,62 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Body_genAudioToText"
+              $ref: '#/components/schemas/Body_genAudioToText'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TextResponse"
+                $ref: '#/components/schemas/TextResponse'
                 x-speakeasy-name-override: data
-        "400":
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "401":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "413":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '413':
           description: Request Entity Too Large
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "422":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPValidationError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "500":
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/studio-api-error"
+                $ref: '#/components/schemas/studio-api-error'
       security:
         - HTTPBearer: []
       x-speakeasy-name-override: audioToText
@@ -329,54 +329,54 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Body_genSegmentAnything2"
+              $ref: '#/components/schemas/Body_genSegmentAnything2'
         required: true
       responses:
-        "200":
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MasksResponse"
+                $ref: '#/components/schemas/MasksResponse'
                 x-speakeasy-name-override: data
-        "400":
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "401":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "422":
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPValidationError"
-                  - $ref: "#/components/schemas/studio-api-error"
-        "500":
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/HTTPError"
-                  - $ref: "#/components/schemas/studio-api-error"
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/studio-api-error"
+                $ref: '#/components/schemas/studio-api-error'
       security:
         - HTTPBearer: []
       x-speakeasy-name-override: segmentAnything2
@@ -429,8 +429,7 @@ components:
         strength:
           type: number
           title: Strength
-          description:
-            Degree of transformation applied to the reference image (0 to 1).
+          description: Degree of transformation applied to the reference image (0 to 1).
           default: 0.8
         guidance_scale:
           type: number
@@ -452,7 +451,7 @@ components:
           description: >-
             Text prompt(s) to guide what to exclude from image generation.
             Ignored if guidance_scale < 1.
-          default: ""
+          default: ''
         safety_check:
           type: boolean
           title: Safety Check
@@ -557,7 +556,7 @@ components:
           type: string
           title: Model Id
           description: Hugging Face model ID used for image generation.
-          default: "facebook/sam2-hiera-large:"
+          default: 'facebook/sam2-hiera-large:'
         point_coords:
           type: string
           title: Point Coords
@@ -573,9 +572,7 @@ components:
         box:
           type: string
           title: Box
-          description:
-            "A length 4 array given as a box prompt to the model, in XYXY
-            format."
+          description: 'A length 4 array given as a box prompt to the model, in XYXY format.'
         mask_input:
           type: string
           title: Mask Input
@@ -653,7 +650,7 @@ components:
       properties:
         detail:
           allOf:
-            - $ref: "#/components/schemas/APIError"
+            - $ref: '#/components/schemas/APIError'
           description: Detailed error information.
       type: object
       required:
@@ -664,7 +661,7 @@ components:
       properties:
         detail:
           items:
-            $ref: "#/components/schemas/ValidationError"
+            $ref: '#/components/schemas/ValidationError'
           type: array
           title: Detail
       type: object
@@ -673,7 +670,7 @@ components:
       properties:
         images:
           items:
-            $ref: "#/components/schemas/Media"
+            $ref: '#/components/schemas/Media'
           type: array
           title: Images
           description: The generated images.
@@ -695,8 +692,7 @@ components:
         logits:
           type: string
           title: Logits
-          description:
-            "The raw, unnormalized predictions (logits) for the masks."
+          description: 'The raw, unnormalized predictions (logits) for the masks.'
       type: object
       required:
         - masks
@@ -724,8 +720,7 @@ components:
         - seed
         - nsfw
       title: Media
-      description:
-        A media object containing information about the generated media.
+      description: A media object containing information about the generated media.
     TextResponse:
       properties:
         text:
@@ -734,7 +729,7 @@ components:
           description: The generated text.
         chunks:
           items:
-            $ref: "#/components/schemas/chunk"
+            $ref: '#/components/schemas/chunk'
           type: array
           title: Chunks
           description: The generated text chunks.
@@ -780,7 +775,7 @@ components:
           description: >-
             Text prompt(s) to guide what to exclude from image generation.
             Ignored if guidance_scale < 1.
-          default: ""
+          default: ''
         safety_check:
           type: boolean
           title: Safety Check
@@ -834,7 +829,7 @@ components:
       properties:
         images:
           items:
-            $ref: "#/components/schemas/Media"
+            $ref: '#/components/schemas/Media'
           type: array
           title: Images
           description: The generated images.
