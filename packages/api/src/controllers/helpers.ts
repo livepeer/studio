@@ -699,10 +699,14 @@ export const triggerCatalystPullStart =
         throw new Error(`failed to trigger catalyst pull`);
       };
 
-export const getCatalystStreamMetadata =
+export const waitCatalystStreamReady =
   process.env.NODE_ENV === "test"
     ? async () => {} // noop in case of tests
-    : async (url: string) => {
+    : async (stream: DBStream, playbackUrl: string) => {
+        const metadataUrl = new URL(playbackUrl);
+        metadataUrl.pathname = "/json_video+" + stream.playbackId + ".js";
+        const url = metadataUrl.toString();
+
         const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
         while (Date.now() < deadline) {
           const res = await fetchWithTimeoutAndRedirects(url, {
