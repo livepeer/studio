@@ -65,7 +65,7 @@ const downloadAiSchema = async () => {
     // prefix paths with /api/beta/generate
     path = `/api/beta/generate${path}`;
     // remove security field
-    delete value.security;
+    delete value.post.security;
     // add Studio API error as oneOf to all of the error responses
     const studioErrorRef = () => ({
       $ref: "#/components/schemas/studio-api-error",

@@ -59,8 +59,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
-      security:
-        - HTTPBearer: []
       x-speakeasy-name-override: textToImage
   /api/beta/generate/image-to-image:
     post:
@@ -121,8 +119,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
-      security:
-        - HTTPBearer: []
       x-speakeasy-name-override: imageToImage
   /api/beta/generate/image-to-video:
     post:
@@ -183,8 +179,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
-      security:
-        - HTTPBearer: []
       x-speakeasy-name-override: imageToVideo
   /api/beta/generate/upscale:
     post:
@@ -245,8 +239,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
-      security:
-        - HTTPBearer: []
       x-speakeasy-name-override: upscale
   /api/beta/generate/audio-to-text:
     post:
@@ -315,8 +307,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
-      security:
-        - HTTPBearer: []
       x-speakeasy-name-override: audioToText
   /api/beta/generate/segment-anything-2:
     post:
@@ -377,8 +367,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
-      security:
-        - HTTPBearer: []
       x-speakeasy-name-override: segmentAnything2
 components:
   schemas:
