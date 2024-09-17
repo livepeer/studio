@@ -59,6 +59,7 @@ import {
   triggerCatalystPullStart,
   triggerCatalystStreamStopSessions,
   triggerCatalystStreamUpdated,
+  waitCatalystStreamReady,
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
@@ -1256,7 +1257,8 @@ app.put(
       ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      await triggerCatalystPullStart(stream, playbackUrl);
+      triggerCatalystPullStart(stream, playbackUrl);
+      await waitCatalystStreamReady(stream, playbackUrl);
     }
 
     res.status(streamExisted ? 200 : 201);
