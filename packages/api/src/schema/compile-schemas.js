@@ -24,23 +24,47 @@ const write = (dir, data) => {
   console.log(`wrote ${dir}`);
 };
 
-const schemaDir = path.resolve(__dirname, "schema");
+// Remove the title from the schema to avoid conflicts with the TypeScript type name
+function removeAllTitles(schema) {
+  if (schema.title) {
+    delete schema.title;
+  }
+
+  if (schema.properties) {
+    for (const key in schema.properties) {
+      if (schema.properties[key]) {
+        schema.properties[key] = removeAllTitles(schema.properties[key]);
+      }
+    }
+  }
+
+  if (schema.items) {
+    if (Array.isArray(schema.items)) {
+      schema.items = schema.items.map((item) => removeAllTitles(item));
+    } else {
+      schema.items = removeAllTitles(schema.items);
+    }
+  }
+
+  return schema;
+}
+
+const schemaDir = path.resolve(__dirname, ".");
+process.chdir(schemaDir);
+
 const validatorDir = path.resolve(schemaDir, "validators");
 const schemaDistDir = path.resolve(__dirname, "..", "dist", "schema");
 fs.ensureDirSync(validatorDir);
 fs.ensureDirSync(schemaDistDir);
 
-const apiSchemaStr = fs.readFileSync(
-  path.resolve(schemaDir, "api-schema.yaml"),
-  "utf8",
-);
-const dbSchemaStr = fs.readFileSync(
-  path.resolve(schemaDir, "db-schema.yaml"),
-  "utf8",
-);
-const apiData = parseYaml(apiSchemaStr);
-const dbData = parseYaml(dbSchemaStr);
-const data = _.merge({}, apiData, dbData);
+const schemaFiles = ["api-schema.yaml", "ai-api-schema.yaml", "db-schema.yaml"];
+const subSchemas = [];
+for (const file of schemaFiles) {
+  const schemaStr = fs.readFileSync(path.resolve(schemaDir, file), "utf8");
+  const data = parseYaml(schemaStr);
+  subSchemas.push(data);
+}
+const data = _.merge({}, ...subSchemas);
 
 (async () => {
   const yaml = serializeYaml(data);
@@ -65,7 +89,8 @@ const data = _.merge({}, apiData, dbData);
   const index = [];
   let types = [];
 
-  for (const [name, schema] of Object.entries(data.components.schemas)) {
+  for (let [name, schema] of Object.entries(data.components.schemas)) {
+    schema = removeAllTitles(schema);
     schema.title = name;
     const type = await generateTypes(schema);
     types.push(type);

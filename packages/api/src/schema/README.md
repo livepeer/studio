@@ -1,14 +1,21 @@
 # Studio API Schema
 
-Our API schema is generated from the 2 YAML files in this repository:
+Our API schema is generated from the 3 YAML files in this repository:
 
-- `api-schema.yaml` - the schema file for our public API
-- `db-schema.yaml` - the schema file for internal fields we use in our code
+- `api-schema.yaml` - The schema file for our public API. This is the base and
+  used by the code and docs/SDKs
+- `ai-api-schema.yaml` - The schema for the AI Gateway APIs. This is also used
+  by code and docs/SDKs, but is kept separate since it's pulled from
+  `livepeer/ai-worker`.
+- `db-schema.yaml` - The schema file for internal fields we use in our code.
+  This is used by the code, but not for docs/SDK generation since it contains
+  internal abstractions.
 
-These 2 files are deep merged on a key-by-key basis to generate the final schema
-file, with `api-schema.yaml` going first (so `db-schema` can override values).
-It is recursive, so if you want to set only 1 key in a nested object you can set
-only that and all the other fields in the objects will be left intact.
+These files are deep merged on a key-by-key basis to generate the final schema
+file, in the order specified above (the later can override the previous ones).
+It is recursive, so if you want to set only 1 key in a nested object you can
+specify only the nested field and all the other fields in the objects path will
+be left intact.
 
 e.g. `{a:{b:{c:d:"hello"}}}` will set only the `d` field in the `c` nested obj.
 
@@ -26,6 +33,10 @@ possible reasons to use `db-schema` instead:
   returned objects in our code (e.g. `password`, `createdByTokenId`)
 - Deprecated fields we don't want anyone using (e.g. `wowza`, `detection`)
 
+The `ai-api-schema.yaml` file should never be edited manually. Instead, run
+`yarn pull-ai-schema` to update it from the source of truth
+(`livepeer/ai-worker`).
+
 ## Outputs
 
 The schema files are used to generate the following files:
@@ -39,3 +50,14 @@ The schema files are used to generate the following files:
   our API code to validate request payloads (`middleware/validators.js`)
 
 Check `compile-schemas.js` for more details on the whole process.
+
+## AI APIs
+
+The flow for the AI Gateway schemas is:
+
+- When there are changes to the upstream AI Gateway schema, a developer can run
+  `yarn pull-ai-schema` to update the version in the repository with it.
+- The `ai-api-schema.yaml` file is merged into the code abstractions in the
+  `compile-schemas.js` script above.
+- The `ai-api-schema.yaml` file is also used on the automatic SDK and docs
+  generation to include the AI APIs.

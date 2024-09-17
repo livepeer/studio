@@ -8,10 +8,11 @@ import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
 import logger from "../logger";
 import { authorizer, validateFormData, validatePost } from "../middleware";
+import { defaultModels } from "../schema/pull-ai-schema";
 import { AiGenerateLog } from "../schema/types";
 import { db } from "../store";
 import { BadRequestError } from "../store/errors";
-import { fetchWithTimeout } from "../util";
+import { fetchWithTimeout, kebabToCamel } from "../util";
 import { experimentSubjectsOnly } from "./experiment";
 import { pathJoin2 } from "./helpers";
 
@@ -170,13 +171,24 @@ function logAiGenerateRequest(
 
 function registerGenerateHandler(
   type: AiGenerateType,
-  defaultModel: string,
   isJSONReq = false, // multipart by default
 ): RequestHandler {
   const path = `/${type}`;
-  const payloadParsers = isJSONReq
-    ? [validatePost(`${type}-payload`)]
-    : [multipart.any(), validateFormData(`${type}-payload`)];
+
+  let payloadParsers: RequestHandler[];
+  let camelType = kebabToCamel(type);
+  camelType = camelType[0].toUpperCase() + camelType.slice(1);
+  if (isJSONReq) {
+    payloadParsers = [validatePost(`${camelType}Params`)];
+  } else {
+    payloadParsers = [
+      multipart.any(),
+      validateFormData(`Body_gen${camelType}`),
+    ];
+  }
+
+  const defaultModel = defaultModels[type];
+
   return app.post(
     path,
     authorizer({}),
@@ -236,17 +248,11 @@ function registerGenerateHandler(
   );
 }
 
-registerGenerateHandler(
-  "text-to-image",
-  "SG161222/RealVisXL_V4.0_Lightning",
-  true,
-);
-registerGenerateHandler("image-to-image", "timbrooks/instruct-pix2pix");
-registerGenerateHandler(
-  "image-to-video",
-  "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
-);
-registerGenerateHandler("upscale", "stabilityai/stable-diffusion-x4-upscaler");
-registerGenerateHandler("audio-to-text", "openai/whisper-large-v3");
+registerGenerateHandler("text-to-image", true);
+registerGenerateHandler("image-to-image");
+registerGenerateHandler("image-to-video");
+registerGenerateHandler("upscale");
+registerGenerateHandler("audio-to-text");
+registerGenerateHandler("segment-anything-2");
 
 export default app;

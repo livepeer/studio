@@ -90,6 +90,7 @@ describe("controllers/generate", () => {
       "image-to-image",
       "image-to-video",
       "upscale",
+      "segment-anything-2",
     ];
     for (const api of apis) {
       aiGatewayServer.app.post(`/${api}`, async (req, res) => {
@@ -212,6 +213,19 @@ describe("controllers/generate", () => {
         reqContentType: expect.stringMatching("^multipart/form-data"),
       });
       expect(aiGatewayCalls).toEqual({ upscale: 1 });
+    });
+
+    it("should call the AI Gateway for generate API /segment-anything-2", async () => {
+      const res = await client.fetch("/beta/generate/segment-anything-2", {
+        method: "POST",
+        body: buildMultipartBody({}),
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        message: "success",
+        reqContentType: expect.stringMatching("^multipart/form-data"),
+      });
+      expect(aiGatewayCalls).toEqual({ "segment-anything-2": 1 });
     });
   });
 

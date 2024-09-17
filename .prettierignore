@@ -17,3 +17,5 @@ packages/api/src/schema/schema.yaml
 packages/www/static-build
 packages/www/static-build-app
 packages/api/dist-esbuild/api.js
+# auto-generated from AI Gateway schema
+packages/api/src/schema/ai-api-schema.yaml
