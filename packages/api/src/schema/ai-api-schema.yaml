@@ -1,4 +1,7 @@
 openapi: 3.1.0
+tags:
+  - name: generate
+    description: Operations related to AI generate api
 paths:
   /api/beta/generate/text-to-image:
     post:
