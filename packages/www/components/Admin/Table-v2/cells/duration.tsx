@@ -11,14 +11,18 @@ export type DurationCellProps = {
 const DurationCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, DurationCellProps>) => {
-  if (cell.value.status === "waiting") {
-    return "In progress";
-  } else if (cell.value.status === "failed") {
-    return "Failed";
+  switch (cell.value.status) {
+    case "waiting":
+      return "In progress";
+    case "failed":
+      return "Failed";
+    case "deleted":
+      return "Deleted";
   }
   if (cell.value.duration === 0 || cell.value.status !== "ready") {
     return "n/a";
   }
+
   try {
     const dur = intervalToDuration({
       start: new Date(0),

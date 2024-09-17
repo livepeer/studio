@@ -19,7 +19,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [shouldShowFeature, setShouldShowFeature] = useState(false);
   const product = getUserProduct(user);
-  const showPromo = user.disabled;
+  const showPromo = user?.disabled;
   const [openSnackbar] = useSnackbar();
 
   const resendVerificationEmail = async () => {
@@ -68,19 +68,34 @@ const Dashboard = () => {
       {showPromo && (
         <Banner
           title="Upgrade"
+          titleCss={{
+            color: "$red11",
+            fontWeight: 600,
+            fontSize: "14px",
+          }}
+          descriptionCss={{
+            color: "$red11",
+            fontSize: "12px",
+          }}
+          css={{
+            background: "$red3",
+            mb: "$6",
+          }}
           description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
           button={
-            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+            <Link href={"/settings/billing/plans"} passHref legacyBehavior>
               <Button
-                variant="primary"
+                variant="tomato"
                 as="a"
                 size="2"
-                css={{ cursor: "default" }}>
+                css={{
+                  cursor: "default",
+                  border: "1px solid $tomato7",
+                }}>
                 Upgrade
               </Button>
             </Link>
           }
-          css={{ mb: "$7" }}
         />
       )}
       <Box css={{ mb: "$6" }}>

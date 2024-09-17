@@ -59,6 +59,7 @@ import {
   triggerCatalystPullStart,
   triggerCatalystStreamStopSessions,
   triggerCatalystStreamUpdated,
+  waitCatalystStreamReady,
 } from "./helpers";
 import { toExternalSession } from "./session";
 import wowzaHydrate from "./wowza-hydrate";
@@ -619,11 +620,12 @@ export async function getRecordingFields(
     const assetPhase = assetWithPlayback.status?.phase;
     return {
       recordingStatus:
-        assetPhase == "ready"
-          ? "ready"
-          : assetPhase == "failed"
-            ? "failed"
-            : "waiting",
+        {
+          ready: "ready",
+          failed: "failed",
+          deleting: "deleted",
+          deleted: "deleted",
+        }[assetPhase] ?? "waiting",
       recordingUrl: assetWithPlayback.playbackUrl,
       mp4Url: assetWithPlayback.downloadUrl,
     };
@@ -1255,7 +1257,8 @@ app.put(
       ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      await triggerCatalystPullStart(stream, playbackUrl);
+      triggerCatalystPullStart(stream, playbackUrl);
+      await waitCatalystStreamReady(stream, playbackUrl);
     }
 
     res.status(streamExisted ? 200 : 201);
@@ -2407,6 +2410,8 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
   const { data: webhooks } = await db.webhook.listSubscribed(
     user.id,
     "stream.detection",
+    stream.projectId || user.defaultProjectId,
+    user.defaultProjectId,
   );
   let detection = undefined;
   if (webhooks.length > 0 || stream.detection) {

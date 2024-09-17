@@ -124,7 +124,7 @@ const StreamSetupBox = ({
                   fontWeight: 600,
                   color: "$hiContrast",
                 }}>
-                SRT ingest
+                SRT ingest (Beta)
               </Box>
               <Text variant="neutral" css={{ fontSize: "$2", mt: "$2" }}>
                 <ShowURL url={globalSrtIngestUrl} anchor={false} />

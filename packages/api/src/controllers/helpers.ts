@@ -699,6 +699,37 @@ export const triggerCatalystPullStart =
         throw new Error(`failed to trigger catalyst pull`);
       };
 
+export const waitCatalystStreamReady =
+  process.env.NODE_ENV === "test"
+    ? async () => {} // noop in case of tests
+    : async (stream: DBStream, playbackUrl: string) => {
+        const metadataUrl = new URL(playbackUrl);
+        metadataUrl.pathname = "/json_video+" + stream.playbackId + ".js";
+        const url = metadataUrl.toString();
+
+        const deadline = Date.now() + 2 * PULL_START_TIMEOUT;
+        while (Date.now() < deadline) {
+          const res = await fetchWithTimeoutAndRedirects(url, {
+            method: "GET",
+            timeout: PULL_START_TIMEOUT,
+            maxRedirects: 10,
+          });
+          const body = await res.text();
+          if (res.ok && body.includes(`"meta":`)) {
+            return;
+          }
+
+          logger.warn(
+            `getCatalystStreamMetadata failed for playbackUrl=${url} status=${
+              res.status
+            } error=${JSON.stringify(body)}`,
+          );
+          await sleep(250);
+        }
+
+        throw new Error(`failed to trigger catalyst pull`);
+      };
+
 export const triggerCatalystStreamStopSessions = (
   req: Request,
   playback_id: string,

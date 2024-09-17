@@ -154,7 +154,7 @@ describe("controllers/access-control", () => {
       expect(res4.status).toBe(200);
       expect(await res4.json()).toEqual({
         user_id: gatedAsset.userId,
-        user_viewer_limit: 50_000,
+        user_viewer_limit: 10_000,
       });
 
       await db.user.update(gatedAsset.userId, { stripeProductId: null }); // Default for untracked plans
@@ -166,7 +166,7 @@ describe("controllers/access-control", () => {
       expect(res5.status).toBe(200);
       expect(await res5.json()).toEqual({
         user_id: gatedAsset.userId,
-        user_viewer_limit: 50_000,
+        user_viewer_limit: 10_000,
       });
 
       await hookSem.wait(3000);
