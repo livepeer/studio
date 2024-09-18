@@ -418,11 +418,22 @@ function getDownloadUrl(
     os.id !== vodObjectStoreId ? os.publicUrl : pathJoin(ingest, "asset");
   const source = asset.files?.find((f) => f.type === "source_file");
   if (source) {
+    const formatToFileExtension: Map<string, string> = new Map([
+      ["mpegts", "ts"],
+      ["mp4", "mp4"],
+    ]);
+
+    if (
+      source.path != "video" ||
+      !formatToFileExtension.has(asset.videoSpec.format)
+    ) {
+      return pathJoin(base, asset.playbackId, source.path);
+    }
     return pathJoin(
       base,
       asset.playbackId,
       source.path,
-      "download." + asset.videoSpec.format,
+      "download." + formatToFileExtension.get(asset.videoSpec.format),
     );
   }
   return pathJoin(base, asset.playbackId, "video");
