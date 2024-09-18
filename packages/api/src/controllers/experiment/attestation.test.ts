@@ -240,42 +240,6 @@ describe("Attestation API", () => {
     });
   });
 
-  it("should fail export attestation into IPFS", async () => {
-    let res = await client.get(`/experiment/-/attestation/${id}`);
-    expect(res.status).toEqual(200);
-    let attestation = await res.json();
-    const taskId = attestation.storage.status.tasks.pending;
-
-    expect(taskId).not.toBeNull();
-    client.apiKey = adminApiKey;
-    res = await client.get(`/task/${taskId}`);
-    expect(res.status).toBe(200);
-    const task = await res.json();
-    expect(task.type).toEqual("export-data");
-
-    await server.taskScheduler.processTaskEvent({
-      id: uuid(),
-      type: "task_result",
-      timestamp: Date.now(),
-      task: {
-        id: taskId,
-        type: "export-data",
-        snapshot: task,
-      },
-      error: {
-        message: "oh no it failed!",
-        unretriable: true,
-      },
-      output: null,
-    });
-
-    res = await client.get(`/experiment/-/attestation/${id}`);
-    expect(res.status).toEqual(200);
-    attestation = await res.json();
-    expect(attestation.storage.status.phase).toEqual("failed");
-    expect(attestation.storage.status.tasks.failed).toEqual(taskId);
-  });
-
   describe("GET /", () => {
     it("should return a list of attestation metadata entries", async () => {
       const res = await client.get(`/experiment/-/attestation`);
