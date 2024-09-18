@@ -32,7 +32,10 @@ import {
   TooManyRequestsError,
   UnprocessableEntityError,
 } from "../store/errors";
-import { ensureExperimentSubject } from "../store/experiment-table";
+import {
+  ensureExperimentSubject,
+  isExperimentSubject,
+} from "../store/experiment-table";
 import messages from "../store/messages";
 import Queue from "../store/queue";
 import { DBSession } from "../store/session-table";
@@ -1257,8 +1260,12 @@ app.put(
       ? pathJoin(streamPullUrl + stream.playbackId, `index.m3u8`)
       : getHLSPlaybackUrl(ingest, stream);
     if (!stream.isActive || streamExisted) {
-      triggerCatalystPullStart(stream, playbackUrl);
-      await waitCatalystStreamReady(stream, playbackUrl);
+      if (await isExperimentSubject("stream-metadata-wait", req.user.id)) {
+        triggerCatalystPullStart(stream, playbackUrl);
+        await waitCatalystStreamReady(stream, playbackUrl);
+      } else {
+        await triggerCatalystPullStart(stream, playbackUrl);
+      }
     }
 
     res.status(streamExisted ? 200 : 201);
