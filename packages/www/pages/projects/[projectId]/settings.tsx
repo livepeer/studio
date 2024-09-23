@@ -57,7 +57,7 @@ const Settings = () => {
             p: "$6",
           },
         }}>
-        <Box css={{ mb: "$7" }}>
+        <Box css={{ mb: "$5" }}>
           <Box
             css={{
               borderBottom: "1px solid",
@@ -66,7 +66,7 @@ const Settings = () => {
               mb: "$5",
               width: "100%",
             }}>
-            <Text size="xl" weight="medium">
+            <Text size="xl" weight="semibold">
               Settings
             </Text>
             <Text variant="neutral" className="mt-2" size="sm">

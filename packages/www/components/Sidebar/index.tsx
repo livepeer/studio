@@ -28,6 +28,8 @@ import {
   PlaySquareIcon,
   SettingsIcon,
   SquarePenIcon,
+  Star,
+  Stars,
   TerminalIcon,
   VideoIcon,
 } from "lucide-react";
@@ -62,7 +64,8 @@ export type SidebarId =
   | "settings/projects"
   | "settings/usage"
   | "settings/billing"
-  | "settings/plans";
+  | "settings/plans"
+  | "model-gallery";
 
 export const generalSidebarItems = [
   {
@@ -71,24 +74,37 @@ export const generalSidebarItems = [
     icon: <HomeIcon className="w-4 h-4 text-muted-foreground" />,
     id: "home",
   },
+
   {
-    title: "Streams",
+    title: "Video",
     path: "/streams",
     icon: <PlaySquareIcon className="w-4 h-4 text-muted-foreground" />,
-    id: "streams",
+    id: "video",
     children: [
       {
-        title: "Sessions",
-        path: "/sessions",
-        id: "streams/sessions",
+        title: "Streams",
+        path: "/streams",
+        id: "streams",
+        children: [
+          {
+            title: "Sessions",
+            path: "/sessions",
+            id: "streams/sessions",
+          },
+        ],
+      },
+      {
+        title: "Assets",
+        path: "/assets",
+        id: "assets",
       },
     ],
   },
   {
-    title: "Assets",
-    path: "/assets",
-    icon: <VideoIcon className="w-4 h-4 text-muted-foreground" />,
-    id: "assets",
+    title: "AI Models",
+    path: "/model-gallery",
+    icon: <Stars className="w-4 h-4 text-muted-foreground" />,
+    id: "model-gallery",
   },
   {
     title: "Developers",
@@ -212,7 +228,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
     const response = canSendEmail("resetPassword");
     if (!response.canSend) {
       openSnackbar(
-        `Please wait ${response.waitTime} seconds before sending another email.`,
+        `Please wait ${response.waitTime} seconds before sending another email.`
       );
       return;
     }
@@ -389,7 +405,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                     </Box>
                   )}
                 </Box>
-              ),
+              )
             )}
           </Grid>
           <Flex className="flex flex-col gap-1">
