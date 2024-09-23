@@ -65,7 +65,8 @@ export type SidebarId =
   | "settings/usage"
   | "settings/billing"
   | "settings/plans"
-  | "model-gallery";
+  | "model-gallery"
+  | "model-gallery/playground";
 
 export const generalSidebarItems = [
   {
