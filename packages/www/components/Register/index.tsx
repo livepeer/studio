@@ -12,7 +12,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
   const router = useRouter();
   const [organization, setOrganization] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [surname, setSurname] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [utmCampaign, setUtmCampaign] = useState("");
@@ -78,6 +78,7 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
       email,
       password: hashedPassword,
       firstName,
+      lastName,
       organization,
     });
   };
@@ -126,16 +127,16 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
 
           <TextField
             size="3"
-            id="surname"
+            id="lastName"
             css={{
               width: "100%",
               mb: "$2",
             }}
-            name="surname"
+            name="lastName"
             type="text"
-            placeholder="Surname"
-            value={surname}
-            onChange={(e) => setSurname(e.target.value)}
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
 
           <TextField
