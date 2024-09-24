@@ -116,7 +116,7 @@ const CustomModelBanner = () => {
   return (
     <Card className="relative ">
       <CardHeader>
-        <CardTitle>Bring Your Custom AI Models on Livepeer</CardTitle>
+        <CardTitle>Bring Your Custom AI Models to Livepeer</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="w-1/2 text-gray-500">
