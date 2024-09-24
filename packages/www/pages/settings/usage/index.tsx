@@ -1,43 +1,34 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import {
-  Box,
-  Heading,
-  Flex,
-  Text,
-  Link as A,
-  Select,
-  Grid,
-  Tooltip as LPTooltip,
-} from "@livepeer/design-system";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { Box, Tooltip as LPTooltip } from "@livepeer/design-system";
+import { useEffect, useState } from "react";
 import { DashboardUsage as Content } from "content";
-import React, { PureComponent } from "react";
-import {
-  BarChart,
-  Bar,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { BarChart, Bar, XAxis, CartesianGrid, AreaChart, Area } from "recharts";
 import { UsageCard } from "components/UsageSummary";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
+import {
+  Card,
+  CardTitle,
+  CardHeader,
+  CardDescription,
+  CardContent,
+} from "components/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/ui/select";
 
 const Usage = () => {
   useLoggedIn();
-  const {
-    user,
-    getUsage,
-    getBillingUsage,
-    getSubscription,
-    getInvoices,
-    getUserProduct,
-  } = useApi();
-  const [_usage, setUsage] = useState(null);
+  const { user, getUsage, getBillingUsage, getSubscription } = useApi();
   const [billingUsage, setBillingUsage] = useState<any>({
     TotalUsageMins: 0,
     DeliveryUsageMins: 0,
@@ -49,116 +40,92 @@ const Usage = () => {
   const [to, setTo] = useState(0);
   const [usageData, setUsageData] = useState([]);
 
-  const doSetTimeStep = async (ts: string) => {
-    setTimestep(ts);
-    const [
-      res,
-      usage = {
-        TotalUsageMins: 0,
-        DeliveryUsageMins: 0,
-        StorageUsageMins: 0,
-      },
-    ] = await getBillingUsage(from, to, null, ts);
-    if (res.status == 200 && Array.isArray(usage)) {
-      const now = new Date();
-      const currentMonth = now.toLocaleString("default", { month: "short" });
-      let dayCounter = 1;
-
-      for (let i = 0; i < usage.length; i++) {
-        const item = usage[i];
-        if (ts == "day") {
-          item.name = `${currentMonth} ${dayCounter}`;
-          dayCounter++;
-        } else {
-          item.name = "";
-        }
-      }
-
-      setUsageData(usage);
-      console.log(usage);
+  const updateUsageData = async (fromTime, toTime, ts) => {
+    const [res, usage = []] = await getBillingUsage(fromTime, toTime, null, ts);
+    if (res.status === 200 && Array.isArray(usage)) {
+      const formattedUsage = formatUsageData(usage);
+      setUsageData(formattedUsage);
     }
   };
 
-  const doSetFrom = async (from: number) => {
-    setFrom(from);
+  const updateBillingUsage = async (fromTime, toTime) => {
+    const [res, usage] = await getBillingUsage(fromTime, toTime);
+    if (res.status === 200) {
+      setBillingUsage(
+        usage || {
+          TotalUsageMins: 0,
+          DeliveryUsageMins: 0,
+          StorageUsageMins: 0,
+        }
+      );
+    }
   };
 
-  const doSetTo = async (to: number) => {
-    setTo(to);
+  const handleTimeStepChange = async (ts: string) => {
+    setTimestep(ts);
+    await updateUsageData(from, to, ts);
+  };
+
+  const handleDateChange = async (fromTime: number, toTime: number) => {
+    setFrom(fromTime);
+    setTo(toTime);
+    await updateBillingUsage(fromTime, toTime);
+    await updateUsageData(fromTime, toTime, timestep);
   };
 
   useEffect(() => {
-    const doGetUsage = async (fromTime, toTime, userId) => {
-      const [res, usage] = await getUsage(fromTime, toTime, userId);
-      if (res.status == 200) {
-        setUsage(usage);
-      }
-    };
-
-    const doGetBillingUsage = async (
-      fromTime: any,
-      toTime: any,
-      status: any,
-    ) => {
-      fromTime = fromTime * 1000;
-      toTime = toTime * 1000;
-
-      // if subscription is cancelled, get current month data
-      if (status === "canceled") {
-        const now = new Date();
-        fromTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-        toTime = now.getTime();
-      }
-
-      let [res, usage] = await getBillingUsage(fromTime, toTime);
-
-      if (res.status == 200) {
-        if (!usage) {
-          usage = {
-            TotalUsageMins: 0,
-            DeliveryUsageMins: 0,
-            StorageUsageMins: 0,
-          };
-        }
-        setBillingUsage(usage);
-      }
-
-      const [res2, usageByDay] = await getBillingUsage(
-        fromTime,
-        toTime,
-        null,
-        timestep,
+    const fetchInitialData = async () => {
+      const [res, subscription] = await getSubscription(
+        user.stripeCustomerSubscriptionId
       );
-      if (res2.status == 200 && Array.isArray(usageByDay)) {
-        setUsageData(usageByDay);
-      }
-    };
-
-    const getSubscriptionAndUsage = async (subscriptionId) => {
-      const [res, subscription] = await getSubscription(subscriptionId);
-      if (res.status == 200) {
+      if (res.status === 200 && subscription) {
         setSubscription(subscription);
+        const { current_period_start, current_period_end } = subscription ?? {};
+        setFrom((current_period_start as number) ?? 0);
+        setTo((current_period_end as number) ?? 0);
+        await updateBillingUsage(
+          (current_period_start as number) ?? 0,
+          (current_period_end as number) ?? 0
+        );
+        await updateUsageData(
+          (current_period_start as number) ?? 0,
+          (current_period_end as number) ?? 0,
+          timestep
+        );
       }
-      doGetUsage(
-        subscription?.current_period_start,
-        subscription?.current_period_end,
-        user.id,
-      );
-      doGetBillingUsage(
-        subscription?.current_period_start,
-        subscription?.current_period_end,
-        subscription?.status,
-      );
     };
 
     if (user) {
-      getSubscriptionAndUsage(user.stripeCustomerSubscriptionId);
+      fetchInitialData();
     }
   }, [user]);
 
   if (!user) {
     return <Layout />;
   }
+
+  const formatUsageData = (usage) => {
+    const TotalUsageMins = [];
+    const DeliveryUsageMins = [];
+    const StorageUsageMins = [];
+
+    usage.forEach((item) => {
+      const date = new Date(item.TimeInterval).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      TotalUsageMins.push({ name: date, value: item.TotalUsageMins });
+      DeliveryUsageMins.push({ name: date, value: item.DeliveryUsageMins });
+      StorageUsageMins.push({ name: date, value: item.StorageUsageMins });
+    });
+
+    return [
+      { name: "Transcoding usage minutes", data: TotalUsageMins },
+      { name: "Delivery usage minutes", data: DeliveryUsageMins },
+      { name: "Storage usage minutes", data: StorageUsageMins },
+    ];
+  };
+
   return (
     <Layout
       id="settings/usage"
@@ -166,92 +133,54 @@ const Usage = () => {
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
-          <Flex
-            justify="between"
-            align="end"
-            css={{
-              borderBottom: "1px solid",
-              borderColor: "$neutral6",
-              pb: "$4",
-              mb: "$5",
-              width: "100%",
-            }}>
-            <Heading size="2">
-              <Flex>
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Usage
-                </Box>
-              </Flex>
-            </Heading>
-            <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
+          <div className="flex  justify-between border-b border-border pb-4 mb-5 w-[100%]">
+            <h2 className="flex items-center text-2xl font-semibold leading-none tracking-tight">
+              Usage
+            </h2>
+            <div className="flex">
               Current billing period (
               {subscription && (
-                <Flex>
+                <div>
                   {new Date(
-                    subscription.current_period_start * 1000,
+                    subscription.current_period_start * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}{" "}
                   to{" "}
                   {new Date(
-                    subscription.current_period_end * 1000,
+                    subscription.current_period_end * 1000
                   ).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}{" "}
-                </Flex>
+                </div>
               )}
               )
-            </Flex>
-          </Flex>
+            </div>
+          </div>
         </Box>
-
-        <Box css={{ mb: "$9" }}>
-          <Flex
-            justify="between"
-            align="end"
-            css={{
-              mb: "$4",
-              width: "100%",
-            }}>
-            <Heading size="1">
-              <Flex align="center">
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Summary
-                </Box>
-                <Flex align="center">
-                  <LPTooltip
-                    multiline
-                    //@ts-ignore
-                    content={
-                      <Box>
-                        Usage minutes may take up to an hour to be reflected.
-                      </Box>
-                    }>
-                    <Help />
-                  </LPTooltip>
-                </Flex>
-              </Flex>
-            </Heading>
-          </Flex>
-          <Grid gap="4" columns="3">
+        <div className="mb-7 flex flex-col space-y-4 ">
+          <h2 className="flex items-center text-xl font-semibold leading-none tracking-tight">
+            Summary
+            <span className="ml-2">
+              <LPTooltip
+                multiline
+                content={
+                  <p>Usage minutes may take up to an hour to be reflected.</p>
+                }>
+                <Help />
+              </LPTooltip>
+            </span>
+          </h2>
+          <div className="grid grid-cols-3 gap-4">
             <UsageCard
               title="Transcoding minutes"
               loading={!billingUsage}
               usage={
-                billingUsage &&
-                billingUsage.TotalUsageMins.toFixed(2).toLocaleString()
+                (billingUsage &&
+                  billingUsage?.TotalUsageMins?.toFixed(2).toLocaleString()) ||
+                0
               }
               limit={false}
             />
@@ -259,8 +188,11 @@ const Usage = () => {
               title="Delivery minutes"
               loading={!billingUsage}
               usage={
-                billingUsage &&
-                billingUsage.DeliveryUsageMins.toFixed(2).toLocaleString()
+                (billingUsage &&
+                  billingUsage?.DeliveryUsageMins?.toFixed(
+                    2
+                  ).toLocaleString()) ||
+                0
               }
               limit={false}
             />
@@ -268,81 +200,76 @@ const Usage = () => {
               title="Storage minutes"
               loading={!billingUsage}
               usage={
-                billingUsage &&
-                billingUsage.StorageUsageMins.toFixed(2).toLocaleString()
+                (billingUsage &&
+                  billingUsage?.StorageUsageMins?.toFixed(
+                    2
+                  ).toLocaleString()) ||
+                0
               }
               limit={false}
             />
-          </Grid>
-        </Box>
-        <Flex
-          justify="between"
-          align="end"
-          css={{
-            mb: "$4",
-            width: "100%",
-          }}>
-          <Heading size="1">
-            <Flex align="center">
-              <Box
-                css={{
-                  mr: "$3",
-                  fontWeight: 600,
-                  letterSpacing: "0",
-                  display: "",
-                }}>
-                Charts
-              </Box>
-            </Flex>
-          </Heading>
-        </Flex>
-        <Box css={{ mb: "$4", display: "" }}>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="flex items-center text-xl font-semibold leading-none tracking-tight">
+            Charts
+          </h2>
           <Select
-            css={{ fontSize: "$3", px: "$2", mb: "$4" }}
-            defaultValue="day"
-            onChange={(e) => doSetTimeStep(e.target.value)}>
-            <option value="hour">Hourly</option>
-            <option value="day">Daily</option>
+            onValueChange={(value) => handleTimeStepChange(value)}
+            defaultValue={timestep}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Time step" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Daily</SelectItem>
+              <SelectItem value="hour">Hourly</SelectItem>
+            </SelectContent>
           </Select>
-        </Box>
-        <Box css={{ mb: "$4", display: "" }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart width={150} height={40} data={usageData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="TotalUsageMins" fill="#30a46c" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-        <Box css={{ mb: "$4", display: "" }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart width={150} height={40} data={usageData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="DeliveryUsageMins" fill="#30a46c" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-        <Box css={{ mb: "$4", display: "" }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart width={150} height={40} data={usageData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="StorageUsageMins"
-                stroke="#30a46c"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Box>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {usageData.map((usageType, index) => (
+            <Card className={`w-full `} key={usageType.name}>
+              <CardHeader>
+                <CardTitle className="capitalize">{usageType.name}</CardTitle>
+                <CardDescription className="normal-case">{`${
+                  usageType.name
+                } ${new Date(from * 1000).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })} to ${new Date(to * 1000).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}`}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    desktop: {
+                      label: "Desktop",
+                      color: "#fff",
+                    },
+                  }}
+                  className="w-full">
+                  <BarChart data={usageType.data}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="name"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Bar dataKey="value" fill="#3B8F68" radius={8} />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </Box>
     </Layout>
   );
