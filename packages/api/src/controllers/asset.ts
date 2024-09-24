@@ -421,6 +421,9 @@ function getDownloadUrl(
     const formatToFileExtension: Map<string, string> = new Map([
       ["mpegts", "ts"],
       ["mp4", "mp4"],
+      ["mov", "mov"],
+      ["matroska", "mkv"],
+      ["avi", "avi"],
     ]);
 
     if (
