@@ -1,6 +1,6 @@
 import { Checkbox } from "components/ui/checkbox";
 import { Input } from "components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Stars } from "lucide-react";
 import React, { useState } from "react";
 import { availableModels } from "./constants";
 import Model from "./model";
@@ -119,18 +119,18 @@ const CustomModelBanner = () => {
         <CardTitle>Bring Your Custom AI Models to Livepeer</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="w-1/2 text-gray-500">
-          Leverage Livepeer's decentralized infrastructure to run a custom
-          fine-tuned AI models or any open source models at scale. Our network
-          is engineered to support diverse model architectures and deliver
-          high-performance inference.
+        <p className="w-3/5 text-gray-500">
+          Leverage Livepeer's decentralized infrastructure to run AI models at
+          scale: open-source, LoRA fine-tuned, custom ML, and proprietary
+          solutions. Our network supports diverse architectures, delivers
+          high-performance inference, and offers seamless API integration.
         </p>
       </CardContent>
       <CardFooter className="flex flex-row gap-4">
         <Button>Request custom model</Button>
         <Button variant="outline">Learn more</Button>
       </CardFooter>
-      <div className="absolute top-0 right-0 w-1/2 h-full">
+      <div className="absolute top-0 right-0 w-2/5 h-full">
         <Image
           src="/dashboard/ai/banner.webp"
           className="w-full h-full object-cover"
