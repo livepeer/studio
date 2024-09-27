@@ -544,7 +544,7 @@ components:
           type: string
           title: Model Id
           description: Hugging Face model ID used for image generation.
-          default: 'facebook/sam2-hiera-large:'
+          default: 'facebook/sam2-hiera-large'
         point_coords:
           type: string
           title: Point Coords
