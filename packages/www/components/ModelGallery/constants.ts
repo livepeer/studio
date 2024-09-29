@@ -184,7 +184,7 @@ const availableModels: Model[] = [
     id: "SG161222/RealVisXL_V4.0_Lightning",
     title: "Realistic Vision V4",
     description:
-      "A streamlined version of RealVisXL_V4.0, designed for faster inference while still aiming for photorealism.",
+      "A lightning model designed for faster inference while still aiming for photorealism.",
     pipline: "Text to Image",
     image: "RealVisXL_V4.0_Lightning.png",
     lightning: true,
@@ -194,7 +194,7 @@ const availableModels: Model[] = [
     id: "ByteDance/SDXL-Lightning",
     title: "SDXL Lightning",
     description:
-      "SDXL-Lightning is a lightning-fast text-to-image generation model.",
+      "The SDXL-Lightning is a lightning-fast text-to-image generation model.",
     pipline: "Text to Image",
     image: "SDXL-Lightning.jpg",
     lightning: true,
@@ -204,7 +204,7 @@ const availableModels: Model[] = [
     id: "timbrooks/instruct-pix2pix",
     title: "Instruct Pix2Pix",
     description:
-      "A powerful diffusion model that edits images to a high-quality standard based on human-written instructions.",
+      "A  model that edits images based on human-written instructions.",
     pipline: "Image to Image",
     image: "instruct-pix2pix.jpg",
     inputs: imageToImageInputs,
@@ -213,7 +213,7 @@ const availableModels: Model[] = [
     id: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
     title: "Stable Video Diffusion",
     description:
-      "An updated version of the stable-video-diffusion-img2vid-xt model with enhanced performance.",
+      "An updated version of Stable Video Diffusion Video with improved quality.",
     pipline: "Image to Video",
     image: "stable-video-diffusion-img2vid-xt-1-1.gif",
     inputs: imageToVideoInputs,
@@ -249,5 +249,11 @@ type Input = {
   group: string;
 };
 
+type Output = {
+  url: string;
+  seed: number;
+  nsfw: boolean;
+};
+
 export { availableModels };
-export type { Model };
+export type { Model, Input, Output };

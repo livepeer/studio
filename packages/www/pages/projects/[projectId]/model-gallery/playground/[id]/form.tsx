@@ -1,18 +1,50 @@
-import React, { useRef } from "react";
-import type { Model as ModelT } from "components/ModelGallery/constants";
+import React, { useRef, useState } from "react";
+import type {
+  Model as ModelT,
+  Output,
+} from "components/ModelGallery/constants";
 import { Label } from "components/ui/label";
 import { Button } from "components/ui/button";
 import { Textarea } from "components/ui/textarea";
 import { Input } from "components/ui/input";
-import { ScrollArea } from "components/ui/scroll-area";
+import { useApi } from "hooks";
 
-export default function Form({ model }: { model: ModelT }) {
+export default function Form({
+  model,
+  setOutput,
+}: {
+  model: ModelT;
+  setOutput: (output: Output[]) => void;
+}) {
+  const { textToImage } = useApi();
+  const [loading, setLoading] = useState<boolean>(false);
+
   const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    console.log(formData.get("prompt"));
+    const formInputs = Object.fromEntries(
+      Array.from(formData.entries()).map(([key, value]) => [
+        key,
+        model?.inputs.find(
+          (input) => input.id === key && input.type === "number",
+        )
+          ? Number(value)
+          : value,
+      ]),
+    );
+
+    switch (model?.pipline) {
+      case "Text to Image":
+        const res = await textToImage(formInputs);
+        setOutput(res);
+        setLoading(false);
+        break;
+      case "image-to-image":
+        console.log(formInputs);
+        break;
+    }
   };
 
   const handleReset = () => {
@@ -61,7 +93,7 @@ export default function Form({ model }: { model: ModelT }) {
         <Button variant="outline" onClick={handleReset}>
           Reset
         </Button>
-        <Button type="submit">Run pipline</Button>
+        <Button type="submit">Run pipeline</Button>
       </div>
     </form>
   );

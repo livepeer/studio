@@ -19,7 +19,7 @@ export default function Model({ model }: { model: ModelT }) {
 
   return (
     <Link href={appendProjectId(`/model-gallery/playground/${modelHref}`)}>
-      <Card className="h-[28rem]">
+      <Card className="">
         <CardHeader className="p-4">
           <CardTitle className="text-lg">{model.title}</CardTitle>
         </CardHeader>
@@ -31,7 +31,7 @@ export default function Model({ model }: { model: ModelT }) {
               alt={model.title}
             />
           </div>
-          <p className="text-sm text-gray-600">{model.description}</p>
+          <p className="text-sm text-gray-600 ">{model.description}</p>
         </CardContent>
         <CardFooter className="flex justify-between items-center p-4 py-2">
           <ModelSource model={model} />

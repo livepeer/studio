@@ -15,13 +15,16 @@ import {
 } from "components/ui/card";
 import { useRouter } from "next/router";
 import { availableModels } from "components/ModelGallery/constants";
-import type { Model as ModelT } from "components/ModelGallery/constants";
+import type {
+  Model as ModelT,
+  Output as OutputT,
+} from "components/ModelGallery/constants";
 import { Label } from "components/ui/label";
 import { Input } from "components/ui/input";
 import { Textarea } from "components/ui/textarea";
 import { Switch } from "components/ui/switch";
 import { Button } from "components/ui/button";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Output from "./output";
 import Form from "./form";
 
@@ -37,6 +40,8 @@ export default function PlaygroundPage() {
   if (!user) {
     return <Layout />;
   }
+
+  const [output, setOutput] = useState<OutputT[]>([]);
 
   return (
     <Layout
@@ -55,10 +60,10 @@ export default function PlaygroundPage() {
         <PageHeader model={model} />
         <main className="flex flex-col md:flex-row flex-1 gap-8 overflow-auto mt-4">
           <div className="md:w-[30%]">
-            <Form model={model} />
+            <Form model={model} setOutput={setOutput} />
           </div>
           <div className="md:w-[70%]">
-            <Output />
+            <Output output={output} />
           </div>
         </main>
       </Box>
