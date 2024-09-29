@@ -119,12 +119,12 @@ const CustomModelBanner = () => {
         <CardTitle>Bring Your Custom AI Models to Livepeer</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="w-3/5 text-gray-500">
+        <CardDescription className="w-3/5">
           Leverage Livepeer's decentralized infrastructure to run AI models at
           scale: open-source, LoRA fine-tuned, custom ML, and proprietary
           solutions. Our network supports diverse architectures, delivers
           high-performance inference, and offers seamless API integration.
-        </p>
+        </CardDescription>
       </CardContent>
       <CardFooter className="flex flex-row gap-4">
         <Button>Request custom model</Button>

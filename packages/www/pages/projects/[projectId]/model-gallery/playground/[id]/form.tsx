@@ -21,7 +21,7 @@ export default function Form({ model }: { model: ModelT }) {
 
     model?.inputs.forEach((input) => {
       const inputElement = form.elements.namedItem(
-        input.id
+        input.id,
       ) as HTMLInputElement;
       if (inputElement && input.defaultValue) {
         inputElement.value = input.defaultValue.toString();
@@ -30,42 +30,40 @@ export default function Form({ model }: { model: ModelT }) {
   };
 
   return (
-    <ScrollArea className="h-[75vh]">
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="grid w-full items-start gap-6 ">
-        {model?.inputs && (
-          <>
-            {[...new Set(model.inputs.map((input) => input.group))].map(
-              (group) => (
-                <fieldset
-                  key={group}
-                  className="grid gap-4 rounded-lg border p-4">
-                  <legend className="-ml-1 px-1 text-sm font-medium capitalize">
-                    {group}
-                  </legend>
-                  {model.inputs
-                    .filter((input) => input.group === group)
-                    .map((input) => (
-                      <div key={input.id}>
-                        <Label>{input.name}</Label>
-                        <div className="mt-1">{renderInput(input)}</div>
-                      </div>
-                    ))}
-                </fieldset>
-              )
-            )}
-          </>
-        )}
-        <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={handleReset}>
-            Reset
-          </Button>
-          <Button type="submit">Run pipline</Button>
-        </div>
-      </form>
-    </ScrollArea>
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="grid w-full items-start gap-6 ">
+      {model?.inputs && (
+        <>
+          {[...new Set(model.inputs.map((input) => input.group))].map(
+            (group) => (
+              <fieldset
+                key={group}
+                className="grid gap-4 rounded-lg border p-4">
+                <legend className="-ml-1 px-1 text-sm font-medium capitalize">
+                  {group}
+                </legend>
+                {model.inputs
+                  .filter((input) => input.group === group)
+                  .map((input) => (
+                    <div key={input.id}>
+                      <Label>{input.name}</Label>
+                      <div className="mt-1">{renderInput(input)}</div>
+                    </div>
+                  ))}
+              </fieldset>
+            ),
+          )}
+        </>
+      )}
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" onClick={handleReset}>
+          Reset
+        </Button>
+        <Button type="submit">Run pipline</Button>
+      </div>
+    </form>
   );
 }
 

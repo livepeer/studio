@@ -88,7 +88,7 @@ const imageToImageInputs: Input[] = [
     type: "number",
     required: false,
     description: "The strength to use for image generation",
-    defaultValue: 0.8,
+    defaultValue: 1,
     group: "settings",
   },
   {
@@ -97,25 +97,7 @@ const imageToImageInputs: Input[] = [
     type: "number",
     required: false,
     description: "The guidance scale to use for image generation",
-    defaultValue: 7.5,
-    group: "settings",
-  },
-  {
-    id: "image_guidance_scale",
-    name: "Image Guidance Scale",
-    type: "number",
-    required: false,
-    description: "The image guidance scale to use for image generation",
-    defaultValue: 1.5,
-    group: "settings",
-  },
-
-  {
-    id: "seed",
-    name: "Seed",
-    type: "number",
-    required: false,
-    description: "The seed to use for image generation",
+    defaultValue: 2,
     group: "settings",
   },
   {
@@ -124,17 +106,75 @@ const imageToImageInputs: Input[] = [
     type: "number",
     required: false,
     description: "The number of inference steps to use for image generation",
-    defaultValue: 100,
+    defaultValue: 6,
     group: "settings",
   },
+];
 
+const upscalerInputs: Input[] = [
   {
-    id: "num_images_per_prompt",
-    name: "Number of Images per Prompt",
+    id: "image",
+    name: "Image",
+    type: "file",
+    required: true,
+    description: "The image to upscale",
+    group: "prompt",
+  },
+];
+
+const imageToVideoInputs: Input[] = [
+  {
+    id: "image",
+    name: "Image",
+    type: "file",
+    required: true,
+    description: "The image to generate a video from",
+    group: "prompt",
+  },
+  {
+    id: "width",
+    name: "Width",
     type: "number",
     required: false,
-    description: "The number of images to generate per prompt",
-    defaultValue: 1,
+    description: "The width of the image to generate",
+    defaultValue: 512,
+    group: "settings",
+  },
+  {
+    id: "height",
+    name: "Height",
+    type: "number",
+    required: false,
+    description: "The height of the image to generate",
+    defaultValue: 512,
+    group: "settings",
+  },
+  {
+    id: "fps",
+    name: "Frames Per Second",
+    type: "number",
+    required: false,
+    description: "The frames per second of the video to generate",
+    defaultValue: 4,
+    group: "settings",
+  },
+  {
+    id: "motionBucketId",
+    name: "Motion Bucket Id",
+    type: "number",
+    required: false,
+    description: "The frames per second of the video to generate",
+    defaultValue: 127,
+    group: "settings",
+  },
+  {
+    id: "noiseAugStrength",
+    name: "Noise Aug Strength",
+    type: "number",
+    required: false,
+    description:
+      "The strength of the noise augmentation to use for video generation",
+    defaultValue: 0.065,
     group: "settings",
   },
 ];
@@ -174,6 +214,7 @@ const availableModels: Model[] = [
       "An updated version of the stable-video-diffusion-img2vid-xt model with enhanced performance.",
     pipline: "Image to Video",
     image: "stable-video-diffusion-img2vid-xt-1-1.gif",
+    inputs: imageToVideoInputs,
   },
   {
     id: "stable-diffusion-x4-upscaler",
@@ -182,6 +223,7 @@ const availableModels: Model[] = [
       " A text-guided upscaling diffusion model trained on large LAION images ",
     pipline: "Upscale Image",
     image: "stable-diffusion-x4-upscaler.png",
+    inputs: upscalerInputs,
   },
 ];
 
