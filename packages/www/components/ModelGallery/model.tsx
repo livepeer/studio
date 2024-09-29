@@ -15,8 +15,10 @@ import { useProjectContext } from "context/ProjectContext";
 export default function Model({ model }: { model: ModelT }) {
   const { appendProjectId } = useProjectContext();
 
+  const modelHref = model.id.replace("/", "-");
+
   return (
-    <Link href={appendProjectId(`/model-gallery/playground/${model.id}`)}>
+    <Link href={appendProjectId(`/model-gallery/playground/${modelHref}`)}>
       <Card className="h-[28rem]">
         <CardHeader className="p-4">
           <CardTitle className="text-lg">{model.title}</CardTitle>

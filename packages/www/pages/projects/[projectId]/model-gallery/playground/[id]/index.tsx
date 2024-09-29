@@ -31,7 +31,8 @@ export default function PlaygroundPage() {
   const { query } = useRouter();
   const id = query.id as string;
 
-  const model = availableModels.find((model) => model.id === id);
+  const modelId = id.replace("-", "/");
+  const model = availableModels.find((model) => model.id === modelId);
 
   if (!user) {
     return <Layout />;
