@@ -13,8 +13,23 @@ import {
   CardFooter,
   CardContent,
 } from "components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "components/ui/alert-dialog";
 import { Button } from "components/ui/button";
 import Image from "next/image";
+import { Label } from "components/ui/label";
+import { Textarea } from "components/ui/textarea";
+import { ScrollArea } from "components/ui/scroll-area";
+import { useApi } from "hooks";
 
 export default function ModelGallery() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -113,6 +128,8 @@ const Filter = ({
 };
 
 const CustomModelBanner = () => {
+  const [open, setOpen] = useState(false);
+
   return (
     <Card className="relative ">
       <CardHeader>
@@ -127,7 +144,7 @@ const CustomModelBanner = () => {
         </CardDescription>
       </CardContent>
       <CardFooter className="flex flex-row gap-4">
-        <Button>Request custom model</Button>
+        <Button onClick={() => setOpen(true)}>Request custom model</Button>
         <Button variant="outline">Learn more</Button>
       </CardFooter>
       <div className="absolute top-0 right-0 w-2/5 h-full">
@@ -139,6 +156,116 @@ const CustomModelBanner = () => {
           height={500}
         />
       </div>
+      <CustomModelPopover open={open} setOpen={setOpen} />
     </Card>
+  );
+};
+
+const CustomModelPopover = ({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) => {
+  const { user } = useApi();
+
+  const formInputs = [
+    {
+      name: "email",
+      placeholder: "Email",
+      type: "text",
+      defaultValue: user?.email,
+    },
+    {
+      name: "name",
+      placeholder: "Name",
+      type: "text",
+      defaultValue: user?.firstName,
+    },
+    {
+      name: "companyWebsite",
+      placeholder: "Company Website",
+      type: "text",
+    },
+    {
+      name: "keyFeatures",
+      placeholder: "Please describe the key features of the model",
+      type: "textarea",
+    },
+    {
+      name: "dependencies",
+      placeholder: "What are the major dependencies for executing the model?",
+      type: "textarea",
+    },
+    {
+      name: "gpuRamRequirement",
+      placeholder: "What’s the GPU RAM requirement for the model?",
+      type: "textarea",
+    },
+    {
+      name: "inputFormat",
+      placeholder: "What are the input and output formats of the model?",
+      type: "textarea",
+    },
+    {
+      name: "linkToModel",
+      placeholder: "Link to model (if publicly available)",
+      type: "text",
+    },
+    {
+      name: "modelAccess",
+      placeholder:
+        "Would you like to make this model openly accessible, or keep it private?",
+      type: "text",
+    },
+
+    {
+      name: "workWithLivepeer",
+      placeholder:
+        "Are you open to working with the Livepeer team in deploying this model?",
+      type: "text",
+    },
+  ];
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Request a custom model</AlertDialogTitle>
+          <AlertDialogDescription>
+            You can request a custom model for your use case. We will review
+            your request and get back to you.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <ScrollArea className="h-[500px]">
+          <form className="flex flex-col gap-4">
+            {formInputs.map((input) => (
+              <>
+                {input.type === "textarea" ? (
+                  <Textarea
+                    key={input.name}
+                    defaultValue={input.defaultValue}
+                    placeholder={input.placeholder}
+                  />
+                ) : (
+                  <Input
+                    defaultValue={input.defaultValue}
+                    key={input.name}
+                    placeholder={input.placeholder}
+                  />
+                )}
+              </>
+            ))}
+          </form>
+        </ScrollArea>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setOpen(false)}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction>Submit Request</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
