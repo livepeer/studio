@@ -181,7 +181,7 @@ const imageToVideoInputs: Input[] = [
 
 const availableModels: Model[] = [
   {
-    id: "SG161222/RealVisXL_V4.0_Lightning",
+    id: "RealVisXL_V4.0_Lightning",
     title: "Realistic Vision V4",
     description:
       "A lightning model designed for faster inference while still aiming for photorealism.",
@@ -191,7 +191,7 @@ const availableModels: Model[] = [
     inputs: textToImageInputs,
   },
   {
-    id: "ByteDance/SDXL-Lightning",
+    id: "SDXL-Lightning",
     title: "SDXL Lightning",
     description:
       "The SDXL-Lightning is a lightning-fast text-to-image generation model.",
@@ -201,7 +201,7 @@ const availableModels: Model[] = [
     inputs: textToImageInputs,
   },
   {
-    id: "timbrooks/instruct-pix2pix",
+    id: "instruct-pix2pix",
     title: "Instruct Pix2Pix",
     description:
       "A  model that edits images based on human-written instructions.",
@@ -210,7 +210,7 @@ const availableModels: Model[] = [
     inputs: imageToImageInputs,
   },
   {
-    id: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
+    id: "stable-video-diffusion-img2vid-xt-1-1",
     title: "Stable Video Diffusion",
     description:
       "An updated version of Stable Video Diffusion Video with improved quality.",
@@ -219,7 +219,7 @@ const availableModels: Model[] = [
     inputs: imageToVideoInputs,
   },
   {
-    id: "stabilityai/stable-diffusion-x4-upscaler",
+    id: "stable-diffusion-x4-upscaler",
     title: "Stable Diffusion Upscaler",
     description:
       " A text-guided upscaling diffusion model trained on large LAION images ",

@@ -34,14 +34,13 @@ export default function PlaygroundPage() {
   const { query } = useRouter();
   const id = query.id as string;
 
-  const modelId = id.replace("-", "/");
-  const model = availableModels.find((model) => model.id === modelId);
+  const model = availableModels.find((model) => model.id === id);
+
+  const [output, setOutput] = useState<OutputT[]>([]);
 
   if (!user) {
     return <Layout />;
   }
-
-  const [output, setOutput] = useState<OutputT[]>([]);
 
   return (
     <Layout
