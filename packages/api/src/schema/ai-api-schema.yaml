@@ -1,6 +1,6 @@
 openapi: 3.1.0
 paths:
-  /api/beta/generate/text-to-image:
+  /api/generate/text-to-image:
     post:
       tags:
         - generate
@@ -60,7 +60,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
       x-speakeasy-name-override: textToImage
-  /api/beta/generate/image-to-image:
+  /api/generate/image-to-image:
     post:
       tags:
         - generate
@@ -120,7 +120,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
       x-speakeasy-name-override: imageToImage
-  /api/beta/generate/image-to-video:
+  /api/generate/image-to-video:
     post:
       tags:
         - generate
@@ -180,7 +180,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
       x-speakeasy-name-override: imageToVideo
-  /api/beta/generate/upscale:
+  /api/generate/upscale:
     post:
       tags:
         - generate
@@ -240,7 +240,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
       x-speakeasy-name-override: upscale
-  /api/beta/generate/audio-to-text:
+  /api/generate/audio-to-text:
     post:
       tags:
         - generate
@@ -308,7 +308,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
       x-speakeasy-name-override: audioToText
-  /api/beta/generate/segment-anything-2:
+  /api/generate/segment-anything-2:
     post:
       tags:
         - generate
