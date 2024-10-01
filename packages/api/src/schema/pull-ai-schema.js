@@ -60,10 +60,20 @@ const downloadAiSchema = async () => {
   // add studio-api-error schema
   schema.components.schemas["studio-api-error"] = studioApiErrorSchema;
 
+  // TODO: Remove beta paths
+  const newPaths = {};
+  Object.entries(schema.paths).forEach(([path, value]) => {
+    const generatePath = `/api/generate${path}`;
+    const betaGeneratePath = `/api/beta/generate${path}`;
+    newPaths[generatePath] = value;
+    newPaths[betaGeneratePath] = value;
+  });
+  schema.paths = newPaths;
+
   // patches to the paths section
   schema.paths = mapObject(schema.paths, (path, value) => {
-    // prefix paths with /api/beta/generate
-    path = `/api/beta/generate${path}`;
+    // prefix paths with /api/generate
+    path = `/api/generate${path}`;
     // remove security field
     delete value.post.security;
     // add Studio API error as oneOf to all of the error responses

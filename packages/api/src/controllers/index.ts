@@ -34,6 +34,8 @@ export default {
   "api-token": apiToken,
   asset,
   auth,
+  generate,
+  // TODO: Remove beta paths
   "beta/generate": generate,
   broadcaster,
   clip,
