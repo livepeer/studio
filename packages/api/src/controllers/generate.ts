@@ -35,14 +35,6 @@ const aiGenerateDurationMetric = new promclient.Histogram({
 
 const app = Router();
 
-// TODO: Remove beta paths middleware
-app.use((req, res, next) => {
-  if (req.path.startsWith("/beta/generate")) {
-    req.url = req.url.replace("/beta/generate", "/generate");
-  }
-  next();
-});
-
 const rateLimiter: RequestHandler = async (req, res, next) => {
   const now = Date.now();
   const [[{ count, min }]] = await db.aiGenerateLog.find(
