@@ -46,6 +46,10 @@ function removeAllTitles(schema) {
     }
   }
 
+  if (schema.oneOf && Array.isArray(schema.oneOf)) {
+    schema.oneOf = schema.oneOf.map((item) => removeAllTitles(item));
+  }
+
   return schema;
 }
 
