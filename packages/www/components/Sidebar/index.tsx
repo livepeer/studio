@@ -245,7 +245,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               placeholder="Account"
-              className="w-[12rem] ml-3">
+              className="w-[14rem] mt-1 ml-3">
               <DropdownMenuGroup className="flex flex-col mx-1">
                 <DropdownMenuItem
                   className="px-2 py-1"
@@ -305,11 +305,13 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
         {!isSettingsPage && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1">
+            <DropdownMenuTrigger className="ml-2 flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1">
               {activeProject?.name}
               <ChevronDown className="h-4 w-4 opacity-50" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent placeholder={"Projects"}>
+            <DropdownMenuContent
+              className="mt-1 w-[13rem]"
+              placeholder={"Projects"}>
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Projects</DropdownMenuLabel>
 
