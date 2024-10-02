@@ -1454,6 +1454,7 @@ components:
             - image-to-video
             - upscale
             - segment-anything-2
+            - llm
         request:
           oneOf:
             - $ref: "./ai-api-schema.yaml#/components/schemas/TextToImageParams"
@@ -1461,6 +1462,7 @@ components:
             - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genImageToVideo"
             - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genUpscale"
             - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genSegmentAnything2"
+            - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genLLM"
         statusCode:
           type: integer
           description: HTTP status code received from the AI gateway

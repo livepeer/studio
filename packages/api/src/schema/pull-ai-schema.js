@@ -12,6 +12,7 @@ export const defaultModels = {
   upscale: "stabilityai/stable-diffusion-x4-upscaler",
   "audio-to-text": "openai/whisper-large-v3",
   "segment-anything-2": "facebook/sam2-hiera-large",
+  llm: "meta-llama/Meta-Llama-3.1-8B-Instruct",
 };
 const schemaDir = path.resolve(__dirname, ".");
 const aiSchemaUrl =

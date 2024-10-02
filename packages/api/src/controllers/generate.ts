@@ -254,5 +254,6 @@ registerGenerateHandler("image-to-video");
 registerGenerateHandler("upscale");
 registerGenerateHandler("audio-to-text");
 registerGenerateHandler("segment-anything-2");
+registerGenerateHandler("llm");
 
 export default app;

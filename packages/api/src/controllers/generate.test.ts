@@ -227,6 +227,19 @@ describe("controllers/generate", () => {
       });
       expect(aiGatewayCalls).toEqual({ "segment-anything-2": 1 });
     });
+
+    it("should call the AI Gateway for generate API /llm", async () => {
+      const res = await client.fetch("/beta/generate/llm", {
+        method: "POST",
+        body: buildMultipartBody({}),
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        message: "success",
+        reqContentType: expect.stringMatching("^multipart/form-data"),
+      });
+      expect(aiGatewayCalls).toEqual({ llm: 1 });
+    });
   });
 
   describe("validates multipart schema", () => {
