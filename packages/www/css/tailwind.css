@@ -77,3 +77,15 @@
     text-rendering: optimizeLegibility;
   }
 }
+
+.rccs__card--front {
+  @apply border-2 border-input rounded-2xl !important;
+}
+
+.rccs__card__background {
+  @apply bg-gradient-to-r from-zinc-900 to-zinc-900 border-2 border-input !important;
+}
+
+.rccs__card--front {
+  @apply text-white !important;
+}
