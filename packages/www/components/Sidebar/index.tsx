@@ -225,7 +225,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
 
   return (
     <>
-      <Flex className="bg-background flex-col min-h-0 border-r border-input md:w-[270px] h-full p-2">
+      <Flex className=" flex-col min-h-0  md:w-[270px] h-full p-2">
         <Flex className="p-1 mb-1 gap-2 flex items-center justify-between">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex w-full items-center p-2 bg-transparent border-0 gap-2 hover:bg-accent data-[state=open]:bg-accent rounded-lg">
