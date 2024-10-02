@@ -77,19 +77,23 @@ function DashboardLayout({
 
   return (
     <>
-      <Flex className="min-w-0 min-h-0 flex-1 w-full h-full max-h-full">
+      <div className="flex min-w-0 min-h-0 flex-1 w-full h-full max-h-full">
         <Elements stripe={stripePromise}>
           {!isExport() && <NextSeo {...seo} />}
           <Sidebar id={id} />
-          <Flex className="w-full min-w-0 flex-col max-h-full h-full min-h-0 overflow-auto">
+          <div
+            style={{
+              margin: 25,
+            }}
+            className="border border-input  flex w-full min-w-0 flex-col max-h-auto h-auto bg-card rounded-md min-h-0 overflow-auto">
             <Header breadcrumbs={breadcrumbs} />
-            <Flex className="w-full flex-col mx-auto max-w-[1200px] h-full">
+            <div className="w-full flex flex-col mx-auto max-w-[1200px] h-full">
               {children}
-            </Flex>
-          </Flex>
+            </div>
+          </div>
           <FileUpload />
         </Elements>
-      </Flex>
+      </div>
     </>
   );
 }

@@ -311,16 +311,7 @@ const Billing = () => {
             </Text>
             <PaymentMethodDialog invalidateQuery={invalidateQuery} />
           </Flex>
-          <Flex
-            css={{
-              ".rccs__card__background": {
-                background:
-                  "linear-gradient(to right, $colors$green11, $colors$green11) !important",
-              },
-              ".rccs__card--front": {
-                color: "white !important",
-              },
-            }}>
+          <Flex>
             {user?.stripeCustomerPaymentMethodId ? (
               <>
                 <PaymentMethod data={data} />

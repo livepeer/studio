@@ -177,7 +177,7 @@ curl --request POST \
           <Heading>Get started with Livepeer Studio</Heading>
         </Box>
         <Grid className="grid-cols-1 gap-5 lg:grid-cols-2">
-          <Box className="w-full h-full flex bg-card flex-col justify-between p-4 rounded-md">
+          <Box className="w-full h-full flex bg-background border border-input flex-col justify-between p-4 rounded-lg">
             <Box>
               <TerminalIcon
                 strokeWidth={1}
@@ -269,7 +269,7 @@ const Card = ({
   link: string;
 }) => {
   return (
-    <Box className="w-full h-full flex bg-card flex-col justify-between p-4 rounded-md">
+    <Box className="w-full h-full flex bg-background flex-col justify-between p-4 rounded-lg border border-input">
       <Box>
         {icon ? (
           <Box>{icon}</Box>
