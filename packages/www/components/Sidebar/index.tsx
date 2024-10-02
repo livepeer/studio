@@ -381,7 +381,9 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                           key={child.id}
                           passHref
                           legacyBehavior>
-                          <NavLink aria-selected={isActive(child)}>
+                          <NavLink
+                            aria-selected={isActive(child)}
+                            isChild={true}>
                             {child.title}
                           </NavLink>
                         </Link>
