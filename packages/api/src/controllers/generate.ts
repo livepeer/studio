@@ -15,6 +15,7 @@ import { BadRequestError } from "../store/errors";
 import { fetchWithTimeout, kebabToCamel } from "../util";
 import { experimentSubjectsOnly } from "./experiment";
 import { pathJoin2 } from "./helpers";
+import validators from "../schema/validators";
 
 const AI_GATEWAY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
@@ -181,6 +182,9 @@ function registerGenerateHandler(
   if (isJSONReq) {
     payloadParsers = [validatePost(`${camelType}Params`)];
   } else {
+    if (!validators[`Body_gen${camelType}`]) {
+      camelType = type.toUpperCase();
+    }
     payloadParsers = [
       multipart.any(),
       validateFormData(`Body_gen${camelType}`),

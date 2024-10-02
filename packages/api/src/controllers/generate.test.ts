@@ -91,6 +91,7 @@ describe("controllers/generate", () => {
       "image-to-video",
       "upscale",
       "segment-anything-2",
+      "llm",
     ];
     for (const api of apis) {
       aiGatewayServer.app.post(`/${api}`, async (req, res) => {
@@ -135,13 +136,18 @@ describe("controllers/generate", () => {
     textFields: Record<string, any>,
     multipartField = { name: "image", contentType: "image/png" },
   ) => {
+    const form = buildForm(textFields);
+    form.append(multipartField.name, "dummy", {
+      contentType: multipartField.contentType,
+    });
+    return form;
+  };
+
+  const buildForm = (textFields: Record<string, any>) => {
     const form = new FormData();
     for (const [k, v] of Object.entries(textFields)) {
       form.append(k, v);
     }
-    form.append(multipartField.name, "dummy", {
-      contentType: multipartField.contentType,
-    });
     return form;
   };
 
@@ -231,7 +237,7 @@ describe("controllers/generate", () => {
     it("should call the AI Gateway for generate API /llm", async () => {
       const res = await client.fetch("/beta/generate/llm", {
         method: "POST",
-        body: buildMultipartBody({}),
+        body: buildForm({ prompt: "foo" }),
       });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({
