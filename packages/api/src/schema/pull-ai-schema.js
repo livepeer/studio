@@ -62,8 +62,8 @@ const downloadAiSchema = async () => {
 
   // patches to the paths section
   schema.paths = mapObject(schema.paths, (path, value) => {
-    // prefix paths with /api/beta/generate
-    path = `/api/beta/generate${path}`;
+    // prefix paths with /api/generate
+    path = `/api/generate${path}`;
     // remove security field
     delete value.post.security;
     // add Studio API error as oneOf to all of the error responses
