@@ -36,8 +36,6 @@ const aiGenerateDurationMetric = new promclient.Histogram({
 
 const app = Router();
 
-app.use(experimentSubjectsOnly("ai-generate"));
-
 const rateLimiter: RequestHandler = async (req, res, next) => {
   const now = Date.now();
   const [[{ count, min }]] = await db.aiGenerateLog.find(
