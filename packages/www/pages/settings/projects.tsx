@@ -13,6 +13,7 @@ import CreateProjectDialog from "components/Project/createProjectDialog";
 import { useProjectContext } from "context/ProjectContext";
 import Link from "next/link";
 import FeaturesModel from "components/FeaturesModel";
+import Banner from "components/Banner";
 
 const WorkspaceProjects = () => {
   useLoggedIn();
@@ -39,6 +40,7 @@ const WorkspaceProjects = () => {
   }, [queryClient]);
 
   const { data } = useQuery("projects", getProjects);
+  const showPromo = user?.disabled;
 
   if (!user) {
     return <Layout />;
@@ -59,7 +61,45 @@ const WorkspaceProjects = () => {
           },
         }}>
         <Box css={{ mb: "$6" }}>
-          <Flex className="justify-between flex-col md:flex-row border-b border-accent pb-5 gap-4 w-full">
+          {showPromo && (
+            <Banner
+              title="Upgrade"
+              titleCss={{
+                color: "$red11",
+                fontWeight: 600,
+                fontSize: "14px",
+              }}
+              descriptionCss={{
+                color: "$red11",
+                fontSize: "12px",
+              }}
+              css={{
+                background: "$red3",
+                mb: "$6",
+              }}
+              description="Your free tier usage limit has been reached or we were unable to process your payment. Upgrade to our Growth or Scale plans or update your payment method to continue using Livepeer Studio."
+              button={
+                <Link href={"/settings/billing/plans"} passHref legacyBehavior>
+                  <Button
+                    variant="destructive"
+                    css={{
+                      cursor: "default",
+                      border: "1px solid $tomato7",
+                    }}>
+                    Upgrade
+                  </Button>
+                </Link>
+              }
+            />
+          )}
+          <Flex
+            className="justify-between"
+            css={{
+              borderBottom: "1px solid",
+              borderColor: "$neutral6",
+              pb: "$5",
+              width: "100%",
+            }}>
             <Flex className="flex-col">
               <Heading
                 size="2"
@@ -87,13 +127,13 @@ const WorkspaceProjects = () => {
         <Grid className="grid-cols-1 md:grid-cols-2 gap-5">
           {data?.map((project, i) => (
             <Link
+              key={project.id}
               style={{
                 textDecoration: "none",
               }}
               passHref
               href={`/projects/${project.id}/`}>
               <ProjectTile
-                key={`project-tile-${i}`}
                 invalidateQuery={invalidateQuery}
                 id={project.id}
                 name={project?.name}

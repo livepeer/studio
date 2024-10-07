@@ -127,6 +127,7 @@ const fieldsMap: FieldsMap = {
   type: `task.data->>'type'`,
   inputAssetId: `task.data->>'inputAssetId'`,
   outputAssetId: `task.data->>'outputAssetId'`,
+  projectId: `task.data->>'projectId'`,
 };
 
 export function toExternalTask(
@@ -209,6 +210,11 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`task.data->>'userId' = ${req.user.id}`);
+  query.push(
+    sql`coalesce(task.data->>'projectId', ${
+      req.user.defaultProjectId || ""
+    }) = ${req.project?.id || ""}`,
+  );
 
   if (!all || all === "false" || !req.user.admin) {
     query.push(sql`task.data->>'deleted' IS NULL`);
@@ -361,11 +367,15 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   );
   if (task.outputAssetId) {
     const asset = await db.asset.get(task.outputAssetId);
+    let phase: Asset["status"]["phase"] = "processing";
+    if (asset.status?.phase === "deleting") {
+      phase = "deleting";
+    }
     await req.taskScheduler.updateAsset(
       asset,
       {
         status: {
-          phase: "processing",
+          phase,
           updatedAt: Date.now(),
           progress: Math.max(doc.progress, asset.status.progress ?? 0),
         },

@@ -744,6 +744,11 @@ components:
         objectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+        multistream:
+          properties:
+            targets:
+              index: true
+              indexType: gin
         presets:
           type: array
           items:
@@ -1085,6 +1090,8 @@ components:
         inputAssetId:
           index: true
         outputAssetId:
+          index: true
+        projectId:
           index: true
         requesterId:
           type: string

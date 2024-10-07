@@ -478,7 +478,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           {!noPagination && (
             <Flex className="justify-between items-center mt-4">
               <Text>
-                <b>{data?.count}</b> results
+                <b>{data?.count}</b> {data?.count > 1 ? "results" : "result"}
               </Text>
               {viewAll ? (
                 <Link href={viewAll} passHref legacyBehavior>

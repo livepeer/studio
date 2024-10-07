@@ -24,6 +24,7 @@ import { DBStream } from "../store/stream-table";
 import { DBWebhook } from "../store/webhook-table";
 import { taskScheduler } from "../task/scheduler";
 import { RequestInitWithTimeout, fetchWithTimeout, sleep } from "../util";
+import tracking from "../middleware/tracking";
 
 const WEBHOOK_TIMEOUT = 30 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -123,7 +124,7 @@ export default class WebhookCannon {
   }
 
   async processWebhookEvent(msg: messages.WebhookEvent): Promise<boolean> {
-    const { event, streamId, sessionId, userId } = msg;
+    const { event, streamId, sessionId, userId, projectId } = msg;
 
     if (event === "playback.accessControl") {
       // Cannot fire this event as a webhook, this is specific to access control and fired there
@@ -142,7 +143,23 @@ export default class WebhookCannon {
       }
     }
 
-    const { data: webhooks } = await db.webhook.listSubscribed(userId, event);
+    let user = await db.user.get(userId);
+    if (!user) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: Account not found userId=${userId}`,
+      );
+    } else if (user.suspended) {
+      throw new UnprocessableEntityError(
+        `webhook Cannon: onTrigger: User suspended userId=${userId}`,
+      );
+    }
+
+    const { data: webhooks } = await db.webhook.listSubscribed(
+      userId,
+      event,
+      projectId,
+      user.defaultProjectId,
+    );
 
     console.log(
       `fetched webhooks. userId=${userId} event=${event} webhooks=`,
@@ -168,17 +185,6 @@ export default class WebhookCannon {
         db.stream.removePrivateFields({ ...stream }),
       );
       delete stream.streamKey;
-    }
-
-    let user = await db.user.get(userId);
-    if (!user) {
-      throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: Account not found userId=${userId}`,
-      );
-    } else if (user.suspended) {
-      throw new UnprocessableEntityError(
-        `webhook Cannon: onTrigger: User suspended userId=${userId}`,
-      );
     }
 
     try {
@@ -603,6 +609,8 @@ export default class WebhookCannon {
         this.secondaryRecordObjectStoreId,
       );
 
+      const user = await db.user.get(session.userId, { useCache: true });
+
       await taskScheduler.createAndScheduleTask(
         "upload",
         {
@@ -615,6 +623,7 @@ export default class WebhookCannon {
             )),
           },
         },
+        user,
         undefined,
         asset,
       );
@@ -761,7 +770,7 @@ export async function storeTriggerStatus(
         },
       };
     }
-    await db.webhook.updateStatus(webhook.id, status);
+    tracking.recordWebhookStatus(webhook.id, status);
   } catch (e) {
     console.log(
       `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`,

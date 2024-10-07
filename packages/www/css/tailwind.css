@@ -6,7 +6,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-    --card: 0 0% 97.5%;
+    --card: 0 0% 99%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
@@ -33,7 +33,7 @@
   }
 
   .dark-theme-green {
-    --background: 240 10% 3.9%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 98%;
     --card: 240 3% 8.2%;
     --card-foreground: 0 0% 98%;
@@ -65,13 +65,27 @@
   * {
     @apply border-border;
   }
+
   html {
     @apply scroll-smooth;
   }
+
   body {
     @apply bg-background text-foreground;
     /* font-feature-settings: "rlig" 1, "calt" 1; */
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
+}
+
+.rccs__card--front {
+  @apply border-2 border-input rounded-2xl !important;
+}
+
+.rccs__card__background {
+  @apply bg-gradient-to-r from-zinc-900 to-zinc-900 border-2 border-input !important;
+}
+
+.rccs__card--front {
+  @apply text-white !important;
 }

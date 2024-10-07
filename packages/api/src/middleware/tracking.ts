@@ -1,7 +1,8 @@
 import sql from "sql-template-strings";
 import { ApiToken } from "../schema/types";
-import { db } from "../store";
+import { jobsDb as db } from "../store";
 import Table from "../store/table";
+import { DBWebhook } from "../store/webhook-table";
 
 const flushDelay = 60 * 1000; // 60s
 
@@ -12,7 +13,7 @@ type PendingLastSeen = {
 };
 
 class Tracker {
-  pendingUpdates: Map<string, PendingLastSeen> = new Map();
+  pendingLastSeenUpdates: Map<string, PendingLastSeen> = new Map();
 
   recordUser(userId: string) {
     this.recordLastSeen(db.user, userId);
@@ -31,16 +32,16 @@ class Tracker {
     id: string,
   ) {
     const key = `${table.name}-${id}`;
-    const alreadyScheduled = this.pendingUpdates.has(key);
-    this.pendingUpdates.set(key, { table, id, lastSeen: Date.now() });
+    const alreadyScheduled = this.pendingLastSeenUpdates.has(key);
+    this.pendingLastSeenUpdates.set(key, { table, id, lastSeen: Date.now() });
     if (alreadyScheduled) return;
 
     setTimeout(() => this.flushLastSeen(key), flushDelay);
   }
 
   private async flushLastSeen(key: string) {
-    const { table, id, lastSeen } = this.pendingUpdates.get(key) ?? {};
-    this.pendingUpdates.delete(key);
+    const { table, id, lastSeen } = this.pendingLastSeenUpdates.get(key) ?? {};
+    this.pendingLastSeenUpdates.delete(key);
     if (!id) {
       return;
     }
@@ -60,13 +61,44 @@ class Tracker {
     }
   }
 
-  async flushAll() {
-    const all = this.pendingUpdates;
-    this.pendingUpdates = new Map();
+  pendingWebhookStatusUpdates: Map<string, DBWebhook["status"]> = new Map();
 
-    for (const key of all.keys()) {
-      await this.flushLastSeen(key);
+  recordWebhookStatus(id: string, status: DBWebhook["status"]) {
+    const key = `${id}`;
+    const alreadyScheduled = this.pendingWebhookStatusUpdates.has(key);
+    this.pendingWebhookStatusUpdates.set(key, status);
+    if (alreadyScheduled) return;
+
+    setTimeout(() => this.flushWebhookStatus(key), flushDelay);
+  }
+
+  private async flushWebhookStatus(id: string) {
+    const status = this.pendingWebhookStatusUpdates.get(id);
+    this.pendingWebhookStatusUpdates.delete(id);
+    if (!status) {
+      return;
     }
+    try {
+      await db.webhook.updateStatus(id, status);
+    } catch (err) {
+      console.log(`error saving webhook status: id=${id} err=`, err);
+    }
+  }
+
+  async flushAll() {
+    const flushTasks = [];
+    for (const key of this.pendingLastSeenUpdates.keys()) {
+      flushTasks.push(this.flushLastSeen(key));
+    }
+    for (const key of this.pendingWebhookStatusUpdates.keys()) {
+      flushTasks.push(this.flushWebhookStatus(key));
+    }
+
+    // Only await after clearing the maps to avoid concurrent updates
+    this.pendingLastSeenUpdates = new Map();
+    this.pendingWebhookStatusUpdates = new Map();
+
+    await Promise.all(flushTasks);
   }
 }
 

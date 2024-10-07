@@ -21,6 +21,8 @@ export default class WebhookTable extends Table<DBWebhook> {
   async listSubscribed(
     userId: string,
     event: EventKey,
+    projectId: string,
+    defaultProjectId: string,
     streamId?: string,
     limit = 100,
     cursor?: string,
@@ -32,6 +34,13 @@ export default class WebhookTable extends Table<DBWebhook> {
         sql`(data->>'streamId' = ${streamId} OR data->>'streamId' IS NULL)`,
       );
     }
+
+    query.push(
+      sql`coalesce(data->>'projectId', ${
+        defaultProjectId || ""
+      }) = ${projectId || defaultProjectId}`,
+    );
+
     if (event) {
       const jsonEvent = JSON.stringify(event);
       query.push(sql`data->'events' @> ${jsonEvent}`);
