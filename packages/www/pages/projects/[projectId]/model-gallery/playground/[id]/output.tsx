@@ -4,7 +4,7 @@ import type { Output as OutputT } from "components/ModelGallery/constants";
 import { Card } from "components/ui/card";
 
 export default function Output({
-  output,
+  output = [],
   generationTime,
 }: {
   output: OutputT[];

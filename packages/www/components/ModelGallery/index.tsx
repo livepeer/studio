@@ -175,7 +175,6 @@ const CustomModelPopover = ({
     formId: process.env.NEXT_PUBLIC_HUBSPOT_REGISTER_FORM_ID,
   });
 
-
   const formInputs = [
     {
       name: "email",
@@ -253,32 +252,28 @@ const CustomModelPopover = ({
             your request and get back to you.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <form
-          id={"request-custom-model"}
-          onSubmit={onSubmit}>
+        <form id={"request-custom-model"} onSubmit={onSubmit}>
           <ScrollArea className="h-[500px]">
             {formInputs.map((input) => (
               <div key={input.name} className="flex flex-col space-y-1.5 mb-3">
-                {
-                  input.type === "textarea" ? (
-                    <Textarea
-                      id={input.name}
-                      required={true}
-                      name={input.name}
-                      defaultValue={input.defaultValue}
-                      placeholder={input.placeholder}
-                    />
-                  ) : (
-                    <Input
-                      id={input.name}
-                      required={true}
-                      name={input.name}
-                      type={input.type}
-                      defaultValue={input.defaultValue}
-                      placeholder={input.placeholder}
-                    />
-                  )
-                }
+                {input.type === "textarea" ? (
+                  <Textarea
+                    id={input.name}
+                    required={true}
+                    name={input.name}
+                    defaultValue={input.defaultValue}
+                    placeholder={input.placeholder}
+                  />
+                ) : (
+                  <Input
+                    id={input.name}
+                    required={true}
+                    name={input.name}
+                    type={input.type}
+                    defaultValue={input.defaultValue}
+                    placeholder={input.placeholder}
+                  />
+                )}
               </div>
             ))}
           </ScrollArea>
@@ -290,6 +285,6 @@ const CustomModelPopover = ({
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>
-    </AlertDialog >
+    </AlertDialog>
   );
 };
