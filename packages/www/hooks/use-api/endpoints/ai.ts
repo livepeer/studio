@@ -28,3 +28,19 @@ export const textToImage = async (params: any) => {
 
   return image;
 };
+
+export const upscale = async (formData: any) => {
+  const url = `/beta/generate/upscale`;
+  const [res, image] = await context.fetch(url, {
+    method: "POST",
+    body: formData
+
+  });
+  if (!res.ok) {
+    throw new Error(image.errors.join(", "));
+  }
+
+
+  return image;
+
+};

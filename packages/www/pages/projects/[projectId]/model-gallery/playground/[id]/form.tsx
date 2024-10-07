@@ -19,7 +19,7 @@ export default function Form({
   setOutput: (output: Output[]) => void;
   setGenerationTime: (time: number) => void;
 }) {
-  const { textToImage } = useApi();
+  const { textToImage, upscale } = useApi();
   const [loading, setLoading] = useState<boolean>(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -49,19 +49,25 @@ export default function Form({
       }
     }, 100);
 
+
     switch (model?.pipline) {
       case "Text to Image":
-        const res = await textToImage(formInputs);
-        setOutput(res.images);
+        const textToImageRes = await textToImage(formInputs);
+        setOutput(textToImageRes.images);
+        break;
+      case "Upscale Image":
+        const upscaleRes = await upscale(formData);
+        setOutput(upscaleRes.images);
         break;
       case "image-to-image":
-        console.log(formInputs);
         break;
     }
 
     if (timerRef.current) clearInterval(timerRef.current);
     setLoading(false);
     startTimeRef.current = null;
+
+
   };
 
   const handleReset = () => {
@@ -107,10 +113,13 @@ export default function Form({
         </>
       )}
       <div className="flex gap-2 justify-end">
-        <Button disabled={loading} variant="outline" onClick={(e) => {
-          e.preventDefault();
-          handleReset();
-        }}>
+        <Button
+          disabled={loading}
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            handleReset();
+          }}>
           Reset
         </Button>
         <Button disabled={loading} type="submit">

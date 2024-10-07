@@ -19,7 +19,9 @@ export default function Output({
       <div className="flex items-center justify-center h-full">
         <div className="mt-10">
           {output.map((item, index) => (
-            <div key={index} className="flex items-center justify-center">
+            <div
+              key={index}
+              className="flex items-center justify-center w-[512px] h-[512px]">
               <img
                 src={item.url}
                 alt={`Output ${index + 1}`}

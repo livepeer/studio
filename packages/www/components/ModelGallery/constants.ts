@@ -60,7 +60,7 @@ const imageToImageInputs: Input[] = [
     id: "prompt",
     name: "Prompt",
     type: "textarea",
-    defaultValue: "A beautiful landscape with a river and mountains",
+    defaultValue: "n/a",
     required: true,
     description: "The prompt to generate an image from",
     group: "prompt",
@@ -113,12 +113,30 @@ const imageToImageInputs: Input[] = [
 
 const upscalerInputs: Input[] = [
   {
+    id: "prompt",
+    name: "Prompt",
+    type: "textarea",
+    defaultValue: "n/a",
+    required: true,
+    description: "The prompt to generate an image from",
+    group: "prompt",
+  },
+  {
     id: "image",
     name: "Image",
     type: "file",
     required: true,
     description: "The image to upscale",
     group: "prompt",
+  },
+  {
+    id: "num_inference_steps",
+    name: "Number of Inference Steps",
+    type: "number",
+    required: false,
+    description: "The number of inference steps to use for image generation",
+    defaultValue: 50,
+    group: "settings",
   },
 ];
 
