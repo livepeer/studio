@@ -30,6 +30,7 @@ import { Label } from "components/ui/label";
 import { Textarea } from "components/ui/textarea";
 import { ScrollArea } from "components/ui/scroll-area";
 import { useApi } from "hooks";
+import { useHubspotForm } from "hooks";
 
 export default function ModelGallery() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -169,6 +170,11 @@ const CustomModelPopover = ({
   setOpen: (open: boolean) => void;
 }) => {
   const { user } = useApi();
+  const { handleSubmit } = useHubspotForm({
+    portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_REGISTER_FORM_ID,
+  });
+
 
   const formInputs = [
     {
@@ -228,6 +234,15 @@ const CustomModelPopover = ({
     },
   ];
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSubmit(e);
+    setOpen(false);
+
+    // TODO: show toast
+    alert("Request submitted");
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
@@ -238,34 +253,43 @@ const CustomModelPopover = ({
             your request and get back to you.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <ScrollArea className="h-[500px]">
-          <form className="flex flex-col gap-4">
+        <form
+          id={"request-custom-model"}
+          onSubmit={onSubmit}>
+          <ScrollArea className="h-[500px]">
             {formInputs.map((input) => (
-              <>
-                {input.type === "textarea" ? (
-                  <Textarea
-                    key={input.name}
-                    defaultValue={input.defaultValue}
-                    placeholder={input.placeholder}
-                  />
-                ) : (
-                  <Input
-                    defaultValue={input.defaultValue}
-                    key={input.name}
-                    placeholder={input.placeholder}
-                  />
-                )}
-              </>
+              <div key={input.name} className="flex flex-col space-y-1.5 mb-3">
+                {
+                  input.type === "textarea" ? (
+                    <Textarea
+                      id={input.name}
+                      required={true}
+                      name={input.name}
+                      defaultValue={input.defaultValue}
+                      placeholder={input.placeholder}
+                    />
+                  ) : (
+                    <Input
+                      id={input.name}
+                      required={true}
+                      name={input.name}
+                      type={input.type}
+                      defaultValue={input.defaultValue}
+                      placeholder={input.placeholder}
+                    />
+                  )
+                }
+              </div>
             ))}
-          </form>
-        </ScrollArea>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setOpen(false)}>
-            Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction>Submit Request</AlertDialogAction>
-        </AlertDialogFooter>
+          </ScrollArea>
+          <AlertDialogFooter>
+            <AlertDialogCancel type="button" onClick={() => setOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <Button type="submit">Submit Request</Button>
+          </AlertDialogFooter>
+        </form>
       </AlertDialogContent>
-    </AlertDialog>
+    </AlertDialog >
   );
 };
