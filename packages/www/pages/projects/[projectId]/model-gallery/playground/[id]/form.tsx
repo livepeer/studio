@@ -107,14 +107,13 @@ export default function Form({
         </>
       )}
       <div className="flex gap-2 justify-end">
-        <Button
-          disabled={loading}
-          variant="outline" onClick={handleReset}>
+        <Button disabled={loading} variant="outline" onClick={(e) => {
+          e.preventDefault();
+          handleReset();
+        }}>
           Reset
         </Button>
-        <Button
-          disabled={loading}
-          type="submit">
+        <Button disabled={loading} type="submit">
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
