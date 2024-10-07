@@ -608,7 +608,7 @@ components:
         model_id:
           type: string
           title: Model Id
-          default: ''
+          default: meta-llama/Meta-Llama-3.1-8B-Instruct
         system_msg:
           type: string
           title: System Msg
@@ -632,7 +632,6 @@ components:
       type: object
       required:
         - prompt
-        - model_id
       title: Body_genLLM
       additionalProperties: false
     Body_genSegmentAnything2:
