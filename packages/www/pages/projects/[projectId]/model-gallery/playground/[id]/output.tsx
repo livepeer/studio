@@ -21,12 +21,23 @@ export default function Output({
           {output.map((item, index) => (
             <div
               key={index}
-              className="flex items-center justify-center w-[512px] h-[512px]">
-              <img
-                src={item.url}
-                alt={`Output ${index + 1}`}
-                className="max-w-full max-h-full object-contain rounded-lg"
-              />
+              className="flex items-center justify-center h-[512px]">
+              {item.url.includes("mp4") ? (
+                <video
+                  src={item.url}
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                  autoPlay
+                  loop
+                  muted
+                  controls
+                />
+              ) : (
+                <img
+                  src={item.url}
+                  alt={`Output ${index + 1}`}
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              )}
             </div>
           ))}
         </div>

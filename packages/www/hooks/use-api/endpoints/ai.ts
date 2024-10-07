@@ -6,7 +6,7 @@ let setState: (value: SetStateAction<ApiState>) => void;
 
 export const setSharedScope = (
   _context: any,
-  _setState: (value: SetStateAction<ApiState>) => void,
+  _setState: (value: SetStateAction<ApiState>) => void
 ) => {
   context = _context;
   setState = _setState;
@@ -33,14 +33,25 @@ export const upscale = async (formData: any) => {
   const url = `/beta/generate/upscale`;
   const [res, image] = await context.fetch(url, {
     method: "POST",
-    body: formData
-
+    body: formData,
   });
   if (!res.ok) {
     throw new Error(image.errors.join(", "));
   }
 
-
   return image;
+};
 
+export const imageToVideo = async (formData: any) => {
+  const url = `/beta/generate/image-to-video`;
+  const [res, video] = await context.fetch(url, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(video.errors.join(", "));
+  }
+
+  return video;
 };

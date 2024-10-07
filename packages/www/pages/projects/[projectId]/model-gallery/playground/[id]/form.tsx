@@ -19,7 +19,7 @@ export default function Form({
   setOutput: (output: Output[]) => void;
   setGenerationTime: (time: number) => void;
 }) {
-  const { textToImage, upscale } = useApi();
+  const { textToImage, upscale, imageToVideo } = useApi();
   const [loading, setLoading] = useState<boolean>(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -49,7 +49,6 @@ export default function Form({
       }
     }, 100);
 
-
     switch (model?.pipline) {
       case "Text to Image":
         const textToImageRes = await textToImage(formInputs);
@@ -59,6 +58,10 @@ export default function Form({
         const upscaleRes = await upscale(formData);
         setOutput(upscaleRes.images);
         break;
+      case "Image to Video":
+        const imageToVideoRes = await imageToVideo(formData);
+        setOutput(imageToVideoRes.images);
+        break;
       case "image-to-image":
         break;
     }
@@ -66,8 +69,6 @@ export default function Form({
     if (timerRef.current) clearInterval(timerRef.current);
     setLoading(false);
     startTimeRef.current = null;
-
-
   };
 
   const handleReset = () => {

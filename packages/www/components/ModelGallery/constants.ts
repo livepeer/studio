@@ -176,25 +176,6 @@ const imageToVideoInputs: Input[] = [
     defaultValue: 4,
     group: "settings",
   },
-  {
-    id: "motionBucketId",
-    name: "Motion Bucket Id",
-    type: "number",
-    required: false,
-    description: "The frames per second of the video to generate",
-    defaultValue: 127,
-    group: "settings",
-  },
-  {
-    id: "noiseAugStrength",
-    name: "Noise Aug Strength",
-    type: "number",
-    required: false,
-    description:
-      "The strength of the noise augmentation to use for video generation",
-    defaultValue: 0.065,
-    group: "settings",
-  },
 ];
 
 const availableModels: Model[] = [
