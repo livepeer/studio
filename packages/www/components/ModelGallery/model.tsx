@@ -21,8 +21,7 @@ export default function Model({ model }: { model: ModelT }) {
     <Link href={appendProjectId(`/model-gallery/playground/${model.id}`)}>
       <Card className="">
         <CardHeader className="p-4 flex justify-between flex-row">
-          <CardTitle className="text-lg">{model.title}
-          </CardTitle>
+          <CardTitle className="text-lg">{model.title}</CardTitle>
           <Badge>{model.pipline}</Badge>
         </CardHeader>
         <CardContent className="p-4 py-0">
@@ -56,7 +55,7 @@ const ModelSource = ({ model }: { model: ModelT }) => {
           alt={model.title}
         />
       </div>
-      <Label >by Livepeer Network</Label>
+      <Label>by Livepeer Network</Label>
     </div>
   );
 };

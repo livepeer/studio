@@ -33,6 +33,7 @@ export default function PlaygroundPage() {
   const { user } = useApi();
   const { query } = useRouter();
   const id = query.id as string;
+  const [generationTime, setGenerationTime] = useState(0);
 
   const model = availableModels.find((model) => model.id === id);
 
@@ -59,10 +60,14 @@ export default function PlaygroundPage() {
         <PageHeader model={model} />
         <main className="flex flex-col md:flex-row flex-1 gap-8 overflow-auto mt-4">
           <div className="md:w-[30%]">
-            <Form model={model} setOutput={setOutput} />
+            <Form
+              model={model}
+              setOutput={setOutput}
+              setGenerationTime={setGenerationTime}
+            />
           </div>
           <div className="md:w-[70%]">
-            <Output output={output} />
+            <Output output={output} generationTime={generationTime} />
           </div>
         </main>
       </Box>

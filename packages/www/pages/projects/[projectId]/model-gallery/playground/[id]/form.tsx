@@ -8,43 +8,60 @@ import { Button } from "components/ui/button";
 import { Textarea } from "components/ui/textarea";
 import { Input } from "components/ui/input";
 import { useApi } from "hooks";
+import { Loader2 } from "lucide-react";
 
 export default function Form({
   model,
   setOutput,
+  setGenerationTime,
 }: {
   model: ModelT;
   setOutput: (output: Output[]) => void;
+  setGenerationTime: (time: number) => void;
 }) {
   const { textToImage } = useApi();
   const [loading, setLoading] = useState<boolean>(false);
+  const startTimeRef = useRef<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const formRef = useRef<HTMLFormElement>(null);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
+    setOutput([]);
+    startTimeRef.current = Date.now();
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const formInputs = Object.fromEntries(
       Array.from(formData.entries()).map(([key, value]) => [
         key,
         model?.inputs.find(
-          (input) => input.id === key && input.type === "number",
+          (input) => input.id === key && input.type === "number"
         )
           ? Number(value)
           : value,
-      ]),
+      ])
     );
+
+    timerRef.current = setInterval(() => {
+      if (startTimeRef.current) {
+        const currentTime = Date.now();
+        setGenerationTime(currentTime - startTimeRef.current);
+      }
+    }, 100);
 
     switch (model?.pipline) {
       case "Text to Image":
         const res = await textToImage(formInputs);
         setOutput(res.images);
-        setLoading(false);
         break;
       case "image-to-image":
         console.log(formInputs);
         break;
     }
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    setLoading(false);
+    startTimeRef.current = null;
   };
 
   const handleReset = () => {
@@ -53,7 +70,7 @@ export default function Form({
 
     model?.inputs.forEach((input) => {
       const inputElement = form.elements.namedItem(
-        input.id,
+        input.id
       ) as HTMLInputElement;
       if (inputElement && input.defaultValue) {
         inputElement.value = input.defaultValue.toString();
@@ -85,15 +102,28 @@ export default function Form({
                     </div>
                   ))}
               </fieldset>
-            ),
+            )
           )}
         </>
       )}
       <div className="flex gap-2 justify-end">
-        <Button variant="outline" onClick={handleReset}>
+        <Button
+          disabled={loading}
+          variant="outline" onClick={handleReset}>
           Reset
         </Button>
-        <Button type="submit">Run pipeline</Button>
+        <Button
+          disabled={loading}
+          type="submit">
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              Running...
+            </>
+          ) : (
+            "Run pipeline"
+          )}
+        </Button>
       </div>
     </form>
   );
