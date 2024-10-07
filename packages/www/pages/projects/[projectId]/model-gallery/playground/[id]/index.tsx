@@ -87,7 +87,7 @@ const PageHeader = ({ model }: { model: ModelT }) => {
               className="w-5 h-5 rounded-full "
               alt="Livepeer Network"
             />
-            {model?.id}
+            {model?.modelId}
           </div>
         </CardDescription>
         <div className="mt-6">

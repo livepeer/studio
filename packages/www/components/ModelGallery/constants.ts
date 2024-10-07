@@ -88,7 +88,7 @@ const imageToImageInputs: Input[] = [
     type: "number",
     required: false,
     description: "The strength to use for image generation",
-    defaultValue: 1,
+    defaultValue: 0.8,
     group: "settings",
   },
   {
@@ -97,7 +97,7 @@ const imageToImageInputs: Input[] = [
     type: "number",
     required: false,
     description: "The guidance scale to use for image generation",
-    defaultValue: 2,
+    defaultValue: 7.5,
     group: "settings",
   },
   {
@@ -106,7 +106,7 @@ const imageToImageInputs: Input[] = [
     type: "number",
     required: false,
     description: "The number of inference steps to use for image generation",
-    defaultValue: 6,
+    defaultValue: 100,
     group: "settings",
   },
 ];

@@ -19,7 +19,7 @@ export default function Form({
   setOutput: (output: Output[]) => void;
   setGenerationTime: (time: number) => void;
 }) {
-  const { textToImage, upscale, imageToVideo } = useApi();
+  const { textToImage, upscale, imageToVideo, imageToImage } = useApi();
   const [loading, setLoading] = useState<boolean>(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -61,6 +61,10 @@ export default function Form({
       case "Image to Video":
         const imageToVideoRes = await imageToVideo(formData);
         setOutput(imageToVideoRes.images);
+        break;
+      case "Image to Image":
+        const imageToImageRes = await imageToImage(formData);
+        setOutput(imageToImageRes.images);
         break;
       case "image-to-image":
         break;
