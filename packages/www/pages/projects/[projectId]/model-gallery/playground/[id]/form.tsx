@@ -38,7 +38,7 @@ export default function Form({
     switch (model?.pipline) {
       case "Text to Image":
         const res = await textToImage(formInputs);
-        setOutput(res);
+        setOutput(res.images);
         setLoading(false);
         break;
       case "image-to-image":

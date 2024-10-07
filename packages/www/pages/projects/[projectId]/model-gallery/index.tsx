@@ -17,7 +17,7 @@ export default function ModelGalleryPage() {
   return (
     <Layout
       id="model-gallery"
-      breadcrumbs={[{ title: "Sessions" }]}
+      breadcrumbs={[{ title: "Model Gallery" }]}
       {...Content.metaData}>
       <Box
         css={{

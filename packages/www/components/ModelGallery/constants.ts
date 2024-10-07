@@ -187,16 +187,7 @@ const availableModels: Model[] = [
       "A lightning model designed for faster inference while still aiming for photorealism.",
     pipline: "Text to Image",
     image: "RealVisXL_V4.0_Lightning.png",
-    lightning: true,
-    inputs: textToImageInputs,
-  },
-  {
-    id: "SDXL-Lightning",
-    title: "SDXL Lightning",
-    description:
-      "The SDXL-Lightning is a lightning-fast text-to-image generation model.",
-    pipline: "Text to Image",
-    image: "SDXL-Lightning.jpg",
+    modelId: "SG161222/RealVisXL_V4.0_Lightning",
     lightning: true,
     inputs: textToImageInputs,
   },
@@ -207,6 +198,7 @@ const availableModels: Model[] = [
       "A  model that edits images based on human-written instructions.",
     pipline: "Image to Image",
     image: "instruct-pix2pix.jpg",
+    modelId: "timbrooks/instruct-pix2pix",
     inputs: imageToImageInputs,
   },
   {
@@ -216,6 +208,7 @@ const availableModels: Model[] = [
       "An updated version of Stable Video Diffusion Video with improved quality.",
     pipline: "Image to Video",
     image: "stable-video-diffusion-img2vid-xt-1-1.gif",
+    modelId: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
     inputs: imageToVideoInputs,
   },
   {
@@ -225,6 +218,7 @@ const availableModels: Model[] = [
       " A text-guided upscaling diffusion model trained on large LAION images ",
     pipline: "Upscale Image",
     image: "stable-diffusion-x4-upscaler.png",
+    modelId: "stabilityai/stable-diffusion-x4-upscaler",
     inputs: upscalerInputs,
   },
 ];
@@ -236,6 +230,7 @@ type Model = {
   image: string;
   pipline: string;
   lightning?: boolean;
+  modelId: string;
   inputs?: Input[];
 };
 

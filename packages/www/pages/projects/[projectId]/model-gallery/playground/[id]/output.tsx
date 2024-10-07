@@ -1,10 +1,11 @@
 import { Badge } from "components/ui/badge";
 import React from "react";
 import type { Output as OutputT } from "components/ModelGallery/constants";
+import { Card } from "components/ui/card";
 
 export default function Output({ output }: { output: OutputT[] }) {
   return (
-    <div className="w-full h-[75vh] rounded-lg bg-card relative ">
+    <Card className="w-full h-[69vh] mt-2 relative">
       <Badge className="absolute top-5 right-5">Output</Badge>
       <div className="flex items-center justify-center h-full">
         <div className="grid grid-cols-3 gap-4 p-10 mt-10">
@@ -19,6 +20,6 @@ export default function Output({ output }: { output: OutputT[] }) {
           ))}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

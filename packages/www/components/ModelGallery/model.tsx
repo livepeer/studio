@@ -11,6 +11,8 @@ import {
 import { Button } from "components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { useProjectContext } from "context/ProjectContext";
+import { Badge } from "components/ui/badge";
+import { Label } from "components/ui/label";
 
 export default function Model({ model }: { model: ModelT }) {
   const { appendProjectId } = useProjectContext();
@@ -18,8 +20,10 @@ export default function Model({ model }: { model: ModelT }) {
   return (
     <Link href={appendProjectId(`/model-gallery/playground/${model.id}`)}>
       <Card className="">
-        <CardHeader className="p-4">
-          <CardTitle className="text-lg">{model.title}</CardTitle>
+        <CardHeader className="p-4 flex justify-between flex-row">
+          <CardTitle className="text-lg">{model.title}
+          </CardTitle>
+          <Badge>{model.pipline}</Badge>
         </CardHeader>
         <CardContent className="p-4 py-0">
           <div className="aspect-video  mb-4 relative">
@@ -29,7 +33,7 @@ export default function Model({ model }: { model: ModelT }) {
               alt={model.title}
             />
           </div>
-          <p className="text-sm text-gray-600 ">{model.description}</p>
+          <Label>{model.description}</Label>
         </CardContent>
         <CardFooter className="flex justify-between items-center p-4 py-2">
           <ModelSource model={model} />
@@ -52,7 +56,7 @@ const ModelSource = ({ model }: { model: ModelT }) => {
           alt={model.title}
         />
       </div>
-      <span className="text-sm text-gray-600">by Livepeer Network</span>
+      <Label >by Livepeer Network</Label>
     </div>
   );
 };
