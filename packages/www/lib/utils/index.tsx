@@ -236,12 +236,11 @@ export function isExport(): boolean {
 
 export function isStaging(): boolean {
   return (
-    true ||
-    (typeof window !== "undefined" &&
-      (window.location.hostname.includes("livepeer.monster") ||
-        window.location.hostname.includes("livepeer.vercel.app") ||
-        window.location.hostname.includes("livepeerorg.vercel.app") ||
-        window.location.hostname.includes("livepeerorg.now.sh")))
+    typeof window !== "undefined" &&
+    (window.location.hostname.includes("livepeer.monster") ||
+      window.location.hostname.includes("livepeer.vercel.app") ||
+      window.location.hostname.includes("livepeerorg.vercel.app") ||
+      window.location.hostname.includes("livepeerorg.now.sh"))
   );
 }
 
