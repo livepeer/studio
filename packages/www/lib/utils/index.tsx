@@ -2,6 +2,8 @@ import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
 import getConfig from "next/config";
 
+export { cn } from "../cn";
+
 export const { publicRuntimeConfig } = getConfig();
 
 export const { basePath } = publicRuntimeConfig;

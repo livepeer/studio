@@ -1,14 +1,7 @@
 import {
   Box,
-  Button,
   Flex,
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
   TextField,
-  Text,
   Heading,
   Label,
   Link,
@@ -16,9 +9,18 @@ import {
   Checkbox,
   styled,
 } from "@livepeer/design-system";
+import { Button } from "components/ui/button";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useApi } from "../../hooks";
 import Spinner from "components/Spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "components/ui/dialog";
+import { Text } from "components/ui/text";
 import { ApiToken } from "@livepeer.studio/api";
 import {
   ExclamationTriangleIcon as Warning,
@@ -27,6 +29,7 @@ import {
   PlusIcon as Plus,
 } from "@radix-ui/react-icons";
 import ClipButton from "../Clipping/ClipButton";
+import { Input } from "components/ui/input";
 
 const initialCorsOpts: ApiToken["access"]["cors"] = {
   allowedOrigins: ["http://localhost:3000"],
@@ -115,13 +118,13 @@ const CreateDialog = ({
   }, [toggleOrigin, setNewAllowedOrigin, isNewOriginValid]);
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         {!newToken && (
           <>
-            <AlertDialogTitle asChild>
+            <DialogTitle>
               <Heading size="1">Create an API Key</Heading>
-            </AlertDialogTitle>
+            </DialogTitle>
             <Box
               as="form"
               onSubmit={async (e) => {
@@ -141,18 +144,14 @@ const CreateDialog = ({
                   setCreating(false);
                 }
               }}>
-              <AlertDialogDescription asChild>
-                <Text
-                  size="3"
-                  variant="neutral"
-                  css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
+              <DialogDescription asChild>
+                <Text className="my-2" variant="neutral">
                   Enter a name for your key to differentiate it from other keys.
                 </Text>
-              </AlertDialogDescription>
+              </DialogDescription>
 
               <Flex direction="column" gap="2">
-                <TextField
-                  size="2"
+                <Input
                   type="text"
                   required
                   id="tokenName"
@@ -200,16 +199,10 @@ const CreateDialog = ({
                       Add an origin
                     </Label>
                     <Box css={{ display: "flex", alignItems: "stretch" }}>
-                      <TextField
-                        size="2"
+                      <Input
                         type="text"
                         id="addAllowedOrigin"
                         value={newAllowedOrigin}
-                        state={
-                          newAllowedOrigin !== "" && !isNewOriginValid
-                            ? "invalid"
-                            : null
-                        }
                         onChange={(e) => setNewAllowedOrigin(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
@@ -220,9 +213,8 @@ const CreateDialog = ({
                         placeholder="e.g. * for all origins; https://example.com for one"
                       />
                       <Button
-                        css={{ ml: "$1" }}
-                        size="3"
-                        variant="primary"
+                        className="ml-1"
+                        variant="outline"
                         disabled={!isNewOriginValid}
                         onClick={(e) => {
                           e.preventDefault();
@@ -231,6 +223,10 @@ const CreateDialog = ({
                         <Plus />
                       </Button>
                     </Box>
+
+                    {newAllowedOrigin !== "" && !isNewOriginValid ? (
+                      <Text variant="error">Invalid origin</Text>
+                    ) : null}
 
                     <Flex
                       align="center"
@@ -244,26 +240,25 @@ const CreateDialog = ({
                         height: 120,
                         overflowX: "hidden",
                         overflowY: "auto",
-                        border: "1px solid $colors$neutral7",
-                        backgroundColor: "$neutral2",
+                        backgroundColor: "hsl(var(--card))",
                         mt: "-3px",
                         zIndex: 1,
                       }}>
                       {cors.allowedOrigins.length > 0 ? (
                         cors.allowedOrigins.map((origin, i) => (
                           <Flex
-                            key={i}
+                            key={origin}
                             justify="between"
                             align="center"
                             css={{
                               width: "100%",
-                              borderBottom: "1px solid $colors$neutral5",
                               p: "$2",
                               fontSize: "$2",
                               color: "$hiContrast",
                             }}>
                             {origin}
                             <StyledCross
+                              className="h-3 w-3"
                               onClick={() => {
                                 toggleOrigin(origin);
                               }}
@@ -323,16 +318,10 @@ const CreateDialog = ({
               </Flex>
 
               <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-                <AlertDialogCancel asChild>
-                  <Button size="2" ghost>
-                    Cancel
-                  </Button>
-                </AlertDialogCancel>
-                <Button
-                  size="2"
-                  disabled={creating}
-                  type="submit"
-                  variant="primary">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button disabled={creating} type="submit">
                   {creating && (
                     <Spinner
                       css={{
@@ -351,31 +340,28 @@ const CreateDialog = ({
         )}
         {newToken && (
           <Box>
-            <AlertDialogTitle asChild>
+            <DialogTitle>
               <Heading size="1">Token Created</Heading>
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <Text
-                size="3"
-                variant="neutral"
-                css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
+            </DialogTitle>
+            <DialogDescription asChild>
+              <Text className="my-2" variant="neutral">
                 <Box>
                   <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
-                  <Button variant="neutral" size="2">
+                  <Button variant="outline">
                     <ClipButton value={newToken.id} text={newToken.id} />
                   </Button>
                 </Box>
               </Text>
-            </AlertDialogDescription>
+            </DialogDescription>
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button onClick={() => onClose()} size="2">
+              <Button onClick={() => onClose()} variant="outline">
                 Close
               </Button>
             </Flex>
           </Box>
         )}
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 
