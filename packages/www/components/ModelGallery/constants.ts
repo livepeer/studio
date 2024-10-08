@@ -195,9 +195,9 @@ const availableModels: Model[] = [
     title: "Realistic Vision V4",
     description:
       "A lightning model designed for faster inference while still aiming for photorealism.",
-    pipline: "Text to Image",
+    pipeline: "Text to Image",
     image: "RealVisXL_V4.0_Lightning.png",
-    modelId: "SG161222/RealVisXL_V4.0_Lightning",
+    huggingFaceId: "SG161222/RealVisXL_V4.0_Lightning",
     lightning: true,
     inputs: textToImageInputs,
   },
@@ -206,9 +206,9 @@ const availableModels: Model[] = [
     title: "Instruct Pix2Pix",
     description:
       "A  model that edits images based on human-written instructions.",
-    pipline: "Image to Image",
+    pipeline: "Image to Image",
     image: "instruct-pix2pix.jpg",
-    modelId: "timbrooks/instruct-pix2pix",
+    huggingFaceId: "timbrooks/instruct-pix2pix",
     inputs: imageToImageInputs,
   },
   {
@@ -216,9 +216,9 @@ const availableModels: Model[] = [
     title: "Stable Video Diffusion",
     description:
       "An updated version of Stable Video Diffusion Video with improved quality.",
-    pipline: "Image to Video",
+    pipeline: "Image to Video",
     image: "stable-video-diffusion-img2vid-xt-1-1.gif",
-    modelId: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
+    huggingFaceId: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
     inputs: imageToVideoInputs,
   },
   {
@@ -226,18 +226,28 @@ const availableModels: Model[] = [
     title: "Stable Diffusion Upscaler",
     description:
       " A text-guided upscaling diffusion model trained on large LAION images ",
-    pipline: "Upscale Image",
+    pipeline: "Upscale Image",
     image: "stable-diffusion-x4-upscaler.png",
-    modelId: "stabilityai/stable-diffusion-x4-upscaler",
+    huggingFaceId: "stabilityai/stable-diffusion-x4-upscaler",
     inputs: upscalerInputs,
   },
   {
     id: "whisper-large-v3",
     title: "OpenAI Whisper",
     description: " A large-v3 model trained by OpenAI for voice recognition ",
-    pipline: "Audio to Text",
+    pipeline: "Audio to Text",
     image: "whisper-large-v3.png",
-    modelId: "openai/whisper-large-v3",
+    huggingFaceId: "openai/whisper-large-v3",
+    inputs: audioToTextInputs,
+  },
+  {
+    id: "sam2-hiera-large",
+    title: "Segment Anything 2",
+    description:
+      "SAM 2 is a segmentation model that enables precise selection of objects in image",
+    pipeline: "Segmentation",
+    image: "sam2-hiera-large.png",
+    huggingFaceId: "facebook/sam2-hiera-large",
     inputs: audioToTextInputs,
   },
 ];
@@ -247,9 +257,9 @@ type Model = {
   title: string;
   description: string;
   image: string;
-  pipline: string;
+  pipeline: string;
   lightning?: boolean;
-  modelId: string;
+  huggingFaceId: string;
   inputs?: Input[];
 };
 

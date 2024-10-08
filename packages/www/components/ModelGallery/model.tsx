@@ -22,7 +22,7 @@ export default function Model({ model }: { model: ModelT }) {
       <Card className="">
         <CardHeader className="p-4 flex justify-between flex-row">
           <CardTitle className="text-lg">{model.title}</CardTitle>
-          <Badge>{model.pipline}</Badge>
+          <Badge>{model.pipeline}</Badge>
         </CardHeader>
         <CardContent className="p-4 py-0">
           <div className="aspect-video  mb-4 relative">
@@ -32,7 +32,7 @@ export default function Model({ model }: { model: ModelT }) {
               alt={model.title}
             />
           </div>
-          <Label>{model.description}</Label>
+          <Label className="font-normal">{model.description}</Label>
         </CardContent>
         <CardFooter className="flex justify-between items-center p-4 py-2">
           <ModelSource model={model} />
@@ -55,7 +55,7 @@ const ModelSource = ({ model }: { model: ModelT }) => {
           alt={model.title}
         />
       </div>
-      <Label>by Livepeer Network</Label>
+      <Label className="font-normal">by Livepeer Network</Label>
     </div>
   );
 };

@@ -20,16 +20,18 @@ export default function Output({
   return (
     <Card className="w-full h-[69vh] mt-2 relative">
       <Badge className="absolute top-5 right-5">Output</Badge>
-      <Badge className="absolute bottom-5 right-5">
-        {(generationTime / 1000).toFixed(2)}s
-      </Badge>
+      {generationTime !== 0 && (
+        <Badge className="absolute bottom-5 right-5">
+          {(generationTime / 1000).toFixed(2)}s
+        </Badge>
+      )}
       <div className="flex items-center justify-center h-full">
         <div className="mt-10">
           {output.map((item, index) => (
             <div
               key={index}
               className="flex items-center justify-center h-[512px]">
-              {model.pipline == "Image to Video" ? (
+              {model.pipeline == "Image to Video" ? (
                 <video
                   src={item.url}
                   className="max-w-full max-h-full object-contain rounded-lg"
@@ -38,7 +40,7 @@ export default function Output({
                   muted
                   controls
                 />
-              ) : model.pipline == "Audio to Text" ? (
+              ) : model.pipeline == "Audio to Text" ? (
                 <ScrollArea className="bg-card p-4 rounded-lg border border-input max-h-[512px] overflow-y-auto">
                   <Label>Chunks (with timestamps)</Label>
                   {item.chunks.map((chunk, index) => (

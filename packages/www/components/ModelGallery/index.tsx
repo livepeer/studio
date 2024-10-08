@@ -53,7 +53,7 @@ export default function ModelGallery() {
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesFilter =
-      selectedFilters.length === 0 || selectedFilters.includes(model.pipline);
+      selectedFilters.length === 0 || selectedFilters.includes(model.pipeline);
     return matchesSearch && matchesFilter;
   });
 
@@ -91,7 +91,9 @@ const Filter = ({
   handleFilterChange: (filter: string) => void;
   models: typeof availableModels;
 }) => {
-  const availablePipelines = [...new Set(models.map((model) => model.pipline))];
+  const availablePipelines = [
+    ...new Set(models.map((model) => model.pipeline)),
+  ];
   return (
     <div className="w-1/6 border-r border-input pr-8 h-[90vh] ">
       <h2 className="text-md font-medium mb-3">Filter Templates</h2>
@@ -120,7 +122,7 @@ const Filter = ({
             </label>
           </div>
           <Badge variant="secondary">
-            {models.filter((model) => model.pipline === item).length}
+            {models.filter((model) => model.pipeline === item).length}
           </Badge>
         </div>
       ))}

@@ -50,8 +50,8 @@ export default function Form({
       }
     }, 100);
 
-    console.log(model?.pipline);
-    switch (model?.pipline) {
+    console.log(model?.pipeline);
+    switch (model?.pipeline) {
       case "Text to Image":
         const textToImageRes = await textToImage(formInputs);
         setOutput(textToImageRes.images);

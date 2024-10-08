@@ -27,6 +27,7 @@ import { Button } from "components/ui/button";
 import { useRef, useState } from "react";
 import Output from "./output";
 import Form from "./form";
+import Link from "next/link";
 
 export default function PlaygroundPage() {
   useLoggedIn();
@@ -85,17 +86,20 @@ const PageHeader = ({ model }: { model: ModelT }) => {
       <CardHeader className="pb-4 pl-8 space-y-2">
         <CardTitle>{model?.title}</CardTitle>
         <CardDescription>
-          <div className="flex items-center gap-1">
+          <Link
+            href={`https://huggingface.co/${model?.huggingFaceId}`}
+            target="_blank"
+            className="flex items-center gap-1">
             <img
-              src={"/dashboard/ai/livepeer.webp"}
+              src={"https://cdn.worldvectorlogo.com/logos/huggingface-2.svg"}
               className="w-5 h-5 rounded-full "
-              alt="Livepeer Network"
+              alt="Hugging Face Logo"
             />
-            {model?.modelId}
-          </div>
+            {model?.huggingFaceId}
+          </Link>
         </CardDescription>
         <div className="mt-6">
-          <Badge>{model?.pipline}</Badge>
+          <Badge>{model?.pipeline}</Badge>
         </div>
       </CardHeader>
     </Card>
