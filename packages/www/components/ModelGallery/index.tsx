@@ -244,7 +244,7 @@ const CustomModelPopover = ({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Request a custom model</AlertDialogTitle>
           <AlertDialogDescription>

@@ -69,3 +69,13 @@ export const imageToImage = async (formData: any) => {
 
   return image;
 };
+
+export const audioToText = async (formData: any) => {
+  const url = `/beta/generate/audio-to-text`;
+  const [res, text] = await context.fetch(url, {
+    method: "POST",
+    body: formData,
+  });
+
+  return [text];
+};

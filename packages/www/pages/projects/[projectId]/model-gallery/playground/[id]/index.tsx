@@ -67,7 +67,11 @@ export default function PlaygroundPage() {
             />
           </div>
           <div className="md:w-[70%]">
-            <Output output={output} generationTime={generationTime} />
+            <Output
+              model={model}
+              output={output}
+              generationTime={generationTime}
+            />
           </div>
         </main>
       </Box>

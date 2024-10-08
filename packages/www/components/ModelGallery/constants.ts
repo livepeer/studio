@@ -178,6 +178,17 @@ const imageToVideoInputs: Input[] = [
   },
 ];
 
+const audioToTextInputs: Input[] = [
+  {
+    id: "audio",
+    name: "Audio",
+    type: "file",
+    required: true,
+    description: "The audio to transcribe",
+    group: "prompt",
+  },
+];
+
 const availableModels: Model[] = [
   {
     id: "RealVisXL_V4.0_Lightning",
@@ -220,6 +231,15 @@ const availableModels: Model[] = [
     modelId: "stabilityai/stable-diffusion-x4-upscaler",
     inputs: upscalerInputs,
   },
+  {
+    id: "whisper-large-v3",
+    title: "OpenAI Whisper",
+    description: " A large-v3 model trained by OpenAI for voice recognition ",
+    pipline: "Audio to Text",
+    image: "whisper-large-v3.png",
+    modelId: "openai/whisper-large-v3",
+    inputs: audioToTextInputs,
+  },
 ];
 
 type Model = {
@@ -244,9 +264,16 @@ type Input = {
 };
 
 type Output = {
-  url: string;
-  seed: number;
-  nsfw: boolean;
+  url?: string;
+  seed?: number;
+  nsfw?: boolean;
+  text?: string;
+  chunks?: Chunk[];
+};
+
+type Chunk = {
+  text: string;
+  timestamp: [number, number];
 };
 
 export { availableModels };
