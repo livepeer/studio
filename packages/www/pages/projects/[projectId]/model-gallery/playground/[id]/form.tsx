@@ -9,6 +9,7 @@ import { Textarea } from "components/ui/textarea";
 import { Input } from "components/ui/input";
 import { useApi } from "hooks";
 import { Loader2, X } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Form({
   model,
@@ -59,51 +60,54 @@ export default function Form({
       }
     }, 100);
 
-    console.log(formData);
-    switch (model?.pipeline) {
-      case "Text to Image":
-        const textToImageRes = await textToImage(formInputs);
-        setOutput(textToImageRes.images);
-        break;
-      case "Upscale Image":
-        const upscaleRes = await upscale(formData);
-        setOutput(upscaleRes.images);
-        break;
-      case "Image to Video":
-        const imageToVideoRes = await imageToVideo(formData);
-        setOutput(imageToVideoRes.images);
-        break;
-      case "Image to Image":
-        const imageToImageRes = await imageToImage(formData);
-        setOutput(imageToImageRes.images);
-        break;
-      case "Audio to Text":
-        const audioToTextRes = await audioToText(formData);
-        setOutput(audioToTextRes);
-        break;
-      case "Segmentation":
-        const segmentImageRes = await segmentImage(formData);
+    try {
+      switch (model?.pipeline) {
+        case "Text to Image":
+          const textToImageRes = await textToImage(formInputs);
+          setOutput(textToImageRes.images);
+          break;
+        case "Upscale Image":
+          const upscaleRes = await upscale(formData);
+          setOutput(upscaleRes.images);
+          break;
+        case "Image to Video":
+          const imageToVideoRes = await imageToVideo(formData);
+          setOutput(imageToVideoRes.images);
+          break;
+        case "Image to Image":
+          const imageToImageRes = await imageToImage(formData);
+          setOutput(imageToImageRes.images);
+          break;
+        case "Audio to Text":
+          const audioToTextRes = await audioToText(formData);
+          setOutput(audioToTextRes);
+          break;
+        case "Segmentation":
+          const segmentImageRes = await segmentImage(formData);
 
-        const image = formRef.current?.elements.namedItem(
-          "image"
-        ) as HTMLInputElement;
+          const image = formRef.current?.elements.namedItem(
+            "image"
+          ) as HTMLInputElement;
 
-        const imageUrl = URL.createObjectURL(image.files[0]);
+          const imageUrl = URL.createObjectURL(image.files[0]);
 
-        const box = formRef.current?.elements.namedItem(
-          "box"
-        ) as HTMLInputElement;
+          const box = formRef.current?.elements.namedItem(
+            "box"
+          ) as HTMLInputElement;
 
-        setOutput([
-          {
-            url: imageUrl,
-            mask: segmentImageRes.masks,
-            scores: segmentImageRes.scores,
-          },
-        ]);
-        break;
-      case "image-to-image":
-        break;
+          setOutput([
+            {
+              url: imageUrl,
+              mask: segmentImageRes.masks,
+              scores: segmentImageRes.scores,
+            },
+          ]);
+          break;
+        case "image-to-image":
+          break;
+      }
+    } catch (error) {
+      toast.error("Error running pipeline");
     }
 
     if (timerRef.current) clearInterval(timerRef.current);
@@ -119,8 +123,10 @@ export default function Form({
       const inputElement = form.elements.namedItem(
         input.id
       ) as HTMLInputElement;
-      if (inputElement && input.defaultValue) {
-        inputElement.value = input.defaultValue.toString();
+      if (inputElement) {
+        inputElement.value = input.defaultValue
+          ? input.defaultValue.toString()
+          : "";
       }
     });
   };
@@ -154,15 +160,17 @@ export default function Form({
         </>
       )}
       <div className="flex gap-2 justify-end">
-        <Button
-          disabled={loading}
-          variant="outline"
-          onClick={(e) => {
-            e.preventDefault();
-            handleReset();
-          }}>
-          Reset
-        </Button>
+        {model?.pipeline !== "Segmentation" && (
+          <Button
+            disabled={loading}
+            variant="outline"
+            onClick={(e) => {
+              e.preventDefault();
+              handleReset();
+            }}>
+            Reset
+          </Button>
+        )}
         <Button disabled={loading} type="submit">
           {loading ? (
             <>

@@ -7,6 +7,7 @@ import type {
 import { Card } from "components/ui/card";
 import { Label } from "components/ui/label";
 import { ScrollArea } from "components/ui/scroll-area";
+import { Button } from "components/ui/button";
 
 export default function Output({
   loading,
@@ -19,7 +20,26 @@ export default function Output({
   model: Model;
   generationTime: number;
 }) {
-  console.log("output", output);
+  const downloadOutput = (item: OutputT) => {
+    if (item.url) {
+      window.open(item.url, "_blank");
+      return;
+    }
+    if (item.chunks) {
+      const blob = new Blob([JSON.stringify(item.chunks)], {
+        type: "application/json",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = "output.json";
+      document.body.appendChild(a);
+      a.click();
+      return;
+    }
+  };
+
   return (
     <Card className="w-full h-[69vh] mt-2 relative">
       <Badge className="absolute top-5 right-5">Output</Badge>
@@ -38,7 +58,7 @@ export default function Output({
             output.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-center h-[512px]">
+                className="flex flex-col items-center justify-center h-[512px]">
                 {model.pipeline == "Image to Video" ? (
                   <video
                     src={item.url}
@@ -77,6 +97,17 @@ export default function Output({
                     alt={`Output ${index + 1}`}
                     className="max-w-full max-h-full object-contain rounded-lg"
                   />
+                )}
+
+                {model.pipeline !== "Segmentation" && (
+                  <Button
+                    onClick={() => {
+                      downloadOutput(item);
+                    }}
+                    variant="outline"
+                    className="mt-2">
+                    Download Output
+                  </Button>
                 )}
               </div>
             ))
