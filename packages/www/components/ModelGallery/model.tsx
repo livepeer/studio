@@ -25,7 +25,7 @@ export default function Model({ model }: { model: ModelT }) {
           <Badge>{model.pipeline}</Badge>
         </CardHeader>
         <CardContent className="p-4 py-0">
-          <div className="aspect-video  mb-4 relative">
+          <div className="aspect-video mb-4 relative">
             <img
               src={`/dashboard/ai/${model.image}`}
               className="w-full h-[17rem] object-cover rounded-md"

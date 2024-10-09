@@ -217,6 +217,7 @@ const availableModels: Model[] = [
     pipeline: "Text to Image",
     image: "RealVisXL_V4.0_Lightning.png",
     huggingFaceId: "SG161222/RealVisXL_V4.0_Lightning",
+    docs: "https://docs.livepeer.org/api-reference/generate/text-to-image",
     lightning: true,
     inputs: textToImageInputs,
   },
@@ -228,6 +229,7 @@ const availableModels: Model[] = [
     pipeline: "Image to Image",
     image: "instruct-pix2pix.jpg",
     huggingFaceId: "timbrooks/instruct-pix2pix",
+    docs: "https://docs.livepeer.org/api-reference/generate/image-to-image",
     inputs: imageToImageInputs,
   },
   {
@@ -238,6 +240,7 @@ const availableModels: Model[] = [
     pipeline: "Image to Video",
     image: "stable-video-diffusion-img2vid-xt-1-1.gif",
     huggingFaceId: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
+    docs: "https://docs.livepeer.org/api-reference/generate/image-to-video",
     inputs: imageToVideoInputs,
   },
   {
@@ -248,6 +251,7 @@ const availableModels: Model[] = [
     pipeline: "Upscale Image",
     image: "stable-diffusion-x4-upscaler.png",
     huggingFaceId: "stabilityai/stable-diffusion-x4-upscaler",
+    docs: "https://docs.livepeer.org/api-reference/generate/upscale",
     inputs: upscalerInputs,
   },
   {
@@ -257,6 +261,7 @@ const availableModels: Model[] = [
     pipeline: "Audio to Text",
     image: "whisper-large-v3.png",
     huggingFaceId: "openai/whisper-large-v3",
+    docs: "https://docs.livepeer.org/api-reference/generate/audio-to-text",
     inputs: audioToTextInputs,
   },
   {
@@ -267,6 +272,7 @@ const availableModels: Model[] = [
     pipeline: "Segmentation",
     image: "sam2-hiera-large.png",
     huggingFaceId: "facebook/sam2-hiera-large",
+    docs: "https://docs.livepeer.org/api-reference/generate/segment-anything-2",
     inputs: segmentationInputs,
   },
 ];
@@ -278,6 +284,7 @@ type Model = {
   image: string;
   pipeline: string;
   lightning?: boolean;
+  docs: string;
   huggingFaceId: string;
   inputs?: Input[];
 };

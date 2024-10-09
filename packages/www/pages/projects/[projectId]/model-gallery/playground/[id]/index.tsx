@@ -28,6 +28,7 @@ import { useRef, useState } from "react";
 import Output from "./output";
 import Form from "./form";
 import Link from "next/link";
+import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 
 export default function PlaygroundPage() {
   useLoggedIn();
@@ -102,8 +103,14 @@ const PageHeader = ({ model }: { model: ModelT }) => {
             {model?.huggingFaceId}
           </Link>
         </CardDescription>
-        <div className="mt-6">
-          <Badge>{model?.pipeline}</Badge>
+        <div className="mt-6 flex w-full justify-between">
+          <Badge className="h-full">{model?.pipeline}</Badge>
+          <Button asChild variant="outline" className="h-8  px-3 text-xs">
+            <Link target="_blank" href={model?.docs}>
+              Visit Documentation
+              <ArrowTopRightIcon className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
         </div>
       </CardHeader>
     </Card>
