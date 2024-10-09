@@ -57,6 +57,7 @@ export default function FeaturesModel() {
             </AlertDialogDescription>
             <div className="flex flex-row gap-3 mt-2">
               <Button
+                className="px-10"
                 onClick={() => {
                   setShouldShowFeature(false);
                 }}>
