@@ -37,6 +37,17 @@ export function parseCli() {
         type: "string",
         demandOption: true,
       },
+      "postgres-create-tables": {
+        describe:
+          "create tables and indexes on the database if they don't exist",
+        type: "boolean",
+        default: false,
+      },
+      "postgres-conn-pool-size": {
+        describe: "size of the postgres connection pool",
+        type: "number",
+        default: 5,
+      },
     })
     .help()
     .parse();
