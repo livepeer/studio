@@ -353,7 +353,7 @@ const SegmentInput = ({
         type="file"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) {
+          if (file && file.type.startsWith("image/")) {
             setSelectedSegmentImage(URL.createObjectURL(file));
           } else {
             setSelectedSegmentImage(null);
