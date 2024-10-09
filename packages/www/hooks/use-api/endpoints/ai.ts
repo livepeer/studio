@@ -79,3 +79,14 @@ export const audioToText = async (formData: any) => {
 
   return [text];
 };
+
+export const segmentImage = async (formData: any) => {
+  console.log("formData", formData);
+  const url = `/beta/generate/segment-anything-2`;
+  const [res, image] = await context.fetch(url, {
+    method: "POST",
+    body: formData,
+  });
+
+  return image;
+};

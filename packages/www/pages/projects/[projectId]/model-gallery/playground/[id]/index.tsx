@@ -39,6 +39,7 @@ export default function PlaygroundPage() {
   const model = availableModels.find((model) => model.id === id);
 
   const [output, setOutput] = useState<OutputT[]>([]);
+  const [loading, setLoading] = useState(false);
 
   if (!user) {
     return <Layout />;
@@ -64,6 +65,8 @@ export default function PlaygroundPage() {
             <Form
               model={model}
               setOutput={setOutput}
+              setLoading={setLoading}
+              loading={loading}
               setGenerationTime={setGenerationTime}
             />
           </div>
@@ -71,6 +74,7 @@ export default function PlaygroundPage() {
             <Output
               model={model}
               output={output}
+              loading={loading}
               generationTime={generationTime}
             />
           </div>

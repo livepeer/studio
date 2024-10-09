@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type {
   Model as ModelT,
   Output,
@@ -8,20 +8,29 @@ import { Button } from "components/ui/button";
 import { Textarea } from "components/ui/textarea";
 import { Input } from "components/ui/input";
 import { useApi } from "hooks";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 export default function Form({
   model,
   setOutput,
   setGenerationTime,
+  loading,
+  setLoading,
 }: {
   model: ModelT;
   setOutput: (output: Output[]) => void;
   setGenerationTime: (time: number) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
 }) {
-  const { textToImage, upscale, imageToVideo, imageToImage, audioToText } =
-    useApi();
-  const [loading, setLoading] = useState<boolean>(false);
+  const {
+    textToImage,
+    upscale,
+    imageToVideo,
+    imageToImage,
+    audioToText,
+    segmentImage,
+  } = useApi();
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -50,7 +59,7 @@ export default function Form({
       }
     }, 100);
 
-    console.log(model?.pipeline);
+    console.log(formData);
     switch (model?.pipeline) {
       case "Text to Image":
         const textToImageRes = await textToImage(formInputs);
@@ -71,6 +80,10 @@ export default function Form({
       case "Audio to Text":
         const audioToTextRes = await audioToText(formData);
         setOutput(audioToTextRes);
+        break;
+      case "Segmentation":
+        const segmentImageRes = await segmentImage(formData);
+        setOutput(segmentImageRes.images);
         break;
       case "image-to-image":
         break;
@@ -115,7 +128,7 @@ export default function Form({
                   .map((input) => (
                     <div key={input.id}>
                       <Label>{input.name}</Label>
-                      <div className="mt-1">{renderInput(input)}</div>
+                      <div className="mt-1">{renderInput(input, formRef)}</div>
                     </div>
                   ))}
               </fieldset>
@@ -148,7 +161,11 @@ export default function Form({
   );
 }
 
-const renderInput = (input: any) => {
+const renderInput = (input: any, formRef: React.RefObject<HTMLFormElement>) => {
+  const [selectedSegmentImage, setSelectedSegmentImage] = useState<
+    string | null
+  >(null);
+
   switch (input.type) {
     case "textarea":
       return (
@@ -178,13 +195,177 @@ const renderInput = (input: any) => {
           type="file"
         />
       );
+    case "segment_file":
+      return <SegmentInput formRef={formRef} input={input} />;
     default:
       return (
         <Input
           name={input.id}
           placeholder={input.description}
           required={input.required}
+          disabled={input.disabled}
+          type="text"
+          defaultValue={input.defaultValue}
         />
       );
   }
+};
+
+const SegmentInput = ({
+  formRef,
+  input,
+}: {
+  formRef: React.RefObject<HTMLFormElement>;
+  input: any;
+}) => {
+  const [selectedSegmentImage, setSelectedSegmentImage] = useState<
+    string | null
+  >(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [box, setBox] = useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+  } | null>(null);
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (selectedSegmentImage && canvasRef.current) {
+      const image = new Image();
+      image.src = selectedSegmentImage;
+      image.onload = () => {
+        const canvas = canvasRef.current!;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const aspectRatio = image.height / image.width;
+          canvas.width = 400; // Set a fixed width
+          canvas.height = canvas.width * aspectRatio;
+          setImageDimensions({ width: canvas.width, height: canvas.height });
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }
+      };
+    }
+  }, [selectedSegmentImage]);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!selectedSegmentImage) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const startX =
+      (e.clientX - rect.left) * (canvasRef.current!.width / rect.width);
+    const startY =
+      (e.clientY - rect.top) * (canvasRef.current!.height / rect.height);
+    setBox({ startX, startY, endX: startX, endY: startY });
+    setIsDrawing(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !box) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const endX =
+      (e.clientX - rect.left) * (canvasRef.current!.width / rect.width);
+    const endY =
+      (e.clientY - rect.top) * (canvasRef.current!.height / rect.height);
+    setBox((prevBox) => ({ ...prevBox!, endX, endY }));
+    drawBox();
+  };
+
+  const handleMouseUp = () => {
+    if (isDrawing && box) {
+      const boxValue = JSON.stringify([
+        Math.round(box.startX),
+        Math.round(box.startY),
+        Math.round(box.endX),
+        Math.round(box.endY),
+      ]);
+    }
+    setIsDrawing(false);
+  };
+
+  const drawBox = () => {
+    if (canvasRef.current && box && selectedSegmentImage) {
+      const ctx = canvasRef.current.getContext("2d");
+      if (ctx && imageDimensions) {
+        const image = new Image();
+        image.src = selectedSegmentImage;
+        image.style.borderRadius = "15px";
+        image.onload = () => {
+          ctx.clearRect(0, 0, imageDimensions.width, imageDimensions.height);
+          ctx.drawImage(
+            image,
+            0,
+            0,
+            imageDimensions.width,
+            imageDimensions.height
+          );
+          ctx.strokeStyle = "red";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(
+            box.startX,
+            box.startY,
+            box.endX - box.startX,
+            box.endY - box.startY
+          );
+        };
+      }
+    }
+  };
+
+  return (
+    <>
+      <Input
+        name={input.id}
+        placeholder={input.description}
+        required={input.required}
+        type="file"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setSelectedSegmentImage(URL.createObjectURL(file));
+          } else {
+            setSelectedSegmentImage(null);
+          }
+        }}
+      />
+      {selectedSegmentImage && (
+        <div className="mt-4">
+          <Label className="font-normal">
+            Draw a box around the object you want to segment
+          </Label>
+          <div className="relative mt-1">
+            <canvas
+              ref={canvasRef}
+              className="w-full object-contain rounded-md border-2 border-input"
+              style={{ maxWidth: "400px" }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+            />
+            <button
+              className="absolute top-2 right-2 bg-white/50 rounded-full p-2 shadow"
+              onClick={() => {
+                setSelectedSegmentImage(null);
+                if (formRef.current) {
+                  const inputElement = formRef.current.elements.namedItem(
+                    input.id
+                  ) as HTMLInputElement;
+                  if (inputElement) {
+                    inputElement.value = "";
+                  }
+                }
+              }}>
+              <X className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </div>
+          <input type="hidden" name="box" />
+        </div>
+      )}
+    </>
+  );
 };

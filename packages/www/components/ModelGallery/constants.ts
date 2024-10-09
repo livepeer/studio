@@ -189,6 +189,25 @@ const audioToTextInputs: Input[] = [
   },
 ];
 
+const segmentationInputs: Input[] = [
+  {
+    id: "image",
+    name: "Image",
+    type: "segment_file",
+    required: true,
+    description: "The image to segment",
+    group: "prompt",
+  },
+  {
+    id: "box",
+    name: "Box",
+    type: "",
+    required: true,
+    description: "A length 4 array given as a box prompt [x1, y1, x2, y2]",
+    group: "prompt",
+  },
+];
+
 const availableModels: Model[] = [
   {
     id: "RealVisXL_V4.0_Lightning",
@@ -248,7 +267,7 @@ const availableModels: Model[] = [
     pipeline: "Segmentation",
     image: "sam2-hiera-large.png",
     huggingFaceId: "facebook/sam2-hiera-large",
-    inputs: audioToTextInputs,
+    inputs: segmentationInputs,
   },
 ];
 
@@ -267,8 +286,9 @@ type Input = {
   id: string;
   name: string;
   type: string;
-  defaultValue?: string | number;
+  defaultValue?: string | number | boolean;
   required: boolean;
+  disabled?: boolean;
   description: string;
   group: string;
 };
