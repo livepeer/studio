@@ -1,5 +1,5 @@
 import { Badge } from "components/ui/badge";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import type {
   Model,
   Output as OutputT,
@@ -19,6 +19,7 @@ export default function Output({
   model: Model;
   generationTime: number;
 }) {
+  console.log("output", output);
   return (
     <Card className="w-full h-[69vh] mt-2 relative">
       <Badge className="absolute top-5 right-5">Output</Badge>
@@ -64,6 +65,12 @@ export default function Output({
                       <p>{item.text}</p>
                     </div>
                   </ScrollArea>
+                ) : model.pipeline == "Segmentation" ? (
+                  <SegmentationOutput
+                    imageUrl={item.url}
+                    masks={item.mask}
+                    scores={item.scores}
+                  />
                 ) : (
                   <img
                     src={item.url}
@@ -78,4 +85,48 @@ export default function Output({
       </div>
     </Card>
   );
+}
+
+function SegmentationOutput({ imageUrl, masks, scores }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (canvasRef.current && masks && scores && imageUrl) {
+      const ctx = canvasRef.current.getContext("2d");
+      if (!ctx) return;
+
+      const image = new Image();
+      image.src = imageUrl;
+
+      image.onload = () => {
+        const width = image.width;
+        const height = image.height;
+        canvasRef.current.width = width;
+        canvasRef.current.height = height;
+        ctx.drawImage(image, 0, 0, width, height);
+
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+
+        JSON.parse(masks).forEach((mask) => {
+          for (let i = 0; i < mask.length; i++) {
+            for (let j = 0; j < mask[i].length; j++) {
+              const pixelIndex = (i * width + j) * 4;
+              if (mask[i][j] > 0.5) {
+                // Apply the mask with some transparency effect
+                data[pixelIndex] = data[pixelIndex] * 0.6 + 255 * 0.4; // Red
+                data[pixelIndex + 1] = data[pixelIndex + 1] * 0.6; // Green
+                data[pixelIndex + 2] = data[pixelIndex + 2] * 0.6; // Blue
+                data[pixelIndex + 3] = 255; // Alpha
+              }
+            }
+          }
+        });
+
+        ctx.putImageData(imageData, 0, 0);
+      };
+    }
+  }, [masks, scores, imageUrl]);
+
+  return <canvas ref={canvasRef} />;
 }

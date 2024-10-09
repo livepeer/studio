@@ -201,8 +201,8 @@ const segmentationInputs: Input[] = [
   {
     id: "box",
     name: "Box",
-    type: "",
-    required: true,
+    type: "text",
+    required: false,
     description: "A length 4 array given as a box prompt [x1, y1, x2, y2]",
     group: "prompt",
   },
@@ -299,6 +299,8 @@ type Output = {
   nsfw?: boolean;
   text?: string;
   chunks?: Chunk[];
+  mask?: string;
+  scores?: number[];
 };
 
 type Chunk = {

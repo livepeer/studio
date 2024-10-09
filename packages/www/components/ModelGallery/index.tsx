@@ -1,6 +1,6 @@
 import { Checkbox } from "components/ui/checkbox";
 import { Input } from "components/ui/input";
-import { Search, Stars } from "lucide-react";
+import { Search } from "lucide-react";
 import React, { useState } from "react";
 import { availableModels } from "./constants";
 import Model from "./model";
@@ -15,7 +15,6 @@ import {
 } from "components/ui/card";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -31,6 +30,8 @@ import { Textarea } from "components/ui/textarea";
 import { ScrollArea } from "components/ui/scroll-area";
 import { useApi } from "hooks";
 import { useHubspotForm } from "hooks";
+import { toast } from "sonner";
+import Link from "next/link";
 
 export default function ModelGallery() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -148,7 +149,11 @@ const CustomModelBanner = () => {
       </CardContent>
       <CardFooter className="flex flex-row gap-4">
         <Button onClick={() => setOpen(true)}>Request custom model</Button>
-        <Button variant="outline">Learn more</Button>
+        <Button asChild variant="outline">
+          <Link target="_blank" href="https://discord.gg/livepeer">
+            Join Livepeer Community
+          </Link>
+        </Button>
       </CardFooter>
       <div className="absolute top-0 right-0 w-2/5 h-full">
         <Image
@@ -240,8 +245,7 @@ const CustomModelPopover = ({
     handleSubmit(e);
     setOpen(false);
 
-    // TODO: show toast
-    alert("Request submitted");
+    toast("Request submitted! We will get back to you soon.");
   };
 
   return (

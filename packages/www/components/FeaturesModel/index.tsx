@@ -1,4 +1,3 @@
-import { Box } from "@livepeer/design-system";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -12,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HiOutlineSparkles } from "react-icons/hi";
+
 export default function FeaturesModel() {
   const [shouldShowFeature, setShouldShowFeature] = useState(false);
 

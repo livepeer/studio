@@ -83,7 +83,24 @@ export default function Form({
         break;
       case "Segmentation":
         const segmentImageRes = await segmentImage(formData);
-        setOutput(segmentImageRes.images);
+
+        const image = formRef.current?.elements.namedItem(
+          "image"
+        ) as HTMLInputElement;
+
+        const imageUrl = URL.createObjectURL(image.files[0]);
+
+        const box = formRef.current?.elements.namedItem(
+          "box"
+        ) as HTMLInputElement;
+
+        setOutput([
+          {
+            url: imageUrl,
+            mask: segmentImageRes.masks,
+            scores: segmentImageRes.scores,
+          },
+        ]);
         break;
       case "image-to-image":
         break;
@@ -162,10 +179,6 @@ export default function Form({
 }
 
 const renderInput = (input: any, formRef: React.RefObject<HTMLFormElement>) => {
-  const [selectedSegmentImage, setSelectedSegmentImage] = useState<
-    string | null
-  >(null);
-
   switch (input.type) {
     case "textarea":
       return (
@@ -278,13 +291,19 @@ const SegmentInput = ({
 
   const handleMouseUp = () => {
     if (isDrawing && box) {
-      const boxValue = JSON.stringify([
-        Math.round(box.startX),
-        Math.round(box.startY),
-        Math.round(box.endX),
-        Math.round(box.endY),
-      ]);
+      if (formRef.current) {
+        const inputElement = formRef.current.elements.namedItem(
+          "box"
+        ) as HTMLInputElement;
+        inputElement.value = JSON.stringify([
+          Math.round(box.startX),
+          Math.round(box.startY),
+          Math.round(box.endX),
+          Math.round(box.endY),
+        ]);
+      }
     }
+
     setIsDrawing(false);
   };
 
@@ -336,13 +355,13 @@ const SegmentInput = ({
       {selectedSegmentImage && (
         <div className="mt-4">
           <Label className="font-normal">
-            Draw a box around the object you want to segment
+            Optional: Draw a box around the object you want to segment
           </Label>
           <div className="relative mt-1">
             <canvas
               ref={canvasRef}
               className="w-full object-contain rounded-md border-2 border-input"
-              style={{ maxWidth: "400px" }}
+              style={{ maxWidth: "100%" }}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -363,7 +382,6 @@ const SegmentInput = ({
               <X className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
-          <input type="hidden" name="box" />
         </div>
       )}
     </>
