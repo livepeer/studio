@@ -2,6 +2,7 @@ import { useProjectContext } from "context/ProjectContext";
 
 export const TOKEN_KEY = "PERSISTENT_TOKEN";
 export const REFRESH_TOKEN_KEY = "REFRESH_TOKEN";
+export const PROJECT_ID_KEY = "projectId";
 
 export const storeToken = (token: string, refreshToken: string) => {
   try {
@@ -35,6 +36,7 @@ export const clearTokens = () => {
   try {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(PROJECT_ID_KEY);
   } catch (err) {
     console.error(`Error clearing persistent token: ${err.message}.`);
   }
