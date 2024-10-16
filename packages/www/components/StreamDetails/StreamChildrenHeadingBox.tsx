@@ -1,14 +1,5 @@
-import {
-  Box,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Flex,
-} from "@livepeer/design-system";
+import { Box, Flex } from "@livepeer/design-system";
+import { Button } from "components/ui/button";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { Dispatch, SetStateAction } from "react";
 import Record from "components/StreamDetails/Record";
@@ -16,6 +7,15 @@ import Terminate from "components/StreamDetails/Terminate";
 import Suspend from "components/StreamDetails/Suspend";
 import Delete from "components/StreamDetails/Delete";
 import { Stream, User } from "@livepeer.studio/api";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "components/ui/dropdown-menu";
 
 export type StreamChildrenHeadingBoxProps = {
   stream: Stream;
@@ -79,7 +79,7 @@ const StreamChildrenHeadingBox = ({
       <Box css={{ position: "relative", top: "-8px" }}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="2" css={{ display: "flex", ai: "center", mr: "$1" }}>
+            <Button variant="secondary" size="sm">
               Actions
               <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
             </Button>
