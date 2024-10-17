@@ -768,6 +768,8 @@ components:
           $ref: "#/components/schemas/new-stream-payload/properties/recordingSpec"
         userTags:
           $ref: "#/components/schemas/stream/properties/userTags"
+        name:
+          $ref: "#/components/schemas/stream/properties/name"
     target-add-payload:
       type: object
       additionalProperties: false

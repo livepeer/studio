@@ -1961,6 +1961,7 @@ app.patch(
       creatorId,
       profiles,
       recordingSpec,
+      name,
     } = payload;
     if (record != undefined && stream.isActive && stream.record != record) {
       res.status(400);
@@ -1977,6 +1978,7 @@ app.patch(
 
     let patch: StreamPatchPayload & Partial<DBStream> = {
       record,
+      name,
       profiles,
       suspended,
       creatorId: mapInputCreatorId(creatorId),
