@@ -1307,6 +1307,7 @@ describe("controllers/stream", () => {
           multistream: { targets: { profile: "a", id: "b" } },
         });
         await testTypeErr({ multistream: { targets: [{ profile: 123 }] } });
+        await testTypeErr({ name: 123 });
       });
 
       it("should validate url format", async () => {
