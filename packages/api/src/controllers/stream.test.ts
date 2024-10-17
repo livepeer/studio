@@ -1240,6 +1240,13 @@ describe("controllers/stream", () => {
         });
       });
 
+      it("should allow patch of name", async () => {
+        const res = await client.patch(patchPath, {
+          name: "new name",
+        });
+        expect(res.status).toBe(204);
+      });
+
       it("should allow patch of playbackPolicy", async () => {
         const res = await client.patch(patchPath, {
           playbackPolicy: {
@@ -1255,15 +1262,6 @@ describe("controllers/stream", () => {
           },
         });
         expect(res.status).toBe(400);
-      });
-
-      it("should disallow additional fields", async () => {
-        const res = await client.patch(patchPath, {
-          name: "the stream name is immutable",
-        });
-        expect(res.status).toBe(422);
-        const json = await res.json();
-        expect(json.errors[0]).toContain("additionalProperties");
       });
 
       it("should disallow adding recordingSpec without record=true", async () => {
