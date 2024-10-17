@@ -1245,6 +1245,8 @@ describe("controllers/stream", () => {
           name: "new name",
         });
         expect(res.status).toBe(204);
+        let s = await db.stream.get(stream.id);
+        expect(s.name).toBe("new name");
       });
 
       it("should allow patch of playbackPolicy", async () => {
