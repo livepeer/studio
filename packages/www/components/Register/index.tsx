@@ -25,6 +25,13 @@ const Register = ({ id, buttonText, onSubmit, loading, errors }) => {
     formId: process.env.NEXT_PUBLIC_HUBSPOT_REGISTER_FORM_ID,
   });
 
+  console.log(
+    ">>>>>>> portalID: " +
+      process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID +
+      " Form ID: " +
+      process.env.NEXT_PUBLIC_HUBSPOT_REGISTER_FORM_ID,
+  );
+
   const { subscribe } = useMailChimp({
     action: `https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=ecd3bf60d5&f_id=00ae69e0f0&tags=3536469`,
   });
