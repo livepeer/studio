@@ -39,6 +39,7 @@ const useHubspotForm = ({ portalId, formId }) => {
       const body = await result.json();
       console.log("body");
       console.log(body);
+      console.log(result);
       setData(body);
       setForm(false);
     } catch (e) {
