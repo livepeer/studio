@@ -15,6 +15,7 @@ const useHubspotForm = ({ portalId, formId }) => {
   console.log("useMemo URL: " + url);
 
   const fetchData = async () => {
+    console.log("fetchData");
     setIsError(false);
     setIsLoading(true);
     try {
@@ -36,9 +37,13 @@ const useHubspotForm = ({ portalId, formId }) => {
         },
       });
       const body = await result.json();
+      console.log("body");
+      console.log(body);
       setData(body);
       setForm(false);
     } catch (e) {
+      console.log("error");
+      console.log(e);
       setIsError(true);
       setForm(false);
     }
