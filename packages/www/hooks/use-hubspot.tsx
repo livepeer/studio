@@ -12,6 +12,8 @@ const useHubspotForm = ({ portalId, formId }) => {
     [portalId, formId],
   );
 
+  console.log("useMemo URL: " + url);
+
   const fetchData = async () => {
     setIsError(false);
     setIsLoading(true);
