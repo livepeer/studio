@@ -121,7 +121,13 @@ app.post(
       5,
     );
 
-    if (processingClips.length >= MAX_PROCESSING_CLIPS && !clippingUser.admin) {
+    // Hack to let StreamETH have a higher clipping limit without having to do the work to put this on the User object
+    let maxProcessingClips = MAX_PROCESSING_CLIPS;
+    if (req.user.id == "05f04681-b600-4a9b-81ea-1f56e7871f04") {
+      maxProcessingClips = 20;
+    }
+
+    if (processingClips.length >= maxProcessingClips && !clippingUser.admin) {
       throw new ForbiddenError("Too many clips are being processed.");
     }
 
