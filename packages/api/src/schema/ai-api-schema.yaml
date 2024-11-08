@@ -285,6 +285,14 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/HTTPError'
                   - $ref: '#/components/schemas/studio-api-error'
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
         '422':
           description: Validation Error
           content:
@@ -452,6 +460,15 @@ components:
           title: Model Id
           description: Hugging Face model ID used for transcription.
           default: openai/whisper-large-v3
+        return_timestamps:
+          type: string
+          title: Return Timestamps
+          description: >-
+            Return timestamps for the transcribed text. Supported values:
+            'sentence', 'word', or a string boolean ('true' or 'false'). Default
+            is 'true' ('sentence'). 'false' means no timestamps. 'word' means
+            word-based timestamps.
+          default: 'true'
       type: object
       required:
         - audio
@@ -735,6 +752,23 @@ components:
         - image
       title: Body_genUpscale
       additionalProperties: false
+    Chunk:
+      properties:
+        timestamp:
+          items: {}
+          type: array
+          title: Timestamp
+          description: The timestamp of the chunk.
+        text:
+          type: string
+          title: Text
+          description: The text of the chunk.
+      type: object
+      required:
+        - timestamp
+        - text
+      title: Chunk
+      description: A chunk of text with a timestamp.
     HTTPError:
       properties:
         detail:
@@ -831,7 +865,7 @@ components:
           description: The generated text.
         chunks:
           items:
-            $ref: '#/components/schemas/chunk'
+            $ref: '#/components/schemas/Chunk'
           type: array
           title: Chunks
           description: The generated text chunks.
@@ -948,23 +982,6 @@ components:
         - images
       title: VideoResponse
       description: Response model for image generation.
-    chunk:
-      properties:
-        timestamp:
-          items: {}
-          type: array
-          title: Timestamp
-          description: The timestamp of the chunk.
-        text:
-          type: string
-          title: Text
-          description: The text of the chunk.
-      type: object
-      required:
-        - timestamp
-        - text
-      title: chunk
-      description: A chunk of text with a timestamp.
     studio-api-error:
       type: object
       properties:
