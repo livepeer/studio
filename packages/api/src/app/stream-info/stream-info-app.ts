@@ -1,19 +1,19 @@
 import express, { Router } from "express";
 import "express-async-errors"; // it monkeypatches, i guess
 import morgan from "morgan";
-import { db } from "../../store";
-import { healthCheck } from "../../middleware";
-import logger from "../../logger";
-import { Stream } from "../../schema/types";
 import fetch from "node-fetch";
 import { hostname } from "os";
+import logger from "../../logger";
+import { healthCheck } from "../../middleware";
+import { Stream } from "../../schema/types";
+import { db } from "../../store";
 
+import { DBStream } from "../../store/stream-table";
 import {
-  StatusResponse,
   MasterPlaylist,
   MasterPlaylistDictionary,
+  StatusResponse,
 } from "./livepeer-types";
-import { DBStream } from "../../store/stream-table";
 import { CliArgs } from "./parse-cli";
 
 const pollInterval = 2 * 1000; // 2s
@@ -377,9 +377,22 @@ class statusPoller {
 }
 
 export default async function makeApp(params: CliArgs) {
-  const { port, postgresUrl, ownRegion, listen = true, broadcaster } = params;
+  const {
+    port,
+    postgresUrl,
+    ownRegion,
+    listen = true,
+    broadcaster,
+    postgresCreateTables,
+    postgresConnPoolSize,
+  } = params;
   // Storage init
-  await db.start({ postgresUrl, appName: "stream-info" });
+  await db.start({
+    postgresUrl,
+    appName: "stream-info",
+    createTablesOnDb: postgresCreateTables,
+    poolMaxSize: postgresConnPoolSize,
+  });
 
   const { router } = await makeRouter(params);
   const app = express();
