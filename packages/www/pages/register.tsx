@@ -122,7 +122,7 @@ const RegisterPage = () => {
               py: "$3",
             }}>
             <Register
-              id="register"
+              id="register-form"
               onSubmit={onSubmit}
               buttonText="Create account"
               loading={loading}
