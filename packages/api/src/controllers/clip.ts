@@ -18,7 +18,7 @@ import { v4 as uuid } from "uuid";
 import { DBSession } from "../store/session-table";
 import { authorizer } from "../middleware";
 import { toExternalAsset } from "./asset";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { buildRecordingUrl, getRunningRecording } from "./session";
@@ -39,10 +39,12 @@ export const LVPR_SDK_EMAILS = ["livepeerjs@livepeer.org"];
 const MAX_PROCESSING_CLIPS = 5;
 
 app.use(
-  mung.jsonAsync(async function cleanWriteOnlyResponses(
+  jsonMiddleware(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req,
+    res,
   ) {
+    if (res.statusCode >= 400) return data;
     const { details } = toStringValues(req.query);
     const toExternalAssetFunc = (a: Asset) =>
       toExternalAsset(a, req.config, !!details, req.user.admin);

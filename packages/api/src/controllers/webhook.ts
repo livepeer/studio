@@ -16,7 +16,7 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
 import webhookLog from "./webhook-log";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 
 function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
   try {
@@ -48,7 +48,7 @@ function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
 
 const app = Router();
 
-app.use(mung.jsonAsync(addDefaultProjectId));
+app.use(jsonMiddleware(addDefaultProjectId));
 
 app.use("/:id/log", webhookLog);
 

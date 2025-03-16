@@ -21,7 +21,7 @@ import {
 } from "../schema/types";
 import { WithID } from "../store/types";
 import { SignOptions, sign } from "jsonwebtoken";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 
 const fieldsMap: FieldsMap = {
   id: `signing_key.ID`,
@@ -58,7 +58,7 @@ async function generateSigningKeys() {
 
 const signingKeyApp = Router();
 
-signingKeyApp.use(mung.jsonAsync(addDefaultProjectId));
+signingKeyApp.use(jsonMiddleware(addDefaultProjectId));
 
 signingKeyApp.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
