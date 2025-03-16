@@ -21,7 +21,20 @@ export const makeColumns = () => [
   {
     Header: "URL",
     accessor: "url",
-    Cell: TextCell,
+    Cell: ({ cell }) => {
+      const url = cell.value.value;
+      const truncatedUrl = url.length > 40 ? url.substring(0, 40) + "..." : url;
+
+      const updatedCell = {
+        ...cell,
+        value: {
+          ...cell.value,
+          children: truncatedUrl,
+        },
+      };
+      // @ts-ignore - it is valid, just not typed - will check back later
+      return <TextCell cell={updatedCell} />;
+    },
     disableSortBy: true,
   },
   {
