@@ -20,8 +20,8 @@ const Assets = () => {
       id="assets"
       breadcrumbs={[{ title: "Assets" }]}
       {...Content.metaData}>
-      <Box css={{ p: "$6" }}>
-        <Box css={{ mb: "$8" }}>
+      <Box className="h-full p-6">
+        <Box className="mb-8 h-full">
           <AssetsTable userId={user.id} tableId="dashboardAssetsTable" />
         </Box>
       </Box>

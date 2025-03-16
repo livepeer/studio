@@ -1,16 +1,8 @@
-import {
-  Flex,
-  Heading,
-  Box,
-  Button,
-  Text,
-  Link as A,
-} from "@livepeer/design-system";
-import {
-  ArrowRightIcon,
-  ArrowTopRightIcon,
-  PlusIcon,
-} from "@radix-ui/react-icons";
+import { Link as A } from "@livepeer/design-system";
+import { ArrowTopRightIcon, PlusIcon } from "@radix-ui/react-icons";
+import { Button } from "components/ui/button";
+import { Flex } from "components/ui/flex";
+import { Text } from "components/ui/text";
 import { ToggleState } from "hooks/use-toggle-state";
 import Link from "next/link";
 
@@ -29,52 +21,31 @@ const TableEmptyState = ({
   primaryActionTitle?: string;
   actionToggleState?: ToggleState;
 }) => (
-  <Flex
-    direction="column"
-    justify="center"
-    css={{
-      margin: "0 auto",
-      height: "calc(100vh - 400px)",
-      maxWidth: 450,
-    }}>
-    <Heading css={{ fontWeight: 500, mb: "$3" }}>{title}</Heading>
+  <Flex className="flex-col justify-center h-full max-w-md mx-auto gap-2 md:min-h-[500px]">
+    <Text size="lg" weight="semibold">
+      {title}
+    </Text>
 
-    <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
+    <Text variant="neutral" size="sm" className="mb-2">
       {description}
     </Text>
 
     {actionToggleState && (
-      <Flex align="center">
-        <Button
-          onClick={actionToggleState.onOn}
-          css={{ alignSelf: "flex-start", mr: "$2" }}
-          size="2"
-          variant="primary">
-          <PlusIcon />{" "}
-          <Box as="span" css={{ ml: "$2" }}>
-            {primaryActionTitle}
-          </Box>
+      <Flex className="sm:items-center gap-4 flex-col sm:flex-row">
+        <Button onClick={actionToggleState.onOn} size="sm" variant="default">
+          <PlusIcon /> <span className="ml-2">{primaryActionTitle}</span>
         </Button>
 
-        <Link href={learnMoreUrl} passHref legacyBehavior>
+        <Link className="w-full" href={learnMoreUrl} passHref legacyBehavior>
           <A
+            className="w-full"
             target="_blank"
             css={{
               textDecoration: "none",
               cursor: "default",
               "&:hover": { textDecoration: "none" },
             }}>
-            <Button
-              ghost
-              size={2}
-              variant="neutral"
-              css={{
-                display: "flex",
-                ai: "center",
-                mb: "$5",
-                gap: "$2",
-                fontWeight: 500,
-              }}>
+            <Button className="w-full sm:w-auto" variant="ghost">
               {secondaryActionTitle}
               <ArrowTopRightIcon />
             </Button>
