@@ -1,5 +1,5 @@
 import { Router } from "express";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 import _ from "lodash";
 import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
@@ -145,7 +145,8 @@ export function toExternalTask(
 }
 
 export const cleanTaskResponses = () =>
-  mung.jsonAsync(async function cleanWriteOnlyResponses(data, req) {
+  jsonMiddleware(async function cleanWriteOnlyResponses(data, req, res) {
+    if (res.statusCode >= 400) return data;
     const toExternalTaskFunc = (t: WithID<Task>) =>
       toExternalTask(t, req.config, req.user.admin);
 

@@ -11,13 +11,13 @@ import {
 import { authorizer, validatePost } from "../middleware";
 import { AuthPolicy } from "../middleware/authPolicy";
 import { db } from "../store";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 
 const app = Router();
 
 app.use(authorizer({ noApiToken: true }));
 
-app.use(mung.jsonAsync(addDefaultProjectId));
+app.use(jsonMiddleware(addDefaultProjectId));
 
 app.get("/:id", async (req, res) => {
   const { id } = req.params;

@@ -7636,14 +7636,6 @@
   resolved "https://registry.npmjs.org/@types/eventsource/-/eventsource-1.1.10.tgz"
   integrity sha512-rYzRmJSnm44Xb7FICRXEjwe/26ZiiS+VMGmuD17PevMP56cGgLEsaM955sYQW0S+K7h+mPOL70vGf1hi4WDjVA==
 
-"@types/express-mung@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.npmjs.org/@types/express-mung/-/express-mung-0.5.2.tgz"
-  integrity sha512-QOPFfb4CAw1ZAhA2z7jAXSn+TduuqaoLw3baFiaU+S+9unIt3zz2vq8MM820nCs/pRX81K73YOvz6pHTjjmSrg==
-  dependencies:
-    "@types/express" "*"
-    "@types/node" "*"
-
 "@types/express-serve-static-core@^4.17.31":
   version "4.17.32"
   resolved "https://registry.npmjs.org/@types/express-serve-static-core/-/express-serve-static-core-4.17.32.tgz"
@@ -12767,11 +12759,6 @@ express-async-errors@^3.1.1:
   resolved "https://registry.npmjs.org/express-async-errors/-/express-async-errors-3.1.1.tgz"
   integrity sha512-h6aK1da4tpqWSbyCa3FxB/V6Ehd4EEB15zyQq9qe75OZBp0krinNKuH4rAY+S/U/2I36vdLAUFSjQJ+TFmODng==
 
-express-mung@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.npmjs.org/express-mung/-/express-mung-0.5.1.tgz"
-  integrity sha512-5M8Oi2s9ePuP86YMyLT+hefWPPGxuxW3Vnuni/Hq3r2nGE0L4qulG0HkWuc4PIOpzZuZTwONwyfBFtR2xlnfgg==
-
 express-prom-bundle@^6.4.1:
   version "6.6.0"
   resolved "https://registry.npmjs.org/express-prom-bundle/-/express-prom-bundle-6.6.0.tgz"
@@ -12779,6 +12766,11 @@ express-prom-bundle@^6.4.1:
   dependencies:
     on-finished "^2.3.0"
     url-value-parser "^2.0.0"
+
+express-response-middleware@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/express-response-middleware/-/express-response-middleware-2.1.0.tgz#7f059d16156af4e13f82d8e77e800461122ccaec"
+  integrity sha512-tiuRo94vrMlyKI81GkJhFgwCHMKz5lnhq5BZIxvA46mssWvxVz5mf55m08psA+EJbDKYcUSZlw/00UiJ6pAl1A==
 
 express@^4.16.4:
   version "4.18.2"

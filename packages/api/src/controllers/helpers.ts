@@ -787,6 +787,7 @@ export async function addDefaultProjectId(
   req: Request,
   res: Response,
 ) {
+  if (res.statusCode >= 400) return body;
   const deepClone = (obj) => {
     return JSON.parse(JSON.stringify(obj));
   };

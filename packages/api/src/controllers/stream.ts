@@ -5,7 +5,7 @@ import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 import logger from "../logger";
 import {
   authorizer,
@@ -125,7 +125,7 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
   });
 };
 
-app.use(mung.jsonAsync(addDefaultProjectId));
+app.use(jsonMiddleware(addDefaultProjectId));
 
 async function validateMultistreamTarget(
   userId: string,

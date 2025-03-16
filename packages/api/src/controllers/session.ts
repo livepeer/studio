@@ -25,7 +25,7 @@ import {
 import { LVPR_SDK_EMAILS, getClips } from "./clip";
 import { NotFoundError } from "../store/errors";
 import { cache } from "../store/cache";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 
 const app = Router();
 
@@ -59,7 +59,7 @@ const fieldsMap: FieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
-app.use(mung.jsonAsync(addDefaultProjectId));
+app.use(jsonMiddleware(addDefaultProjectId));
 
 app.get("/", authorizer({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId, count } =

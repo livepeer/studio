@@ -1,5 +1,5 @@
 import { SQLStatement } from "sql-template-strings";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
@@ -74,7 +74,9 @@ const badRequest = (res: Response, error: string) =>
 const target = Router();
 
 target.use(
-  mung.json(function cleanWriteOnlyResponses(data, req) {
+  jsonMiddleware(function cleanWriteOnlyResponses(data, req, res) {
+    if (res.statusCode >= 400) return data;
+
     if (req.user.admin) {
       return data;
     }

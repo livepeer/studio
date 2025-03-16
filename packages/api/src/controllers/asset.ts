@@ -6,7 +6,7 @@ import {
   Upload as TusUpload,
 } from "@tus/server";
 import { Request, Response, Router } from "express";
-import mung from "express-mung";
+import { jsonMiddleware } from "express-response-middleware";
 import httpProxy from "http-proxy";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import _ from "lodash";
@@ -643,13 +643,15 @@ export async function toExternalAsset(
   return a;
 }
 
-app.use(mung.jsonAsync(addDefaultProjectId));
+app.use(jsonMiddleware(addDefaultProjectId));
 
 app.use(
-  mung.jsonAsync(async function cleanWriteOnlyResponses(
+  jsonMiddleware(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req,
+    res,
   ) {
+    if (res.statusCode >= 400) return data;
     const { details } = toStringValues(req.query);
     const toExternalAssetFunc = async (a: Asset) => {
       const modifiedAsset = await toExternalAsset(
