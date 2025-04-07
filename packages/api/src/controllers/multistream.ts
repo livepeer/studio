@@ -14,6 +14,7 @@ import {
 } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery, WithID } from "../store/types";
+import logger from "../logger";
 import {
   MultistreamTarget,
   MultistreamTargetPatchPayload,
@@ -195,15 +196,18 @@ target.patch(
 );
 
 async function triggerCatalystMultistreamUpdated(req: Request, id: string) {
-  const query = [];
-  query.push(
-    `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`,
-  );
-  const [streams] = await db.stream.find(query, {});
-
-  await Promise.all(
-    streams.map((s) => triggerCatalystStreamUpdated(req, s.playbackId)),
-  );
+  const streamId = req.query.streamId?.toString();
+  const playbackId = req.query.playbackId?.toString();
+  if (playbackId) {
+    await triggerCatalystStreamUpdated(req, playbackId);
+  } else if (streamId) {
+    const stream = await db.stream.get(streamId);
+    await triggerCatalystStreamUpdated(req, stream.playbackId);
+  } else {
+    logger.info(
+      `Skip triggering Catalyst for multistream update with ID ${id}`,
+    );
+  }
 }
 
 const app = Router();
