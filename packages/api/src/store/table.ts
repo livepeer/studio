@@ -24,6 +24,9 @@ export interface TableOptions {
 }
 
 function parseLimit({ limit }: FindOptions<any>) {
+  if (limit === null) {
+    return null;
+  }
   if (typeof limit === "string") {
     limit = parseInt(limit);
   }
