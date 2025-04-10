@@ -199,7 +199,7 @@ async function triggerCatalystMultistreamUpdated(req: Request, id: string) {
   query.push(
     `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`,
   );
-  const [streams] = await db.stream.find(query, {});
+  const [streams] = await db.stream.find(query, { limit: null });
 
   await Promise.all(
     streams.map((s) => triggerCatalystStreamUpdated(req, s.playbackId)),

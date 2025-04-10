@@ -24,7 +24,7 @@ export default class WebhookTable extends Table<DBWebhook> {
     projectId: string,
     defaultProjectId: string,
     streamId?: string,
-    limit = 100,
+    limit = null,
     cursor?: string,
     includeDeleted = false,
   ) {
