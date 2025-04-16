@@ -32,7 +32,10 @@
     "@radix-ui/react-accordion": "^0.1.7-rc.7",
     "@radix-ui/react-collapsible": "^0.1.6",
     "@radix-ui/react-icons": "^1.1.1",
+    "@radix-ui/react-menubar": "^1.1.1",
+    "@radix-ui/react-navigation-menu": "^1.2.0",
     "@radix-ui/react-switch": "^0.0.13",
+    "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/themes": "^1.1.2",
     "@segment/snippet": "^4.9.0",
     "@sentry/nextjs": "^7.26.0",
@@ -43,6 +46,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^2.16.1",
+    "embla-carousel-react": "^8.2.0",
     "eslint-config-next": "^13.0.2",
     "eventsource": "^1.1.0",
     "filenamify": "^4.3.0",
@@ -63,6 +67,7 @@
     "react-collapsible": "^2.8.3",
     "react-copy-to-clipboard": "^5.0.2",
     "react-credit-cards": "^0.8.3",
+    "react-day-picker": "^9.0.8",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-google-recaptcha-v3": "^1.9.7",
@@ -80,6 +85,7 @@
     "rehype-parse": "^7.0.1",
     "remark-emoji": "^2.1.0",
     "sass": "^1.77.6",
+    "sonner": "^1.5.0",
     "styled-components": "^6.1.11",
     "tailwind-merge": "^2.3.0",
     "theme-ui": "0.3.1",
@@ -104,7 +110,7 @@
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.12.0",
     "tailwindcss": "^3.4.4",
-    "typescript": "4.5.5"
+    "typescript": "5.5.4"
   },
   "bin": "server.js"
 }

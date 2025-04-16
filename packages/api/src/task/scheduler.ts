@@ -102,7 +102,9 @@ export class TaskScheduler {
     const task = await db.task.get(event.task.id, { useReplica: false });
     if (!task || task?.deleted) {
       console.log(
-        `task event process error: task ${event.task.id} ${task ? "is deleted" : "not found"} in process task event`,
+        `task event process error: task ${event.task.id} ${
+          task ? "is deleted" : "not found"
+        } in process task event`,
       );
       return true;
     }
@@ -220,7 +222,9 @@ export class TaskScheduler {
     const task = await db.task.get(event.task.id, { useReplica: false });
     if (!task || task?.deleted) {
       console.log(
-        `task event process error: task ${event.task.id} ${task ? "is deleted" : "not found"} in process task result partial`,
+        `task event process error: task ${event.task.id} ${
+          task ? "is deleted" : "not found"
+        } in process task result partial`,
       );
       return true;
     }
