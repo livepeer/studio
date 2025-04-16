@@ -1,11 +1,6 @@
 import {
   Box,
-  Button,
   Flex,
-  AlertDialog,
-  AlertDialogTitle,
-  AlertDialogContent,
-  AlertDialogCancel,
   TextField,
   Label,
   Text,
@@ -22,8 +17,16 @@ import {
 import { useState, useEffect } from "react";
 import Spinner from "components/Spinner";
 import { Webhook } from "@livepeer.studio/api";
+import {
+  Dialog,
+  DialogTitle,
+  DialogDescription,
+  DialogContent,
+  DialogClose,
+} from "components/ui/dialog";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { v4 as uuid } from "uuid";
+import { Button } from "components/ui/button";
 
 const StyledCrossIcon = styled(Cross1Icon, {});
 
@@ -92,17 +95,17 @@ const CreateEditDialog = ({
   }, [webhook]);
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
-      <AlertDialogContent
+      <DialogContent
         css={{ width: 450, maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle asChild>
+        <DialogTitle>
           <Heading size="1">
             {action === Action.Create
               ? "Add a webhook endpoint"
               : "Update webhook endpoint"}
           </Heading>
-        </AlertDialogTitle>
+        </DialogTitle>
         <Box
           as="form"
           css={{
@@ -179,6 +182,7 @@ const CreateEditDialog = ({
                 </Box>
               </DropdownMenuTrigger>
               <DropdownMenuContent
+                className="z-50"
                 placeholder="dropdown-menu-content"
                 css={{ mt: "$1" }}>
                 <Box
@@ -270,18 +274,13 @@ const CreateEditDialog = ({
             </Flex>
           </Flex>
           <Box>
-            <Flex css={{ ai: "center", jc: "flex-end" }}>
-              <AlertDialogCancel asChild>
-                <Button disabled={saving} size="2" css={{ mr: "$2" }}>
+            <Flex className="gap-2 items-center justify-end">
+              <DialogClose asChild>
+                <Button disabled={saving} variant="outline">
                   Cancel
                 </Button>
-              </AlertDialogCancel>
-              <Button
-                css={{ display: "flex", ai: "center" }}
-                type="submit"
-                size="2"
-                disabled={saving}
-                variant="primary">
+              </DialogClose>
+              <Button type="submit" disabled={saving}>
                 {saving && (
                   <Spinner
                     css={{
@@ -297,8 +296,8 @@ const CreateEditDialog = ({
             </Flex>
           </Box>
         </Box>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

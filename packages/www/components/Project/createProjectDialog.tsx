@@ -1,18 +1,14 @@
-import {
-  Box,
-  Button,
-  Flex,
-  AlertDialog,
-  AlertDialogTitle,
-  AlertDialogContent,
-  AlertDialogCancel,
-  TextField,
-  Heading,
-  Label,
-} from "@livepeer/design-system";
-import { useCallback, useState } from "react";
+import { Box, Flex, Heading, Label } from "@livepeer/design-system";
 import Spinner from "components/Spinner";
-import { createProject } from "hooks/use-api/endpoints/project";
+import { Button } from "components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "components/ui/dialog";
+import { Input } from "components/ui/input";
+import { useState } from "react";
 
 const CreateProjectDialog = ({
   isOpen,
@@ -27,11 +23,11 @@ const CreateProjectDialog = ({
   const [projectName, setProjectName] = useState("");
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle asChild>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <DialogTitle asChild>
           <Heading size="1">Create Project</Heading>
-        </AlertDialogTitle>
+        </DialogTitle>
         <Label css={{ mt: "$1", color: "$neutral10" }}>
           Working with different projects helps create a clear separation
           between different customers or environments.
@@ -56,13 +52,9 @@ const CreateProjectDialog = ({
           }}>
           <Flex direction="column" gap="2">
             <Label htmlFor="projectName">Project name</Label>
-            <TextField
+            <Input
               required
-              size="2"
               type="text"
-              css={{
-                mt: "-$1",
-              }}
               id="projectName"
               autoFocus={true}
               value={projectName}
@@ -72,17 +64,15 @@ const CreateProjectDialog = ({
           </Flex>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-            <AlertDialogCancel asChild>
-              <Button disabled={creating} size="2" ghost>
+            <DialogClose asChild>
+              <Button disabled={creating} variant="outline">
                 Cancel
               </Button>
-            </AlertDialogCancel>
+            </DialogClose>
             <Button
               css={{ display: "flex", ai: "center" }}
               type="submit"
-              size="2"
-              disabled={creating}
-              variant="primary">
+              disabled={creating}>
               {creating && (
                 <Spinner
                   css={{
@@ -97,8 +87,8 @@ const CreateProjectDialog = ({
             </Button>
           </Flex>
         </Box>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

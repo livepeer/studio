@@ -1,21 +1,18 @@
-import {
-  Box,
-  Button,
-  Flex,
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  TextField,
-  Text,
-  Heading,
-} from "@livepeer/design-system";
+import { Box, Flex, TextField, Text, Heading } from "@livepeer/design-system";
+import { Button } from "components/ui/button";
+import { Input } from "components/ui/input";
 import { useState, useEffect } from "react";
 import { useApi } from "../../hooks";
 import Spinner from "components/Spinner";
 import { SigningKeyResponsePayload } from "@livepeer.studio/api";
 import ClipTextArea from "../Clipping/ClipTextArea";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "components/ui/dialog";
 
 const CreateDialog = ({
   isOpen,
@@ -59,15 +56,15 @@ const CreateDialog = ({
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         {!newKey && (
           <>
-            <AlertDialogTitle asChild>
+            <DialogTitle>
               <Heading size="1">New Signing Key</Heading>
-            </AlertDialogTitle>
+            </DialogTitle>
             <Box as="form" onSubmit={createNewKey}>
-              <AlertDialogDescription asChild>
+              <DialogDescription asChild>
                 <Text
                   size="3"
                   variant="neutral"
@@ -75,10 +72,9 @@ const CreateDialog = ({
                   Enter a name for your signing key to differentiate it from
                   other keys.
                 </Text>
-              </AlertDialogDescription>
+              </DialogDescription>
 
-              <TextField
-                size="2"
+              <Input
                 type="text"
                 required
                 id="keyName"
@@ -89,16 +85,10 @@ const CreateDialog = ({
               />
 
               <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-                <AlertDialogCancel asChild>
-                  <Button size="2" ghost>
-                    Cancel
-                  </Button>
-                </AlertDialogCancel>
-                <Button
-                  size="2"
-                  disabled={isLoading}
-                  type="submit"
-                  variant="primary">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button disabled={isLoading} type="submit">
                   {isLoading && (
                     <Spinner
                       css={{
@@ -118,13 +108,13 @@ const CreateDialog = ({
 
         {newKey && (
           <Box>
-            <AlertDialogTitle asChild>
+            <DialogTitle>
               <Heading size="2" css={{ mb: "$4" }}>
                 Here's your new signing key pair
               </Heading>
-            </AlertDialogTitle>
+            </DialogTitle>
 
-            <AlertDialogDescription asChild>
+            <DialogDescription asChild>
               <Flex
                 direction="column"
                 css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
@@ -147,17 +137,17 @@ const CreateDialog = ({
                   text={newKey.privateKey}
                 />
               </Flex>
-            </AlertDialogDescription>
+            </DialogDescription>
 
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button variant="green" onClick={() => onClose()} size="2">
-                Continue
+              <Button variant="outline" onClick={() => onClose()}>
+                Close
               </Button>
             </Flex>
           </Box>
         )}
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 
