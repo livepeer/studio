@@ -78,7 +78,7 @@
     "reactour": "^1.18.0",
     "recharts": "^2.0.7",
     "rehype-parse": "^7.0.1",
-    "remark-emoji": "^2.1.0",
+    "remark-emoji": "^5.0.1",
     "sass": "^1.77.6",
     "styled-components": "^6.1.11",
     "tailwind-merge": "^2.3.0",
