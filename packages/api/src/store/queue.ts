@@ -3,6 +3,7 @@ import { AmqpConnectionManager, ChannelWrapper } from "amqp-connection-manager";
 import { Channel, ConsumeMessage } from "amqplib";
 import messages from "./messages";
 import { EventKey } from "./webhook-table";
+import { sleep } from "../util";
 
 export const defaultTaskExchange = "lp_tasks";
 
@@ -306,27 +307,39 @@ export class RabbitQueue implements Queue {
     msg: any,
     opts: amqp.Options.Publish,
   ) {
-    try {
-      const success = await this.channel.publish(
-        exchange,
-        routingKey,
-        msg,
-        opts,
-      );
-      if (!success) {
-        throw new Error(
-          `Failed to publish message ${routingKey}: publish buffer full`,
+    const maxRetries = 3;
+    const delayMs = 1000;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const success = await this.channel.publish(
+          exchange,
+          routingKey,
+          msg,
+          opts,
         );
+        if (!success) {
+          throw new Error(
+            `Failed to publish message ${routingKey}: publish buffer full`,
+          );
+        }
+        return;
+      } catch (err) {
+        console.error(
+          `Error publishing message: exchange="${exchange}" routingKey="${routingKey}" attempt="${attempt}" err=`,
+          err,
+        );
+        if (attempt < maxRetries) {
+          await sleep(delayMs);
+        } else {
+          if (err?.message?.includes("timeout")) {
+            throw new Error(
+              `Timeout publishing message ${routingKey} to queue`,
+            );
+          }
+          throw err;
+        }
       }
-    } catch (err) {
-      console.error(
-        `Error publishing message: exchange="${exchange}" routingKey="${routingKey}" err=`,
-        err,
-      );
-      if (err?.message?.includes("timeout")) {
-        throw new Error(`Timeout publishing message ${routingKey} to queue`);
-      }
-      throw err;
     }
   }
 }
