@@ -8,10 +8,16 @@ export default function errorHandler(): ErrorRequestHandler {
   return (err, _req, res, _next) => {
     // If we throw any errors with numerical statuses, use them.
     if (isAPIError(err)) {
+      logger.error(
+        `API Error path=${_req.path} errType=${err.name} err="${err.message}"`,
+      );
       return res.status(err.status).json({ errors: [err.message] });
     }
     // multipart form errors are always bad input-related
     if (err instanceof multer.MulterError) {
+      logger.error(
+        `Multipart form error path=${_req.path} errType=${err.name} err="${err.message}"`,
+      );
       return res.status(422).json({ errors: [err.message] });
     }
 
