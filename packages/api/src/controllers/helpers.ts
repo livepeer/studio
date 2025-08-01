@@ -782,6 +782,43 @@ export function getProjectId(req: Request): string {
   return projectId;
 }
 
+export async function deleteAllOwnedObjects(
+  req: Request,
+  params: {
+    projectId?: string;
+    userId?: string;
+    deleted?: boolean;
+  },
+) {
+  const filters: any = {};
+  if (params.projectId) {
+    filters.projectId = params.projectId;
+  }
+  if (params.userId) {
+    filters.userId = params.userId;
+  }
+  if (params.deleted !== undefined) {
+    filters.deleted = params.deleted;
+  } else {
+    filters.deleted = false;
+  }
+
+  let [assets] = await db.asset.find({ filters });
+  let [streams] = await db.stream.find({ filters });
+  let [signingKeys] = await db.signingKey.find({ filters });
+  let [webhooks] = await db.webhook.find({ filters });
+  let [sessions] = await db.session.find({ filters });
+
+  for (const asset of assets) {
+    await req.taskScheduler.deleteAsset(asset.id);
+  }
+
+  await db.stream.markDeletedMany(streams.map((s) => s.id));
+  await db.signingKey.markDeletedMany(signingKeys.map((sk) => sk.id));
+  await db.webhook.markDeletedMany(webhooks.map((w) => w.id));
+  await db.session.markDeletedMany(sessions.map((s) => s.id));
+}
+
 export async function addDefaultProjectId(
   body: any,
   req: Request,

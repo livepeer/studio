@@ -551,6 +551,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "number",
         default: 1000,
       },
+      "projects-cleanup-limit": {
+        describe: "job/projects-cleanup: max number of projects to clean up",
+        type: "number",
+        default: 100,
+      },
       "update-usage-from": {
         describe:
           "job/update-usage: unix millis timestamp for start time of update usage job",
