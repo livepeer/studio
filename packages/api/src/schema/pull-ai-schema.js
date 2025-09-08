@@ -1,11 +1,11 @@
-import fs from "fs-extra";
-import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
-import path from "path";
+const fs = require("fs-extra");
+const { safeLoad: parseYaml, safeDump: serializeYaml } = require("js-yaml");
+const path = require("path");
 
 // This downloads the AI schema from the AI worker repo and saves in the local
 // ai-api-schema.yaml file, referenced by our main api-schema.yaml file.
 
-export const defaultModels = {
+const defaultModels = {
   "text-to-image": "SG161222/RealVisXL_V4.0_Lightning",
   "image-to-image": "timbrooks/instruct-pix2pix",
   "image-to-video": "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
@@ -14,6 +14,8 @@ export const defaultModels = {
   "segment-anything-2": "facebook/sam2-hiera-large",
   llm: "meta-llama/Meta-Llama-3.1-8B-Instruct",
 };
+
+module.exports.defaultModels = defaultModels;
 const schemaDir = path.resolve(__dirname, ".");
 const aiSchemaUrl =
   "https://raw.githubusercontent.com/livepeer/ai-worker/refs/heads/main/runner/gateway.openapi.yaml";

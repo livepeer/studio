@@ -1,12 +1,21 @@
-import Ajv from "ajv";
-import ajvFormats from "ajv-formats";
-import standaloneCode from "ajv/dist/standalone";
-import fs from "fs-extra";
-import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
-import $RefParser from "json-schema-ref-parser";
-import { compile as generateTypes } from "json-schema-to-typescript";
-import _ from "lodash";
-import path from "path";
+const Ajv = require("ajv");
+let ajvFormats = require("ajv-formats");
+ajvFormats = ajvFormats && ajvFormats.default ? ajvFormats.default : ajvFormats;
+let standaloneCode = require("ajv/dist/standalone");
+standaloneCode =
+  standaloneCode && standaloneCode.default
+    ? standaloneCode.default
+    : standaloneCode;
+const fs = require("fs-extra");
+const { safeLoad: parseYaml, safeDump: serializeYaml } = require("js-yaml");
+const $RefParser = require("json-schema-ref-parser");
+let generateTypes = require("json-schema-to-typescript");
+generateTypes =
+  generateTypes && generateTypes.compile
+    ? generateTypes.compile
+    : generateTypes;
+const _ = require("lodash");
+const path = require("path");
 
 // This takes schema.yaml as its input and produces a few outputs.
 // 1. types.d.ts, TypeScript definitions of the JSON-schema objects
