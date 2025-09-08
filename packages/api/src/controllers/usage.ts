@@ -1,5 +1,5 @@
 import { Request } from "express";
-import Router from "express/lib/router";
+import { Router } from "express";
 import fetch from "node-fetch";
 import qs from "qs";
 import { products } from "../config";

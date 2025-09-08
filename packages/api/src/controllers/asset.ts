@@ -1125,7 +1125,7 @@ const getPendingAssetAndTask = async (playbackId: string) => {
   return { asset, task };
 };
 
-app.use("/upload/tus/*", async (req, res, next) => {
+app.use("/upload/tus/*path", async (req, res, next) => {
   if (!tusServer) {
     throw new NotImplementedError("Tus server not configured");
   }
@@ -1148,7 +1148,7 @@ app.post("/upload/tus", async (req, res) => {
   return tusServer.handle(req, res);
 });
 
-app.all("/upload/tus/*", (req, res) => {
+app.all("/upload/tus/*path", (req, res) => {
   return tusServer.handle(req, res);
 });
 

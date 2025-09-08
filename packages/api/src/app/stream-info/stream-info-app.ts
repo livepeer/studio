@@ -1,5 +1,4 @@
 import express, { Router } from "express";
-import "express-async-errors"; // it monkeypatches, i guess
 import morgan from "morgan";
 import fetch from "node-fetch";
 import { hostname } from "os";

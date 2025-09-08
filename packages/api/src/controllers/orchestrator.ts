@@ -1,5 +1,4 @@
-import { Request } from "express";
-import Router from "express/lib/router";
+import { Request, Router } from "express";
 
 const app = Router();
 

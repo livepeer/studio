@@ -1,4 +1,4 @@
-import Router from "express/lib/router";
+import { Router } from "express";
 import { geolocateMiddleware } from "../middleware";
 import { amalgamate } from "./broadcaster";
 import { shuffle } from "../util";

@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { authorizer, hasAccessToResource } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
+import { Router } from "express";
 import logger from "../logger";
 import { v4 as uuid } from "uuid";
 import {

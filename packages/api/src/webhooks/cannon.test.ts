@@ -642,7 +642,7 @@ describe("webhook cannon", () => {
           sourceSegments: 1,
         });
 
-        webhookServer.app.all("/bucket-name/*", (req, res) => {
+        webhookServer.app.all("/bucket-name/*path", (req, res) => {
           console.log("req.url", req.url);
           res.end("a good file");
         });
