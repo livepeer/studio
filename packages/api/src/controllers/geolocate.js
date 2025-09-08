@@ -1,5 +1,5 @@
 import { geolocateMiddleware } from "../middleware";
-import Router from "express/lib/router";
+import { Router } from "express";
 
 const app = Router();
 

@@ -12,7 +12,7 @@ const AssetFailedStatusItem = ({ asset }: { asset: Asset }) => {
     <Text variant="red">
       {name?.length > MAX_FILENAME_LENGTH
         ? `${name.slice(0, MAX_FILENAME_LENGTH)}...`
-        : name ?? ""}
+        : (name ?? "")}
     </Text>
   );
 

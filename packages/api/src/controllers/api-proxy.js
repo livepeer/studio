@@ -2,7 +2,7 @@
  * Special controller for forwarding all incoming requests to a geolocated API region
  */
 
-import Router from "express/lib/router";
+import { Router } from "express";
 import geolocateMiddleware from "../middleware/geolocate";
 import fetch from "node-fetch";
 import qs from "qs";

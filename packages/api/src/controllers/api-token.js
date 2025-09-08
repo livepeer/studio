@@ -1,4 +1,4 @@
-import Router from "express/lib/router";
+import { Router } from "express";
 import { v4 as uuid } from "uuid";
 import sql from "sql-template-strings";
 

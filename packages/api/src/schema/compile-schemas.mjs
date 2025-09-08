@@ -1,12 +1,17 @@
 import Ajv from "ajv";
 import ajvFormats from "ajv-formats";
-import standaloneCode from "ajv/dist/standalone";
+import standaloneCode from "ajv/dist/standalone/index.js";
 import fs from "fs-extra";
-import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
+import pkg from 'js-yaml';
+const { safeLoad: parseYaml, safeDump: serializeYaml } = pkg;
 import $RefParser from "json-schema-ref-parser";
 import { compile as generateTypes } from "json-schema-to-typescript";
 import _ from "lodash";
 import path from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // This takes schema.yaml as its input and produces a few outputs.
 // 1. types.d.ts, TypeScript definitions of the JSON-schema objects
@@ -57,7 +62,7 @@ const schemaDir = path.resolve(__dirname, ".");
 process.chdir(schemaDir);
 
 const validatorDir = path.resolve(schemaDir, "validators");
-const schemaDistDir = path.resolve(__dirname, "..", "dist", "schema");
+const schemaDistDir = path.resolve(__dirname, "..", "..", "dist", "schema");
 fs.ensureDirSync(validatorDir);
 fs.ensureDirSync(schemaDistDir);
 

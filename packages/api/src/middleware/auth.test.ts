@@ -47,19 +47,21 @@ beforeAll(async () => {
   });
   app.use(authenticator());
 
-  app.all("/admin/*", authorizer({ anyAdmin: true }), (_req, res) =>
+  app.all("/admin/*path", authorizer({ anyAdmin: true }), (_req, res) =>
     res.status(202).end(),
   );
 
   const router = Router();
   router.use(
     "/nested",
-    Router().all("/*", authorizer({}), (_req, res) => res.status(203).end()),
+    Router().all("/*path", authorizer({}), (_req, res) =>
+      res.status(203).end(),
+    ),
   );
-  router.all("/*", authorizer({}), (_req, res) => res.status(203).end());
+  router.all("/*path", authorizer({}), (_req, res) => res.status(203).end());
   app.use("/router", router);
 
-  app.all("/*", authorizer({}), (_req, res) => res.status(204).end());
+  app.all("/*path", authorizer({}), (_req, res) => res.status(204).end());
   app.use(errorHandler());
 });
 

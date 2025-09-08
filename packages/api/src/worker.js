@@ -8,7 +8,6 @@ self.setImmediate = (fn, ...args) => setTimeout(() => fn(...args), 0);
 self.navigator = { userAgent: "" };
 self.window = self;
 
-import "express-async-errors"; // it monkeypatches, i guess
 import parseCli from "./parse-cli.js";
 import { getAssetFromKV } from "@cloudflare/kv-asset-handler";
 import fetch from "node-fetch";

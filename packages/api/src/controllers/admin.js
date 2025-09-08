@@ -1,5 +1,5 @@
 import { authorizer } from "../middleware";
-import Router from "express/lib/router";
+import { Router } from "express";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import consul from "consul";

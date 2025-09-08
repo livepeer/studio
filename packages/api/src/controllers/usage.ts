@@ -1,5 +1,5 @@
 import { Request } from "express";
-import Router from "express/lib/router";
+import { Router } from "express";
 import fetch from "node-fetch";
 import qs from "qs";
 import { products } from "../config";
@@ -227,13 +227,11 @@ export async function getUsageData(
 }
 
 app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
-  let { fromTime, toTime } = req.query;
-
-  // if time range isn't specified return all usage
-  if (!fromTime && !toTime) {
-    fromTime = +new Date(2020, 0); // start at beginning
-    toTime = +new Date();
-  }
+  // Parse query parameters properly
+  let fromTime = req.query.fromTime
+    ? Number(req.query.fromTime)
+    : +new Date(2020, 0);
+  let toTime = req.query.toTime ? Number(req.query.toTime) : +new Date();
 
   const cachedUsageHistory = await db.stream.cachedUsageHistory(
     fromTime,
@@ -263,13 +261,11 @@ app.get(
 );
 
 app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
-  let { fromTime, toTime } = req.query;
-
-  // if time range isn't specified return all usage
-  if (!fromTime && !toTime) {
-    fromTime = +new Date(2020, 0); // start at beginning
-    toTime = +new Date();
-  }
+  // Parse query parameters properly
+  let fromTime = req.query.fromTime
+    ? Number(req.query.fromTime)
+    : +new Date(2020, 0);
+  let toTime = req.query.toTime ? Number(req.query.toTime) : +new Date();
 
   if (!req.query.userId) {
     res.status(400);
@@ -278,9 +274,10 @@ app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
   }
 
   const ingests = await req.getIngest();
+  const userId = req.query.userId as string;
 
   const usage = await getBillingUsage(
-    req.query.userId,
+    userId,
     fromTime,
     toTime,
     ingests[0].origin,
@@ -292,13 +289,11 @@ app.get("/user", authorizer({ anyAdmin: true }), async (req, res) => {
 });
 
 app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
-  let { fromTime, toTime } = req.query;
-
-  // if time range isn't specified return all usage
-  if (!fromTime && !toTime) {
-    fromTime = +new Date(2020, 0); // start at beginning
-    toTime = +new Date();
-  }
+  // Parse query parameters properly
+  let fromTime = req.query.fromTime
+    ? Number(req.query.fromTime)
+    : +new Date(2020, 0);
+  let toTime = req.query.toTime ? Number(req.query.toTime) : +new Date();
 
   if (!req.query.userId) {
     res.status(400);
@@ -306,7 +301,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
     return;
   }
 
-  const user = await db.user.get(req.query.userId);
+  const user = await db.user.get(req.query.userId as string);
 
   if (!user) {
     throw new NotFoundError(`Account not found: ${req.query.userId}`);
@@ -315,7 +310,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
   const ingests = await req.getIngest();
 
   const usage = await getBillingUsage(
-    req.query.userId,
+    req.query.userId as string,
     fromTime,
     toTime,
     ingests[0].origin,
@@ -333,7 +328,7 @@ app.get("/user/overage", authorizer({ anyAdmin: true }), async (req, res) => {
   );
 
   res.status(200);
-  res.json(overage, usagePercentages);
+  res.json({ overage, usagePercentages });
 });
 
 // Runs the update-usage job on demand if necessary
@@ -341,7 +336,9 @@ app.post("/update", authorizer({ anyAdmin: true }), async (req, res) => {
   // import the job dynamically to avoid circular dependencies
   const { default: updateUsage } = await import("../jobs/update-usage");
 
-  let { fromTime, toTime } = req.query;
+  // Parse query parameters properly
+  const fromTime = req.query.fromTime ? Number(req.query.fromTime) : undefined;
+  const toTime = req.query.toTime ? Number(req.query.toTime) : undefined;
 
   const { usageHistory } = await updateUsage(
     {

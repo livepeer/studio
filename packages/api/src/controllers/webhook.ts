@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { authorizer, hasAccessToResource } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
+import { Router } from "express";
 import logger from "../logger";
 import { v4 as uuid } from "uuid";
 import {
@@ -17,6 +17,7 @@ import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
 import webhookLog from "./webhook-log";
 import mung from "express-mung";
+import WebhookTable, { EventKey } from "../store/webhook-table";
 
 function validateWebhookPayload(id, userId, projectId, createdAt, payload) {
   try {
@@ -68,12 +69,12 @@ const fieldsMap: FieldsMap = {
 app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     req.query;
-  if (isNaN(parseInt(limit))) {
+  if (isNaN(parseInt(limit as string))) {
     limit = undefined;
   }
 
   if (req.user.admin && allUsers && allUsers !== "false") {
-    const query = parseFilters(fieldsMap, filters);
+    const query = parseFilters(fieldsMap, filters as string);
     if (!all || all === "false") {
       query.push(sql`webhook.data->>'deleted' IS NULL`);
     }
@@ -85,11 +86,11 @@ app.get("/", authorizer({}), async (req, res) => {
     }
     const from = `webhook left join users on webhook.data->>'userId' = users.id`;
     const [output, newCursor] = await db.webhook.find(query, {
-      limit,
-      cursor,
+      limit: limit as string | number,
+      cursor: cursor as string,
       fields,
       from,
-      order: parseOrder(fieldsMap, order),
+      order: parseOrder(fieldsMap, order as string),
       process: ({ data, usersdata, count: c }) => {
         if (count) {
           res.set("X-Total-Count", c);
@@ -106,7 +107,7 @@ app.get("/", authorizer({}), async (req, res) => {
     return res.json(output);
   }
 
-  const query = parseFilters(fieldsMap, filters);
+  const query = parseFilters(fieldsMap, filters as string);
   query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
   query.push(
     sql`coalesce(webhook.data->>'projectId', ${
@@ -124,11 +125,11 @@ app.get("/", authorizer({}), async (req, res) => {
   }
   const from = `webhook`;
   const [output, newCursor] = await db.webhook.find(query, {
-    limit,
-    cursor,
+    limit: limit as string | number,
+    cursor: cursor as string,
     fields,
     from,
-    order: parseOrder(fieldsMap, order),
+    order: parseOrder(fieldsMap, order as string),
     process: ({ data, count: c }) => {
       if (count) {
         res.set("X-Total-Count", c);
@@ -147,7 +148,7 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/subscribed/:event", authorizer({}), async (req, res) => {
-  let event = req.params.event;
+  const event = req.params.event as unknown as EventKey;
 
   let userId =
     req.user.admin && req.query.userId ? req.query.userId : req.user.id;
@@ -155,11 +156,11 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
   let streamId = req.query.streamId;
 
   const { data } = await db.webhook.listSubscribed(
-    userId,
+    userId as string,
     event,
     req.project?.id || req.user.defaultProjectId,
     req.user.defaultProjectId,
-    streamId,
+    streamId as string,
   );
 
   res.status(200);
@@ -201,7 +202,7 @@ app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
   const webhook = await req.store.get(`webhook/${req.body.id}`);
   req.checkResourceAccess(webhook);
 
-  const { id, userId, projectId, createdAt } = webhook;
+  const { id, userId, projectId, createdAt } = webhook as any;
   const doc = validateWebhookPayload(
     id,
     userId,

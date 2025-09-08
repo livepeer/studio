@@ -1,4 +1,4 @@
-import Router from "express/lib/router";
+import { Router } from "express";
 import fetch from "node-fetch";
 import { authorizer, geolocateMiddleware } from "../middleware";
 import { shuffle } from "../util";

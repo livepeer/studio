@@ -1,5 +1,4 @@
 import express from "express";
-import "express-async-errors"; // it monkeypatches, i guess
 import { Server } from "http";
 import morgan from "morgan";
 import { AddressInfo } from "net";

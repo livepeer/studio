@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import { safeLoad as parseYaml, safeDump as serializeYaml } from "js-yaml";
 import path from "path";
+import fetch from "node-fetch";
 
 // This downloads the AI schema from the AI worker repo and saves in the local
 // ai-api-schema.yaml file, referenced by our main api-schema.yaml file.
@@ -14,6 +15,7 @@ export const defaultModels = {
   "segment-anything-2": "facebook/sam2-hiera-large",
   llm: "meta-llama/Meta-Llama-3.1-8B-Instruct",
 };
+
 const schemaDir = path.resolve(__dirname, ".");
 const aiSchemaUrl =
   "https://raw.githubusercontent.com/livepeer/ai-worker/refs/heads/main/runner/gateway.openapi.yaml";
@@ -31,7 +33,7 @@ const studioApiErrorSchema = {
   },
 };
 
-const write = (dir, data) => {
+const write = (dir: string, data: string) => {
   if (fs.existsSync(dir)) {
     const existing = fs.readFileSync(dir, "utf8");
     if (existing === data) {
@@ -42,17 +44,20 @@ const write = (dir, data) => {
   console.log(`wrote ${dir}`);
 };
 
-const mapObject = (obj, fn) => {
+const mapObject = (
+  obj: any,
+  fn: (key: string, value: any) => [string, any],
+) => {
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => fn(key, value)),
   );
 };
 
-const downloadAiSchema = async () => {
+export const downloadAiSchema = async () => {
   // download the file
   const response = await fetch(aiSchemaUrl);
   const data = await response.text();
-  const schema = parseYaml(data);
+  const schema = parseYaml(data) as any;
 
   // remove info and servers fields
   delete schema.info;
@@ -105,7 +110,7 @@ const downloadAiSchema = async () => {
   schema.components.schemas = mapObject(
     schema.components.schemas,
     (key, value) => {
-      let pipelineName;
+      let pipelineName: string;
       if (key.endsWith("Params")) {
         pipelineName = key.slice(0, -6);
       } else if (key.startsWith("Body_gen")) {
@@ -119,9 +124,12 @@ const downloadAiSchema = async () => {
         .toLowerCase();
 
       if (pipelineName in defaultModels && value.properties.model_id) {
-        value.properties.model_id.default = defaultModels[pipelineName];
+        value.properties.model_id.default =
+          defaultModels[pipelineName as keyof typeof defaultModels];
         if (value.required) {
-          value.required = value.required.filter((key) => key !== "model_id");
+          value.required = value.required.filter(
+            (key: string) => key !== "model_id",
+          );
         }
       }
       value.additionalProperties = false;
@@ -134,7 +142,10 @@ const downloadAiSchema = async () => {
   write(path.resolve(schemaDir, "ai-api-schema.yaml"), yaml);
 };
 
-downloadAiSchema().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Only run the download when this file is executed directly, not when imported
+if (require.main === module) {
+  downloadAiSchema().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

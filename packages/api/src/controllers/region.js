@@ -1,4 +1,4 @@
-import Router from "express/lib/router";
+import { Router } from "express";
 import { authorizer, validatePost } from "../middleware";
 import { db } from "../store";
 
