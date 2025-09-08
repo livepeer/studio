@@ -2,6 +2,9 @@
   "private": true,
   "name": "@livepeer.studio/www",
   "version": "0.19.0",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "prepare": "cd ../api && yarn run prepare",
     "dev": "next",
