@@ -13,7 +13,7 @@ const FileItem = ({ fileUpload }: { fileUpload: FileUpload }) => {
     <Text>
       {name?.length > MAX_FILENAME_LENGTH
         ? `${name.slice(0, MAX_FILENAME_LENGTH)}...`
-        : name ?? ""}
+        : (name ?? "")}
     </Text>
   );
 

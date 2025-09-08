@@ -108,7 +108,6 @@ instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
 ### How is a contribution reviewed and accepted?
 
 - **If you are opening an issue...**
-
   - Fill out all required sections for your issue type. Issues that are not
     filled out properly will be flagged as `invalid` and will be closed if not
     updated.

@@ -21,11 +21,11 @@
     "prepare:redoc": "redoc-cli bundle --cdn -o docs/index.html src/schema/schema.yaml",
     "prepare:type-check": "tsc --pretty --noEmit",
     "prepare": "run-s compile-schemas && run-p \"prepare:**\"",
-    "compile-schemas": "node -r esm src/schema/compile-schemas.js",
-    "pull-ai-schema": "node -r esm src/schema/pull-ai-schema.js",
+    "compile-schemas": "node src/schema/compile-schemas.mjs",
+    "pull-ai-schema": "node dist/schema/pull-ai-schema.js",
     "dev-server": "run-s compile-schemas && node dist/cli.js",
     "redoc": "nodemon -w src/schema/schema.yaml -x npm run prepare:redoc",
-    "siserver": "nodemon -w dist -x node -r esm dist/stream-info-service.js -e js,yaml",
+    "siserver": "nodemon -w dist -x node dist/stream-info-service.js -e js,yaml",
     "dev:server": "NODE_ENV=development LP_API_FRONTEND=false nodemon --inspect -w dist -x node dist/cli.js -e js,yaml",
     "dev:babel": "yarn run prepare:babel --watch",
     "dev:yaml-json": "nodemon -w ./src/schema -e 'yaml' -x 'run-s compile-schemas'",
@@ -95,7 +95,7 @@
     "lodash": "^4.17.21",
     "m3u8-parser": "^4.4.0",
     "mime": "^3.0.0",
-    "minio": "^7.0.12",
+    "minio": "8",
     "morgan": "^1.9.1",
     "mqtt": "^4.2.6",
     "ms": "^2.1.2",
@@ -165,7 +165,7 @@
     ]
   },
   "browserslist": [
-    "node 16"
+    "node 22"
   ],
   "types": "src/schema/types.d.ts",
   "nodemonConfig": {
