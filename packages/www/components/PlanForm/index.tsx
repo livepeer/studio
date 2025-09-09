@@ -7,7 +7,6 @@ import {
   TextField,
   Label,
   Text,
-  Button,
   AlertDialog,
   AlertDialogTitle,
   AlertDialogContent,
@@ -15,6 +14,7 @@ import {
   AlertDialogCancel,
   useSnackbar,
 } from "@livepeer/design-system";
+import { Button } from "components/ui/button";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
@@ -192,21 +192,9 @@ const PlanForm = ({
       <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
         <Flex css={{ ai: "center" }}>
           <Button
-            size="3"
-            css={{
-              width: "100%",
-              background: bc,
-              color: color,
-              borderRadius: "$3",
-              cursor: "pointer",
-              "&:hover": {
-                boxShadow: "none",
-                background: bc,
-                color: color,
-              },
-            }}
+            className="w-full"
             disabled={disabled}
-            variant="primary"
+            variant="default"
             onClick={() => {
               onClick();
               setOpen(true);
@@ -448,22 +436,19 @@ const PlanForm = ({
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
               <AlertDialogCancel asChild>
                 <Button
-                  size="2"
+                  variant="outline"
                   onClick={() => {
                     setOpen(false);
-                  }}
-                  ghost>
+                  }}>
                   Cancel
                 </Button>
               </AlertDialogCancel>
               <Button
-                size="2"
                 className="elements-style-background"
                 type="submit"
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
-                }
-                variant="primary">
+                }>
                 {status === "processing" && (
                   <Spinner
                     css={{

@@ -4,13 +4,13 @@ import {
   HoverCardTrigger,
   Flex,
   HoverCardContent,
-  Button,
   Text,
   useSnackbar,
 } from "@livepeer/design-system";
 import { CopyIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Button } from "components/ui/button";
 
 const KeyCell = ({ token }) => {
   const [openSnackbar] = useSnackbar();
@@ -52,7 +52,10 @@ const KeyCell = ({ token }) => {
           </HoverCardContent>
         </HoverCardRoot>
       ) : (
-        <Button size="1" type="button" onClick={() => setKeyRevealed(true)}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setKeyRevealed(true)}>
           Reveal key
         </Button>
       )}
