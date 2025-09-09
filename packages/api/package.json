@@ -135,7 +135,7 @@
     "@types/node-fetch": "^2.5.10",
     "@types/pg": "^7.14.4",
     "@types/uuid": "^9.0.0",
-    "cloudflare": "^2.7.0",
+    "cloudflare": "^3.5.0",
     "esbuild": "^0.18.17",
     "esm": "^3.2.22",
     "istanbul-api": "^2.1.6",
