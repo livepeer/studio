@@ -1,4 +1,4 @@
-FROM node:18 as builder
+FROM node:22 as builder
 
 WORKDIR /app
 COPY . .
@@ -7,7 +7,7 @@ RUN yarn run prepare:lerna
 RUN cd packages/www && yarn run static
 RUN cd packages/api && yarn run esbuild
 
-FROM node:18
+FROM node:22
 
 WORKDIR app
 COPY --from=builder /app/packages/api/dist-esbuild/livepeer-api /usr/local/bin/livepeer-api
