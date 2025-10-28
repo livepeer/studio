@@ -180,13 +180,12 @@ function registerGenerateHandler(
   if (isJSONReq) {
     payloadParsers = [validatePost(`${camelType}Params`)];
   } else {
-    if (!validators[`Body_gen${camelType}`]) {
-      camelType = type.toUpperCase();
+    let validatorName = `Body_gen${camelType}`;
+    if (!validators[validatorName]) {
+      // LLM requests are named differently in the schema
+      validatorName = `${type.toUpperCase()}Request`;
     }
-    payloadParsers = [
-      multipart.any(),
-      validateFormData(`Body_gen${camelType}`),
-    ];
+    payloadParsers = [multipart.any(), validateFormData(validatorName)];
   }
 
   const defaultModel = defaultModels[type];
@@ -252,10 +251,12 @@ function registerGenerateHandler(
 
 registerGenerateHandler("text-to-image", true);
 registerGenerateHandler("image-to-image");
+registerGenerateHandler("image-to-text");
 registerGenerateHandler("image-to-video");
 registerGenerateHandler("upscale");
 registerGenerateHandler("audio-to-text");
+registerGenerateHandler("text-to-speech", true);
 registerGenerateHandler("segment-anything-2");
-registerGenerateHandler("llm");
+registerGenerateHandler("llm", true);
 
 export default app;

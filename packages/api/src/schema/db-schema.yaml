@@ -1449,7 +1449,9 @@ components:
           example: text-to-image
           enum:
             - audio-to-text
+            - text-to-speech
             - text-to-image
+            - image-to-text
             - image-to-image
             - image-to-video
             - upscale
