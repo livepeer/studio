@@ -97,7 +97,7 @@ function createPayload(
     // TODO: Make this save the contents of the file in some OS and only reference them here.
     const fileHash = crypto
       .createHash("sha256")
-      .update(file.buffer)
+      .update(new Uint8Array(file.buffer))
       .digest("hex");
     payload[file.fieldname] = fileHash;
   }
