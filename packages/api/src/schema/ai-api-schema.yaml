@@ -385,9 +385,9 @@ paths:
       operationId: genLLM
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              $ref: '#/components/schemas/Body_genLLM'
+              $ref: '#/components/schemas/LLMRequest'
         required: true
       responses:
         '200':
@@ -435,6 +435,198 @@ paths:
               schema:
                 $ref: '#/components/schemas/studio-api-error'
       x-speakeasy-name-override: llm
+  /api/generate/image-to-text:
+    post:
+      tags:
+        - generate
+      summary: Image To Text
+      description: Transform image files to text.
+      operationId: genImageToText
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_genImageToText'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageToTextResponse'
+                x-speakeasy-name-override: data
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/studio-api-error'
+      x-speakeasy-name-override: imageToText
+  /api/generate/live-video-to-video:
+    post:
+      tags:
+        - generate
+      summary: Live Video To Video
+      description: >-
+        Apply transformations to a live video streamed to the returned
+        endpoints.
+      operationId: genLiveVideoToVideo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveVideoToVideoParams'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveVideoToVideoResponse'
+                x-speakeasy-name-override: data
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/studio-api-error'
+      x-speakeasy-name-override: liveVideoToVideo
+  /api/generate/text-to-speech:
+    post:
+      tags:
+        - generate
+      summary: Text To Speech
+      description: >-
+        Generate a text-to-speech audio file based on the provided text input
+        and speaker description.
+      operationId: genTextToSpeech
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextToSpeechParams'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioResponse'
+                x-speakeasy-name-override: data
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPValidationError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/HTTPError'
+                  - $ref: '#/components/schemas/studio-api-error'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/studio-api-error'
+      x-speakeasy-name-override: textToSpeech
 components:
   schemas:
     APIError:
@@ -448,6 +640,17 @@ components:
         - msg
       title: APIError
       description: API error response model.
+    AudioResponse:
+      properties:
+        audio:
+          allOf:
+            - $ref: '#/components/schemas/MediaURL'
+          description: The generated audio.
+      type: object
+      required:
+        - audio
+      title: AudioResponse
+      description: Response model for audio generation.
     Body_genAudioToText:
       properties:
         audio:
@@ -553,6 +756,29 @@ components:
         - image
       title: Body_genImageToImage
       additionalProperties: false
+    Body_genImageToText:
+      properties:
+        image:
+          type: string
+          format: binary
+          title: Image
+          description: Uploaded image to transform with the pipeline.
+        prompt:
+          type: string
+          title: Prompt
+          description: Text prompt(s) to guide transformation.
+          default: ''
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for transformation.
+          default: ''
+      type: object
+      required:
+        - image
+        - model_id
+      title: Body_genImageToText
+      additionalProperties: false
     Body_genImageToVideo:
       properties:
         image:
@@ -616,40 +842,6 @@ components:
       required:
         - image
       title: Body_genImageToVideo
-      additionalProperties: false
-    Body_genLLM:
-      properties:
-        prompt:
-          type: string
-          title: Prompt
-        model_id:
-          type: string
-          title: Model Id
-          default: meta-llama/Meta-Llama-3.1-8B-Instruct
-        system_msg:
-          type: string
-          title: System Msg
-          default: ''
-        temperature:
-          type: number
-          title: Temperature
-          default: 0.7
-        max_tokens:
-          type: integer
-          title: Max Tokens
-          default: 256
-        history:
-          type: string
-          title: History
-          default: '[]'
-        stream:
-          type: boolean
-          title: Stream
-          default: false
-      type: object
-      required:
-        - prompt
-      title: Body_genLLM
       additionalProperties: false
     Body_genSegmentAnything2:
       properties:
@@ -802,19 +994,224 @@ components:
         - images
       title: ImageResponse
       description: Response model for image generation.
-    LLMResponse:
+    ImageToTextResponse:
       properties:
-        response:
+        text:
           type: string
-          title: Response
-        tokens_used:
-          type: integer
-          title: Tokens Used
+          title: Text
+          description: The generated text.
       type: object
       required:
-        - response
-        - tokens_used
+        - text
+      title: ImageToTextResponse
+      description: Response model for text generation.
+    LLMChoice:
+      properties:
+        index:
+          type: integer
+          title: Index
+        finish_reason:
+          type: string
+          title: Finish Reason
+          default: ''
+        delta:
+          allOf:
+            - $ref: '#/components/schemas/LLMMessage'
+        message:
+          allOf:
+            - $ref: '#/components/schemas/LLMMessage'
+      type: object
+      required:
+        - index
+      title: LLMChoice
+    LLMMessage:
+      properties:
+        role:
+          type: string
+          title: Role
+        content:
+          type: string
+          title: Content
+      type: object
+      required:
+        - role
+        - content
+      title: LLMMessage
+    LLMRequest:
+      properties:
+        messages:
+          items:
+            $ref: '#/components/schemas/LLMMessage'
+          type: array
+          title: Messages
+        model:
+          type: string
+          title: Model
+          default: ''
+        temperature:
+          type: number
+          title: Temperature
+          default: 0.7
+        max_tokens:
+          type: integer
+          title: Max Tokens
+          default: 256
+        top_p:
+          type: number
+          title: Top P
+          default: 1
+        top_k:
+          type: integer
+          title: Top K
+          default: -1
+        stream:
+          type: boolean
+          title: Stream
+          default: false
+      type: object
+      required:
+        - messages
+      title: LLMRequest
+    LLMResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        model:
+          type: string
+          title: Model
+        created:
+          type: integer
+          title: Created
+        usage:
+          $ref: '#/components/schemas/LLMTokenUsage'
+        choices:
+          items:
+            $ref: '#/components/schemas/LLMChoice'
+          type: array
+          title: Choices
+      type: object
+      required:
+        - id
+        - model
+        - created
+        - usage
+        - choices
       title: LLMResponse
+    LLMTokenUsage:
+      properties:
+        prompt_tokens:
+          type: integer
+          title: Prompt Tokens
+        completion_tokens:
+          type: integer
+          title: Completion Tokens
+        total_tokens:
+          type: integer
+          title: Total Tokens
+      type: object
+      required:
+        - prompt_tokens
+        - completion_tokens
+        - total_tokens
+      title: LLMTokenUsage
+    LiveVideoToVideoParams:
+      properties:
+        subscribe_url:
+          type: string
+          title: Subscribe Url
+          description: Source URL of the incoming stream to subscribe to.
+        publish_url:
+          type: string
+          title: Publish Url
+          description: Destination URL of the outgoing stream to publish.
+        control_url:
+          type: string
+          title: Control Url
+          description: >-
+            URL for subscribing via Trickle protocol for updates in the live
+            video-to-video generation params.
+          default: ''
+        events_url:
+          type: string
+          title: Events Url
+          description: >-
+            URL for publishing events via Trickle protocol for pipeline status
+            and logs.
+          default: ''
+        model_id:
+          type: string
+          title: Model Id
+          description: >-
+            Name of the pipeline to run in the live video to video job. Notice
+            that this is named model_id for consistency with other routes, but
+            it does not refer to a Hugging Face model ID. The exact model(s)
+            depends on the pipeline implementation and might be configurable via
+            the `params` argument.
+          default: ''
+        params:
+          type: object
+          title: Params
+          description: Initial parameters for the pipeline.
+          default: {}
+        gateway_request_id:
+          type: string
+          title: Gateway Request Id
+          description: The ID of the Gateway request (for logging purposes).
+          default: ''
+        manifest_id:
+          type: string
+          title: Manifest Id
+          description: The manifest ID from the orchestrator (for logging purposes).
+          default: ''
+        stream_id:
+          type: string
+          title: Stream Id
+          description: The Stream ID (for logging purposes).
+          default: ''
+      type: object
+      required:
+        - subscribe_url
+        - publish_url
+        - model_id
+      title: LiveVideoToVideoParams
+      additionalProperties: false
+    LiveVideoToVideoResponse:
+      properties:
+        subscribe_url:
+          type: string
+          title: Subscribe Url
+          description: Source URL of the incoming stream to subscribe to
+        publish_url:
+          type: string
+          title: Publish Url
+          description: Destination URL of the outgoing stream to publish to
+        control_url:
+          type: string
+          title: Control Url
+          description: URL for updating the live video-to-video generation
+          default: ''
+        events_url:
+          type: string
+          title: Events Url
+          description: URL for subscribing to events for pipeline status and logs
+          default: ''
+        request_id:
+          type: string
+          title: Request Id
+          description: The ID generated for this request
+          default: ''
+        manifest_id:
+          type: string
+          title: Manifest Id
+          description: Orchestrator manifest ID for this request
+          default: ''
+      type: object
+      required:
+        - subscribe_url
+        - publish_url
+      title: LiveVideoToVideoResponse
+      description: Response model for live video-to-video generation.
     MasksResponse:
       properties:
         masks:
@@ -857,6 +1254,17 @@ components:
         - nsfw
       title: Media
       description: A media object containing information about the generated media.
+    MediaURL:
+      properties:
+        url:
+          type: string
+          title: Url
+          description: The URL where the media can be accessed.
+      type: object
+      required:
+        - url
+      title: MediaURL
+      description: A URL from which media can be accessed.
     TextResponse:
       properties:
         text:
@@ -947,6 +1355,30 @@ components:
       required:
         - prompt
       title: TextToImageParams
+      additionalProperties: false
+    TextToSpeechParams:
+      properties:
+        model_id:
+          type: string
+          title: Model Id
+          description: Hugging Face model ID used for text to speech generation.
+          default: ''
+        text:
+          type: string
+          title: Text
+          description: Text input for speech generation.
+          default: ''
+        description:
+          type: string
+          title: Description
+          description: Description of speaker to steer text to speech generation.
+          default: >-
+            A male speaker delivers a slightly expressive and animated speech
+            with a moderate speed and pitch.
+      type: object
+      title: TextToSpeechParams
+      required:
+        - model_id
       additionalProperties: false
     ValidationError:
       properties:
