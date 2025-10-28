@@ -178,14 +178,17 @@ function registerGenerateHandler(
   let camelType = kebabToCamel(type);
   camelType = camelType[0].toUpperCase() + camelType.slice(1);
   if (isJSONReq) {
-    payloadParsers = [validatePost(`${camelType}Params`)];
-  } else {
-    let validatorName = `Body_gen${camelType}`;
+    let validatorName = `${camelType}Params`;
     if (!validators[validatorName]) {
-      // LLM requests are named differently in the schema
+      // LLM requests are named differently
       validatorName = `${type.toUpperCase()}Request`;
     }
-    payloadParsers = [multipart.any(), validateFormData(validatorName)];
+    payloadParsers = [validatePost(validatorName)];
+  } else {
+    payloadParsers = [
+      multipart.any(),
+      validateFormData(`Body_gen${camelType}`),
+    ];
   }
 
   const defaultModel = defaultModels[type];
