@@ -1462,7 +1462,7 @@ components:
             - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genImageToVideo"
             - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genUpscale"
             - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genSegmentAnything2"
-            - $ref: "./ai-api-schema.yaml#/components/schemas/Body_genLLM"
+            - $ref: "./ai-api-schema.yaml#/components/schemas/LLMRequest"
         statusCode:
           type: integer
           description: HTTP status code received from the AI gateway
