@@ -97,7 +97,7 @@ function createPayload(
     // TODO: Make this save the contents of the file in some OS and only reference them here.
     const fileHash = crypto
       .createHash("sha256")
-      .update(file.buffer)
+      .update(new Uint8Array(file.buffer))
       .digest("hex");
     payload[file.fieldname] = fileHash;
   }
@@ -178,11 +178,13 @@ function registerGenerateHandler(
   let camelType = kebabToCamel(type);
   camelType = camelType[0].toUpperCase() + camelType.slice(1);
   if (isJSONReq) {
-    payloadParsers = [validatePost(`${camelType}Params`)];
-  } else {
-    if (!validators[`Body_gen${camelType}`]) {
-      camelType = type.toUpperCase();
+    let validatorName = `${camelType}Params`;
+    if (!validators[validatorName]) {
+      // LLM requests are named differently
+      validatorName = `${type.toUpperCase()}Request`;
     }
+    payloadParsers = [validatePost(validatorName)];
+  } else {
     payloadParsers = [
       multipart.any(),
       validateFormData(`Body_gen${camelType}`),
@@ -252,10 +254,12 @@ function registerGenerateHandler(
 
 registerGenerateHandler("text-to-image", true);
 registerGenerateHandler("image-to-image");
+registerGenerateHandler("image-to-text");
 registerGenerateHandler("image-to-video");
 registerGenerateHandler("upscale");
 registerGenerateHandler("audio-to-text");
+registerGenerateHandler("text-to-speech", true);
 registerGenerateHandler("segment-anything-2");
-registerGenerateHandler("llm");
+registerGenerateHandler("llm", true);
 
 export default app;

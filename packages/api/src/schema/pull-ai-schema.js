@@ -136,7 +136,9 @@ const downloadAiSchema = async () => {
   write(path.resolve(schemaDir, "ai-api-schema.yaml"), yaml);
 };
 
-downloadAiSchema().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  downloadAiSchema().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
