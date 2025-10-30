@@ -98,9 +98,11 @@ describe("controllers/generate", () => {
       "audio-to-text",
       "text-to-image",
       "image-to-image",
+      "image-to-text",
       "image-to-video",
       "upscale",
       "segment-anything-2",
+      "text-to-speech",
       "llm",
     ];
     for (const api of apis) {
@@ -244,17 +246,43 @@ describe("controllers/generate", () => {
       expect(aiGatewayCalls).toEqual({ "segment-anything-2": 1 });
     });
 
-    it("should call the AI Gateway for generate API /llm", async () => {
-      const res = await client.fetch("/beta/generate/llm", {
+    it(`should call the AI Gateway for ${basePath}/llm`, async () => {
+      const res = await client.post(`${basePath}/llm`, {
+        messages: [{ role: "user", content: "foo" }],
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        message: "success",
+        reqContentType: "application/json",
+      });
+      expect(aiGatewayCalls).toEqual({ llm: 1 });
+    });
+
+    it(`should call the AI Gateway for ${basePath}/image-to-text`, async () => {
+      const res = await client.fetch(`${basePath}/image-to-text`, {
         method: "POST",
-        body: buildForm({ prompt: "foo" }),
+        body: buildMultipartBody({
+          model_id: "Salesforce/blip-image-captioning-large",
+        }),
       });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({
         message: "success",
         reqContentType: expect.stringMatching("^multipart/form-data"),
       });
-      expect(aiGatewayCalls).toEqual({ llm: 1 });
+      expect(aiGatewayCalls).toEqual({ "image-to-text": 1 });
+    });
+
+    it(`should call the AI Gateway for ${basePath}/text-to-speech`, async () => {
+      const res = await client.post(`${basePath}/text-to-speech`, {
+        model_id: "parler-tts/parler-tts-mini-v1",
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        message: "success",
+        reqContentType: "application/json",
+      });
+      expect(aiGatewayCalls).toEqual({ "text-to-speech": 1 });
     });
   });
 
