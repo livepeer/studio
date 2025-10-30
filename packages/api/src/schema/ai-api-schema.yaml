@@ -643,8 +643,7 @@ components:
     AudioResponse:
       properties:
         audio:
-          allOf:
-            - $ref: '#/components/schemas/MediaURL'
+          $ref: '#/components/schemas/MediaURL'
           description: The generated audio.
       type: object
       required:
@@ -964,8 +963,7 @@ components:
     HTTPError:
       properties:
         detail:
-          allOf:
-            - $ref: '#/components/schemas/APIError'
+          $ref: '#/components/schemas/APIError'
           description: Detailed error information.
       type: object
       required:
@@ -1015,11 +1013,9 @@ components:
           title: Finish Reason
           default: ''
         delta:
-          allOf:
-            - $ref: '#/components/schemas/LLMMessage'
+          $ref: '#/components/schemas/LLMMessage'
         message:
-          allOf:
-            - $ref: '#/components/schemas/LLMMessage'
+          $ref: '#/components/schemas/LLMMessage'
       type: object
       required:
         - index
@@ -1150,6 +1146,7 @@ components:
             the `params` argument.
           default: ''
         params:
+          additionalProperties: true
           type: object
           title: Params
           description: Initial parameters for the pipeline.
