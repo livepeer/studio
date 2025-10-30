@@ -244,15 +244,14 @@ describe("controllers/generate", () => {
       expect(aiGatewayCalls).toEqual({ "segment-anything-2": 1 });
     });
 
-    it("should call the AI Gateway for generate API /llm", async () => {
-      const res = await client.fetch("/beta/generate/llm", {
-        method: "POST",
-        body: buildForm({ prompt: "foo" }),
+    it(`should call the AI Gateway for ${basePath}/llm`, async () => {
+      const res = await client.post(`${basePath}/llm`, {
+        messages: [{ role: "user", content: "foo" }],
       });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({
         message: "success",
-        reqContentType: expect.stringMatching("^multipart/form-data"),
+        reqContentType: "application/json",
       });
       expect(aiGatewayCalls).toEqual({ llm: 1 });
     });
