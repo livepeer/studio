@@ -157,14 +157,50 @@ const PlanForm = ({
 
     // If user already submitted payment, don't ask for payment information again
     if (user.stripeCustomerPaymentMethodId) {
-      await updateSubscription({
-        stripeCustomerId: user.stripeCustomerId,
-        stripeCustomerPaymentMethodId: user.stripeCustomerPaymentMethodId,
-        stripeCustomerSubscriptionId: user.stripeCustomerSubscriptionId,
-        stripeProductId,
-      });
-      setStatus("succeeded");
-      setOpen(false);
+      try {
+        const result: any = await updateSubscription({
+          stripeCustomerId: user.stripeCustomerId,
+          stripeCustomerPaymentMethodId: user.stripeCustomerPaymentMethodId,
+          stripeCustomerSubscriptionId: user.stripeCustomerSubscriptionId,
+          stripeProductId,
+        });
+
+        if (result?.error || result?.errors) {
+          console.error(result.error || result.errors);
+          setStatus("error");
+          openSnackbar("Payment failed. Please update your payment method.");
+          return;
+        }
+
+        const pendingSetupIntent = result?.pending_setup_intent;
+        if (pendingSetupIntent?.status === "requires_action") {
+          const confirmResult = await stripe.confirmCardSetup(
+            pendingSetupIntent.client_secret,
+            {
+              payment_method: user.stripeCustomerPaymentMethodId,
+            },
+          );
+          if (confirmResult.error) {
+            console.error(confirmResult.error);
+            setStatus("error");
+            openSnackbar("Payment verification failed.");
+            return;
+          }
+        }
+
+        if (result?.status === "past_due" || result?.status === "unpaid") {
+          setStatus("error");
+          openSnackbar("Payment failed. Please update your payment method.");
+          return;
+        }
+
+        setStatus("succeeded");
+        setOpen(false);
+      } catch (error) {
+        console.error(error);
+        setStatus("error");
+        openSnackbar("An error occurred. Please try again.");
+      }
     } else {
       const cardElement = elements!.getElement(CardElement);
       createPaymentMethod({
