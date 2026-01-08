@@ -1378,6 +1378,7 @@ app.post(
               price: item.id,
             })),
           ],
+          expand: ["latest_invoice.payment_intent", "pending_setup_intent"],
         },
       );
     } else {
@@ -1413,8 +1414,35 @@ app.post(
             })),
             ...payAsYouGoItems,
           ],
+          expand: ["latest_invoice.payment_intent", "pending_setup_intent"],
         },
       );
+    }
+
+    // Check if payment failed before updating user's plan
+    const latestInvoice = updatedSubscription.latest_invoice as any;
+    if (latestInvoice?.payment_intent) {
+      const paymentIntent = latestInvoice.payment_intent;
+      if (
+        paymentIntent.status === "requires_payment_method" ||
+        paymentIntent.status === "canceled"
+      ) {
+        return res.status(402).send({
+          error: {
+            message: "Payment failed. Please update your payment method.",
+          },
+        });
+      }
+    }
+
+    // Check subscription status for payment issues
+    if (
+      updatedSubscription.status === "past_due" ||
+      updatedSubscription.status === "unpaid"
+    ) {
+      return res.status(402).send({
+        error: { message: "Subscription payment failed." },
+      });
     }
 
     if (
