@@ -65,6 +65,7 @@ app.post(
           creatorId: params.creatorId,
           c2pa: params.c2pa,
           catalystPipelineStrategy,
+          reencode: params.reencode ?? false,
         },
       },
       req.user,
