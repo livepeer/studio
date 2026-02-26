@@ -168,7 +168,7 @@ async function reportUsageForUser(
       stripe,
       user,
       subscriptionItemsByLookupKey,
-      usageData.overUsage,
+      usageToReport,
     );
   }
 
