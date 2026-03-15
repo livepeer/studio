@@ -12,28 +12,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch Event to JS SDK Repo
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           repository: livepeer/livepeer-js
           event-type: update-schema
 
       - name: Dispatch Event to Go SDK Repo
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           repository: livepeer/livepeer-go
           event-type: update-schema
 
       - name: Dispatch Event to Python SDK Repo
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           repository: livepeer/livepeer-python
           event-type: update-schema
 
       - name: Dispatch Event to Ruby SDK Repo
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           repository: livepeer/livepeer-ruby
