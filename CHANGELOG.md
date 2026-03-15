@@ -235,7 +235,7 @@ This configuration file will determine the spacing rules for different editors
 - refactor(packages/explorer/.env.development): Added envars for Mining view
 - If envars are missing app doesn't work
 
-- fix(Removed previos edit that makes pages depend on localhost blockchain):
+- fix(Removed previous edit that makes pages depend on localhost blockchain):
 
 Removed previous change which make explorer depend on localhost blockchain
 
@@ -331,7 +331,7 @@ This configuration file will determine the spacing rules for different editors
 - refactor(packages/explorer/.env.development): Added envars for Mining view
 - If envars are missing app doesn't work
 
-- fix(Removed previos edit that makes pages depend on localhost blockchain):
+- fix(Removed previous edit that makes pages depend on localhost blockchain):
 
 Removed previous change which make explorer depend on localhost blockchain
 
