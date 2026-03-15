@@ -18,11 +18,7 @@ import { useApi } from "hooks";
 import { products } from "@livepeer.studio/api/src/config";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 import { useJune, events } from "hooks/use-june";
-
-const StyledUpcomingIcon = styled(UpcomingIcon, {
-  mr: "$2",
-  color: "$gray",
-});
+import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
 
 export interface OverUsageBill {
   transcodingBill: OverUsageItem;
@@ -37,40 +33,23 @@ export interface OverUsageItem {
 
 export const UsageCard = ({ title, usage, limit, loading = false }) => {
   return (
-    <Box
-      css={{
-        px: "$5",
-        py: "$4",
-        boxShadow: "0 0 0 1px $colors$neutral6",
-        borderRadius: "$1",
-        backgroundColor: "$neutral2",
-        color: "$hiContrast",
-        mb: "$6",
-        minHeight: 92,
-      }}>
+    <Card>
       {loading ? (
-        <Box
-          css={{
-            display: "flex",
-            fd: "column",
-            gap: "$3",
-          }}>
-          <Skeleton variant="heading" css={{ width: "25%" }} />
-          <Skeleton variant="title" css={{ width: "50%", mr: "$3" }} />
-        </Box>
+        <div className="flex flex-col gap-3">
+          <Skeleton variant="heading" className="w-1/4" />
+          <Skeleton variant="title" className="w-1/2 mr-4" />
+        </div>
       ) : (
         <>
-          <Flex align="center">
-            <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
-              {title}
-            </Box>
-          </Flex>
-          <Flex align="center" css={{ fontSize: "$6" }}>
-            <Box css={{ fontWeight: 700 }}>{usage}</Box>
-          </Flex>
+          <CardHeader>
+            <CardTitle className="text-lg  ">{title}</CardTitle>
+          </CardHeader>
+          <CardContent className="-mt-3 font-medium">
+            <p>{usage} minutes</p>
+          </CardContent>
         </>
       )}
-    </Box>
+    </Card>
   );
 };
 
@@ -87,7 +66,7 @@ const UsageSummary = () => {
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
   const [overUsageBill, setOverUsageBill] = useState<OverUsageBill | null>(
-    null,
+    null
   );
   const [upcomingInvoiceTotal, setUpcomingInvoiceTotal] = useState(0);
   const [upcomingInvoice, setUpcomingInvoice] = useState<any>(null);
@@ -134,7 +113,7 @@ const UsageSummary = () => {
       doGetUsage(
         subscription?.current_period_start,
         subscription?.current_period_end,
-        subscription?.status,
+        subscription?.status
       );
     };
 
@@ -160,7 +139,7 @@ const UsageSummary = () => {
         TotalUsageMins: Math.max(usage?.TotalUsageMins - limits.transcoding, 0),
         DeliveryUsageMins: Math.max(
           usage?.DeliveryUsageMins - limits.streaming,
-          0,
+          0
         ),
         StorageUsageMins: Math.max(usage?.StorageUsageMins - limits.storage, 0),
       };
@@ -176,8 +155,8 @@ const UsageSummary = () => {
           units: overusage.TotalUsageMins,
           total: Number(
             (overusage.TotalUsageMins * payAsYouGoData.usage[0].price).toFixed(
-              2,
-            ),
+              2
+            )
           ),
         },
         deliveryBill: {
@@ -185,7 +164,7 @@ const UsageSummary = () => {
           total: Number(
             (
               overusage.DeliveryUsageMins * payAsYouGoData.usage[1].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
         storageBill: {
@@ -193,7 +172,7 @@ const UsageSummary = () => {
           total: Number(
             (
               overusage.StorageUsageMins * payAsYouGoData.usage[2].price
-            ).toFixed(2),
+            ).toFixed(2)
           ),
         },
       };
@@ -263,14 +242,14 @@ const UsageSummary = () => {
           {subscription && (
             <Flex>
               {new Date(
-                subscription.current_period_start * 1000,
+                subscription.current_period_start * 1000
               ).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               })}{" "}
               to{" "}
               {new Date(
-                subscription.current_period_end * 1000,
+                subscription.current_period_end * 1000
               ).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
