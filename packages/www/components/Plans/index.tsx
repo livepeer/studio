@@ -3,11 +3,11 @@ import {
   Box,
   Flex,
   Heading,
-  Button,
   Text,
   styled,
   Tooltip,
 } from "@livepeer/design-system";
+import { Button } from "components/ui/button";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/PlanForm";
 import { products } from "@livepeer.studio/api/src/config";
@@ -271,15 +271,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item displayCheck={false} css={{ borderBottom: 0 }} title={""} />
             </List>
           </Box>
-          <Box
-            css={{
-              p: "$4",
-              borderRadius: 16,
-              width: "12%",
-              background: "$green3",
-              minWidth: 230,
-              mr: "$2",
-            }}>
+          <Box className="bg-card p-4 rounded-lg w-[12%] min-w-[230px] mr-2 outline outline-1 outline-accent">
             <Flex
               css={{
                 mb: "$4",
@@ -364,18 +356,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item css={{ borderBottom: 0 }} displayCheck={false} title={""} />
             </List>
           </Box>
-          <Box
-            className="upgrade-card"
-            css={{
-              width: "12%",
-              color: "$hiContrast",
-              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
-              borderRadius: "16px",
-              background: "$green5",
-              p: "$4",
-              mr: "$2",
-              minWidth: 230,
-            }}>
+          <Box className="bg-card p-4 rounded-lg w-[12%] min-w-[230px] mr-2 outline outline-1 outline-accent">
             <Flex
               css={{
                 mb: "$4",
@@ -500,15 +481,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </List>
           </Box>
 
-          <Box
-            css={{
-              borderRadius: 16,
-              p: "$4",
-              width: "12%",
-              minWidth: 230,
-              mr: "$2",
-              background: "$green7",
-            }}>
+          <Box className="bg-card p-4 rounded-lg w-[12%] min-w-[230px] mr-2 outline outline-1 outline-accent">
             <Flex
               css={{
                 mb: "$4",
@@ -522,21 +495,9 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Volume Discounts</Box>
               <Button
-                as="a"
-                size="3"
-                onClick={() => setOpen(true)}
-                css={{
-                  background: "$sage12",
-                  border: "none",
-                  color: "$loContrast",
-                  cursor: "pointer",
-                  borderRadius: "$3",
-                  "&:hover": {
-                    boxShadow: "none",
-                    background: "$sage12",
-                    color: "$loContrast",
-                  },
-                }}>
+                className="w-full"
+                variant="secondary"
+                onClick={() => setOpen(true)}>
                 Contact Us
               </Button>
               <ContactDialog open={open} setOpen={setOpen} />

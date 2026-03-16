@@ -1,18 +1,18 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import {
-  Box,
-  Heading,
-  Flex,
-  Text,
-  Link as A,
-  Select,
-  Grid,
-  Tooltip as LPTooltip,
-} from "@livepeer/design-system";
+import { Box, Flex, Link as A } from "@livepeer/design-system";
+import { Grid } from "components/ui/grid";
+import { Text } from "components/ui/text";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { DashboardUsage as Content } from "content";
 import React, { PureComponent } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/ui/select";
 import {
   BarChart,
   Bar,
@@ -24,6 +24,12 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import {
+  Tooltip as TooltipUI,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "components/ui/tooltip";
 import { UsageCard } from "components/UsageSummary";
 import { QuestionMarkCircledIcon as Help } from "@radix-ui/react-icons";
 
@@ -166,32 +172,13 @@ const Usage = () => {
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
-          <Flex
-            justify="between"
-            align="end"
-            css={{
-              borderBottom: "1px solid",
-              borderColor: "$neutral6",
-              pb: "$4",
-              mb: "$5",
-              width: "100%",
-            }}>
-            <Heading size="2">
-              <Flex>
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Usage
-                </Box>
-              </Flex>
-            </Heading>
-            <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
+          <Flex className="gap-2 border-b border-accent pb-4 mb-5 w-full justify-between items-center">
+            <Text size="lg">Usage</Text>
+
+            <Text variant="neutral">
               Current billing period (
               {subscription && (
-                <Flex>
+                <span>
                   {new Date(
                     subscription.current_period_start * 1000,
                   ).toLocaleDateString("en-US", {
@@ -205,47 +192,28 @@ const Usage = () => {
                     month: "short",
                     day: "numeric",
                   })}{" "}
-                </Flex>
+                </span>
               )}
               )
-            </Flex>
+            </Text>
           </Flex>
         </Box>
 
-        <Box css={{ mb: "$9" }}>
-          <Flex
-            justify="between"
-            align="end"
-            css={{
-              mb: "$4",
-              width: "100%",
-            }}>
-            <Heading size="1">
-              <Flex align="center">
-                <Box
-                  css={{
-                    mr: "$3",
-                    fontWeight: 600,
-                    letterSpacing: "0",
-                  }}>
-                  Summary
-                </Box>
-                <Flex align="center">
-                  <LPTooltip
-                    multiline
-                    //@ts-ignore
-                    content={
-                      <Box>
-                        Usage minutes may take up to an hour to be reflected.
-                      </Box>
-                    }>
-                    <Help />
-                  </LPTooltip>
-                </Flex>
-              </Flex>
-            </Heading>
+        <Box>
+          <Flex className="justify-between mb-4">
+            <Text>Summary</Text>
+            <Flex align="center">
+              <TooltipUI>
+                <TooltipTrigger asChild>
+                  <Help />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Usage minutes may take up to an hour to be reflected.
+                </TooltipContent>
+              </TooltipUI>
+            </Flex>
           </Flex>
-          <Grid gap="4" columns="3">
+          <Grid className="grid-cols-1 md:grid-cols-3 gap-2">
             <UsageCard
               title="Transcoding minutes"
               loading={!billingUsage}
@@ -275,39 +243,26 @@ const Usage = () => {
             />
           </Grid>
         </Box>
-        <Flex
-          justify="between"
-          align="end"
-          css={{
-            mb: "$4",
-            width: "100%",
-          }}>
-          <Heading size="1">
-            <Flex align="center">
-              <Box
-                css={{
-                  mr: "$3",
-                  fontWeight: 600,
-                  letterSpacing: "0",
-                  display: "",
-                }}>
-                Charts
-              </Box>
-            </Flex>
-          </Heading>
-        </Flex>
+
+        <Text className="mb-4">Charts</Text>
+
         <Box css={{ mb: "$4", display: "" }}>
           <Select
             css={{ fontSize: "$3", px: "$2", mb: "$4" }}
             defaultValue="day"
-            onChange={(e) => doSetTimeStep(e.target.value)}>
-            <option value="hour">Hourly</option>
-            <option value="day">Daily</option>
+            onValueChange={(e) => doSetTimeStep(e)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a time step" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="hour">Hourly</SelectItem>
+              <SelectItem value="day">Daily</SelectItem>
+            </SelectContent>
           </Select>
         </Box>
-        <Box css={{ mb: "$4", display: "" }}>
+        <Box className="mb-4 w-full">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart width={150} height={40} data={usageData}>
+            <BarChart height={40} data={usageData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
@@ -318,7 +273,7 @@ const Usage = () => {
         </Box>
         <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart width={150} height={40} data={usageData}>
+            <BarChart height={40} data={usageData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
@@ -329,7 +284,7 @@ const Usage = () => {
         </Box>
         <Box css={{ mb: "$4", display: "" }}>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart width={150} height={40} data={usageData}>
+            <LineChart height={40} data={usageData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />

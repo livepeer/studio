@@ -1,15 +1,14 @@
+import { Box, Flex } from "@livepeer/design-system";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { Dispatch, SetStateAction } from "react";
+import { Button } from "components/ui/button";
 import {
-  Box,
-  Flex,
-  Button,
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-} from "@livepeer/design-system";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { Dispatch, SetStateAction } from "react";
+  DropdownMenuTrigger,
+} from "components/ui/dropdown-menu";
 
 export type AssetChildrenHeadingBoxProps = {
   children: React.ReactNode;
@@ -77,9 +76,7 @@ const AssetChildrenHeadingBox = ({
         <Box css={{ position: "relative", top: "-8px" }}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                size="2"
-                css={{ display: "flex", ai: "center", mr: "$1" }}>
+              <Button variant="secondary" size="sm">
                 Actions
                 <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
               </Button>

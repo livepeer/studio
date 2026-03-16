@@ -2,6 +2,8 @@ import { Stripe } from "@stripe/stripe-js/types/stripe-js";
 import { theme } from "../theme";
 import getConfig from "next/config";
 
+export { cn } from "../cn";
+
 export const { publicRuntimeConfig } = getConfig();
 
 export const { basePath } = publicRuntimeConfig;
@@ -234,11 +236,12 @@ export function isExport(): boolean {
 
 export function isStaging(): boolean {
   return (
-    typeof window !== "undefined" &&
-    (window.location.hostname.includes("livepeer.monster") ||
-      window.location.hostname.includes("livepeer.vercel.app") ||
-      window.location.hostname.includes("livepeerorg.vercel.app") ||
-      window.location.hostname.includes("livepeerorg.now.sh"))
+    true ||
+    (typeof window !== "undefined" &&
+      (window.location.hostname.includes("livepeer.monster") ||
+        window.location.hostname.includes("livepeer.vercel.app") ||
+        window.location.hostname.includes("livepeerorg.vercel.app") ||
+        window.location.hostname.includes("livepeerorg.now.sh")))
   );
 }
 

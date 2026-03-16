@@ -14,20 +14,20 @@ import {
   SetStateAction,
 } from "react";
 import {
-  Button,
   Table,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
-  Box,
-  Flex,
   Checkbox,
-  Text,
   Heading,
   Link as A,
 } from "@livepeer/design-system";
+import { Flex } from "components/ui/flex";
+import { Box } from "components/ui/box";
+import { Button } from "components/ui/button";
+import { Text } from "components/ui/text";
 import TableFilter, {
   FilterItem,
   Filter as TFilter,
@@ -38,6 +38,7 @@ import Spinner from "components/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import TableHeader from "./components/TableHeader";
 import StreamFilter from "components/StreamsTable/StreamFilter";
+import { cn } from "lib/cn";
 
 type Sort<T extends Record<string, unknown>> = {
   id: keyof T;
@@ -306,57 +307,36 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   const isStreamsTable = state.tableId === "streamsTable";
 
   return (
-    <Box>
+    <>
       <Flex
-        justify="between"
-        css={{
-          mb: "$3",
-          borderBottom: "1px solid",
-          borderColor: border ? "$neutral5" : "transparent",
-          pb: border ? "$2" : 0,
-        }}>
+        className={cn(
+          "border-b mb-3 gap-3 border-transparent flex-col sm:flex-row sm:justify-between",
+          border && "border-accent pb-2",
+        )}>
         {/* Header title */}
-        <Box
-          css={{
-            width: "100%",
-          }}>
-          {headerComponent}
-        </Box>
+        <Flex className="w-full flex-wrap flex-col">{headerComponent}</Flex>
 
         {/* Header actions */}
-        <Flex
-          css={{
-            alignItems: "center",
-            position: "absolute",
-            right: "4%",
-          }}>
+        <Flex className="sm:justify-between gap-2">
           {state.selectedRows.length ? (
-            <Flex css={{ ai: "center" }}>
-              <Flex css={{ ai: "center", mr: "$3" }}>
-                <Box css={{ fontSize: "$2", px: "$2", color: "$neutral9" }}>
+            <Flex className="gap-2 items-center">
+              <Flex className="gap-2 items-center">
+                <Text variant="neutral" size="sm">
                   {state.selectedRows.length} selected
-                </Box>
-                <Box
-                  css={{ height: 18, width: "1px", bc: "$neutral7", mx: "$3" }}
-                />
+                </Text>
+
                 <Button
-                  ghost
-                  css={{
-                    fontSize: "$2",
-                  }}
+                  variant="ghost"
+                  size="sm"
                   onClick={() => toggleAllRowsSelected(false)}>
                   Deselect
                 </Button>
               </Flex>
               {selectAction && (
                 <Button
-                  size="2"
                   // @ts-ignore
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
                   {...selectAction}
+                  variant="secondary"
                 />
               )}
             </Flex>
@@ -373,49 +353,33 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                 </>
               )}
               {createAction && (
-                <Button
-                  variant="neutral"
-                  size="2"
-                  // @ts-ignore
-                  css={{ display: "flex", alignItems: "center" }}
-                  {...createAction}
-                />
+                <Button size="sm" variant="secondary" {...createAction} />
               )}
             </>
           )}
         </Flex>
       </Flex>
       {isLoading ? (
-        <Flex
-          align="center"
-          justify="center"
-          css={{ height: "calc(100vh - 400px)" }}>
+        <Flex className="items-center justify-center h-full">
           <Spinner />
         </Flex>
       ) : !data?.count ? (
         !JSON.parse(state.stringifiedFilters).length ? (
           emptyState
         ) : (
-          <Flex
-            direction="column"
-            justify="center"
-            css={{
-              margin: "0 auto",
-              height: "calc(100vh - 400px)",
-              maxWidth: 300,
-            }}>
+          <Flex className="flex-col justify-center h-full max-w-md mx-auto">
             <Heading css={{ fontWeight: 500, mb: "$3" }}>
               No results found
             </Heading>
-            <Text variant="neutral" css={{ lineHeight: 1.5, mb: "$3" }}>
+            <Text variant="neutral">
               There aren't any results for that query.
             </Text>
           </Flex>
         )
       ) : (
-        <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
-          <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
-            <Table {...getTableProps()}>
+        <Box>
+          <Box className="overflow-x-auto">
+            <Table className="min-w-[500px]" {...getTableProps()}>
               <Thead>
                 {headerGroups.map((headerGroup) => (
                   <Tr {...headerGroup.getHeaderGroupProps()}>
@@ -468,12 +432,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                   prepareRow(row);
                   return (
                     <Tr
-                      css={{
-                        "&:hover": {
-                          backgroundColor: "$neutral2",
-                          cursor,
-                        },
-                      }}
+                      className="hover:bg-accent cursor-pointer"
                       {...row.getRowProps()}>
                       {row.cells.map((cell, i) => (
                         <Td
@@ -517,9 +476,9 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
             </Table>
           </Box>
           {!noPagination && (
-            <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
+            <Flex className="justify-between items-center mt-4">
               <Text>
-                <b>{data?.count}</b> results
+                <b>{data?.count}</b> {data?.count > 1 ? "results" : "result"}
               </Text>
               {viewAll ? (
                 <Link href={viewAll} passHref legacyBehavior>
@@ -528,14 +487,17 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                   </A>
                 </Link>
               ) : (
-                <Flex>
+                <Flex className="gap-2 items-center">
                   <Button
-                    css={{ marginRight: "6px" }}
+                    size="sm"
+                    variant="outline"
                     onClick={handlePreviousPage}
                     disabled={state.prevCursors.length <= 0}>
                     Previous
                   </Button>
                   <Button
+                    size="sm"
+                    variant="outline"
                     onClick={handleNextPage}
                     disabled={
                       state.nextCursor === "" ||
@@ -550,7 +512,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           )}
         </Box>
       )}
-    </Box>
+    </>
   );
 };
 
