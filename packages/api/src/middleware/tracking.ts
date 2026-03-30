@@ -52,6 +52,9 @@ class Tracker {
           sql`coalesce((data->'lastSeen')::bigint, 0) < ${lastSeen}`,
         ],
         { lastSeen },
+        // lastSeen is best-effort: the record may have been deleted since the
+        // token was last seen, so a no-op update is not an error.
+        { throwIfEmpty: false },
       );
     } catch (err) {
       console.log(
