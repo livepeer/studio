@@ -4,9 +4,8 @@ import { Task } from "../schema/types";
 import Table from "./table";
 import { WithID } from "./types";
 
-// TODO: Clean-up these lost tasks, making them failed
 const ACTIVE_TASK_TIMEOUT = 5 * 60 * 1000; // 5 mins
-const ENQUEUED_TASK_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours
+export const ENQUEUED_TASK_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours
 
 function joinOr(filters: SQLStatement[]): SQLStatement {
   const stmt = sql`(`;
@@ -26,6 +25,24 @@ export default class TaskTable extends Table<WithID<Task>> {
 
   async countScheduledTasks(userId: string) {
     return this.countPendingTasks(userId, false);
+  }
+
+  async findStaleEnqueuedTasks(limit: number): Promise<Array<WithID<Task>>> {
+    const enqueuedTaskThreshold = Date.now() - ENQUEUED_TASK_TIMEOUT;
+    const [tasks] = await this.find(
+      [
+        sql`task.data->>'deleted' IS NULL`,
+        sql`task.data->'status'->>'phase' = 'waiting'`,
+        sql`task.data->'status'->>'retries' IS NULL`,
+        sql`coalesce((task.data->'status'->>'updatedAt')::bigint, 0) <= ${enqueuedTaskThreshold}`,
+      ],
+      {
+        limit,
+        order: "(task.data->'status'->>'updatedAt')::bigint ASC",
+        useReplica: false,
+      },
+    );
+    return tasks;
   }
 
   private async countPendingTasks(

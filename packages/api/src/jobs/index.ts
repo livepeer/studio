@@ -4,12 +4,14 @@ import { timeout } from "../util";
 import activeCleanup from "./active-cleanup";
 import createDbTables from "./create-db-tables";
 import updateUsage from "./update-usage";
+import taskCleanup from "./task-cleanup";
 
 type JobFunc = (config: CliArgs) => Promise<void | { logContext?: string }>;
 
 export const jobFuncs: Record<JobType, JobFunc> = {
   "active-cleanup": activeCleanup,
   "create-db-tables": createDbTables,
+  "task-cleanup": taskCleanup,
   "update-usage": updateUsage,
 };
 
