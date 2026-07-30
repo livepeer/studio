@@ -284,19 +284,27 @@ export class TaskScheduler {
     task: WithID<Task>,
     error: string,
     output?: Task["output"],
-  ) {
+    filters?: { allowedPhases: Array<Task["status"]["phase"]> },
+  ): Promise<boolean> {
     const baseStatus: Task["status"] & Asset["status"] = {
       phase: "failed",
       updatedAt: Date.now(),
       errorMessage: error,
     };
-    await this.updateTask(task, {
-      output,
-      status: {
-        ...baseStatus,
-        retries: task.status.retries,
+    const updatedTask = await this.updateTask(
+      task,
+      {
+        output,
+        status: {
+          ...baseStatus,
+          retries: task.status.retries,
+        },
       },
-    });
+      filters,
+    );
+    if (!updatedTask) {
+      return false;
+    }
     if (task.outputAssetId) {
       await this.updateAsset(task.outputAssetId, { status: baseStatus });
     }
@@ -342,6 +350,7 @@ export class TaskScheduler {
         }
         break;
     }
+    return true;
   }
 
   async createAndScheduleTask(
@@ -352,6 +361,7 @@ export class TaskScheduler {
     outputAsset?: Asset,
     requesterId?: string,
   ) {
+    await ensureQueueCapacity(this.config, user.id);
     const projectId =
       inputAsset?.projectId || outputAsset?.projectId || user?.defaultProjectId;
     const task = await this.createTask(

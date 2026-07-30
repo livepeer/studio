@@ -20,6 +20,7 @@ const DEFAULT_ARWEAVE_GATEWAY_PREFIXES = [
 const JOB_TYPES = [
   "active-cleanup",
   "create-db-tables",
+  "task-cleanup",
   "update-usage",
 ] as const;
 
@@ -548,6 +549,11 @@ export default function parseCli(argv?: string | readonly string[]) {
       },
       "active-cleanup-limit": {
         describe: "job/active-cleanup: max number of streams to clean up",
+        type: "number",
+        default: 1000,
+      },
+      "task-cleanup-limit": {
+        describe: "job/task-cleanup: max number of stale tasks to fail",
         type: "number",
         default: 1000,
       },
