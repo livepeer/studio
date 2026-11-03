@@ -307,6 +307,10 @@ app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
 });
 
 app.post("/", validatePost("user"), async (req, res) => {
+  if (req.config.disableSignup) {
+    res.status(403);
+    return res.json({ errors: ["new registrations are disabled"] });
+  }
   const {
     email,
     password,

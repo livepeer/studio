@@ -5,6 +5,7 @@ import { User } from "../schema/types";
 import { db } from "../store";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
+import params from "../test-params";
 import sql from "sql-template-strings";
 import { NEVER_EXPIRING_JWT_CUTOFF_DATE } from "../middleware";
 import {
@@ -115,6 +116,17 @@ describe("controllers/user", () => {
       expect(res.headers.raw().link).toBeDefined();
       expect(res.headers.raw().link.length).toBe(1);
       expect(users.length).toEqual(11);
+    });
+
+    it("should reject registration when signup is disabled", async () => {
+      client.jwtAuth = "";
+      params.disableSignup = true;
+      try {
+        const res = await client.post("/user/", { ...mockUser });
+        expect(res.status).toBe(403);
+      } finally {
+        params.disableSignup = false;
+      }
     });
 
     it("should create a user without authorization and not allow repeat user creation", async () => {
