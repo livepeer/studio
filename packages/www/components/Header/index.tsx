@@ -1,26 +1,13 @@
-import {
-  Flex,
-  Box,
-  Text,
-  Link as A,
-  styled,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Button,
-  TextArea,
-} from "@livepeer/design-system";
-import Breadcrumbs from "../Breadcrumbs";
-import Link from "next/link";
-import HornIcon from "../../public/img/icons/horn.svg";
-import QuestionIcon from "../../public/img/icons/question.svg";
-import SupportIcon from "../../public/img/icons/support.svg";
-import DocumentationIcon from "../../public/img/icons/documentation.svg";
-import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
-import CheckedIcon from "../../public/img/icons/checked.svg";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { Link as A, Box, Flex, styled, Text } from "@livepeer/design-system";
 import { useApi, useHubspotForm } from "hooks";
-import { useJune, events } from "hooks/use-june";
+import { events, useJune } from "hooks/use-june";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import CheckedIcon from "../../public/img/icons/checked.svg";
+import DocumentationIcon from "../../public/img/icons/documentation.svg";
+import HornIcon from "../../public/img/icons/horn.svg";
+import PolygonIcon from "../../public/img/icons/polygonWithoutBorderBottom.svg";
+import Breadcrumbs from "../Breadcrumbs";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -79,7 +66,7 @@ const Header = ({ breadcrumbs = [] }) => {
 
   return (
     <Box
-      id="test123"
+      id="header"
       css={{
         width: "100%",
         borderBottom: "1px solid",
@@ -93,7 +80,6 @@ const Header = ({ breadcrumbs = [] }) => {
           height: 60,
           width: "100%",
           margin: "0 auto",
-          maxWidth: "1520px",
         }}>
         <Breadcrumbs aria-label="breadcrumb">
           {breadcrumbs.map((breadcrumb, i) => {

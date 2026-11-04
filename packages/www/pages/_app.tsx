@@ -25,19 +25,24 @@ import { DEFAULT_THEME } from "../lib/theme";
 import SEO from "../next-seo.config";
 import { ProjectProvider } from "context/ProjectContext";
 import useSyncProjectId from "hooks/use-project";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
 const globalStyles = globalCss({
+  html: {
+    height: "100%",
+  },
   body: {
     margin: 0,
-    bc: "$loContrast",
+    bc: "hsl(var(--background))",
     fontFamily: "Inter",
     color: "$hiContrast",
+    height: "100%",
   },
 
   ".main": {
-    bc: "$loContrast",
+    bc: "hsl(var(--background))",
   },
 
   "h1, h2, h3, h4, h5": { fontWeight: 500 },
@@ -49,6 +54,7 @@ const globalStyles = globalCss({
   "#__next": {
     position: "relative",
     zIndex: 0,
+    height: "100%",
   },
 
   "#hubspot-messages-iframe-container iframe": {
@@ -63,7 +69,7 @@ const globalStyles = globalCss({
 const themes: any = getThemes();
 const themeMap = {};
 Object.keys(themes).map(
-  (key, _index) => (themeMap[themes[key].className] = themes[key].className),
+  (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
 const livepeerClient = createReactClient({
@@ -131,6 +137,7 @@ const App = ({ Component, pageProps }) => {
                       client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
+                      <Toaster />
                     </LivepeerConfig>
                   </AnalyzerProvider>
                 </ApiProvider>

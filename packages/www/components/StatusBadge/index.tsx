@@ -1,6 +1,7 @@
 import moment from "moment";
-import { Box, Badge, Status, Tooltip } from "@livepeer/design-system";
+import { Box, Status, Tooltip } from "@livepeer/design-system";
 import { useMemo } from "react";
+import { Badge } from "components/ui/badge";
 
 // TODO: Make this an actual variant somehow? Maybe semantic variants like good/bad/warning
 export enum Variant {
@@ -19,12 +20,12 @@ type Style = {
 };
 
 const styleByVariant: Record<Variant, Style> = {
-  Idle: { color: "gray", noTooltip: true },
-  Pending: { color: "lime", dotColor: "yellow" },
-  Offline: { color: "red" },
-  Online: { color: "green" },
-  Healthy: { color: "green" },
-  Unhealthy: { color: "red" },
+  Idle: { color: "default", noTooltip: true },
+  Pending: { color: "secondary", dotColor: "yellow" },
+  Offline: { color: "destructive" },
+  Online: { color: "default" },
+  Healthy: { color: "default" },
+  Unhealthy: { color: "destructive" },
 };
 
 const StatusBadge = ({
@@ -38,7 +39,7 @@ const StatusBadge = ({
 }) => {
   const style = styleByVariant[variant];
   const badge = (
-    <Badge size="2" variant={style.color}>
+    <Badge variant={style.color}>
       <Box css={{ mr: "$1" }}>
         <Status size="1" variant={style.dotColor ?? (style.color as any)} />
       </Box>

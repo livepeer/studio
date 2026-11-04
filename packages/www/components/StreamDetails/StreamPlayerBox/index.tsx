@@ -1,11 +1,4 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Status,
-  Tooltip,
-} from "@livepeer/design-system";
+import { Box, Flex, Status, Tooltip } from "@livepeer/design-system";
 import { Broadcast as LivepeerBroadcast } from "@livepeer/react";
 import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "@livepeer.studio/api";
@@ -24,6 +17,8 @@ import { FiVideo } from "react-icons/fi";
 import StreamSetupBox from "../StreamSetupBox";
 import ActiveStream from "./ActiveStream";
 import { useJune, events } from "hooks/use-june";
+import { Badge } from "components/ui/badge";
+import { Button } from "components/ui/button";
 
 export type StreamPlayerBoxProps = {
   stream: Stream;
@@ -78,64 +73,30 @@ const StreamPlayerBox = ({
   }, [June]);
 
   return (
-    <Box
-      css={{
-        maxWidth: "470px",
-        justifySelf: "flex-end",
-        width: "100%",
-      }}>
-      <Box
-        css={{
-          borderRadius: "$3",
-          position: "relative",
-          mb: "$5",
-        }}>
-        <Box
-          css={{
-            width: "100%",
-            minHeight: 220,
-            borderRadius: "$2",
-            position: "relative",
-            bc: "$panel",
-            border: "1px solid $neutral6",
-            overflow: "hidden",
-          }}>
+    <div className="max-w-[470px] justify-self-end w-full">
+      <div className="rounded-lg relative mb-5">
+        <div className="w-full rounded-md relative bg-background border border-input overflow-hidden min-h-[220px]">
           {isBroadcastLive ? (
             <LivepeerBroadcast streamKey={stream.streamKey} />
           ) : stream.isActive ? (
             <ActiveStream playbackId={stream.playbackId} />
           ) : (
             <>
-              <Badge
-                size="2"
-                css={{
-                  backgroundColor: "$neutral7",
-                  position: "absolute",
-                  zIndex: 1,
-                  left: 10,
-                  top: 10,
-                  letterSpacing: 0,
-                }}>
-                <Box css={{ mr: 5 }}>
+              <Badge className="absolute z-10 left-2 top-2 ">
+                <div className="mr-1">
                   <Status css={{ backgroundColor: "$neutral9" }} size="1" />
-                </Box>
+                </div>
                 Idle
               </Badge>
             </>
           )}
-        </Box>
+        </div>
         <Flex css={{ mt: "$2", mb: "$1" }} gap="2" align="center">
           <AssetSharePopup
             playbackId={stream.playbackId}
             triggerNode={
-              <Button size="2">
-                <Box
-                  as={Share2Icon}
-                  css={{
-                    mr: "$1",
-                    flex: 1,
-                  }}
-                />
+              <Button variant="outline">
+                <Share2Icon className="mr-1" />
                 Share
               </Button>
             }
@@ -151,10 +112,8 @@ const StreamPlayerBox = ({
                 : "Go live from the browser, instantly"
             }>
             <Button
-              size="2"
-              css={{
-                flex: 2,
-              }}
+              className="w-full"
+              variant="secondary"
               disabled={isStreamActiveFromExternal}
               onClick={() =>
                 setIsBroadcastLive((prev) => {
@@ -162,25 +121,14 @@ const StreamPlayerBox = ({
                   return !prev;
                 })
               }>
-              <Box
-                as={FiVideo}
-                css={{
-                  mr: "$1",
-                }}
-              />
+              <FiVideo className="mr-1" />
+
               {isBroadcastLive ? "Stop broadcast" : "Go live"}
             </Button>
           </Tooltip>
         </Flex>
-      </Box>
-      <Box
-        css={{
-          display: "flex",
-          backgroundColor: "$neutral3",
-          borderRadius: "$1",
-          fontWeight: 600,
-          fontSize: "$2",
-        }}>
+      </div>
+      <div className="flex flex-row bg-background border border-input rounded-md font-semibold text-sm">
         <Box
           as="div"
           onClick={() => {
@@ -225,7 +173,7 @@ const StreamPlayerBox = ({
           <FaKey />
           Streaming Software
         </Box>
-      </Box>
+      </div>
       <StreamSetupBox
         activeTab={activeTab}
         stream={stream}
@@ -234,7 +182,7 @@ const StreamPlayerBox = ({
         globalPlaybackUrl={globalPlaybackUrl}
         invalidateStream={invalidateStream}
       />
-    </Box>
+    </div>
   );
 };
 

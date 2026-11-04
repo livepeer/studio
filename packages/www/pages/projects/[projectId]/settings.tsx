@@ -1,13 +1,9 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import {
-  Box,
-  Heading,
-  Flex,
-  Text,
-  TextField,
-  Button,
-} from "@livepeer/design-system";
+import { Box, Heading, Flex } from "@livepeer/design-system";
+import { Input } from "components/ui/input";
+import { Button } from "components/ui/button";
+import { Text } from "components/ui/text";
 import { DashboardSettingsGeneral as Content } from "content";
 import React, { useCallback, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
@@ -61,7 +57,7 @@ const Settings = () => {
             p: "$6",
           },
         }}>
-        <Box css={{ mb: "$7" }}>
+        <Box css={{ mb: "$5" }}>
           <Box
             css={{
               borderBottom: "1px solid",
@@ -70,16 +66,10 @@ const Settings = () => {
               mb: "$5",
               width: "100%",
             }}>
-            <Heading
-              size="2"
-              css={{
-                mr: "$3",
-                fontWeight: 600,
-                letterSpacing: "0",
-              }}>
+            <Text size="xl" weight="semibold">
               Settings
-            </Heading>
-            <Text variant="neutral" size="3" css={{ mt: "$2" }}>
+            </Text>
+            <Text variant="neutral" className="mt-2" size="sm">
               Manage your project settings
             </Text>
           </Box>
@@ -95,37 +85,24 @@ const Settings = () => {
               mb: "$4",
               mt: "$6",
             }}>
-            <Box
-              css={{
-                fontWeight: 500,
-                mb: "$3",
-              }}>
+            <Text weight="medium" className="mb-3">
               Project Name
-            </Box>
-            <TextField
+            </Text>
+            <Input
               required
-              size="2"
               type="text"
               onChange={(e) => setProjectName(e.target.value)}
               value={projectName}
               defaultValue={data?.name}
               id="projectName"
-              css={{
-                width: "15rem",
-              }}
+              className="max-w-md"
               placeholder="Project Name"
             />
           </Flex>
           <Button
+            className="mt-3"
             onClick={handleSubmit}
-            disabled={isLoading || !projectName}
-            css={{
-              p: "$4",
-              fontSize: "$2",
-              mt: "$3",
-              backgroundColor: "$hiContrast",
-              color: "$loContrast",
-            }}>
+            disabled={isLoading || !projectName}>
             {isLoading && (
               <Spinner
                 css={{

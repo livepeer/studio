@@ -1,16 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  AlertDialog,
-  IconButton,
-  AlertDialogTitle,
-  AlertDialogContent,
-  AlertDialogCancel,
-  AlertDialogDescription,
-  Heading,
-  Text,
-} from "@livepeer/design-system";
+import { Box, IconButton, Heading } from "@livepeer/design-system";
 import { useCallback, useMemo, useState } from "react";
 import Spinner from "components/Spinner";
 import { useDropzone } from "react-dropzone";
@@ -18,6 +6,16 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
 import { isStaging } from "lib/utils";
 import AssetsUploadError from "./AssetsUploadError";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogClose,
+} from "components/ui/dialog";
+import { Button } from "components/ui/button";
+import { Text } from "components/ui/text";
+import { Flex } from "components/ui/flex";
 
 // Note: commond mimetype list https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 const acceptedMimeTypes = isStaging()
@@ -107,12 +105,11 @@ const CreateAssetDialog = ({
   );
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        css={{ maxWidth: 450, minWidth: 350, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle asChild>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogTitle>
           <Heading size="1">Upload Asset</Heading>
-        </AlertDialogTitle>
+        </DialogTitle>
 
         <Box
           css={{ mt: "$3" }}
@@ -148,7 +145,7 @@ const CreateAssetDialog = ({
                 p: "$1",
                 mb: "$0",
                 height: "auto",
-                border: "1px solid $colors$primary7",
+                border: "1px solid hsl(var(--primary))",
                 borderRadius: "$1",
               }}
               {...getRootProps({ style })}>
@@ -158,7 +155,7 @@ const CreateAssetDialog = ({
                 css={{
                   width: "100%",
                   height: "100%",
-                  border: "1px dotted $colors$primary7",
+                  border: "1px dotted hsl(var(--primary))",
                   borderRadius: "$1",
                   m: 0,
                   fontSize: "$3",
@@ -172,9 +169,7 @@ const CreateAssetDialog = ({
                 }}>
                 <Text>
                   Drag and drop or{" "}
-                  <Box as="span" css={{ color: "$primary9", fontWeight: 700 }}>
-                    browse files
-                  </Box>
+                  <span className="font-semibold">browse files</span>
                 </Text>
               </Box>
             </Box>
@@ -184,46 +179,33 @@ const CreateAssetDialog = ({
             <Box css={{ mt: "$1" }}>
               {videoFiles &&
                 Object.keys(videoFiles).map((key) => (
-                  <Flex key={key} align="center">
+                  <Flex className="items-center gap-1" key={key}>
                     <IconButton
-                      onClick={() => setVideoFiles((prev) => omit(prev, key))}
-                      css={{ mr: "$1" }}>
+                      onClick={() => setVideoFiles((prev) => omit(prev, key))}>
                       <Cross2Icon />
                     </IconButton>
-                    <Text
-                      as="p"
-                      css={{
-                        my: "$1",
-                        fontSize: "$1",
-                      }}>
-                      {key}
-                    </Text>
+                    <Text size="sm">{key}</Text>
                   </Flex>
                 ))}
             </Box>
           </Box>
-          <AlertDialogDescription asChild>
-            <Text
-              size="3"
-              variant="neutral"
-              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
+          <DialogDescription>
+            <Text size="sm" variant="neutral" className="mt-1">
               Select up to {maxFiles} files. Files are uploaded 5 at a time.
               <br />
               {acceptedFileTypesString} supported.
             </Text>
-          </AlertDialogDescription>
-          <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-            <AlertDialogCancel asChild>
-              <Button disabled={creating} size="2" ghost>
+          </DialogDescription>
+          <Flex className="justify-end gap-3 mt-4">
+            <DialogClose>
+              <Button disabled={creating} variant="outline">
                 Cancel
               </Button>
-            </AlertDialogCancel>
+            </DialogClose>
             <Button
-              css={{ display: "flex", ai: "center" }}
               type="submit"
-              size="2"
               disabled={creating || Object.keys(videoFiles ?? {}).length === 0}
-              variant="primary">
+              variant="default">
               {creating && (
                 <Spinner
                   css={{
@@ -238,8 +220,8 @@ const CreateAssetDialog = ({
             </Button>
           </Flex>
         </Box>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

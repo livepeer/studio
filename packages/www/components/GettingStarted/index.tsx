@@ -1,35 +1,36 @@
 import {
   Heading,
-  Text,
-  Button,
   Box,
   Flex,
   Link as A,
   Paragraph,
-  Promo,
   Code,
-  Grid,
   useSnackbar,
   Avatar,
   HoverCardRoot,
   HoverCardContent,
   HoverCardTrigger,
 } from "@livepeer/design-system";
+import { Grid } from "components/ui/grid";
+import { Button } from "components/ui/button";
+import { Text } from "components/ui/text";
 import Link from "next/link";
 import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
 import { useProjectContext } from "context/ProjectContext";
 import { useQuery } from "react-query";
 import { useApi } from "hooks";
 import Image from "next/image";
-import {
-  AssetsIcon,
-  StreamIcon,
-  TerminalIcon,
-  UsageIcon,
-} from "components/Sidebar/NavIcons";
+
 import { getEmojiIcon } from "lib/get-emoji";
 import { useTheme } from "next-themes";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import {
+  CameraIcon,
+  CircleGauge,
+  FileVideoIcon,
+  TerminalIcon,
+  VideoIcon,
+} from "lucide-react";
 
 const GettingStarted = () => {
   const { appendProjectId, projectId } = useProjectContext();
@@ -45,7 +46,12 @@ const GettingStarted = () => {
       name: "Upload your first video",
       description: "Upload your first video asset for on-demand playback.",
       link: appendProjectId("/assets"),
-      icon: <AssetsIcon size={"24"} />,
+      icon: (
+        <FileVideoIcon
+          strokeWidth={1}
+          className="w-7 h-7 text-muted-foreground"
+        />
+      ),
       action: "Upload Video",
     },
     {
@@ -53,14 +59,21 @@ const GettingStarted = () => {
       description:
         "Generate a stream key to use in your favorite broadcasting software.",
       link: appendProjectId("/streams"),
-      icon: <StreamIcon size={"24"} />,
+      icon: (
+        <CameraIcon strokeWidth={1} className="w-7 h-7 text-muted-foreground" />
+      ),
       action: "Create Stream",
     },
     {
       name: "Understand your usage",
       description: "Browse through your account usage and billing data.",
       link: "/settings/usage",
-      icon: <UsageIcon size={"24"} />,
+      icon: (
+        <CircleGauge
+          strokeWidth={1}
+          className="w-7 h-7 text-muted-foreground"
+        />
+      ),
       action: "View Usage",
     },
     {
@@ -68,7 +81,12 @@ const GettingStarted = () => {
       description:
         "Set up a webhook to receive notifications about your video events.",
       link: appendProjectId("/developers/webhooks"),
-      icon: <TerminalIcon size={"24"} />,
+      icon: (
+        <TerminalIcon
+          strokeWidth={1}
+          className="w-7 h-7 text-muted-foreground"
+        />
+      ),
       action: "Create Webhook",
     },
   ];
@@ -140,17 +158,12 @@ curl --request POST \
           </Heading>
         </Flex>
         <Link href={appendProjectId("/settings")} passHref legacyBehavior>
-          <Button as="a" size="2">
+          <Button variant="secondary" size="sm">
             Edit Project
           </Button>
         </Link>
       </Flex>
-      <Grid
-        css={{
-          width: "100%",
-          gap: "$5",
-          gridTemplateColumns: "repeat(auto-fill, minmax(23%, 1fr))",
-        }}>
+      <Grid className="grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         {GettingStartedCard.map((sdk) => (
           <Card key={sdk.name} {...sdk} />
         ))}
@@ -163,32 +176,17 @@ curl --request POST \
           }}>
           <Heading>Get started with Livepeer Studio</Heading>
         </Box>
-        <Grid
-          css={{
-            width: "100%",
-            gap: "$5",
-            gridTemplateColumns: "repeat(auto-fill, minmax(46%, 1fr))",
-          }}>
-          <Promo
-            css={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}>
+        <Grid className="grid-cols-1 gap-5 lg:grid-cols-2">
+          <Box className="w-full h-full flex bg-background border border-input flex-col justify-between p-4 rounded-lg">
             <Box>
-              <TerminalIcon size={"24"} />
-              <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
+              <TerminalIcon
+                strokeWidth={1}
+                className="w-7 h-7 text-muted-foreground"
+              />
+              <Text size="lg" className="mt-2" weight="semibold">
                 Integrate with your app
               </Text>
-              <Text
-                variant="neutral"
-                size="2"
-                css={{
-                  mt: "$1",
-                  mb: "$1",
-                }}>
+              <Text variant="neutral" size="sm" className="mt-1 mb-1">
                 Get your API key and start coding your next video application.
               </Text>
               <HoverCardRoot openDelay={200}>
@@ -237,25 +235,12 @@ curl --request POST \
               href={
                 "https://docs.livepeer.org/api-reference/overview/introduction"
               }>
-              <Button
-                css={{
-                  mt: "$2",
-                  display: "flex",
-                  width: "fit-content",
-                  alignItems: "center",
-                }}>
+              <Button variant="outline" size="sm" className="mt-2">
                 Visit documentation <ArrowRightIcon />
               </Button>
             </Link>
-          </Promo>
-          <Grid
-            css={{
-              display: "grid",
-              width: "100%",
-              height: "100%",
-              gap: "$5",
-              gridTemplateColumns: "repeat(2, 1fr)",
-            }}>
+          </Box>
+          <Grid className="grid-cols-1 md:grid-cols-2 gap-5">
             {SDKs.map((sdk) => (
               <Box key={sdk.name}>
                 <Card key={sdk.name} {...sdk} />
@@ -284,15 +269,7 @@ const Card = ({
   link: string;
 }) => {
   return (
-    <Promo
-      css={{
-        width: "100%",
-        height: "100%",
-        boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}>
+    <Box className="w-full h-full flex bg-background flex-col justify-between p-4 rounded-lg border border-input">
       <Box>
         {icon ? (
           <Box>{icon}</Box>
@@ -307,16 +284,10 @@ const Card = ({
             height={26}
           />
         )}
-        <Text size={"4"} css={{ fontWeight: 500, mt: "$2" }}>
+        <Text size="lg" className="mt-2" weight="semibold">
           {name}
         </Text>
-        <Text
-          variant="neutral"
-          size="2"
-          css={{
-            mt: "$1",
-            mb: "$1",
-          }}>
+        <Text variant="neutral" size="sm" className="mt-1 mb-1">
           {description}
         </Text>
       </Box>
@@ -325,13 +296,7 @@ const Card = ({
         style={{
           textDecoration: "none",
         }}>
-        <Button
-          css={{
-            mt: "$2",
-            display: "flex",
-            width: "fit-content",
-            alignItems: "center",
-          }}>
+        <Button variant="outline" size="sm" className="mt-2">
           {action}{" "}
           <ArrowRightIcon
             style={{
@@ -340,7 +305,7 @@ const Card = ({
           />
         </Button>
       </Link>
-    </Promo>
+    </Box>
   );
 };
 
