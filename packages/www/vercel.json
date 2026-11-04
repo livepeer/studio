@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "public": true,
   "redirects": [
     {
       "source": "/changelog",
