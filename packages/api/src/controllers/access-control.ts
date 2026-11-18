@@ -247,9 +247,14 @@ app.post(
     if (
       playbackPolicyType !== "public" &&
       req.body.pub === req.config.accessControlAdminPubkey &&
+      req.config.accessControlAdminPubkey !== "" &&
+      req.config.accessControlAdminPubkey &&
       req.body.pub !== "" &&
       req.body.pub
     ) {
+      console.log(
+        `access-control: gate: allowing admin access for contentId=${content.id} playbackId=${playbackId}, user=${user.id} is admin, pubKey=${req.config.accessControlAdminPubkey} is adminPubKey`
+      );
       res.status(204);
       return res.end();
     }
