@@ -30,6 +30,7 @@ import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
 import {
   FieldsMap,
+  deleteAllOwnedObjects,
   makeNextHREF,
   parseFilters,
   parseOrder,
@@ -296,11 +297,9 @@ app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
     res.status(404);
     return res.json({ errors: ["Account not found"] });
   }
-  await db.user.delete(id);
 
-  // TODO: remove all streams owned by user
-  // TODO: remove all assets owned by user
-  // TODO: remove the stripe account
+  await db.user.markDeleted(id);
+  await deleteAllOwnedObjects(req, { userId: id, deleted: false });
 
   res.status(204);
   res.end();
