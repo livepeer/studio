@@ -43,13 +43,13 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: yarn install
-        run: yarn install --frozen-lockfile --silent
+        run: yarn install --frozen-lockfile --silent --ignore-engines
 
       - name: build api server
         # I want to do --parallel here, but the binary downloads conflict with each other
         run: |
           echo RELEASE_PATH="${GITHUB_WORKSPACE}/releases" >> "${GITHUB_ENV}"
-          yarn run esbuild
+          cd packages/api && yarn run esbuild
 
       - name: Rename and move built binaries
         run: |
