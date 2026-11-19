@@ -1,4 +1,5 @@
 import { Router } from "express";
+import sql from "sql-template-strings";
 import { db } from "../../store";
 import { validatePost } from "../../middleware";
 import { ethers } from "ethers";
@@ -180,7 +181,9 @@ app.get("/", async (req, res) => {
   const query = [];
   if (creator) {
     query.push(
-      `attestation.data->'message'->'attestations' @> '[{"role":"creator","address":"${creator}"}]'`,
+      sql`attestation.data->'message'->'attestations' @> ${JSON.stringify([
+        { role: "creator", address: creator },
+      ])}::jsonb`,
     );
   }
   const [output, newCursor] = await db.attestation.find(query, {
