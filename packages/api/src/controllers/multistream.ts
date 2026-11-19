@@ -1,4 +1,4 @@
-import { SQLStatement } from "sql-template-strings";
+import sql, { SQLStatement } from "sql-template-strings";
 import mung from "express-mung";
 
 import { authorizer } from "../middleware";
@@ -197,7 +197,9 @@ target.patch(
 async function triggerCatalystMultistreamUpdated(req: Request, id: string) {
   const query = [];
   query.push(
-    `stream.data->>'userId' = '${req.user.id}' AND stream.data->'multistream'->'targets' @> '[{"id":"${id}"}]'`,
+    sql`stream.data->>'userId' = ${req.user.id} AND stream.data->'multistream'->'targets' @> ${JSON.stringify(
+      [{ id }],
+    )}::jsonb`,
   );
   const [streams] = await db.stream.find(query, { limit: null });
 
