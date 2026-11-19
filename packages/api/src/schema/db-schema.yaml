@@ -1185,6 +1185,9 @@ components:
                     - background_mist
                     - fallback_external
                     - external
+                reencode:
+                  type: boolean
+                  default: false
         deleted:
           type: boolean
           description: Set to true when the task is deleted
@@ -1336,6 +1339,9 @@ components:
       properties:
         catalystPipelineStrategy:
           $ref: "#/components/schemas/task/properties/params/properties/upload/properties/catalystPipelineStrategy"
+        reencode:
+          type: boolean
+          default: false
     room:
       table: room
       properties:
