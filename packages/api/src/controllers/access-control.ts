@@ -81,7 +81,7 @@ async function fireGateWebhook(
 
   const startTime = process.hrtime();
   let resp: Response;
-  let respBody: string;
+  let respBody = "";
   let errorMessage: string;
   let statusCode: number;
   let bodyStatusCode: number;
