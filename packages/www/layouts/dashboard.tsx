@@ -1,14 +1,13 @@
-import { Box } from "@livepeer/design-system";
-import { withEmailVerifyMode } from "./withEmailVerifyMode";
-import Sidebar, { SidebarId } from "components/Sidebar";
-import Header from "components/Header";
-import FileUpload from "components/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
-import { getStripe, isExport } from "../lib/utils";
+import FileUpload from "components/FileUpload";
+import Header from "components/Header";
+import Sidebar, { SidebarId } from "components/Sidebar";
+import { Flex } from "components/ui/flex";
+import { NextSeo } from "next-seo";
 import Router from "next/router";
 import { useMemo } from "react";
-import Head from "next/head";
-import { NextSeo } from "next-seo";
+import { getStripe, isExport } from "../lib/utils";
+import { withEmailVerifyMode } from "./withEmailVerifyMode";
 
 // Track client-side page views with Segment & HubSpot
 if (!isExport() && process.env.NODE_ENV === "production") {
@@ -78,26 +77,23 @@ function DashboardLayout({
 
   return (
     <>
-      <Box className="dashboard">
+      <div className="flex min-w-0 min-h-0 flex-1 w-full h-full max-h-full">
         <Elements stripe={stripePromise}>
-          <Head>
-            <meta name="viewport" content="width=1023" />
-          </Head>
           {!isExport() && <NextSeo {...seo} />}
           <Sidebar id={id} />
-          <Box css={{ pl: 270, width: "100%" }}>
+          <div
+            style={{
+              margin: 25,
+            }}
+            className="border border-input  flex w-full min-w-0 flex-col max-h-auto h-auto bg-card rounded-md min-h-0 overflow-auto">
             <Header breadcrumbs={breadcrumbs} />
-            <Box
-              css={{
-                margin: "0 auto",
-                maxWidth: "1520px",
-              }}>
+            <div className="w-full flex flex-col mx-auto max-w-[1200px] h-full">
               {children}
-            </Box>
-          </Box>
+            </div>
+          </div>
           <FileUpload />
         </Elements>
-      </Box>
+      </div>
     </>
   );
 }

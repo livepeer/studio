@@ -4,7 +4,6 @@ import {
   Box,
   Grid,
   Heading,
-  Button,
   TextField,
   Label,
   AlertDialog,
@@ -13,6 +12,7 @@ import {
   AlertDialogCancel,
   Alert,
 } from "@livepeer/design-system";
+import { Button } from "components/ui/button";
 import Spinner from "components/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
@@ -116,7 +116,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       <Flex css={{ ai: "center" }}>
         <Button
-          size="2"
+          variant="secondary"
           onClick={() => {
             setOpen(true);
           }}>
@@ -336,22 +336,19 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
             <AlertDialogCancel asChild>
               <Button
-                size="2"
+                variant="outline"
                 onClick={() => {
                   setOpen(false);
-                }}
-                ghost>
+                }}>
                 Cancel
               </Button>
             </AlertDialogCancel>
             <Button
-              size="2"
               className="elements-style-background"
               type="submit"
               disabled={
                 !["initial", "succeeded", "error"].includes(status) || !stripe
-              }
-              variant="primary">
+              }>
               {status === "processing" && (
                 <Spinner
                   css={{

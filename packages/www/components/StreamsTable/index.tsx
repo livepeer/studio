@@ -23,12 +23,13 @@ import TableHeader from "../Table/components/TableHeader";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 import { useProjectContext } from "context/ProjectContext";
 import StreamFilter from "./StreamFilter";
-import { Flex } from "@livepeer/design-system";
+import { Flex } from "components/ui/flex";
 import TypeFilterCard from "components/TypeFilterCard";
 import {
   Filter,
   formatFilterItemFromQueryParam,
 } from "components/Table/filters";
+import { Grid } from "components/ui/grid";
 
 const filterCategory = ["All", "Active", "Unhealthy"];
 
@@ -193,20 +194,17 @@ const StreamsTable = ({
             </TableHeader>
             <>
               {!hideFilters && (
-                <Flex
-                  gap={4}
-                  css={{
-                    my: "$4",
-                  }}>
+                <Grid className="gap-4 my-4 grid-cols-1 md:grid-cols-3">
                   {filterCategory.map((category, index) => (
                     <TypeFilterCard
+                      key={category}
                       name={category}
                       value={state?.dataCount[index] || "0"}
                       isActive={filter === category}
                       handleClick={() => handleFilterType(category)}
                     />
                   ))}
-                </Flex>
+                </Grid>
               )}
               {!viewAll && filterItems && (
                 <StreamFilter

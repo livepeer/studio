@@ -1,5 +1,6 @@
 import { Box, Flex, Text } from "@livepeer/design-system";
 import { styled } from "@stitches/react";
+import { cn } from "lib/cn";
 import React from "react";
 
 export default function TypeFilterCard({
@@ -13,33 +14,13 @@ export default function TypeFilterCard({
   name: string;
   value: string;
 }) {
-  const StyledDiv = styled("div", {
-    paddingLeft: "$3",
-    paddingTop: "$2",
-    paddingBottom: "$2",
-    width: "20em",
-    border: "1px solid",
-    borderColor: isActive ? "$primary8" : "$neutral8",
-    borderRadius: "$3",
-    color: isActive ? "$primary8" : "$neutral8",
-    cursor: "default",
-    "&:hover": {
-      border: "1px solid",
-      borderColor: "$primary8",
-      color: "$primary8",
-      transition: "0.3s",
-    },
-    "& h4": {
-      color: isActive ? "$primary8" : "$primary12",
-    },
-    "&:hover h4": {
-      color: "$primary8",
-      transition: "0.3s",
-    },
-  });
-
   return (
-    <StyledDiv onClick={handleClick}>
+    <Box
+      className={cn(
+        "px-3 py-2 border border-accent rounded-md hover:bg-accent-foreground/10",
+        isActive && "border-primary",
+      )}
+      onClick={handleClick}>
       <Text
         css={{
           fontSize: "$3",
@@ -49,6 +30,6 @@ export default function TypeFilterCard({
         {name}
       </Text>
       <h4>{value}</h4>
-    </StyledDiv>
+    </Box>
   );
 }

@@ -1,16 +1,15 @@
 import {
   Box,
-  Heading,
   Badge,
   Flex,
-  Grid,
   Link as A,
-  Text,
   styled,
   Skeleton,
-  Tooltip,
 } from "@livepeer/design-system";
+import { Grid } from "components/ui/grid";
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "components/ui/tooltip";
+import { Text } from "components/ui/text";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../public/img/icons/upcoming.svg";
 import { useCallback, useEffect, useState } from "react";
@@ -37,17 +36,7 @@ export interface OverUsageItem {
 
 export const UsageCard = ({ title, usage, limit, loading = false }) => {
   return (
-    <Box
-      css={{
-        px: "$5",
-        py: "$4",
-        boxShadow: "0 0 0 1px $colors$neutral6",
-        borderRadius: "$1",
-        backgroundColor: "$neutral2",
-        color: "$hiContrast",
-        mb: "$6",
-        minHeight: 92,
-      }}>
+    <Box className="px-5 py-4 bg-card text-card-foreground mb-6 min-h-24 rounded-md flex flex-col gap-3">
       {loading ? (
         <Box
           css={{
@@ -61,9 +50,9 @@ export const UsageCard = ({ title, usage, limit, loading = false }) => {
       ) : (
         <>
           <Flex align="center">
-            <Box css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
+            <Text css={{ mb: "$2", mr: "$3", color: "$hiContrast" }}>
               {title}
-            </Box>
+            </Text>
           </Flex>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
@@ -216,6 +205,7 @@ const UsageSummary = () => {
   return (
     <>
       <Flex
+        className="gap-2"
         justify="between"
         align="end"
         css={{
@@ -225,43 +215,35 @@ const UsageSummary = () => {
           mb: "$5",
           width: "100%",
         }}>
-        <Heading size="2">
-          <Flex>
-            <Box
-              css={{
-                mr: "$3",
-                fontWeight: 600,
-                letterSpacing: "0",
-              }}>
-              Usage
-            </Box>
-            <Flex align="center" css={{ mr: "$3" }}>
-              <Tooltip
-                multiline
-                // @ts-ignore
-                content={
-                  <Box>
-                    Usage minutes may take up to an hour to be reflected.
-                  </Box>
-                }>
+        <Flex>
+          <Text className="mr-3" size="lg" weight="medium">
+            Usage
+          </Text>
+          <Flex align="center" css={{ mr: "$3" }}>
+            <Tooltip>
+              <TooltipTrigger>
                 <Help />
-              </Tooltip>
-            </Flex>
-            <Badge
-              size="1"
-              variant="neutral"
-              css={{ letterSpacing: 0, mt: "7px" }}>
-              {user?.stripeProductId
-                ? products[user.stripeProductId]?.name
-                : products["prod_O9XuIjn7EqYRVW"].name}{" "}
-              Plan
-            </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                Usage minutes may take up to an hour to be reflected.
+              </TooltipContent>
+            </Tooltip>
           </Flex>
-        </Heading>
-        <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
+          <Badge
+            size="1"
+            variant="neutral"
+            css={{ letterSpacing: 0, mt: "7px" }}>
+            {user?.stripeProductId
+              ? products[user.stripeProductId]?.name
+              : products["prod_O9XuIjn7EqYRVW"].name}{" "}
+            Plan
+          </Badge>
+        </Flex>
+
+        <Text size="sm" variant="neutral">
           Current billing period (
           {subscription && (
-            <Flex>
+            <span>
               {new Date(
                 subscription.current_period_start * 1000,
               ).toLocaleDateString("en-US", {
@@ -275,12 +257,12 @@ const UsageSummary = () => {
                 month: "short",
                 day: "numeric",
               })}{" "}
-            </Flex>
+            </span>
           )}
           )
-        </Flex>
+        </Text>
       </Flex>
-      <Grid gap="4" columns="3">
+      <Grid className="grid-cols-1 md:grid-cols-3 gap-2">
         <UsageCard
           title="Transcoding minutes"
           loading={!usage}

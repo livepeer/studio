@@ -20,6 +20,7 @@ import { useApi } from "hooks";
 import Spinner from "../Spinner";
 import moment from "moment";
 import ClipButton from "../Clipping/ClipButton";
+import { Card } from "components/ui/card";
 
 const StyledIpfsIcon = styled(IpfsIcon, {
   color: "$gray",
@@ -134,7 +135,7 @@ const AssetOverviewTab = ({
             may also archive them using the following storage providers.
           </Text>
         </Box>
-        <Promo size="2" css={{ borderRadius: "$2" }}>
+        <Card className="p-4">
           <Flex css={{ justifyContent: "space-between" }}>
             <Flex align="center">
               <StyledIpfsIcon />
@@ -206,7 +207,7 @@ const AssetOverviewTab = ({
               </Flex>
             </Box>
           )}
-        </Promo>
+        </Card>
       </Box>
     </>
   );

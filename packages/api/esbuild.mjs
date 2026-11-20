@@ -11,7 +11,7 @@ async function getFiles(dir) {
     dirents.map((dirent) => {
       const res = resolve(dir, dirent.name);
       return dirent.isDirectory() ? getFiles(res) : res;
-    }),
+    })
   );
   return Array.prototype.concat(...files).filter((f) => !f.includes("cache"));
 }
@@ -46,7 +46,7 @@ let frontendBundlePlugin = {
           loader: "js",
           resolveDir: resolve(args.resolveDir, args.path),
         };
-      },
+      }
     );
 
     // Any files from the static-build directory should be bundled as binary
