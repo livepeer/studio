@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --color-border: 240 5% 80%;
+    --color-border: 240 5% 90%;
     --color-background: 0 0% 98%;
     --color-foreground: 0 0% 10%;
     --color-muted: 249 4% 44%;
