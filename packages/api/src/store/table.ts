@@ -251,7 +251,11 @@ export default class Table<T extends DBObject> {
     }
 
     if (res.rowCount < 1 && throwIfEmpty) {
-      throw new NotFoundError(`${this.name} id=${doc.id} not found`);
+      // When query is an array of SQL conditions, doc may not contain an id.
+      // Fall back to a generic message to avoid misleading "id=undefined" errors.
+      const idHint =
+        typeof query === "string" ? query : (doc as any).id ?? "(unknown)";
+      throw new NotFoundError(`${this.name} id=${idHint} not found`);
     }
     return res;
   }
